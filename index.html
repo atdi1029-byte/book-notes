@@ -267,9 +267,24 @@
 
 <script>
   var KEY = 'books_read';
+  // Paste your deployed Apps Script web app URL here:
+  var SYNC_URL = 'https://script.google.com/macros/s/AKfycbwt438APIycBc534W6T66O3IgtxLUU9cczw-PZAN6Mc9p2xfU2ySsND_wEMJDHUvrXyUg/exec';
 
   function getRead() {
     try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch(e) { return {}; }
+  }
+
+  function saveRead(read) {
+    localStorage.setItem(KEY, JSON.stringify(read));
+  }
+
+  async function fireGet(url) {
+    try {
+      var resp = await fetch(url);
+      return await resp.json();
+    } catch(e) {
+      return { status: 'error', message: e.message };
+    }
   }
 
   function toggleRead(e, id) {
@@ -277,8 +292,12 @@
     e.stopPropagation();
     var read = getRead();
     if (read[id]) { delete read[id]; } else { read[id] = true; }
-    localStorage.setItem(KEY, JSON.stringify(read));
+    saveRead(read);
     render();
+    // Sync to backend (fire and forget)
+    if (SYNC_URL && SYNC_URL !== 'YOUR_APPS_SCRIPT_URL_HERE') {
+      fireGet(SYNC_URL + '?action=set_read&data=' + encodeURIComponent(JSON.stringify(read)));
+    }
   }
 
   function render() {
@@ -297,7 +316,28 @@
     });
   }
 
+  // Initial render from localStorage (instant)
   render();
+
+  // Sync from backend on load
+  (async function() {
+    if (!SYNC_URL || SYNC_URL === 'YOUR_APPS_SCRIPT_URL_HERE') return;
+    try {
+      var data = await fireGet(SYNC_URL + '?action=get_read');
+      if (data.status === 'ok' && data.books_read) {
+        var remote = data.books_read;
+        var local = getRead();
+        // Merge: backend wins (overwrite local with remote)
+        var merged = Object.assign({}, local, remote);
+        // Remove keys that are in local but explicitly absent in remote
+        Object.keys(merged).forEach(function(k) {
+          if (!remote[k]) delete merged[k];
+        });
+        saveRead(merged);
+        render();
+      }
+    } catch(e) { /* offline — localStorage is fine */ }
+  })();
 </script>
 
 </body>
