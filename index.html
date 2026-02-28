@@ -195,6 +195,25 @@
     margin-top: 0;
   }
 
+  .filter-btn {
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.25);
+    color: #fff;
+    padding: 0.35rem 1rem;
+    border-radius: 20px;
+    cursor: pointer;
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 0.85rem;
+    transition: background 0.2s, border-color 0.2s;
+  }
+  .filter-btn:hover { background: rgba(255,255,255,0.2); }
+  .filter-btn.active {
+    background: rgba(58,158,74,0.5);
+    border-color: rgba(58,158,74,0.8);
+  }
+
+  .book.hidden-read { display: none; }
+
   @media (max-width: 600px) {
     .bg { background-size: auto 100%; background-position: center center; }
     .content { padding: 1.2rem; }
@@ -210,7 +229,9 @@
 
 <div class="content">
   <h1>Book Notes</h1>
-  <p class="subtitle">Personal library of summaries &amp; detailed notes</p>
+  <p class="subtitle">Personal library of summaries &amp; detailed notes
+    <button class="filter-btn" id="filterUnread" onclick="toggleFilter()">Unread</button>
+  </p>
 
   <h2 class="section-title">Personal Finance</h2>
   <div class="shelf">
@@ -267,6 +288,7 @@
 
 <script>
   var KEY = 'books_read';
+  var filtering = false;
   // Paste your deployed Apps Script web app URL here:
   var SYNC_URL = 'https://script.google.com/macros/s/AKfycbwt438APIycBc534W6T66O3IgtxLUU9cczw-PZAN6Mc9p2xfU2ySsND_wEMJDHUvrXyUg/exec';
 
@@ -300,6 +322,12 @@
     }
   }
 
+  function toggleFilter() {
+    filtering = !filtering;
+    document.getElementById('filterUnread').classList.toggle('active', filtering);
+    render();
+  }
+
   function render() {
     var read = getRead();
     document.querySelectorAll('.book').forEach(function(el) {
@@ -309,9 +337,11 @@
       if (read[id]) {
         badge.classList.add('show');
         btn.classList.add('hide');
+        el.classList.toggle('hidden-read', filtering);
       } else {
         badge.classList.remove('show');
         btn.classList.remove('hide');
+        el.classList.remove('hidden-read');
       }
     });
   }
