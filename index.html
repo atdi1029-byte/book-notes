@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="theme-color" content="#1c1008">
+<meta name="theme-color" content="#0e0804">
 <link rel="apple-touch-icon" href="icon.png">
 <link rel="manifest" href="manifest.json">
 <title>Book Notes</title>
@@ -13,78 +13,132 @@
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
   body {
-    background: #1c1008;
-    color: #d4c4a8;
+    background: #0e0804;
+    color: #e8dcc8;
     font-family: Georgia, 'Times New Roman', serif;
     line-height: 1.7;
-    padding: 2rem 1.5rem;
+    min-height: 100vh;
+  }
+
+  .bg {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: url('bg.jpg') center/cover no-repeat;
+    z-index: 0;
+  }
+
+  .fade {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: linear-gradient(
+      to bottom,
+      rgba(14,8,4,0.1) 0%,
+      rgba(14,8,4,0.4) 60%,
+      rgba(14,8,4,0.7) 100%
+    );
+    z-index: 0;
+  }
+
+  .content {
+    position: relative;
+    z-index: 1;
+    padding: 2.5rem 1.5rem;
     max-width: 960px;
     margin: 0 auto;
   }
 
   h1 {
-    font-size: 2rem;
-    color: #e8c878;
-    margin-bottom: 0.5rem;
+    font-size: 2.2rem;
+    color: #f0d890;
+    margin-bottom: 0.3rem;
+    text-shadow: 0 2px 12px rgba(200,150,50,0.2);
   }
 
   .subtitle {
-    color: #8a7a60;
+    color: #9a8a6a;
     font-size: 1rem;
     font-style: italic;
-    margin-bottom: 2rem;
+    margin-bottom: 2.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid rgba(180,140,80,0.15);
   }
 
   .shelf {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 1.5rem;
+    gap: 1.8rem;
   }
 
   .book {
     display: block;
     text-decoration: none;
-    color: #d4c4a8;
-    transition: transform 0.2s;
+    color: #e8dcc8;
+    transition: transform 0.25s ease;
     position: relative;
   }
 
   .book:hover {
-    transform: translateY(-4px);
+    transform: translateY(-6px);
   }
 
   .cover-wrap {
     position: relative;
+    border-radius: 4px 8px 8px 4px;
+    overflow: hidden;
+  }
+
+  .cover-wrap::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 6px;
+    background: linear-gradient(to right, rgba(0,0,0,0.5), rgba(80,50,20,0.3), transparent);
+    z-index: 1;
+  }
+
+  .cover-wrap::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 4px 8px 8px 4px;
+    box-shadow: inset 0 0 20px rgba(0,0,0,0.3);
+    pointer-events: none;
+    z-index: 1;
   }
 
   .book-cover {
     width: 100%;
     aspect-ratio: 2 / 3;
     object-fit: cover;
-    border-radius: 6px;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.5);
-    transition: box-shadow 0.2s;
+    display: block;
+    transition: box-shadow 0.25s ease;
+    box-shadow:
+      2px 4px 12px rgba(0,0,0,0.6),
+      6px 8px 24px rgba(0,0,0,0.3);
   }
 
   .book:hover .book-cover {
-    box-shadow: 0 8px 24px rgba(0,0,0,0.7);
+    box-shadow:
+      2px 4px 16px rgba(0,0,0,0.7),
+      8px 12px 32px rgba(0,0,0,0.4),
+      0 0 40px rgba(180,120,40,0.1);
   }
 
   .read-badge {
     position: absolute;
-    top: 8px;
-    right: 8px;
-    width: 28px;
-    height: 28px;
-    background: #2ecc40;
+    top: 10px;
+    right: 10px;
+    width: 30px;
+    height: 30px;
+    background: linear-gradient(135deg, #3a9e4a, #2a8538);
     border-radius: 50%;
     display: none;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.5);
     cursor: pointer;
-    z-index: 2;
-    border: none;
+    z-index: 3;
+    border: 2px solid rgba(255,255,255,0.2);
     padding: 0;
   }
 
@@ -98,60 +152,66 @@
 
   .mark-read {
     position: absolute;
-    top: 8px;
-    right: 8px;
-    width: 28px;
-    height: 28px;
-    background: rgba(0,0,0,0.5);
-    border: 2px solid rgba(212,196,168,0.4);
+    top: 10px;
+    right: 10px;
+    width: 30px;
+    height: 30px;
+    background: rgba(0,0,0,0.4);
+    border: 2px solid rgba(232,220,200,0.35);
     border-radius: 50%;
     cursor: pointer;
-    z-index: 2;
+    z-index: 3;
     padding: 0;
+    backdrop-filter: blur(4px);
   }
 
   .mark-read.hide { display: none; }
 
   .book-title {
     font-size: 0.95rem;
-    color: #e8c878;
+    color: #f0d890;
     font-weight: 700;
-    margin-top: 0.6rem;
+    margin-top: 0.75rem;
     line-height: 1.3;
   }
 
   .book-author {
     font-size: 0.8rem;
-    color: #8a7a60;
+    color: #9a8a6a;
     margin-top: 0.15rem;
   }
 
   @media (max-width: 600px) {
-    body { padding: 1rem; }
-    h1 { font-size: 1.5rem; }
-    .shelf { grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+    .content { padding: 1.2rem; }
+    h1 { font-size: 1.6rem; }
+    .shelf { grid-template-columns: repeat(2, 1fr); gap: 1.2rem; }
   }
 </style>
 </head>
 <body>
 
-<h1>Book Notes</h1>
-<p class="subtitle">Personal library of summaries &amp; detailed notes</p>
+<div class="bg"></div>
+<div class="fade"></div>
 
-<div class="shelf">
+<div class="content">
+  <h1>Book Notes</h1>
+  <p class="subtitle">Personal library of summaries &amp; detailed notes</p>
 
-  <a class="book" href="Personal_Finance_For_Dummies/index.html" data-book="personal-finance">
-    <div class="cover-wrap">
-      <img class="book-cover" src="Personal_Finance_For_Dummies/cover.jpg" alt="Personal Finance For Dummies">
-      <button class="mark-read" onclick="toggleRead(event,'personal-finance')" title="Mark as read"></button>
-      <button class="read-badge" onclick="toggleRead(event,'personal-finance')" title="Read! Click to unmark">
-        <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
-      </button>
-    </div>
-    <div class="book-title">Personal Finance For Dummies</div>
-    <div class="book-author">Eric Tyson</div>
-  </a>
+  <div class="shelf">
 
+    <a class="book" href="Personal_Finance_For_Dummies/index.html" data-book="personal-finance">
+      <div class="cover-wrap">
+        <img class="book-cover" src="Personal_Finance_For_Dummies/cover.jpg" alt="Personal Finance For Dummies">
+        <button class="mark-read" onclick="toggleRead(event,'personal-finance')" title="Mark as read"></button>
+        <button class="read-badge" onclick="toggleRead(event,'personal-finance')" title="Read! Click to unmark">
+          <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+        </button>
+      </div>
+      <div class="book-title">Personal Finance For Dummies</div>
+      <div class="book-author">Eric Tyson</div>
+    </a>
+
+  </div>
 </div>
 
 <script>
