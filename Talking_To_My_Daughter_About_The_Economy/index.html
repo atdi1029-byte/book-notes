@@ -197,6 +197,81 @@
     color: #5a4a30;
   }
 
+  /* Bookmark feature */
+  .bookmark-bar {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: #6b8f8b;
+    color: #fff;
+    padding: 0.5rem 1rem;
+    margin: -2rem -1.5rem 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.9rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    cursor: pointer;
+    font-family: Georgia, 'Times New Roman', serif;
+  }
+
+  .bookmark-bar:hover { background: #5a7d79; }
+
+  .bookmark-bar .bm-label { flex: 1; }
+  .bookmark-bar .bm-clear {
+    background: none;
+    border: 1px solid rgba(255,255,255,0.4);
+    color: #fff;
+    padding: 0.15rem 0.5rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    margin-left: 0.75rem;
+    font-family: inherit;
+  }
+  .bookmark-bar .bm-clear:hover { background: rgba(255,255,255,0.15); }
+
+  .bm-btn {
+    display: inline-block;
+    cursor: pointer;
+    font-size: 0.75rem;
+    opacity: 0.35;
+    margin-left: 0.5rem;
+    vertical-align: middle;
+    transition: opacity 0.2s, transform 0.2s;
+    user-select: none;
+  }
+  .bm-btn:hover { opacity: 0.7; transform: scale(1.2); }
+  .bm-btn.active { opacity: 1; color: #c5a55a; }
+
+  .bm-toast {
+    position: fixed;
+    bottom: 1.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #3a2e1e;
+    color: #f4efe8;
+    padding: 0.5rem 1.25rem;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    z-index: 200;
+    opacity: 0;
+    transition: opacity 0.3s;
+    pointer-events: none;
+    font-family: Georgia, 'Times New Roman', serif;
+  }
+  .bm-toast.show { opacity: 1; }
+
+  .progress-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 3px;
+    background: #c5a55a;
+    z-index: 101;
+    transition: width 0.1s;
+  }
+
   @media (max-width: 600px) {
     body { padding: 1rem; font-size: 0.95rem; }
     h1 { font-size: 1.5rem; }
@@ -204,6 +279,7 @@
     table { font-size: 0.85rem; }
     th, td { padding: 0.4rem 0.5rem; }
     .toc ol { columns: 1; }
+    .bookmark-bar { margin: -1rem -1rem 1rem; padding: 0.4rem 0.75rem; }
   }
 </style>
 </head>
@@ -708,6 +784,83 @@
   <li>We&rsquo;d rather have imperfect real experience than perfect simulated experience</li>
   <li>Final message to Xenia: the most important thing is maintaining the escape hatch &mdash; the ability to choose reality, to shape the world rather than be shaped by an algorithm or a market</li>
 </ul>
+
+<div class="progress-bar" id="progressBar"></div>
+<div class="bm-toast" id="bmToast"></div>
+
+<script>
+(function() {
+  var BOOK_KEY = 'book_bm_talking_daughter';
+
+  // Add bookmark buttons to all h2/h3 with id
+  document.querySelectorAll('h2[id], h3[id]').forEach(function(h) {
+    if (h.closest('.toc')) return;
+    var btn = document.createElement('span');
+    btn.className = 'bm-btn';
+    btn.textContent = '\u{1F516}';
+    btn.title = 'Bookmark this section';
+    btn.setAttribute('data-target', h.id);
+    btn.addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      setBookmark(h.id, h.textContent.replace('\u{1F516}', '').trim());
+    });
+    h.appendChild(btn);
+  });
+
+  function setBookmark(id, label) {
+    localStorage.setItem(BOOK_KEY, JSON.stringify({ id: id, label: label }));
+    renderBar();
+    highlightBtn(id);
+    showToast('Bookmarked: ' + label);
+  }
+
+  function getBookmark() {
+    try { return JSON.parse(localStorage.getItem(BOOK_KEY)); } catch(e) { return null; }
+  }
+
+  function renderBar() {
+    var bm = getBookmark();
+    var existing = document.getElementById('bmBar');
+    if (existing) existing.remove();
+    if (!bm) return;
+    var bar = document.createElement('div');
+    bar.className = 'bookmark-bar';
+    bar.id = 'bmBar';
+    bar.innerHTML = '<span class="bm-label">\u{1F516} Continue: <strong>' + bm.label + '</strong></span>' +
+      '<button class="bm-clear" onclick="event.stopPropagation();localStorage.removeItem(\'' + BOOK_KEY + '\');this.parentElement.remove();document.querySelectorAll(\'.bm-btn\').forEach(function(b){b.classList.remove(\'active\')})">Clear</button>';
+    bar.addEventListener('click', function() {
+      var el = document.getElementById(bm.id);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+    document.body.prepend(bar);
+    highlightBtn(bm.id);
+  }
+
+  function highlightBtn(activeId) {
+    document.querySelectorAll('.bm-btn').forEach(function(b) {
+      b.classList.toggle('active', b.getAttribute('data-target') === activeId);
+    });
+  }
+
+  function showToast(msg) {
+    var t = document.getElementById('bmToast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(function() { t.classList.remove('show'); }, 1500);
+  }
+
+  // Progress bar
+  window.addEventListener('scroll', function() {
+    var h = document.documentElement.scrollHeight - window.innerHeight;
+    var pct = h > 0 ? (window.scrollY / h) * 100 : 0;
+    document.getElementById('progressBar').style.width = pct + '%';
+  });
+
+  // Init
+  renderBar();
+})();
+</script>
 
 </body>
 </html>
