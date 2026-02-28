@@ -46,10 +46,15 @@
     text-decoration: none;
     color: #e0e0e0;
     transition: transform 0.2s;
+    position: relative;
   }
 
   .book:hover {
     transform: translateY(-4px);
+  }
+
+  .cover-wrap {
+    position: relative;
   }
 
   .book-cover {
@@ -64,6 +69,48 @@
   .book:hover .book-cover {
     box-shadow: 0 8px 24px rgba(0,0,0,0.6);
   }
+
+  .read-badge {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 28px;
+    height: 28px;
+    background: #2ecc40;
+    border-radius: 50%;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+    cursor: pointer;
+    z-index: 2;
+    border: none;
+    padding: 0;
+  }
+
+  .read-badge svg {
+    width: 16px;
+    height: 16px;
+    fill: white;
+  }
+
+  .read-badge.show { display: flex; }
+
+  .mark-read {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 28px;
+    height: 28px;
+    background: rgba(0,0,0,0.5);
+    border: 2px solid rgba(255,255,255,0.4);
+    border-radius: 50%;
+    cursor: pointer;
+    z-index: 2;
+    padding: 0;
+  }
+
+  .mark-read.hide { display: none; }
 
   .book-title {
     font-size: 0.95rem;
@@ -93,13 +140,54 @@
 
 <div class="shelf">
 
-  <a class="book" href="Personal_Finance_For_Dummies/index.html">
-    <img class="book-cover" src="Personal_Finance_For_Dummies/cover.jpg" alt="Personal Finance For Dummies">
+  <a class="book" href="Personal_Finance_For_Dummies/index.html" data-book="personal-finance">
+    <div class="cover-wrap">
+      <img class="book-cover" src="Personal_Finance_For_Dummies/cover.jpg" alt="Personal Finance For Dummies">
+      <button class="mark-read" onclick="toggleRead(event,'personal-finance')" title="Mark as read"></button>
+      <button class="read-badge" onclick="toggleRead(event,'personal-finance')" title="Read! Click to unmark">
+        <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+      </button>
+    </div>
     <div class="book-title">Personal Finance For Dummies</div>
     <div class="book-author">Eric Tyson</div>
   </a>
 
 </div>
+
+<script>
+  var KEY = 'books_read';
+
+  function getRead() {
+    try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch(e) { return {}; }
+  }
+
+  function toggleRead(e, id) {
+    e.preventDefault();
+    e.stopPropagation();
+    var read = getRead();
+    if (read[id]) { delete read[id]; } else { read[id] = true; }
+    localStorage.setItem(KEY, JSON.stringify(read));
+    render();
+  }
+
+  function render() {
+    var read = getRead();
+    document.querySelectorAll('.book').forEach(function(el) {
+      var id = el.dataset.book;
+      var badge = el.querySelector('.read-badge');
+      var btn = el.querySelector('.mark-read');
+      if (read[id]) {
+        badge.classList.add('show');
+        btn.classList.add('hide');
+      } else {
+        badge.classList.remove('show');
+        btn.classList.remove('hide');
+      }
+    });
+  }
+
+  render();
+</script>
 
 </body>
 </html>
