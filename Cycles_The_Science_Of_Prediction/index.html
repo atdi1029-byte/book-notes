@@ -1,0 +1,1016 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#f4efe8">
+<title>Cycles: The Science of Prediction - Notes</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html {
+    background: #2a1f14;
+    background-image: url('../bg.jpg');
+    background-size: cover;
+    background-attachment: fixed;
+    background-position: center;
+  }
+
+  body {
+    background: #f4efe8;
+    color: #3a2e1e;
+    font-family: Georgia, 'Times New Roman', serif;
+    line-height: 1.7;
+    padding: 2rem 1.5rem;
+    max-width: 820px;
+    margin: 0 auto;
+    box-shadow: 0 0 40px rgba(0,0,0,0.3);
+    min-height: 100vh;
+  }
+
+  h1 {
+    font-size: 2rem;
+    color: #5a3e1a;
+    margin-bottom: 0.25rem;
+    line-height: 1.3;
+  }
+
+  .subtitle {
+    color: #8a7a60;
+    font-size: 1rem;
+    margin-bottom: 2rem;
+    font-style: italic;
+  }
+
+  h2 {
+    font-size: 1.5rem;
+    color: #5a3e1a;
+    margin-top: 2.5rem;
+    margin-bottom: 0.75rem;
+    border-bottom: 2px solid #c5a55a;
+    padding-bottom: 0.4rem;
+  }
+
+  h3 {
+    font-size: 1.2rem;
+    color: #6b8f8b;
+    margin-top: 1.8rem;
+    margin-bottom: 0.5rem;
+  }
+
+  h4 {
+    font-size: 1.05rem;
+    color: #7a6530;
+    margin-top: 1.4rem;
+    margin-bottom: 0.4rem;
+  }
+
+  p { margin-bottom: 0.8rem; }
+
+  strong { color: #5a3e1a; }
+
+  ol, ul {
+    margin: 0.5rem 0 1rem 1.5rem;
+  }
+
+  li { margin-bottom: 0.4rem; }
+
+  hr {
+    border: none;
+    border-top: 1px solid #d4c8b0;
+    margin: 2.5rem 0;
+  }
+
+  .toc {
+    background: #e8e0d0;
+    border: 1px solid #d4c8b0;
+    border-radius: 6px;
+    padding: 1.25rem 1.5rem;
+    margin: 1.5rem 0 2rem;
+  }
+
+  .toc h2 {
+    margin-top: 0;
+    border: none;
+    padding: 0;
+    font-size: 1.2rem;
+  }
+
+  .toc ol {
+    margin-bottom: 0;
+    columns: 2;
+    column-gap: 2rem;
+  }
+
+  .toc li { font-size: 0.9rem; break-inside: avoid; }
+
+  .toc a {
+    color: #4a7872;
+    text-decoration: none;
+  }
+
+  .toc a:hover { text-decoration: underline; }
+
+  a { color: #4a7872; }
+
+  .summary-section {
+    background: #e8e0d0;
+    border-left: 4px solid #c5a55a;
+    padding: 1.5rem;
+    border-radius: 0 6px 6px 0;
+    margin: 1.5rem 0;
+  }
+
+  .summary-section ol { margin-left: 1.25rem; }
+  .summary-section li { margin-bottom: 0.6rem; }
+
+  .contrarian {
+    background: #e0ece9;
+    border-left: 4px solid #6b8f8b;
+    padding: 1.25rem 1.5rem;
+    border-radius: 0 6px 6px 0;
+    margin: 1.5rem 0;
+  }
+
+  .contrarian strong { color: #4a7872; }
+
+  .chapter-header {
+    color: #5a3e1a;
+    font-size: 1.3rem;
+    margin-top: 3rem;
+    margin-bottom: 0.3rem;
+    padding-bottom: 0.4rem;
+    border-bottom: 2px solid #c5a55a;
+  }
+
+  .key-number {
+    display: inline-block;
+    background: #c5a55a;
+    color: #fff;
+    font-weight: 700;
+    padding: 0 0.4rem;
+    border-radius: 3px;
+    font-size: 0.9em;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0 1.5rem;
+    font-size: 0.95rem;
+  }
+
+  th {
+    background: #6b8f8b;
+    color: #fff;
+    text-align: left;
+    padding: 0.6rem 0.75rem;
+    border-bottom: 2px solid #5a7d79;
+    font-weight: 600;
+  }
+
+  td {
+    padding: 0.5rem 0.75rem;
+    border-bottom: 1px solid #d4c8b0;
+  }
+
+  tr:hover td { background: #ece5d8; }
+
+  .proposals {
+    background: #e8e0d0;
+    border-left: 4px solid #c5a55a;
+    padding: 1.25rem 1.5rem;
+    border-radius: 0 6px 6px 0;
+    margin: 1.5rem 0;
+  }
+
+  .proposals li { margin-bottom: 0.5rem; }
+
+  blockquote {
+    border-left: 3px solid #c5a55a;
+    margin: 1rem 0;
+    padding: 0.5rem 1rem;
+    background: #ede7da;
+    font-style: italic;
+    color: #5a4a30;
+  }
+
+  .bookmark-bar {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: #6b8f8b;
+    color: #fff;
+    padding: 0.5rem 1rem;
+    margin: -2rem -1.5rem 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.9rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    cursor: pointer;
+    font-family: Georgia, 'Times New Roman', serif;
+  }
+
+  .bookmark-bar:hover { background: #5a7d79; }
+
+  .bookmark-bar .bm-label { flex: 1; }
+  .bookmark-bar .bm-clear {
+    background: none;
+    border: 1px solid rgba(255,255,255,0.4);
+    color: #fff;
+    padding: 0.15rem 0.5rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    margin-left: 0.75rem;
+    font-family: inherit;
+  }
+  .bookmark-bar .bm-clear:hover { background: rgba(255,255,255,0.15); }
+
+  .bm-btn {
+    display: inline-block;
+    cursor: pointer;
+    font-size: 0.75rem;
+    opacity: 0;
+    margin-left: 0.5rem;
+    vertical-align: middle;
+    transition: opacity 0.2s, transform 0.2s;
+    user-select: none;
+  }
+  h2:hover .bm-btn, h3:hover .bm-btn { opacity: 0.5; }
+  .bm-btn:hover { opacity: 0.8 !important; transform: scale(1.2); }
+  .bm-btn.active { opacity: 1 !important; color: #c5a55a; }
+
+  .bm-toast {
+    position: fixed;
+    bottom: 1.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #3a2e1e;
+    color: #f4efe8;
+    padding: 0.5rem 1.25rem;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    z-index: 200;
+    opacity: 0;
+    transition: opacity 0.3s;
+    pointer-events: none;
+    font-family: Georgia, 'Times New Roman', serif;
+  }
+  .bm-toast.show { opacity: 1; }
+
+  .progress-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 3px;
+    background: #c5a55a;
+    z-index: 101;
+    transition: width 0.1s;
+  }
+
+  @media (max-width: 600px) {
+    body { padding: 1rem; font-size: 0.95rem; }
+    h1 { font-size: 1.5rem; }
+    h2 { font-size: 1.25rem; }
+    table { font-size: 0.85rem; }
+    th, td { padding: 0.4rem 0.5rem; }
+    .toc ol { columns: 1; }
+    .bookmark-bar { margin: -1rem -1rem 1rem; padding: 0.4rem 0.75rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none" onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear" onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+
+<h1>Cycles: The Science of Prediction</h1>
+<p class="subtitle">By Edward R. Dewey &amp; Edwin F. Dakin &middot; 1947 &middot; 16 Chapters + 3 Appendices &middot; ~255 pages</p>
+
+<!-- TABLE OF CONTENTS -->
+<nav class="toc">
+<h2>Contents</h2>
+<ol>
+  <li><a href="#key-takeaways">Key Takeaways</a></li>
+  <li><a href="#four-rhythms">The Four Major Economic Rhythms</a></li>
+  <li><a href="#contrarian">Contrarian Ideas</a></li>
+  <li><a href="#proposals">Author's Key Proposals</a></li>
+  <li><a href="#allegories">Allegories &amp; Cultural References</a></li>
+  <li><a href="#thinkers">Books &amp; Thinkers Referenced</a></li>
+  <li><a href="#ch-intro">Intro: Concerning Economic Prediction</a></li>
+  <li><a href="#ch1">I. Why Trends Are Important</a></li>
+  <li><a href="#ch2">II. Patterns in Growth of Organisms</a></li>
+  <li><a href="#ch3">III. Growth Trend in Basic Industries</a></li>
+  <li><a href="#ch4">IV. Trends in Some Other Industries</a></li>
+  <li><a href="#ch5">V. Rhythmic Cycles in Natural Phenomena</a></li>
+  <li><a href="#ch6">VI. The 54-Year Rhythm</a></li>
+  <li><a href="#ch7">VII. The 9-Year Rhythm</a></li>
+  <li><a href="#ch8">VIII. The 3&frac12;-Year Rhythm</a></li>
+  <li><a href="#ch9">IX. The 18-Year Rhythm</a></li>
+  <li><a href="#ch10">X. Causes, Correlations, Conjectures</a></li>
+  <li><a href="#ch11">XI. Analysis and Synthesis</a></li>
+  <li><a href="#ch12">XII. Timing a Business</a></li>
+  <li><a href="#ch13">XIII. Avoiding Some Economic Illusions</a></li>
+  <li><a href="#ch14">XIV. War and Its Dislocations</a></li>
+  <li><a href="#ch15">XV. Postwar Trends</a></li>
+  <li><a href="#ch16">XVI. Postwar Rhythms</a></li>
+  <li><a href="#app1">Appendix I: The Ratio Scale</a></li>
+  <li><a href="#app2">Appendix II: Moving Averages</a></li>
+  <li><a href="#app3">Appendix III: Section Moving Average</a></li>
+</ol>
+</nav>
+
+<!-- KEY TAKEAWAYS -->
+<h2 id="key-takeaways">Key Takeaways</h2>
+<div class="summary-section">
+<ol>
+  <li><strong>Rhythmic cycles permeate all economic and natural phenomena.</strong> Business cycles are not random &mdash; they follow identifiable rhythmic patterns that repeat with enough regularity to be used for prediction.</li>
+  <li><strong>Four major economic rhythms form an &ldquo;economic clock&rdquo;:</strong> the 54-year Kondratieff wave (wholesale prices, innovation epochs), the 18&frac13;-year building/real estate cycle, the 9-year Juglar cycle (prices, stocks, industrial production), and the 3&frac12;-year Kitchin cycle (business activity, stock prices).</li>
+  <li><strong>Growth follows a universal law &mdash; the logistic (S-curve).</strong> Every organism, population, industry, and business follows the same pattern: rapid early growth that decelerates toward maturity. This applies equally to white rats, fruit flies, national populations, and entire industries.</li>
+  <li><strong>America&rsquo;s basic economic fabric had reached maturity by the 1940s.</strong> The rate of growth in manufacturing, exports, iron/steel, railways, automobiles, and agriculture was declining or had leveled off. &ldquo;Any talk of unlimited frontiers that lie before us is a pure expression of faith and hope.&rdquo;</li>
+  <li><strong>The trend is more important than the cycle for long-term planning.</strong> Cycles are waves moving around a curved axis (the trend). When the trend is rising rapidly, even depression bottoms may be higher than previous peaks. When the trend levels out, depressions become absolutely painful.</li>
+  <li><strong>Cycles ride on top of each other.</strong> When multiple rhythms (54-year, 18-year, 9-year, 3&frac12;-year) are all declining together, catastrophe results (as in 1929). When they rise together, extraordinary prosperity follows. The key to forecasting is knowing where each rhythm stands at any given time.</li>
+  <li><strong>War does not alter the timing of cycles &mdash; only their amplitude.</strong> All three great American war-era price peaks came when the 54-year wave was cresting. Wars distort the magnitude of waves (like wind pushing a high tide higher) but rarely interfere with the beat itself.</li>
+  <li><strong>The cause of these rhythms is unknown &mdash; and it doesn&rsquo;t matter for practical purposes.</strong> &ldquo;One need not know the cause of night to know that morning will follow.&rdquo; Whether the rhythms are forced oscillations from solar radiation, free oscillations from internal economic dynamics, or responses to unknown cosmic forces, they can be used for prediction.</li>
+  <li><strong>Solar and cosmic radiation correlate with economic rhythms.</strong> Sunspot phenomena showed no correlation with agricultural production but <em>remarkable</em> correlation with industrial production, business activity, and stock prices. Solar eruptions correlate with human suicide rates, mental disorders, and diseases of the nervous system.</li>
+  <li><strong>Income distribution follows Pareto&rsquo;s Law</strong> &mdash; in any stable economy, the distribution follows y&nbsp;=&nbsp;ax<sup>&minus;v</sup> with v&nbsp;&asymp;&nbsp;1.5, regardless of whether the society is rich or poor. Deviations from 1.5 predict social unrest and revolutionary change.</li>
+  <li><strong>Cause-and-effect thinking is an illusion in economics.</strong> Drawing from Ouspensky, Eddington, and Minkowski, the authors argue that we perceive time sequentially like a two-dimensional being watching a wheel through a slot &mdash; what we call &ldquo;cause and effect&rdquo; is merely our sequential perception of a higher-dimensional reality.</li>
+  <li><strong>The law of averages governs groups, not individuals.</strong> We cannot predict what any individual will do, but patterns reveal how masses are likely to act at given times. Society is a biological organism whose whole is greater than the sum of its parts.</li>
+  <li><strong>Every business has its own unique rhythms</strong> that can be discovered by analysis (just as tidal rhythms are discovered by harmonic analysis). A synthesis of a company&rsquo;s rhythms, projected forward, provides actionable forecasts for hiring, expansion, refinancing, and real estate decisions.</li>
+  <li><strong>The 18-year building cycle predicts panics.</strong> Major panics have consistently arrived 2&ndash;4 years after building activity peaks: 1836&rarr;1837, 1853&rarr;1857, 1871&rarr;1873, 1890&rarr;1893, 1906&rarr;1907, 1925&rarr;1929.</li>
+  <li><strong>New economic growth cycles only emerge with revolutionary environmental change.</strong> You cannot graft a new growth pattern onto an old one merely by changing the economic system or government policy.</li>
+  <li><strong>The ratio (logarithmic) scale is essential for trend analysis.</strong> Arithmetic scale conceals the deceleration of growth; ratio scale makes it visually obvious.</li>
+  <li><strong>Multiple methods of cycle analysis exist</strong> &mdash; harmonic analysis (Fourier), periodogram, Hoskins Time Chart, Moving Cycle Average, Periodic Table, electrical spectrum analysis, and the Cyclograph machine.</li>
+  <li><strong>Emotional and physiological rhythms are as real as economic ones.</strong> Professor Hersey found every individual has emotional ups and downs in rhythmic cycles of 2&frac12; to 9&frac12; weeks. Blood pH cycles correlate with stock market variations.</li>
+  <li><strong>The 54-year cycle operates like economic seasons.</strong> Spring (recovery) = venture capital starts, innovations sprout; Summer (peak) = speculation rife, &ldquo;new era&rdquo; thinking; Autumn (harvest) = prices drift down, purchasing power increases, but unemployment grows; Winter (depression) = enterprise loses fervor.</li>
+  <li><strong>Chinese history shows ~800-year war cycles</strong> with three distinct epochs showing striking parallelism in their periods of unification, prosperity, secession, rivalry, and invasion &mdash; a pattern Lee said &ldquo;far exceeds the limits of probability.&rdquo;</li>
+</ol>
+</div>
+
+<!-- FOUR MAJOR RHYTHMS TABLE -->
+<h2 id="four-rhythms">The Four Major Economic Rhythms</h2>
+<table>
+<tr><th>Rhythm</th><th>Length</th><th>Appears In</th><th>Key Discoverers</th></tr>
+<tr><td>Kondratieff Wave</td><td>~54 years</td><td>Wholesale prices, innovation epochs</td><td>N.D. Kondratieff, J.A. Schumpeter</td></tr>
+<tr><td>Building Cycle</td><td>~18&frac13; years</td><td>Real estate, building, marriages</td><td>Roy Wenzlick, C.D. Long</td></tr>
+<tr><td>Juglar Cycle</td><td>~9 years</td><td>Stock prices, wholesale prices, pig iron</td><td>Cl&eacute;ment Juglar, Samuel Benner</td></tr>
+<tr><td>Kitchin Cycle</td><td>~3&frac12; years (40.8 mo)</td><td>Industrial production, stock prices</td><td>Joseph Kitchin, W.L. Crum</td></tr>
+</table>
+
+<h3>The Question of Cause</h3>
+<table>
+<tr><th>Theory</th><th>Proponent</th><th>Explanation</th></tr>
+<tr><td>Forced oscillations (solar)</td><td>Jevons, Garcia-Mata &amp; Shaffner, Stetson</td><td>Solar radiation affects human physiology &rarr; psychology &rarr; economic behavior</td></tr>
+<tr><td>Free oscillations (random shock)</td><td>Slutsky, Schumpeter</td><td>Random economic shocks produce cyclic responses like a rocking chair</td></tr>
+<tr><td>Huntington&rsquo;s three cycles</td><td>Ellsworth Huntington</td><td>Weather (heat), physiological (ozone), psychological (atmospheric electricity) &mdash; all solar-linked</td></tr>
+<tr><td>&ldquo;Y waves&rdquo; postulate</td><td>Dewey &amp; Dakin</td><td>Unknown long waves permeate universe; different organisms respond to different wavelengths</td></tr>
+</table>
+
+<!-- CONTRARIAN IDEAS -->
+<h2 id="contrarian">Contrarian Ideas</h2>
+<div class="contrarian">
+<ol>
+  <li><strong>Abandoning cause-and-effect economics entirely.</strong> The book explicitly rejects the classical approach of looking for causes behind economic events, arguing instead for pattern recognition and rhythm analysis &mdash; a radical position even today.</li>
+  <li><strong>Wars are symptoms, not causes, of economic cycles.</strong> Kondratieff&rsquo;s assertion (supported by the data) that wars, revolutions, gold discoveries, and innovations are all expressions of the long wave &mdash; not its drivers &mdash; inverts conventional historical thinking.</li>
+  <li><strong>Government cannot prevent depressions.</strong> &ldquo;There is equally no reason to assume that government planning by government administrators will prevent rhythmic depressions.&rdquo;</li>
+  <li><strong>America&rsquo;s &ldquo;unlimited frontiers&rdquo; are statistical fiction.</strong> Writing in 1947, the authors declared that statistical evidence showed America&rsquo;s basic economic fabric had reached maturity &mdash; deeply contrarian in the postwar optimism era.</li>
+  <li><strong>Stock prices reflect biology, not reason.</strong> &ldquo;In studying the market we are studying men in one of the fundamental aspects of their nature.&rdquo; Their rhythms are expressions of the human organism.</li>
+  <li><strong>The &ldquo;new era&rdquo; is always an illusion.</strong> Every peak in the 54-year cycle generates the same conviction that permanent prosperity has arrived. The timing is predictable.</li>
+  <li><strong>Capitalism&rsquo;s trends are not essentially different from other economic systems.</strong> The 54-year wave can be traced back to feudalism; Pareto&rsquo;s income distribution law holds regardless of economic system.</li>
+  <li><strong>Income redistribution is a mathematical inevitability, not a policy choice.</strong> Pareto&rsquo;s Law suggests that the percentage of people in each income bracket is essentially fixed in any stable economy.</li>
+</ol>
+</div>
+
+<!-- AUTHOR'S KEY PROPOSALS -->
+<h2 id="proposals">Author&rsquo;s Key Proposals</h2>
+<div class="proposals">
+<ol>
+  <li><strong>Use the four major rhythms as an &ldquo;economic clock&rdquo;</strong> to determine where you stand in the business cycle before making any major business or investment decision.</li>
+  <li><strong>Plot all business data on ratio (logarithmic) scale</strong> to reveal the true rate of growth and impending maturity.</li>
+  <li><strong>Analyze individual businesses for their unique rhythms</strong> using rate-of-change techniques, moving averages, and harmonic analysis, then synthesize and project forward.</li>
+  <li><strong>Prepare for economic winter, not endless summer.</strong> Minimize debt, avoid long-term leases at peak prices, build surpluses during good times to maintain operations during inevitable downturns.</li>
+  <li><strong>Study rhythm patterns rather than arguing about causes.</strong> The practical businessman needs to know <em>when</em>, not <em>why</em>.</li>
+  <li><strong>Recognize that building peaks predict panics</strong> &mdash; when a building peak is reached, it is a warning of serious reaction within 2&ndash;4 years.</li>
+  <li><strong>Abandon the illusion that any policy, reform, or &ldquo;plan&rdquo; will prevent cyclical downturns.</strong> At best, preparation can be ameliorative.</li>
+</ol>
+</div>
+
+<!-- ALLEGORIES & CULTURAL REFERENCES -->
+<h2 id="allegories">Allegories &amp; Cultural References</h2>
+<table>
+<tr><th>Reference</th><th>Concept Illustrated</th></tr>
+<tr><td>Ouspensky&rsquo;s two-dimensional being on a tabletop</td><td>Our perception of &ldquo;cause and effect&rdquo; is a limitation of dimensionality &mdash; we see the wheel&rsquo;s colors passing through a slot and mistake sequence for causation</td></tr>
+<tr><td>The red-loving 2D colony and the spinning wheel</td><td>Communities mistake cyclical phenomena for cause-and-effect chains, leading to misguided &ldquo;investigations&rdquo; and &ldquo;legislation&rdquo;</td></tr>
+<tr><td>Joseph&rsquo;s preparation for lean years</td><td>The foresighted individual can help himself by knowing where cycles stand &mdash; saving in fat years for lean ones</td></tr>
+<tr><td>Pearl&rsquo;s Drosophila bottle</td><td>America is the fruit fly reaching the upper asymptote &mdash; &ldquo;we need a whole new social bottle&rdquo;</td></tr>
+<tr><td>The fence going up a hill</td><td>Business cycles are like fence peaks going up and down a hillside (the trend)</td></tr>
+<tr><td>A coil spring over a bent poker</td><td>Cycles moving around a curved trend</td></tr>
+<tr><td>The bookmaker vs. the trainer (Eddington)</td><td>Modern physics studies odds and probabilities, not deterministic mechanisms</td></tr>
+<tr><td>Galton&rsquo;s Quincunx</td><td>Physical demonstration of normal distribution &mdash; even &ldquo;randomness&rdquo; follows mathematical law</td></tr>
+<tr><td>Tide prediction</td><td>Economic forecasting uses harmonic synthesis &mdash; break data into constituent rhythms, then recombine and project forward</td></tr>
+<tr><td>The rocking chair</td><td>Free oscillation theory: once pushed, an economy oscillates at its natural frequency regardless of the push&rsquo;s character</td></tr>
+<tr><td>Economic seasons (Spring/Summer/Autumn/Winter)</td><td>The 54-year Kondratieff wave mapped to seasonal metaphor &mdash; recovery, peak speculation, harvest, depression</td></tr>
+</table>
+
+<!-- BOOKS & THINKERS REFERENCED -->
+<h2 id="thinkers">Books &amp; Thinkers Referenced</h2>
+<table>
+<tr><th>Thinker / Author</th><th>Work / Contribution</th></tr>
+<tr><td>N.D. Kondratieff</td><td>Identified the 54-year &ldquo;long wave&rdquo; in economic activity</td></tr>
+<tr><td>Joseph A. Schumpeter</td><td><em>Business Cycles</em> &mdash; confirmed Kondratieff, linked each 54-year cycle to major innovations</td></tr>
+<tr><td>Raymond Pearl</td><td>Johns Hopkins &mdash; discovered universal logistic (S-curve) growth law</td></tr>
+<tr><td>P.F. Verhulst</td><td>Belgian mathematician &mdash; first described the logistic curve (1838)</td></tr>
+<tr><td>Cl&eacute;ment Juglar</td><td>French economist &mdash; pioneered the ~9-year business cycle</td></tr>
+<tr><td>Joseph Kitchin</td><td>Identified the ~40-month rhythm in bank clearings and prices</td></tr>
+<tr><td>Samuel Benner</td><td>Ohio farmer &mdash; independently identified iron/corn/cotton price cycles (1875)</td></tr>
+<tr><td>Sir William H. Beveridge</td><td>Periodogram analysis of 700 years of wheat prices</td></tr>
+<tr><td>Chapin Hoskins</td><td>Identified 40.5-month periodicity in pig iron and many other series</td></tr>
+<tr><td>Roy Wenzlick</td><td>Compiled U.S. real estate activity data (1796&ndash;1946)</td></tr>
+<tr><td>Clarence D. Long, Jr.</td><td>Landmark study of building cycles since the Civil War</td></tr>
+<tr><td>W.L. Crum</td><td>Found ~40-month rhythm in commercial paper rates (1866&ndash;1922)</td></tr>
+<tr><td>E. Br&uuml;ckner</td><td>Confirmed ~35-year European weather cycle (1891)</td></tr>
+<tr><td>C.N. Anderson</td><td>AT&amp;T &mdash; harmonic analysis of 300 years of sunspot data</td></tr>
+<tr><td>Ellsworth Huntington</td><td>Yale &mdash; <em>Mainsprings of Civilization</em>; three types of solar-linked cycles</td></tr>
+<tr><td>Garcia-Mata &amp; Shaffner</td><td>Harvard &mdash; discovered sunspot correlation with industrial (not agricultural) production</td></tr>
+<tr><td>H.T. Stetson</td><td>MIT &mdash; confirmed solar radiation correlation with business/stock prices</td></tr>
+<tr><td>Edgar Lawrence Smith</td><td>Found blood pH cycles correlating with stock market variations</td></tr>
+<tr><td>E. Slutsky</td><td><em>Summation of Random Causes as the Source of Cyclic Processes</em> (1927)</td></tr>
+<tr><td>Tchijewski</td><td>Linked solar ionization to physiological/psychological stimulation of mankind</td></tr>
+<tr><td>Raymond Holder Wheeler</td><td>University of Kansas &mdash; historical data on solar rhythms and human rhythms</td></tr>
+<tr><td>Vilfredo Pareto</td><td>Income distribution law (y = ax<sup>&minus;v</sup>, v &asymp; 1.5)</td></tr>
+<tr><td>Pitirim A. Sorokin</td><td>Harvard &mdash; <em>Crisis of Our Age</em>; documented declining rate of discoveries</td></tr>
+<tr><td>Rex B. Hersey</td><td>U. of Pennsylvania &mdash; charted emotional rhythms of workers</td></tr>
+<tr><td>Sir James Jeans</td><td>Identified wave with probability</td></tr>
+<tr><td>A.S. Eddington</td><td><em>The Nature of the Physical World</em> &mdash; limits of scientific knowledge</td></tr>
+<tr><td>P.D. Ouspensky</td><td><em>Tertium Organum</em> &mdash; two-dimensional being thought experiment</td></tr>
+<tr><td>H. Minkowski</td><td>Four-dimensional spacetime continuum (1905)</td></tr>
+<tr><td>Warren &amp; Pearson</td><td>Linked building peaks to subsequent panics</td></tr>
+<tr><td>Francis Galton</td><td>Quincunx demonstrating normal frequency distribution</td></tr>
+<tr><td>J.B.J. Fourier</td><td>Fourier&rsquo;s Theorem (1822) &mdash; any periodic motion resolvable into simple harmonic motions</td></tr>
+<tr><td>Sir William Thompson</td><td>Devised harmonic method for predicting tides (1867)</td></tr>
+<tr><td>Roger Babson</td><td>Growth curve chart placing industries on a single maturity curve</td></tr>
+<tr><td>J.S. Lee</td><td>&ldquo;The Periodic Recurrence of Internecine Wars in China&rdquo; (1931)</td></tr>
+<tr><td>Oswald Spengler</td><td>All cultures follow a ~1,000-year life course with parallel periods</td></tr>
+<tr><td>E.J. Hamilton</td><td>Spanish Empire trade data (1503&ndash;1660)</td></tr>
+<tr><td>Lin Yutang</td><td><em>My Country and My People</em> &mdash; reproduced Lee&rsquo;s war-cycle charts</td></tr>
+<tr><td>Carl Snyder</td><td>Explained Pareto&rsquo;s Law as instance of general law of inequality</td></tr>
+</table>
+
+<hr>
+
+<!-- ==================== CHAPTER NOTES ==================== -->
+
+<h2 id="ch-intro" class="chapter-header">Introduction: Concerning Economic Prediction</h2>
+
+<p>Science&rsquo;s business is to predict &mdash; astronomy, chemistry, nuclear physics all make accurate predictions. Economics is now reaching a point where it too can make rather accurate predictions within limits.</p>
+
+<p>The book abandons the classical cause-and-effect approach to economics in favor of studying rhythmic patterns and periodic cycles. The law of averages applies to humanity &mdash; certain activities of people fall into definite patterns, some with periodic rhythm. These patterns reveal how masses are likely to act at given times &mdash; a formulation of law.</p>
+
+<p>The &ldquo;forecasts&rdquo; in this book are written by the data themselves &mdash; they are tendencies, probabilities of tomorrow, not opinions of any man.</p>
+
+<blockquote>&ldquo;To be completely exposed to surprise by events &mdash; in the complex age we live in &mdash; is a fair route to the insane asylum.&rdquo;</blockquote>
+
+<blockquote>&ldquo;When a people finds that predictions of many financial advisers, statesmen, historians, and other proclaimed experts are seldom better than the predictions of the astrologers, our social sciences have demonstrably not been earning their way. It is time for action.&rdquo;</blockquote>
+
+<hr>
+
+<h2 id="ch1" class="chapter-header">Chapter I: Why Trends Are Important</h2>
+
+<h3>Growth as a Universal Pattern</h3>
+<p>All organisms show declining rates of growth over time &mdash; babies grow 100%+ in year one, then the rate steadily falls until maturity when it reaches zero. An inhibiting growth factor exists in all organisms &mdash; babies, trees, and also human institutions and business organizations.</p>
+<p>A hypothetical business showing $20,000 sales in year 1 grows to $609,000 by year 40, but the <em>rate</em> of growth declines steadily (90% &rarr; 80% &rarr; 70%&hellip; &rarr; 20% &rarr; 10% &rarr; 0%).</p>
+
+<h3>The Trend and the Cycle</h3>
+<p>Business cycles are not departures from a horizontal line &mdash; they are waves moving around a curved axis (the trend). Think of cycles as peaks of a fence going up and down a hill, or a coil spring stretched over a bent poker.</p>
+<p><strong>Key insight:</strong> when the trend is rising rapidly, even a depression bottom may be <em>higher</em> than previous peaks. When the trend levels out, depressions become absolute in character.</p>
+
+<h3>U.S. Industrial Production (1884&ndash;1937)</h3>
+<p>Pre-1920: trend rising rapidly, depression lows were still as high as earlier peaks. Post-1920: trend leveled out, depressions became genuinely painful &mdash; no rising trend to compensate.</p>
+
+<h3>Spanish Trade (1503&ndash;1660)</h3>
+<p>E.J. Hamilton&rsquo;s data on Spanish Empire trade shows the same pattern: growth trend with increasing intensity of depressions as the trend approaches maturity.</p>
+
+<blockquote>&ldquo;The businessman is going to have to anticipate depressions and plan for them wisely, or suffer unprecedented penalties.&rdquo;</blockquote>
+
+<hr>
+
+<h2 id="ch2" class="chapter-header">Chapter II: Patterns in Growth of Organisms</h2>
+
+<h3>The Logistic Curve (S-Curve)</h3>
+<p>Raymond Pearl of Johns Hopkins discovered that growth follows a universal law &mdash; the logistic curve (first described by Belgian mathematician P.F. Verhulst in 1838). The same S-shaped growth curve appears in: body weight of white rats, weight of pumpkins, yeast cell populations, fruit fly populations, and human populations.</p>
+
+<h3>Population Growth Follows the Same Law</h3>
+<ul>
+  <li><strong>Sweden:</strong> grew like a population of yeast cells in quantitative relations.</li>
+  <li><strong>United States:</strong> upper limit of present cycle projected at ~197 million.</li>
+  <li><strong>France:</strong> took 400+ years for its growth cycle; upper limit ~42.5 million.</li>
+  <li><strong>Algeria:</strong> completed an entire growth cycle in less than 100 years under French colonial control.</li>
+  <li><strong>Germany:</strong> two overlapping growth cycles visible &mdash; old agricultural cycle reaching maturity mid-1800s, new industrial cycle beginning ~1848&ndash;1870.</li>
+</ul>
+
+<h3>Key Principles</h3>
+<ul>
+  <li>When a consistent pattern of growth exists, we have sound grounds for making predictions.</li>
+  <li>New cycles of growth can be superimposed on old ones &mdash; triggered by revolutions in constitution, environment, or where the pattern is being worked out.</li>
+  <li>A renaissance in growth pattern does NOT occur except concurrently with revolutionary changes in the environment.</li>
+</ul>
+
+<blockquote>&ldquo;When human social evolution does manage to put a kink in the curve of population growth, it has not done it by altering any biological law. It merely shifts, by a greater or smaller amount, the absolute base from which the law operates.&rdquo;</blockquote>
+
+<hr>
+
+<h2 id="ch3" class="chapter-header">Chapter III: The Growth Trend in Our Basic Industries</h2>
+
+<h3>Ratio Scale Method</h3>
+<p>Using ratio (logarithmic) scale instead of arithmetic scale reveals the rate of growth, making the logistic curve visible as a smooth elongated curve. More useful than Pearl&rsquo;s equation method for the average businessman &mdash; just chart on semi-log paper.</p>
+
+<h3>U.S. Manufactures (1830&ndash;1945)</h3>
+<p>Rate of growth declining since ~1900; by 1920 it had become a fraction of 1800s rates. WWII production peak can be ignored &mdash; it was destruction, not creative production.</p>
+
+<h3>Iron and Steel</h3>
+<p>An &ldquo;old industry&rdquo; since 1914 &mdash; each depression carried production to lower levels than previous ones (sign of declining vitality). Average annual production ~40 million gross tons as the mean around which future fluctuations will oscillate.</p>
+
+<h3>Steam Railways</h3>
+<p>Reached maturity between 1910&ndash;1914 in mileage operated; actual decline in per capita freight since then. By 1943 (peak war effort), total tonnage originated was only 9% more than 1929; per capita it was actually less.</p>
+
+<h3>Automobiles</h3>
+<p>Industry&rsquo;s rate of growth was declining sharply well before 1940, approaching maturity. Fortune estimated 4.5 million cars annually from mid-1945 would completely saturate the market by 1950.</p>
+
+<h3>Agricultural Industries</h3>
+<p>Cattle, corn, cotton, wool, wheat, malt liquors &mdash; all show the same logistic growth pattern approaching maturity. Cotton shows two distinct trends (before and after the Civil War). Wool shows two distinct trends (before and after the Tariff Act of 1924).</p>
+
+<h3>Mature Industries</h3>
+<p>Lumber, cotton spindles, coal, copper, lead &mdash; all approaching or past maturity. Copper: birth of the electrical industry in 1880 launched a new growth cycle. Lead: junction of Union Pacific and Central Pacific in 1869 opened western ores, starting a second cycle.</p>
+
+<blockquote>&ldquo;Like goldfish nibbling at the glass of their bowl, we have demonstrably been reaching the circumference of our economic world-as-it-is.&rdquo;</blockquote>
+
+<hr>
+
+<h2 id="ch4" class="chapter-header">Chapter IV: Trends in Some Other Industries</h2>
+
+<h3>New vs. Old Industries</h3>
+<p>No single new industry can absorb unemployment slack or &ldquo;spring full-blown upon the world.&rdquo; Industries follow orderly growth patterns &mdash; they don&rsquo;t appear fully formed. Any great industry capable of creating impressive postwar employment is already on the scene with an established rate of growth.</p>
+
+<h3>Younger Industries with Growth Ahead</h3>
+<ul>
+  <li><strong>Rayon:</strong> Typical of young chemical industries. Gratifying growth trend, but chemical industries create practically no direct employment compared to older industries.</li>
+  <li><strong>Aircraft:</strong> A baby industry before the war; war gave it munitions status. Postwar reversion to youthful dimensions was inevitable &mdash; two million wartime employees reduced to a tenth by mid-1946.</li>
+  <li><strong>Electric Energy, Natural Gas, Petroleum, Paper &amp; Wood Pulp:</strong> Still have natural expansion ahead.</li>
+  <li><strong>Radio &amp; Electrical Refrigeration:</strong> Not as young as some suppose &mdash; already slowing markedly before the war.</li>
+</ul>
+
+<h3>Roger Babson&rsquo;s Growth Curve Chart</h3>
+<p>Composite chart placing various U.S. industries on a single growth curve according to their comparable age/rate of growth. Young/fast-growing industries appear at left (Television, Airplanes, Radio); mature/declining ones at right (Horse-Drawn Vehicles, Cotton Spindles).</p>
+<p><strong>Key question for any corporation:</strong> Is high sales volume due to youthful growth rate, or merely a cyclical upsweep that will be compensated by decline?</p>
+
+<blockquote>&ldquo;Like the weatherman, we are concerned initially not with altering the weather, but with the problem of predicting it with fair accuracy.&rdquo;</blockquote>
+
+<hr>
+
+<h2 id="ch5" class="chapter-header">Chapter V: Some Rhythmic Cycles in Natural Phenomena</h2>
+
+<h3>Definitions</h3>
+<ul>
+  <li><strong>Cycle:</strong> From Greek &ldquo;circle&rdquo; &mdash; any regularity in time intervals, but not necessarily equal intervals.</li>
+  <li><strong>Rhythm / Rhythmic cycle:</strong> A cycle repeating at rather uniform time intervals. Implies a kind of beat (like a heartbeat &mdash; rhythmic though slightly irregular).</li>
+  <li><strong>Periodicity / Periodic cycle:</strong> A cycle repeating at mathematically exact intervals. True periodicity does not exist in nature, but close approximations do.</li>
+</ul>
+
+<h3>The 9&frac23;-Year Rhythm in Nature</h3>
+<ul>
+  <li><strong>Atlantic Salmon</strong> (Restigouche River, 1880&ndash;1929): Five clear maxima showing ~9&frac23;-year periodicity in catch per rod per day.</li>
+  <li><strong>Lynx</strong> (Hudson&rsquo;s Bay Company pelts, 1844&ndash;1933): Dramatic 9&frac23;-year cycle. Evidenced back to 1735. Fluctuations from 4,000 skins in poor years to over 70,000 in good ones.</li>
+  <li><strong>Tent Caterpillars</strong> (New Jersey, 1913&ndash;1939): ~9.6-year cycle in complaint letters about the pest.</li>
+  <li><strong>Heart Disease:</strong> Professor Ellsworth Huntington of Yale found 9&frac23;-year rhythm in death rate from heart disease.</li>
+  <li><strong>Ozone</strong> (London &amp; Paris, 1877&ndash;1907): 9&frac23;-year cycle in atmospheric ozone, possibly linked to ultraviolet light.</li>
+</ul>
+<p>A composite chart of tent caterpillars, salmon, lynx, heart disease, and ozone plotted together shows strikingly synchronized ~9&frac23;-year cycles.</p>
+
+<h3>The Br&uuml;ckner Weather Cycle (~35 Years)</h3>
+<p>Sir Francis Bacon noted 300+ years ago that weather in the Low Countries repeats in 35-year cycles. E. Br&uuml;ckner (1891) confirmed: European weather varies in cycles of ~35 years average. David Brunt (1927) traced 34 different weather rhythms with durations from under 2 years up.</p>
+
+<h3>Solar and Terrestrial Rhythms</h3>
+<p>41-month rhythm in the solar constant matching an identical rhythm in atmospheric electricity. Sunspot rhythms: approximately 11 and 22 years in duration. Correlation does not prove causality &mdash; but one need not know the cause of night to know that morning will follow.</p>
+
+<h3>The ~4-Year Biological Cycle</h3>
+<p>Approximately 4 years: epidemics of lemmings, field mice, and the foxes that prey on them &mdash; in regions as far separated as Norway, Newfoundland, and New York. Foxes (Norway, 1880&ndash;1931): 3&#8541;-year cycle, cresting one year after the vole cycle.</p>
+
+<h3>Rhythms in Human Emotion</h3>
+<p>Professor Rex B. Hersey (U. of Pennsylvania): every individual has emotional ups and downs in rhythmic cycles, periods varying from 2&frac12; to 9&frac12; weeks. Charted emotional variations of Pennsylvania Railroad workers show clear rhythmic patterns.</p>
+
+<h3>Synthesis of Cycles</h3>
+<p>Two or more regular cycles can be combined to produce a complex wave pattern. Four cycles combined produce a complex-looking wave &mdash; yet it is entirely determined by the four component rhythms.</p>
+
+<blockquote>&ldquo;The student of periodic rhythms in human affairs has a tool which the law of averages itself puts into his hands.&rdquo;</blockquote>
+
+<hr>
+
+<h2 id="ch6" class="chapter-header">Chapter VI: The 54-Year Rhythm</h2>
+
+<h3>The Kondratieff / Long Wave</h3>
+<p>A rhythmic cycle of ~54 years is apparent in many aspects of U.S. economic life. Its average length is almost exactly 54 years &mdash; longer than most individuals&rsquo; economic lifetimes, so it readily escapes notice. Shows up most clearly in wholesale price swings.</p>
+<p>The U.S. has experienced three of these 54-year rhythms: each one saw average commodity prices begin at a low level, move up to a peak, and move down again to approximately the level they started from.</p>
+
+<h3>680 Years of Wheat Prices in England</h3>
+<p>J.E.T. Rogers assembled wheat price data over several centuries &mdash; the longest price data available. Wheat prices show a 54-year rhythm repeated 13&frac12; times &mdash; too regular to be pure chance. Sir William H. Beveridge conducted periodogram analysis finding strong correlation at T = 54.00 years.</p>
+
+<h3>The Kondratieff Wave in Economic History</h3>
+<p>Schumpeter dates the first long cycle in modern American history from the 1780s to 1842, the second from 1842 to 1897, and the third from 1898 onward. Each Kondratieff cycle has been uniquely characterized by some great innovation: the first was the industrial revolution; the second was the age of steam, steel, and railroads; the third has been the age of chemistry, electricity, and motors.</p>
+
+<h3>International Synchronization</h3>
+<p>Wholesale prices for Germany, Great Britain, United States, and Japan all follow the same pattern. The South Sea Bubble in England and the Mississippi Bubble in France developed concurrently and collapsed within the same month (1720). The 1929 American collapse was similarly synchronized worldwide.</p>
+
+<h3>The 54-Year Rhythm as an Economic Clock</h3>
+<ul>
+  <li><strong>Spring (Recovery):</strong> Economy emerges from depression; venture capital starts; great innovations planted in the previous cycle begin to spring up in full force.</li>
+  <li><strong>Summer (Peak):</strong> Employment grows; money flows; credit expands; midsummer arrives with million evidences of a new era; speculation regarding boundless future is rife (1929).</li>
+  <li><strong>Autumn (Harvest):</strong> Products distributed more widely than ever; prices drift downward; wages stay up, increasing purchasing power; but unemployment grows.</li>
+  <li><strong>Winter (Depression):</strong> Enterprise loses fervor; great fortunes no longer found by turning over a stone; people wonder if progress has stopped.</li>
+</ul>
+
+<blockquote>&ldquo;Anyone who starts out in business without knowing what time it is on the economic clock will obviously owe much to luck if he succeeds.&rdquo;</blockquote>
+
+<hr>
+
+<h2 id="ch7" class="chapter-header">Chapter VII: The 9-Year Rhythm</h2>
+
+<h3>The Juglar Cycle</h3>
+<p>A rhythm close to 9 years in length appears in both commodity and stock prices. Schumpeter calls this the Juglar cycle, after Cl&eacute;ment Juglar. Samuel Benner, an Ohio farmer, independently identified similar cycles in 1875.</p>
+<p>In pig iron prices, Benner cited 9-year cycles. If you had bought and sold pig iron on his projected pattern, your gains over a 69-year period would have been twelve times your loss.</p>
+
+<h3>The 9-Year Rhythm in Stock Prices</h3>
+<p>The Axe-Houghton Index of common stock prices (1854&ndash;1945) shows highs of regular 9&#8537;-year cycles. A rhythm repeated as many as 10 times and as regularly as this cannot easily be the result of pure chance.</p>
+<p>The three deepest and longest depressions &mdash; 1825&ndash;1830, 1873&ndash;1878, and 1929&ndash;1934 &mdash; all display the coincidence of corresponding phases of all three cycles (54-year, 9-year, and 3&frac12;-year).</p>
+
+<h3>Interaction with the 54-Year Rhythm</h3>
+<p>The 9-year wave rides on top of the 54-year wave. When both are rising together, there is great momentum; when the 9-year reaches its crest and turns down while the 54-year is also declining, catastrophe follows (as in 1929).</p>
+
+<h3>Gold Prices and Currency</h3>
+<p>When the U.S. abandoned the gold standard in 1933, the economic upturn that followed was in harmony with the prevailing 9-year rhythm signaling a rise. The departure from gold may not have <em>caused</em> the recovery &mdash; the rhythm was already due to rise.</p>
+
+<blockquote>&ldquo;The explanation cannot be derived from them [external injuries]&hellip; The crisis was nowhere else anything like so severe as in the United States, the country most nearly free from injury by external factors.&rdquo;</blockquote>
+
+<hr>
+
+<h2 id="ch8" class="chapter-header">Chapter VIII: The 3&frac12;-Year Rhythm</h2>
+
+<h3>The Kitchin Cycle</h3>
+<p>A rhythm of approximately 40.8 months (~3&frac12; years) appears in the Federal Reserve Index of Industrial Production, pig iron production, common stock prices, and many other economic series. There may be two rhythmic tendencies &mdash; one slightly over 42 months, one slightly less than 40 &mdash; that combine to produce a seeming length of almost 41.</p>
+
+<h3>Rate of Change Technique</h3>
+<p>Instead of plotting actual production, plot each month&rsquo;s figure as a percentage of the corresponding month one year prior. The hidden rhythm becomes strikingly clear. Out of more than 500 different economic series analyzed, something more than half show fluctuations of the 3&frac12;-year interval type.</p>
+
+<h3>The 3&frac12;-Year Rhythm in Stock Prices</h3>
+<p>The same rhythm appears in Dow-Jones industrial stock prices. Around the end of 1926, the actual stock market diverged from the ideal 3&frac12;-year wave &mdash; the overpowering forces of the 9-year and 54-year cycles meeting at confluence proved more powerful than the short 3&frac12;-year wave.</p>
+
+<h3>Stock Prices as Community Psychology</h3>
+<p>Stock prices reflect a purely mental reality &mdash; they are an index to a mental attitude focused as desire. The stock market&rsquo;s rhythms are not located in Wall Street but are expressions of the human organism.</p>
+
+<blockquote>&ldquo;Much of the success or failure of an individual is due to forces over which he has no control; but if he understands these forces, he may protect himself from the worst results of unfavorable combinations and profit personally from favorable combinations.&rdquo;</blockquote>
+
+<hr>
+
+<h2 id="ch9" class="chapter-header">Chapter IX: The 18-Year Rhythm</h2>
+
+<h3>Real Estate and Building Activity</h3>
+<p>The 18-year rhythmic cycle has an average length of ~18&frac13; years &mdash; roughly a doubling of the 9-year rhythm. Shows up most clearly in real estate activity, building activity, and marriages.</p>
+
+<h3>Marriage Rate Follows the Same Rhythm</h3>
+<p>Marriages per 10,000 adult males in St. Louis (1886&ndash;1934) show a regular 18&frac13;-year cycle &mdash; possibly linked to man&rsquo;s mating instinct being &ldquo;aboriginally associated in his being&rdquo; with nest-building instinct.</p>
+
+<h3>Building Peaks Predict Panics</h3>
+<p>Major panics have tended to come within two to four years after building activity peaks:</p>
+<ul>
+  <li>1836 peak &rarr; panic 1837</li>
+  <li>1853 peak &rarr; panic 1857</li>
+  <li>~1871 peak &rarr; panic 1873</li>
+  <li>1890 peak &rarr; panic 1893</li>
+  <li>1906 peak &rarr; panic 1907</li>
+  <li>1925 peak &rarr; panic 1929</li>
+</ul>
+
+<blockquote>&ldquo;When it is apparent that a building peak has been reached, it is a warning of the danger of a serious reaction. If there is also an impending rise in the value of gold, the danger is accentuated.&rdquo;</blockquote>
+
+<h3>The 18-Year Rhythm in Other Phenomena</h3>
+<p>Also appears in pig iron production, loans and discounts of American banks (with a 3-year lag behind building), railroad stock prices, common stock prices, and sales of individual industrial companies.</p>
+<p>The building cycle is so long that few people experience two complete cycles in their business life &mdash; education must therefore be &ldquo;book knowledge&rdquo; rather than experience.</p>
+
+<blockquote>&ldquo;Four great waves in the construction of new buildings have occurred since the Civil War and it is not too much to say that their turning points mark the most exciting and memorable episodes in the nation&rsquo;s history.&rdquo;</blockquote>
+
+<hr>
+
+<h2 id="ch10" class="chapter-header">Chapter X: Causes, Correlations, Conjectures</h2>
+
+<h3>The Question of Cause</h3>
+<p>The four major rhythms (54, 9, 3&frac12;, 18&frac13; years) provide measuring scales &mdash; like hands of an economic clock &mdash; as accurate a guide to timing as we may hope to establish. Ultimate cause is extremely difficult to discover &mdash; more a problem for philosophy than science. But we need not know the cause to use the patterns.</p>
+
+<h3>Forced vs. Free Oscillations</h3>
+<p><strong>Forced oscillations:</strong> Rhythms caused by forces entering from outside the economic environment. Garcia-Mata and Shaffner (Harvard, 1934) found: sunspot phenomena showed no correlation with agricultural production, but remarkable correlation with industrial production, business activity, and stock market prices. &ldquo;Surprised and aghast,&rdquo; they passed the problem to biologists and psychologists.</p>
+
+<p><strong>Free oscillations / &ldquo;random shock&rdquo; theory:</strong> Rhythms generated internally by the economic system itself &mdash; like a rocking chair that, once pushed, oscillates at its natural frequency regardless of the push&rsquo;s character. E. Slutsky (1927) argued that summation of random causes generates a cyclical series imitating a harmonic series.</p>
+
+<p>Two characteristics the random shock theory apparently fails to explain: (1) after distortion, rhythms snap back to their old established pattern; (2) it cannot account for the correspondence between so many economic and &ldquo;natural&rdquo; rhythms.</p>
+
+<h3>Kondratieff&rsquo;s Rebuttal</h3>
+<p>Kondratieff asserts that causes usually assumed for rhythms &mdash; wars, exploration, gold discoveries, innovations &mdash; &ldquo;reverse the causal connections.&rdquo; Wars and revolutions are symptoms of the long waves, not causes. Gold production is subordinate to the rhythm. Innovations are part of it, not the trigger.</p>
+
+<h3>Huntington&rsquo;s Three Types of Cycles</h3>
+<ol>
+  <li><strong>Weather cycles</strong> &mdash; variations in heat/cold, rain/drought directly affect plants, animals, and humans.</li>
+  <li><strong>Physiological/reproductive cycles</strong> &mdash; the only known factor showing required periodicity is atmospheric ozone.</li>
+  <li><strong>Psychological cycles</strong> &mdash; primarily in humans; associated with rhythms in atmospheric electricity, due presumably to the sun.</li>
+</ol>
+
+<h3>Solar Radiation and Human Behavior</h3>
+<p>Edgar Lawrence Smith: pH curve (acid-alkalinity ratio in blood) for 1938 closely coincided with stock market variations. Population tends to be &ldquo;depressed and blue&rdquo; when pH is low, &ldquo;buoyant and optimistic&rdquo; when pH is higher.</p>
+<p>Bernhard and Traute D&uuml;ll: daily deaths from suicide, mental disorders, and diseases of the nerves ran almost parallel with the curve for magnetic disturbance.</p>
+
+<h3>Anderson&rsquo;s Sunspot Harmonic Analysis</h3>
+<p>C.N. Anderson performed harmonic analysis on 300 years of sunspot data, finding a fundamental long-term cycle of 312 years with a chief component rhythm of 22.28 years. Adjacent rhythms at 17.33 and 18.35 years &mdash; the 18.35-year sunspot rhythm is an almost perfect match for the 18&frac13;-year economic building cycle. Clustered around 9&ndash;10 years: five waves suggesting solar counterparts of the 9-year economic rhythm.</p>
+<p><strong>Key finding:</strong> Turning points in prices generally <em>precede</em> corresponding turning points in the combined solar series.</p>
+
+<h3>The &ldquo;Y Waves&rdquo; Postulate</h3>
+<p>Suppose there are still longer waves in the universe with peaks 3&frac12;, 9, 18&frac13;, 54 years apart. These could directly or indirectly affect the sun, weather, animals, and humans &mdash; different organisms might respond only to waves that &ldquo;fit&rdquo; their respective natures.</p>
+
+<blockquote>&ldquo;Man is a child of the earth, and by that same token a part of it, and for this reason he must also be a child of the sun.&rdquo;</blockquote>
+
+<blockquote>&ldquo;If the oscillations in business are dominated by forces following some mathematical formula&hellip; the pattern of business must to a considerable extent be repetitive in nature and hence predictable.&rdquo;</blockquote>
+
+<hr>
+
+<h2 id="ch11" class="chapter-header">Chapter XI: Analysis and Synthesis</h2>
+
+<h3>Waves as Probability, Not Material Reality</h3>
+<p>When speaking of &ldquo;waves&rdquo; in the economy, these are mathematical references. As Sir James Jeans identified the <em>wave</em> with <em>probability</em>: a &ldquo;suicide wave&rdquo; passing over London does not mean each person will commit suicide, only that the <em>likelihood</em> increases.</p>
+
+<h3>Normal Frequency Distribution</h3>
+<p>Galton&rsquo;s Quincunx demonstrates the physical basis of the bell curve &mdash; shot falling through pegs into bins. Even &ldquo;distortion&rdquo; follows law: bearing balls of varying diameter follow the normal distribution in diameter but produce a skewed distribution in mass.</p>
+
+<h3>Sound Synthesis as Analogy</h3>
+<p>Two simple sound waves combined produce a complex wave (synthesis); any complex wave can be broken into its simple components (analysis). An organ pipe curve can be decomposed into 12 harmonic components.</p>
+
+<h3>The Harmonic Method for Predicting Tides</h3>
+<p>Sir William Thompson (1867) devised the harmonic method: a tidal curve is broken into constituent cosine curves, each attributable to a periodic cause. Any periodic motion can always be resolved into the sum of a series of simple harmonic motions (Fourier&rsquo;s Theorem, 1822). The U.S. Coast and Geodetic Survey uses 21 constituents for tide prediction.</p>
+
+<h3>Fourier&rsquo;s Theorem</h3>
+<p>Any curve of wave length <em>l</em> can be reproduced by compounding simple harmonic curves of suitable amplitudes and phases, with wave lengths of l, &frac12;l, &frac13;l, and successive aliquot parts of l.</p>
+
+<h3>Limitations of Harmonic Analysis for Economics</h3>
+<p>Harmonic analysis fails by itself to give the true <em>length</em> of a rhythm &mdash; it ignores individual variation and changes in amplitude and phase shift. ~20 other methods of analysis are available: periodogram, Hoskins Time Chart, Moving Cycle Average, Periodic Table, electrical spectrum analysis. The Cyclograph &mdash; only two machines exist in the world (one in Chicago, one in Tucson, Arizona).</p>
+
+<hr>
+
+<h2 id="ch12" class="chapter-header">Chapter XII: Timing a Business</h2>
+
+<h3>Every Business Has Its Own Rhythms</h3>
+<p>Every business, wrapped around its trend, has rhythms that combine to make a path like an orbit. We can discover these rhythms by analysis, just as we discover constituent rhythms in tides. A business is an organ in the whole economy &mdash; it should contain at least one of the major rhythms found in the economy as a whole.</p>
+
+<h3>Case Study: A Public Utility Company (1883&ndash;1939)</h3>
+<ol>
+  <li><strong>Sales chart (ratio scale):</strong> Strong healthy growth, but the slope is flattening &mdash; rate of growth is declining.</li>
+  <li><strong>Rate of change:</strong> Calculate each month&rsquo;s sales as a percentage of the corresponding month 3 years prior. Reveals wide swings not visible in raw sales.</li>
+  <li><strong>Isolate regular cycles:</strong> Two perfectly regular rhythms emerge &mdash; 18&frac13; years (Cycle C) and 7&frac12; years (Cycle B). Concealed because their crests and troughs sometimes augmented, sometimes cancelled each other.</li>
+  <li><strong>Synthesis:</strong> Combine the two cycles &mdash; shows excellent conformity with actual data.</li>
+  <li><strong>Trend line:</strong> Rate of growth decreasing steadily.</li>
+  <li><strong>Complete synthesis:</strong> Two cycles plus trend = total synthetic curve. Conformity is excellent overall.</li>
+  <li><strong>Projection:</strong> Projected 20 years into the future &mdash; proved extremely close to actual curve from 1939 through 1945.</li>
+</ol>
+
+<h3>Practical Applications</h3>
+<ul>
+  <li>1938&ndash;1939: plant expansion was reasonable at low cost.</li>
+  <li>1939&ndash;1946: refinancing should be favorable.</li>
+  <li>1944&ndash;1945: no new vice-presidencies.</li>
+  <li>1946: city was in a great real estate boom &mdash; but the chart projected a great letdown before the forties ended.</li>
+</ul>
+
+<h3>War Does Not Alter the Rhythm&rsquo;s Timing</h3>
+<p>War may distort the <em>amplitude</em> of a wave but rarely interferes with the <em>timing</em>. It is hazardous to read &ldquo;reasons&rdquo; into rhythmic patterns.</p>
+
+<h3>Case Study: An Industrial Company (1871&ndash;1940)</h3>
+<p>Analysis reveals: a 9&frac13;-year wave, an 18&frac13;-year wave, and an underlying growth trend. WWI lifted the growth trend from one level to another &mdash; the pattern and rate of growth were not affected.</p>
+
+<h3>The Four Major Rhythms Diagrammed</h3>
+<p>Approximate timing of the 54-year, 18&frac13;-year, 9-year, and 41-month rhythms projected from 1940 to 1980. <strong>Key observation:</strong> From 1947 onward, all four major rhythms are declining, and all four reach a bottom <em>circa</em> 1952, with the subsequent pattern calling for a concerted rise.</p>
+
+<blockquote>&ldquo;Much of the success or failure of an individual is due to forces over which he has no control; but if he understands these forces, he may protect himself from the worst results of unfavorable combinations and profit personally from favorable combinations.&rdquo;</blockquote>
+
+<hr>
+
+<h2 id="ch13" class="chapter-header">Chapter XIII: Avoiding Some Economic Illusions</h2>
+
+<h3>The A Priori Prejudice Against Rhythms</h3>
+<p>Many businessmen and economists find it hard to use trends and rhythms because of an <em>a priori</em> prejudice &mdash; they find it hard to believe human experience can be &ldquo;determined&rdquo; by factors outside man&rsquo;s conscious control. A man accustomed to thinking that &ldquo;causes&rdquo; always produce &ldquo;results&rdquo; feels especially confused.</p>
+
+<h3>Ouspensky&rsquo;s Two-Dimensional Being</h3>
+<p>P.D. Ouspensky asked readers to imagine living in only two dimensions &mdash; a being infinitely thin, living on a tabletop, unable to conceive thickness. In the center of the tabletop is a slot through which a multicolored wheel slowly revolves. The 2D being sees only a line of color changing &mdash; red to black to white to blue to red again &mdash; and concludes &ldquo;when red comes, it will eventually cause black.&rdquo;</p>
+<p>A three-dimensional scientist would admit he merely described <em>what happened</em>, without explaining it.</p>
+
+<h3>Time, Space, and Causality as Illusion</h3>
+<p>Minkowski (1905, following Einstein): electrical phenomena must be regarded as occurring in a continuum of four dimensions &mdash; three of space and one of time, welded together so closely that a joint could not be detected. If time is relative, cause and effect are equally relative. If <em>Now</em> has no absolute meaning, neither can <em>Cause</em>.</p>
+<p>Ouspensky&rsquo;s psychological approach: time is the way we experience the unknown dimensions of space. The future is already &ldquo;there&rdquo; &mdash; and what we call &ldquo;cause and effect&rdquo; is merely our sequential perception of a spatial reality.</p>
+
+<h3>The Law of Averages, Not Individual Prediction</h3>
+<p>In economics, as in physics, we cannot predict what any given individual will do. But we do have useful methods for predicting what groups will do, within tolerable margins of error. <em>All the successful predictions hitherto attributed to causality are traceable to this</em> &mdash; the law of averages governing vast numbers.</p>
+
+<h3>Society as Organism, Not Sum of Individuals</h3>
+<p>People banded together form a biological organism whose whole is greater than the sum of its parts. They are cells subject to mathematical laws controlling aggregates. The scientist&rsquo;s only proper question is not <em>why</em> they act as they do, but <em>how</em> and <em>when</em>.</p>
+
+<blockquote>&ldquo;The outcome is itself sufficient justification of the method.&rdquo;</blockquote>
+
+<hr>
+
+<h2 id="ch14" class="chapter-header">Chapter XIV: War and Its Dislocations</h2>
+
+<h3>The Periodicity of War in China</h3>
+<p>Dr. J.S. Lee&rsquo;s study analyzed three 800-year epochs of Chinese history &mdash; the longest continuous historical record of any people. Each epoch follows the same pattern: unification &rarr; prosperity &rarr; secession/rivalry &rarr; invasion. Lee concluded the parallelism &ldquo;far exceeds the limits of probability.&rdquo;</p>
+
+<h3>War as Symptom, Not Cause</h3>
+<p>Kondratieff argued that wars are <em>symptoms</em> of the long economic wave, not causes. The three great wars that created familiar wholesale price peaks all occurred when the 54-year rhythm was approaching its peak. WWII was fought wholly during a period of <em>decline</em> in the 54-year cycle &mdash; any upward price distortion was effected <em>against</em> the rhythmic tendency.</p>
+<p><strong>Key insight:</strong> Once the war &ldquo;explosion&rdquo; has subsided, previously prevailing trends and levels have usually been re-established. Previous wars did not, in themselves, alter basic underlying trends.</p>
+
+<h3>Pareto&rsquo;s Law of Income Distribution</h3>
+<p>Vilfredo Pareto stated: in all places and at all times, the distribution of income in a <em>stable</em> economy follows the formula y&nbsp;=&nbsp;ax<sup>&minus;v</sup>, where v is approximately 1.5. The Pareto value of 1.5 represents stability; deviations signal social unrest. H.T. Davis correctly deduced that the 1935 Pareto index for France (1.85) predicted serious social disturbance. American conditions in 1932, reflected in a figure of 1.76, preceded revolutionary changes.</p>
+
+<h3>The National Debt Problem</h3>
+<p>U.S. interest-bearing debt (plotted on ratio scale, 1830&ndash;1945) shows a concave upward trend &mdash; counter to all laws of growth, meaning it cannot continue permanently. Total indebtedness by early 1946 was estimated at $350 billion (double the 1930 prewar peak).</p>
+
+<blockquote>&ldquo;If we fix our minds upon the fact that the capacity to produce is the nation&rsquo;s wealth and upon the dislocation of that capacity as the supreme evil to be avoided, we shall, I believe, have hold of the saving truth.&rdquo;</blockquote>
+
+<hr>
+
+<h2 id="ch15" class="chapter-header">Chapter XV: Postwar Trends</h2>
+
+<h3>Five Key Trend Facts</h3>
+<ol>
+  <li>The United States has achieved &ldquo;maturity&rdquo; &mdash; relative stability in fundamental aspects of life where once there was rapid growth.</li>
+  <li>Land area has been constant for many years; population still increasing but at a decreasing rate.</li>
+  <li>Some indices (railroad mileage) have actually started down.</li>
+  <li>Manufacturing activity still increasing but at a decreasing rate. Basic industries like steel seem to be reaching their summit.</li>
+  <li>Depressions when the national trend shows &ldquo;maturity&rdquo; &mdash; even ones that in earlier times would have seemed unimportant &mdash; will be felt deeply.</li>
+</ol>
+
+<h3>Resource Depletion</h3>
+<p>WWII reduced known natural oil supplies to unprecedentedly low levels. Iron and copper resources similarly reduced. Bernard M. Baruch: &ldquo;The bedrock fact is that after this war the United States will face a struggle to remain the first power in the world.&rdquo;</p>
+
+<h3>Declining Creative Capacity</h3>
+<p>Dr. Pitirim A. Sorokin (Harvard): the rate of increase of discoveries and inventions definitely slowed down by the late 19th century; between WWI and 1920 even the absolute number declined. U.S. patents issued (1837&ndash;1944) confirm the declining rate of growth on ratio scale.</p>
+
+<h3>The Possibility of Revolutionary Change</h3>
+<p>If the trends maturing in American basic industries stand for the life pattern of capitalism, the explosion of capitalism in our time means new trends are about to be born. But new growth trends emerge <em>only</em> with revolutionary changes in environment.</p>
+<p>Pearl&rsquo;s Drosophila bottle analogy: we Americans are reaching the upper asymptote of our curve. &ldquo;We must have a whole new social bottle into which the American nation is going to move.&rdquo;</p>
+
+<blockquote>&ldquo;He will be able better to understand the fallacies inherent in the multitudinous nostrums. He will doubtless be able to help his neighbors more sympathetically, as they find themselves saddled with heavy problems not entirely of their own making.&rdquo;</blockquote>
+
+<hr>
+
+<h2 id="ch16" class="chapter-header">Chapter XVI: Postwar Rhythms</h2>
+
+<h3>Summary of Rhythm Findings</h3>
+<ol>
+  <li>The underlying 54-year rhythm in wholesale prices is on the decline since 1925; due to reach bottom around 1952.</li>
+  <li>The shorter 9-year rhythm &mdash; last high in 1937, reached another high in 1946 &mdash; due to turn down until 1951.</li>
+  <li>The 3&frac12;-year pattern was forecasting a peak in 1947. Other peaks due in 1950 and 1954. Lows due in &rsquo;48 and &rsquo;51.</li>
+  <li>The 18&frac13;-year rhythm in building activity reached its high about late 1942; due to decline to a low around 1953.</li>
+  <li>The 15-year pattern in purchasing power of beef cattle prices was scheduled for a high around 1944, thereafter declining to a low due in 1951.</li>
+</ol>
+
+<h3>No Lengthy Postwar Boom Expected</h3>
+<p>The number of important rhythms coming to a low together around 1952 suggests a growing postwar crisis. Government planning cannot be expected to prevent rhythmic depressions any more than planning by bankers and businessmen could.</p>
+
+<h3>Practical Advice for Individuals</h3>
+<ul>
+  <li>No individual can rely wholly on money saved &mdash; governments have learned to demonetize money, restrict withdrawals, control exports, and delay bond payments.</li>
+  <li>Real estate is no longer a perfect hedge for inflation.</li>
+  <li>Bonds are not a perfect refuge for savings.</li>
+  <li>The foresighted individual will minimize dollar indebtedness &mdash; freedom from debt at least means freedom of action in time of emergency.</li>
+</ul>
+
+<h3>The New 54-Year Cycle Beginning ~1952</h3>
+<p>Schumpeter identified each 54-year cycle with a particular economic force. The new 54-year cycle beginning about 1952 may again be associated with some great change in living patterns. After 1952, the upward sweep of various major periodicities suggests a time of important constructive accomplishments and prosperity.</p>
+
+<h3>Three Core Assumptions Restated</h3>
+<ol>
+  <li>A rhythm can be considered significant only if it has repeated itself so many times and so regularly that it cannot reasonably be the result of chance.</li>
+  <li>The rhythms which have evidenced themselves clearly in the past continue to operate repetitively.</li>
+  <li>The trends which have been traced in our great basic industries continue on their established courses.</li>
+</ol>
+
+<blockquote>&ldquo;If the rhythms are ultimately confirmed by events, in their indications that the immediate postwar era will bring our economy into some economic hard sledding, we can take renewed hope in the very rhythm of the winter&rsquo;s coming. It will help confirm the knowledge we have gained that our economic rhythms do have patterns that can be projected &mdash; patterns that assure us that we shall also see, not too long hence, a new economic spring.&rdquo;</blockquote>
+
+<hr>
+
+<h2 id="app1" class="chapter-header">Appendix I: The Ratio Scale</h2>
+
+<p>On a ratio scale, equal vertical distances represent equal <em>percentage</em> changes (not equal absolute changes). A straight line on ratio scale = constant <em>rate</em> of growth. A bending-over line = declining rate of growth.</p>
+<p>The arithmetic scale gives little or no visual warning of a drastic fall-off in sales that lies immediately ahead &mdash; the ratio scale makes the deceleration visually obvious. The interval from one number to a number ten times higher = a &ldquo;cycle&rdquo; on ratio scale.</p>
+
+<hr>
+
+<h2 id="app2" class="chapter-header">Appendix II: Moving Averages</h2>
+
+<h3>Simple Moving Average</h3>
+<p>3-year moving average: sum three consecutive years, divide by three, post against the middle year. For an even number of terms, exact centering is impossible &mdash; a further 2-year moving average of the result is computed.</p>
+
+<h3>Effect on Rhythms</h3>
+<p>A moving average has no effect on the <em>period</em> or <em>length</em> of a rhythm &mdash; but it does affect <em>amplitude</em>. When the moving average length equals the period of the rhythm, the rhythm is completely eliminated. Conversely, when computing <em>deviations</em> from a moving average, the length of the rhythm is unaffected regardless of the moving average length.</p>
+
+<hr>
+
+<h2 id="app3" class="chapter-header">Appendix III: The Section Moving Average</h2>
+
+<p>Unlike the simple moving average (which averages consecutive terms), the section moving average averages two or more consecutive <em>sections</em> or <em>cycles</em>. Example: for a 12-month seasonal cycle over 10 years of monthly data, take the first, second, and third Januarys and average them; then Februarys, etc.</p>
+
+<h3>Three Useful Properties</h3>
+<ol>
+  <li><strong>Smoothing technique:</strong> minimizes month-to-month irregularities by spreading distortions over three months rather than concentrating them in one.</li>
+  <li><strong>Length independence:</strong> even if the section length chosen differs from the true cycle length, the <em>length</em> of the cycle disclosed is unaffected &mdash; only the <em>amplitude</em> is dampened.</li>
+  <li><strong>Selective elimination:</strong> when a series is influenced by two rhythmic forces, a section moving average long enough will completely eliminate one rhythm while leaving the other undisturbed.</li>
+</ol>
+
+<script>
+var BM_KEY = 'bm_cycles_science_prediction';
+var bar = document.getElementById('bookmarkBar');
+var label = document.getElementById('bmLabel');
+var toast = document.getElementById('bmToast');
+
+function initBookmark() {
+  var saved = localStorage.getItem(BM_KEY);
+  if (saved) {
+    try {
+      var d = JSON.parse(saved);
+      bar.style.display = 'flex';
+      label.textContent = 'Resume: ' + d.title;
+    } catch(e) { localStorage.removeItem(BM_KEY); }
+  }
+  document.querySelectorAll('h2[id], h3').forEach(function(h) {
+    if (!h.id) h.id = 'bm_' + Math.random().toString(36).slice(2);
+    var btn = document.createElement('span');
+    btn.className = 'bm-btn';
+    btn.textContent = '\u{1F516}';
+    btn.onclick = function(e) { e.stopPropagation(); setBookmark(h); };
+    h.appendChild(btn);
+  });
+}
+
+function setBookmark(el) {
+  var id = el.id || 'bm_' + Math.random().toString(36).slice(2);
+  if (!el.id) el.id = id;
+  var d = { id: id, title: el.textContent.replace('\u{1F516}','').trim(), y: window.scrollY };
+  localStorage.setItem(BM_KEY, JSON.stringify(d));
+  bar.style.display = 'flex';
+  label.textContent = 'Resume: ' + d.title;
+  showToast('Bookmark saved');
+  document.querySelectorAll('.bm-btn').forEach(function(b) { b.classList.remove('active'); });
+  el.querySelector('.bm-btn').classList.add('active');
+}
+
+function jumpToBookmark() {
+  var saved = localStorage.getItem(BM_KEY);
+  if (!saved) return;
+  var d = JSON.parse(saved);
+  var el = document.getElementById(d.id);
+  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  else window.scrollTo({ top: d.y, behavior: 'smooth' });
+}
+
+function clearBookmark() {
+  localStorage.removeItem(BM_KEY);
+  bar.style.display = 'none';
+  document.querySelectorAll('.bm-btn').forEach(function(b) { b.classList.remove('active'); });
+  showToast('Bookmark cleared');
+}
+
+function showToast(msg) {
+  toast.textContent = msg;
+  toast.classList.add('show');
+  setTimeout(function() { toast.classList.remove('show'); }, 1500);
+}
+
+// Progress bar
+window.addEventListener('scroll', function() {
+  var h = document.documentElement.scrollHeight - window.innerHeight;
+  document.getElementById('progressBar').style.width = h > 0 ? (window.scrollY / h * 100) + '%' : '0%';
+});
+
+initBookmark();
+// Auto-scroll to bookmark on load
+var savedBm = localStorage.getItem(BM_KEY);
+if (savedBm) {
+  try {
+    var d = JSON.parse(savedBm);
+    var target = document.getElementById(d.id);
+    if (target) setTimeout(function() { target.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 300);
+  } catch(e) {}
+}
+</script>
+</body>
+</html>
