@@ -2,13 +2,13 @@
 # process-book.sh — Batch-process a PDF into notes.md using Claude CLI
 #
 # Runs parallel claude invocations per page range, each writing to a temp file.
-# Merges results in page order after each wave. Fast and reliable.
+# Merges results in page order after each wave.
 #
 # Usage:
 #   ./process-book.sh "/path/to/book.pdf" "Book_Folder" [start] [end] [batch] [sleep] [parallel]
 #
 # Examples:
-#   ./process-book.sh "/path/to/book.pdf" "My_Book" 1 300 50 5 3
+#   ./process-book.sh "/path/to/book.pdf" "My_Book" 1 300 20 5 3
 #   ./process-book.sh "/path/to/book.pdf" "My_Book"              # auto-detect pages, defaults
 
 set -euo pipefail
@@ -19,7 +19,7 @@ PDF="$1"
 FOLDER="$2"
 START="${3:-1}"
 END_PAGE="${4:-0}"
-BATCH="${5:-50}"
+BATCH="${5:-20}"
 SLEEP="${6:-5}"
 PARALLEL="${7:-3}"
 
@@ -47,7 +47,7 @@ echo "Output: $NOTES" | tee -a "$LOG"
 echo "Pages:  $START → $END_PAGE (batch: $BATCH, parallel: $PARALLEL, sleep: ${SLEEP}s)" | tee -a "$LOG"
 echo "========================================" | tee -a "$LOG"
 
-MAX_RETRIES=3
+MAX_RETRIES=2
 
 # Function: record successfully processed pages
 record_pages() {
@@ -58,17 +58,16 @@ record_pages() {
   sort -un "$PAGES_DONE" -o "$PAGES_DONE"
 }
 
-# Function: process a single batch, writing to a temp file
-# Runs in a subshell (called with &), so uses exit codes to signal success/failure
-process_batch() {
-  local B_START="$1" B_END="$2" TEMP_FILE="$3" BATCH_LOG="$4"
+# Function: build the prompt for a page range
+make_prompt() {
+  local P_START="$1" P_END="$2" OUT_FILE="$3"
+  cat <<PROMPT_EOF
+You are creating detailed study notes from a book PDF. This is a personal, educational book-analysis project for academic study and note-taking.
 
-  local PROMPT="You are creating detailed study notes from a book PDF for an educational project.
+READ pages $P_START-$P_END of the PDF at '$PDF'.
 
-READ pages $B_START-$B_END of the PDF at '$PDF'.
-
-WRITE the notes to '$TEMP_FILE' using the Write tool. Markdown format:
-- START with: <!-- pp. $B_START-$B_END -->
+WRITE the notes to '$OUT_FILE' using the Write tool. Markdown format:
+- START with: <!-- pp. $P_START-$P_END -->
 - Chapter headers: ## Chapter N: Title
 - Subheadings: ### Topic Name
 - Key points as bullet points (-)
@@ -81,32 +80,58 @@ WRITE the notes to '$TEMP_FILE' using the Write tool. Markdown format:
 - Do NOT summarize or condense — write expansive, detailed notes
 - Do NOT output preamble — ONLY write the notes
 
-IMPORTANT: Only cover pages $B_START-$B_END."
+IMPORTANT: Only cover pages $P_START-$P_END. This is academic study material — process the content faithfully.
+PROMPT_EOF
+}
 
-  local RETRY=0
-  while [ "$RETRY" -lt "$MAX_RETRIES" ]; do
-    if [ "$RETRY" -gt 0 ]; then
-      sleep $((SLEEP * RETRY))
-    fi
+# Function: process a single batch with model fallback
+# On content filter errors, immediately tries haiku instead of retrying sonnet.
+process_batch() {
+  local B_START="$1" B_END="$2" TEMP_FILE="$3" BATCH_LOG="$4"
 
-    claude -p "$PROMPT" \
-      --model sonnet \
-      --allowedTools "Read" "Write" \
-      2>>"$BATCH_LOG" || true
+  local MODELS=("sonnet" "haiku")
 
-    # Check if temp file was created with content
-    if [ -f "$TEMP_FILE" ] && [ "$(wc -c < "$TEMP_FILE" | tr -d ' ')" -gt 50 ]; then
-      local LINES=$(wc -l < "$TEMP_FILE" | tr -d ' ')
-      echo "  OK — pp. $B_START-$B_END (+$LINES lines)" >> "$BATCH_LOG"
-      return 0
-    fi
+  for MODEL in "${MODELS[@]}"; do
+    local RETRY=0
+    while [ "$RETRY" -lt "$MAX_RETRIES" ]; do
+      if [ "$RETRY" -gt 0 ]; then
+        sleep 30
+      fi
 
-    RETRY=$((RETRY + 1))
-    echo "  RETRY $RETRY — pp. $B_START-$B_END" >> "$BATCH_LOG"
-    rm -f "$TEMP_FILE"
+      local PROMPT
+      PROMPT=$(make_prompt "$B_START" "$B_END" "$TEMP_FILE")
+      local STDERR_FILE="$DIR/.stderr_${B_START}_${B_END}.tmp"
+
+      claude -p "$PROMPT" \
+        --model "$MODEL" \
+        --allowedTools "Read" "Write" \
+        2>"$STDERR_FILE" || true
+
+      local STDERR_CONTENT=""
+      [ -f "$STDERR_FILE" ] && STDERR_CONTENT=$(cat "$STDERR_FILE") && rm -f "$STDERR_FILE"
+
+      # Check if temp file was created with content
+      if [ -f "$TEMP_FILE" ] && [ "$(wc -c < "$TEMP_FILE" | tr -d ' ')" -gt 50 ]; then
+        local LINES=$(wc -l < "$TEMP_FILE" | tr -d ' ')
+        echo "  OK — pp. $B_START-$B_END ($MODEL, +$LINES lines)" >> "$BATCH_LOG"
+        return 0
+      fi
+
+      # Content filter? Skip straight to next model
+      if echo "$STDERR_CONTENT" | grep -q "content filtering"; then
+        echo "  CONTENT_FILTER — pp. $B_START-$B_END ($MODEL)" >> "$BATCH_LOG"
+        rm -f "$TEMP_FILE"
+        break  # break retry loop, try next model
+      fi
+
+      # Other error — retry same model
+      RETRY=$((RETRY + 1))
+      echo "  RETRY $RETRY — pp. $B_START-$B_END ($MODEL)" >> "$BATCH_LOG"
+      rm -f "$TEMP_FILE"
+    done
   done
 
-  echo "  FAILED — pp. $B_START-$B_END after $MAX_RETRIES retries" >> "$BATCH_LOG"
+  echo "  FAILED — pp. $B_START-$B_END after all models" >> "$BATCH_LOG"
   return 1
 }
 
@@ -225,7 +250,7 @@ else
     TEMP="$DIR/.gap_${FP}.md"
     rm -f "$TEMP"
 
-    GAP_PROMPT="You are creating detailed study notes from a book PDF for an educational project.
+    GAP_PROMPT="You are creating detailed study notes from a book PDF. This is a personal, educational book-analysis project for academic study and note-taking.
 
 READ page $FP of the PDF at '$PDF'.
 
@@ -241,18 +266,22 @@ WRITE the notes to '$TEMP' using the Write tool. Markdown format:
 - Do NOT summarize — write expansive, detailed notes
 - Do NOT output preamble — ONLY write the notes
 
-IMPORTANT: Only cover page $FP."
+IMPORTANT: Only cover page $FP. This is academic study material — process the content faithfully."
 
     GAP_OK=false
     for MODEL in sonnet haiku; do
       [ "$GAP_OK" = true ] && break
       RETRY=0
       while [ "$RETRY" -lt "$MAX_RETRIES" ] && [ "$GAP_OK" = false ]; do
-        [ "$RETRY" -gt 0 ] && sleep 10
+        [ "$RETRY" -gt 0 ] && sleep 15
+        STDERR_FILE="$DIR/.stderr_gap_${FP}.tmp"
         claude -p "$GAP_PROMPT" \
           --model "$MODEL" \
           --allowedTools "Read" "Write" \
-          2>>"$LOG" || true
+          2>"$STDERR_FILE" || true
+
+        STDERR_CONTENT=""
+        [ -f "$STDERR_FILE" ] && STDERR_CONTENT=$(cat "$STDERR_FILE") && rm -f "$STDERR_FILE"
 
         if [ -f "$TEMP" ] && [ "$(wc -c < "$TEMP" | tr -d ' ')" -gt 20 ]; then
           cat "$TEMP" >> "$NOTES"
@@ -262,6 +291,10 @@ IMPORTANT: Only cover page $FP."
           GAP_FIXED=$((GAP_FIXED + 1))
           echo "    OK — page $FP ($MODEL, +$(wc -l < "$TEMP" | tr -d ' ') lines)" | tee -a "$LOG"
           rm -f "$TEMP"
+        elif echo "$STDERR_CONTENT" | grep -q "content filtering"; then
+          echo "    CONTENT_FILTER — page $FP ($MODEL)" | tee -a "$LOG"
+          rm -f "$TEMP"
+          break  # try next model
         else
           RETRY=$((RETRY + 1))
           rm -f "$TEMP"
