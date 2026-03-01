@@ -1,37 +1,77 @@
 # Antifragile — Detailed Notes
 
-## Notable Quotes
-> "[Quote]" — [Attribution if not the author]
+## Prologue
 
-> "[Quote]"
+### I. How to Love the Wind
 
-## Allegories & Cultural References
-| Reference | Concept It Illustrates |
-|-----------|----------------------|
-| [Reference] | [Concept] |
+- **Wind as metaphor**: Wind extinguishes a candle and energizes fire — likewise with randomness, uncertainty, and chaos, you want to use them, not hide from them
+- You want to be the fire and wish for the wind
+- The goal is not merely to survive uncertainty but to **dominate, domesticate, and conquer** the unseen, the opaque, and the inexplicable — like a certain class of aggressive Roman Stoics who sought to have the last word
 
-## Books & Thinkers Referenced
-| Author/Work | Contribution/Relevance |
-|-------------|----------------------|
-| [Author — Title] | [Why referenced] |
+### II. The Antifragile
 
----
+- **Core definition**: Some things benefit from shocks — they thrive and grow when exposed to volatility, randomness, disorder, stressors, and love adventure, risk, and uncertainty
+- There is no word for the exact opposite of fragile — Taleb coins the term **antifragile**
+- **Antifragility is beyond resilience or robustness** — the resilient resists shocks and stays the same; the antifragile gets better
+- This property is behind everything that has changed with time: evolution, culture, ideas, revolutions, political systems, technological innovation, cultural and economic success, corporate survival, good recipes, the rise of cities, cultures, legal systems, equatorial forests, bacterial resistance, and even our own existence as a species
+- **Antifragility determines the boundary between what is living and organic (or complex) and what is inert** — like a stapler on your desk vs. the human body
+- The antifragile loves randomness and uncertainty — crucially, a love of errors, a certain class of errors
+- Antifragility allows us to deal with the unknown, to do things without understanding them — and do them well
 
-## Chapter 1: [Title]
-### [Subheading]
-- [Key point]
-- [Key point]
+> "Let me be more aggressive: we are largely better at doing than we are at thinking, thanks to antifragility. I'd rather be dumb and antifragile than extremely smart and fragile, any time."
 
-> "[Notable quote from this chapter]"
+- Things around us that like a measure of stressors and volatility: economic systems, your body, your nutrition (diabetes and many modern ailments seem associated with a lack of randomness in feeding and the absence of the stressor of occasional starvation), your psyche
+- There are even **financial contracts that are antifragile** — explicitly designed to benefit from market volatility
+- **Antifragility and fragility are degrees on a spectrum** — just as we cannot improve health without reducing disease, or increase wealth without first decreasing losses
 
-### [Subheading]
-- [Key point]
+### Nonprediction
 
----
+- By grasping the mechanisms of antifragility we can build a systematic and broad guide to **nonpredictive decision making** under uncertainty in business, politics, medicine, and life in general
+- **Fragility can be measured; risk is not measurable** (outside of casinos or the minds of people who call themselves "risk experts")
+- This provides a solution to the **Black Swan problem** — the impossibility of calculating the risks of consequential rare events and predicting their occurrence
+- **Sensitivity to harm from volatility is tractable**, more so than forecasting the event that would cause the harm
+- The proposal: stand current approaches to prediction, prognostication, and risk management on their heads
+- **Simple test of asymmetry**: anything that has more upside than downside from random events (or certain shocks) is antifragile; the reverse is fragile
+- In every domain, we can propose rules for moving from the fragile toward the antifragile, through reduction of fragility or harnessing of antifragility
 
-## Chapter 2: [Title]
-### [Subheading]
-- [Key point]
+### Deprivation of Antifragility
+
+- **Critical insight**: antifragility is the property of all natural (and complex) systems that have survived — depriving these systems of volatility, randomness, and stressors will harm them; they will weaken, die, or blow up
+- We have been **fragilizing the economy, our health, political life, education, almost everything** by suppressing randomness and volatility
+- Just as spending a month in bed leads to muscle atrophy, complex systems are weakened, even killed, when deprived of stressors
+- Much of our modern, structured world has been harming us with **top-down policies and contraptions** (dubbed **"Soviet-Harvard delusions"** in the book) — an insult to the antifragility of systems
+- **The tragedy of modernity**: as with neurotically overprotective parents, those trying to help are often hurting us the most
+- Everything **top-down fragilizes** and blocks antifragility and growth; everything **bottom-up thrives** under the right amount of stress and disorder
+- The process of discovery (or innovation, or technological progress) depends on **antifragile tinkering, aggressive risk bearing** rather than formal education
+
+### Upside at the Expense of Others
+
+- The largest fragilizer of society and greatest generator of crises: **absence of "skin in the game"**
+- Some become antifragile at the expense of others by getting the upside (or gains) from volatility, variations, and disorder and exposing others to the downside risks of losses or harm
+- Such **antifragility-at-the-cost-of-fragility-of-others** is hidden — given the blindness to antifragility by the Soviet-Harvard intellectual circles, this asymmetry is rarely identified and never taught
+- During the **financial crisis starting in 2008**, blowup risks-to-others were easily concealed owing to the growing complexity of modern institutions and political affairs
+- In the past, people of rank or status were those who took risks and had the downside for their actions — heroes were those who did so for the sake of others; today the exact reverse is taking place
+- The rise of a new class of **inverse heroes**: bureaucrats, bankers, Davos-attending members of the I.A.N.D. (International Association of Name Droppers), and academics with too much power and no real downside and/or accountability — they game the system while citizens pay the price
+- At no point in history have so many **non-risk-takers** (those with no personal exposure) exerted so much control
+
+> "The chief ethical rule is the following: Thou shalt not have antifragility at the expense of the fragility of others."
+
+### III. The Antidote to the Black Swan
+
+- **Black Swans** (capitalized) are large-scale unpredictable and irregular events of massive consequence — unpredicted by a certain observer, and such an unpredictor is generally called the "turkey" when he is both surprised and harmed by these events
+- Taleb's claim: most of history comes from Black Swan events, while we worry about fine-tuning our understanding of the ordinary, developing models, theories, or representations that cannot possibly track or measure the possibility of these shocks
+- **Black Swans hijack our brains** — making us feel we "sort of" or "almost" predicted them because they are retrospectively explainable; we don't realize the role of these Swans in life because of the **illusion of predictability**
+- Life is more labyrinthine than shown in our memory — our minds turn history into something smooth and linear, which makes us underestimate randomness
+- When we see randomness, we fear it and overreact; because of this fear and thirst for order, some human systems disrupt the invisible logic of things and tend to be exposed to harm from Black Swans and almost never get any benefit
+
+> "You get pseudo-order when you seek order; you only get a measure of order and control when you embrace randomness."
+
+- **Complex systems** are full of interdependencies — hard to detect — and nonlinear responses
+- **"Nonlinear"** means that when you double the dose of, say, a medication, or double the number of employees in a factory, you don't get twice the initial effect, but rather a lot more or a lot less
+- Two weekends in Philadelphia are not twice as pleasant as a single one — when plotted on a graph, the response shows as a **curve, not a straight line**
+- In such an environment, simple causal associations are misplaced; it is hard to see how things work by looking at single parts
+- Man-made complex systems tend to develop **cascades and runaway chains of reactions** that decrease, even eliminate, predictability and cause outsized events
+- The modern world may be increasing in technological knowledge but, paradoxically, it is making things a lot more unpredictable
 
 ---
 
@@ -163,81 +203,6 @@
 - There is empirical evidence of the effect of **"disfluency"**: mental effort moves us into higher gear, activating more vigorous and more analytical brain machinery
 - **Peter Drucker** (management guru) and **Jacques Lacan** (psychoanalyst), two persons who mesmerized crowds the most in their respective areas, were the antithesis of the polished-swanky speaker or the consonant-trained television announcer
 - The same mechanism of overcompensation makes us **concentrate better in the presence of a modicum of background random noise**
-
-## Prologue
-
-### I. How to Love the Wind
-
-- **Wind as metaphor**: Wind extinguishes a candle and energizes fire — likewise with randomness, uncertainty, and chaos, you want to use them, not hide from them
-- You want to be the fire and wish for the wind
-- The goal is not merely to survive uncertainty but to **dominate, domesticate, and conquer** the unseen, the opaque, and the inexplicable — like a certain class of aggressive Roman Stoics who sought to have the last word
-
-### II. The Antifragile
-
-- **Core definition**: Some things benefit from shocks — they thrive and grow when exposed to volatility, randomness, disorder, stressors, and love adventure, risk, and uncertainty
-- There is no word for the exact opposite of fragile — Taleb coins the term **antifragile**
-- **Antifragility is beyond resilience or robustness** — the resilient resists shocks and stays the same; the antifragile gets better
-- This property is behind everything that has changed with time: evolution, culture, ideas, revolutions, political systems, technological innovation, cultural and economic success, corporate survival, good recipes, the rise of cities, cultures, legal systems, equatorial forests, bacterial resistance, and even our own existence as a species
-- **Antifragility determines the boundary between what is living and organic (or complex) and what is inert** — like a stapler on your desk vs. the human body
-- The antifragile loves randomness and uncertainty — crucially, a love of errors, a certain class of errors
-- Antifragility allows us to deal with the unknown, to do things without understanding them — and do them well
-
-> "Let me be more aggressive: we are largely better at doing than we are at thinking, thanks to antifragility. I'd rather be dumb and antifragile than extremely smart and fragile, any time."
-
-- Things around us that like a measure of stressors and volatility: economic systems, your body, your nutrition (diabetes and many modern ailments seem associated with a lack of randomness in feeding and the absence of the stressor of occasional starvation), your psyche
-- There are even **financial contracts that are antifragile** — explicitly designed to benefit from market volatility
-- **Antifragility and fragility are degrees on a spectrum** — just as we cannot improve health without reducing disease, or increase wealth without first decreasing losses
-
-### Nonprediction
-
-- By grasping the mechanisms of antifragility we can build a systematic and broad guide to **nonpredictive decision making** under uncertainty in business, politics, medicine, and life in general
-- **Fragility can be measured; risk is not measurable** (outside of casinos or the minds of people who call themselves "risk experts")
-- This provides a solution to the **Black Swan problem** — the impossibility of calculating the risks of consequential rare events and predicting their occurrence
-- **Sensitivity to harm from volatility is tractable**, more so than forecasting the event that would cause the harm
-- The proposal: stand current approaches to prediction, prognostication, and risk management on their heads
-- **Simple test of asymmetry**: anything that has more upside than downside from random events (or certain shocks) is antifragile; the reverse is fragile
-- In every domain, we can propose rules for moving from the fragile toward the antifragile, through reduction of fragility or harnessing of antifragility
-
-### Deprivation of Antifragility
-
-- **Critical insight**: antifragility is the property of all natural (and complex) systems that have survived — depriving these systems of volatility, randomness, and stressors will harm them; they will weaken, die, or blow up
-- We have been **fragilizing the economy, our health, political life, education, almost everything** by suppressing randomness and volatility
-- Just as spending a month in bed leads to muscle atrophy, complex systems are weakened, even killed, when deprived of stressors
-- Much of our modern, structured world has been harming us with **top-down policies and contraptions** (dubbed **"Soviet-Harvard delusions"** in the book) — an insult to the antifragility of systems
-- **The tragedy of modernity**: as with neurotically overprotective parents, those trying to help are often hurting us the most
-- Everything **top-down fragilizes** and blocks antifragility and growth; everything **bottom-up thrives** under the right amount of stress and disorder
-- The process of discovery (or innovation, or technological progress) depends on **antifragile tinkering, aggressive risk bearing** rather than formal education
-
-### Upside at the Expense of Others
-
-- The largest fragilizer of society and greatest generator of crises: **absence of "skin in the game"**
-- Some become antifragile at the expense of others by getting the upside (or gains) from volatility, variations, and disorder and exposing others to the downside risks of losses or harm
-- Such **antifragility-at-the-cost-of-fragility-of-others** is hidden — given the blindness to antifragility by the Soviet-Harvard intellectual circles, this asymmetry is rarely identified and never taught
-- During the **financial crisis starting in 2008**, blowup risks-to-others were easily concealed owing to the growing complexity of modern institutions and political affairs
-- In the past, people of rank or status were those who took risks and had the downside for their actions — heroes were those who did so for the sake of others; today the exact reverse is taking place
-- The rise of a new class of **inverse heroes**: bureaucrats, bankers, Davos-attending members of the I.A.N.D. (International Association of Name Droppers), and academics with too much power and no real downside and/or accountability — they game the system while citizens pay the price
-- At no point in history have so many **non-risk-takers** (those with no personal exposure) exerted so much control
-
-> "The chief ethical rule is the following: Thou shalt not have antifragility at the expense of the fragility of others."
-
-### III. The Antidote to the Black Swan
-
-- **Black Swans** (capitalized) are large-scale unpredictable and irregular events of massive consequence — unpredicted by a certain observer, and such an unpredictor is generally called the "turkey" when he is both surprised and harmed by these events
-- Taleb's claim: most of history comes from Black Swan events, while we worry about fine-tuning our understanding of the ordinary, developing models, theories, or representations that cannot possibly track or measure the possibility of these shocks
-- **Black Swans hijack our brains** — making us feel we "sort of" or "almost" predicted them because they are retrospectively explainable; we don't realize the role of these Swans in life because of the **illusion of predictability**
-- Life is more labyrinthine than shown in our memory — our minds turn history into something smooth and linear, which makes us underestimate randomness
-- When we see randomness, we fear it and overreact; because of this fear and thirst for order, some human systems disrupt the invisible logic of things and tend to be exposed to harm from Black Swans and almost never get any benefit
-
-> "You get pseudo-order when you seek order; you only get a measure of order and control when you embrace randomness."
-
-- **Complex systems** are full of interdependencies — hard to detect — and nonlinear responses
-- **"Nonlinear"** means that when you double the dose of, say, a medication, or double the number of employees in a factory, you don't get twice the initial effect, but rather a lot more or a lot less
-- Two weekends in Philadelphia are not twice as pleasant as a single one — when plotted on a graph, the response shows as a **curve, not a straight line**
-- In such an environment, simple causal associations are misplaced; it is hard to see how things work by looking at single parts
-- Man-made complex systems tend to develop **cascades and runaway chains of reactions** that decrease, even eliminate, predictability and cause outsized events
-- The modern world may be increasing in technological knowledge but, paradoxically, it is making things a lot more unpredictable
-
----
 
 ## Chapter 2: Overcompensation and Overreaction Everywhere (continued)
 
@@ -869,99 +834,124 @@
 
 *Never shout in French — Ms. Bré gains in respect — Black Swan territory*
 
-### The Korea Incident
-
-- In 2009, at a panel in Korea with **Takatoshi Kato** (deputy managing director of a powerful international institution), Taleb watched Kato present economic projections for 2010–2014 — future projections, without any mention of how badly his organization had projected 2008–2009
-- Taleb ran to the podium and told the audience: the next time someone in a suit and tie gives you projections for future dates, ask to see what he had projected in the past — they would find he was "not very good at this predictionizing business"
-- Our track record in figuring out significant rare events in politics and economics is not close to zero; **it is zero**
+- In fall 2009, Taleb found himself in Korea at a panel with **Takatoshi Kato**, deputy managing director of a powerful international institution, who presented economic projections for 2010–2014
+- Taleb flew into a rage in front of two thousand Koreans — ran to the podium and told the audience that the next time someone gives them projections, they should ask him to show **what he had projected in the past** (in this case, what he had been forecasting for 2008 and 2009 two to five years earlier)
+- Our track record in figuring out significant rare events in politics and economics is **not close to zero; it is *zero***
+- Taleb improvised his solution on the spot: we can't put false predictors in jail; we can't stop people from asking for predictions — but we can live in a world where predictions like Kato's **do not harm you**. Such a world has a unique attribute: **robustness**
+- The idea of the **Triad** was born there: **Fragility–Robustness–Antifragility** as a replacement for predictive methods
 
 ### Ms. Bré Has Competitors
 
-- Forecasting is **not neutral** — it is iatrogenic. Forecasting can be downright injurious to risk-takers, no different from giving people snake oil medicine
-- **Danny Kahneman** stoked Taleb's frustration by showing evidence: providing someone with a random numerical forecast **increases his risk taking**, even if the person *knows* the projections are random
-- The next step is obvious yet rarely taken: **avoidance of iatrogenics from forecasting** — we understand childproofing, but not forecaster-hubris-proofing
+- Forecasting is **not neutral** — it is iatrogenic. It can be downright injurious to risk-takers, no different from giving people snake oil medicine instead of cancer treatment, or **bleeding** (as with George Washington)
+- **Danny Kahneman** stoked Taleb's frustration by showing the evidence of iatrogenics: providing someone with a random numerical forecast **increases his risk taking**, even if the person *knows* the projections are random
+- The next step is obvious yet rarely taken: **avoidance of iatrogenics from forecasting** — we understand childproofing, but not **forecaster-hubris-proofing**
 
 ### The Predictive
 
-- The robust and antifragile **don't need to have as accurate a comprehension of the world** as the fragile — and they do not need forecasting
-- If you have extra cash in the bank (plus cans of Spam, hummus, and gold bars in the basement), you don't need to know with precision which event will cause potential difficulties — it could be a war, a recession, an epidemic, anything. You do not need to predict much
-- Those in the opposite situation — in debt — because of their fragility, need to predict with more and more accuracy
-
-### Plus or Minus Bad Teeth
-
-- Three refined points:
-  1. Detecting (anti)fragility — or actually, *smelling* it, as Fat Tony will show — is **easier than prediction** and understanding the dynamics of events. The entire mission reduces to: minimize harm (and maximize gain) from forecasting errors
-  2. We do not want to change the world for now; we should first **make things more robust to defects and forecast errors**, making lemonade out of the lemons
-  3. History is in the business of making it out of lemons; antifragility is necessarily how things move forward under the mother of all stressors, called **time**
-- After the occurrence of an event, we need to switch the blame from the inability to see it coming to the failure to understand **(anti)fragility** — "why did we build something so fragile to these types of events?"
-- Humanity has been trying for thousands of years to eliminate greed and humans remain the same, **plus or minus bad teeth** — the more intelligent action is to make the world **greed-proof**, or even hopefully make society benefit from the greed
-- After Fukushima, intelligent nuclear firms are now focusing on **exposure to failure** — building small enough reactors embedded deep enough with enough protection that a failure would not affect us much. Costly, but still better than nothing
+- The robust and antifragile **don't need as accurate a comprehension of the world** as the fragile — they do not need forecasting
+- **Redundancy** is a nonpredictive, or rather less predictive, mode of action: if you have extra cash in the bank (plus cans of Spam, hummus, and gold bars in the basement), you don't need to know with precision which event will cause difficulties — war, recession, epidemic, terrorist attack, the secession of New Jersey — you do not need to predict much
+- Those in the opposite situation — **in debt** — because of their fragility, need to predict with more and more accuracy
+- You can control **fragility** a lot more than you think. Three refined points:
+  1. **Detecting (anti)fragility** — smelling it, as Fat Tony will show — is easier than prediction. The entire mission reduces to: minimize harm and maximize gain from forecasting errors — have things that don't fall apart, or even benefit, when we make a mistake
+  2. We do not want to change the world for now; we should first **make things more robust to defects and forecast errors**, or even exploit these errors — making lemonade out of the lemons
+  3. History is in the business of making it out of lemons; **antifragility is how things move forward** under the mother of all stressors, called time
+- After an event, we must switch the blame from inability to see it coming to the failure to understand (anti)fragility — **"why did we build something so fragile?"** Not seeing a tsunami or economic event coming is excusable; **building something fragile to them is not**
+- As to naive utopianism (blindness to history): we cannot afford to rely on the rationalistic elimination of greed and other human defects that fragilize society — humanity has been trying for thousands of years and humans remain the same, **plus or minus bad teeth**. The more intelligent action is to make the world **greed-proof**, or even make society benefit from the greed
+- After Fukushima, intelligent nuclear firms are now focusing on **exposure to failure** — building small enough reactors, embedded deep enough, with enough protection layers that a failure would not affect us much. Making the prediction or nonprediction of failure quite irrelevant. Costly, but still better than nothing
+- The **Swedish government's** focus on total fiscal responsibility after their 1991 budget troubles makes them much **less dependent on economic forecasts** — allowing them to shrug off later crises
 
 ### The Idea of Becoming a Non-Turkey
 
-- There are **two different domains**: one in which we can predict (to some extent), and the **Black Swan domain** — in which we should only let turkeys and turkified people operate
-- The demarcation is the one between the cat and the washing machine — social, economic, and cultural life lie in the Black Swan domain
-- **Randomness in the Black Swan domain is intractable** — the limit is mathematical, period. What is nonmeasurable and nonpredictable will remain so, no matter how many PhDs you put on the job
-- The **Fourth Quadrant** — where we have a high exposure to rare, "tail" events *and* these events are incomputable — is where the danger lies. Focus on getting out of it
-- Because of modernity, **the share of Extremistan is increasing** — winner-take-all effects are worsening. Success for an author, company, idea, musician, athlete is planetary or nothing. These worsen predictability
-- **Opportunists now predict Black Swans** with chaos-complexity-catastrophe-fractal models — yet the answer remains: *less is more*; move the discourse to (anti)fragility
+- We can put a man on the moon, predict the trajectory of planets, predict the most minute effect in quantum physics — yet governments with equally sophisticated models **cannot forecast revolutions, crises, budget deficits, climate change**, or even the closing price of the stock market a few hours from now
+- There are **two different domains**: one in which we can predict (to some extent), and the other — the **Black Swan domain** — in which we should only let turkeys and turkified people operate
+- The demarcation is as visible as the one between **the cat and the washing machine** — social, economic, and cultural life lie in the Black Swan domain, physical life much less so
+- The idea is to separate domains where Black Swans are both **unpredictable and consequential** from those where rare events are either predictable or inconsequential
+
+> "Randomness in the Black Swan domain is intractable. I will repeat it till I get hoarse. The limit is mathematical, period, and there is no way around it on this planet."
+
+- What is nonmeasurable and nonpredictable will remain so, no matter how many PhDs with Russian and Indian names you put on the job — there is, in the Black Swan zone, a **limit to knowledge** that can never be reached
+- Taleb's work is about ***where* one should be skeptical** — focus on getting out of the **Fourth Quadrant** (the scientific name for the Black Swan domain where we have high exposure to rare, "tail" events *and* these events are incomputable)
+- Because of modernity, the share of **Extremistan is increasing** — winner-take-all effects are worsening. Success for an author, a company, an idea, a musician, an athlete is **planetary, or nothing**. These worsen predictability since almost everything in socioeconomic life is now dominated by Black Swans
+- Our sophistication continuously puts us ahead of ourselves, **creating things we are less and less capable of understanding**
+
+### No More Black Swans
+
+- The world has also gone the other way upon the discovery of the Black Swan idea: **opportunists** are now predicting, predictioning, and predictionizing Black Swans with even more complicated models from chaos-complexity-catastrophe-fractal theory
+- Yet the answer is simple: ***less is more*** — move the discourse to **(anti)fragility**
 
 ---
 
 ## Book III: A Nonpredictive View of the World
 
-- **Chapter 10** presents Seneca's stoicism as a starting point for understanding antifragility, with applications from philosophy and religion to engineering
-- **Chapter 11** introduces the barbell strategy and explains why the dual strategy of mixing high risks and highly conservative actions is preferable to a simple medium-risk approach
-- But first, Book III opens with the story of two friends who derive entertainment from, and make a living by, detecting fragility and playing with the ills of fragilistas
-
 ---
 
 ## Chapter 9: Fat Tony and the Fragilistas
 
-*Olfactory methods with the perception of fragility — The difficulties of lunch — Quickly open the envelope — A certain redivision of the world, as seen from New Jersey — The sea gets deeper and deeper*
-
-### Indolent Fellow Travelers
-
-- **Nero Tulip** and **Tony DiBenedetto** (a.k.a. "Fat Tony" or "Tony Horizontal") — before the crisis of 2008, their association would have been hard to explain. They both predicted a sucker's fragility crisis was coming
-- Nero's principal activity is reading books; Fat Tony reads almost nothing. When Nero mentioned he wanted to write his memoirs, Fat Tony joked that "Fat Tony would have written exactly one more book than he had read"
-- Fat Tony grew up in Brooklyn, moved to New Jersey — unburdened with reading activities and allergic to structured office work, he spent a lot of time doing nothing, with occasional commercial transactions. And, of course, a lot of eating
-
-### The Importance of Lunch
-
-- What got them together was **"doing lunch"** — both terrified of boredom, particularly the prospect of waking up early with an empty day ahead
-- Lunch is hard to find during high employment — office workers will cut you short with "I have a two-fifteen." Fat Tony got respect in Italian restaurants where everyone fussed over him
-- Tony once explained to Nero that he had no use for him in the evenings — "he could get better, more humorous, more Italian–New Jersey friends who could give him ideas for something useful"
-
-### The Antifragility of Libraries
-
-- Nero lived a life of mixed asceticism, going to bed close to nine o'clock — he spent his time ordering books from booksellers on the Web, and very often read them
-- Fat Tony was a **"smeller of fragility"** — he claimed he could figure out a person from just walking into a restaurant, which was almost true. When talking to new people, he got very close and sniffed them, like a dog
-- **Curiosity is antifragile**, like an addiction — magnified by attempts to satisfy it. Books have a secret mission and ability to multiply. *The sea gets deeper as you go further into it* (Venetian proverb)
-- Nero's formal training was in statistics and probability, which he approached as a special branch of philosophy — he had been writing *Probability and Metaprobability* his entire adult life, abandoning the project every two years and taking it up again
-
 ### On Suckers and Nonsuckers
 
-- After 2008, it became clear what they had in common: **they were predicting a sucker's fragility crisis** — convinced a snowballing destruction of the modern economic system was bound to happen, simply because there were suckers
-- Fat Tony believed nerds, administrators, and mostly bankers were the ultimate suckers — collectively even bigger suckers than they were individually. He had a natural ability to detect these suckers before they fell apart, and **derived his income from that activity** while leading a life of leisure
-- **By betting against fragility, they were antifragile**
-- Tony made a bundle from the crisis (high eight to low nine figures); Nero made a bit less but was satisfied — he believed in erudition, aesthetics, and risk taking — little else
-- Fat Tony insisted Nero take a ritual look at the physical embodiments of the spoils (bank account statement) — not for financial or purchasing value, but for **symbolic value**. Julius Caesar needed to incur the cost of parading Vercingetorix in chains just to exhibit victory in the flesh
-- **Stay robust to how others treat you** — Nero at some stage befriended a scientist of legendary status who spent his time focused on the status he had that week, enraged at authors who didn't cite him or committees granting medals to people he judged inferior
-- Those who depended on words were **deprived of Tony's serenity** — fragile to the emotional toll from compliments they didn't get. Nero promised himself to escape all this with his ritual: opening the envelope containing the portfolio statement and then going on with his day
+- After the 2008 crisis, it became clear what Fat Tony and Nero had in common: they were predicting a **sucker's fragility crisis**
+- They had both been convinced that a crisis of such magnitude — a snowballing destruction of the modern economic system on a scale never seen before — was bound to happen **simply because there were suckers**
+- Fat Tony believed that **nerds, administrators, and mostly bankers** were the ultimate suckers — when everyone still thought they were geniuses
+- He believed they were **collectively even bigger suckers** than they were individually, and he had a natural ability to detect them before they fell apart
+- Fat Tony derived his income from detecting suckers while leading a life of leisure
+- Nero's interests were similar to Tony's, except dressed up in intellectual traditions — to Nero, a system built on **illusions of understanding probability** is bound to collapse
+- By **betting against fragility**, they were antifragile
+- Tony made a bundle from the crisis, in the high eight to low nine figures — everything other than a bundle for Tony is "tawk"
+- Nero made a bit, though much less than Tony, but was satisfied that he had won — he had already been financially independent and saw money as a waste of time
+- Nero's family wealth had **peaked in 1804**, so he did not have the social insecurity of other adventurers — money to him could not possibly be a social statement, only erudition and perhaps wisdom in old age
+- **Excess wealth** is a heavy burden — nothing was more hideous in Nero's eyes than excessive refinement in clothes, food, lifestyle, manners
+- Wealth was **nonlinear** — beyond some level it forces people into endless complications, creating worries about whether the housekeeper is scamming them
+
+### Ethics of Betting Against Suckers
+
+- The ethics of betting against suckers are discussed in Book VII — two schools of thought
+- To Nero, one should first **warn people that they are suckers**, while Tony was against the very notion of warning
+- > "You will be ridiculed. Words are for sissies. A system based on verbal warnings will be dominated by non-risk-taking-babblers. These people won't give you and your ideas respect unless you take their money."
+- Fat Tony insisted that Nero take a **ritual look at the physical embodiments of the spoils** — such as a bank account statement — not for the financial value, nor the purchasing power, just the **symbolic value**
+- He could understand why Julius Caesar needed Vercingetorix, the leader of the Gaul rebellion, brought to Rome and **paraded in chains** — to exhibit victory in the flesh
+
+### Dependence on External Recognition
+
+- There is another dimension to focusing on **actions over words**: the health-eroding dependence on external recognition
+- People are cruel and unfair in how they confer recognition, so it is best to **stay out of that game** — stay robust to how others treat you
+- Nero befriended a scientist of legendary status who spent his time **focused on the status** he had that week in the scientific community, becoming enraged at authors who did not cite him or committees granting medals to people he judged inferior — an impostor!
+- Those who depend on words for serenity remain **fragile to the emotional toll** from compliments they did *not* get, the ones others got, and from what someone of lower intellect stole from them
+- Nero promised himself to escape this with his small ritual — the **"Fat Tony bet"**: after deducting the cost of a new car (a Mini) and a new $60 Swatch watch, his spoils amounted to a dizzyingly large amount sitting in a portfolio
+- It is not the amount but the **tangibility of his action** that counted — the quantities could have been a tenth, even a hundredth, and the effect would remain the same
+- He would cure himself of the game of recognition by **opening the envelope containing the statement** and then going on with his day, oblivious to those cruel and unfair users of words
+
+### Honor and Risk-Taking
+
+- To follow ethics to their natural conclusion, Nero should have felt just as proud had the envelope contained statements of **losses**
+- > "A man is honorable in proportion to the personal risks he takes for his opinion — in other words, the amount of downside he is exposed to."
+- To sum him up, Nero believed in **erudition, aesthetics, and risk taking** — little else
+
+### Charity
+
+- To avoid the **charity trap**, Nero followed Fat Tony's rule of systematically making donations, but **not to those who directly asked for gifts**
+- He never gave a penny to any charitable organization, with the possible exception of those in which not a single person earned a salary
 
 ### Loneliness
 
-- For Nero, before the crisis, it caused him pain to be alone with his ideas — things out there *did not make sense*, and it was impossible to convey it to others
-- Of the close to a million professionals employed in economic activities (government, academia, media, banking, corporations), **fewer than a handful saw the crisis coming** — and not a single one realized the crisis was a product of modernity
-- Nero could stand near the World Trade Center site and see colossal buildings producing gigabytes of information just by talking — **wasted effort, cacophony, a large-scale delusion of "wealth" that was bound to evaporate**
-- You could stack all the social science books and they would constitute an entire mountain — yet anything in them dealing with probability, statistics, or mathematical models is just *air*. **You learn more in a few lunches with Fat Tony** than from Harvard's social science libraries (two million books, 33 million hours of reading, nine thousand years' worth as a full-time activity)
+- Before the 2008 crisis, Nero sometimes experienced pain at being alone with his ideas — wondering on Sunday nights if there was something wrong with him or the world
+- Lunch with Fat Tony was like **drinking water after an episode of thirst** — immediate relief to realize he was either not crazy, or at least not *alone* in being crazy
+- Things out there *did not make sense*, and it was impossible to convey it to others, particularly people deemed intelligent
+- Of the close to a million professionals employed in economic activities — government, academia, media, banking, corporations — **fewer than a handful saw the crisis coming**, and an even smaller handful managed to foresee the full extent of the damage
+- Not a single one realized that the crisis was a **product of modernity**
+- Nero could stand near the former World Trade Center site in downtown New York, across from colossal buildings housing banks and brokerage houses, with hundreds of people running around inside — all producing **noise**: wasted effort, cacophony, unaesthetic behavior, increased entropy
+- The large-scale delusion of "wealth" was bound to evaporate somehow
+- You could stack the books and they would constitute an entire mountain — to Nero anything in them that deals with probability, statistics, or mathematical models is just **air**
+- > "You learn more in a few lunches with Fat Tony than from the social science sections of the Harvard libraries, with close to two million books and research papers, for a total of 33 million hours of reading."
+- Talk about a major **sucker problem**
 
 ### What the Nonpredictor Can Predict
 
-- Fat Tony did not believe in predictions — but he made big bucks **predicting that some people (the predictors) would go bust**
-- You can't predict in general, but you can predict that those who rely on predictions, taking more risks, will eventually go bust — **someone who predicts will be fragile to prediction errors**
-- An overconfident pilot will eventually crash the plane. A numerical prediction leads people to take more risks
-- **Fat Tony is antifragile because he takes a mirror image of his fragile prey** — he identifies fragilities, makes a bet on the collapse, lectures Nero, collects big after the collapse. Then he has lunch
+- Fat Tony did not believe in predictions, but he made big bucks **predicting that some people — the predictors — would go bust**
+- Nero used to meet physicists from the Santa Fe Institute who believed in predictions and used fancy prediction models — their business ventures based on predictions did not do well, while Fat Tony, who did not believe in predictions, **got rich from prediction**
+- You can't predict in general, but you can predict that those who rely on predictions are taking more risks, will have some trouble, **perhaps even go bust**
+- Someone who predicts will be **fragile to prediction errors** — an overconfident pilot will eventually crash the plane, and numerical prediction leads people to take more risks
+- Fat Tony is **antifragile** because he takes a mirror image of his fragile prey
+- Fat Tony's model is quite simple: he **identifies fragilities**, makes a bet on the collapse of the fragile unit, lectures Nero, trades insults with him about sociocultural matters, reacting to Nero's jabs at New Jersey life, **collects big after the collapse**, then has lunch
 
 ---
 
@@ -969,105 +959,188 @@
 
 *How to survive advice — To lose nothing or gain nothing — What to do on your next shipwreck*
 
+- A couple of millennia before Fat Tony, another child of the Italian peninsula solved the problem of antifragility — **Seneca**, the stoic philosopher
+- Seneca was more intellectual than Fat Tony, spoke in more distinguished prose, and was no less successful in the real world — actually he was **vastly more successful in business** than Fat Tony, and no less intellectual than Nero
+- He solved the problem of antifragility — what connects the elements of the **Triad** — using Stoic philosophy
+
 ### Is This Really Serious?
 
-- A couple of millennia before Fat Tony, another child of the Italian peninsula solved the problem of antifragility: **Seneca** — more intellectual than Tony, he spoke in distinguished prose, was no less successful in business, and no less intellectual than Nero
-- Seneca was the wealthiest person in the Roman Empire (three hundred million denarii), tutor of Emperor Nero, and a prominent expositor of **Stoicism** — focused on the practical: how to take a trip, handle adversity, and critically, handle wealth
-- Not a single one of his commentators detected the ideas about **asymmetry** that are central to antifragility
-- **Professor Triffat anecdote**: a decision theory expert, agonizing over whether to accept an appointment at Harvard, was told to use his own "maximum expected utility" theory — and responded "Come on, this is serious!"
-- By contrast, **Seneca is nothing but "this is serious"** — he survived a shipwreck, wrote practical advice letters, and when he took his own life (as ordered), he followed his own principles. He is still read two millennia after his passing
+- **Lucius Annaeus Seneca** was a philosopher who happened to be the wealthiest person in the Roman Empire, partly owing to his trading acumen, partly for having served as the tutor of Emperor Nero
+- Seneca subscribed to and was a prominent expositor of the philosophical school of **Stoicism**, which advanced a certain indifference to fate
+- His work seduced people because he **walked the walk** — he focused on the practical aspect of Stoicism: how to take a trip, how to handle oneself while committing suicide, how to handle adversity and poverty, and critically, **wealth**
+- Because Seneca was into practical decision making, he has been described by academics as **not theoretical or philosophical enough** — yet not a single one of his commentators detected the ideas about asymmetry central to this book, and the key to robustness and antifragility
+- **Wisdom in decision making** is vastly more important — not just practically, but philosophically — than knowledge
+- Other philosophers came to practice from theory — Aristotle provided practical advice, Plato's ideas about the state and advice to rulers (particularly the ruler of Syracuse) were either **ineffectual or caused debacles**
+- To become a successful philosopher king, it is much better to **start as a king than as a philosopher**
+
+### The Story of Professor Triffat
+
+- Modern members of the discipline of **decision theory** travel a one-way road from theory to practice — they gravitate to the most complicated but inapplicable problems, calling it "doing science"
+- Professor Triffat, a highly cited academic in decision theory, wrote the main textbook and helped develop **"rational decision making"** — loaded with grand and useless axioms and probabilities
+- Triffat was agonizing over the decision to accept an appointment at Harvard — many people who talk about risk never encounter difficult risk-taking decisions like this
+- When a colleague suggested he use **"maximum expected utility"** to decide, Triffat angrily responded: "Come on, this is serious!"
+- By contrast, Seneca is nothing but "this is serious" — he once survived a shipwreck in which other family members perished, and he wrote letters of practical advice to his friends
+- When Seneca took his own life, he followed excellently and in a dignified way the principles he preached
+- While the Harvard economist is only read by people trying to write papers, **Seneca is still read by real people two millennia after his passing**
 
 ### Less Downside from Life
 
-- Seneca's fortune was three hundred million denarii — Judas got thirty for betraying Jesus. The traditional understanding of Stoicism is of *indifference* to fate
-- Key phrase: ***nihil perditi*** — "I lost nothing," after an adverse event. Stoicism makes you desire the challenge of calamity
-- Stoicism as pure robustness: immunity from external circumstances, good or bad — random events won't affect us either way (too strong to lose, not greedy to enjoy the upside). We stay in the middle column of the Triad
-- But reading Seneca directly reveals a different story: **Seneca's version is antifragility from fate. No downside from Lady Fortuna, plenty of upside**
-- Commentators missed that Seneca wanted the upside from fate — if wealth is unnecessary, why did he keep it? Because wealth *without harm from wealth* is preferable to poverty
+- Seneca's fortune was **three hundred million denarii** (Judas got thirty denarii, the equivalent of a month's salary, to betray Jesus)
+- It is not convincing to read denigrations of material wealth from a fellow writing on tables with ivory legs
+- The traditional understanding of Stoicism is of some *indifference* to fate — about continuously degrading the value of earthly possessions
+- When **Zeno of Kition**, the founder of Stoicism, suffered a shipwreck, he declared himself lucky to be unburdened so he could now do philosophy
+- The key phrase reverberating in Seneca's oeuvre is **_nihil perditi_**: "I lost nothing" after an adverse event
+- Stoicism makes you desire the challenge of a calamity — Stoics look down on luxury
+
+> "He is in debt, whether he borrowed from another person or from fortune."
+
+- Stoicism seen this way becomes **pure robustness** — the attainment of a state of immunity from one's external circumstances, good or bad, and an absence of fragility to decisions made by fate
+- Random events won't affect us either way (we are too strong to lose, and not greedy to enjoy the upside), so we stay in the **middle column of the Triad**
+- But reading Seneca directly reveals a different story — Seneca's version of Stoicism is **antifragility from fate**: no downside from Lady Fortuna, plenty of upside
+- Seneca's aim on paper was philosophical — Stoicism was not supposed to be about gains and benefits, just a **sense of control** over one's fate and the reduction of psychological fragility
+- But if wealth is so much of a burden while unnecessary, what's the point of having it? **Why did Seneca keep it?**
+- Intellectuals have this thing against antifragility — for them the world tends to stop at robustness. They avoid considering that **Seneca wanted the upside from fate**, and there is nothing wrong with it
+- Three steps: (1) learn how Seneca advocated the **mitigation of downside** — robustness, protection against harm from emotions, how to move away from the first column of the Triad; (2) show how he truly proposed **antifragility**; (3) generalize his trick into a general method of detection of antifragility
 
 ### Stoicism's Emotional Robustification
 
-- Success brings an asymmetry: you now have a lot more to lose than to gain — **you are hence fragile**. The pain of losing your fortune exceeds the emotional gain of getting additional wealth
-- A rich person becomes trapped by belongings, degrading sleep, raising stress hormones, diminishing sense of humor — **possessions make us worry about downside**, thus acting as punishment
-- Livy: "Men feel the good less intensely than the bad" (*segnius homines bona quam mala sentiunt*) — the ancients stay way ahead of modern psychologists and "loss aversion" theorists
-- Seneca's practical method: **mental exercises to write off possessions** so when losses occurred, he would not feel the sting. Similar to buying an insurance contract against losses
-- Seneca often started journeys with almost the same belongings he would have if he were shipwrecked — a blanket to sleep on the ground
+- Success brings an asymmetry: you now have **a lot more to lose than to gain** — you are hence fragile (like the story of Damocles' sword)
+- When you become rich, the **pain of losing** your fortune exceeds the emotional gain of getting additional wealth — you start living under continuous emotional threat
+- A rich person becomes trapped by belongings that take control of him — degrading his sleep, raising stress hormones, diminishing his sense of humor
+- Seneca fathomed that possessions make us worry about **downside**, thus acting as a punishment as we depend on them — all upside, no downside
+- Dependence on circumstances — rather, the emotions that arise from circumstances — induces **a form of slavery**
+- This asymmetry between good and bad effects was known to the ancients — Livy wrote:
 
-> "I have always hated employment and the associated dependence on someone else's arbitrary opinion."
+> "Men feel the good less intensely than the bad" (*segnius homines bona quam mala sentiunt*)
 
-- **The Stoic method applied to trading**: every morning, go through the mental exercise of assuming the worst possible thing had actually happened — the rest of the day would be a bonus. This made Taleb take a certain class of risks with clear and known downside
+- The ancients — mostly thanks to Seneca — stay **way ahead of modern psychologists** and Triffat-style decision theorists who have developed theories around "risk (or loss) aversion"; the ancients remain deeper, more practical, while transcending vulgar therapy
 
 ### The Domestication of Emotions
 
-- Stoicism is about the **domestication, not elimination**, of emotions — not turning humans into vegetables
+- Stoicism is about the **domestication**, not necessarily the elimination, of emotions — not about turning humans into vegetables
 - The modern Stoic sage is *someone who transforms fear into prudence, pain into information, mistakes into initiation, and desire into undertaking*
-- Seneca proposes a complete training program — one trick: separate anger from rightful action. Wait at least a day before beating a servant who committed a violation (compared to Emperor Hadrian, who stabbed a slave's eye in uncontrolled anger, then felt irreversible remorse)
-- **Invest in good actions** — things can be taken from us, but not good deeds and acts of virtue
+- Seneca proposes a complete **training program** to handle life and use emotions properly — thanks to small but effective tricks
+- One trick: a Roman Stoic would use to **separate anger from rightful action** — to avoid committing harm he would regret later, he would wait at least a day before beating a servant who committed a violation
+- Compare this to Emperor Hadrian's act of stabbing a slave in the eye during uncontrolled anger — when the anger abated, the damage was **irreversible**
+- Seneca also provides a catalogue of social deeds: **invest in good actions** — things can be taken from us, but not good deeds and acts of virtue
 
 ### How to Become the Master
 
-- Seneca said wealth is the slave of the wise man and master of the fool — **he kept the upside**
-- He broke with the purported Stoic habit: if previous Stoics claimed to prefer poverty to wealth, we should be suspicious — since most were poor, they might have been rationalizing (sour grapes)
-- Seneca was all deeds — he kept the wealth. His preference was for **wealth without harm from wealth** to poverty
-- In *De beneficiis*, he explicitly called it a **cost-benefit analysis** using the word "bookkeeping": "The bookkeeping of benefits is simple: it is all expenditure; if any one returns it, that is clear gain"
-- He played a trick on fate: kept the good and ditched the bad; **cut the downside and kept the upside** — that's antifragility in its purest form
+- So far we have learned to move from the left of the Triad (fragile) to the center (robust) — but **Seneca went beyond**
+- He said that wealth is the **slave of the wise man and master of the fool** — thus he broke with the purported Stoic habit: *he kept the upside*
+- If previous Stoics claimed to prefer poverty to wealth, we need to be suspicious — since most were poor, they might have fit a narrative to the circumstances (the notion of **sour grapes**: cognitive games to make yourself believe the grapes you can't reach taste sour)
+- Seneca was all deeds, and we cannot ignore that he **kept the wealth** — it is central that he showed his preference of wealth *without harm from wealth* to poverty
+- Seneca even outlined his strategy in *De beneficiis*, explicitly calling it a cost-benefit analysis using the word **"bookkeeping"**:
+
+> "The bookkeeping of benefits is simple: it is all expenditure; if any one returns it, that is clear gain; if he does not return it, it is not lost, I gave it for the sake of giving."
+
+- So he played a trick on fate: **kept the good and ditched the bad** — cut the downside and kept the upside
+- This cost-benefit analysis is not quite Stoicism in the way people who study Stoicism understand the meaning — there is an **upside-downside asymmetry**
+- That's **antifragility in its purest form**
 
 ### The Foundational Asymmetry
 
-- **Fragility implies more to lose than to gain** = more downside than upside = unfavorable asymmetry
-- **Antifragility implies more to gain than to lose** = more upside than downside = favorable asymmetry
-- You are antifragile for a source of volatility if potential gains exceed potential losses (and vice versa)
-- If you have more upside than downside, you may be **harmed by lack of volatility and stressors**
-- How do we put this idea — reduction of downside, increase in upside — into practice? By the method of the **barbell** in the next chapter
+- The concept used earlier is *more to lose* from adversity — if you have more to lose than to benefit from events of fate, there is an asymmetry, and not a good one, which **brings us to fragility**
+- The fragile package from Chapter 1: it does not like to be shaken and hates the members of the disorder family — hence it is fragile (very asymmetric) because it has **absolutely nothing to gain**
+- The antifragile package has **more to gain than to lose** from being shaken — simple test: if I have "nothing to lose" then it is all gain and I am antifragile
+- The entire Table 1 with triads across fields and domains can be explained in these terms
+- If you have **less to lose than to gain**, more upside than downside, then you like volatility (it will, on balance, bring benefits), and you are also antifragile
+
+> *Fragility implies more to lose than to gain, equals more downside than upside, equals (unfavorable) asymmetry*
+
+> *Antifragility implies more to gain than to lose, equals more upside than downside, equals (favorable) asymmetry*
+
+- You are **antifragile for a source of volatility** if potential gains exceed potential losses (and vice versa)
+- If you have more upside than downside, then you may be **harmed by lack of volatility and stressors**
+- The practical question: how do we put this idea — reduction of downside, increase in upside — into practice? By the method of the **barbell** in the next chapter
 
 ---
 
 ## Chapter 11: Never Marry the Rock Star
 
-*The barbell strategy — Avoiding the middle — Seneca's investment portfolio — The domestication of uncertainty*
+*A precise protocol on how and with whom to cheat on one's husband — Introduction to barbell strategies — Transforming diplomats into writers, and vice versa*
 
-### The Barbell (Bimodal) Strategy
-
-- The **barbell** (or bimodal) strategy: a combination of two extremes, one safe and one speculative, with nothing in the middle — deemed too mediocre
-- In finance: put **90% in boring cash** (or inflation-protected instruments) and **10% in maximally risky, maximally rewarding securities** — you cannot possibly lose more than 10%, while you are exposed to massive upside
-- This is more robust than 100% in "medium" risk: someone with 100% in so-called medium-risk securities will be ruined upon a "Black Swan" event. The barbell person's maximum loss is known and bounded
-- The barbell is **not just about financial risk** — it generalizes to any domain where you separate your extremes and avoid the "mezzanine" risk
+- The **barbell (or bimodal) strategy** is a way to achieve antifragility and move to the right side of the Triad
+- Monogamous birds put it into practice by cheating with the local rock star, and writers do better by having a day job (a sinecure) devoid of writing activities
 
 ### On the Irreversibility of Broken Packages
 
-- The concept of **path dependence**: a broken vase is not the same as an intact one — once broken, you cannot reassemble it. The damage is irreversible
-- **Fragility is particularly punishing when things are path-dependent** — the sequence matters
-- You cannot "average" temperature exposures with a fragile creature: a turkey at 0°F for a day then 60°F is not the same as 30°F for both days — it's dead after the first day
-- This is the fundamental argument against the "golden middle": the middle doesn't work when systems are fragile and path-dependent
+- The first step toward antifragility consists in **first decreasing downside** rather than increasing upside — by lowering exposure to negative Black Swans and letting natural antifragility work by itself
+- **Mitigating fragility** is not an option but a requirement — it may sound obvious but the point seems to be missed
+- Fragility is very punishing, like a terminal disease — a package doesn't break under adverse conditions then manage to fix itself when proper conditions are restored
+- Fragility has a **ratchetlike property**: the irreversibility of damage — what matters is the route taken, the order of events, not just the destination — what scientists call a **path-dependent** property
+- Path dependence illustrated: your experience in getting a kidney stone operation first and anesthesia later is different from the opposite sequence; a meal with coffee and dessert first and tomato soup last would not be the same as the inverse order
+- It is easy to identify the fragile and put it in the **left column of the Triad** — since the broken will tend to stay permanently broken
+- This fragility from path dependence is often ignored by businessmen trained in static thinking — they believe generating profits is their principal mission, with survival and risk control as something to "perhaps consider"
+- The strong logical precedence of **survival over success**: to make profits and buy a BMW, it would be a good idea to, first, survive
+- Notions such as **speed and growth** are empty and meaningless when presented without accounting for fragility — someone driving 250 mph in New York City will certainly never get anywhere (effective speed: zero miles per hour)
+- One needs to focus on the **effective**, not the nominal — speed, growth, something in sociopolitical discourse masks such an elementary point
+
+### Path Dependence and Economic Growth
+
+- Under path dependence, one can no longer separate **growth from risks of recession**, financial returns from risks of terminal losses, and "efficiency" from danger of accident
+- The notion of efficiency becomes quite meaningless on its own — if a gambler has a risk of terminal blowup (losing back everything), the "potential returns" of his strategy are **totally inconsequential**
+- A university fellow boasted that their endowment fund was earning 20 percent or so, not realizing these returns were associated with fragilities that would easily turn into catastrophic losses — sure enough, a bad year **wiped out all these returns**
+- If something is fragile, its risk of breaking makes anything you do to improve it or make it "efficient" inconsequential unless you **first reduce that risk of breaking**
+- > "Nothing can be done both hastily and safely — almost nothing." — Publilius Syrus
+- GDP growth can be obtained easily by loading future generations with **debt** — and the future economy may collapse upon the need to repay it
+- GDP growth, like cholesterol, seems to be a **Procrustean bed reduction** that has been used to game systems
+- For a plane with a high risk of crashing, the notion of "speed" is irrelevant — economic growth with fragilities is **not to be called growth**
+- Throughout the golden years of the Industrial Revolution, growth was very modest — **less than 1 percent per head** — but as low as it was, it was **robust growth**, unlike the current fools' race of states shooting for growth like teenage drivers infatuated with speed
 
 ### Seneca's Barbell
 
-- Seneca had one of history's first barbell strategies: massive wealth combined with the constant mental exercise of losing it all
-- He kept his three hundred million denarii, but trained himself to write it off mentally — so he had the upside of wealth with the emotional robustness of poverty
-- **Financial barbell**: 90% in the safest possible instrument, 10% in extremely speculative bets — never anything in between
-- The barbell satisfies antifragility's core condition: more to gain than to lose, where the loss is known and bounded
+- This brings us to the solution in the form of a **barbell** — about all solutions to uncertainty are in the form of barbells
+- The barbell (a bar with weights on both ends) is meant to illustrate the idea of a **combination of extremes kept separate**, with avoidance of the middle
+- In our context it is not necessarily symmetric: just **composed of two extremes**, with nothing in the middle — also called a bimodal strategy, with two distinct modes rather than a single central one
+- The barbell image describes a dual attitude of **playing it safe in some areas** (robust to negative Black Swans) and **taking a lot of small risks in others** (open to positive Black Swans), hence achieving antifragility
+- That is **extreme risk aversion on one side** and **extreme risk loving on the other**, rather than just the "medium" or the beastly "moderate" risk attitude that in fact is a sucker game (because medium risks can be subjected to huge measurement errors)
+- The barbell also results in the **reduction of downside risk** — the elimination of the risk of ruin
+
+### The Barbell in Finance
+
+- If you put **90 percent of your funds in boring cash** (assuming you are protected from inflation) or something called a "numeraire repository of value," and **10 percent in very risky, maximally risky securities**, you cannot possibly lose more than 10 percent, while you are exposed to massive upside
+- Someone with 100 percent in so-called "medium" risk securities has a **risk of total ruin** from the miscomputation of risks
+- The barbell technique remedies the problem that risks of rare events are **incomputable and fragile to estimation error** — here the financial barbell has a **maximum known loss**
+- For antifragility, the combination is **aggressiveness plus paranoia** — clip your downside, protect yourself from extreme harm, and let the upside (the positive Black Swans) take care of itself
+- Seneca's asymmetry: more upside than downside can come simply from the **reduction of extreme downside** (emotional harm) rather than improving things in the middle
+
+### Barbells vs. Nonbarbells
+
+- A barbell can be **any dual strategy composed of extremes**, without corruption of the middle — somehow they all result in favorable asymmetries
+- Consider that restaurants present the main course (steak cooked rare with Malbec wine), then separately, the goat cheese cake (with Muscat wine) — they do not cut the cake and steak into small pieces and mix them together; activities "in the middle" are like such **mashing**
+- Recall Nero in Chapter 9 hanging around with **janitors and scholars**, rarely with middlebrows
+- In risky matters, instead of having all members of a staff "cautiously optimistic" or something in the middle, have the **flight attendants maximally optimistic** and the **pilot maximally pessimistic** (or better, paranoid)
 
 ### The Accountant and the Rock Star
 
-- Biological barbell: organisms favor extremes over the moderate
-- In mating strategies, there is an observed preference pattern that resembles a barbell — the extremely reliable partner AND extreme risk-takers (the "rock star"), but not the dull middle
-- The barbell extends to social life: have some very safe, reliable friends for stability, and some wildly unpredictable adventurers — but avoid the tepid middle
+- Biological systems are replete with barbell strategies — the **90 percent accountant, 10 percent rock star** mating approach
+- Females in some monogamous species (including humans) tend to marry the **accountant** (someone stable who can provide) and once in a while cheat with the **aggressive alpha, the rock star**, as part of a dual strategy
+- They **limit their downside** while using extrapair copulation to get the genetic upside, or some great fun, or both
+- Even the timing of the cheating seems nonrandom, corresponding to **periods with high likelihood of pregnancy**
+- Evidence from so-called monogamous birds: they enjoy cheating, with more than a tenth of the broods coming from **males other than the putative father**
+- Evolutionary theorists claim females want both **economic-social stability and good genes** for their children — both cannot always be obtained from someone in the middle
+- Recall from Chapter 2 that overcompensation requires **some harm and stressors as tools of discovery** — let children play a little bit with fire and learn from injuries, for the sake of their own future safety
+- Let people experience **some stress** to wake them up a bit — but at the same time, they need to be protected from high danger
+- Ignore small dangers, invest your energy in protecting them from **consequential harm — and only consequential harm**
+- This can visibly be translated into social policy, health care, and many more matters
+
+### Provide for the Worst
+
+- One finds similar ideas in ancestral lore — a Yiddish proverb:
+
+> "Provide for the worst; the best can take care of itself."
+
+- This may sound like a platitude, but it is not: just observe how people tend to **provide for the best** and hope that the worst will take care of itself
+- We have ample evidence that people are averse to small losses but **not so much toward very large Black Swan risks** (which they underestimate) — they tend to insure for small probable losses, but not large infrequent ones — **exactly backwards**
 
 ### Away from the Golden Middle
 
-- **Literature barbell**: many great writers were sinecure holders — Kafka was an insurance executive, Spinoza a lens grinder, Trollope a postal clerk, Stendhal a civil servant
-- The sinecure-cum-writing model: a safe, boring day job provides the stable base, while writing provides the speculative upside
-- This is vastly superior to the "middle" path of being a full-time professional writer depending on publishers and the market — that is fragile
-
-### The Domestication of Uncertainty
-
-- Barbell rules for life: **no smoking, no sugar, no motorcycles, no bicycling in traffic** — then take all manner of professional and intellectual risks
-- The barbell applied to health and exercise: **maximum intensity weight lifting** (short bursts) then complete rest — superior to long, moderate gym sessions. Sprint or walk; never jog
-- Ray Dalio's rule: **"Make sure the probability of the unacceptable is nil."** Then take as much risk as you want on the upside
-- The alcohol barbell: people who drink heavily on certain days but not at all on others may be healthier than those who drink moderately every day (hormesis requires stressors followed by recovery)
-- **Just as Stoicism is the domestication of emotions, the barbell is the domestication of uncertainty**
-
-> "Provide for the worst; the best can take care of itself."
+- There are so many fields in which the middle is no "golden middle" and where the **bimodal strategy** (maximally safe plus maximally speculative) applies
+- Take **literature** — the most uncompromising, most speculative, most demanding, and riskiest of all careers
+- There is a tradition with French and other European literary writers to look for a **sinecure** — the anxiety-free profession of civil servant, with few intellectual demands and high job security — then spend their spare time writing freely, whatever they want, under their own standards
+- There is a shockingly small number of academics among French authors
+- American writers, on the other hand, tend to become members of the media or academics, which **makes them prisoners of a system and corrupts their writing**
 
 ---
 
@@ -1479,541 +1552,115 @@
 
 ---
 
-## Book V: The Nonlinear and the Nonlinear
-
-*Chapters 17–19 — The central technical ideas of the book*
-
----
-
 ## Chapter 17: Fat Tony Debates Socrates
 
-*A tonsillectomy to kill time — Never do today what can be left to tomorrow — Let's predict revolutions after they happen — Lessons in blackjack*
+*Piety for the impious — Fat Tony does not drink milk — Always ask poets to explain their poetry — Mystagogue philosophaster*
 
-### Naive Intervention
+### Euthyphro
 
-- The need to "do something" is illustrated by a 1930s study: **389 children** were presented to New York City doctors; **174** were recommended tonsillectomies. The remaining 215 were presented to doctors again and **99** were said to need the surgery. Of the remaining 116, shown to yet another set of doctors, **52** were recommended for surgery
-- Morbidity in 2 to 4 percent of cases (at the time), and a death occurs in about every **15,000** such operations — this gives an idea of the break-even point between medical gains and detriment
-- This story illustrates **probabilistic homicide at work** — every child who undergoes an unnecessary operation has a shortening of life expectancy
-- The example illustrates not only harm done by those who intervene, but the **lack of awareness of the need to look for a break-even point** between benefits and harm
-- Taleb calls this urge to help **"naive interventionism"**
+- Fat Tony believes they were **totally justified in putting Socrates to death**
+- This chapter completes the discussion of the difference between **narrated, intelligible knowledge** and the more opaque kind that is entirely probed by tinkering — the two columns of Table 4 separating narrative and non-narrative action
+- There is this error of thinking that things always have a *reason* that is accessible to us — that we can comprehend easily
+- The most severe mistake made in life is to **mistake the unintelligible for the unintelligent** — something Nietzsche figured out. It resembles the turkey problem, mistaking what we don't see for the nonexistent
+- **Plato** expressed himself chiefly through his use of Socrates, the Athenian who became the most influential philosopher in the modern sense. Socrates left no writing of his own — we get direct representation mainly through **Plato and Xenophon**
+- In one of Plato's dialogues, *Euthyphro*, Socrates was outside the courthouse awaiting his trial when **Euthyphro**, a religious expert, struck up a conversation. Socrates started explaining the charges against him (corrupting the youth, introducing new gods)
+- Euthyphro was on his way to charge his own father with manslaughter — Socrates started wondering how this was compatible with Euthyphro's religious duties
+- **Socrates' technique**: make his interlocutor agree to a thesis, then proceed to show how the statements he agreed to are inconsistent with the original thesis — establishing that the person has no clue what he's talking about
+- Euthyphro could not produce a definition of piety. The dialogue continued with more definitions until Euthyphro found a polite excuse to run away — the reader is left with the impression it could have gone on for twenty-five centuries without bringing us any closer to anything
 
-### Intervention and Iatrogenics
+### Fat Tony Versus Socrates
 
-- The harm to children undergoing unnecessary tonsillectomies is coupled with trumpeted gain for *some* others — the name for such net loss, the (usually hidden or delayed) damage from treatment in excess of benefits, is **iatrogenics**, literally "caused by the healer" (*iatros* being a healer in Greek)
-- Every time you visit a doctor and get a treatment, you incur risks of such medical harm, which should be analyzed as **probabilistic benefits minus probabilistic costs**
-- **George Washington's death** (December 1799): his doctors greatly helped hasten his death thanks to the standard treatment of **bloodletting** (between five and nine pounds of blood)
-- Until penicillin, medicine had a largely **negative balance sheet** — going to the doctor increased your chance of death
-- Medical iatrogenics seems to have increased over time, peaking sometime late in the nineteenth century — it was "scientific progress," the birth of the clinic and its substitution for home remedies, that caused death rates to shoot up, mostly from **"hospital fever"**
-- **Leibniz** had called hospitals *seminaria mortis* — seedbeds of death
-- **Ignaz Semmelweis** observed that more women died giving birth in hospitals than giving birth on the street. He called the establishment doctors "a bunch of criminals" — which they were: doctors who kept killing patients could not accept his facts since he "had no theory"
-- Semmelweis entered a state of depression, helpless to stop what he saw as murders, and ended up in an **asylum**, where he died ironically from the same hospital fever he had been warning against
-- The lesson: one should **not expect laurels for bringing the truth**
+- Imagine Fat Tony asked by Socrates how he defined piety — Fat Tony's answer would have been most certainly to ***get lost***
+- Fat Tony's power in life is that he **never lets the other person frame the question** — he taught Nero that an answer is planted in every question; never respond with a straight answer to a question that makes no sense to you
 
-### Medical Iatrogenics Today
+> FAT TONY: "You are asking me to define what characteristic makes a difference between pious and nonpious. Do I really *need* to be able to tell you what it is to be able to conduct a pious action?"
+> SOCRATES: "How can you use a word like 'piety' without knowing what it means?"
+> FAT TONY: "Do I actually have to tell you in plain barbarian non-Greek English what it means to prove that I know and understand what it means? I don't know it in words but I know what it is."
 
-- Medicine is comparatively the good news — perhaps the only good news in iatrogenics, because things are starting to be brought under control
-- Medical error still currently kills between **three times** (as accepted by doctors) and **ten times** as many people as car accidents in the United States
-- Harm from doctors — not including hospital germs — accounts for **more deaths than any single cancer**
-- The medical establishment's decision making is still innocent of proper **risk-management principles**, but medicine is getting better
-- **Pharmaceutical companies, lobbies, and special interest groups** play the game of concealed and distributed iatrogenics — producing harm that is not immediately salient and not accounted for as "error"
-- It is easy to assess iatrogenics when the surgeon amputates the wrong leg. But when you **medicate a child** for an imagined or invented psychiatric disease (ADHD, depression), instead of letting him out of the cage, the long-term harm is largely **unaccounted for**
-- Iatrogenics is compounded by the **"agency problem"** or **"principal-agent problem"**: when the agent (stockbroker, doctor) has personal interests divorced from those of the principal (client, patient) — their advice is geared to **benefit themselves**
+- Fat Tony would have taken Socrates down his own road, using the Socratic pattern of dialogue:
 
-### First, Do No Harm
+> FAT TONY: "Tell me, old man. Does a child need to define mother's milk to understand the need to drink it?"
+> SOCRATES: "No, he does not need to."
+> FAT TONY: "And my dear Socrates, does a dog need to define what an owner is to be loyal to him?"
+> SOCRATES (puzzled): "A dog has instinct. It does not reflect on its life."
+> FAT TONY: "But are we humans so fundamentally different as to be completely stripped of instinct leading us to do things we have no clue about? Do we have to limit life to what we can answer in proto-Brooklyn English?"
 
-- Medicine has known about iatrogenics since at least the fourth century before our era — *primum non nocere* ("first do no harm") is a first principle attributed to **Hippocrates** and integrated in the Hippocratic Oath
-- It took medicine about **twenty-four centuries** to properly execute this brilliant idea
-- The term "iatrogenics" only appeared in frequent use very, very late — **a few decades ago** — after so much damage had been done
-- The writer **Bryan Appleyard** introduced Taleb to the exact word (he had used "harmful unintended side effects")
-- Since **no intervention implies no iatrogenics**, the source of harm lies in the **denial of antifragility** and the impression that we humans are so necessary to making things function
-- The concept of iatrogenics needs to be pushed into **political science, economics, urban planning, education**, and more domains — but consultants and academics in these fields did not know what Taleb was talking about, or thought they could not possibly be the source of damage
-- The **Koran** mentions "those who are wrongful while thinking of themselves that they are righteous"
+- Without waiting for Socrates' answer (only suckers wait for answers; questions are not made for answers):
 
-> "To sum up, anything in which there is naive interventionism, nay, even just intervention, will have iatrogenics."
+> FAT TONY: "Then, my good Socrates, why do you think that we need to fix the meaning of things?"
+> SOCRATES: "My dear Mega-Tony, we need to know what we are talking about when we talk about things... An unexamined life is not worth living."
+> FAT TONY: "The problem, my poor old Greek, is that you are killing the things we can know but not express. And if I asked someone riding a bicycle just fine to give me the theory behind his bicycle riding, he would fall from it. By bullying and questioning people you confuse them and hurt them."
 
-### The Opposite of Iatrogenics
+- Then, looking at him patronizingly, with a smirk, very calmly:
 
-- We don't have a designation for the opposite situation — someone who ends up **helping while trying to cause harm**
-- Attacking the antifragile will backfire: **hackers make systems stronger**; Ayn Rand's obsessive, intense critics helped her book spread
-- **Incompetence is double-sided**: in the Mel Brooks movie *The Producers*, two theater fellows get in trouble by finding success instead of intended failure — they had sold the same shares to multiple investors in a Broadway play, reasoning a play that should fail would hide their scheme. The problem was the play (*Springtime for Hitler*) was so bad it became a huge hit
-- A similar irony in trading: a fellow so upset at his year-end bonus that he started making huge bets with his employer's portfolio — and ended up making them considerable sums of money
-- Perhaps the idea behind **capitalism** is an inverse-iatrogenic effect: the system facilitates the conversion of selfish aims into beneficial results for the collective — the **unintended-but-not-so-unintended consequences**
+> FAT TONY: "My dear Socrates... you know why they are putting you to death? It is because you make people feel stupid for blindly following habits, instincts, and traditions. You may be occasionally right. But you may confuse them about things they've been doing just fine without getting in trouble. You are destroying people's illusions about themselves. You are taking the joy of ignorance out of the things we don't understand. And you have *no* answer; you have *no* answer to offer them."
 
-### Iatrogenics in High Places
+### Primacy of Definitional Knowledge
 
-- Two areas have been particularly infected with absence of awareness of iatrogenics: **socioeconomic life** and the **human body** — matters combining a low degree of competence with a high rate of intervention and a disrespect for spontaneous operation and healing
-- People with an **engineering-oriented mind** tend to look at everything as an engineering problem — good for engineering, but when dealing with cats, hire veterinarians rather than circuits engineers — or better, let your animal heal by itself
-- **Table 3** — "Fragilizing Interventionism and Its Effects Across Disciplines" — catalogs iatrogenics across fields:
-  - **Medicine/Health**: overtreatment → fragility; steady feeding/thermal stability → medical error; pharmaceutical addition not subtraction → sicker humans, antibiotic-resistant bacteria
-  - **Ecology**: micromanaging forest fires → worsening total risks, larger "big ones"
-  - **Politics**: central planning → informational opacity; U.S. supporting rotten regimes "for stability" → chaos after a revolution
-  - **Economics**: "No More Boom and Bust" (Greenspan, Bernanke) → fragility, deeper crises; state interventionism → support for established corporations, stifling entrepreneurs; optimization → vulnerability, pseudo-efficiency; value-at-risk methodologies → big-time blowups
-  - **Business**: positive advice from charlatans, focus on return not risk → richer charlatans, bankrupt businesses
-  - **Urbanism**: city planning → urban blight, inner cities, crime
-  - **Forecasting**: forecasting in Black Swan domains → hidden risks (people take more risks when supplied with a forecast)
-  - **Literature**: copy editors trying to change your text → blander, commoditized writing
-  - **Parenting**: soccer mom removing every random element → touristification of children's minds
-  - **Education**: the entire concept grounded in interventionism → ludification/transformation of children's brains
-  - **Technology**: neomania → fragility, alienation, nerdification
-  - **Media**: high-frequency sterile information → disruption of noise/signal filtering, interventionism
+- What Fat Tony is hitting here is the very core of philosophy: the main questions that became philosophy were first raised by Socrates — "what is existence?," "what are morals?," "what is a proof?," "what is science?"
+- The question in *Euthyphro* pervades the various dialogues written by Plato — Socrates is seeking relentlessly **definitions of the essential nature** of the thing concerned rather than descriptions of the properties by means of which we can recognize them
+- Socrates cross-examined the poets and reported they had no more clue than the public about their own works — in Plato's *Apology* he recounted taking them elaborate passages and asking what was the meaning
+- This priority of definitional knowledge led to Plato's thesis: you cannot know anything unless you know the **Forms** — if we cannot define piety from working with particulars, start with the universals. If you cannot get a map from a territory, build a territory out of the map
+- In defense of Socrates: if his questions could not define what something *was*, they at least allowed him to be certain about **what a thing was not**
 
-### Can a Whale Fly Like an Eagle?
+### Mistaking the Unintelligible for the Unintelligent
 
-- Social scientists and economists have **no built-in consciousness of iatrogenics** — when Taleb tried to teach a class on model error in economics and finance, nobody took him seriously, and those who tried to block him asked for "a theory," not realizing it was precisely the errors of theory he was cataloguing
-- **"For a theory is a very dangerous thing to have"**
-- **Phenomenology** — the observation of an empirical regularity without a visible theory — is robust. Theories are **superfragile**: they come and go. Phenomenologies stay
-- **Physics is the exception** — errors get smaller from theory to theory. Saying "Newton was wrong" is attention-grabbing but mendacious; it would be more honest to say "Newton's theory is imprecise in some specific cases"
-- Social science, on the other hand, seems to **diverge from theory to theory** — during the Cold War, Chicago promoted laissez-faire theories while Moscow taught the exact opposite, but their respective physics departments were in convergence
-- Social science theories should be called **"chimeras"** rather than theories — superfragile, unusable for real-world decisions and risk analyses
-- Unlike medicine where iatrogenics is distributed across the population (Mediocristan effects), social science and policy iatrogenics can blow us up — **Extremistan**
+- Fat Tony had many precursors who attacked the primacy of philosophy and rationalistic knowledge — many forgotten because structured learning likes the **impoverishment and simplification of naive rationalism**, easy to teach
+- A vivid modern attack came from the young **Friedrich Nietzsche** — his first book, *The Birth of Tragedy*, written in his early twenties, went after Socrates, whom he called "mystagogue of science," for "making existence appear comprehensible"
+- This brilliant passage exposes what Taleb calls the **sucker-rationalistic fallacy**: "Perhaps — thus he [Socrates] should have asked himself — what is not intelligible to me is not necessarily unintelligent? Perhaps there is a realm of wisdom from which the logician is exiled?"
 
-### Not Doing Nothing
+> "What is not intelligible to me is not necessarily unintelligent" — perhaps the most potent sentence in all of Nietzsche's century
 
-- A main source of the 2007 economic crisis lies in the iatrogenics of **Überfragilista Alan Greenspan** — "certainly the top economic iatrogenist of all time" — who tried to iron out the "boom-bust cycle," causing risks to hide under the carpet and accumulate until they blew up the economy
-- The same naive interventionism was applied by the U.K. government of **Fragilista Gordon Brown**, a student of the Enlightenment whose mission was to "eliminate" the business cycle
-- Brown's policy of centralizing information technology led to massive cost overruns and delays; the U.K. health service was operating under the principle that a pin falling in a remote hospital should be heard in **Whitehall**
-- These attempts to eliminate the business cycle lead to the **mother of all fragilities** — just as a little bit of fire here and there gets rid of flammable material in a forest, a little bit of harm in an economy weeds out vulnerable firms early enough to allow them to **"fail early"** and minimize long-term damage
-- An **ethical problem** arises: in a democracy, the incentive is to always promise a better outcome than the other guy, regardless of the actual delayed cost. It would have taken heroic courage to justify **inaction**
-- Ingenuous interventionism is **pervasive across professions**: give a copy editor a text, he will propose a certain number of edits (about five changes per page). Accept his "corrections" and give it to another editor — he will suggest an equivalent number of edits, sometimes **reversing changes** made by the previous editor
-- Those who **do too much** somewhere do **too little** elsewhere — over my writing career, those who overedit tend to miss the real typos. Taleb once pulled an op-ed from *The Washington Post* because every word had been replaced by a synonym from the thesaurus. He gave the article to the *Financial Times* instead — the editor there made **one single correction**: 1989 became 1990. *The Washington Post* had tried so hard that they missed the only relevant mistake
-- Interventionism depletes **mental and economic resources** — it is rarely available when it is needed the most
+- **Nietzsche** is allergic to Socrates' version of truth: according to Socrates, one does not knowingly do evil — knowledge is the panacea; error is evil; hence science is an optimistic enterprise. It is the very **goodness** of knowledge that Nietzsche questioned
+- In *The Birth of Tragedy*, Nietzsche sees two forces: the **Apollonian** (measured, balanced, rational, imbued with reason and self-restraint) and the **Dionysian** (dark, visceral, wild, untamed, hard to understand). Ancient Greek culture balanced the two, until Socrates' influence gave a larger share to the Apollonian — yang without yin
+- **Nietzsche figured out antifragility**: while many attribute "creative destruction" to Schumpeter, the more erudite source is Karl Marx, but it is indeed Nietzsche who first coined the term with reference to Dionysus — "creatively destructive" and "destructively creative"
+- Reading *The Birth of Tragedy* twice — as a child and after a life thinking of randomness — Taleb realized Nietzsche understood that growth in knowledge **cannot proceed without the Dionysian**. Stochastic tinkering can be the source, and the Apollonian can be part of the selection process
 
-> "Beware what you wish for: small government might in the end be more effective at whatever it needs to do."
+### Tradition
 
-### Non-Naive Interventionism
+- As Fat Tony said, Socrates was put to death because he disrupted something that was working just fine. Things are too complicated to be expressed in words; by doing so, you kill humans — or people may be **focusing on the right things but we are not good enough to figure it out intellectually**
+- Death and martyrdom make good marketing — Socrates' classical critics believed he was **destroying the foundations of society** — the heuristics transmitted by the elders
+- **Cato the Elder** was highly allergic to Socrates. He had the bottom-line mind of Fat Tony, with a much higher civic sense, respect for tradition, and commitment to moral rectitude. Plutarch quotes him: "Socrates was a mighty babbler who tried to make himself tyrant of his country in order to destroy its customs and entice its citizens into holding views contrary to law and order"
+- Many defended this different type of knowledge: **Edmund Burke** countered the French Revolution for disrupting the "collected reasons of the ages," advocating small trial-and-error experiments in social systems. **Michael Oakeshott** believed traditions provide filtered collective knowledge. **Joseph de Maistre** was a counter-Enlightenment thinker who believed in the fundamental depravity of men unless checked by some dictatorship
+- **Wittgenstein** would be at the top of modern antifragile thinkers — his remarkable insight into the inexpressible with words, the green lumber issue. He sacrificed everything for philosophy
+- **Friedrich Hayek** opposed social planning on the grounds that the pricing system reveals knowledge embedded in society, not accessible to a social planner. But Hayek missed the notion of **optionality** as a substitute for the social planner — he believed in distributed intelligence, not optionality as a replacement for intelligence
+- **Claude Lévi-Strauss** showed that nonliterate peoples had their own "science of the concrete," a holistic way of thinking in terms of objects and their sensuous qualities — rich as and even richer than ours. Green lumber
+- **John Gray** fights the prevailing idea that the Enlightenment is a panacea, showing how what we call scientific progress can be a mirage
 
-- The argument is **not against intervention** — Taleb is equally worried about **underintervention** when it is truly necessary. He is warning against *naive* intervention and lack of awareness and acceptance of harm done by it
-- When Taleb wrote *Fooled by Randomness* (arguing "it is more random than you think"), the media simplified it to "it's all random" or "it's all dumb luck" — a Procrustean bed distortion. The message here is that we need to avoid being **blind to the natural antifragility of systems** and fight our tendency to fragilize them
-- **Over-intervention comes with under-intervention**: we tend to over-intervene in areas with **minimal benefits** (and large risks) while under-intervening in areas where intervention is necessary, like **emergencies**, ecology, or limiting economic distortions from large corporations
-- **What should we control?** As a rule, intervening to limit **size** (of companies, airports, pollution sources), **concentration**, and **speed** is beneficial in reducing Black Swan risks — these actions may be devoid of iatrogenics
-- Both markets and governments are unintelligent when it comes to Black Swan events — though not Mother Nature or more ancient types of markets (like the souks)
-- Taleb's simplified take on intervention: it is mostly about having a **systematic protocol** to determine when to intervene and when to leave systems alone. We may need to intervene to control the iatrogenics of modernity — particularly large-scale harm to the **environment** and the **concentration of potential damage**
-- The ideas advanced are **not political but risk-management based** — introducing the vocabulary of harm and fragility so we can formulate appropriate policies
+### The Sucker-Nonsucker Distinction
 
-### In Praise of Procrastination — The Fabian Kind
+- For Fat Tony, the distinction in life isn't True or False, but **sucker or nonsucker**. In real life, as we saw with Seneca and Thales, **exposure is more important than knowledge**; decision effects supersede logic
+- Textbook "knowledge" misses a dimension: the hidden **asymmetry of benefits** — the need to focus on the payoff from your actions instead of studying the structure of the world
 
-- There is an element of **deceit** associated with interventionism in a professionalized society: it's much easier to sell "Look what I did for you" than "Look what I avoided for you"
-- A bonus system based on "performance" exacerbates the problem — heroes who became heroes for what they did *not* do are hard to observe as heroes. It is hard to observe **nonaction**
-- The doctor who refrains from operating on a back will not be rewarded and judged as favorably as the doctor who makes surgery look indispensable. **The true hero in the Black Swan world** is someone who prevents a calamity that, because it did not take place, does not get recognition or a bonus
-- The Romans revered someone who resisted and delayed intervention: general **Fabius Maximus** was nicknamed **Cunctator** ("the Procrastinator"). He drove Hannibal, who had obvious military superiority, crazy by **avoiding and delaying engagement**
-- The **Fabian Society** in the United Kingdom — a political movement created by George Bernard Shaw, H. G. Wells, Leonard and Virginia Woolf, Ramsay MacDonald, and even Bertrand Russell — was named after the Cunctator, based on opportunistically **delaying the revolution**
-- In retrospect, the Fabian strategy was effective not so much as a way to achieve their objectives, but to accommodate the fact that **objectives are moving targets** — procrastination let events take their course and gave activists the chance to change their minds before committing to irreversible policies
-- The Latin expression ***festina lente*** ("make haste slowly"). **Lao Tzu** coined the doctrine of ***wu-wei*** ("passive achievement")
-- **Procrastination is our natural defense**, letting things take care of themselves and exercise their antifragility — it results from ecological or naturalistic wisdom and is not always bad
-- Taleb uses procrastination as a message from his inner self and his deep evolutionary past to resist interventionism in his writing: **"I write only if I feel like it and only on a subject I feel like writing about"** — the reader is no fool
-- Some psychologists and behavioral economists think procrastination is a *disease* to be remedied and cured
-- Given that procrastination has not been sufficiently pathologized yet, some associate it with **akrasia** (Plato, lack of self-control or weakness of will); others with **aboulia** (lack of will)
-- The benefits of procrastination apply similarly to **medical procedures**: procrastination protects you from error by giving nature a chance to do its job, given that nature is less error-prone than scientists
-- Humans may have an instinct to procrastinate only when **no life is in danger** — you do not procrastinate when you see a lion or a fire. You procrastinate after a severe injury with unnatural duties and procedures
-- Taleb once procrastinated on a **spinal cord operation** for a back injury — and was completely cured after a hiking vacation in the Alps followed by weight-lifting sessions
-- Since procrastination is a message from our natural willpower via **low motivation**, the cure is changing the environment or profession, selecting one in which you do not have to fight your impulses — leading a life in which procrastination is good, as a **naturalistic-risk-based form of decision making**
-- Taleb selects the writing of passages of this book by means of procrastination: **"If I defer writing a section, it must be eliminated"**
-- Using ecological reasoning, someone who procrastinates is not irrational — it is his **environment** that is irrational. The psychologist or economist calling him irrational is the one who is beyond irrational
-- Humans are very bad at filtering information, particularly short-term information, and **procrastination can be a way for us to filter better** — to resist the consequences of jumping on information
+> *Philosophers talk about truth and falsehood. People in life talk about payoff, exposure, and consequences (risks and rewards), hence fragility and antifragility.*
 
-### The Naturalistic Fallacy
+- True and False ("belief") play a poor, secondary role in human decisions; it is the payoff from the True and the False that dominates — and it is almost always **asymmetric**, with one consequence much bigger than the other
 
-- Philosophers refer to the **naturalistic fallacy**: implying that what is natural is not necessarily morally right
-- However one slices it, **it is not a fallacy when it comes to risk considerations** — time is the best test of fragility, encompassing high doses of disorder, and nature is the only system that has been stamped "robust" by time
-- There is a worse fallacy: people making the opposite mistake and considering that **what is naturalistic is a fallacy**
+### Fragility, Not Probability
 
-### Neuroticism in Industrial Proportions
+- We check people for weapons before they board the plane — not because we believe they are terrorists (False), but because we are **fragile to terrorism**. There is an asymmetry: the payoff of the True (that they are terrorists) is too large
+- *You decide principally based on fragility, not probability. You decide principally based on fragility, not so much on True/False.*
+- If you jotted down all the decisions you've taken over your lifetime, you would realize almost all had **asymmetric payoff** — one side carrying a larger consequence. True/False (probability) does not work in the real world; it is the payoff that matters
+- A 95 percent confidence level tells you the result being wrong is only 5% likely — but this ignores the **size of the effects**. If you told someone a plane was safe with 95 percent confidence level, that 1 percent crash probability would be alarming
+- You have taken probably a billion decisions in your life. How many times have you computed probabilities? In casinos, but not elsewhere
 
-- Imagine two types of people: the **neurotic** type who overreacts to every small piece of information (every pimple is cancer, every setback is bankruptcy, every detail is a crisis), and the **imperturbable** type who is calm under fire and reacts only when necessary
-- Example of the imperturbable type: **Salvatore Gravano** ("Sammy the Bull"), involved in the murder of nineteen people — speaks with minimal effort, as if what he is discussing is "not a big deal." When this second type reacts in the rare situations when he is angry, **everyone knows it and takes it seriously**
-- The supply of information from modernity is transforming us from the equable second type into the **neurotic first one** — the second fellow only reacts to **real information** (signal), the first largely to **noise**
-- **Noise** is random information totally useless for any purpose; **signal** is what you are supposed to heed
-- The personal or intellectual **inability to distinguish noise from signal** is behind overintervention
+### Conflation of Events and Exposure
 
-### A Legal Way to Kill People
+- This brings us again to the **green lumber fallacy**: a Black Swan event and how it affects you — its impact on your finances, emotions, the destruction it will cause — are ***not the same "ting"***
+- The predictors' reply when we point out their failures has typically been "we need better computation" to predict the event better — instead of the vastly more effective **"modify your exposure"** and learn to get out of trouble
+- Something religions and traditional heuristics have been better at enforcing than naive and cosmetic science
 
-- If you want to accelerate someone's death, **give him a personal doctor** — just pay for him to choose his own. Doctors need to justify their salaries and prove they have a work ethic; "doing nothing" doesn't satisfy
-- **Michael Jackson's** personal doctor has been sued for what amounts to overintervention-to-stifle-antifragility
-- Very rich people and heads of state with access to all medical care die **just as easily as regular persons** — this is *because* of overmedication and excessive medical care
-- Those in corporations or policy making (like Greenspan) who are endowed with sophisticated data-gathering are capable of **overreacting and mistaking noise for information** — Greenspan kept an eye on vacuum cleaner sales in Cleveland to "get a precise idea about where the economy is going," and of course micromanaged us into chaos
+### Conclusion to Book IV
 
-### Noise and Signal — Data Is Toxic
+- This section has attempted to vindicate the unreasonable mavericks, engineers, freelance entrepreneurs, innovative artists, and anti-academic thinkers — some had great courage, not just the courage to put forth their ideas, but the courage to accept to live in a world they knew they did not understand. And they enjoyed it
+- Doing is wiser than you are prone to believe — and more rational. What was done here is to debunk the **Lecturing-Birds-How-to-Fly epiphenomenon** and the "linear model," using the simple mathematical properties of optionality, which does not require knowledge or intelligence, merely **rationality in choice**
+- No empirical evidence supports the statement that organized research leads to the great things promised by universities — the promoters of the Soviet-Harvard idea **do not use optionality** or second-order effects, which invalidates their views about the role of teleological science
 
-- The more frequently you look at data, the more **noise** you are disproportionally likely to get (rather than the valuable part, called signal); hence the higher the **noise-to-signal ratio**
-- This is not psychological but **inherent in the data itself**: look at stock prices yearly and the ratio of signal to noise is about **one to one** (half noise, half signal). Look at the same data daily and it changes to **95 percent noise, 5 percent signal**. Hourly: **99.5 percent noise to 0.5 percent signal** — two hundred times more noise than signal
-- Anyone who listens to news (except when very, very significant events take place) is **one step below sucker**
-- **The iatrogenics of newspapers**: they need to fill their pages every day. They ought to learn to keep silent in the absence of significant news — newspapers should be two-line length on some days, two hundred pages on others, in proportion with the intensity of the signal. Instead they sell us **junk food**, which is iatrogenic
-- In a natural environment, a **stressor is information**. Too much information would be too much stress, exceeding the threshold of antifragility. In medicine, we are discovering the healing powers of **fasting** — avoidance of the hormonal rushes from ingestion of food. Too much information becomes harmful, like daily news and sugar confusing our system
-- We are **not made to understand** the point, so we overreact emotionally to noise. The best solution is to *only* look at very large changes in data or conditions, never at small ones
-- With a clear, uninfected mind, it is almost impossible for someone rational **to mistake a vital signal for noise** — unless he is overanxious, oversensitive, and neurotic, hence distracted and confused by other messages. **Significant signals have a way to reach you**
-- In the tonsillectomies story, the best filter would have been to only consider the children who were **very ill** — those with periodically recurring throat inflammation
+### What Will Happen Next?
 
-### Media-Driven Neuroticism
-
-- Thanks to the media's glorification of the anecdote, we are living more and more in **virtual reality**, separated from the real world a little bit more every day
-- Every day **6,200 persons** die in the United States from preventable causes, but the media only report the most anecdotal and sensational cases (hurricanes, freak accidents, small plane crashes) — giving us a more and more **distorted map of real risks**
-- In an ancestral environment, the anecdote is information. Today, no longer — by presenting us with explanations and theories, the media induce an **illusion of understanding** the world
-- The understanding of events by members of the press is so **retrospective** that they put the security checks after the plane ride — what the ancients call *post bellum auxilium* ("sending troops after the battle")
-- To conclude, the best way to mitigate interventionism is to **ration the supply of information** as naturalistically as possible — the more data you get, the less you know what's going on, and the more iatrogenics you will cause. People are still under the illusion that "science" means more data
-
-### The State Can Help — When Incompetent
-
-- The famine in China that killed **30 million people** between 1959 and 1961 reveals the effect of the state "trying hard" — Xin Meng, Nancy Qian, and Pierre Yared examined variations *between* areas
-- Famine was **more severe in areas with higher food production** before it began — meaning government policy of food distribution (inflexible procurement system) was behind much of the problem
-- A **larger than expected share of famine** over the past century has occurred in economies with central planning
-- Sometimes it is the state's **incompetence** that can help save us from the grip of statism and modernity — **inverse iatrogenics**
-- **Dmitri Orlov** showed how calamities were avoided after the Soviet breakdown because food production was inefficient and full of **unintentional redundancies**, which ended up working in favor of stability
-- Stalin played with agriculture, causing famine. But his successors never managed to make agriculture "efficient" and centralized as in America — every town had staples growing around it. This was costlier (no specialization benefits), but allowed people access to **all varieties of food** despite the severe institutional breakdown
-- In the United States, we burn **twelve calories in transportation for every calorie of nutrition**; in Soviet Russia it was **one to one** — imagine what could happen to the U.S. or Europe in a food disruption
-- The inefficiency of Soviet housing meant people had been **living in close quarters for three generations**, creating tight bonds — as in the Lebanese war, they stayed close, lent to each other, and fed hungry friends. People had **real links**, unlike social networks
-- The **top-down state** is not necessarily the one that has the reputation of being so
-
-### France Is Messier than You Think
-
-- Taleb debunks the narrative that France works well because it is a **Cartesian rationalizing-rationalist top-down state** — as with the Russians, the French were lucky that it was for a long time a failed aim
-- Two decades wondering why France, managed top-down by an oversized state, could fare so well — it is the country of **Jean-Baptiste Colbert**, the grand dreamer of a state that infiltrates everything
-- The current culture is ultra-interventionist: **"if it ain't broke, fix it"** — yet things work somewhat in France, often better than elsewhere
-- France can be used as evidence that central bureaucracies that repress municipal mess are favorable for growth, happiness, science, and literature — until one reads **Graham Robb's *The Discovery of France***, which completely revises the story
-- The nation-state in France was **largely nominal** — despite attempts by Louis XIV, Napoleon, and Jules Ferry's national education program to impose unity
-- In 1863, France did not speak French: **only one in five persons could**. Instead there was a variety of languages and dialects
-- The **Nobel Prize in Literature in 1904** went to **Frédéric Mistral**, who wrote in Provençal — a language of southern France no longer spoken
-- The lack of linguistic integration — like the **variety in cheese** (about four hundred different types) — expresses the difficulties in centralizing the country
-- There was nothing ethnic or linguistic to bind the place — just the property of a king and a weak aristocracy. Roads were horrible, the country was inaccessible to travelers
-- **Tax collection was a dangerous profession**, requiring tenacity and sagacity — the country was progressively "discovered" by Paris, often after its colonies in North Africa
-- **Jean Nicolas** (*La rebellion française*): the culture of rioting was extremely sophisticated — historically the true French national sport
-- **Paris itself was barely controlled by France** — no more than Rio slums called *favelas* are currently ruled by the Brazilian central state
-- **Louis XIV** moved the government to Versailles to escape the Parisian crowd. Paris only became controllable after **Haussmann** in the 1860s removed tenements and narrow streets to make large avenues for police crowd control
-- France was effectively **Paris and "the desert"** — Paris didn't care about the rest. The country was only centralized after long "Five Year Plans" of roads, rail, public schools, and television
-- The **Napoleonic dream of integration**, begun by De Gaulle after the war, was only completed during the reign of **Valéry Giscard d'Estaing** in the late 1970s, at which point **decentralization started taking place**
-- France might have benefited from its two decades under a large centralized state — but equally, it benefited from the happy condition that the large state **did not overstay its welcome**
-
-### Sweden and the Large State
-
-- The puzzle of **Sweden and Nordic states**: often offered as paragons of the large state "that works" — the government represents a large portion of the total economy
-- **Denmark** is the happiest nation in the world (assuming happiness is measurable), yet has a monstrously large state — but these countries are all **smaller than the New York metropolitan area**
-- **Mark Blyth** (political scientist) showed Taleb it was almost the same story as Switzerland (but with worse climate and no ski resorts): the state exists as a **tax collector**, but the money is spent in the **communes**, directed by the communes themselves — for skills training locally determined by community needs
-- The economic elites have **more freedom** than in most other democracies — far from the statism one assumes from the outside
-- Sweden and Nordic countries experienced a **severe recession** at the end of the Cold War (around 1990), to which they responded with **fiscal toughness** — effectively shielding them from the severe financial crisis that took place about two decades later
-
-### Catalyst-as-Cause Confusion
-
-- When constrained systems collapse (those hungry for natural disorder), failure is never seen as the result of **fragility** — rather, it is interpreted as the product of poor forecasting
-- As with a crumbling sand pile, it would be unintelligent to attribute the collapse of a fragile bridge to the **last truck that crossed it**, and even more foolish to try to predict which truck might bring it down. Yet it is done all too often
-- In 2011, **Obama** blamed an intelligence failure for not foreseeing the Egyptian revolution (just as **Carter** blamed intelligence for not foreseeing the 1979 Islamic Revolution in Iran) — missing the point that it is the **suppressed risk in the statistical "tails"** that matters, not the failure to see the last grain of sand
-- After the 2007–2008 financial crisis, many thought that **predicting the subprime meltdown** would have helped — it would not have, since it was a **symptom** of the crisis, not its underlying cause
-- Obama's mistake illustrates the illusion of **local causal chains** — confusing catalysts for causes and assuming one can know which catalyst will produce which effect
-- The final episode of upheaval in Egypt was **unpredictable for all observers**, especially those involved. Blaming the CIA is as injudicious as funding it to forecast such events
-- Governments are **wasting billions** attempting to predict events produced by interdependent systems that are not statistically understandable at the individual level
-- Most explanations for turmoil follow the **catalysts-as-causes confusion**: the "Arab Spring" of 2011 riots were initially attributed to **rising commodity prices** and stifling dictatorships — but Bahrain and Libya were wealthy countries that could afford grain, and considerably higher commodity prices had occurred a few years earlier **without any uprising**
-
-> "It is the system and its fragility, not events, that must be studied — what physicists call 'percolation theory,' in which the properties of the randomness of the terrain are studied, rather than those of a single element of the terrain."
-
-- **Mark Abdollahian** (Sentia Group) sells predictive analytics to the U.S. government — noted regarding Egypt that policy makers should "think of this like Las Vegas. In blackjack, if you can do four percent better than the average, you're making real money." But the analogy is **spurious**: there is no "four percent better" on Egypt
-- Intelligence analysts made the same mistake as the **risk-management systems** that failed to predict the economic crisis — and offered the exact same excuses. Political and economic "tail events" are **unpredictable**, and their probabilities are not scientifically measurable
-- No matter how many dollars are spent on research, predicting revolutions is **not the same as counting cards** — humans will never turn politics and economics into the tractable randomness of blackjack
-
-## Chapter 8: Prediction as a Child of Modernity
-
-*Never shout in French — Ms. Bré gains in respect — Black Swan territory*
-
-- In fall 2009, Taleb found himself in Korea at a panel with **Takatoshi Kato**, deputy managing director of a powerful international institution, who presented economic projections for 2010–2014
-- Taleb flew into a rage in front of two thousand Koreans — ran to the podium and told the audience that the next time someone gives them projections, they should ask him to show **what he had projected in the past** (in this case, what he had been forecasting for 2008 and 2009 two to five years earlier)
-- Our track record in figuring out significant rare events in politics and economics is **not close to zero; it is *zero***
-- Taleb improvised his solution on the spot: we can't put false predictors in jail; we can't stop people from asking for predictions — but we can live in a world where predictions like Kato's **do not harm you**. Such a world has a unique attribute: **robustness**
-- The idea of the **Triad** was born there: **Fragility–Robustness–Antifragility** as a replacement for predictive methods
-
-### Ms. Bré Has Competitors
-
-- Forecasting is **not neutral** — it is iatrogenic. It can be downright injurious to risk-takers, no different from giving people snake oil medicine instead of cancer treatment, or **bleeding** (as with George Washington)
-- **Danny Kahneman** stoked Taleb's frustration by showing the evidence of iatrogenics: providing someone with a random numerical forecast **increases his risk taking**, even if the person *knows* the projections are random
-- The next step is obvious yet rarely taken: **avoidance of iatrogenics from forecasting** — we understand childproofing, but not **forecaster-hubris-proofing**
-
-### The Predictive
-
-- The robust and antifragile **don't need as accurate a comprehension of the world** as the fragile — they do not need forecasting
-- **Redundancy** is a nonpredictive, or rather less predictive, mode of action: if you have extra cash in the bank (plus cans of Spam, hummus, and gold bars in the basement), you don't need to know with precision which event will cause difficulties — war, recession, epidemic, terrorist attack, the secession of New Jersey — you do not need to predict much
-- Those in the opposite situation — **in debt** — because of their fragility, need to predict with more and more accuracy
-- You can control **fragility** a lot more than you think. Three refined points:
-  1. **Detecting (anti)fragility** — smelling it, as Fat Tony will show — is easier than prediction. The entire mission reduces to: minimize harm and maximize gain from forecasting errors — have things that don't fall apart, or even benefit, when we make a mistake
-  2. We do not want to change the world for now; we should first **make things more robust to defects and forecast errors**, or even exploit these errors — making lemonade out of the lemons
-  3. History is in the business of making it out of lemons; **antifragility is how things move forward** under the mother of all stressors, called time
-- After an event, we must switch the blame from inability to see it coming to the failure to understand (anti)fragility — **"why did we build something so fragile?"** Not seeing a tsunami or economic event coming is excusable; **building something fragile to them is not**
-- As to naive utopianism (blindness to history): we cannot afford to rely on the rationalistic elimination of greed and other human defects that fragilize society — humanity has been trying for thousands of years and humans remain the same, **plus or minus bad teeth**. The more intelligent action is to make the world **greed-proof**, or even make society benefit from the greed
-- After Fukushima, intelligent nuclear firms are now focusing on **exposure to failure** — building small enough reactors, embedded deep enough, with enough protection layers that a failure would not affect us much. Making the prediction or nonprediction of failure quite irrelevant. Costly, but still better than nothing
-- The **Swedish government's** focus on total fiscal responsibility after their 1991 budget troubles makes them much **less dependent on economic forecasts** — allowing them to shrug off later crises
-
-### The Idea of Becoming a Non-Turkey
-
-- We can put a man on the moon, predict the trajectory of planets, predict the most minute effect in quantum physics — yet governments with equally sophisticated models **cannot forecast revolutions, crises, budget deficits, climate change**, or even the closing price of the stock market a few hours from now
-- There are **two different domains**: one in which we can predict (to some extent), and the other — the **Black Swan domain** — in which we should only let turkeys and turkified people operate
-- The demarcation is as visible as the one between **the cat and the washing machine** — social, economic, and cultural life lie in the Black Swan domain, physical life much less so
-- The idea is to separate domains where Black Swans are both **unpredictable and consequential** from those where rare events are either predictable or inconsequential
-
-> "Randomness in the Black Swan domain is intractable. I will repeat it till I get hoarse. The limit is mathematical, period, and there is no way around it on this planet."
-
-- What is nonmeasurable and nonpredictable will remain so, no matter how many PhDs with Russian and Indian names you put on the job — there is, in the Black Swan zone, a **limit to knowledge** that can never be reached
-- Taleb's work is about ***where* one should be skeptical** — focus on getting out of the **Fourth Quadrant** (the scientific name for the Black Swan domain where we have high exposure to rare, "tail" events *and* these events are incomputable)
-- Because of modernity, the share of **Extremistan is increasing** — winner-take-all effects are worsening. Success for an author, a company, an idea, a musician, an athlete is **planetary, or nothing**. These worsen predictability since almost everything in socioeconomic life is now dominated by Black Swans
-- Our sophistication continuously puts us ahead of ourselves, **creating things we are less and less capable of understanding**
-
-### No More Black Swans
-
-- The world has also gone the other way upon the discovery of the Black Swan idea: **opportunists** are now predicting, predictioning, and predictionizing Black Swans with even more complicated models from chaos-complexity-catastrophe-fractal theory
-- Yet the answer is simple: ***less is more*** — move the discourse to **(anti)fragility**
-
----
-
-## Chapter 9: Fat Tony and the Fragilistas (continued)
-
-### On Suckers and Nonsuckers
-
-- After the 2008 crisis, it became clear what Fat Tony and Nero had in common: they were predicting a **sucker's fragility crisis**
-- They had both been convinced that a crisis of such magnitude — a snowballing destruction of the modern economic system on a scale never seen before — was bound to happen **simply because there were suckers**
-- Fat Tony believed that **nerds, administrators, and mostly bankers** were the ultimate suckers — when everyone still thought they were geniuses
-- He believed they were **collectively even bigger suckers** than they were individually, and he had a natural ability to detect them before they fell apart
-- Fat Tony derived his income from detecting suckers while leading a life of leisure
-- Nero's interests were similar to Tony's, except dressed up in intellectual traditions — to Nero, a system built on **illusions of understanding probability** is bound to collapse
-- By **betting against fragility**, they were antifragile
-- Tony made a bundle from the crisis, in the high eight to low nine figures — everything other than a bundle for Tony is "tawk"
-- Nero made a bit, though much less than Tony, but was satisfied that he had won — he had already been financially independent and saw money as a waste of time
-- Nero's family wealth had **peaked in 1804**, so he did not have the social insecurity of other adventurers — money to him could not possibly be a social statement, only erudition and perhaps wisdom in old age
-- **Excess wealth** is a heavy burden — nothing was more hideous in Nero's eyes than excessive refinement in clothes, food, lifestyle, manners
-- Wealth was **nonlinear** — beyond some level it forces people into endless complications, creating worries about whether the housekeeper is scamming them
-
-### Ethics of Betting Against Suckers
-
-- The ethics of betting against suckers are discussed in Book VII — two schools of thought
-- To Nero, one should first **warn people that they are suckers**, while Tony was against the very notion of warning
-- > "You will be ridiculed. Words are for sissies. A system based on verbal warnings will be dominated by non-risk-taking-babblers. These people won't give you and your ideas respect unless you take their money."
-- Fat Tony insisted that Nero take a **ritual look at the physical embodiments of the spoils** — such as a bank account statement — not for the financial value, nor the purchasing power, just the **symbolic value**
-- He could understand why Julius Caesar needed Vercingetorix, the leader of the Gaul rebellion, brought to Rome and **paraded in chains** — to exhibit victory in the flesh
-
-### Dependence on External Recognition
-
-- There is another dimension to focusing on **actions over words**: the health-eroding dependence on external recognition
-- People are cruel and unfair in how they confer recognition, so it is best to **stay out of that game** — stay robust to how others treat you
-- Nero befriended a scientist of legendary status who spent his time **focused on the status** he had that week in the scientific community, becoming enraged at authors who did not cite him or committees granting medals to people he judged inferior — an impostor!
-- Those who depend on words for serenity remain **fragile to the emotional toll** from compliments they did *not* get, the ones others got, and from what someone of lower intellect stole from them
-- Nero promised himself to escape this with his small ritual — the **"Fat Tony bet"**: after deducting the cost of a new car (a Mini) and a new $60 Swatch watch, his spoils amounted to a dizzyingly large amount sitting in a portfolio
-- It is not the amount but the **tangibility of his action** that counted — the quantities could have been a tenth, even a hundredth, and the effect would remain the same
-- He would cure himself of the game of recognition by **opening the envelope containing the statement** and then going on with his day, oblivious to those cruel and unfair users of words
-
-### Honor and Risk-Taking
-
-- To follow ethics to their natural conclusion, Nero should have felt just as proud had the envelope contained statements of **losses**
-- > "A man is honorable in proportion to the personal risks he takes for his opinion — in other words, the amount of downside he is exposed to."
-- To sum him up, Nero believed in **erudition, aesthetics, and risk taking** — little else
-
-### Charity
-
-- To avoid the **charity trap**, Nero followed Fat Tony's rule of systematically making donations, but **not to those who directly asked for gifts**
-- He never gave a penny to any charitable organization, with the possible exception of those in which not a single person earned a salary
-
-### Loneliness
-
-- Before the 2008 crisis, Nero sometimes experienced pain at being alone with his ideas — wondering on Sunday nights if there was something wrong with him or the world
-- Lunch with Fat Tony was like **drinking water after an episode of thirst** — immediate relief to realize he was either not crazy, or at least not *alone* in being crazy
-- Things out there *did not make sense*, and it was impossible to convey it to others, particularly people deemed intelligent
-- Of the close to a million professionals employed in economic activities — government, academia, media, banking, corporations — **fewer than a handful saw the crisis coming**, and an even smaller handful managed to foresee the full extent of the damage
-- Not a single one realized that the crisis was a **product of modernity**
-- Nero could stand near the former World Trade Center site in downtown New York, across from colossal buildings housing banks and brokerage houses, with hundreds of people running around inside — all producing **noise**: wasted effort, cacophony, unaesthetic behavior, increased entropy
-- The large-scale delusion of "wealth" was bound to evaporate somehow
-- You could stack the books and they would constitute an entire mountain — to Nero anything in them that deals with probability, statistics, or mathematical models is just **air**
-- > "You learn more in a few lunches with Fat Tony than from the social science sections of the Harvard libraries, with close to two million books and research papers, for a total of 33 million hours of reading."
-- Talk about a major **sucker problem**
-
-### What the Nonpredictor Can Predict
-
-- Fat Tony did not believe in predictions, but he made big bucks **predicting that some people — the predictors — would go bust**
-- Nero used to meet physicists from the Santa Fe Institute who believed in predictions and used fancy prediction models — their business ventures based on predictions did not do well, while Fat Tony, who did not believe in predictions, **got rich from prediction**
-- You can't predict in general, but you can predict that those who rely on predictions are taking more risks, will have some trouble, **perhaps even go bust**
-- Someone who predicts will be **fragile to prediction errors** — an overconfident pilot will eventually crash the plane, and numerical prediction leads people to take more risks
-- Fat Tony is **antifragile** because he takes a mirror image of his fragile prey
-- Fat Tony's model is quite simple: he **identifies fragilities**, makes a bet on the collapse of the fragile unit, lectures Nero, trades insults with him about sociocultural matters, reacting to Nero's jabs at New Jersey life, **collects big after the collapse**, then has lunch
-
----
-
-## Chapter 10: Seneca's Upside and Downside
-
-*How to survive advice — To lose nothing or gain nothing — What to do on your next shipwreck*
-
-- A couple of millennia before Fat Tony, another child of the Italian peninsula solved the problem of antifragility — **Seneca**, the stoic philosopher
-- Seneca was more intellectual than Fat Tony, spoke in more distinguished prose, and was no less successful in the real world — actually he was **vastly more successful in business** than Fat Tony, and no less intellectual than Nero
-- He solved the problem of antifragility — what connects the elements of the **Triad** — using Stoic philosophy
-
-### Is This Really Serious?
-
-- **Lucius Annaeus Seneca** was a philosopher who happened to be the wealthiest person in the Roman Empire, partly owing to his trading acumen, partly for having served as the tutor of Emperor Nero
-- Seneca subscribed to and was a prominent expositor of the philosophical school of **Stoicism**, which advanced a certain indifference to fate
-- His work seduced people because he **walked the walk** — he focused on the practical aspect of Stoicism: how to take a trip, how to handle oneself while committing suicide, how to handle adversity and poverty, and critically, **wealth**
-- Because Seneca was into practical decision making, he has been described by academics as **not theoretical or philosophical enough** — yet not a single one of his commentators detected the ideas about asymmetry central to this book, and the key to robustness and antifragility
-- **Wisdom in decision making** is vastly more important — not just practically, but philosophically — than knowledge
-- Other philosophers came to practice from theory — Aristotle provided practical advice, Plato's ideas about the state and advice to rulers (particularly the ruler of Syracuse) were either **ineffectual or caused debacles**
-- To become a successful philosopher king, it is much better to **start as a king than as a philosopher**
-
-### The Story of Professor Triffat
-
-- Modern members of the discipline of **decision theory** travel a one-way road from theory to practice — they gravitate to the most complicated but inapplicable problems, calling it "doing science"
-- Professor Triffat, a highly cited academic in decision theory, wrote the main textbook and helped develop **"rational decision making"** — loaded with grand and useless axioms and probabilities
-- Triffat was agonizing over the decision to accept an appointment at Harvard — many people who talk about risk never encounter difficult risk-taking decisions like this
-- When a colleague suggested he use **"maximum expected utility"** to decide, Triffat angrily responded: "Come on, this is serious!"
-- By contrast, Seneca is nothing but "this is serious" — he once survived a shipwreck in which other family members perished, and he wrote letters of practical advice to his friends
-- When Seneca took his own life, he followed excellently and in a dignified way the principles he preached
-- While the Harvard economist is only read by people trying to write papers, **Seneca is still read by real people two millennia after his passing**
-
-### Less Downside from Life
-
-- Seneca's fortune was **three hundred million denarii** (Judas got thirty denarii, the equivalent of a month's salary, to betray Jesus)
-- It is not convincing to read denigrations of material wealth from a fellow writing on tables with ivory legs
-- The traditional understanding of Stoicism is of some *indifference* to fate — about continuously degrading the value of earthly possessions
-- When **Zeno of Kition**, the founder of Stoicism, suffered a shipwreck, he declared himself lucky to be unburdened so he could now do philosophy
-- The key phrase reverberating in Seneca's oeuvre is **_nihil perditi_**: "I lost nothing" after an adverse event
-- Stoicism makes you desire the challenge of a calamity — Stoics look down on luxury
-
-> "He is in debt, whether he borrowed from another person or from fortune."
-
-- Stoicism seen this way becomes **pure robustness** — the attainment of a state of immunity from one's external circumstances, good or bad, and an absence of fragility to decisions made by fate
-- Random events won't affect us either way (we are too strong to lose, and not greedy to enjoy the upside), so we stay in the **middle column of the Triad**
-- But reading Seneca directly reveals a different story — Seneca's version of Stoicism is **antifragility from fate**: no downside from Lady Fortuna, plenty of upside
-- Seneca's aim on paper was philosophical — Stoicism was not supposed to be about gains and benefits, just a **sense of control** over one's fate and the reduction of psychological fragility
-- But if wealth is so much of a burden while unnecessary, what's the point of having it? **Why did Seneca keep it?**
-- Intellectuals have this thing against antifragility — for them the world tends to stop at robustness. They avoid considering that **Seneca wanted the upside from fate**, and there is nothing wrong with it
-- Three steps: (1) learn how Seneca advocated the **mitigation of downside** — robustness, protection against harm from emotions, how to move away from the first column of the Triad; (2) show how he truly proposed **antifragility**; (3) generalize his trick into a general method of detection of antifragility
-
-### Stoicism's Emotional Robustification
-
-- Success brings an asymmetry: you now have **a lot more to lose than to gain** — you are hence fragile (like the story of Damocles' sword)
-- When you become rich, the **pain of losing** your fortune exceeds the emotional gain of getting additional wealth — you start living under continuous emotional threat
-- A rich person becomes trapped by belongings that take control of him — degrading his sleep, raising stress hormones, diminishing his sense of humor
-- Seneca fathomed that possessions make us worry about **downside**, thus acting as a punishment as we depend on them — all upside, no downside
-- Dependence on circumstances — rather, the emotions that arise from circumstances — induces **a form of slavery**
-- This asymmetry between good and bad effects was known to the ancients — Livy wrote:
-
-> "Men feel the good less intensely than the bad" (*segnius homines bona quam mala sentiunt*)
-
-- The ancients — mostly thanks to Seneca — stay **way ahead of modern psychologists** and Triffat-style decision theorists who have developed theories around "risk (or loss) aversion"; the ancients remain deeper, more practical, while transcending vulgar therapy
-
-### The Domestication of Emotions
-
-- Stoicism is about the **domestication**, not necessarily the elimination, of emotions — not about turning humans into vegetables
-- The modern Stoic sage is *someone who transforms fear into prudence, pain into information, mistakes into initiation, and desire into undertaking*
-- Seneca proposes a complete **training program** to handle life and use emotions properly — thanks to small but effective tricks
-- One trick: a Roman Stoic would use to **separate anger from rightful action** — to avoid committing harm he would regret later, he would wait at least a day before beating a servant who committed a violation
-- Compare this to Emperor Hadrian's act of stabbing a slave in the eye during uncontrolled anger — when the anger abated, the damage was **irreversible**
-- Seneca also provides a catalogue of social deeds: **invest in good actions** — things can be taken from us, but not good deeds and acts of virtue
-
-### How to Become the Master
-
-- So far we have learned to move from the left of the Triad (fragile) to the center (robust) — but **Seneca went beyond**
-- He said that wealth is the **slave of the wise man and master of the fool** — thus he broke with the purported Stoic habit: *he kept the upside*
-- If previous Stoics claimed to prefer poverty to wealth, we need to be suspicious — since most were poor, they might have fit a narrative to the circumstances (the notion of **sour grapes**: cognitive games to make yourself believe the grapes you can't reach taste sour)
-- Seneca was all deeds, and we cannot ignore that he **kept the wealth** — it is central that he showed his preference of wealth *without harm from wealth* to poverty
-- Seneca even outlined his strategy in *De beneficiis*, explicitly calling it a cost-benefit analysis using the word **"bookkeeping"**:
-
-> "The bookkeeping of benefits is simple: it is all expenditure; if any one returns it, that is clear gain; if he does not return it, it is not lost, I gave it for the sake of giving."
-
-- So he played a trick on fate: **kept the good and ditched the bad** — cut the downside and kept the upside
-- This cost-benefit analysis is not quite Stoicism in the way people who study Stoicism understand the meaning — there is an **upside-downside asymmetry**
-- That's **antifragility in its purest form**
-
-### The Foundational Asymmetry
-
-- The concept used earlier is *more to lose* from adversity — if you have more to lose than to benefit from events of fate, there is an asymmetry, and not a good one, which **brings us to fragility**
-- The fragile package from Chapter 1: it does not like to be shaken and hates the members of the disorder family — hence it is fragile (very asymmetric) because it has **absolutely nothing to gain**
-- The antifragile package has **more to gain than to lose** from being shaken — simple test: if I have "nothing to lose" then it is all gain and I am antifragile
-- The entire Table 1 with triads across fields and domains can be explained in these terms
-- If you have **less to lose than to gain**, more upside than downside, then you like volatility (it will, on balance, bring benefits), and you are also antifragile
-
-> *Fragility implies more to lose than to gain, equals more downside than upside, equals (unfavorable) asymmetry*
-
-> *Antifragility implies more to gain than to lose, equals more upside than downside, equals (favorable) asymmetry*
-
-- You are **antifragile for a source of volatility** if potential gains exceed potential losses (and vice versa)
-- If you have more upside than downside, then you may be **harmed by lack of volatility and stressors**
-- The practical question: how do we put this idea — reduction of downside, increase in upside — into practice? By the method of the **barbell** in the next chapter
-
----
-
-## Chapter 11: Never Marry the Rock Star
-
-*A precise protocol on how and with whom to cheat on one's husband — Introduction to barbell strategies — Transforming diplomats into writers, and vice versa*
-
-- The **barbell (or bimodal) strategy** is a way to achieve antifragility and move to the right side of the Triad
-- Monogamous birds put it into practice by cheating with the local rock star, and writers do better by having a day job (a sinecure) devoid of writing activities
-
-### On the Irreversibility of Broken Packages
-
-- The first step toward antifragility consists in **first decreasing downside** rather than increasing upside — by lowering exposure to negative Black Swans and letting natural antifragility work by itself
-- **Mitigating fragility** is not an option but a requirement — it may sound obvious but the point seems to be missed
-- Fragility is very punishing, like a terminal disease — a package doesn't break under adverse conditions then manage to fix itself when proper conditions are restored
-- Fragility has a **ratchetlike property**: the irreversibility of damage — what matters is the route taken, the order of events, not just the destination — what scientists call a **path-dependent** property
-- Path dependence illustrated: your experience in getting a kidney stone operation first and anesthesia later is different from the opposite sequence; a meal with coffee and dessert first and tomato soup last would not be the same as the inverse order
-- It is easy to identify the fragile and put it in the **left column of the Triad** — since the broken will tend to stay permanently broken
-- This fragility from path dependence is often ignored by businessmen trained in static thinking — they believe generating profits is their principal mission, with survival and risk control as something to "perhaps consider"
-- The strong logical precedence of **survival over success**: to make profits and buy a BMW, it would be a good idea to, first, survive
-- Notions such as **speed and growth** are empty and meaningless when presented without accounting for fragility — someone driving 250 mph in New York City will certainly never get anywhere (effective speed: zero miles per hour)
-- One needs to focus on the **effective**, not the nominal — speed, growth, something in sociopolitical discourse masks such an elementary point
-
-### Path Dependence and Economic Growth
-
-- Under path dependence, one can no longer separate **growth from risks of recession**, financial returns from risks of terminal losses, and "efficiency" from danger of accident
-- The notion of efficiency becomes quite meaningless on its own — if a gambler has a risk of terminal blowup (losing back everything), the "potential returns" of his strategy are **totally inconsequential**
-- A university fellow boasted that their endowment fund was earning 20 percent or so, not realizing these returns were associated with fragilities that would easily turn into catastrophic losses — sure enough, a bad year **wiped out all these returns**
-- If something is fragile, its risk of breaking makes anything you do to improve it or make it "efficient" inconsequential unless you **first reduce that risk of breaking**
-- > "Nothing can be done both hastily and safely — almost nothing." — Publilius Syrus
-- GDP growth can be obtained easily by loading future generations with **debt** — and the future economy may collapse upon the need to repay it
-- GDP growth, like cholesterol, seems to be a **Procrustean bed reduction** that has been used to game systems
-- For a plane with a high risk of crashing, the notion of "speed" is irrelevant — economic growth with fragilities is **not to be called growth**
-- Throughout the golden years of the Industrial Revolution, growth was very modest — **less than 1 percent per head** — but as low as it was, it was **robust growth**, unlike the current fools' race of states shooting for growth like teenage drivers infatuated with speed
-
-### Seneca's Barbell
-
-- This brings us to the solution in the form of a **barbell** — about all solutions to uncertainty are in the form of barbells
-- The barbell (a bar with weights on both ends) is meant to illustrate the idea of a **combination of extremes kept separate**, with avoidance of the middle
-- In our context it is not necessarily symmetric: just **composed of two extremes**, with nothing in the middle — also called a bimodal strategy, with two distinct modes rather than a single central one
-- The barbell image describes a dual attitude of **playing it safe in some areas** (robust to negative Black Swans) and **taking a lot of small risks in others** (open to positive Black Swans), hence achieving antifragility
-- That is **extreme risk aversion on one side** and **extreme risk loving on the other**, rather than just the "medium" or the beastly "moderate" risk attitude that in fact is a sucker game (because medium risks can be subjected to huge measurement errors)
-- The barbell also results in the **reduction of downside risk** — the elimination of the risk of ruin
-
-### The Barbell in Finance
-
-- If you put **90 percent of your funds in boring cash** (assuming you are protected from inflation) or something called a "numeraire repository of value," and **10 percent in very risky, maximally risky securities**, you cannot possibly lose more than 10 percent, while you are exposed to massive upside
-- Someone with 100 percent in so-called "medium" risk securities has a **risk of total ruin** from the miscomputation of risks
-- The barbell technique remedies the problem that risks of rare events are **incomputable and fragile to estimation error** — here the financial barbell has a **maximum known loss**
-- For antifragility, the combination is **aggressiveness plus paranoia** — clip your downside, protect yourself from extreme harm, and let the upside (the positive Black Swans) take care of itself
-- Seneca's asymmetry: more upside than downside can come simply from the **reduction of extreme downside** (emotional harm) rather than improving things in the middle
-
-### Barbells vs. Nonbarbells
-
-- A barbell can be **any dual strategy composed of extremes**, without corruption of the middle — somehow they all result in favorable asymmetries
-- Consider that restaurants present the main course (steak cooked rare with Malbec wine), then separately, the goat cheese cake (with Muscat wine) — they do not cut the cake and steak into small pieces and mix them together; activities "in the middle" are like such **mashing**
-- Recall Nero in Chapter 9 hanging around with **janitors and scholars**, rarely with middlebrows
-- In risky matters, instead of having all members of a staff "cautiously optimistic" or something in the middle, have the **flight attendants maximally optimistic** and the **pilot maximally pessimistic** (or better, paranoid)
-
-### The Accountant and the Rock Star
-
-- Biological systems are replete with barbell strategies — the **90 percent accountant, 10 percent rock star** mating approach
-- Females in some monogamous species (including humans) tend to marry the **accountant** (someone stable who can provide) and once in a while cheat with the **aggressive alpha, the rock star**, as part of a dual strategy
-- They **limit their downside** while using extrapair copulation to get the genetic upside, or some great fun, or both
-- Even the timing of the cheating seems nonrandom, corresponding to **periods with high likelihood of pregnancy**
-- Evidence from so-called monogamous birds: they enjoy cheating, with more than a tenth of the broods coming from **males other than the putative father**
-- Evolutionary theorists claim females want both **economic-social stability and good genes** for their children — both cannot always be obtained from someone in the middle
-- Recall from Chapter 2 that overcompensation requires **some harm and stressors as tools of discovery** — let children play a little bit with fire and learn from injuries, for the sake of their own future safety
-- Let people experience **some stress** to wake them up a bit — but at the same time, they need to be protected from high danger
-- Ignore small dangers, invest your energy in protecting them from **consequential harm — and only consequential harm**
-- This can visibly be translated into social policy, health care, and many more matters
-
-### Provide for the Worst
-
-- One finds similar ideas in ancestral lore — a Yiddish proverb:
-
-> "Provide for the worst; the best can take care of itself."
-
-- This may sound like a platitude, but it is not: just observe how people tend to **provide for the best** and hope that the worst will take care of itself
-- We have ample evidence that people are averse to small losses but **not so much toward very large Black Swan risks** (which they underestimate) — they tend to insure for small probable losses, but not large infrequent ones — **exactly backwards**
-
-### Away from the Golden Middle
-
-- There are so many fields in which the middle is no "golden middle" and where the **bimodal strategy** (maximally safe plus maximally speculative) applies
-- Take **literature** — the most uncompromising, most speculative, most demanding, and riskiest of all careers
-- There is a tradition with French and other European literary writers to look for a **sinecure** — the anxiety-free profession of civil servant, with few intellectual demands and high job security — then spend their spare time writing freely, whatever they want, under their own standards
-- There is a shockingly small number of academics among French authors
-- American writers, on the other hand, tend to become members of the media or academics, which **makes them prisoners of a system and corrupts their writing**
+- When Taleb last met **Alison Wolf**, they discussed the dire problem with education — Ivy League universities becoming a status luxury good, like a Vuitton bag or a Cartier watch
+- It is a huge drag on middle-class parents who have been plowing an increased share of their savings into these institutions — transferring their money to administrators, real estate developers, professors, and agents
+- In the United States, there is a buildup of **student loans** that parallels the subprime-type buildup — both central to the formation of a bubble
 
 ---
 
@@ -2465,7 +2112,7 @@
 
 ## Book VI: Via Negativa
 
-## Chapter 19: Via Negativa (continued from Book VI intro)
+## Chapter 20: Via Negativa
 
 ### The Apophatic Method
 
@@ -2667,7 +2314,7 @@
 - One can now jot down handwritten, or rather fingerwritten, notes — it is much more soothing to **write longhand** instead of having to go through the agency of a keyboard
 - It may be a natural property of technology to **only want to be displaced by itself**
 
-## Chapter 19: To Age in Reverse: The Lindy Effect
+## Chapter 20: The Lindy Effect
 
 ### The Lindy Effect Defined
 
@@ -3114,7 +2761,42 @@
   - **Lysol and other disinfectants** killing so many "germs" that kids' developing immune systems are robbed of necessary workout (or robbed of the "good" friendly germs and parasites)
   - **Dental** treatments
 
-## Chapter 20: Time and Fragility (continued)
+## Chapter 22: To Live Long, but Not Too Long
+
+### Life Expectancy and Convexity
+- Questioning medicine's "progress" prompts the sophistry that "we tend to live longer" — but this is the **exact same argument** as saying eating fresh food implies rejecting civilization, the rule of law, and humanism
+- Life expectancy increased due to **sanitation, penicillin, drop in crime, life-saving surgery** — not routine medical treatment
+- If we live longer because of medicine, it is thanks to **severe, lethal cases** (the convex cases) — not mild ailments where iatrogenics dominate
+- **Hospital strikes** reveal that when only urgent cases are treated, life expectancy either increases or does not drop — a devastating indictment of routine medical intervention
+- Many of the gains attributed to medicine are actually from **improvements in living conditions and social mores**
+
+### Subtraction Adds to Your Life
+- The **via negativa** approach to health: what you **don't do** matters more than what you do
+- Remove **painkillers** (they mask root causes like sleep deprivation, tension, bad stressors), **vitamin pills**, **food supplements**, the family doctor, headache medicine
+- **Oliver Wendell Holmes Sr.**: "if all the medications were dumped in the sea, it would be better for mankind but worse for the fishes"
+- Taleb's father, an oncologist, raised him under the maxim that medications should be dumped in the sea — and followed it in practice
+- Avoid fruits without ancient Greek or Hebrew names (mangoes, papayas, oranges are postmedieval candy equivalents)
+- **Personal rule on liquids**: drink nothing that isn't at least a thousand years old — wine, water, coffee. No soft drinks. Orange juice is the most deceitfully noxious "healthy" drink
+- What is called "healthy" is generally unhealthy, just as "social" networks are antisocial and the "knowledge" economy is typically ignorant
+- Removing offensive irritants from life (morning newspapers, Thomas Friedman, Paul Krugman, the commute, air conditioning, television, gym "strength training" machines) produced a considerable jump in personal health
+
+### The Iatrogenics of Money
+- Construction laborers with ham and cheese baguettes seem **happier** than billionaires at Michelin restaurants — food tastes better after exertion
+- Romans saw anything that "softens" or "mollifies" negatively — history likes the lurid; they understood comfort's side effects
+- **Desert vs. city culture**: the desert is full of poetry, contemplation, frugality; the city breeds gossip, moral decay, decadence
+- Christ fasted forty days in the Judean desert; Saint Simeon spent forty years on a column in Northern Syria — the tradition of shedding possessions
+- Medical iatrogenics is the result of **wealth and sophistication**, not poverty — money has its own iatrogenics
+- **The treadmill effect**: you need to make more and more to stay in the same place — greed is antifragile, though not its victims
+- Wealth does not make people more independent — **we have never been richer in history, and never more in debt** (for the ancients, someone in debt was in bondage)
+- **Tantalus class**: permanently tantalized, socialized into a certain milieu, exposed to a treadmill — you move to Greenwich, Connecticut, then become a pauper next to twenty-million-dollar mansions
+- Romans circumvented treadmill effects through **patron-client relationships** — private charity, no welfare, no church
+- Provincial landowners maintained "open house" with open tables — court life leads to corruption
+
+### Religion and Naive Interventionism
+- Religion has **invisible purposes** beyond what literal-minded scientistic-scientifiers identify — one purpose is to **protect us from scientism**
+- For marginal disease, **anything that takes you away from the doctor and allows you to do nothing** will be beneficial — going to church (or the temple of Apollo) for mild cases helps
+- The risk of iatrogenics exceeds the benefit of cure in cases with **negative convexity** — religion helps by limiting intervention
+- Human nature "deep down, knows when to resort to the solace of religion, and when to switch to science"
 
 ### If It's Wednesday, I Must Be Vegan
 
@@ -3196,7 +2878,7 @@
 
 > Then say goodbye, have a nice funeral in St. Sergius (Mar Sarkis) in Amioun, and, as the French say, *place aux autres*—make room for others.
 
-### Footnotes on Chapter 20
+### Footnotes on Chapter 22
 
 - **Conditional life expectancy** numbers are revealing: Richard Lewontin estimates that in the last 50 years, only four months have been added to the expected life span of a person who is already 60 years old; CDC data shows life expectancy at age 20 only increased from 42.79 additional years in 1900–1902 to 51.2 in 1949–1951 and to 58.2 in 2002
 - The **Cretan diet fallacy**: the second-order effect (the variations in intake via fasting) could be the dominant factor, not the specific foods consumed
@@ -3556,147 +3238,1035 @@
 - Questioned by Fat Tony, Nero's speculative reply was: **"It would most certainly be the absence of slaves"**
 - Fat Tony: "These people never did small domestic things themselves. So imagine Socrates' sorry figure of a bulging belly, spindly legs, wondering *Opou oi douloi?*" ("Where are the slaves?")
 
+## Chapter 25: Conclusion
+
+- At the end of the journey, **Shaiy Pilpel**, a probabilist with whom Taleb has had a decades-long calm conversation without small talk, asked him to explain the book standing on one leg
+- Shaiy summed it up himself: all real ideas can be **distilled down to a central issue** that specialists completely miss — everything in religious law comes down to refinements of the Golden Rule: "Don't do unto others what you don't want them to do to you"
+- The Golden Rule was a **true distillation**, not a Procrustean bed — a central argument is never a summary, it is more like a **generator**
+- Shaiy's extraction: ***Everything gains or loses from volatility. Fragility is what loses from volatility and uncertainty.***
+- The glass on the table is **short volatility** — it is dead; living things are **long volatility**
+
+> "The best way to verify that you are alive is by checking if you like variations."
+
+- **Prometheus is long disorder; Epimetheus is short disorder** — we can separate people by their exposure to and appetite for disorder
+- Spartan hoplites contra bloggers, adventurers contra copy editors, Phoenician traders contra Latin grammarians, pirates contra tango instructors
+- Everything nonlinear is **convex or concave, or both** — depending on stressor intensity. So everything likes or hates volatility **up to a point**
+- We can detect what likes volatility thanks to **convexity** — we can build Black Swan-protected systems thanks to detection of concavity
+- We can take **medical decisions** by understanding the convexity of harm and the logic of Mother Nature's tinkering
+- Ethics is largely about **stolen convexities and optionality**
+- More technically, we may never get to know *x*, but we can play with the exposure to *x*, barbell things to defang them — we can keep changing *f(x)* until comfortable, by a mechanism called **convex transformation** (the barbell)
+- This short maxim tells you **where fragility supersedes truth**, why we lie to children, and why we got a bit ahead of ourselves in modernity
+- **Distributed randomness** (as opposed to concentrated type) is a necessity, not an option — everything big is short volatility. Big and fast are abominations. Modern times don't like volatility.
+
+> "The glass is dead; living things are long volatility. The best way to verify that you are alive is by checking if you like variations. Remember that food would not have a taste if it weren't for hunger; results are meaningless without effort, joy without sadness, convictions without uncertainty, and an ethical life isn't so when stripped of personal risks."
+
+## Epilogue: From Resurrection to Resurrection
+
+- **Fat Tony dies** of an aortic aneurism while Nero is in the Levant for his annual celebration of the death and rebirth of Adonis — a period of mourning with wailing women, followed by a celebration of resurrection
+- Nero was designated executor of Tony's will — the estate was **flawless**: debt-free, conservative, fairly distributed, with discreet funds for a woman (antifragile obsessive love)
+- **The posthumous prank**: Tony bequeathed Nero twenty million dollars to spend at his discretion on a **secret mission** — noble, but secret, vague, and dangerous
+- It was the best compliment Nero ever got from Tony: **trusting that Nero would be able to read his mind**
+- Which he did.
+
 ## Appendix I: Technical Companion (Continued)
 
-### Technical Version of Fat Tony's "Not the Same 'Ting" — The Conflation of Events and Exposure to Events
+### Technical Version of Fat Tony's "Not the Same 'Ting'" — The Conflation of Events and Exposure to Events
 
-- This note explains the **"convex transformation"** — the key technical idea behind Fat Tony's intuition
-- **f(x)** is *exposure* to the variable x. f(x) can equivalently be called "payoff from x," "exposure to x," or "utility of payoff from x" — where we introduce f as a utility function, and x can be anything
-- **Example**: x is the intensity of an earthquake on some scale in a specific area, f(x) is the number of persons dying from it. We can easily see that f(x) can be made more predictable than x (force people to stay away, build to certain standards, etc.)
-- **Example**: x is the number of meters of a fall when someone pushes you from height x, f(x) is a measure of physical condition from the effect of the fall. You cannot predict x (who will push you), but you can manage f(x)
-- **Example**: x is the number of cars in NYC at noon tomorrow, f(x) is travel time from point A to point B. f(x) can be made more predictable than x (take the subway, or even better, walk)
-- Some people talk about f(x) thinking they are talking about x — this is the problem of the **conflation of event and exposure**. This error is virtually ubiquitous in the philosophy of probability (say, Hacking)
-- One can become antifragile to x without understanding x, through **convexity of f(x)**
-- The answer to "what do you do in a world you don't understand?" is simply: **work on the undesirable states of f(x)**
+- This section also explains the **"convex transformation"**
+- **f(x)** is *exposure* to the variable **x** — it can equivalently be called "payoff from x," "exposure to x," or even "utility of payoff from x," where we introduce **f** as a utility function; **x** can be anything
+- **Example — Earthquake**: x is the intensity of an earthquake on some scale in some specific area; f(x) is the number of persons dying from it — we can easily see that f(x) can be made more predictable than x (if we force people to stay away from a specific area or build to some standards, etc.)
+- **Example — Falling**: x is the number of meters of a fall to the ground when someone pushes you from height x; f(x) is a measure of physical condition from the effect of the fall — clearly you cannot predict x (who will push you), but you can manage f(x) (the effect)
+- **Example — Traffic**: x is the number of cars in NYC at noon tomorrow; f(x) is travel time from point A to point B for a certain agent — f(x) can be made more predictable than x (take the subway, or even better, walk)
+- Some people talk about f(x) thinking they are talking about x — this is the problem of the **conflation of event and exposure**
+- This error is present in **Aristotle** and is virtually ubiquitous in the philosophy of probability (e.g., **Hacking**)
+- One can become **antifragile to x without understanding x**, through convexity of f(x)
+- The answer to "what do you do in a world you don't understand?" is simply: work on the undesirable states of f(x)
+- It is often easier to modify f(x) than to get better knowledge of x — in other words, **robustification rather than forecasting Black Swans**
+- **Example — Insurance barbell**: If you buy insurance on the market dropping more than 20%, f(x) will be independent of the part of the probability distribution of x that is below 20%, and impervious to changes in its scale parameter — this is an example of a **barbell**
 
-### Convex Transformation and Robustification
+### Convex Transformation (Figure 27)
 
-- It is often easier to modify f(x) than to get better knowledge of x — in other words, **robustification rather than forecasting** Black Swans
-- **Example (Barbell)**: If you buy insurance on the market dropping more than 20 percent, f(x) will be independent of the part of the probability distribution of x that is below 20 percent and impervious to changes in its scale parameter
-- **Figure 27**: Shows the probability distribution of x (bell-shaped) versus the probability distribution of f(x) (right-skewed with no downside risk). The key is to modify f(x) to make knowledge of the properties of x on the left side of the distribution as irrelevant as possible — this operation is called **convex transformation**, nicknamed "barbell"
+- **Figure 27** illustrates the difference between x and exposure to x via a **convex transformation** (f(x) is a convex function of x)
+- The top graph shows the **probability distribution of x** — a symmetrical bell curve
+- The bottom graph shows the **probability distribution of f(x)** — right-skewed, with no downside risk
+- The key is to modify f(x) in order to make knowledge of the properties of x on the left side of the distribution as irrelevant as possible
+- This operation is called **convex transformation**, nicknamed **"barbell"**
 
 ### Green Lumber Fallacy (Technical Definition)
 
-- When one confuses f(x) for another function g(x), one that has **different nonlinearities**
+- **Green lumber fallacy**: When one confuses f(x) for another function g(x) — one that has different nonlinearities
+- This is a precise technical restatement of why confusing the source of knowledge doesn't matter if you get the exposure function right
 
 ### Antifragility and Variance (Technical)
 
-- If one is antifragile to x, then the variance (or volatility, or other measures of variation) of x **benefit f(x)**, since distributions that are skewed have their mean depend on the variance
-- When skewed right, their expectation **increases with variance** (the lognormal, for instance, has for mean a term that includes +½ σ²)
-- The probability distribution of f(x) is **markedly different** from that of x, particularly in the presence of nonlinearities
-- When f(x) is convex (concave) monotonically, f(x) is **right (left) skewed**
-- When f(x) is increasing and convex on the left then concave to the right, the probability distribution of f(x) is **thinner-tailed** than that of x — e.g., in Kahneman-Tversky's prospect theory, the utility of changes in wealth is more "robust" than that of wealth
+- If one is **antifragile to x**, then the variance (or other measures of variation) of x **benefit** f(x), since distributions that are skewed have their mean depend on the variance
+- When skewed right, their expectation **increases with variance** — the lognormal, for instance, has for mean a term that includes **+½ σ²**
+- The **probability distribution of f(x)** is markedly different from that of x, particularly in the presence of nonlinearities
+- When f(x) is **convex (concave) monotonically**, f(x) is **right (left) skewed**
+- When f(x) is increasing and convex on the left then concave to the right, the probability distribution of f(x) is **thinner-tailed** than that of x — for instance, in **Kahneman-Tversky's prospect theory**, the so-called utility of changes in wealth is more "robust" than that of wealth
 
 ### Why Payoff Matters More Than Probability (Technical)
 
-- Where p(x) is the density, the expectation ∫ f(x)p(x)dx will depend increasingly on **f rather than p**, and the more nonlinear f is, the more it will depend on f rather than p
+- Where **p(x)** is the density, the expectation — ∫ f(x)p(x)dx — will depend increasingly on **f** rather than **p**
+- The more **nonlinear f** is, the more the expectation depends on f rather than p
+- This is a fundamental insight: the shape of the payoff function matters more than getting the probability distribution right
+
+---
 
 ### The Fourth Quadrant (Taleb, 2009)
 
 - The idea is that **tail events are not computable** (in fat-tailed domains), but we can assess our **exposure** to the problem
-- Assuming f(x) is an increasing function, Table 10 connects the idea to the Fourth Quadrant:
-  - **f(x) "mitigating" by clipping extreme outcomes (convex-concave)** + Thin-tailed distribution = Very robust outcome
-  - **f(x) "mitigating" by clipping extreme outcomes (convex-concave)** + Fat-tailed distribution = Quite robust outcome
-  - **f(x) concave-convex, exacerbates remote outcomes** + Thin-tailed distribution = Robust outcome (sort of)
-  - **f(x) concave-convex, exacerbates remote outcomes** + Fat-tailed distribution = **FOURTH QUADRANT** — Fragile (if f(x) is concave) or antifragile
+- Assume f(x) is an increasing function — **Table 10** connects the idea to the notion of the **Fourth Quadrant**:
+  - **f(x) "mitigating" by clipping extreme outcomes (convex-concave)** + **Thin-tailed distribution for x** = Very robust outcome
+  - **f(x) "mitigating" (convex-concave)** + **Fat-tailed distribution for x** = Quite robust outcome
+  - **f(x) concave-convex, exacerbates remote outcomes** + **Thin-tailed distribution for x** = Robust outcome (sort of)
+  - **f(x) concave-convex** + **Fat-tailed distribution for x** = **FOURTH QUADRANT** — Fragile (if f(x) is concave) or antifragile
+- The **Fourth Quadrant** is the danger zone: fat-tailed distributions combined with concave-convex exposure functions that exacerbate remote outcomes
+
+---
 
 ### Local and Global Convexities (Technical)
 
-- Nothing is open-ended in nature — **death is a maximum outcome** for a unit. So things end up convex on one end, concave on the other
-- There is **maximum harm** at some point in things biological
-- Revisiting the concave figure of the stone and pebbles from Chapter 18: by widening the range we see that **boundedness of harm brings convexities** somewhere — concavity was dominant, but local
-- **Figure 28** (top graph): Shows harm vs. size of stone — at some point, the concave turns convex as we hit **maximum harm**
-- **Figure 28** (bottom graph): Shows gains vs. variable with "the sky is the limit" — strong antifragility with **no known upper limit** (leading to Extremistan). These payoffs are only available in economic variables (sales of books, matters unbounded or near-unbounded). Taleb is unable to find such an effect in nature
-- **Figure 29**: Shows **weak antifragility (Mediocristan)** with bounded maximum — typical in nature. Response increases with dose up to a maximum benefit, then levels off
+- **Nothing is open-ended in nature** — death is a maximum outcome for a unit
+- Things end up **convex on one end, concave on the other**
+- In fact, there is **maximum harm** at some point in things biological
+- Revisiting the concave figure of the **stone and pebbles** from Chapter 18: by widening the range we see that **boundedness of harm brings convexities** somewhere
+- **Concavity was dominant, but local** — Figure 28 shows the broader range
+- **Figure 28** (top graph): At some point the concave turns convex as we hit **maximum harm** — the harm from the stone is bounded
+- **Figure 28** (bottom graph): Shows strong antifragility with **no known upper limit** (leading to **Extremistan**) — these payoffs are only available in **economic variables** (sales of books, or matters unbounded or near-unbounded); Taleb is unable to find such an effect in nature
+
+### Weak Antifragility (Mediocristan) — Figure 29
+
+- **Figure 29** shows **weak antifragility** with a **bounded maximum** — typical in nature
+- The response curve is S-shaped (sigmoid): initially convex, then concave, with a ceiling on maximum benefit
+- This is the dose-response pattern seen in biological systems — **Mediocristan**-style antifragility
+
+---
 
 ### Freak Nonlinearities (Very Technical)
 
 - The next two types of nonlinearities are **almost never seen outside of economic variables** — they are particularly limited to those caused by **derivatives**
-- **Figure 30** (top graph): Shows a **convex-concave increasing function** — the opposite of the bounded dose-response functions we see in nature. It leads to **Type 2, Fragile** (very, very fat tails)
-- **Figure 30** (bottom graph): Shows the most dangerous of all: **pseudoconvexity** — local antifragility, global fragility
+- **Figure 30** (top graph): Shows a **convex-concave increasing function** — the opposite of the bounded dose-response functions seen in nature; it leads to **Type 2, Fragile** (very, very fat tails)
+- **Figure 30** (bottom graph): Shows the most dangerous of all — **pseudoconvexity**: **local antifragility, global fragility**
+- Pseudoconvexity is extremely dangerous because it creates the illusion of benefiting from volatility locally while being devastatingly fragile at the global level
+
+---
 
 ### Medical Nonlinearities and Their Probability Correspondence (Chapters 21 & 22)
 
-- **Figure 31 — Medical Iatrogenics**: Shows the case of small benefits and large Black Swan-style losses seen in probability space
-- **Iatrogenics** occurs when we have small identifiable gains (avoidance of small discomfort or a minor infection) and exposure to Black Swans with delayed invisible large side effects (death)
+- **Figure 31 — Medical Iatrogenics**: Shows the case of **small benefits and large Black Swan-style losses** seen in probability space
+- **Iatrogenics** occurs when we have small identifiable gains (avoidance of small discomfort or a minor infection) and exposure to **Black Swans with delayed invisible large side effects** (death)
 - These **concave benefits from medicine** are just like selling a financial option (plenty of risk) against small tiny immediate gains while claiming "evidence of no harm"
-- For a healthy person: there is a **small probability of disastrous outcomes** (discounted because unseen and not taken into account), and a **high probability of mild benefits**
-- **Figure 32 — Nonlinearities in biology**: The shape convex-concave necessarily flows from anything increasing (monotone), bounded, with maximum and minimum values. At low levels, the dose response is **convex** (gradually more effective). Additional doses tend to become gradually ineffective or start hurting — becoming **concave** (fragile)
-- This type of graph necessarily applies to any situation **bounded on both sides**, with a known minimum and maximum (saturation) — which includes happiness
-- If one considers maximum levels of happiness and unhappiness, the general shape is a curve with **convexity on the left and concavity on the right** — Kahneman-Tversky prospect theory models a similar shape for "utility" of changes in wealth
-- **Figure 33 — Medical Breakeven**: Shows net benefits vs. severity of condition. The arrow points at the level where **probabilistic gains match probabilistic harm** — iatrogenics disappears nonlinearly as a function of severity of condition
-- When the patient is very ill, the distribution shifts to **antifragile** (thicker right tail), with large benefits from treatment over possible iatrogenics, little to lose
-- **Figure 34 — Hormesis**: Top graph shows hormesis for an organism — a stage of benefits as dose increases (initially **convex**) slowing down into a phase of harm (initially **concave**); then things flatten out at the level of maximum harm (beyond a certain point, the organism is dead — there is a bounded and known worst case in biology)
-- The bottom graph shows the **wrong graph of hormesis** in medical textbooks — showing initial concavity, with a beginning that looks linear or slightly concave
+- For a **healthy person**, there is a small probability of disastrous outcomes (discounted because unseen and not taken into account) and a high probability of mild benefits
+
+### Nonlinearities in Biology — Figure 32
+
+- **Figure 32** shows the shape **convex-concave** that necessarily flows from anything increasing (monotone, never decreasing) and **bounded** (with maximum and minimum values — does not reach infinity from either side)
+- At **low levels**, the dose response is **convex** (gradually more and more effective)
+- **Additional doses** tend to become gradually ineffective or start hurting — this is the concave region
+- This type of graph necessarily applies to any situation **bounded on both sides**, with a known minimum and maximum (**saturation**), which includes happiness
+- If one considers that there exists a maximum level of happiness and unhappiness, then the general shape of this curve with **convexity on the left and concavity on the right** has to hold for happiness (replace "dose" with "wealth" and "response" with "happiness")
+- **Kahneman-Tversky prospect theory** models a similar shape for "utility" of changes in wealth, which they discovered empirically
+
+### Medical Breakeven — Figure 33
+
+- **Figure 33** illustrates the **hypertension example**: on the vertical axis, net benefits of a treatment; on the horizontal, severity of the condition
+- The arrow points at the level where **probabilistic gains match probabilistic harm** — the **medical breakeven point**
+- **Iatrogenics disappears nonlinearly** as a function of the severity of the condition
+- When the patient is **very ill**, the distribution shifts to **antifragile** (thicker right tail), with large benefits from the treatment over possible iatrogenics, little to lose
+- If you increase the treatment you hit concavity from maximum benefits — seen more broadly, it would look like the convex-concave curve
+
+### Hormesis — Figure 34
+
+- **Figure 34** (top graph): Shows **hormesis for an organism** — a stage of benefits as the dose increases (initially convex) slowing down into a phase of harm as we increase dose further (initially concave)
+- Then things **flatten out at the level of maximum harm** — beyond a certain point, the organism is dead, so there is a **bounded and known worst-case scenario in biology**
+- **Figure 34** (bottom graph): Shows a **wrong graph of hormesis** in medical textbooks — showing initial concavity, with a beginning that looks linear or slightly concave (this is incorrect)
+
+---
 
 ### The Inverse Turkey Problem
 
-- **Figure 35**: Shows the antifragile inverse turkey problem — the unseen rare event is **positive**
-- When you look at a **positively skewed (antifragile)** time series and make inferences about the unseen, you miss the good stuff and **underestimate the benefits** (the Pisano mistake)
-- On the bottom (the other Harvard problem, Froot 2001): the filled area corresponds to what we do not tend to see in small samples, from **insufficiency of points**
-- The shaded area increases with model error — the technical sections call this zone **ω_B** (turkey) and **ω_C** (inverse turkey)
+- **Figure 35** illustrates the **Antifragile, Inverse Turkey Problem**: the unseen rare event is **positive**
+- **Top graph**: When you look at a **positively skewed (antifragile)** time series and make inferences about the unseen, you miss the good stuff and **underestimate the benefits** (the **Pisano, 2006a, 2006b** mistake)
+- **Bottom graph**: The other Harvard problem, that of **Froot (2001)** — the filled/shaded area corresponds to what we do not tend to see in small samples, from insufficiency of data points
+- Interestingly the shaded area **increases with model error**
+- The technical sections call the zone **ω_B** (turkey) and **ω_C** (inverse turkey)
+- This is the mirror image of the regular turkey problem: instead of unseen negative Black Swans, here the unseen rare events are **positive** — leading to systematic underestimation of upside
+
+---
 
 ### Difference Between Point Estimates and Distributions
 
-- Applying this analysis to how **planners make mistakes** and why deficits tend to be worse than planned
-- **Figure 36** (top graph): Shows the probability distribution of outcomes from costs of projects **in the minds of planners** — they assume costs will be both low and quite certain (a spike near one value)
-- **Figure 36** (bottom graph): Shows **reality** — outcomes are both worse and more spread out, particularly with higher possibility of unfavorable outcomes. The fragility increases owing to the **swelling left tail**
-- This misunderstanding of the effect of uncertainty applies to **government deficits**, plans that have IT components, travel time (to a lesser degree), and many more
-- The same graph is used to show **model error** from underestimating fragility by assuming a parameter is constant when it is random — this is what plagues **bureaucrat-driven economics**
+- Applying this analysis to how **planners make mistakes** and why **deficits tend to be worse than planned**
+- **Figure 36** (top graph): Shows the probability distribution of outcomes from costs of projects **in the minds of planners** — they assume costs will be both low and quite certain (a very narrow spike)
+- **Figure 36** (bottom graph): Shows the probability distribution **in reality** — outcomes are both worse and more spread out, particularly with higher possibility of unfavorable outcomes
+- Note the **fragility increase** owing to the swelling **left tail**
+- This misunderstanding of the effect of uncertainty applies to **government deficits**, plans that have **IT components**, **travel time** (to a lesser degree), and many more
+- The same graph shows **model error from underestimating fragility** by assuming that a parameter is constant when it is random — this is what plagues **bureaucrat-driven economics**
+
+---
 
 ## Appendix II (Very Technical): Where Most Economic Models Fragilize and Blow People Up
 
-- When Taleb said "technical" in the main text, he may have been fibbing — here he is not
+- Taleb admits: "When I said 'technical' in the main text, I may have been fibbing. Here I am not."
 
 ### The Markowitz Incoherence
 
-- Assume someone tells you the probability of an event is exactly zero. If they say "Baal told me," they are coherent (but deemed unrealistic by non-Baalists)
-- But if they say "I *estimated* it to be zero," there is a problem — the person is both **unrealistic and inconsistent**. Something estimated needs to have an estimation error
-- **Probability cannot be zero if it is estimated** — its lower bound is linked to the estimation error; the higher the estimation error, the higher the probability (up to a point)
-- As with **Laplace's argument** of total ignorance, an infinite estimation error pushes the probability toward ½
-- Anything estimating a parameter and then putting it into an equation is **different from** estimating the equation across parameters (same story as the health of the grandmother — average health across temperatures, not health at the average temperature)
-- **Markowitz** showed his incoherence by starting his "semi-nal" paper with "Assume you know E and V" (the expectation and the variance). At the end he accepts they need to be estimated, with a combination of statistical techniques and "the judgment of practical men"
-- If these parameters need to be estimated with error, then the **derivations need to be written differently** — and there would be no Markowitz paper, no blowups, no modern finance, no fragilistas teaching junk to students
+- **The Markowitz incoherence**: Assume someone tells you that the probability of an event is exactly zero. You ask where he got this from. If "Baal told me" — the person is coherent (but would be deemed unrealistic by non-Baalists)
+- But if the person says "I *estimated* it to be zero," we have a problem — the person is **both unrealistic and inconsistent**
+- Something estimated needs to have an **estimation error** — so probability cannot be zero if it is estimated
+- Its **lower bound is linked to the estimation error**: the higher the estimation error, the higher the probability, up to a point
+- As with **Laplace's argument** of total ignorance, an infinite estimation error pushes the probability toward **½**
+- The key mistake: anything estimating a parameter and then putting it into an equation is different from estimating the equation across parameters (same story as the health of the grandmother — the average temperature, here "estimated," is irrelevant; what we need is **average health across temperatures**)
+- **Markowitz** showed his incoherence by starting his "semi-nal" paper with "Assume you know E and V" (the expectation and the variance) — at the end of the paper he accepts that they need to be estimated, and what is worse, with a combination of statistical techniques and "judgment of practical men"
+- If these parameters need to be estimated with an error, then the **derivations need to be written differently** — and of course, we would have no paper, and no Markowitz paper, no blowups, no modern finance, no **fragilistas** teaching junk to students
 - **Economic models are extremely fragile to assumptions** — a slight alteration in assumptions can lead to extremely consequential differences in results
-- Many models are **"back-fit" to assumptions** — the hypotheses are selected to make the math work, which makes them ultrafragile and ultrafragilizing
+- Many of these models are **"back-fit" to assumptions** — the hypotheses are selected to make the math work, which makes them **ultrafragile and ultrafragilizing**
 
 ### Simple Example: Government Deficits
 
-- Governments and government agencies currently **miss convexity terms** in their calculations (and have a hard time accepting it). The example illustrates:
-  - (a) Missing the **stochastic character** of a variable known to affect the model but deemed deterministic (and fixed)
-  - (b) **F**, the function of such variable, is convex or concave with respect to the variable
-- A government estimates unemployment for the next three years as averaging 9 percent; uses econometric models to issue a forecast balance B of a **−200 billion deficit** in local currency
-- But it misses that **unemployment is a stochastic variable**. Employment over a three-year period has fluctuated by 1 percent on average
-- The error calculation:
+- The deficit example illustrates how governments and government agencies currently **miss convexity terms** (and have a hard time accepting it)
+- The example illustrates two problems:
+  - (a) **Missing the stochastic character** of a variable known to affect the model but deemed deterministic (and fixed)
+  - (b) **F**, the function of such variable, is **convex or concave** with respect to the variable
+- A government estimates unemployment for the next three years as averaging **9 percent**; it uses its econometric models to issue a forecast balance **B** of a **two-hundred-billion deficit** in local currency
+- But it misses (like almost everything in economics) that **unemployment is a stochastic variable** — employment over a three-year period has fluctuated by **1 percent** on average
+- Calculating the effect of the error:
   - Unemployment at 8%, Balance B(8%) = −75 bn (improvement of 125 bn)
   - Unemployment at 9%, Balance B(9%) = −200 bn
   - Unemployment at 10%, Balance B(10%) = −550 bn (worsening of 350 bn)
-- The **concavity bias** (negative convexity bias) from underestimation of the deficit is −112.5 bn, since ½ {B(8%) + B(10%)} = −312 bn, not −200 bn — this is the exact case of the **inverse philosopher's stone**
-- **Figure 37**: Shows the nonlinear transformation — histogram from Monte Carlo simulation of government deficit as a left-tailed random variable simply as a result of randomizing unemployment (a concave function). The method of point estimate would assume a Dirac stick at −200, thus **underestimating both the expected deficit (−312) and the tail fragility** of it
+- The **concavity bias** (negative convexity bias) from underestimation of the deficit is **−112.5 bn**, since ½ {B(8%) + B(10%)} = −312 bn, not −200 bn
+- This is the exact case of the **inverse philosopher's stone** — variability systematically worsens the outcome because of concavity
+
+### Figure 37: Nonlinear Transformations Detect Convexity Bias and Fragility
+
+- **Figure 37** shows a Monte Carlo simulation of government deficit as a **left-tailed random variable** simply as a result of randomizing unemployment, of which it is a **concave function**
+- The method of **point estimate** would assume a Dirac stick at −200, thus underestimating both the **expected deficit (−312)** and the **tail fragility** of it
+- From **Taleb and Douady, 2012**
 
 ### Application: Ricardian Model and Left Tail — The Price of Wine Happens to Vary
 
-- For almost two hundred years, economists have discussed David Ricardo's **"comparative advantage"** — a country should have a certain policy based on its comparative advantage in wine or clothes
-- **Paul Samuelson's analogy**: if someone is both the best doctor and best secretary in town, it would be preferable to be the higher-earning doctor and let someone else be the secretary
-- Taleb agrees there are benefits in *some* form of specialization, but not from the models used to prove it
-- **The flaw**: It would be inconceivable for a doctor to become a part-time secretary just because he is good at it. Being a doctor insures professional stability (people will not cease to get sick), has higher social status. But a **country specialized in wine** hoping to sell its specialty, if the **price of wine drops precipitously**, faces a very different situation
-- **Table 11 — Ricardo's Original Example** (Costs of Production Per Unit):
-  - Britain: Cloth 100, Wine 110
-  - Portugal: Cloth 90, Wine 80
-- The paradox: Portugal produces cloth cheaper than Britain, but should buy cloth from there instead, using gains from wine sales. Britain produces just cloth, Portugal just wine
-- **The critical error**: Ricardo's analysis assumes that both the market price of wine and costs of production **remain constant** — there is no "second order" part of the story
-- **Krugman** falls into the critical and dangerous mistake of confusing **function of average** and **average of function** (Traditional Ricardian analysis assumes variables are endogenous but does not add a layer of stochasticity)
-- Now consider the price of wine and clothes **variable** — which Ricardo did not assume — with the numbers above the unbiased average long-term value. Further assume they follow a **fat-tailed distribution**
-- If the price of wine rises by 40 percent, clear benefits. But if it drops by an equal percentage (−40 percent), **massive harm** would ensue, in magnitude larger than the benefits — there are **concavities to the exposure**, severe concavities
-- A 90 percent price drop would be **disastrous** — imagine an instant, unpredicted 40 percent pay cut to your household
-- Historical problems with countries specializing in goods, commodities, and crops that turn out to be **not just volatile, but extremely volatile**
-- Disaster comes not just from variation in price but also **problems in production**: a germ, bad weather, or other hindrance
-- **The Irish potato famine** (around 1850) caused by monoculture (focus on a single crop): caused the death of a million and emigration of a million more (Ireland's population was only about six million)
-- Unlike the doctor-secretary story, **countries don't have the ability to easily reconvert resources**. Monoculture has turned out to be lethal in history
-- Countries also don't have family, friends, or a support community like a doctor does. A doctor has savings; **countries tend to be borrowers**
-- Here again: **fragility to second-order effects**
+- For almost two hundred years, we've been talking about **David Ricardo's** idea of **"comparative advantage"** — a country should have a certain policy based on its comparative advantage in wine or clothes
+- The analogy by **Paul Samuelson**: if someone is both the best doctor and the best secretary in town, it would be preferable to be the higher-earning doctor and let someone else be the secretary
+- Taleb agrees there are benefits in *some* form of specialization, but **not from the models used to prove it**
+- The flaw: it would be inconceivable for a doctor to become a part-time secretary just because he is good at it — being a doctor insures professional stability (people will not cease to get sick), and there is higher social status associated with the profession than that of secretary
+- But in a **two-country world**, a country specialized in wine, hoping to sell its specialty to the other country, faces the risk that **suddenly the price of wine drops precipitously**
+- Ricardo's analysis assumes that both the **market price of wine and the costs of production remain constant** — there is no "second order" part of the story
+- **Table 11 — Ricardo's Original Example** (costs of production per unit): Britain produces cloth at 100, wine at 110; Portugal produces cloth at 90, wine at 80
+- The "paradox": Portugal produces cloth cheaper than Britain but should buy cloth from there instead, using the gains from wine sales — in the absence of transaction costs, it's efficient for Britain to produce just cloth and Portugal to only produce wine
+- **Paul Krugman** in "Why Intellectuals Don't Understand Comparative Advantage" (1998) makes fun of intellectuals like **S. J. Gould** who understand tail events albeit intuitively rather than analytically — yet Krugman himself fails to understand the concept, as his essay and technical work show him to be completely innocent of tail events and risk management
+- Krugman falls into the critical and dangerous mistake of **confusing function of average and average of function** (traditional Ricardian analysis assumes variables are endogenous but does not add a layer of stochasticity)
+- Now consider the price of wine and clothes **variable** — not assumed to be the unbiased average long-term value, but following a **fat-tailed distribution**; or consider that costs of production vary according to a fat-tailed distribution
+- If the price of wine **rises by 40 percent**, there are clear benefits — but should the price drop by an equal percentage (−40%), then **massive harm** would ensue, in magnitude larger than the benefits should there be an equal rise — there are **concavities to the exposure**, severe concavities
+- A **90 percent price drop** would be disastrous — imagine getting an instant and unpredicted 40 percent pay cut
+- Historical problems with countries specializing in some goods, commodities, and crops that happen to be **not just volatile, but extremely volatile**
+- Disaster does not necessarily come from variation in price but from **problems in production**: a germ, bad weather, or some other hindrance
+- **The Irish potato famine** (around 1850): A bad crop caused the death of a million and the emigration of a million more (Ireland's entire population was only about six million) — **monoculture** (focus on a single crop) has turned out to be one of the most **lethal in history**; one bad crop leads to devastating famines
+- The **doctor-typist analogy breaks down** because countries don't have family and friends, a support community, a father-in-law to borrow from, a state above to help — countries don't have savings; countries tend to be **borrowers**
+- So here again we have **fragility to second-order effects**
 
 ### Probability Matching
 
 - The idea of comparative advantage has an analog in probability: sampling from an urn (with replacement) getting black ball 60% of the time and white 40% — the **optimal strategy** according to textbooks is to bet 100% on black
 - The strategy of betting 60% on black and 40% on white is called **"probability matching"** and considered to be an error in the decision-science literature
+- But people's instinct to engage in **probability matching** appears to be sound, not a mistake — in nature, probabilities are **unstable** (or unknown), and probability matching is similar to **redundancy**, as a buffer
+- If the probabilities change — i.e., if there is another layer of randomness — then the optimal strategy is probability matching
+
+### How Specialization Works
+
+- Taleb clarifies he is not saying specialization is not a good thing — only that one should establish such specialization **after addressing fragility and second-order effects**
+- He believes **Ricardo** is ultimately right, but not from the models shown — organically, systems without top-down controls would specialize **progressively, slowly**, and over a long time, through **trial and error**, getting the right amount of specialization
+- Not through some bureaucrat using a model — systems make small errors, design makes large ones
+- The imposition of Ricardo's insight-turned-model by some **social planner** would lead to a blowup; letting **tinkering work slowly** would lead to efficiency — true efficiency
+- The role of policy makers should be, ***via negativa*** style, to **allow the emergence of specialization** by preventing what hinders the process
+
+---
+
+### A More General Methodology to Spot Model Error
+
+- **Model second-order effects and fragility**: Assume we have the right model (a very generous assumption) but are uncertain about the parameters
+- As a generalization of the deficit/employment example: using a simple function *f(x|α)*, where *α̅* is supposed to be the average expected input variable, with *φ* as the distribution of *α* over its domain
+- **The philosopher's stone**: The mere fact that *α* is uncertain (since it is estimated) might lead to a **bias** if we perturbate from the *inside* (of the integral), i.e., stochasticize the parameter deemed fixed
+- The **convexity bias** is easily measured as the difference between (a) the function *f* integrated across values of potential *α*, and (b) *f* estimated for a single value of *α* deemed to be its average
+- This convexity bias (the "philosopher's stone") *ω_A* is formally expressed as the integral difference between the stochasticized and point-estimated versions of the function
+
+### The Central Equation — Fragility Detection
+
+- **Fragility** is a partial philosopher's stone below *K* — hence *ω_B*, the missed fragility, is assessed by comparing the two integrals below *K* to capture the effect on the **left tail**
+- The equation can be approximated by an interpolated estimate obtained with two values of *α* separated from a midpoint by *Δα* (its mean deviation)
+- Note that **antifragility** *ω_C* is integrating from *K* to infinity
+- We can probe *ω_B* by point estimates of *f* at a level of *X ≤ K*
+- The **detection heuristic** is a perturbation in the tails to probe fragility, by checking the function *ω'_B(X)* at any level *X*
+- This leads to the **fragility detection heuristic** (Taleb, Canetti, et al., 2012): if *ω'_B(X)* has a constant sign for *X ≤ K*, then *ω_B(K)* has the same sign
+
+### Table 12 — Sources of Fragility in Economic Models
+
+- **Portfolio theory / mean-variance**: Source of fragility is assuming knowledge of the parameters, not integrating models across parameters, relying on very unstable correlations; assumes *ω_A* (bias) and *ω_B* (fragility) = 0. Remedy: **1/n** (spread across as large a number of exposures as manageable), **barbells**, progressive and organic construction
+- **Ricardian comparative advantage**: Source is missing a layer of randomness in the price of wine that may imply total reversal of allocation; assumes *ω_A* and *ω_B* = 0. Remedy: natural systems find their own allocation through **tinkering**
+- **Samuelson optimization**: Concentration of sources of randomness under concavity of loss function; assumes *ω_A* and *ω_B* = 0. Remedy: **distributed randomness**
+- **Arrow-Debreu lattice / state-space**: Ludic fallacy — assumes exhaustive knowledge of outcomes and knowledge of probabilities; assumes *ω_A*, *ω_B*, and *ω_C* (antifragility) = 0. Remedy: use of **metaprobabilities** which changes entire model implications
+- **Dividend cash flow models**: Missing stochasticity causing convexity effects; mostly considers *ω_C* (antifragility) = 0. Remedy: **heuristics**
+
+### Portfolio Fallacies
+
+- A fallacy promoted by Markowitz users: *"portfolio theory entices people to diversify, hence it is better than nothing"* — Taleb says this is **wrong**
+- It pushes people to **optimize**, hence **overallocate** — it does not drive people to take less risk based on diversification, but causes them to take **more open positions** owing to the perception of offsetting statistical properties
+- This makes them vulnerable to **model error** and especially to the **underestimation of tail events**
+- Example: two investors facing a choice of allocation across cash, securities *A* and *B* — the investor who does not know the statistical properties will allocate conservatively (putting what he doesn't want to lose in cash); the investor who *thinks* he knows the parameters (σ_A, σ_B, ρ_{A,B}) will allocate in a way that puts total risk at some target level
+- The **lower his perception of the correlation** ρ_{A,B}, the worse his exposure to model error
+- If he thinks ρ_{A,B} = 0, he will be **overallocated by ⅓** for extreme events
+- If he has the illusion that the correlation is −1, he will be **maximally overallocated** to his *A* and *B* investments
+- If the investor uses leverage, we end up with the story of **Long-Term Capital Management** (LTCM) — fooled by the parameters
+- In real life, unlike in economic papers, things tend to change — parameters change
+- Taleb noticed as a trader that **correlations were never the same** in different measurements — unstable would be a mild word; 0.8 over a long period becomes −0.2 over another long period
+- At times of stress, correlations experience even more abrupt changes without any reliable regularity, in spite of attempts to model "stress correlations"
+- **Taleb (1997)** deals with the effects of stochastic correlations: one is only safe shorting a correlation at 1, and buying it at −1 — which corresponds to what the **1/n heuristic** does
+
+### Kelly Criterion vs. Markowitz
+
+- For a full **Markowitz-style optimization**, one needs to know the entire joint probability distribution of all assets for the entire future, plus the exact utility function for wealth at all future times — and without errors (estimation errors make the system explode)
+- **Kelly's method**, developed around the same period, requires no joint distribution or utility function — in practice one needs the ratio of expected profit to worst-case return, dynamically adjusted to **avoid ruin**
+- In the case of **barbell transformations**, the worst case is guaranteed, and model error is much, much milder under Kelly criterion
+- References: **Thorp** (1971, 1998), **Haigh** (2000)
+- **Aaron Brown** holds that Kelly's ideas were rejected by economists — in spite of the practical appeal — because of their love of general theories for all asset prices
+- **Bounded trial and error** is compatible with the Kelly criterion — even when one is ignorant of the returns, if losses are bounded, the payoff will be robust and should outperform that of "Fragilista Markowitz"
+
+### Corporate Finance
+
+- Corporate finance seems to be based on **point projections**, not distributional projections
+- If one perturbates cash flow projections in the **Gordon valuation model**, replacing the fixed-and-known growth (and other parameters) by continuously varying jumps (particularly under **fat-tailed distributions**), companies deemed "expensive" or those with high growth but low earnings could markedly **increase in expected value**
+- Something the market prices heuristically but without explicit reason
+
+### Conclusion on Model Error
+
+- Something the economics establishment has been missing is that having the right model (a very generous assumption) but being **uncertain about the parameters** will invariably lead to an **increase in fragility** in the presence of convexity and nonlinearities
+
+---
+
+## Fuhgetaboud Small Probabilities
+
+### How Fat Tails (Extremistan) Come from Nonlinear Responses to Model Parameters
+
+- Rare events have a property missed at the time of writing: we deal with them using a model (a mathematical contraption that takes input parameters and outputs the probability)
+- The more **parameter uncertainty** there is in a model designed to compute probabilities, the more **small probabilities tend to be underestimated**
+- Simply, small probabilities are **convex** to errors of computation, as an airplane ride is concave to errors and disturbances (it gets longer, not shorter)
+- The more sources of disturbance one forgets to take into account, the longer the airplane ride compared to the naive estimation
+- To compute probability using a standard Normal distribution, one needs a parameter called **standard deviation** (σ) — uncertainty about σ has the effect of making the small probabilities **rise**
+- For a "**three sigma**" event (which should take place no more than 1 in 740 observations), the probability **rises by 60%** if one moves σ up by 5%, and drops by only 40% if we move σ down by 5%
+- So if your error is on average a tiny 5%, the underestimation from a naive model is about **20%** — great asymmetry
+- It gets worse for more deviations: the "**six sigma**" ones (chronically frequent in economics) — a rise of **five times more**
+- The rarer the event (the higher the "sigma"), the worse the effect from small uncertainty about what to put in the equation
+- With events such as **ten sigma**, the difference is more than **a billion times**
+- Smaller and smaller probabilities require **more and more precision** in computation — the smaller the probability, the more a small, very small rounding in the computation makes the asymmetry **massively insignificant**
+- For tiny, very small probabilities, you need near-infinite precision in the parameters; the slightest uncertainty causes **mayhem** — they are very convex to perturbations
+- This is the argument Taleb has used to show that **small probabilities are incomputable**, even if one has the right model — which of course we don't
+- The same argument relates to deriving probabilities **nonparametrically**, from past frequencies — if the probability gets close to 1/sample size, the error explodes
+- This explains the error of **Fukushima** and **Fannie Mae**
+- To summarize: small probabilities increase in an **accelerated manner** as one changes the parameter that enters their computation
+
+### Figure 38 — Convexity of Probability to Standard Deviation
+
+- The probability is **convex** to standard deviation in a Gaussian model — the plot shows the STD effect on P>x, comparing P>6 with STD of 1.5 to P>6 assuming a linear combination of 1.2 and 1.8
+- The worrisome fact is that a perturbation in σ extends well into the **tail of the distribution** in a convex way
+- The risks of a portfolio that is sensitive to the tails would **explode** — and we are still in the Gaussian world
+- Such explosive uncertainty isn't the result of natural fat tails in the distribution, merely **small imprecision about a future parameter** — it is just **epistemic**
+- So those who use these models while admitting parameter uncertainty are necessarily committing a **severe inconsistency**
+- Of course, uncertainty **explodes even more** when we replicate conditions of the non-Gaussian real world upon perturbating **tail exponents** — even with a powerlaw distribution, the results are severe, particularly under variations of the tail exponent as these have **massive consequences**
+- Really, **fat tails mean incomputability of tail events**, little else
+
+### Compounding Uncertainty (Fukushima)
+
+- Using the earlier statement that **estimation implies error**, extend the logic: errors have errors; these in turn have errors
+- Taking into account the effect makes all small probabilities rise regardless of model — even in the Gaussian — to the point of reaching **fat tails and powerlaw effects** (even the so-called infinite variance) when higher orders of uncertainty are large
+- Even taking a Gaussian with σ the standard deviation having a proportional error *a(1)*; *a(1)* has an error rate *a(2)*, etc. — it depends on the higher order error rate *a(n)* related to *a(n−1)*
+- If these are in **constant proportion**, then we converge to a very **thick-tailed distribution**; if proportional errors decline, we still have fat tails — in all cases, mere error is not a good thing for small probability
+- The sad part is that getting people to accept that every measure has an error has been nearly impossible — the event in **Fukushima** held to happen **once per million years** would turn into **once per 30** if one percolates the different layers of uncertainty in the adequate manner
+
+### Footnotes on the Technical Material
+
+- The difference between the two sides of **Jensen's inequality** corresponds to a notion in information theory, the **Bregman divergence** (Briys, Magdalou, and Nock, 2012)
+- This further shows the defects of the notion of "**Knightian uncertainty**" — since *all* tails are uncertain under the slightest perturbation and their effect is severe in fat-tailed domains (i.e., economic life)
+
+---
+
+## Additional Notes, Afterthoughts, and Further Reading
+
+- These are additional readings and ideas that came to Taleb after the composition of the book — topics include whether God is considered robust or antifragile by theologians, or the history of measurement as a sucker problem in the probability domain
+- He managed to bury some mathematical material in the text without **Alexis K.**, the math-phobic London editor, catching him (particularly the definition of fragility in the notes for Book V and the derivation of "small is beautiful")
+
+### Seclusion
+
+- Since *The Black Swan*, Taleb has spent **1,150 days** in physical seclusion, a soothing state of more than 300 days a year with minimal contact with the outside world — plus 20 years of thinking about nonlinearities and nonlinear exposures
+- He has lost patience with institutional and cosmetic knowledge — science and knowledge are convincing and deepened rigorous argument taken to its conclusion, not naive (*via positiva*) empiricism or fluff
+- He refuses the commoditized journalistic idea of "reference" / "further reading" — his results should not depend on a single paper or result, except for ***via negativa*** debunking (which are illustrative)
+
+### Charlatans
+
+- In the **"fourth quadrant"** paper published in *International Journal of Forecasting* (one of the backup documents for *The Black Swan*), Taleb showed *empirically* using all economic data available that **fat tails are both severe and intractable** — hence all methods with "squares" don't work with socioeconomic variables: regression, standard deviation, correlation, etc.
+- Technically, **80% of the Kurtosis** in 10,000 pieces of data can come from *one single observation*, meaning all measures of fat tails are just sampling errors
+- This is a very strong ***via negativa*** statement: it means we **can't use covariance matrices** — they are unreliable and uninformative
+- Actually just accepting fat tails would have led us to such a result — no need for empiricism; he processed the data nevertheless
+- Now any honest scientific profession would say: "what do we do with such evidence?" — the economics and finance establishment just **ignored it**, a bunch of charlatans by any scientific norm and ethical metric
+- Many "**Nobels**" (**Engle, Merton, Scholes, Markowitz, Miller, Samuelson, Sharpe**, and a few more) have their results grounded in such central assumptions, and all their works would evaporate otherwise
+- Charlatans (and fragilistas) do well in institutions — it is a matter of ethics
+- Taleb ignores any economic paper that uses regression in fat-tailed domains — as just hot air — except in some cases such as **Pritchet (2001)**, where the result is not impacted by fat tails
+
+---
+
+## Additional Notes: Prologue & Book I — The Antifragile: An Introduction
+
+### Antifragility and Complexity
+
+- **Bar-Yam and Epstein (2004)** define sensitivity (the possibility of large response to small stimuli) and robustness (the possibility of small response to large stimuli) — in fact, this sensitivity, when the response is positive, resembles **antifragility**
+
+### Private Correspondence with Bar-Yam
+
+- **Yaneer Bar-Yam** generously commented: "If we take a step back and more generally consider the issue of **partitioned versus connected systems**, partitioned systems are more stable, and connected systems are both more vulnerable and have more opportunities for collective action"
+- **Vulnerability (fragility)** is connectivity without responsiveness; responsiveness enables connectivity to lead to opportunity
+- If collective action can be employed to address threats or take advantage of opportunities, then the vulnerability can be mitigated and outweighed by the benefits
+- This is the basic relationship between the idea of sensitivity and the concept of antifragility
+
+### Damocles and Complexification
+
+- **Tainter (1988)** argues that sophistication leads to fragility — but following a very different line of reasoning
+
+### Post-Traumatic Growth
+
+- References: **Bonanno (2004)**, **Tedeschi and Calhoun (1996)**, Calhoun and Tedeschi (2006), Alter et al. (2007), Shah et al. (2007), Pat-Horenczyk and Brom (2007)
+
+### Pilots Abdicate Responsibility to the System
+
+- FAA report: **John Lowy**, AP, Aug. 29, 2011
+
+### Lucretius Effect
+
+- Fourth Quadrant discussion in the Postscript of *The Black Swan* and empirical evidence in associated papers
+
+### High-Water Mark
+
+- **Kahneman (2011)**, using as backup the works of the very insightful **Howard Kunreuther**, that "protective actions, whether by individuals or by governments, are usually designed to be adequate to the **worst disaster actually experienced**… Images of even worse disaster do not come easily to mind"
+
+### Psychologists and "Resilience"
+
+- **Seery 2011**, courtesy **Peter Bevelin**: "However, some theory and empirical evidence suggest that the experience of facing difficulties can also promote benefits in the form of greater propensity for **resilience** when dealing with subsequent stressful situations"
+- Once again: **it's not resilience** (it's antifragility)
+
+### Additional References for Prologue & Book I
+
+- **Danchin's paper**: Danchin et al. (2011)
+- **Engineering errors and sequential effect on safety**: Petroski (2006)
+- **Noise and effort**: Mehta et al. (2012)
+- **Effort and fluency**: Shan and Oppenheimer (2007), Alter et al. (2007)
+- **Barricades**: idea communicated by **Saifedean Ammous**
+- **Buzzati**: *Una felice sintesi di quell'ultimo capitolo della vita di Buzzati è contenuto nel libro di Lucia Bellaspiga «Dio che non esisti, ti prego. Dino Buzzati, la fatica di credere»*
+- **Self-knowledge**: **Daniel Wegner's** illusion of conscious will, in *Fooled by Randomness*
+- **Book sales and bad reviews**: For Ayn Rand, **Michael Shermer**, "The Unlikeliest Cult in History," *Skeptic* vol. 2, no. 2, 1993, pp. 74–81 — this is an example, not an endorsement of Ayn Rand
+
+### Smear Campaigns
+
+- The German philosopher **Brentano** waged an anonymous attack on **Marx** — initially it was the accusation of covering up some sub-minor fact completely irrelevant to the ideas of *Das Kapital*; Brentano got the discussion completely diverted away from the central theme, even posthumously, with **Engels** vigorously continuing the debate defending Marx in the preface of the third volume of the treatise
+- **How to run a smear campaign from Louis XIV to Napoleon**: Darnton (2010)
+
+### Wolff's Law and Bones
+
+- **Wolff (1892)**, Carbuhn (2010), Guadaluppe-Grau (2009), Hallström et al. (2010), Mudd (2007), Velez (2008)
+- **Aesthetics of disorder**: Arnheim (1971)
+- **Nanocomposites**: Carey et al. (2011)
+- **Karsenty and Bones**: Thanks to **Jacques Merab** for introduction to Karsenty; Karsenty (2003, 2012a), Fukumoto and Martin (2009); for male fertility and bones, Karsenty (2011, 2012b)
+
+### Mistaking the Economy for a Clock
+
+- **Grant (2001)**: "Society is conceived as a huge and intricate clockwork that functions automatically and predictably once it has been set in motion. The whole system is governed by mechanical laws that organize the relations of each part"
+- Just as Newton discovered the laws of gravity, Adam Smith discovered the laws of supply and demand — Smith used the **metaphor of the watch and the machine** in describing social systems
+
+### Selfish Gene
+
+- The "**selfish gene**" is (convincingly) an idea of **Robert Trivers**, often attributed to **Richard Dawkins** — private communication with Robert Trivers. A sad story.
+
+### Danchin's Systemic Antifragility and Redefinition of Hormesis
+
+- **Danchin et al. (2011)**: "The idea behind is that in the fate of a collection of entities, exposed to serious challenges, it may be possible to obtain a positive overall outcome. Within the collection, one of the entities would fare extremely well, compensating for the collapse of all the others and even doing much better than the bulk if unchallenged"
+- With this view, **hormesis** is just a holistic description of underlying scenarios acting at the level of a population of processes, structures, or molecules, just noting the positive outcome for the whole
+- For living organisms this could act at the level of the population of organisms, the population of cells, or the population of intracellular molecules
+- This explores how antifragility could operate at the latter level, noting that its implementation has features highly reminiscent of what we name **natural selection** — if antifragility is a built-in process that permits some individual entities to stand out from the bulk in a challenging situation, thereby improving the fate of the whole, it would illustrate the implementation of a process that gathers and utilises information
+
+### Steve Jobs
+
+> "Death is the most wonderful invention of life. It purges the system of these old models that are obsolete." — **Steve Jobs** (Beahm, 2011)
+
+### Swiss Cuckoo Clock
+
+- **Orson Welles**, *The Third Man*
+
+### Bruno Leoni
+
+- Thanks to **Alberto Mingardi** for making him aware of the idea of legal robustness — and for the privilege of being invited to give the **Leoni lecture** in Milan in 2009. Leoni (1957, 1991)
+
+### Great Moderation
+
+- A **turkey problem**: before the turmoil that started in 2008, **Benjamin Bernanke**, then a Princeton professor (later chairman of the Federal Reserve Bank), dubbed the period the "**great moderation**" — putting Taleb in a very difficult position to argue for increase of fragility
+- This is like pronouncing that someone who has just spent a decade in a sterilized room is in "great health" — when he is the **most vulnerable**
+- The **turkey problem** is an evolution of **Russell's chicken** (*The Black Swan*)
+
+### Rousseau
+
+- In *Contrat Social*. See also **Joseph de Maistre**, *Oeuvres*, Éditions Robert Laffont
+
+---
+
+## Additional Notes: Book II — Modernity and the Denial of Antifragility
+
+### City-States
+
+- Great arguments in support of the movement toward semiautonomous cities: **Benjamin Barber**, Long Now Foundation Lecture (2012), **Khanna** (2010), **Glaeser** (2011)
+- Mayors are better than presidents at dealing with trash collection — and less likely to drag us into war
+- Also **Mansel (2012)** for the Levant
+
+### Austro-Hungarian Empire
+
+- **Fejtö (1989)**: Counterfactual history — Fejtö holds that the first war would have been avoided
+
+### Random Search and Oil Exploration
+
+- **Menard and Sharman (1976)**, controversy White et al. (1976), Singer et al. (1981)
+
+### Randomizing Politicians
+
+- **Pluchino et al. (2011)**
+
+### Switzerland
+
+- Exposition in **Fossedal and Berkeley (2005)**
+
+### Modern State
+
+- **Scott (1998)** provides a critique of the high modernistic state
+
+### Levantine Economies
+
+- **Mansel (2012)** on city-states. Economic history: **Pamuk** (2006), **Issawi** (1966, 1988), **von Heyd** (1886). Insights in **Edmond About** (About, 1855)
+
+### City-States in History
+
+- **Stasavage (2012)** is critical of the oligarchic city-state as an engine of long-term growth (though initially high growth rate)
+- However, the paper is totally unconvincing econometrically owing to **missing fat tails** — the issue is fragility and risk management, not cosmetic growth
+- Aside from **Weber and Pirenne**, advocates of the model include **Delong and Schleifer (1993)**. See **Ogilvie (2011)**
+
+### Tonsillectomies
+
+- **Bakwin (1945)**, cited by **Bornstein and Emler (2001)**, discussion in **Freidson (1970)**. Redone by **Avanian and Berwick (1991)**
+
+### Orlov
+
+- **Orlov (2011)**
+
+### Naive Interventionism in Development
+
+- **Easterly (2006)** reports a green lumber problem: "The fallacy is to assume that because I have studied and lived in a society that somehow wound up with prosperity and peace, I know enough to plan for other societies to have prosperity and peace"
+- As his friend April once said, this is like thinking the **racehorses can be put in charge of building the racetracks**
+- Also luck in development: Easterly et al. (1993), Easterly and Levine (2003), Easterly (2001)
+
+### China Famine
+
+- **Meng et al. (2010)**
+
+### Washington's Death
+
+- Morens (1999); Wallenborn (1997)
+
+### Koran and Iatrogenics
+
+- Arabic passages cited from the Koran
+
+### Semmelweiss
+
+- Of the most unlikely references: see **Louis-Ferdinand Céline's** doctoral thesis, reprinted in Gallimard (1999), courtesy **Gloria Origgi**
+
+### Fake Stabilization
+
+- Some of the arguments in Chapter 7 were co-developed with **Mark Blyth** in *Foreign Affairs*, Taleb and Blyth (2011)
+
+### Sweden
+
+- "Economic elites had more autonomy than in any successful democracy," **Steinmo (2011)**
+
+### Traffic and Removal of Signs
+
+- **Vanderbilt (2008)**
+
+### History of China
+
+- **Eberhard** (reprint, 2006)
+
+### Nudge
+
+- They call it the *status quo bias* and some people want to get the government to manipulate people into breaking out of it — good idea, except when the "expert" nudging us is not an expert
+
+### Procrastination and the Priority Heuristic
+
+- **Brandstetter and Gigerenzer (2006)**
+
+### France's Variety
+
+- **Robb (2007)**: French riots as a national sport. **Nicolas** (2008). Nation-state in France between 1680 and 1800, **Bell (2001)**
+
+### Complexity and Fat Tails
+
+- More interested here in the effect on fat tails than other attributes. See **Kaufman (1995)**, **Hilland (1995)**, **Bar-Yam (2001)**, **Miller and Page (2007)**, **Sornette (2004)**
+- No need to load the math here (left to the technical companion); simple rigorous arguments can prove with minimal words how **fat tails emerge from some attributes of complex systems**
+- The important mathematical effect comes from **lack of independence of random variables** which prevents convergence to the Gaussian basin
+
+### How Fat Tails Emerge from Leverage and Feedback Loops
+
+- **A — Why fat tails emerge from leverage and feedback loops, single agent simplified case**:
+  - **A1 [leverage]**: If an agent with some leverage L buys securities in response to increase in his wealth (from the increase of the value of securities held), and sells them in response to decrease in their value to maintain a certain level of leverage L (he is **concave in exposure**)
+  - **A2 [feedback effects]**: If securities rise nonlinearly in value in response to purchases and decline in value in response to sales, then by the violation of the independence between the variations of securities, **CLT** (the central limit theorem) no longer holds (no convergence to the Gaussian basin) — so **fat tails are an immediate result of feedback and leverage**, exacerbated by the concavity from the level of leverage L
+  - **A3**: If feedback effects are **concave to size** (it costs more per unit to sell 10 than to sell 1), then negative skewness of the security and the wealth process will emerge — simply, like the "negative gamma" of portfolio insurance: the agent has an option in buying but no option in selling, hence **negative skewness** — the forced selling is exactly like the hedging of a **short option**
+- **Note on path dependence exacerbating skewness**: if wealth increases first, this causes more risk and skew — squeezes and forced selling on the way down: the market drops more (but less frequently) than it rises on the way up
+- **B — Multiagents**: if furthermore more than one agent is involved, the effect is compounded by the dynamic adjustment (hedging) of one agent causing the adjustment of another — commonly called "**contagion**"
+- **C**: One can generalize to anything, such as home prices rising in response to excess liquidity, etc.
+- The same general idea of forced execution plus concavity of costs leads to the **superiority of systems with distributed randomness**
+
+### Increase of Risk Upon Being Provided Numbers
+
+- See the literature on **anchoring** (reviewed in *The Black Swan*). Also **Mary Kate Stimmler's** doctoral thesis at Berkeley (2012), courtesy **Phil Tetlock**
+- **Stimmler's experiment**: In the simple condition, subjects were told: "For your reference, you have been provided with the following formula for calculating the total amount of money (*T*) the investment will make three months after the initial investment (*I*) given the rate of return (*R*): **T=I*R**"
+- In the complex condition, subjects were told the same thing but with a deliberately intimidating, complex formula involving summations and subscripts
+- Needless to mention that the simple condition and the complex one produced the same output — but those who had the complex condition **took more risks**
+
+### The Delusion of Probabilistic Measurement
+
+- Something obvious to cabdrivers and grandmothers disappears inside university hallways
+- In his book *The Measure of Reality*, **Alfred Crosby (1997)** presented the following thesis: what distinguished Western Europe from the rest of the world is **obsession with measurement**, the transformation of the qualitative into the quantitative
+- He cites the first mechanical clock (which quantized time), marine charts, perspective painting (which quantized space), and **double-entry bookkeeping** (which quantized financial accounts)
+- The obsession with measurement started with the right places, and progressively **invaded the wrong ones**
+- Now the problem is that such measurement started to be applied to elements that have a **high measurement error** — in some cases infinitely high (recall Fukushima)
+- Errors from **Mediocristan** are inconsequential; those from **Extremistan** are acute — when measurement errors are prohibitively large, we should not be using the word "measure"
+- Clearly one can "measure" the table on which he writes, and "measure" the temperature — but one cannot "measure" future risks, nor can one "measure" probability — unlike a table, it cannot lend itself to investigation; this is at best a speculative estimation of something that *can* happen
+- Note that **Hacking (2006)** does not for a single second consider fat tails! Same with **Hald (1998, 2003)**, **von Plato (1994)**, **Salsburg (2001)**, and from one who should know better, **Stigler (1990)**
+- A book that promoted bad risk models: **Bernstein (1996)**. **Daston (1988)** links probabilistic measurement to the Enlightenment
+- The idea of probability as a quantitative (not qualitative) construct has indeed been plaguing us — and the notion that science *equals* measurement free of error (it is, largely but not in everything) can lead us to all manner of fictions, delusions, and dreams
+- An excellent understanding of probability linked to skepticism: **Franklin (2001)** — few other philosophers go back to the real problem of probability
+
+### Fourth Quadrant
+
+- See the discussion in *The Black Swan* or paper **Taleb (1999)**
+
+### Nuclear, New Risk Management
+
+- Private communication, Atlanta, INPO, Nov. 2011
+
+### Anecdotal Knowledge and Power of Evidence
+
+- A reader, **Karl Schluze**, wrote: "An old teacher and colleague told me (between his sips of bourbon) 'If you cut off the head of a dog and it barks, you don't have to repeat the experiment'"
+- Easy to get examples: no lawyer would invoke an "N=1" argument in defense of a person, saying "he only killed once"; nobody considers a plane crash as "anecdotal"
+- Taleb would go further and map **disconfirmation** as exactly where **N=1 is sufficient**
+- Sometimes researchers call a result "anecdotal" as a knee-jerk reaction when the result is exactly the reverse — **Steven Pinker** called **John Gray's** pointing out the two world wars as counterevidence to his story of great moderation "anecdotal"
+- Taleb's experience is that social science people rarely know what they are talking about when they talk about "evidence"
+
+---
+
+## Additional Notes: Book III — A Nonpredictive View of the World
+
+### Decision Theorists Teaching Practitioners
+
+- To add more insults: decision scientists use the notion of "practical," an inverse designation
+- See **Hammond, Keeney, and Raiffa (1999)** trying to teach us how to make decisions
+- For a book describing exactly how practitioners don't act, but how academics think practitioners act: **Schon (1983)**
+
+### The Asymmetry Between Good and Bad
+
+- *Segnius homines bona quam mala sentiunt* — in **Livy's** *Annals* (XXX, 21)
+
+### Stoics and Emotions
+
+- Contradicts common beliefs that Stoicism is about being a vegetable — **Graver (2007)**
+
+### Economic Growth Was Not So Fast
+
+- **Crafts (1985)**, Crafts and Harley (1992)
+
+### Cheating with the Rock Star
+
+- **Arnavist and Kirkpatrick (2005)**, Griffith et al. (2002), Townsend et al. (2010)
+
+### Simenon
+
+- "Georges Simenon, profession: rentier," **Nicole de Jassy**, *Le Soir illustré* 9 janvier 1958, N° 1333, pp. 8–9, 12
+
+### Dalio
+
+- Bridgewater-Associates-Ray-Dalio-Principles
+
+---
+
+## Additional Notes: Book IV — Optionality, Technology, and the Intelligence of Antifragility
+
+### The Teleological
+
+- **Aristotle and his influence**: Rashed (2007), both an Arabist and a Hellenist
+- **The nobility of failure**: Morris (1975)
+
+### Optionality
+
+- **Bricolage**: Jacob (1977a, 1977b), Esnault (2001)
+- **Rich getting richer**: On the total wealth for HNWI (High Net Worth Individuals) increasing, see **Merrill Lynch** data in "World's wealthiest people now richer than before the credit crunch," **Jill Treanor**, *The Guardian*, June 2012
+- The next graph shows why it has nothing to do with growth and total wealth formation — a **25% increase in dispersion** at the tail of a distribution dramatically increases the density above high thresholds (illustrated with a convex curve showing how a shift in dispersion disproportionately affects the extreme right tail)
+
+<!-- pp. 601-650 -->
+
+## BOOK V: The Nonlinear and the Nonlinear
+
+### Formal Definition of Fragility
+
+- More formally, to complement graphical exposition, from **Taleb and Douady (2012)**, local fragility of random variable *Xλ* depending on parameter λ, at stress level *K* and semi-deviation level *s⁻(λ)* with pdf *f*_λ is its **K-left-tailed semi-vega sensitivity** ("vega" being sensitivity to some measure of volatility), *V(X, fλ, K, s⁻)* to *s⁻*, mean absolute semi-deviation below Ω
+- Mathematical formulas presented for semi-deviation and fragility calculations involving integrals and partial derivatives
+- **Inherited fragility** of *Y* with respect to *X* at stress level *L = φ(K)* and left-semi-deviation level *s⁻(λ)* of *X* is partial derivative
+- Note that stress level and pdf are defined for variable *Y*, but parameter used for differentiation is left-semi-absolute deviation of *X*
+- For antifragility, flip above Ω, in addition to robustness below same stress level *K*
+- **Transfer theorems** relate fragility of *Y* to second derivative *φ(K)* and show effect of convex (concave or mixed nonlinear) transformations on tails via **transfer function** *H*^K. For antifragile, use *s*⁺, integral above *K*
+
+### Fragility is Not Psychological
+
+- Start from definition of fragility as tail vega sensitivity and end up with nonlinearity as necessary attribute of source of such fragility in inherited case—cause of disease rather than disease itself
+- However, long literature by economists and decision scientists embedding risk into psychological preferences—historically, risk has been described as derived from risk aversion as result of structure of choices under uncertainty with concavity of muddled concept of "utility" of payoff; see **Pratt (1964)**, **Arrow (1965)**, **Rothschild and Stiglitz (1970, 1971)**
+- But this "utility" business never led anywhere except circularity, expressed by **Machina and Rothschild (2008)**: "risk is what risk-averters hate." Indeed limiting risk to aversion to concavity of choices is quite unhappy result
+
+### The Porcelain Cup and Its Concavity
+
+- Clearly, coffee cup, house, or bridge doesn't have psychological preferences, subjective utility, etc. Yet each is concave in its reaction to harm
+- Simply, taking *z* as stress level and Π(*z*) the harm function, it suffices to see that, with *n*>1, Π(*n z*) < *n* Π(*z*) for all 0< *n z*<*Z**, where *Z** is level (not necessarily) at which item is broken
+- Such inequality leads to Π(*z*) having negative second derivative at initial value *z*. So if coffee cup is less harmed by *n* times stressor of intensity *Z* than once a stressor of *n Z*, then harm (as negative function) needs to be concave to stressors up to point of breaking
+- Such stricture is imposed by structure of survival probabilities and distribution of harmful events, nothing to do with subjective utility or some other figments
+
+### Scaling in Positive Way, Convexity of Cities
+
+- **Bettencourt and West (2010, 2011)**, **West (2011)**: Cities are 3-D items like animals, and these beneficial nonlinearities correspond to efficiencies. But consider traffic!
+
+### "More Is Different"
+
+- **Anderson (1972)**
+
+### Comparative Fragility of Animals
+
+- **Diamond (1988)**
+
+### Flyvbjerg and Colleagues on Delays
+
+- **Flyvbjerg (2009)**, **Flyvbjerg and Buzier (2011)**
+
+### Small Is Beautiful, Romantic Views
+
+- **Dahl and Tufte (1973)**, **Schumacher (1973)** for soundbite. **Kohr (1957)** for first manifesto against size of governing unit
+
+### Size of Government
+
+- Can't find people thinking in terms of convexity effects, not even libertarians—take **Kahn (2011)**
+
+### Small States Do Better
+
+- Long research tradition on governance of city-states. Looks like what we interpret as political systems might come from size. Evidence in **Easterly and Kraay (2000)**
+
+### The Age of Increasing Fragility
+
+- **Zajdenwebber**, see discussion in *The Black Swan*. Risks redone recently in *The Economist*, "Counting Cost of Calamities," Jan. 14, 2012
+
+### Convexity Effect on Mean
+
+- **Jensen (1906)**, **Van Zwet (1966)**: While Jensen deals with monotone functions, Van Zwet deals with concave-convex and other mixtures—but these remain simple nonlinearities. **Taleb and Douady (2012)** applies it to all forms of local nonlinearities
+
+### Empirical Record of Bigger
+
+- **Mergers and hubris hypothesis**: in Roll (1986); since then Cartwright and Schoenberg (2006)
+
+### Debt in Ancient History
+
+- Babylonian jubilees, Hudson et al. (2002), Athens, Harrison (1998), Finley (1953)
+- **History of debt**: Barty-King (1997), Muldrew (1993), Glaeser (2001). Latter has anarchist view. He actually believes that debt precedes barter exchange
+
+### Food Networks
+
+- **Dunne et al. (2002)**, **Perchey and Dunne (2012)**, **Valdovinos and Ramos-Jiliberto (2010)**. Fragility and resources, **Nasr (2008, 2009)**
+
+### Fannie Mae
+
+- They were concave across all meaningful variables. Some probability-and-nonlinearity-challenged fellow in Obama commission investigating cause of crisis spread rumor that author only detected interest rate risk of Fannie Mae: not true
+
+### Costs of Execution
+
+- **"Price impact,"** that is, execution costs, increase with size; they tend to follow square root—meaning total price is convex and grows at exponent 3/2 (meaning costs are concave)
+- But problem is that for large deviations, such as Société Générale case, it is lot worse; transaction costs accelerate, in less and less precise manner—all these papers on price impact by financial research tradition are meaningless when you need them
+- Remarkably, **Bent Flyvbjerg** found similar effect, but slightly less concave in total, for bridges and tunnels with proportional costs growing at 10 Log[*x*] of size
+
+### Small Is Beautiful, Technical Approach
+
+- To explain how city-states, small firms, etc. are more robust to harmful events, take *X*, random variable for "unintended exposure," source of uncertainty (for Soc Gen it was position that it did not see, for corporation it might be emergency need to some inventory, etc.)
+- Assume size of this unintended harm is proportional to size of unit—for smaller entities engage in smaller transactions than larger ones. We use for probability distribution the variable of all unintended exposures Σ*X*ᵢ where *X*ᵢ are independent random variables, simply scaled as *X*ᵢ= *X/N*
+- With *k* the tail amplitude and α the tail exponent, π(*k*, α, *X*) = α *k*^α *x*^(-1-α). The *N*-convoluted Pareto distribution for unintended total position *N* Σ *X*ᵢ; π(*k/N*, α, *X*)_N where *N* is number of convolutions for distribution. Mean of distribution, invariant with respect to *N*, is α *k*/(*α*–1)
+
+### Losses from Squeezes and Overruns
+
+- For loss function, take C[*X*]= -*b X*^β, where costs of harm is concave function of *X*. Note that for small deviations, β = 3/2 in microstructure and execution literature
+
+### Resulting Probability Distribution of Harm
+
+- As we are interested in distribution of *y*, we make transformation of stochastic variable. Harm *y*=C[*X*] has for distribution: π[*C*^(-1)[*x*]]/*C*'[*C*^(-1)[*x*]]
+- Consider that it follows Pareto distribution with tail amplitude *k*^β and tail exponent α/β, *k*^β α which has for mean α−β
+- Now the sum: for convoluted sum of *N* entities, asymptotic distribution becomes formulas with mean (owing to additivity) as function of variables which include *N*
+- Formulas comparing ratio of expected losses in tails for *N*=1 to *N*=10 at different values of ratio of β over α, ratio of expectation for 1 unit over 10 units *M*(α = 3,β/α,*k*,*N* = 1) versus *M*(α = 3,β/α,*k*,*N* =10) reveals "small is beautiful" effect across different levels of concavity
+
+---
+
+## BOOK VI: Via Negativa
+
+### Subtractive Knowledge
+
+#### Maps
+
+- Reader, **Jean-Louis**, mammaker, writes: "As mapmaker, I learned long time ago that key to good mapmaking is precisely info you choose to leave out. I have made numerous clients notice that if map is too literal and precise, it confuses people."
+
+#### Imam Ali
+
+- **Nahj-el-Balagha**, Letter. 31
+
+### The Mosaic God Is Not Antifragile
+
+- For God—**Abrahamic-Mosaic God** (of Jews, Christians, and Moslems)—is representation of total robustness and infallibility. Note that counter to initial impressions, essence of perfection is robustness, not antifragility
+- Author received many messages suggesting that (Levantine) God should be put in antifragile category. This would be severe mistake according to Eastern Mediterranean religions. Antifragility for deity may apply to Babylonian, Greek, Syrian and Egyptian mythologies
+- But **Levantine monotheistic theology**, from ancient Semitic El (or Al) to modern Allah or, to lesser extent, what people call "the Lord" in Bible Belt, from Genesis to Koran, progressed into definition of increasingly abstract God—hence closest to definition of pure robustness
+- Monotheistic God is certainly not fragile; but he is not antifragile. By definition, thanks to his maximally abstract quality, he is what cannot be improved, which is very property of perfection—only imperfect mortals can improve, therefore need antifragility to try to improve
+- In Koran, one of properties of God is **Smd**, word that has no synonym even in Arabic, hence cannot be translated; its meaning can only be conveyed through iteration of partial descriptions. *Smd* is that which has reached such degree of completeness that it does not depend on external circumstances, anything or anyone; bulwark against all manner of attacks; He transcends notion of time
+- Idea is also present in other Levantine systems. **Orthodox theology**, through *theosis*, seeks merger with God, aspiration to level of completeness, hence independence from anything else
+
+#### Interdicts in Religion
+
+- **Fourest and Venner (2010)** presents list across all persuasions
+
+#### Steve Jobs
+
+- **Beahm (2011)**
+
+#### Gladwell
+
+> "If you totted up all his hospital bills for ten years that he had been on streets—as well as substance-abuse-treatment costs, doctors' fees, and other expenses—Murray Barr probably ran up medical bill as large as anyone in state of Nevada. 'It cost us one million dollars not to do something about Murray,' O'Bryan said." **Gladwell (2009)**
+
+### Falsification and Problems of Induction
+
+- See references in *The Black Swan*
+
+### Smoking and Overall Medical Effect
+
+- **Burch (2009)**
+
+### Fractality
+
+- **Mandelbrot (1983)**
+
+### Edgerton's Shock of the Old
+
+- **Edgerton (2007)**
+
+---
+
+## Less Is More in Decision Theory
+
+### Simplicity and Steve Jobs
+
+> "That's been one of my mantras—focus and simplicity. Simple can be harder than complex: You have to work hard to get your thinking clean to make it simple. But it's worth it in end because once you get there, you can move mountains." *BusinessWeek*, May 25, 1998
+
+### Heuristics as Powerful—and Necessary—Shortcuts
+
+- **Gigerenzer and Brighton (2009)** bust following myth, as presented in *The Selfish Gene* by **Richard Dawkins**, in which we find following about how baseball outfielder catches ball: "[H]e behaves as if he had solved set of differential equations in predicting trajectory of ball.… At some subconscious level, something functionally equivalent to mathematical calculations is going on."
+- Not quite, Professor Dawkins. **Gerd Gigerenzer** et al. counter by saying that none of that is done. They write following:
+
+> Instead, experiments have shown that players rely on several heuristics. Gaze heuristic is simplest one and works if ball is already high up in air: Fix your gaze on ball, start running, and adjust your running speed so that angle of gaze remains constant. Player who relies on gaze heuristic can ignore all causal variables necessary to compute trajectory of ball—initial distance, velocity, angle, air resistance, speed and direction of wind, and spin, among others. By paying attention to only one variable, player will end up where ball comes down without computing exact spot.
+
+- Same heuristic is also used by animal species for catching prey and for intercepting potential mates. In pursuit and predation, bats, birds, and dragonflies maintain constant optical angle between themselves and their prey, as do dogs when catching Frisbee
+
+Additional examples from peahen mate selection and ant nest measurement demonstrate how simple heuristics produce remarkably precise results without complex calculations.
+
+Other references: **Czerlinski and Gigerenzer et al. (1999)**, **Goldstein and Gigerenzer (1999)**, **Gigerenzer (2008)**
+
+### Makridakis, Forecasting, and Less Is More
+
+- **Makridakis et al. (1982, 1993)**, **Makridakis and Hibon (2000)**, **Makridakis and Taleb (2009)**
+
+### Heuristic to Measure Risks
+
+- **Taleb, Canetti et al. (2012)**—with IMF staff
+
+---
+
+## Lindy Effects and Associated Topics
+
+### The Lindy Effect
+
+- Demonstrated in **Mandelbrot (1997)**. Initially he used it for artistic production, bounded by life of producer. In author's conversations toward end of his life, suggested boundary perishable/nonperishable and agreed that nonperishable would be powerlaw distributed while perishable (initial Lindy story) worked as mere metaphor
+- Depending on whether we condition for knowledge of initial time, remaining lifetime for exponential remains constant regardless of future condition, for powerlaw increases with time since inception, by factor of (α/1-α), where α is tail exponent; for Gaussian or semi-Gaussian it decreases
+
+### Gott
+
+- **Gott (1993, 1994)** presented Copernican idea but did not properly condition probability; corrected in **Caves (2000)**. See discussion in **Rees (2003)**, treatment of paradox in **Bostrom (2002)**
+
+### Survival Papers and Distributional Properties
+
+- Often powerlaws are mistaken for exponential distributions, owing to lack of data in tails. So author assumes a priori that exponential is likely to be powerlaw, but not reverse, as error in opposite direction is vastly less likely
+- **Pigolotti et al. (2005)**. For empires, **Arbesman (2011)**. **Klinknadze et al. (2007, 2010)**, **Taagepera (1978, 1979)**. For firms: **Fujiwara**. Also **Turchin (2003, 2009)**
+
+### Conditional Expected Time of Survival Across Distributions
+
+- **Sornette and Knopoff (1997)**: They show how, paradoxically, longer one waits for earthquake, longer he would be expected to wait
+
+---
+
+## Other Neomania
+
+### Le Corbusier
+
+- **Christopher Caldwell**, "Revolting High Rises," *New York Times*, November 27, 2005
+
+### Cairns and Ancient Measures
+
+- **Cairns (2007)**. His work was brought to author's attention by **Yoav Brand**, who graciously offered his book after lecture
+
+## Back Matter (Pages 601-650)
+
+### Bibliography (pp. 601-640)
+
+- Extensive bibliography containing hundreds of academic references spanning philosophy (**Hacking**, **Hayek**, **Popper**, **Oakeshott**), medicine and health (**Guidone**, **Hadler**, **Hamazaki**, **Ioannidis**), statistics and probability (**Hald**, **Hajek**, **Jaynes**, **Kahneman**), economics (**Hayek**, **Issawi**, **Kahn**, **Makridakis**), history (**Issawi**, **Kohr**, **Lindsay**), complex systems (**Kauffman**, **Miller & Page**, **Sornette**), biology and aging (**Harrison**, **Hayflick**, hormesis research), and technology/innovation (**Johnson**, **Mokyr**, **Scranton**)
+
+### Acknowledgments (p. 641)
+
+- **Primary reviewers** who read entire manuscript multiple times: **Peter Bevelin**, **Jazi Zilber**, **Peter Tanous**, **Rolf Dobelli**
+- **Major contributors**: **Will Murphy**, **Evan Camfield**, **Alexis Kirshbaum**, **Cynthia Taleb**, **Will Goodlad**, **Stefan McGrath**, **Asim Samiuddin**
+- Extensive list of academic, trading, and online community contributors
+- Author acknowledges certainty of having forgotten many
+
+### Author Bio (p. 642)
+
+- **Nassim Nicholas Taleb**: Distinguished Professor of Risk Engineering at NYU Polytechnic
+- Triple identity: businessman-trader, philosophical essayist, academic researcher
+- Main subject matter: "decision making under opacity" — living in a world we don't understand
+- Books *Fooled by Randomness* and *The Black Swan* published in 33 languages
+- Core philosophy: prizes, honorary degrees, awards, and ceremonialism debase knowledge by turning it into spectator sport
+
+### Summary Tables (pp. 643-650)
+
+**Table 1: The Central Triad** — compares **Fragile**, **Robust**, and **Antifragile** across mythology, business models, biological systems, errors, science, human body, ways of thinking, ethics, regulation, and knowledge types
+
+**Table 2: The Mechanical vs. The Organic** — contrasts mechanical/noncomplex systems (need repair, hate randomness, age with use, undercompensate) with organic/complex systems (self-healing, love randomness, need recovery, age with disuse, overcompensate)
+
+**Table 3: Fragilizing Interventionism** — shows how intervention creates fragility across medicine (overtreatment), ecology (forest fire micromanagement), politics (central planning), economics (boom-bust policies), business (charlatan advice), urbanism (city planning), forecasting, and education
+
+**Table 4: Teleological vs. Optionality** — contrasts narrative knowledge (hates uncertainty, looks at past, Epimetheus, concave) with antifragile optionality-driven tinkering (domesticates uncertainty, looks at future, Prometheus, convex)
+
+**Table 5: The Lecturing-Birds-How-to-Fly Effect** — compares marketed origins vs. real origination in jet engines (physicists vs. tinkering engineers), architecture (Euclidian geometry vs. heuristics/guilds), cybernetics (**Wiener** vs. programmers), derivatives (**Black-Scholes-Merton** vs. traders/**Regnauld**/**Bachelier**/**Thorp**), medicine (biological understanding vs. trial and error), and Industrial Revolution (Scientific Revolution narrative vs. adventurers/hobbyists reality)
+
+**Table 6: Life Expectancy Domains** — perishable (Gaussian), non-perishable informational (Exponential), and **Lindy Effect** intellectual production (Power law)
+
+**Table 7: Ethics and Foundational Asymmetry** — **no skin in the game** (bureaucrats, consultants), **skin in the game** (citizens, merchants, artisans, entrepreneurs), **soul in the game** (saints, knights, warriors, prophets, philosophers, artists, innovators, taxpayers as victims)
+
+**Table 8: Professions** — opportunist (invited to game ethics) vs. protected from pseudoethics game
+
+**Table 9: Four Classes of Payoffs** — based on tail thickness: thin/thick = antifragile; thick/thick = fragile Type 1 (very rare); thick/thin = fragile Type 2; thin/thin = robust
+
+**Table 10: Function Properties** — how convex-concave vs. concave-convex functions behave with thin-tailed vs. fat-tailed distributions
+
+**Table 11: Ricardo's Example** — comparative advantage illustration (Britain: cloth 100/wine 110; Portugal: cloth 90/wine 80)
+
+**Table 12: Model Fragilities** — portfolio theory, Ricardian comparative advantage, Samuelson optimization, Arrow-Debreu lattice, dividend cash flow models — all assume away bias or fragility terms
+
+**Table 13: Know How vs. Know What** — Type 1 (explicit, episteme, propositional, rationalism, Plato/Aristotle) vs. Type 2 (implicit/tacit, techne, experiential, heuristic, empiricism, bricolage, Menodotus/empirical medicine, autopsia)
+
+<!-- pp. 561-600 -->
+
+### References and Citations (continued from Book IV)
+
+#### Luxury Goods and Optionality
+- **Figure 39**: On vertical axis probability, on horizontal axis integral of wealth. **Antifragility city**: effect of change in inequality on pool of very rich increases nonlinearly in tails. French economy reacts to inequality more than total wealth in world. Their share of wealth multiplies by close to 50 times in response to change of 25% in dispersion of wealth. Small change of 0.01 in GINI coefficient (0 when perfect inequality, 1.00 when one person has all) equivalent to 8% rise in real Gross Domestic Product—effect is stark regardless of probability distribution
+
+#### Academic Citations for Optionality and Technology
+
+- **Camel in Arabia**: Lindsay (2005)
+- **Obliquity**: Kay (2010)
+- **Real options literature**: Trigeorgis (1993), review in Dixit and Pindyck (1994), Trigeorgis (1996), Luehrman (1998), McGrath (1999)—focus is on reversible and irreversible investments
+- **Translational gap**: Wooton (2007); Arikha (2008b); modern Contopoulos-Ioannidis et al. (2003, 2008), commentary Bosco and Watts (2007)
+- **Criticism of Wooton**: Brosco and Watts (2007)
+- **Epiphenomena and Granger-causality**: See Granger (1999) for review
+
+#### "Lecturing Birds How to Fly"
+
+- Antecedents in **Erasmus**: "teaching fish how to swim." *Adages*, 2519, III, VI, 19. "*Piscem natare doces*" I'γθυν διδάσκεις, "*id est piscem nature doces. Perinde est ac si dicas : Doctum doces. Confine illi, quod alibi retulimus* : Δελφίνα νήχεσθαι διδάσκεις, *id est Delphinum natare doces.*"
+- Expression first coined in **Haug and Taleb (2010)**, posted in 2006, leading to book **Triana (2009)**
+- Author wasn't aware of Erasmus imagery, which would have been selected instead
+
+#### Education and Economic Growth
+
+- **Education and its effect on growth and wealth**: Pritchett (2001), Wolf (2002), Chang (2011)
+
+#### Schumpeter and Creative Destruction
+
+- **Schumpeter's ideas on destruction for advancement**: Schumpeter (1942). Criticism by Harvard economists about lack of technical approach in McCraw (2007)
+
+#### Amateur Innovation
+
+- **Amateurs**: Bryson (2010), Kealey (1996)
+- **Scientific misattribution of works of Bachelier, Thorpe, and others**: Haug and Taleb (2010). Discussion in Triana (2009, 2011)
+
+#### Jet Engine Development
+
+- **Jet engine**: Scranton (2006, 2007, 2009), Gibbert and Scranton (2009)
+
+#### Cybernetics and Systems Theory
+
+- **Busting the episteme theory of cybernetics**: Mindell, 2002. Author thanks **David Edgerton** for introducing him to his works
+
+#### Cathedrals and Geometry
+
+- **Cathedrals and theoretical and axiomatic geometry**: Beaujoan (1973, 1991), Portet (2002). Ball (2008) for history of construction of Chartres cathedral
+
+#### Epistemic Base and Knowledge Types
+
+- **Epistemic base and conflations**: Epistemic base is sort of *x*, not *f(x)*. Great way to see difference between *x* and *f(x)* in technology, offered by **Michael Polanyi**: one can patent *f(x)*, a technique, but not *x*, scientific knowledge. In Mokyr (2005)
+- **Epistemic Base**: Mokyr (1999, 2002, 2005, 2009). Biggest problem with Mokyr: not getting ω_C. Further, this notion of East missing trial and error (also see argument about China): see **Tetlock** in Tetlock et al. (2009). **Mokyr and Meisenzahl** have different spin, with microinventions feeding macroinventions. Still intellectually weak
+- **Techne-Episteme in economics**: Marglin (1996), but tradition did not go very far
+
+#### Needham's Paradox and China
+
+- **Needham's works on China**: Winchester (2008)
+
+#### Academic Tenure and Incentives
+
+- **Tenure**: Kealey (1996): "**Adam Smith** attributed English professors' decay to their guaranteed salaries and tenured jobs. (As compared to Scottish Universities.)"
+
+#### Fideism
+
+- **Fideism**: Popkin (2003)
+
+#### Linear Model of Innovation
+
+- **Linear Model**: Edgerton (1996a, 1996b, 2004). Edgerton showed it was backward-fit idea, that is, fit to past. Edgerton also writes: "This profoundly academic-research-oriented model of twentieth-century science is all the more surprising in view of long tradition of *stressing the non-academic origins of modern science* [emphasis mine], particularly craft traditions, and insistence of much history of science, strengthened in last 20 years, on significance of industrial contexts for science, from dyeing to brewing to engine making."
+
+#### Convexity Bias in Finance
+
+- **Convexity bias**: Discovered early in commodity and financial futures; Burghardt and Hoskins (1994), Taleb (1997), Burghardt and Liu (2002), Burghardt and Panos (2001), Kirikos and Novak (1997), Pieterbarg and Renedo (2004). Many people blew up on misunderstanding the effect
+
+#### Detection and Mapping of Convexity Bias (ω_X)
+
+- **Example of detection and mapping of convexity bias (ω_X), from author's doctoral thesis**: Method is to find what needs dynamic hedging and dynamic revisions. Among members of class of instruments considered that are not options *stricto-sensu* but require dynamic hedging can be rapidly mentioned broad class of convex instruments:
+  - (1) **Low coupon long dated bonds**: Assume discrete time framework. Take *B(r,T,C)* the bond maturing period *T*, paying coupon *C* where *rt = ∫rs ds*. We have the convexity ∂²*B*/∂*r*² increasing with *T* and decreasing with *C*
+  - (2) **Contracts where financing is extremely correlated with price of Future**: (3) Baskets with geometric feature in its computation
+  - (4) Largely neglected class of assets: **"quanto-defined" contracts** (in which payoff is not in native currency of contract), such as Japanese NIKEI Future where payoff is in U.S. currency. In short, while Japanese yen denominated NIKEI contract is linear, U.S. dollars denominated one is nonlinear and requires dynamic hedging
+
+- Take at initial time *t*₀, final condition *V(S,T) = S*_T where *T* is expiration date. More simply, security just described is plain forward, assumed to be linear. There appears to be no Ito term there yet. However should there be intermediate payoff such that, having accounting period *i/T*, variation margin is paid in cash disbursement, some complexity would arise
+- Assume Δ(*t*ᵢ) changes in value of portfolio during period (*t*ᵢ,*t*ᵢ₋₁), Δ(*t*ᵢ)= (*V*(*S*,*t*ᵢ)-*V*(*S*, *t*ᵢ₋₁)). If variation margin is to be paid at period *t*₀ then operator would have to borrow at forward rate between periods *t*ᵢ and *T*, here *r*(*t*ᵢ,*T*). This financing is necessary to make *V(S,T)* and *S*_T comparable in present value
+- In expectation, we will have to discount variation using forward cash flow method for accounting period between *t*ᵢ₋₁ and *t*ᵢ. Seen from period *T*, value of variation becomes *E*₁ [*exp*[-*r*(*t*ᵢ,*T*)(*T*-*t*ᵢ)] Δ(*t*ᵢ)], where *E*₁ is expectation operator at time *t* (under, say, risk-neutral probability measure)
+- Therefore delivering at period *T*, in expectation, as seen from period *t*₀, expected value of stream of future variation *E*₁₀[Σ *exp*[-*r*(*t*ᵢ,*T*)(*T*-*t*ᵢ)] Δ(*t*ᵢ)]
+- However need to discount to present using term rate *r(T)*. Previous equation becomes *V(S,T)*|ₜ₌ₜ₀= *V[s,t*₀]+ *exp[r(T)] E*ₜ₀ [Σ *exp*[-*r*(*t*ᵢ,*T*)(*T*-*t*ᵢ)] Δ(*t*ᵢ)], which will be different from *S*_T when any of interest rate forwards is stochastic
+- **Result** (polite way to say "theorem"): *When the variances of the forward discount rate r(t*ᵢ,*T) and the underlying security S*_T *are strictly positive and the correlation between the two is lower than 1, V(S,T)*|ₜ₌ₜ₀ ≠ *S*_T. Proof: by examining properties of expectation operator. Therefore: *F(S, t*₀) = *F(S,t*₀+Δ*t)*, while nonlinear instrument will merely satisfy: *E[V(S,t*₀)]= *E[V(S,t*₀+Δ*t)]*
+
+#### Critique of Kealey
+
+- **Critique of Kealey**: Posner (1996)
+
+---
