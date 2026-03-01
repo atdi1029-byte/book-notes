@@ -112,6 +112,17 @@ add_shelf() {
   echo "  </div>"
 }
 
+process() {
+  local PDF="$1"
+  local FOLDER="$2"
+  local START="${3:-1}"
+  local END="${4:-0}"
+  local BATCH="${5:-20}"
+  local SLEEP="${6:-120}"
+
+  "$BOOKS_DIR/process-book.sh" "$PDF" "$FOLDER" "$START" "$END" "$BATCH" "$SLEEP"
+}
+
 case "$1" in
   scaffold)
     shift
@@ -121,9 +132,19 @@ case "$1" in
     shift
     add_shelf "$@"
     ;;
+  process)
+    shift
+    process "$@"
+    ;;
+  queue)
+    shift
+    "$BOOKS_DIR/process-queue.sh" "$@"
+    ;;
   *)
     echo "Usage:"
     echo "  ./build.sh scaffold \"Title\" \"Author\" \"Year\" \"Pages\" \"category\" \"source.pdf\""
     echo "  ./build.sh add-shelf \"Title\" \"Author\" \"folder\" \"category\" \"data-book-id\""
+    echo "  ./build.sh process  \"/path/to/book.pdf\" \"Folder\" [start] [end] [batch] [sleep]"
+    echo "  ./build.sh queue    [\"/path/to/pdf/folder\"] [batch] [sleep]   # process all unfinished PDFs"
     ;;
 esac
