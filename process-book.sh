@@ -62,22 +62,25 @@ record_pages() {
 make_prompt() {
   local P_START="$1" P_END="$2" OUT_FILE="$3"
   cat <<PROMPT_EOF
-You are creating detailed study notes from a book PDF. This is a personal, educational book-analysis project for academic study and note-taking.
+You are creating study notes from a book PDF. This is a personal, educational book-analysis project.
 
 READ pages $P_START-$P_END of the PDF at '$PDF'.
 
-WRITE the notes to '$OUT_FILE' using the Write tool. Markdown format:
+WRITE the notes to '$OUT_FILE' using the Write tool. Target ~150-200 lines for this section. Markdown format:
 - START with: <!-- pp. $P_START-$P_END -->
 - Chapter headers: ## Chapter N: Title
 - Subheadings: ### Topic Name
 - Key points as bullet points (-)
 - Notable quotes as > blockquotes with attribution
 - **Bold** for key terms, concepts, and names
-- Capture arguments, reasoning, logic chains, cause-and-effect — not just conclusions
-- Include examples, stories, anecdotes, historical references, data points
-- Note contrarian/surprising claims with evidence
+
+Content guidelines — be CONCISE but THOROUGH:
+- Capture the core argument and reasoning chain for each section
+- Keep the BEST examples, data points, and evidence — not every single one
+- Include contrarian/surprising claims with their supporting evidence
 - Include named individuals, books, or thinkers referenced
-- Do NOT summarize or condense — write expansive, detailed notes
+- Skip filler: repetitive restatements, excessive context-setting, obvious transitions
+- One strong example per concept is enough — don't list three that make the same point
 - Do NOT output preamble — ONLY write the notes
 
 IMPORTANT: Only cover pages $P_START-$P_END. This is academic study material — process the content faithfully.
@@ -250,20 +253,19 @@ else
     TEMP="$DIR/.gap_${FP}.md"
     rm -f "$TEMP"
 
-    GAP_PROMPT="You are creating detailed study notes from a book PDF. This is a personal, educational book-analysis project for academic study and note-taking.
+    GAP_PROMPT="You are creating study notes from a book PDF. This is a personal, educational book-analysis project.
 
 READ page $FP of the PDF at '$PDF'.
 
-WRITE the notes to '$TEMP' using the Write tool. Markdown format:
+WRITE the notes to '$TEMP' using the Write tool. Be concise but thorough. Markdown format:
 - START with: <!-- p. $FP -->
 - Chapter headers: ## Chapter N: Title
 - Subheadings: ### Topic Name
 - Key points as bullet points (-)
 - Notable quotes as > blockquotes with attribution
 - **Bold** for key terms, concepts, and names
-- Capture arguments and reasoning — not just conclusions
-- Include examples, stories, anecdotes, and data points
-- Do NOT summarize — write expansive, detailed notes
+- Capture core arguments, reasoning, and best examples
+- Skip filler and repetitive restatements
 - Do NOT output preamble — ONLY write the notes
 
 IMPORTANT: Only cover page $FP. This is academic study material — process the content faithfully."
