@@ -2,7 +2,7 @@
 
 **Author:** Frank J. Fabozzi and Francesco A. Fabozzi
 **Published:** 2021 (10th Edition)
-**Pages:** 928
+**Pages:** 1,274
 
 ## One-Line Summary
 A comprehensive textbook covering bond valuation, risk measurement, all major fixed-income sectors, and portfolio management strategies from theoretical foundations through practical applications.
