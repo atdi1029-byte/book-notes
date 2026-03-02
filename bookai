@@ -22,11 +22,15 @@ END_PAGE="${4:-0}"
 BATCH="${5:-20}"
 SLEEP="${6:-5}"
 PARALLEL="${7:-3}"
+BUILD_INTERVAL="${8:-5}"  # Start building summary+HTML every N waves
 
 DIR="$BOOKS_DIR/$FOLDER"
 NOTES="$DIR/notes.md"
 LOG="$DIR/process.log"
 PAGES_DONE="$DIR/.pages_done"
+SUMMARY="$DIR/summary.md"
+INDEX_HTML="$DIR/index.html"
+BUILDER_PID=""
 
 # Auto-detect total pages if not specified
 if [ "$END_PAGE" -eq 0 ]; then
@@ -138,6 +142,92 @@ process_batch() {
   return 1
 }
 
+# Function: run the builder (summary.md + index.html) in background
+run_builder() {
+  local PASS_TYPE="$1"  # "incremental" or "final"
+  local NOTES_LINES
+  NOTES_LINES=$(wc -l < "$NOTES" | tr -d ' ')
+
+  # Skip if notes too small
+  if [ "$NOTES_LINES" -lt 200 ]; then
+    return
+  fi
+
+  # Kill previous builder if still running
+  if [ -n "$BUILDER_PID" ] && kill -0 "$BUILDER_PID" 2>/dev/null; then
+    kill "$BUILDER_PID" 2>/dev/null || true
+    wait "$BUILDER_PID" 2>/dev/null || true
+    echo "  Builder: killed previous (new $PASS_TYPE pass)" | tee -a "$LOG"
+  fi
+
+  echo "  Builder: starting $PASS_TYPE pass ($NOTES_LINES lines of notes)" | tee -a "$LOG"
+
+  # Derive book metadata from scaffold files
+  local BOOK_TITLE BOOK_AUTHOR BOOK_YEAR BOOK_KEY
+  BOOK_TITLE=$(head -1 "$SUMMARY" 2>/dev/null | sed 's/^# //' || echo "$FOLDER" | tr '_' ' ')
+  BOOK_AUTHOR=$(grep '^\\*\\*Author:\\*\\*' "$SUMMARY" 2>/dev/null | sed 's/.*\\*\\* //' || echo "Unknown")
+  BOOK_YEAR=$(grep '^\\*\\*Published:\\*\\*' "$SUMMARY" 2>/dev/null | sed 's/.*\\*\\* //' || echo "")
+  BOOK_KEY=$(echo "$FOLDER" | tr '[:upper:]' '[:lower:]')
+
+  local BUILDER_PROMPT INCREMENTAL_NOTE=""
+  [ "$PASS_TYPE" = "incremental" ] && INCREMENTAL_NOTE="NOTE: Notes are still being generated. Build with whatever exists so far."
+  BUILDER_PROMPT="You are building a CURATED book notes webpage. This is a personal, educational project.
+
+READ these files:
+1. ${NOTES} -- raw study notes (may be very long -- read enough to understand the full scope)
+2. ${SUMMARY} -- the book summary with key takeaways
+3. ${BOOKS_DIR}/template.html -- the HTML template skeleton
+4. ${BOOKS_DIR}/Antifragile/index.html -- REFERENCE: example of a properly curated book page (match this style/length)
+
+TASK 1 (if summary.md is empty/template): Write ${SUMMARY}
+Follow the structure in ${BOOKS_DIR}/summary-template.md. Include:
+- One-line summary
+- Key Takeaways (as many as warranted -- no limit)
+- Thematic Breakdowns with subheadings
+- Contrarian Ideas
+- Author's Key Proposals
+- Relevance to Trading/Investing
+Base everything on what is in the notes, not general knowledge.
+
+TASK 2: Write ${INDEX_HTML} -- a CURATED, SYNTHESIZED HTML page.
+Use template.html as skeleton. Replace placeholders:
+- BOOK_TITLE, BOOK_AUTHOR, BOOK_YEAR, BOOK_PAGES = ${END_PAGE}
+- BOOK_KEY = ${BOOK_KEY}
+- Use link rel=stylesheet href=../book.css and script src=../book.js
+- Set var BM_KEY = bm_${BOOK_KEY} before book.js
+- No inline CSS
+
+CRITICAL RULES FOR THE HTML:
+- TARGET 1000-1500 lines. Do NOT dump all raw notes into HTML.
+- SYNTHESIZE and CURATE -- distill the notes into structured, readable content
+- Every section must have REAL content -- NO placeholders like [Reference] or [Concept]
+- Required sections: Key Takeaways, Thematic Breakdowns, Contrarian Ideas, Notable Quotes (10-15 best as blockquotes), Allegories and Cultural References table, Authors Key Proposals, Books and Thinkers Referenced table, Curated Chapter/Section Notes, Relevance to Trading/Investing
+- For chapter notes: capture the main arguments, key evidence, and insights -- NOT every bullet point
+- If there are many similar case studies, GROUP them by pattern instead of listing each individually
+- Build table of contents from h2 sections
+- Use proper HTML: h2 with id, h3, ul/li, blockquote, strong, table, hr between sections
+${INCREMENTAL_NOTE}
+
+IMPORTANT: Write COMPLETE files. No truncation. No placeholders. Every table must have real data from the notes."
+
+  local BUILDER_STDERR="$DIR/.builder_stderr.tmp"
+  claude -p "$BUILDER_PROMPT" \
+    --model sonnet \
+    --allowedTools "Read" "Write" \
+    2>"$BUILDER_STDERR" &
+  BUILDER_PID=$!
+
+  # Log result when done (in background)
+  (
+    if wait "$BUILDER_PID" 2>/dev/null; then
+      echo "  Builder: $PASS_TYPE pass complete ($(date '+%H:%M:%S'))" >> "$LOG"
+    else
+      echo "  Builder: $PASS_TYPE pass failed ($(date '+%H:%M:%S'))" >> "$LOG"
+    fi
+    rm -f "$BUILDER_STDERR"
+  ) &
+}
+
 # Build list of all batch ranges
 BATCHES=()
 PAGE=$START
@@ -212,6 +302,11 @@ while [ "$IDX" -lt "$TOTAL" ]; do
   done
 
   IDX=$WAVE_END
+
+  # Trigger builder every BUILD_INTERVAL waves
+  if [ "$((WAVE_NUM % BUILD_INTERVAL))" -eq 0 ] && [ "$IDX" -lt "$TOTAL" ]; then
+    run_builder "incremental"
+  fi
 
   # Brief sleep between waves
   if [ "$IDX" -lt "$TOTAL" ]; then
@@ -327,10 +422,10 @@ fi
 echo "" | tee -a "$LOG"
 echo "=== DEDUP — removing duplicate sections ===" | tee -a "$LOG"
 
-python3 << DEDUP_EOF 2>>"$LOG" | tee -a "$LOG"
-import sys
+NOTES_FILE="$NOTES" python3 << 'DEDUP_EOF' 2>>"$LOG" | tee -a "$LOG"
+import sys, os
 
-notes_path = "$NOTES"
+notes_path = os.environ['NOTES_FILE']
 with open(notes_path, 'r') as f:
     lines = f.readlines()
 
@@ -422,12 +517,18 @@ DEDUP_EOF
 echo "" | tee -a "$LOG"
 echo "=== VERIFY — checking chapter coverage ===" | tee -a "$LOG"
 
-python3 << VERIFY_EOF 2>>"$LOG" | tee -a "$LOG"
-import re
+# Wait for any running builder before final pass
+if [ -n "$BUILDER_PID" ] && kill -0 "$BUILDER_PID" 2>/dev/null; then
+  echo "  Waiting for incremental builder to finish..." | tee -a "$LOG"
+  wait "$BUILDER_PID" 2>/dev/null || true
+fi
 
-notes_path = "$NOTES"
-pages_done_path = "$PAGES_DONE"
-total_pages = $END_PAGE
+NOTES_FILE="$NOTES" PAGES_DONE_FILE="$PAGES_DONE" END_PAGE_NUM="$END_PAGE" python3 << 'VERIFY_EOF' 2>>"$LOG" | tee -a "$LOG"
+import re, os
+
+notes_path = os.environ['NOTES_FILE']
+pages_done_path = os.environ['PAGES_DONE_FILE']
+total_pages = int(os.environ['END_PAGE_NUM'])
 
 with open(notes_path, 'r') as f:
     content = f.read()
@@ -496,3 +597,88 @@ if issues:
 else:
     print(f"  VERDICT: COMPLETE")
 VERIFY_EOF
+
+# === FINAL BUILD PASS ===
+echo "" | tee -a "$LOG"
+echo "=== BUILD — final summary + HTML ===" | tee -a "$LOG"
+run_builder "final"
+if [ -n "$BUILDER_PID" ]; then
+  wait "$BUILDER_PID" 2>/dev/null || true
+  if [ -f "$SUMMARY" ] && [ -f "$INDEX_HTML" ]; then
+    echo "  summary.md: $(wc -l < "$SUMMARY" | tr -d ' ') lines" | tee -a "$LOG"
+    echo "  index.html: $(wc -l < "$INDEX_HTML" | tr -d ' ') lines" | tee -a "$LOG"
+  else
+    echo "  WARNING: Builder may have failed — check summary.md and index.html" | tee -a "$LOG"
+  fi
+fi
+
+# === POST-BUILD VALIDATION ===
+echo "" | tee -a "$LOG"
+echo "=== VALIDATE — checking build quality ===" | tee -a "$LOG"
+
+SUMMARY_FILE="$SUMMARY" INDEX_FILE="$INDEX_HTML" python3 << 'VALIDATE_EOF' 2>>"$LOG" | tee -a "$LOG"
+import re, sys, os
+
+issues = []
+INDEX_HTML = os.environ.get('INDEX_FILE', '')
+SUMMARY = os.environ.get('SUMMARY_FILE', '')
+
+# Check index.html
+try:
+    with open(INDEX_HTML, 'r') as f:
+        html = f.read()
+    html_lines = html.count('\n')
+
+    if html_lines > 2500:
+        issues.append(f"index.html too long ({html_lines} lines) — likely a raw dump, should be 1000-1500")
+    elif html_lines < 300:
+        issues.append(f"index.html too short ({html_lines} lines) — needs more content")
+    else:
+        print(f"  index.html: {html_lines} lines — OK")
+
+    placeholders = re.findall(r'\[(?:Reference|Concept|Author|Title|Quote|Key point|Takeaway|Point|Subheading)\]', html)
+    if placeholders:
+        issues.append(f"Found {len(placeholders)} unfilled placeholders: {placeholders[:5]}")
+    else:
+        print("  Placeholders: none — OK")
+
+    template_vars = re.findall(r'BOOK_(?:TITLE|AUTHOR|YEAR|PAGES|KEY)', html)
+    if template_vars:
+        issues.append(f"Found unreplaced template variables: {template_vars[:5]}")
+    else:
+        print("  Template vars: all replaced — OK")
+
+    required = ['takeaways', 'blockquote', '<table']
+    for req in required:
+        if req not in html.lower():
+            issues.append(f"Missing required content: {req}")
+        else:
+            print(f"  Has {req}: OK")
+
+except FileNotFoundError:
+    issues.append("index.html not found!")
+
+# Check summary.md
+try:
+    with open(SUMMARY, 'r') as f:
+        summary = f.read()
+    if '[Takeaway' in summary or '[Explanation' in summary:
+        issues.append("summary.md has unfilled placeholders")
+    else:
+        print(f"  summary.md: {summary.count(chr(10))} lines — OK")
+except FileNotFoundError:
+    issues.append("summary.md not found!")
+
+if issues:
+    print(f"\n  VALIDATION FAILED:")
+    for issue in issues:
+        print(f"    - {issue}")
+    print(f"  Manual review needed before pushing.")
+else:
+    print(f"\n  VALIDATION PASSED — ready to push")
+VALIDATE_EOF
+
+echo "" | tee -a "$LOG"
+echo "========================================" | tee -a "$LOG"
+echo "ALL DONE — $(date)" | tee -a "$LOG"
+echo "========================================" | tee -a "$LOG"
