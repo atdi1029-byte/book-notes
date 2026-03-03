@@ -9,6 +9,11 @@
   var label = document.getElementById('bmLabel');
   var toast = document.getElementById('bmToast');
 
+  function stableId(text) {
+    var s = text.replace(/[^a-zA-Z0-9]+/g, '_').toLowerCase().slice(0, 60);
+    return 'bm_' + s;
+  }
+
   function initBookmark() {
     var saved = localStorage.getItem(BM_KEY);
     if (saved) {
@@ -19,7 +24,7 @@
       } catch(e) { localStorage.removeItem(BM_KEY); }
     }
     document.querySelectorAll('h2[id], h3').forEach(function(h) {
-      if (!h.id) h.id = 'bm_' + Math.random().toString(36).slice(2);
+      if (!h.id) h.id = stableId(h.textContent);
       var btn = document.createElement('span');
       btn.className = 'bm-btn';
       btn.textContent = '\u{1F516}';
@@ -29,7 +34,7 @@
   }
 
   window.setBookmark = function(el) {
-    var id = el.id || 'bm_' + Math.random().toString(36).slice(2);
+    var id = el.id || stableId(el.textContent);
     if (!el.id) el.id = id;
     var d = { id: id, title: el.textContent.replace('\u{1F516}','').trim(), y: window.scrollY };
     localStorage.setItem(BM_KEY, JSON.stringify(d));
@@ -64,20 +69,37 @@
   }
 
   // Progress bar
-  window.addEventListener('scroll', function() {
+  function updateProgress() {
     var h = document.documentElement.scrollHeight - window.innerHeight;
     document.getElementById('progressBar').style.width = h > 0 ? (window.scrollY / h * 100) + '%' : '0%';
+  }
+  window.addEventListener('scroll', updateProgress);
+
+  // Wrap tables for horizontal scroll on mobile
+  document.querySelectorAll('table').forEach(function(t) {
+    if (t.parentElement.classList.contains('table-wrap')) return;
+    var wrap = document.createElement('div');
+    wrap.className = 'table-wrap';
+    t.parentNode.insertBefore(wrap, t);
+    wrap.appendChild(t);
   });
 
   initBookmark();
 
-  // Auto-scroll to bookmark on load
+  // Auto-scroll to bookmark on load (with Y-position fallback)
   var savedBm = localStorage.getItem(BM_KEY);
   if (savedBm) {
     try {
       var d = JSON.parse(savedBm);
-      var target = document.getElementById(d.id);
-      if (target) setTimeout(function() { target.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 300);
+      setTimeout(function() {
+        var target = document.getElementById(d.id);
+        if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        else if (d.y) window.scrollTo({ top: d.y, behavior: 'smooth' });
+        setTimeout(updateProgress, 500);
+      }, 300);
     } catch(e) {}
   }
+
+  // Initialize progress bar on load
+  setTimeout(updateProgress, 100);
 })();

@@ -477,6 +477,17 @@
         el.classList.remove('hidden-read');
       }
     });
+    // Hide entire category when all its books are hidden (filtered or display:none)
+    document.querySelectorAll('.section-title').forEach(function(title) {
+      var shelf = title.nextElementSibling;
+      if (!shelf || !shelf.classList.contains('shelf')) return;
+      var hasVisible = false;
+      shelf.querySelectorAll('.book').forEach(function(b) {
+        if (b.style.display !== 'none' && !b.classList.contains('hidden-read')) hasVisible = true;
+      });
+      title.style.display = hasVisible ? '' : 'none';
+      shelf.style.display = hasVisible ? '' : 'none';
+    });
   }
 
   // Initial render from localStorage (instant)
