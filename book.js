@@ -94,19 +94,28 @@
   // Prevent browser from restoring its own scroll position
   if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
 
+  function scrollToBookmarkData(d) {
+    var target = document.getElementById(d.id);
+    if (target) {
+      var rect = target.getBoundingClientRect();
+      window.scrollTo(0, window.scrollY + rect.top);
+    } else if (d.y) {
+      window.scrollTo(0, d.y);
+    }
+    setTimeout(updateProgress, 300);
+  }
+
   function applyBookmark(d) {
     bar.style.display = 'flex';
     label.textContent = 'Resume: ' + d.title;
-    // Use y-position first (most reliable), then try element scroll
-    if (d.y) window.scrollTo(0, d.y);
-    setTimeout(function() {
-      var target = document.getElementById(d.id);
-      if (target) {
-        var rect = target.getBoundingClientRect();
-        window.scrollTo(0, window.scrollY + rect.top);
-      }
-      setTimeout(updateProgress, 500);
-    }, 500);
+    // Wait for full page load before scrolling
+    if (document.readyState === 'complete') {
+      setTimeout(function() { scrollToBookmarkData(d); }, 200);
+    } else {
+      window.addEventListener('load', function() {
+        setTimeout(function() { scrollToBookmarkData(d); }, 200);
+      });
+    }
   }
 
   // Sync from backend (backend wins), then auto-scroll
