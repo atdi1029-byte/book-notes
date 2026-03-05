@@ -91,6 +91,9 @@
 
   initBookmark();
 
+  // Prevent browser from restoring its own scroll position
+  if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+
   function applyBookmark(d) {
     bar.style.display = 'flex';
     label.textContent = 'Resume: ' + d.title;
@@ -99,7 +102,7 @@
       if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
       else if (d.y) window.scrollTo({ top: d.y, behavior: 'smooth' });
       setTimeout(updateProgress, 500);
-    }, 300);
+    }, 600);
   }
 
   // Sync from backend (backend wins), then auto-scroll
