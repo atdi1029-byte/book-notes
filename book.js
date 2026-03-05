@@ -97,12 +97,15 @@
   function applyBookmark(d) {
     bar.style.display = 'flex';
     label.textContent = 'Resume: ' + d.title;
+    // Instant jump first, then smooth adjust
+    var target = document.getElementById(d.id);
+    if (target) target.scrollIntoView({ block: 'start' });
+    else if (d.y) window.scrollTo(0, d.y);
     setTimeout(function() {
-      var target = document.getElementById(d.id);
-      if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      else if (d.y) window.scrollTo({ top: d.y, behavior: 'smooth' });
+      var t2 = document.getElementById(d.id);
+      if (t2) t2.scrollIntoView({ behavior: 'smooth', block: 'start' });
       setTimeout(updateProgress, 500);
-    }, 600);
+    }, 800);
   }
 
   // Sync from backend (backend wins), then auto-scroll
