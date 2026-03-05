@@ -97,15 +97,16 @@
   function applyBookmark(d) {
     bar.style.display = 'flex';
     label.textContent = 'Resume: ' + d.title;
-    // Instant jump first, then smooth adjust
-    var target = document.getElementById(d.id);
-    if (target) target.scrollIntoView({ block: 'start' });
-    else if (d.y) window.scrollTo(0, d.y);
+    // Use y-position first (most reliable), then try element scroll
+    if (d.y) window.scrollTo(0, d.y);
     setTimeout(function() {
-      var t2 = document.getElementById(d.id);
-      if (t2) t2.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      var target = document.getElementById(d.id);
+      if (target) {
+        var rect = target.getBoundingClientRect();
+        window.scrollTo(0, window.scrollY + rect.top);
+      }
       setTimeout(updateProgress, 500);
-    }, 800);
+    }, 500);
   }
 
   // Sync from backend (backend wins), then auto-scroll
