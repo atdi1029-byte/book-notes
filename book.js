@@ -5,13 +5,6 @@
 */
 
 (function() {
-  // Inject back button
-  var backBtn = document.createElement('a');
-  backBtn.href = '../index.html';
-  backBtn.className = 'back-btn';
-  backBtn.textContent = '\u2190 Shelf';
-  document.body.insertBefore(backBtn, document.body.firstChild);
-
   var SYNC_URL = 'https://script.google.com/macros/s/AKfycbwt438APIycBc534W6T66O3IgtxLUU9cczw-PZAN6Mc9p2xfU2ySsND_wEMJDHUvrXyUg/exec';
   var bar = document.getElementById('bookmarkBar');
   var label = document.getElementById('bmLabel');
