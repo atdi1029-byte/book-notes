@@ -32,6 +32,15 @@
       btn.onclick = function(e) { e.stopPropagation(); setBookmark(h); };
       h.appendChild(btn);
     });
+    // Make li items with <strong> leads bookmarkable
+    document.querySelectorAll('li > strong:first-child').forEach(function(s) {
+      if (!s.id) s.id = stableId(s.textContent);
+      var btn = document.createElement('span');
+      btn.className = 'bm-btn';
+      btn.textContent = '\u{1F516}';
+      btn.onclick = function(e) { e.stopPropagation(); setBookmark(s); };
+      s.appendChild(btn);
+    });
   }
 
   window.setBookmark = function(el) {
