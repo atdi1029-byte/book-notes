@@ -536,6 +536,7 @@
   var filtering = true;
   var readingFilter = false;
   var activeBookmarks = {}; // bmkey -> bookmark data
+  var syncReady = false; // blocks pushes until initial remote fetch completes
   // Paste your deployed Apps Script web app URL here:
   var SYNC_URL = 'https://script.google.com/macros/s/AKfycbwt438APIycBc534W6T66O3IgtxLUU9cczw-PZAN6Mc9p2xfU2ySsND_wEMJDHUvrXyUg/exec';
 
@@ -560,12 +561,13 @@
     e.preventDefault();
     e.stopPropagation();
     var read = getRead();
-    if (read[id]) { delete read[id]; } else { read[id] = true; }
+    var nowRead = !read[id];
+    if (nowRead) { read[id] = true; } else { delete read[id]; }
     saveRead(read);
     render();
-    // Sync to backend (fire and forget)
-    if (SYNC_URL && SYNC_URL !== 'YOUR_APPS_SCRIPT_URL_HERE') {
-      fireGet(SYNC_URL + '?action=set_read&data=' + encodeURIComponent(JSON.stringify(read)));
+    // Sync individual toggle to backend (safe — never wipes other data)
+    if (syncReady && SYNC_URL && SYNC_URL !== 'YOUR_APPS_SCRIPT_URL_HERE') {
+      fireGet(SYNC_URL + '?action=toggle_read&book=' + encodeURIComponent(id) + '&read=' + nowRead);
     }
   }
 
@@ -653,8 +655,8 @@
   render();
 
   // Sync from backend on load
-  (async function() {
-    if (!SYNC_URL || SYNC_URL === 'YOUR_APPS_SCRIPT_URL_HERE') return;
+  async function syncFromBackend() {
+    if (!SYNC_URL || SYNC_URL === 'YOUR_APPS_SCRIPT_URL_HERE') { syncReady = true; return; }
     try {
       // Fetch read status and bookmarks in parallel
       var [readData, bmData] = await Promise.all([
@@ -663,19 +665,22 @@
       ]);
       if (readData.status === 'ok' && readData.books_read) {
         var remote = readData.books_read;
-        var local = getRead();
-        var merged = Object.assign({}, local, remote);
-        Object.keys(merged).forEach(function(k) {
-          if (!remote[k]) delete merged[k];
-        });
-        saveRead(merged);
+        // Remote is source of truth — restore it
+        saveRead(remote);
       }
       if (bmData.status === 'ok' && bmData.bookmarks) {
         activeBookmarks = bmData.bookmarks;
       }
+      syncReady = true;
       render();
-    } catch(e) { /* offline — localStorage is fine */ }
-  })();
+    } catch(e) { syncReady = true; /* offline — localStorage is fine */ }
+  }
+  syncFromBackend();
+
+  // Re-fetch when page becomes visible (fixes Reading filter after setting bookmark in a book)
+  document.addEventListener('visibilitychange', function() {
+    if (document.visibilityState === 'visible') syncFromBackend();
+  });
 </script>
 
 </body>

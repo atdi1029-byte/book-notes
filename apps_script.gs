@@ -9,9 +9,10 @@
 //
 // Zercher Actions:
 //   ?action=zercher_save_config&data=  → saves config JSON to Zercher!A1
-//   ?action=zercher_log_workout&data=  → appends workout log to Zercher!A2+
+//   ?action=zercher_log_workout&data=  → appends workout log to Zercher!A2+ (col A)
+//   ?action=zercher_log_run&data=      → appends run log to Zercher!C2+ (col C)
 //   ?action=zercher_save_extra&data=   → saves holds/notes/starts to Zercher!B1
-//   ?action=zercher_load               → returns all zercher data
+//   ?action=zercher_load               → returns all zercher data (logs + runLogs)
 
 function doGet(e) {
   var action = (e.parameter.action || '').toLowerCase();
@@ -31,12 +32,33 @@ function doGet(e) {
 
     if (action === 'set_read') {
       var data = e.parameter.data || '{}';
-      JSON.parse(data);
+      var incoming = JSON.parse(data);
+      // Safety: never overwrite with empty — merge instead
+      if (Object.keys(incoming).length === 0) {
+        return ContentService.createTextOutput(
+          JSON.stringify({ status: 'ok', skipped: true })
+        ).setMimeType(ContentService.MimeType.JSON);
+      }
       sheet.getRange('A1').setValue(data);
       return ContentService.createTextOutput(
         JSON.stringify({ status: 'ok' })
       ).setMimeType(ContentService.MimeType.JSON);
     }
+  }
+
+  // Toggle a single book's read status (safe — never wipes other data)
+  if (action === 'toggle_read') {
+    var sheet = ss.getSheetByName('Settings');
+    if (!sheet) sheet = ss.insertSheet('Settings');
+    var book = e.parameter.book || '';
+    var read = e.parameter.read === 'true';
+    var existing = {};
+    try { existing = JSON.parse(sheet.getRange('A1').getValue() || '{}'); } catch(err) {}
+    if (read) { existing[book] = true; } else { delete existing[book]; }
+    sheet.getRange('A1').setValue(JSON.stringify(existing));
+    return ContentService.createTextOutput(
+      JSON.stringify({ status: 'ok', books_read: existing })
+    ).setMimeType(ContentService.MimeType.JSON);
   }
 
   // ── BOOKMARKS ──
@@ -122,25 +144,61 @@ function doGet(e) {
     ).setMimeType(ContentService.MimeType.JSON);
   }
 
+  if (action === 'zercher_log_run') {
+    var runData = e.parameter.data || '{}';
+    var runObj = JSON.parse(runData);
+    // Check for duplicate by ID in column C
+    var lastRow = zSheet.getLastRow();
+    var lastRunRow = 1;
+    if (lastRow >= 2) {
+      var existing = zSheet.getRange(2, 3, lastRow - 1, 1).getValues();
+      for (var i = 0; i < existing.length; i++) {
+        if (existing[i][0]) lastRunRow = i + 2;
+        try {
+          var ex = JSON.parse(existing[i][0]);
+          if (ex.id === runObj.id) {
+            zSheet.getRange(i + 2, 3).setValue(runData);
+            return ContentService.createTextOutput(
+              JSON.stringify({ status: 'ok', updated: true })
+            ).setMimeType(ContentService.MimeType.JSON);
+          }
+        } catch(err) {}
+      }
+    }
+    // Append new in column C
+    var newRow = Math.max(lastRunRow + 1, 2);
+    zSheet.getRange(newRow, 3).setValue(runData);
+    return ContentService.createTextOutput(
+      JSON.stringify({ status: 'ok' })
+    ).setMimeType(ContentService.MimeType.JSON);
+  }
+
   if (action === 'zercher_load') {
     var config = {};
     var extra = {};
     var logs = [];
+    var runLogs = [];
     var prs = {};
     try { config = JSON.parse(zSheet.getRange('A1').getValue() || '{}'); } catch(err) {}
     try { extra = JSON.parse(zSheet.getRange('B1').getValue() || '{}'); } catch(err) {}
     var lastRow = zSheet.getLastRow();
     if (lastRow >= 2) {
-      var rows = zSheet.getRange(2, 1, lastRow - 1, 1).getValues();
+      var rows = zSheet.getRange(2, 1, lastRow - 1, 3).getValues();
       for (var i = 0; i < rows.length; i++) {
         try {
           var log = JSON.parse(rows[i][0]);
           logs.push(log);
         } catch(err) {}
+        try {
+          if (rows[i][2]) {
+            var rlog = JSON.parse(rows[i][2]);
+            runLogs.push(rlog);
+          }
+        } catch(err) {}
       }
     }
     return ContentService.createTextOutput(
-      JSON.stringify({ status: 'ok', config: config, extra: extra, logs: logs, prs: config.prs || {} })
+      JSON.stringify({ status: 'ok', config: config, extra: extra, logs: logs, runLogs: runLogs, prs: config.prs || {} })
     ).setMimeType(ContentService.MimeType.JSON);
   }
 
