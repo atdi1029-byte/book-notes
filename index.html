@@ -260,6 +260,9 @@
     <button class="filter-btn" id="filterReading" onclick="toggleReading()">Reading</button>
   </p>
 
+  <h2 class="section-title" id="readingTitle" style="display:none">Currently Reading</h2>
+  <div class="shelf" id="readingShelf" style="display:none"></div>
+
   <h2 class="section-title">Personal Finance</h2>
   <div class="shelf">
     <a class="book" href="Personal_Finance_For_Dummies/index.html" data-book="personal-finance" data-bmkey="book_bm_personal_finance">
@@ -599,7 +602,13 @@
 
   function render() {
     var read = getRead();
-    document.querySelectorAll('.book').forEach(function(el) {
+    var readingShelf = document.getElementById('readingShelf');
+    var readingTitle = document.getElementById('readingTitle');
+
+    // Clear reading shelf
+    readingShelf.innerHTML = '';
+
+    document.querySelectorAll('.content > .shelf:not(#readingShelf) .book, .content > .shelf:not(#readingShelf) > .book').forEach(function(el) {
       var id = el.dataset.book;
       var bmkey = el.dataset.bmkey;
       var badge = el.querySelector('.read-badge');
@@ -615,18 +624,46 @@
         btn.classList.remove('hide');
         el.classList.remove('hidden-read');
       }
-      // Reading badge + filter
+      // Reading badge
       var hasBookmark = bmkey && activeBookmarks[bmkey];
       if (rbadge) rbadge.classList.toggle('show', !!hasBookmark);
-      el.classList.toggle('hidden-reading', readingFilter && !hasBookmark);
     });
-    // Hide entire category when all its books are hidden
-    document.querySelectorAll('.section-title').forEach(function(title) {
+
+    if (readingFilter) {
+      // Collect bookmarked books, sort by timestamp (most recent first)
+      var bookmarked = [];
+      document.querySelectorAll('.book[data-bmkey]').forEach(function(el) {
+        var bmkey = el.dataset.bmkey;
+        if (bmkey && activeBookmarks[bmkey]) {
+          bookmarked.push({ el: el, ts: activeBookmarks[bmkey].ts || 0 });
+        }
+      });
+      bookmarked.sort(function(a, b) { return b.ts - a.ts; });
+      // Clone into reading shelf
+      bookmarked.forEach(function(item) {
+        var clone = item.el.cloneNode(true);
+        clone.classList.remove('hidden-read', 'hidden-reading');
+        readingShelf.appendChild(clone);
+      });
+      readingTitle.style.display = bookmarked.length ? '' : 'none';
+      readingShelf.style.display = bookmarked.length ? '' : 'none';
+    } else {
+      readingTitle.style.display = 'none';
+      readingShelf.style.display = 'none';
+    }
+
+    // Hide/show category sections
+    document.querySelectorAll('.section-title:not(#readingTitle)').forEach(function(title) {
       var shelf = title.nextElementSibling;
       if (!shelf || !shelf.classList.contains('shelf')) return;
+      if (readingFilter) {
+        title.style.display = 'none';
+        shelf.style.display = 'none';
+        return;
+      }
       var hasVisible = false;
       shelf.querySelectorAll('.book').forEach(function(b) {
-        if (b.style.display !== 'none' && !b.classList.contains('hidden-read') && !b.classList.contains('hidden-reading')) hasVisible = true;
+        if (b.style.display !== 'none' && !b.classList.contains('hidden-read')) hasVisible = true;
       });
       title.style.display = hasVisible ? '' : 'none';
       shelf.style.display = hasVisible ? '' : 'none';
