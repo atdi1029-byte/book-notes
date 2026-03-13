@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=3.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#0e0804">
+<title>Book Web — Cross-Reference Map</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: #0e0804;
+  color: #e8dcc8;
+  font-family: Georgia, 'Times New Roman', serif;
+  overflow: hidden;
+  height: 100vh;
+  width: 100vw;
+}
+
+/* Loading */
+.loading {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #0e0804;
+  transition: opacity 0.5s;
+}
+
+.loading.done { opacity: 0; pointer-events: none; }
+
+.loading h2 {
+  color: #fff;
+  font-size: 1.3rem;
+  margin-bottom: 12px;
+}
+
+.loading .progress {
+  font-size: 0.85rem;
+  color: rgba(255,255,255,0.5);
+  font-family: -apple-system, sans-serif;
+}
+
+.spinner {
+  width: 36px; height: 36px;
+  border: 3px solid rgba(255,255,255,0.1);
+  border-top-color: #4a9a8f;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin-bottom: 16px;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Header */
+.header {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 20px;
+  background: linear-gradient(180deg, rgba(14,8,4,0.95) 0%, rgba(14,8,4,0.7) 80%, transparent 100%);
+}
+
+.back-link {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  text-decoration: none;
+  color: rgba(255,255,255,0.6);
+  font-size: 0.8rem;
+  font-family: -apple-system, sans-serif;
+  padding: 6px 14px;
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 20px;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.back-link:hover {
+  color: #fff;
+  border-color: rgba(255,255,255,0.5);
+  background: rgba(255,255,255,0.08);
+}
+
+.back-link svg {
+  width: 14px; height: 14px;
+  stroke: currentColor; fill: none;
+  stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
+}
+
+.header h1 {
+  font-size: 1.2rem;
+  color: #fff;
+  text-shadow: 0 2px 12px rgba(0,0,0,0.5);
+}
+
+.header .stats {
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.45);
+  font-family: -apple-system, sans-serif;
+}
+
+/* Legend */
+.legend {
+  position: fixed;
+  bottom: 16px; left: 16px;
+  z-index: 10;
+  background: rgba(14,8,4,0.9);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 0.7rem;
+  font-family: -apple-system, sans-serif;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  max-width: 360px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: rgba(255,255,255,0.6);
+}
+
+.legend-dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* Info Panel */
+.info-panel {
+  position: fixed;
+  top: 60px; right: 0;
+  z-index: 10;
+  width: 320px;
+  max-height: calc(100vh - 80px);
+  overflow-y: auto;
+  background: rgba(14,8,4,0.95);
+  border-left: 1px solid rgba(255,255,255,0.1);
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  border-radius: 0 0 0 12px;
+  padding: 20px;
+  transform: translateX(100%);
+  transition: transform 0.3s ease;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,0.15) transparent;
+}
+
+.info-panel.open { transform: translateX(0); }
+
+.info-panel .close-btn {
+  position: absolute;
+  top: 12px; right: 12px;
+  background: none; border: none;
+  color: rgba(255,255,255,0.4);
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 4px 8px;
+}
+
+.info-panel .close-btn:hover { color: #fff; }
+
+.info-panel h2 {
+  font-size: 1.1rem;
+  color: #fff;
+  margin-bottom: 4px;
+  padding-right: 30px;
+}
+
+.info-panel .author {
+  font-size: 0.85rem;
+  color: rgba(255,255,255,0.5);
+  font-style: italic;
+  margin-bottom: 16px;
+}
+
+.info-panel .view-notes {
+  display: inline-block;
+  font-size: 0.8rem;
+  color: #4a7872;
+  text-decoration: none;
+  margin-bottom: 16px;
+}
+
+.info-panel .view-notes:hover { text-decoration: underline; color: #6b9f99; }
+
+.info-panel h3 {
+  font-size: 0.85rem;
+  color: rgba(255,255,255,0.7);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 10px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.connection-item {
+  margin-bottom: 14px;
+  padding: 10px 12px;
+  background: rgba(255,255,255,0.04);
+  border-radius: 8px;
+  border-left: 3px solid;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.connection-item:hover { background: rgba(255,255,255,0.08); }
+
+.connection-item .book-name {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #e8dcc8;
+  margin-bottom: 4px;
+}
+
+.connection-item .shared-label {
+  font-size: 0.72rem;
+  color: rgba(255,255,255,0.4);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 4px;
+}
+
+.connection-item .thinkers {
+  font-size: 0.82rem;
+  color: rgba(255,255,255,0.65);
+  line-height: 1.5;
+}
+
+.connection-item .thinker-name {
+  display: inline-block;
+  background: rgba(255,255,255,0.06);
+  padding: 1px 7px;
+  border-radius: 10px;
+  margin: 2px 2px;
+  font-size: 0.78rem;
+}
+
+/* SVG */
+svg { display: block; }
+
+.link {
+  stroke-opacity: 0.25;
+  fill: none;
+}
+
+.link.highlighted { stroke-opacity: 0.7; }
+.link.dimmed { stroke-opacity: 0.05; }
+
+.node-circle {
+  stroke: rgba(255,255,255,0.2);
+  stroke-width: 1.5;
+  cursor: pointer;
+  transition: stroke 0.2s, stroke-width 0.2s;
+}
+
+.node-circle:hover {
+  stroke: rgba(255,255,255,0.6);
+  stroke-width: 2.5;
+}
+
+.node-circle.selected { stroke: #fff; stroke-width: 3; }
+.node-circle.dimmed { opacity: 0.15; }
+
+.node-label {
+  font-family: -apple-system, sans-serif;
+  font-size: 10px;
+  fill: rgba(255,255,255,0.7);
+  pointer-events: none;
+  text-anchor: middle;
+}
+
+.node-label.dimmed { opacity: 0.1; }
+
+.edge-label {
+  font-family: -apple-system, sans-serif;
+  font-size: 8px;
+  fill: rgba(255,255,255,0.3);
+  pointer-events: none;
+  text-anchor: middle;
+}
+
+.edge-label.dimmed { opacity: 0; }
+.edge-label.highlighted { fill: rgba(255,255,255,0.6); }
+
+/* Tooltip */
+.tooltip {
+  position: fixed;
+  z-index: 20;
+  background: rgba(14,8,4,0.95);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 0.78rem;
+  color: #e8dcc8;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s;
+  max-width: 200px;
+  font-family: -apple-system, sans-serif;
+}
+
+.tooltip.show { opacity: 1; }
+
+/* Mobile */
+@media (max-width: 600px) {
+  .header h1 { font-size: 1rem; }
+  .header .stats { display: none; }
+  .legend { bottom: 10px; left: 10px; padding: 8px 10px; font-size: 0.65rem; max-width: 280px; }
+  .info-panel {
+    width: 100%;
+    top: auto; bottom: 0; right: 0;
+    max-height: 55vh;
+    border-radius: 12px 12px 0 0;
+    border-left: none;
+    border-top: 1px solid rgba(255,255,255,0.15);
+    transform: translateY(100%);
+  }
+  .info-panel.open { transform: translateY(0); }
+}
+</style>
+</head>
+<body>
+
+<div class="loading" id="loading">
+  <div class="spinner"></div>
+  <h2>Building Book Web</h2>
+  <div class="progress" id="loadProgress">Fetching shelf data...</div>
+</div>
+
+<div class="header">
+  <a class="back-link" href="index.html">
+    <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+    Shelf
+  </a>
+  <h1>Book Web</h1>
+  <span class="stats" id="stats"></span>
+</div>
+
+<div class="legend" id="legend"></div>
+
+<div class="info-panel" id="infoPanel">
+  <button class="close-btn" onclick="closePanel()">&times;</button>
+  <div id="panelContent"></div>
+</div>
+
+<div class="tooltip" id="tooltip"></div>
+
+<svg id="graph"></svg>
+
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script>
+// ── Category colors ──
+const CATEGORIES = {
+  'Personal Finance': '#c5a55a',
+  'Economics': '#4a9a8f',
+  'Cycles': '#b87333',
+  'History': '#6b8f8b',
+  'Self Help': '#e07a5f',
+  'Sociology': '#c49a3c',
+  'Philosophy': '#9b7fbf',
+  'Psychology': '#5b9bd5'
+};
+
+// ── Dynamic Data Loading ──
+async function loadBookData() {
+  const progress = document.getElementById('loadProgress');
+
+  // 1. Fetch shelf page to discover all books
+  progress.textContent = 'Fetching shelf data...';
+  let shelfHtml;
+  try {
+    const resp = await fetch('index.html');
+    shelfHtml = await resp.text();
+  } catch(e) {
+    progress.textContent = 'Error loading shelf: ' + e.message;
+    return null;
+  }
+
+  // 2. Parse shelf HTML to extract books
+  const parser = new DOMParser();
+  const shelfDoc = parser.parseFromString(shelfHtml, 'text/html');
+  const books = [];
+
+  const sections = shelfDoc.querySelectorAll('.section-title');
+  sections.forEach(section => {
+    // Skip "Currently Reading" section
+    if (section.id === 'readingTitle') return;
+    const category = section.textContent.trim();
+    const shelf = section.nextElementSibling;
+    if (!shelf || !shelf.classList.contains('shelf')) return;
+
+    shelf.querySelectorAll('.book').forEach(bookEl => {
+      const href = bookEl.getAttribute('href');
+      if (!href) return;
+      // Skip hidden books
+      if (bookEl.style.display === 'none') return;
+      const dir = href.split('/')[0];
+      const title = bookEl.querySelector('.book-title')?.textContent?.trim() || dir;
+      const author = bookEl.querySelector('.book-author')?.textContent?.trim() || '';
+      const id = bookEl.dataset.book || dir;
+      books.push({ id, title, author, dir, category, thinkers: [] });
+    });
+  });
+
+  // 3. Fetch each book's index.html and parse referenced works
+  progress.textContent = `Scanning ${books.length} books for references...`;
+  let loaded = 0;
+
+  await Promise.all(books.map(async (book) => {
+    try {
+      const resp = await fetch(`${book.dir}/index.html`);
+      const html = await resp.text();
+      const doc = parser.parseFromString(html, 'text/html');
+
+      // Find "Books & Thinkers Referenced" section
+      const h2s = doc.querySelectorAll('h2');
+      let refH2 = null;
+      for (const h2 of h2s) {
+        if (h2.textContent.includes('Referenced')) {
+          refH2 = h2;
+          break;
+        }
+      }
+
+      if (refH2) {
+        // Find the table — might be direct sibling or inside a wrapper div
+        let table = null;
+        let el = refH2.nextElementSibling;
+        for (let i = 0; i < 5 && el; i++) {
+          if (el.tagName === 'TABLE') { table = el; break; }
+          if (el.tagName === 'H2') break; // hit next section
+          const inner = el.querySelector('table');
+          if (inner) { table = inner; break; }
+          el = el.nextElementSibling;
+        }
+
+        if (table) {
+          table.querySelectorAll('tr').forEach(tr => {
+            const td = tr.querySelector('td');
+            if (td) {
+              // Get text, clean it up
+              let name = td.textContent.trim();
+              // Remove content in parentheses at end
+              name = name.replace(/\s*\(.*\)\s*$/, '').trim();
+              // Remove trailing quotes/italics artifacts
+              name = name.replace(/["""'']/g, '').trim();
+              if (name && name.length > 1) {
+                book.thinkers.push(name);
+              }
+            }
+          });
+        }
+      }
+    } catch(e) {
+      // Book page not found — no thinkers
+    }
+    loaded++;
+    progress.textContent = `Scanned ${loaded} of ${books.length} books...`;
+  }));
+
+  // 4. Generate short labels for nodes
+  books.forEach(b => {
+    b.short = shortenTitle(b.title);
+  });
+
+  return books;
+}
+
+function shortenTitle(title) {
+  // Create 2-line short labels for graph nodes
+  const map = {
+    'Personal Finance For Dummies': 'Personal\nFinance',
+    'I Will Teach You to Be Rich': 'I Will Teach\nYou to Be Rich',
+    'Asset Allocation': 'Asset\nAllocation',
+    "The Bogleheads' Guide to Investing": "Bogleheads'\nGuide",
+    'Bond Markets, Analysis, and Strategies': 'Bond\nMarkets',
+    'Talking to My Daughter About the Economy': 'Talking to\nMy Daughter',
+    'The Wealth of Nations': 'Wealth of\nNations',
+    'Big Debt Crises': 'Big Debt\nCrises',
+    'Capital Wars': 'Capital\nWars',
+    'Economics 101': 'Economics\n101',
+    'Capitalism and Freedom': 'Capitalism\n& Freedom',
+    'Cycles: The Science of Prediction': 'Cycles',
+    'The Golden Constant': 'Golden\nConstant',
+    'Against the Gods': 'Against\nthe Gods',
+    'A History of Money and Banking in the United States': 'History of\nMoney & Banking',
+    'Atomic Habits': 'Atomic\nHabits',
+    'Bowling Alone': 'Bowling\nAlone',
+    'Fooled by Randomness': 'Fooled by\nRandomness',
+  };
+  if (map[title]) return map[title];
+  // Default: if title is long, split at midpoint space
+  if (title.length > 14) {
+    const mid = Math.floor(title.length / 2);
+    const spaceAfter = title.indexOf(' ', mid);
+    const spaceBefore = title.lastIndexOf(' ', mid);
+    const splitAt = (spaceAfter !== -1 && spaceAfter - mid < mid - spaceBefore) ? spaceAfter : spaceBefore;
+    if (splitAt > 0) return title.substring(0, splitAt) + '\n' + title.substring(splitAt + 1);
+  }
+  return title;
+}
+
+// ── Normalize thinker name for matching ──
+function normalize(s) {
+  return s.toLowerCase().replace(/[^a-z]/g, '');
+}
+
+// ── Compute Edges from shared thinkers ──
+function computeEdges(books) {
+  const edges = [];
+  for (let i = 0; i < books.length; i++) {
+    for (let j = i + 1; j < books.length; j++) {
+      const a = books[i], b = books[j];
+      if (!a.thinkers.length || !b.thinkers.length) continue;
+
+      const setA = new Map(a.thinkers.map(t => [normalize(t), t]));
+      const shared = [];
+      const seen = new Set();
+
+      for (const t of b.thinkers) {
+        const norm = normalize(t);
+        if (setA.has(norm) && !seen.has(norm)) {
+          shared.push(setA.get(norm));
+          seen.add(norm);
+        }
+      }
+
+      if (shared.length > 0) {
+        edges.push({
+          source: a.id,
+          target: b.id,
+          shared: shared,
+          weight: shared.length
+        });
+      }
+    }
+  }
+  return edges;
+}
+
+// ── Build D3 Graph ──
+function buildGraph(books, edges) {
+  // Hide loading
+  document.getElementById('loading').classList.add('done');
+
+  // Stats
+  const connectedBooks = new Set();
+  edges.forEach(e => { connectedBooks.add(e.source); connectedBooks.add(e.target); });
+  const allThinkers = new Set();
+  edges.forEach(e => e.shared.forEach(t => allThinkers.add(t)));
+  document.getElementById('stats').textContent =
+    `${books.length} books · ${edges.length} connections · ${allThinkers.size} shared thinkers`;
+
+  // Legend
+  const legendEl = document.getElementById('legend');
+  const usedCats = new Set(books.map(b => b.category));
+  for (const [cat, color] of Object.entries(CATEGORIES)) {
+    if (!usedCats.has(cat)) continue;
+    legendEl.innerHTML += `<span class="legend-item"><span class="legend-dot" style="background:${color}"></span>${cat}</span>`;
+  }
+
+  // SVG setup
+  const width = window.innerWidth;
+  const height = window.innerHeight;
+
+  const svg = d3.select('#graph')
+    .attr('width', width)
+    .attr('height', height);
+
+  const g = svg.append('g');
+  const zoom = d3.zoom()
+    .scaleExtent([0.3, 4])
+    .on('zoom', e => g.attr('transform', e.transform));
+  svg.call(zoom);
+
+  // Nodes
+  const nodes = books.map(b => ({
+    ...b,
+    connectionCount: edges.filter(e => e.source === b.id || e.target === b.id).length
+  }));
+
+  // Links
+  const links = edges.map(e => ({ ...e }));
+
+  // Scales
+  const maxConn = d3.max(nodes, d => d.connectionCount) || 1;
+  const radiusScale = d3.scaleSqrt().domain([0, maxConn]).range([14, 32]);
+  const linkWidthScale = d3.scaleLinear().domain([1, d3.max(edges, e => e.weight) || 1]).range([1, 4]);
+
+  // Simulation
+  const simulation = d3.forceSimulation(nodes)
+    .force('link', d3.forceLink(links).id(d => d.id)
+      .distance(d => 180 - d.weight * 15)
+      .strength(d => 0.3 + d.weight * 0.05))
+    .force('charge', d3.forceManyBody().strength(-400))
+    .force('center', d3.forceCenter(width / 2, height / 2))
+    .force('collision', d3.forceCollide().radius(d => radiusScale(d.connectionCount) + 20))
+    .force('x', d3.forceX(width / 2).strength(0.05))
+    .force('y', d3.forceY(height / 2).strength(0.05));
+
+  // Draw links
+  const link = g.append('g').selectAll('line')
+    .data(links).enter().append('line')
+    .attr('class', 'link')
+    .attr('stroke', d => {
+      const src = books.find(b => b.id === (d.source.id || d.source));
+      return CATEGORIES[src?.category] || '#4a9a8f';
+    })
+    .attr('stroke-width', d => linkWidthScale(d.weight));
+
+  // Edge labels
+  const edgeLabel = g.append('g').selectAll('text')
+    .data(links).enter().append('text')
+    .attr('class', 'edge-label')
+    .text(d => d.weight);
+
+  // Draw nodes
+  const node = g.append('g').selectAll('g')
+    .data(nodes).enter().append('g')
+    .call(d3.drag()
+      .on('start', (e, d) => { if (!e.active) simulation.alphaTarget(0.3).restart(); d.fx = d.x; d.fy = d.y; })
+      .on('drag', (e, d) => { d.fx = e.x; d.fy = e.y; })
+      .on('end', (e, d) => { if (!e.active) simulation.alphaTarget(0); d.fx = null; d.fy = null; }));
+
+  node.append('circle')
+    .attr('class', 'node-circle')
+    .attr('r', d => radiusScale(d.connectionCount))
+    .attr('fill', d => CATEGORIES[d.category] || '#666')
+    .attr('fill-opacity', 0.85);
+
+  // Labels
+  node.each(function(d) {
+    const lines = d.short.split('\n');
+    const el = d3.select(this);
+    lines.forEach((line, i) => {
+      el.append('text')
+        .attr('class', 'node-label')
+        .attr('dy', `${(i - (lines.length - 1) / 2) * 12 + radiusScale(d.connectionCount) + 14}px`)
+        .text(line);
+    });
+  });
+
+  // Tooltip
+  const tooltip = document.getElementById('tooltip');
+  node.on('mouseover', (event, d) => {
+    tooltip.innerHTML = d.connectionCount === 0
+      ? `<strong>${d.title}</strong><br><em>No cross-references yet</em>`
+      : `<strong>${d.title}</strong><br>${d.connectionCount} connection${d.connectionCount !== 1 ? 's' : ''}`;
+    tooltip.classList.add('show');
+  })
+  .on('mousemove', event => {
+    tooltip.style.left = (event.clientX + 14) + 'px';
+    tooltip.style.top = (event.clientY - 10) + 'px';
+  })
+  .on('mouseout', () => tooltip.classList.remove('show'));
+
+  // Click
+  node.on('click', (event, d) => {
+    event.stopPropagation();
+    tooltip.classList.remove('show');
+    selectNode(d, nodes, links, books, node, link, edgeLabel);
+  });
+
+  svg.on('click', () => clearSelection(node, link, edgeLabel));
+
+  // Tick
+  simulation.on('tick', () => {
+    link.attr('x1', d => d.source.x).attr('y1', d => d.source.y)
+        .attr('x2', d => d.target.x).attr('y2', d => d.target.y);
+    edgeLabel.attr('x', d => (d.source.x + d.target.x) / 2)
+             .attr('y', d => (d.source.y + d.target.y) / 2);
+    node.attr('transform', d => `translate(${d.x},${d.y})`);
+  });
+
+  // Resize
+  window.addEventListener('resize', () => {
+    const w = window.innerWidth, h = window.innerHeight;
+    svg.attr('width', w).attr('height', h);
+    simulation.force('center', d3.forceCenter(w / 2, h / 2));
+    simulation.alpha(0.3).restart();
+  });
+
+  // Store refs for click handlers
+  window._graphState = { nodes, links, books, node, link, edgeLabel };
+}
+
+function selectNode(d, nodes, links, books, node, link, edgeLabel) {
+  const connectedEdges = links.filter(l =>
+    (l.source.id || l.source) === d.id || (l.target.id || l.target) === d.id
+  );
+  const connectedIds = new Set([d.id]);
+  connectedEdges.forEach(e => {
+    connectedIds.add(e.source.id || e.source);
+    connectedIds.add(e.target.id || e.target);
+  });
+
+  node.select('.node-circle')
+    .classed('selected', n => n.id === d.id)
+    .classed('dimmed', n => !connectedIds.has(n.id));
+  node.selectAll('.node-label')
+    .classed('dimmed', n => !connectedIds.has(n.id));
+  link.classed('highlighted', l =>
+    (l.source.id || l.source) === d.id || (l.target.id || l.target) === d.id
+  ).classed('dimmed', l =>
+    (l.source.id || l.source) !== d.id && (l.target.id || l.target) !== d.id
+  );
+  edgeLabel.classed('highlighted', l =>
+    (l.source.id || l.source) === d.id || (l.target.id || l.target) === d.id
+  ).classed('dimmed', l =>
+    (l.source.id || l.source) !== d.id && (l.target.id || l.target) !== d.id
+  );
+
+  // Build info panel
+  const bookColor = CATEGORIES[d.category] || '#666';
+  let html = `<h2 style="color:${bookColor}">${d.title}</h2>`;
+  html += `<div class="author">${d.author}</div>`;
+  html += `<a class="view-notes" href="${d.dir}/index.html">View full notes &rarr;</a>`;
+
+  if (connectedEdges.length === 0) {
+    html += `<h3>No Connections Yet</h3>`;
+    html += `<p style="font-size:0.85rem;color:rgba(255,255,255,0.4)">No shared references found with other books.</p>`;
+  } else {
+    html += `<h3>Connections (${connectedEdges.length})</h3>`;
+    connectedEdges.sort((a, b) => b.weight - a.weight);
+    connectedEdges.forEach(edge => {
+      const otherId = (edge.source.id || edge.source) === d.id
+        ? (edge.target.id || edge.target)
+        : (edge.source.id || edge.source);
+      const other = books.find(b => b.id === otherId);
+      if (!other) return;
+      const otherColor = CATEGORIES[other.category] || '#666';
+      html += `<div class="connection-item" style="border-color:${otherColor}" onclick="navBook('${otherId}')">`;
+      html += `<div class="book-name" style="color:${otherColor}">${other.title}</div>`;
+      html += `<div class="shared-label">${edge.shared.length} shared reference${edge.shared.length !== 1 ? 's' : ''}</div>`;
+      html += `<div class="thinkers">${edge.shared.map(t => `<span class="thinker-name">${t}</span>`).join('')}</div>`;
+      html += `</div>`;
+    });
+  }
+
+  document.getElementById('panelContent').innerHTML = html;
+  document.getElementById('infoPanel').classList.add('open');
+}
+
+function navBook(id) {
+  const s = window._graphState;
+  const book = s.nodes.find(n => n.id === id);
+  if (book) selectNode(book, s.nodes, s.links, s.books, s.node, s.link, s.edgeLabel);
+}
+
+function clearSelection(node, link, edgeLabel) {
+  const s = window._graphState;
+  if (!s) return;
+  s.node.select('.node-circle').classed('selected', false).classed('dimmed', false);
+  s.node.selectAll('.node-label').classed('dimmed', false);
+  s.link.classed('highlighted', false).classed('dimmed', false);
+  s.edgeLabel.classed('highlighted', false).classed('dimmed', false);
+  document.getElementById('infoPanel').classList.remove('open');
+}
+
+function closePanel() {
+  clearSelection();
+}
+
+// ── Init ──
+(async function() {
+  const books = await loadBookData();
+  if (!books) return;
+  const edges = computeEdges(books);
+  buildGraph(books, edges);
+})();
+</script>
+
+</body>
+</html>
