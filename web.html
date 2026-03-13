@@ -414,7 +414,7 @@ async function loadBookData() {
       const title = bookEl.querySelector('.book-title')?.textContent?.trim() || dir;
       const author = bookEl.querySelector('.book-author')?.textContent?.trim() || '';
       const id = bookEl.dataset.book || dir;
-      books.push({ id, title, author, dir, category, thinkers: [] });
+      books.push({ id, title, author, dir, category, thinkers: [], refRows: [] });
     });
   });
 
@@ -444,7 +444,7 @@ async function loadBookData() {
         let el = refH2.nextElementSibling;
         for (let i = 0; i < 5 && el; i++) {
           if (el.tagName === 'TABLE') { table = el; break; }
-          if (el.tagName === 'H2') break; // hit next section
+          if (el.tagName === 'H2') break;
           const inner = el.querySelector('table');
           if (inner) { table = inner; break; }
           el = el.nextElementSibling;
@@ -452,16 +452,15 @@ async function loadBookData() {
 
         if (table) {
           table.querySelectorAll('tr').forEach(tr => {
-            const td = tr.querySelector('td');
-            if (td) {
-              // Get text, clean it up
-              let name = td.textContent.trim();
-              // Remove content in parentheses at end
+            const tds = tr.querySelectorAll('td');
+            if (tds.length >= 1) {
+              let name = tds[0].textContent.trim();
               name = name.replace(/\s*\(.*\)\s*$/, '').trim();
-              // Remove trailing quotes/italics artifacts
               name = name.replace(/["""'']/g, '').trim();
+              const desc = tds.length >= 2 ? tds[1].textContent.trim() : '';
               if (name && name.length > 1) {
                 book.thinkers.push(name);
+                book.refRows.push({ name, desc });
               }
             }
           });
@@ -516,42 +515,67 @@ function shortenTitle(title) {
   return title;
 }
 
-// ── Normalize thinker name for matching ──
-function normalize(s) {
-  return s.toLowerCase().replace(/[^a-z]/g, '');
+// ── Extract surnames from an author string ──
+function getAuthorSurnames(authorStr) {
+  // Handle "Larimore, Lindauer & LeBoeuf", "William Strauss & Neil Howe", "Frank J. Fabozzi"
+  const parts = authorStr.split(/[,&]+/).map(s => s.trim()).filter(Boolean);
+  return parts.map(part => {
+    const words = part.split(/\s+/);
+    return words[words.length - 1]; // last word = surname
+  }).filter(s => s.length >= 3);
 }
 
-// ── Compute Edges from shared thinkers ──
+// ── Compute Edges: does Book A reference Book B's author? ──
 function computeEdges(books) {
   const edges = [];
+  const edgeMap = {}; // "idA|idB" → edge (for merging bidirectional)
+
   for (let i = 0; i < books.length; i++) {
-    for (let j = i + 1; j < books.length; j++) {
-      const a = books[i], b = books[j];
-      if (!a.thinkers.length || !b.thinkers.length) continue;
+    for (let j = 0; j < books.length; j++) {
+      if (i === j) continue;
+      if (!books[i].refRows.length) continue;
 
-      const setA = new Map(a.thinkers.map(t => [normalize(t), t]));
-      const shared = [];
-      const seen = new Set();
+      const targetSurnames = getAuthorSurnames(books[j].author);
+      const matches = [];
 
-      for (const t of b.thinkers) {
-        const norm = normalize(t);
-        if (setA.has(norm) && !seen.has(norm)) {
-          shared.push(setA.get(norm));
-          seen.add(norm);
+      for (const ref of books[i].refRows) {
+        const refNameLower = ref.name.toLowerCase();
+        const refDescLower = ref.desc.toLowerCase();
+        const fullText = refNameLower + ' ' + refDescLower;
+
+        // Check if this reference row mentions the target book's author
+        for (const sn of targetSurnames) {
+          if (refNameLower.includes(sn.toLowerCase())) {
+            matches.push(ref.name);
+            break;
+          }
+        }
+
+        // Also check if the row mentions the target book's title
+        const titleLower = books[j].title.toLowerCase();
+        if (fullText.includes(titleLower)) {
+          matches.push(books[j].title);
         }
       }
 
-      if (shared.length > 0) {
-        edges.push({
-          source: a.id,
-          target: b.id,
-          shared: shared,
-          weight: shared.length
-        });
+      if (matches.length > 0) {
+        // Create undirected edge key (alphabetical order)
+        const key = [books[i].id, books[j].id].sort().join('|');
+        if (!edgeMap[key]) {
+          edgeMap[key] = {
+            source: books[i].id,
+            target: books[j].id,
+            refs: {},  // { bookId: [matched names] }
+            weight: 0
+          };
+        }
+        edgeMap[key].refs[books[i].id] = [...new Set(matches)];
+        edgeMap[key].weight++;
       }
     }
   }
-  return edges;
+
+  return Object.values(edgeMap);
 }
 
 // ── Build D3 Graph ──
@@ -756,7 +780,7 @@ function selectNode(d, nodes, links, books, node, link, edgeLabel) {
 
   if (connectedEdges.length === 0) {
     html += `<h3>No Connections Yet</h3>`;
-    html += `<p style="font-size:0.85rem;color:rgba(0,0,0,0.4)">No shared references found with other books.</p>`;
+    html += `<p style="font-size:0.85rem;color:rgba(0,0,0,0.4)">This book doesn't reference any other books on your shelf (or vice versa).</p>`;
   } else {
     html += `<h3>Connections (${connectedEdges.length})</h3>`;
     connectedEdges.sort((a, b) => b.weight - a.weight);
@@ -767,10 +791,23 @@ function selectNode(d, nodes, links, books, node, link, edgeLabel) {
       const other = books.find(b => b.id === otherId);
       if (!other) return;
       const otherColor = CATEGORIES[other.category] || '#666';
+
+      // Determine direction of reference
+      const thisRefs = edge.refs[d.id] || [];
+      const otherRefs = edge.refs[otherId] || [];
+
       html += `<div class="connection-item" style="border-color:${otherColor}" onclick="navBook('${otherId}')">`;
       html += `<div class="book-name" style="color:${otherColor}">${other.title}</div>`;
-      html += `<div class="shared-label">Both books discuss:</div>`;
-      html += `<div class="thinkers">${edge.shared.map(t => `<span class="thinker-name">${t}</span>`).join('')}</div>`;
+
+      if (thisRefs.length > 0) {
+        html += `<div class="shared-label">This book cites:</div>`;
+        html += `<div class="thinkers">${thisRefs.map(t => `<span class="thinker-name">${t}</span>`).join('')}</div>`;
+      }
+      if (otherRefs.length > 0) {
+        html += `<div class="shared-label" style="margin-top:6px">Cited by ${other.title.split(':')[0]}:</div>`;
+        html += `<div class="thinkers">${otherRefs.map(t => `<span class="thinker-name">${t}</span>`).join('')}</div>`;
+      }
+
       html += `</div>`;
     });
   }
