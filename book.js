@@ -112,18 +112,6 @@
 
   initBookmark();
 
-  // Mobile bookmark toggle button (only on small screens)
-  if (window.innerWidth <= 600) {
-    var toggle = document.createElement('button');
-    toggle.className = 'bm-toggle';
-    toggle.textContent = '\u{1F516}';
-    toggle.setAttribute('aria-label', 'Toggle bookmark buttons');
-    toggle.onclick = function() {
-      document.body.classList.toggle('bm-mode');
-    };
-    document.body.appendChild(toggle);
-  }
-
   // Prevent browser from restoring its own scroll position
   if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
 
