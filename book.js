@@ -58,7 +58,8 @@
   window.setBookmark = function(el) {
     var id = el.id || stableId(el.textContent);
     if (!el.id) el.id = id;
-    var d = { id: id, title: el.textContent.replace('\u{1F516}','').trim(), y: window.scrollY, ts: Date.now() };
+    var rawTitle = el.textContent.replace('\u{1F516}','').trim();
+    var d = { id: id, title: rawTitle.length > 60 ? rawTitle.slice(0, 60) + '...' : rawTitle, y: window.scrollY, ts: Date.now() };
     localStorage.setItem(BM_KEY, JSON.stringify(d));
     bar.style.display = 'flex';
     label.textContent = 'Resume: ' + d.title;
