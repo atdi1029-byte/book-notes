@@ -41,6 +41,18 @@
       btn.onclick = function(e) { e.stopPropagation(); setBookmark(s); };
       s.appendChild(btn);
     });
+    // Make every paragraph bookmarkable
+    document.querySelectorAll('section p, .chapter p').forEach(function(p) {
+      if (p.querySelector('.bm-btn')) return; // already has one
+      var preview = p.textContent.replace(/\s+/g, ' ').trim().slice(0, 50);
+      if (!preview) return;
+      if (!p.id) p.id = stableId(preview);
+      var btn = document.createElement('span');
+      btn.className = 'bm-btn bm-p';
+      btn.textContent = '\u{1F516}';
+      btn.onclick = function(e) { e.stopPropagation(); setBookmark(p); };
+      p.insertBefore(btn, p.firstChild);
+    });
   }
 
   window.setBookmark = function(el) {
