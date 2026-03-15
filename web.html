@@ -247,6 +247,62 @@ body {
   font-size: 0.78rem;
 }
 
+.ref-direction {
+  font-size: 0.78rem;
+  color: rgba(0,0,0,0.55);
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.ref-arrow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  font-size: 0.72rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.ref-arrow.out { background: rgba(74,154,143,0.15); color: #4a9a8f; }
+.ref-arrow.in { background: rgba(197,165,90,0.15); color: #c5a55a; }
+
+.ref-detail {
+  margin: 3px 0 8px 25px;
+  padding: 7px 10px;
+  background: rgba(0,0,0,0.025);
+  border-radius: 6px;
+  border-left: 2px solid rgba(0,0,0,0.08);
+}
+
+.ref-name {
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: #3a2e1e;
+}
+
+.ref-desc {
+  font-size: 0.76rem;
+  color: rgba(0,0,0,0.45);
+  margin-top: 2px;
+  line-height: 1.4;
+  font-style: italic;
+}
+
+.no-refs-note {
+  font-size: 0.8rem;
+  color: rgba(0,0,0,0.35);
+  font-style: italic;
+  margin-top: 4px;
+  padding: 8px 10px;
+  background: rgba(0,0,0,0.02);
+  border-radius: 6px;
+}
+
 /* SVG */
 svg { display: block; }
 
@@ -546,7 +602,7 @@ function computeEdges(books) {
         // Check if this reference row mentions the target book's author
         for (const sn of targetSurnames) {
           if (refNameLower.includes(sn.toLowerCase())) {
-            matches.push(ref.name);
+            matches.push({ name: ref.name, desc: ref.desc, matchType: 'author' });
             break;
           }
         }
@@ -554,7 +610,7 @@ function computeEdges(books) {
         // Also check if the row mentions the target book's title
         const titleLower = books[j].title.toLowerCase();
         if (fullText.includes(titleLower)) {
-          matches.push(books[j].title);
+          matches.push({ name: ref.name, desc: ref.desc, matchType: 'title' });
         }
       }
 
@@ -565,11 +621,17 @@ function computeEdges(books) {
           edgeMap[key] = {
             source: books[i].id,
             target: books[j].id,
-            refs: {},  // { bookId: [matched names] }
+            refs: {},  // { bookId: [{name, desc, matchType}] }
             weight: 0
           };
         }
-        edgeMap[key].refs[books[i].id] = [...new Set(matches)];
+        // Deduplicate by name
+        const seen = new Set();
+        edgeMap[key].refs[books[i].id] = matches.filter(m => {
+          if (seen.has(m.name)) return false;
+          seen.add(m.name);
+          return true;
+        });
         edgeMap[key].weight++;
       }
     }
@@ -636,23 +698,38 @@ function buildGraph(books, edges) {
     .force('x', d3.forceX(width / 2).strength(0.05))
     .force('y', d3.forceY(height / 2).strength(0.05));
 
-  // Draw links
-  const link = g.append('g').selectAll('line')
-    .data(links).enter().append('line')
+  // Expand undirected links into directed sub-edges for arrow rendering
+  const directedLinks = [];
+  links.forEach(l => {
+    const srcId = l.source.id || l.source;
+    const tgtId = l.target.id || l.target;
+    // If source book references target's author → arrow from source to target
+    if (l.refs[srcId] && l.refs[srcId].length > 0) {
+      directedLinks.push({ ...l, dirSource: srcId, dirTarget: tgtId, parentLink: l });
+    }
+    // If target book references source's author → arrow from target to source
+    if (l.refs[tgtId] && l.refs[tgtId].length > 0) {
+      directedLinks.push({ ...l, dirSource: tgtId, dirTarget: srcId, parentLink: l });
+    }
+  });
+
+  // Draw directed edges as paths with arrow markers
+  const link = g.append('g').selectAll('path')
+    .data(directedLinks).enter().append('path')
     .attr('class', 'link')
     .attr('stroke', d => {
-      const src = books.find(b => b.id === (d.source.id || d.source));
+      const src = books.find(b => b.id === d.dirSource);
       return CATEGORIES[src?.category] || '#4a9a8f';
     })
-    .attr('stroke-width', d => linkWidthScale(d.weight));
+    .attr('stroke-width', d => linkWidthScale(d.parentLink.weight))
+    .attr('marker-end', 'url(#arrow)')
+    .attr('fill', 'none');
 
-  // Edge labels
+  // Remove old edge count labels (confusing "1"s)
   const edgeLabel = g.append('g').selectAll('text')
-    .data(links).enter().append('text')
-    .attr('class', 'edge-label')
-    .text(d => d.weight);
+    .data([]).enter().append('text');
 
-  // Clip paths for cover art circles
+  // Defs: clip paths + arrow markers
   const defs = svg.append('defs');
   nodes.forEach(d => {
     defs.append('clipPath')
@@ -660,6 +737,31 @@ function buildGraph(books, edges) {
       .append('circle')
       .attr('r', radiusScale(d.connectionCount));
   });
+
+  // Arrow marker for directed edges
+  defs.append('marker')
+    .attr('id', 'arrow')
+    .attr('viewBox', '0 -4 8 8')
+    .attr('refX', 8)
+    .attr('refY', 0)
+    .attr('markerWidth', 6)
+    .attr('markerHeight', 6)
+    .attr('orient', 'auto')
+    .append('path')
+    .attr('d', 'M0,-3.5L8,0L0,3.5')
+    .attr('fill', 'rgba(0,0,0,0.18)');
+
+  defs.append('marker')
+    .attr('id', 'arrow-hl')
+    .attr('viewBox', '0 -4 8 8')
+    .attr('refX', 8)
+    .attr('refY', 0)
+    .attr('markerWidth', 6)
+    .attr('markerHeight', 6)
+    .attr('orient', 'auto')
+    .append('path')
+    .attr('d', 'M0,-3.5L8,0L0,3.5')
+    .attr('fill', 'rgba(0,0,0,0.45)');
 
   // Draw nodes
   const node = g.append('g').selectAll('g')
@@ -686,6 +788,27 @@ function buildGraph(books, edges) {
     .attr('r', d => radiusScale(d.connectionCount))
     .attr('fill', 'none');
 
+  // Connection count badge
+  const badgeGroup = node.filter(d => d.connectionCount > 0);
+  badgeGroup.append('circle')
+    .attr('cx', d => radiusScale(d.connectionCount) * 0.7)
+    .attr('cy', d => -radiusScale(d.connectionCount) * 0.7)
+    .attr('r', 9)
+    .attr('fill', d => CATEGORIES[d.category] || '#4a9a8f')
+    .attr('stroke', '#fff')
+    .attr('stroke-width', 1.5);
+  badgeGroup.append('text')
+    .attr('x', d => radiusScale(d.connectionCount) * 0.7)
+    .attr('y', d => -radiusScale(d.connectionCount) * 0.7)
+    .attr('text-anchor', 'middle')
+    .attr('dominant-baseline', 'central')
+    .attr('fill', '#fff')
+    .attr('font-size', '8px')
+    .attr('font-family', '-apple-system, sans-serif')
+    .attr('font-weight', '700')
+    .attr('pointer-events', 'none')
+    .text(d => d.connectionCount);
+
   // Labels
   node.each(function(d) {
     const lines = d.short.split('\n');
@@ -701,9 +824,15 @@ function buildGraph(books, edges) {
   // Tooltip
   const tooltip = document.getElementById('tooltip');
   node.on('mouseover', (event, d) => {
-    tooltip.innerHTML = d.connectionCount === 0
-      ? `<strong>${d.title}</strong><br><em>No cross-references yet</em>`
-      : `<strong>${d.title}</strong><br>${d.connectionCount} connection${d.connectionCount !== 1 ? 's' : ''}`;
+    let tip = `<strong>${d.title}</strong>`;
+    if (d.connectionCount > 0) {
+      tip += `<br>${d.connectionCount} connection${d.connectionCount !== 1 ? 's' : ''}`;
+    } else if (d.refRows.length === 0) {
+      tip += `<br><em>No reference table yet</em>`;
+    } else {
+      tip += `<br><em>No shelf cross-references</em>`;
+    }
+    tooltip.innerHTML = tip;
     tooltip.classList.add('show');
   })
   .on('mousemove', event => {
@@ -721,12 +850,44 @@ function buildGraph(books, edges) {
 
   svg.on('click', () => clearSelection(node, link, edgeLabel));
 
+  // Helper: find node object by id
+  const nodeById = {};
+  nodes.forEach(n => nodeById[n.id] = n);
+
   // Tick
   simulation.on('tick', () => {
-    link.attr('x1', d => d.source.x).attr('y1', d => d.source.y)
-        .attr('x2', d => d.target.x).attr('y2', d => d.target.y);
-    edgeLabel.attr('x', d => (d.source.x + d.target.x) / 2)
-             .attr('y', d => (d.source.y + d.target.y) / 2);
+    link.attr('d', d => {
+      const src = nodeById[d.dirSource] || d.source;
+      const tgt = nodeById[d.dirTarget] || d.target;
+      if (!src.x || !tgt.x) return '';
+
+      const dx = tgt.x - src.x;
+      const dy = tgt.y - src.y;
+      const dist = Math.sqrt(dx * dx + dy * dy) || 1;
+      const ux = dx / dist;
+      const uy = dy / dist;
+
+      // Offset start/end to node edge (radius)
+      const r1 = radiusScale(src.connectionCount) + 4;
+      const r2 = radiusScale(tgt.connectionCount) + 8; // extra for arrow
+      const x1 = src.x + ux * r1;
+      const y1 = src.y + uy * r1;
+      const x2 = tgt.x - ux * r2;
+      const y2 = tgt.y - uy * r2;
+
+      // Check if bidirectional — offset perpendicular slightly
+      const isBidirectional = d.parentLink.refs[d.dirSource] && d.parentLink.refs[d.dirTarget]
+        && d.parentLink.refs[d.dirSource].length > 0 && d.parentLink.refs[d.dirTarget].length > 0;
+
+      if (isBidirectional) {
+        const off = 4; // perpendicular offset
+        const px = -uy * off;
+        const py = ux * off;
+        return `M${x1 + px},${y1 + py}L${x2 + px},${y2 + py}`;
+      }
+      return `M${x1},${y1}L${x2},${y2}`;
+    });
+
     node.attr('transform', d => `translate(${d.x},${d.y})`);
   });
 
@@ -760,14 +921,11 @@ function selectNode(d, nodes, links, books, node, link, edgeLabel) {
   node.selectAll('.node-label')
     .classed('dimmed', n => !connectedIds.has(n.id));
   link.classed('highlighted', l =>
-    (l.source.id || l.source) === d.id || (l.target.id || l.target) === d.id
+    l.dirSource === d.id || l.dirTarget === d.id
   ).classed('dimmed', l =>
-    (l.source.id || l.source) !== d.id && (l.target.id || l.target) !== d.id
-  );
-  edgeLabel.classed('highlighted', l =>
-    (l.source.id || l.source) === d.id || (l.target.id || l.target) === d.id
-  ).classed('dimmed', l =>
-    (l.source.id || l.source) !== d.id && (l.target.id || l.target) !== d.id
+    l.dirSource !== d.id && l.dirTarget !== d.id
+  ).attr('marker-end', l =>
+    (l.dirSource === d.id || l.dirTarget === d.id) ? 'url(#arrow-hl)' : 'url(#arrow)'
   );
 
   // Build info panel
@@ -776,9 +934,14 @@ function selectNode(d, nodes, links, books, node, link, edgeLabel) {
   html += `<div class="author">${d.author}</div>`;
   html += `<a class="view-notes" href="${d.dir}/index.html">View full notes &rarr;</a>`;
 
+  // Show reference table status
+  if (d.refRows.length === 0) {
+    html += `<div class="no-refs-note">This book doesn't have a Referenced Works section yet.</div>`;
+  }
+
   if (connectedEdges.length === 0) {
-    html += `<h3>No Connections Yet</h3>`;
-    html += `<p style="font-size:0.85rem;color:rgba(0,0,0,0.4)">This book doesn't reference any other books on your shelf (or vice versa).</p>`;
+    html += `<h3>No Connections</h3>`;
+    html += `<p style="font-size:0.85rem;color:rgba(0,0,0,0.4)">No cross-references found with other books on your shelf.</p>`;
   } else {
     html += `<h3>Connections (${connectedEdges.length})</h3>`;
     connectedEdges.sort((a, b) => b.weight - a.weight);
@@ -790,20 +953,33 @@ function selectNode(d, nodes, links, books, node, link, edgeLabel) {
       if (!other) return;
       const otherColor = CATEGORIES[other.category] || '#666';
 
-      // Determine direction of reference
+      // Get directional references (now full objects with name, desc, matchType)
       const thisRefs = edge.refs[d.id] || [];
       const otherRefs = edge.refs[otherId] || [];
+
+      const shortThis = d.title.split(':')[0].split(',')[0];
+      const shortOther = other.title.split(':')[0].split(',')[0];
 
       html += `<div class="connection-item" style="border-color:${otherColor}" onclick="navBook('${otherId}')">`;
       html += `<div class="book-name" style="color:${otherColor}">${other.title}</div>`;
 
       if (thisRefs.length > 0) {
-        html += `<div class="shared-label">This book cites:</div>`;
-        html += `<div class="thinkers">${thisRefs.map(t => `<span class="thinker-name">${t}</span>`).join('')}</div>`;
+        html += `<div class="ref-direction"><span class="ref-arrow out">&rarr;</span> <em>${shortThis}</em> references:</div>`;
+        thisRefs.forEach(ref => {
+          html += `<div class="ref-detail">`;
+          html += `<div class="ref-name">${ref.name}</div>`;
+          if (ref.desc) html += `<div class="ref-desc">${ref.desc}</div>`;
+          html += `</div>`;
+        });
       }
       if (otherRefs.length > 0) {
-        html += `<div class="shared-label" style="margin-top:6px">Cited by ${other.title.split(':')[0]}:</div>`;
-        html += `<div class="thinkers">${otherRefs.map(t => `<span class="thinker-name">${t}</span>`).join('')}</div>`;
+        html += `<div class="ref-direction" style="margin-top:8px"><span class="ref-arrow in">&larr;</span> <em>${shortOther}</em> references:</div>`;
+        otherRefs.forEach(ref => {
+          html += `<div class="ref-detail">`;
+          html += `<div class="ref-name">${ref.name}</div>`;
+          if (ref.desc) html += `<div class="ref-desc">${ref.desc}</div>`;
+          html += `</div>`;
+        });
       }
 
       html += `</div>`;
@@ -826,8 +1002,7 @@ function clearSelection(node, link, edgeLabel) {
   s.node.select('.node-circle').classed('selected', false).classed('dimmed', false);
   s.node.select('.node-cover').classed('dimmed', false);
   s.node.selectAll('.node-label').classed('dimmed', false);
-  s.link.classed('highlighted', false).classed('dimmed', false);
-  s.edgeLabel.classed('highlighted', false).classed('dimmed', false);
+  s.link.classed('highlighted', false).classed('dimmed', false).attr('marker-end', 'url(#arrow)');
   document.getElementById('infoPanel').classList.remove('open');
 }
 
