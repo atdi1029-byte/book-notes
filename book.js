@@ -10,6 +10,17 @@
   var label = document.getElementById('bmLabel');
   var toast = document.getElementById('bmToast');
 
+  function jsonpFetch(url, cb) {
+    var cbName = '_bmCb_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5);
+    var script = document.createElement('script');
+    var done = false;
+    window[cbName] = function(resp) { done = true; delete window[cbName]; script.remove(); cb(null, resp); };
+    script.src = url + (url.includes('?') ? '&' : '?') + 'callback=' + cbName;
+    script.onerror = function() { if (!done) { delete window[cbName]; script.remove(); cb('Failed'); } };
+    setTimeout(function() { if (!done) { delete window[cbName]; script.remove(); cb('Timeout'); } }, 15000);
+    document.head.appendChild(script);
+  }
+
   function stableId(text) {
     var s = text.replace(/[^a-zA-Z0-9]+/g, '_').toLowerCase().slice(0, 60);
     return 'bm_' + s;
@@ -42,7 +53,7 @@
       s.appendChild(btn);
     });
     // Make every paragraph bookmarkable
-    document.querySelectorAll('section p, .chapter p').forEach(function(p) {
+    document.querySelectorAll('p').forEach(function(p) {
       if (p.querySelector('.bm-btn')) return; // already has one
       var preview = p.textContent.replace(/\s+/g, ' ').trim().slice(0, 50);
       if (!preview) return;
@@ -65,7 +76,7 @@
     label.textContent = 'Resume: ' + d.title;
     showToast('Bookmark saved');
     // Sync to backend
-    fetch(SYNC_URL + '?action=set_bookmark&key=' + encodeURIComponent(BM_KEY) + '&data=' + encodeURIComponent(JSON.stringify(d))).catch(function() {});
+    jsonpFetch(SYNC_URL + '?action=set_bookmark&key=' + encodeURIComponent(BM_KEY) + '&data=' + encodeURIComponent(JSON.stringify(d)), function(){});
     document.querySelectorAll('.bm-btn').forEach(function(b) { b.classList.remove('active'); });
     var activeBtn = el.querySelector('.bm-btn');
     if (activeBtn) activeBtn.classList.add('active');
@@ -86,7 +97,7 @@
     document.querySelectorAll('.bm-btn').forEach(function(b) { b.classList.remove('active'); });
     showToast('Bookmark cleared');
     // Sync clear to backend
-    fetch(SYNC_URL + '?action=set_bookmark&key=' + encodeURIComponent(BM_KEY) + '&data=').catch(function() {});
+    jsonpFetch(SYNC_URL + '?action=set_bookmark&key=' + encodeURIComponent(BM_KEY) + '&data=', function(){});
   };
 
   function showToast(msg) {
@@ -141,20 +152,16 @@
   }
 
   // Sync from backend (backend wins), then auto-scroll
-  fetch(SYNC_URL + '?action=get_bookmarks').then(function(r) { return r.json(); }).then(function(json) {
-    if (json.status === 'ok' && json.bookmarks && json.bookmarks[BM_KEY]) {
+  jsonpFetch(SYNC_URL + '?action=get_bookmarks', function(err, json) {
+    if (!err && json && json.status === 'ok' && json.bookmarks && json.bookmarks[BM_KEY]) {
       var remote = json.bookmarks[BM_KEY];
       localStorage.setItem(BM_KEY, JSON.stringify(remote));
       applyBookmark(remote);
     } else {
-      // No remote bookmark — use local if exists
+      // Offline or no remote — use local if exists
       var local = localStorage.getItem(BM_KEY);
       if (local) applyBookmark(JSON.parse(local));
     }
-  }).catch(function() {
-    // Offline — use local
-    var local = localStorage.getItem(BM_KEY);
-    if (local) applyBookmark(JSON.parse(local));
   });
 
   // Initialize progress bar on load
