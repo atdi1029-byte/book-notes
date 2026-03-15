@@ -747,6 +747,338 @@ Four generational responses to Trinity test:
 
 ---
 
+## Chapter 10: The Silent Generation (continued)
+
+### Generational Identity and Timing
+
+- **Admiral William Crowe** calls them a "transitional generation," **Rose Franzblau** a "Middle Generation"—forever "betwixt and between"
+- Silent boundaries defined less by what they did than by what those older and younger did—and what the Silent themselves just missed
+- First wave came of age too late for war-era heroism but in time to encounter a powerful national consensus—against which young rebels like **James Dean** found themselves "without a cause"
+- Last wave graduated just before **Benita Eisler's** "great divide" before the fiery Boom Class of 1965
+- 16% of Harvard's Class of '64 joined the Peace Corps (Harvard's top postgraduate destination that year)—whereas next year's graduates began criticizing the Peace Corps amid early stirrings of antiestablishment rebellion
+
+### Life Phase Dynamics
+
+- Silent realize they are generational stuffing of a sandwich between the get-it-done G.I. and the self-absorbed Boom
+- Looked to G.I.s for role models in rising adulthood—pursued lifelong mission of refining and humanizing the G.I.-built world
+- As songwriters, graduate students, and young attorneys, they mentored the Boom Awakening, founding organizations of political dissent that next-juniors later radicalized
+
+> "During the ferment of the 1960s, a period of the famous 'generation gap,' we occupied, unobtrusively as usual, the gap itself. When nobody over thirty was to be trusted, our age was thirty-something." —**Wade Greene**
+
+### Lifecycle Pattern
+
+- The sexual revolution hit the Silent when most were passing forty, decades after their natural adolescence—causing immense problems in family lives
+- **Franzblau** (1971): "a generation of jealousies and role reversals"
+- In *Birth and Fortune*, **Richard Easterlin** labeled his own peer group "the fortunate ones"—relatively small cohort size gave them an edge
+- Silent have enjoyed lifetime of steady rising affluence, suffered relatively few war casualties, and shown twentieth century's lowest rates for almost every social pathology of youth
+- Apart from significant number of divorced women who never remarried, Silent lifecycle has been an escalator of prosperity, offering maximum reward for minimum initiative
+
+### Philosophy and Values
+
+- No other living generation could half-believe in **Ellen Goodman's** "Woody Allen school of philosophy: 80 percent of life is showing up"
+- Where G.I.s did great things and felt one with history, where Boomers found ravishment within themselves, the Silent have taken great things for granted and looked beyond themselves while worrying that the larger challenges of life are passing them by
+- They have been keen on manufacturing points of lifecycle reference around personal rather than historical markers—what various Silent authors labeled "passages," "seasons," "turning points"
+
+### Social Impact and Contributions
+
+- Well aware of their own deficiencies, Silent have spent a lifetime plumbing inner wellsprings older G.I.s seldom felt while maintaining a sense of social obligation Boomers haven't shared
+- Their solutions—fairness, openness, due process, expertise—reflect a lack of surefootedness but also keen sense of how humans fall short of grand civic plans or ideal moral standards
+- Silent appeals for change have seldom arisen from anger or fury, but rather through self-conscious humanity and tender social conscience
+
+> "Deep in my heart, I do believe / We shall overcome someday"
+
+- Have adopted moral relativism of the skilled arbitrator, mediating arguments between others and reaching out to people of all cultures, races, ages, and handicaps
+
+> "We don't arrive with ready-made conclusions so much as a honed capacity to ask and to listen." —**Wade Greene**
+
+### The Silent Malleability Paradox
+
+- This very malleability left the Silent unable to build secure generational family lives
+- **Ellen Goodman**: "If anything has changed in the last generation, it is the erosion of confidence" among parents
+- **Benita Eisler** labels hers the generation with "a corpse in the trunk"—the R-rated decade of the 1970s when so much seemed to go wrong coincided precisely with Silent rise to influence
+
+### The 1970s Crisis
+
+- **Alvin Toffler** (*Future Shock*) foresaw "historic crisis of adaptation"—called for "the moderation and regulation of change" with "exact scientific knowledge, expertly applied"
+- But as Toffler's peers applied this cult of expertise, they encountered their turbulent passage to midlife—and the "transience index" began exploding upward
+- Families splintered, substance abuse moved past euphoria to social damage, American society felt its G.I.-era sensation of belonging fall away
+- **Daniel Ellsbergs** pushed to get secrets out, **Phil Donahues** and **Ted Koppels** aimed microphones everywhere
+- **Lester Thurow** (*Zero-Sum Society*): improvement in any one group came at expense of another
+- **Jerry Brown** called it "the age of limits"—became, in **William Schneider's** words, "the Zeitgeist theme of his generation"
+
+### Reagan Era Transformation
+
+- Elder G.I. won Presidency by ridiculing Silent midlife mind-set
+- America of 1980s became Silent-style Tofflerian "ad hocracy" stressing expertise over simplicity, participation over authority, process over result
+- "Liberal" transformed from G.I.-style constituency nationalism to Silent-style enervator attuned to multitudinous special interests
+- "Conservative" evolved from Lost-style cautious stewardship to faintly hip, high-rolling optimism
+- On both sides of political spectrum, Silent would much prefer to discuss processes than outcomes
+- America grew more accustomed to deferring or learning to live with problems than to taking aggressive steps to solve them
+
+### Cultural Fragmentation and "End of Empire" Anxieties
+
+- Today's 50- and 60-year-olds have been less successful in forging a sense of national or personal direction than any generation in living memory
+- **Robert Bellah** (*Habits of the Heart*): haunted by diffuse disconnectedness in American life
+- **Kevin Phillips** describes "End of Empire fixation"; **Barbara Ehrenreich**: white-collar workforce haunted by "fear of falling"; **Jack Kemp** foresees exhilarating prosperity
+- What mostly emerges is fuss and detail—world view of such enormous complexity that contributions often lack one redeeming description
+- Approaching old age, many still find themselves emotionally obliged to struggling children in what **Robert Grossman** terms "Parenthood II"
+- Most aging Silent find themselves wealthier, but more confused as to purpose, than they ever imagined
+
+### The "Grandtravel" Generation
+
+- Travel agents report boom in "grandtravel" (grandparent-grandchild trips)
+- New interest in "Elderhostels"—reminiscent of how Silent toured Europe as youths
+- Self-styled "kids over 60" formed "SeniorNet" computer network
+- In 1989, affluent Social Security beneficiaries formed "21st Century Club" to assign checks to philanthropic trust fund
+- **Ralph Nader** mobilizing "Princeton Project '55" to attack "systemic social problems"
+- In 1986, Union of International Associations catalogued 10,000 world problems awaiting solution—and the Silent Generation is running out of time
+
+### Historical Memory and Legacy
+
+- Nearly four decades after Korean War, no national memorial exists—fund-raiser complained veterans were being treated "as if they have never lived, never ennobled their time and place"
+- Planned memorial: thirty-eight life-size soldiers in two slightly crooked columns, walking through a forest to nowhere in particular—no Iwo Jima heroics, no moral statement like Vietnam Memorial walls
+
+### Looking Forward
+
+- **Neil Armstrong** and **Martin Luther King, Jr.** will likely remain among the most celebrated Americans
+- "Above all, the generation that took America from grinding bulldozers to user-friendly computers, from the circa-1960 'Nuclear Age' into the circa-1990 'Information Age,' has excelled at *personal communication*"
+- Have consistently tried to defuse conflict by encouraging people to talk to each other—"From therapeutic T-groups to 'Donahue'-style 'global town meetings'"
+- Have been pathbreakers for much of the 1960s-era "consciousness" (music, civil rights, ecology, feminism) for which Boomers too often claim credit
+- This most considerate of living generations has specialized not in grand bright institutions but in people—*life-size people* like the statues planned for the Korean War Memorial
+
+---
+
+## Chapter 11: The Millennial Cycle
+
+### Woodstock Anniversary (1989)
+
+> "Suddenly the Woodstock generation was not wonderfully young, but wonderfully old, somehow, full of wisdom, a kind of Druidic savvy signaled by long hair, walking staffs and face paint accompanied by the thousand-yard squint they'd get after smoking marijuana." —**Henry Allen**, *Washington Post*, 1989
+
+- Twenty years had passed since late-1960s "generational consciousness"—roughly the span of another generation
+- 45-year-old **Grace Slick** reinterpreted old slogan "Feed your head" to mean "Go home and read a book"
+
+### The Three Generations at Woodstock's Anniversary
+
+**BOOM GENERATION** (Idealist, age 29-46): Overwhelming majority of original 400,000 attendees; now trying to keep own children from replaying their youthful exuberances; twentieth-anniversary reissue of *Hair* stripped it of offensive lyrics, turning "Sodomy" into a saxophone solo
+
+**THIRTEENTH GENERATION** (Reactive, age 8-28): The punkish part-timers behind the checkout counter; kept mouths shut while overhearing 40-year-olds revel—to them, rehashing Woodstock was waste of time: just look at the drug-related deaths of seven performers; revealed rising alienation: **Jeffrey Hoogeveen** told Boomers "the Sixties are history—history that the rest of us don't need repeated and crammed down our throats"
+
+**MILLENNIAL GENERATION** (Civic, age 7 and under): Where many a Boomer had hitchhiked to Woodstock, Millennial tots traveled there in car seats with safety belts
+
+---
+
+## Boom Generation (Born 1943-1960)
+
+### Type: Idealist
+
+### Coming of Age Context
+
+- **1965:** *Time* declared teenagers "on the fringe of a golden era"—predicted they would build blight-proof cities, enrich the underdeveloped world
+- Boomer prophecies collapsed one by one as generation became "a surly political powerhouse" capable of sweeping candidates from White House
+- **Annie Gottlieb**: Boomers recall "time" as the 1960s, a decade with newfound solidarity over other generations
+
+### Generational Identity
+
+- **First cohort (1943)**: Born with G.I. optimism rewarded in victory over fascism
+- **Unlike Silent:** No childhood recollection of WWII; **unlike 13ers:** All reaching adolescence before draft ended
+- **1943 "victory babies"** ranked among most self-satisfied in American history
+- **VJ-Day forward:** Cultural and spiritual focal point—childhood America-obsessed, youth youth-obsessed, "yuppie" phase yuppie-obsessed
+- **Mission:** Not constructing society but **justifying and purifying it**—G.I.s learned basics, Boomers learned **critical thinking**
+
+> "We are Bomb Babies... We grew up with fallout in our milk." —23-year-old Ronald Allison, 1967
+
+- **1980:** 12-point October shift among Boom voters turned Reagan landslide
+
+### The Consciousness Revolution (1967-1980)
+
+- **McLoughlin's "Fourth Awakening"**: began 1967 with Summer of Love, inner-city riots, San Francisco counterculture
+- **Peaked 1970** with Kent State and Days of Rage
+- Throughout 1970s: Human potential movement, Aquarian Conspiracy, resurgent evangelicalism
+- **Ended 1980** as rates of crime and substance abuse peaked among coming-of-age Americans
+- Reagan's election (endorsed by Boom) marked acceptance of rising-adult social roles
+
+### Generational Gap and Family Dynamics
+
+- Waged across generation gap between Boomers and G.I.s—began within families as revolt against fathers
+- **Keniston**: attachment to mothers; **Malcolm**: oedipal rebellion; **Feuer**: patricide
+- Youth fury over Vietnam spread **patriphobia** beyond family—most memorable symbols were direct affronts against G.I. constructions: **hippie invasion of Disneyland, burning of Isla Vista Bank, Earth Day burial of automobile**
+
+### Self and Narcissism
+
+- **Tom Wolfe**: "voyage to the interior"; **Christopher Lasch**: "culture of narcissism"
+- Central theme: Rising adulthood through suspended animation, resisting permanent linkages to mates, children, corporations
+- **Katharine Ross** (*The Graduate*): Boomers approached life and heard something inside scream *"STOP!"*
+- Applied what sounded like pick-and-choose idealism
+
+### Boomer Perfectionism
+
+- Desire for ***the best*** within very personal definition of taste
+- If couldn't afford house/family, could at least afford **very best brand of mustard or ice cream**—"Zen luxuriousness" (Katy Butler: maximum enjoyment from minimum consumption)
+- **Fixation on self** forged instinct to make judgments according to **wholly internalized standards**, based on immutable principles of right and wrong
+- Gift for deductive logic—**better philosophers than scientists, better preachers than builders**
+- **Highest-testing Boom cohorts** reached age where scientific achievement peaks—yet "very late to win a Nobel Prize" (Lost, G.I., and Silent won two, four, and six respectively before Boom's first)
+
+> "Like Donald Trump, a prototype Boomer sees himself capable of becoming a titan of whatever world he chooses fully to inhabit." —Authors
+
+### Coming of Age: Spiritual Search
+
+- Sustained compelling urge for perfection and reducing dependence on physical self
+- **Drug phase:** Transcendence in first wave, crime in last wave; by 1990 stripped of spiritual trappings—subsequent search for spiritual euphoria: **flocked from drugs to religion**
+- Spawned most active era of church formation of the twentieth century
+
+### Gender and Sexuality
+
+- **Hermaphroditic quality**—**Urbanska**: exalted "self-sexuality"
+- **Men** intruding into domain of nurturance; **women** invading secular roles once reserved for G.I. males
+- Trends made Boomers more independent of each other yet more open to isolation and economic insecurity
+
+### First Wave vs. Last Wave Schism
+
+- **Schism between fortyish modernists/New Agers** and **thirtyish traditionalists/evangelicals**
+- **Anti-abortionist Bill Tickel**: "it's just easier to have blanket absolutes"
+- **"Victory babies" of mid-to-late 1940s**: Most pampered entirely by G.I.s, came of age during peak parental protectiveness
+- **Babies of conformist late 1950s**: Parented mostly by Silent, came of age at point of maximum freedom (some say chaos)
+- **Last-wave fared worse** in education, financial security, self-direction; **first-wave fared worse in marital stability**
+- But measured by inner-life standards, both ends feel equally serene
+
+### The "Great American Boom"
+
+- **1946:** *Fortune* declared start of "the Great American Boom"—not just fertility, but education, housing, science
+- If G.I.s measure worth objectively (by works they leave behind), **Boomers measure themselves subjectively** (by works they see within)
+- Many having difficulty matching parents' achievements in economic/family life—yet invariably consider their "consciousness" to be higher
+
+> "If it's by choice and it's not overwhelming, having no money can be a way of entering more deeply into your life." —**Katy Butler**
+
+## Boomer Facts
+
+### Demographics & Family
+- **Roughly half of "baby boom"** attributed to unusual fecundity, other half to unusual bunching of family formation
+- **Baby bulge 1946-1957** resulted from coincident babymaking of late-nesting G.I.s and early-nesting Silent
+- **No generation of American women can match G.I.s for intensity of nurture** in their children's upbringing
+- Among preschoolers with working mothers, four in five cared for in own homes—only 2% attended child care
+
+### Youth Pathologies
+- **By almost any standard, Boom = generation of worsening trends**: death rates for accidental death rose sharply; drunk driving, suicide, illegitimate births, teen unemployment all doubled or tripled
+- Crime rates mounted with each successive cohort—during 1970s, serious youth crime grew **twice as fast** as number of youths
+- **Criminals born in 1958** were more likely than those born in 1945 to commit multiple crimes—and **80% more likely to send victims to hospital or morgue**
+
+### Education Statistics
+- **17-year SAT slide** spanned nearly entire Boom (1946-1963 cohorts)—yet worst years coincided with greatest grade inflation ever measured
+- **1969:** 4% of freshmen claimed straight-A average; **1978:** nearly tripled to 11%
+- Average grade rose from C+ to A-; three-fourths of colleges offered alternatives to traditional marking
+
+### Sexual Revolution
+- More a women's than men's movement: **Boomer men showed only 3% increase** in sexual activity over Silent
+- **Boomer women doubled rate of premarital sex** over Silent (41% to 81%) and **tripled relative propensity to commit adultery**
+
+### Vietnam War
+- **Only one Boomer man in sixteen ever saw combat**; among all rest, two-thirds attributed avoidance to deliberate dodge
+- **1% of Boomer men committed draft-law felonies**—ten times percentage killed in combat
+- **Median soldier age during Vietnam (17)** = lowest in American history
+- **Only consensus "lesson"**: war was badly handled by G.I. leaders
+- Following Iraq's invasion of Kuwait (1990), Boomers **more inclined than any other generation** to believe sending troops was "the right thing"
+
+### Religion
+- During 1980s, overall Boom church attendance rose by nearly 30%
+- **America's fastest-growing church = Assembly of God** (membership quadrupled)
+- America now has more Muslims than Episcopalians
+- **Seven Boomers in ten believe in psychic phenomena** (versus five in ten among elders)
+- First-wave Boomers believe more in meditation and reincarnation; last-wavers more in "born-again" conversion
+
+### Economic Position
+- Were it not for employed women, Boomer family incomes would be well below what Silent earned at like age
+- 40-year-old first-waver earns about 15% more than Silent father at like age, but 30-year-old last-waver has fallen about 10% behind
+- Where typical G.I. worker enjoyed 63% inflation-adjusted rise between age 30 and 40, first-wave Boom worker suffered net 1% decline
+- Yet Boomers overwhelmingly consider careers better (5-to-1), personal freedoms greater (6-to-1), and lives more meaningful (9-to-1) than their fathers'
+
+## The Boom Lifecycle
+
+### YOUTH: Hothouse Nurture
+
+> "We wanted our children to be inner-directed... It seemed logical to us that fascism and communism... could not really succeed except in countries where children were raised in very authoritarian homes." —**Eda LeShan** (G.I.)
+
+- G.I. dads worked to pay bills; G.I. moms applied "democratic discipline"—dealing with children "thoughtfully, reasonably, and kindly"
+- Moms turned to **Dr. Spock**, who mixed science with friendliness and instructed that "we need idealistic children"
+- **Permissive feeding schedule** extended to older kids: "He'll-clean-up-his-room-when-he's-ready-to-have-a-clean-room"
+- First-wave Boomers passed through public schools in **Sputnik-era peak of institutional confidence**
+- **Cheryl Merser**: "Watching over them—God or a saint or a guardian angel... the future looked to be 'the way life was on *The Jetsons*'"
+- As successive cohorts passed through childhood, nurturing style leaned more toward tolerance than guidance
+- Reform-minded educators insisted adults had as much to learn from youths as vice versa
+- **Silent-era couples-only Saturday-night dance nearly vanished**, eclipsed by rock concerts where dateless teenagers danced alone
+
+### COMING OF AGE: Student Rebellion
+
+> "I Am a Student! Do Not Fold, Spindle, or Mutilate!" —Pickets outside Berkeley's Sproul Hall, 1964
+
+- Coffeehouse poets gave way to bullhorn-toting radicals—what Silent activists **Peter Collier and David Horowitz** recall as generational shift: "Those of us who had come of age in the fifties" gave way to "second wave of activists" more likely to heed simple motto: "*Do it!*"
+- **Free Speech Movement** served first notice of most emotionally intense and culturally influential youth rebellion in American history
+
+> "I want everyone to see me and say 'There goes an enemy of the state,' because that's what we are, we are at revolution biz." —**James Kunen**
+
+- **Daniel Moynihan**: "Who are these people? I suggest to you they are Christians arrived on the scene of Second Century Rome"
+- Screaming radicals represented just **10 to 15% of their generation**, but the righteous often prevailed in youth culture where purity of moral position counted most
+- **Keniston**: young radicals had "feelings of loneliness, solitude, and isolation," were profoundly mature by measures of ego strength, yet childlike in social skills
+- Collegians could issue "nonnegotiable demands" with little fear—supercharged G.I.-led economy offered good jobs to all comers
+- Urban black youths sparked deadly riots; non-college white Boomers **twice as likely as elders to vote for George Wallace** in 1968
+
+### Vietnam War and Youth Rebellion
+
+- Youth frenzy congealed around Vietnam—policy almost perfectly designed to create conflict between rationalist elders and spiritualist juniors
+- G.I. leaders waged it as limited, scientifically managed internationalist pest control while avoiding asking for sacrifice from noncombatants
+- Boomers had been raised to question, argue, and ultimately disobey orders not comporting with self-felt standards
+- **Draft's class bias** created festering divisions between those who went and those who didn't
+
+### 1969: Peak of Youth Rebellion
+
+- **1969:** Vietnam casualties peaked; Boom rebellion turned bloody with eighteen-month spate of radical bombings and shootings
+- **Gallup Poll 1970:** 44% of all college students believed violence was justified for social change
+- **Rap Brown**: violence "as American as apple pie"
+- Killing of six students at **Kent State and Jackson State** briefly mobilized generation in 1970
+- **Silent Charles Reich** wrote rapturous best seller about Boom's "Consciousness III" leading to *The Greening of America*
+
+### Post-1973: Grinding Pessimism
+
+- Boomers began heeding their Beatle mentors' "simple words of wisdom: *Let It Be*"
+- When economy went sour in 1973, youth mood turned to grinding pessimism
+- Last-wavers came of age amid gray generational drizzle of sex, drugs, unemployment
+- Boom settled in as more apathetic and illiberal than G.I. parents could have imagined
+
+### RISING ADULTHOOD: Searching for Inner Meaning
+
+> "I have made no plans because I have found no plans worth making... All too many people are just waiting for life rather than living." —*Berkeley Daily Californian*, 1971
+
+- **Exercise faddists** searched for "runner's high"; meditative diet faddists triggered what Levenstein terms "century's Second Golden Age of Food Quackery"
+- In athletics, first occupation they gained leverage over: proclaimed "Free agency"—sporting life grew more argumentative and less team-oriented
+- Insisted on "meaningful" careers; by mid-1970s America's postwar productivity surge came to abrupt end
+- **"New Age Man" with "Manifesto of the Person"**: "our sovereign right of self-discovery"
+- **Urbanska** termed personal religion "Sheilaism"—friend Sheila had "this little voice inside" saying "God is whatever I feel"
+- **Enter the "yuppie"**: Only ~5% match demographic definition (urban, professional, affluent), but much larger proportion fit subjective definition: self-immersion, impatient desire for personal satisfaction, weak civic instincts
+
+### APPROACHING MIDLIFE: New Puritanism
+
+- Where Silent prided themselves on ability to "grow young," Boomers see themselves as "growing up" to new responsibility—**P.J. O'Rourke's** "new seriousness"
+- Surveys show Boomers more apt to believe patience necessary to appreciate value
+- **More in parallel than collectively**, Boomers asserting judgments that reflect perfect moral order
+
+> "A generation that when young trusted nobody over 30 now trusts nobody under 30." —**Alan Kors**, history professor
+
+- **"New Puritanism" of circa-1990 America**: Fortyish Boomers policing "politically correct" behavior, passing "anti-ugly" zoning ordinances, banning obscene music, promoting "chastity," supporting novel forms of corporal punishment
+- **Smoking or regular drinking** becoming "new Scarlet Letters" among ex-flower children
+- **M.A.D.D.'s Candy Lightner** attacks social drinkers as dangerous, even immoral
+
+> "There is no such thing as being too rude to a smoker." —Boom activist
+
+- Now gaining real power, **Boomers do not inherently dislike government**—idea of using state to tell people what to do suits them just fine
+- Casting aside Silent preoccupation with process, Boomers (when focused) zero in on essentials, choose between right and wrong, and act
+- Boomers of all stripes—**Oliver North** to "Animal Rights" lab bombers—can be easily attracted to lawlessness in pursuit of higher purpose
+- **"Earth First!" eco-saboteurs**: "No Compromise in Defense of Mother Earth"
+- **Shelby Steele**: blacks should examine "the content of our character" and reject racial preferences as "kindness that kills"
+- Oregon's refusal to spend Medicaid on operations considered too expensive: the budgetary result can be less important than the no-pain-no-gain message
+
+---
+
+---
+
 ## Thirteenth Generation (13ers / Gen X)
 
 **Born: 1961-1981**
@@ -1950,6 +2282,7 @@ Four distinct peer personalities in the biblical narrative:
 - **Biographical sources**: Gale Research, Scribner's *Dictionary of American Biography*, Webster's, Congressional Quarterly, Raimo's *Biographical Directory of Colonial and Revolutionary Governors*
 - All Old Style (Julian) calendar dates before 1752 converted to New Style (Gregorian)
 - Database containing about **15,000 names** -- all congressmen and governors from 1787-1989, plus all Continental Congress delegates from 1774-1789
+
 ## Notes on Sources
 
 ### Source Abbreviations & Conventions
@@ -2168,361 +2501,6 @@ Four distinct peer personalities in the biblical narrative:
 - **Yankelovich Group survey**: Of Silent respondents (45-64), 36% agreed Social Security won't matter; of Boomers (35-44), 60% agreed—largest generational disparity
 - **Hemingway**: "But in modern war there is nothing sweet or fitting in your dying. You will die like a dog for no good reason"
 
-## Appendix A: A Theory of Generations
-
-### French Revolution Literature on Generations
-- **Soulavie** (1803): First to propose generational periodization
-- **Auguste Comte** (1830-42): *Cours de philosophie positive*
-- **John Stuart Mill** (1843): *A System of Logic*
-- **Ottokar Lorenz** (1886); **Giuseppe Ferrari** (1872): *Teoria dei periodi politici*
-- **Wilhelm Dilthey** (1865-75): Various essays
-- **Francois Mentre** (1920): *Les generations sociales*
-- **Jose Ortega y Gasset** (1923): *El tema de nuestro tiempo*
-- **Wilhelm Pinder** (1926, 1928): *Das Problem der Generationen in der Kunstgeschichte Europas*
-- **Karl Mannheim** (1928): "The Problem of Generations"
-
-### A Journey to Cohortia
-- **S. N. Eisenstadt**, *From Generation to Generation* (1956): In premodern societies, social roles rigidly prescribed by age-group membership; in modern societies, younger age groups more apt to change tone and objectives according to unique cohort currently passing through—even manifesting "deviant" or "revolutionary" hostility against social roles recommended by those in power
-- The Greek "visit the sins of the fathers upon the children" appears in **Euripides**
-- **Nestor** (in *Iliad*, book 1) recalls his warrior elders were "a godlike race of heroes"
-- **Agamemnon's** childhood was a gallery of horrors—father killed one brother, killed two cousins and served them to their father in a soup
-
-### The Four-Part Generational Cycle
-- **Old Testament**: Exodus through Judges—"from twenty years old and upward, all that are able to go forth to war..." (Numbers 1:3); "and there arose another generation... which knew not the Lord" (Judges 2:10)
-- **Ibn Khaldun**, *The Muqaddimah* (1370s): Three-generation cycle of civilizational rise and fall
-- **Samuel Huntington**, *American Politics: The Promise of Disharmony* (1981): Description of "IvI" cycle
-
----
-
-## Chapter 10: The Silent Generation (continued)
-
-### Generational Identity and Timing
-
-- **Admiral William Crowe** calls them a "transitional generation," **Rose Franzblau** a "Middle Generation"—forever "betwixt and between"
-- Silent boundaries defined less by what they did than by what those older and younger did—and what the Silent themselves just missed
-- First wave came of age too late for war-era heroism but in time to encounter a powerful national consensus—against which young rebels like **James Dean** found themselves "without a cause"
-- Last wave graduated just before **Benita Eisler's** "great divide" before the fiery Boom Class of 1965
-- 16% of Harvard's Class of '64 joined the Peace Corps (Harvard's top postgraduate destination that year)—whereas next year's graduates began criticizing the Peace Corps amid early stirrings of antiestablishment rebellion
-
-### Life Phase Dynamics
-
-- Silent realize they are generational stuffing of a sandwich between the get-it-done G.I. and the self-absorbed Boom
-- Looked to G.I.s for role models in rising adulthood—pursued lifelong mission of refining and humanizing the G.I.-built world
-- As songwriters, graduate students, and young attorneys, they mentored the Boom Awakening, founding organizations of political dissent that next-juniors later radicalized
-
-> "During the ferment of the 1960s, a period of the famous 'generation gap,' we occupied, unobtrusively as usual, the gap itself. When nobody over thirty was to be trusted, our age was thirty-something." —**Wade Greene**
-
-### Lifecycle Pattern
-
-- The sexual revolution hit the Silent when most were passing forty, decades after their natural adolescence—causing immense problems in family lives
-- **Franzblau** (1971): "a generation of jealousies and role reversals"
-- In *Birth and Fortune*, **Richard Easterlin** labeled his own peer group "the fortunate ones"—relatively small cohort size gave them an edge
-- Silent have enjoyed lifetime of steady rising affluence, suffered relatively few war casualties, and shown twentieth century's lowest rates for almost every social pathology of youth
-- Apart from significant number of divorced women who never remarried, Silent lifecycle has been an escalator of prosperity, offering maximum reward for minimum initiative
-
-### Philosophy and Values
-
-- No other living generation could half-believe in **Ellen Goodman's** "Woody Allen school of philosophy: 80 percent of life is showing up"
-- Where G.I.s did great things and felt one with history, where Boomers found ravishment within themselves, the Silent have taken great things for granted and looked beyond themselves while worrying that the larger challenges of life are passing them by
-- They have been keen on manufacturing points of lifecycle reference around personal rather than historical markers—what various Silent authors labeled "passages," "seasons," "turning points"
-
-### Social Impact and Contributions
-
-- Well aware of their own deficiencies, Silent have spent a lifetime plumbing inner wellsprings older G.I.s seldom felt while maintaining a sense of social obligation Boomers haven't shared
-- Their solutions—fairness, openness, due process, expertise—reflect a lack of surefootedness but also keen sense of how humans fall short of grand civic plans or ideal moral standards
-- Silent appeals for change have seldom arisen from anger or fury, but rather through self-conscious humanity and tender social conscience
-
-> "Deep in my heart, I do believe / We shall overcome someday"
-
-- Have adopted moral relativism of the skilled arbitrator, mediating arguments between others and reaching out to people of all cultures, races, ages, and handicaps
-
-> "We don't arrive with ready-made conclusions so much as a honed capacity to ask and to listen." —**Wade Greene**
-
-### The Silent Malleability Paradox
-
-- This very malleability left the Silent unable to build secure generational family lives
-- **Ellen Goodman**: "If anything has changed in the last generation, it is the erosion of confidence" among parents
-- **Benita Eisler** labels hers the generation with "a corpse in the trunk"—the R-rated decade of the 1970s when so much seemed to go wrong coincided precisely with Silent rise to influence
-
-### The 1970s Crisis
-
-- **Alvin Toffler** (*Future Shock*) foresaw "historic crisis of adaptation"—called for "the moderation and regulation of change" with "exact scientific knowledge, expertly applied"
-- But as Toffler's peers applied this cult of expertise, they encountered their turbulent passage to midlife—and the "transience index" began exploding upward
-- Families splintered, substance abuse moved past euphoria to social damage, American society felt its G.I.-era sensation of belonging fall away
-- **Daniel Ellsbergs** pushed to get secrets out, **Phil Donahues** and **Ted Koppels** aimed microphones everywhere
-- **Lester Thurow** (*Zero-Sum Society*): improvement in any one group came at expense of another
-- **Jerry Brown** called it "the age of limits"—became, in **William Schneider's** words, "the Zeitgeist theme of his generation"
-
-### Reagan Era Transformation
-
-- Elder G.I. won Presidency by ridiculing Silent midlife mind-set
-- America of 1980s became Silent-style Tofflerian "ad hocracy" stressing expertise over simplicity, participation over authority, process over result
-- "Liberal" transformed from G.I.-style constituency nationalism to Silent-style enervator attuned to multitudinous special interests
-- "Conservative" evolved from Lost-style cautious stewardship to faintly hip, high-rolling optimism
-- On both sides of political spectrum, Silent would much prefer to discuss processes than outcomes
-- America grew more accustomed to deferring or learning to live with problems than to taking aggressive steps to solve them
-
-### Cultural Fragmentation and "End of Empire" Anxieties
-
-- Today's 50- and 60-year-olds have been less successful in forging a sense of national or personal direction than any generation in living memory
-- **Robert Bellah** (*Habits of the Heart*): haunted by diffuse disconnectedness in American life
-- **Kevin Phillips** describes "End of Empire fixation"; **Barbara Ehrenreich**: white-collar workforce haunted by "fear of falling"; **Jack Kemp** foresees exhilarating prosperity
-- What mostly emerges is fuss and detail—world view of such enormous complexity that contributions often lack one redeeming description
-- Approaching old age, many still find themselves emotionally obliged to struggling children in what **Robert Grossman** terms "Parenthood II"
-- Most aging Silent find themselves wealthier, but more confused as to purpose, than they ever imagined
-
-### The "Grandtravel" Generation
-
-- Travel agents report boom in "grandtravel" (grandparent-grandchild trips)
-- New interest in "Elderhostels"—reminiscent of how Silent toured Europe as youths
-- Self-styled "kids over 60" formed "SeniorNet" computer network
-- In 1989, affluent Social Security beneficiaries formed "21st Century Club" to assign checks to philanthropic trust fund
-- **Ralph Nader** mobilizing "Princeton Project '55" to attack "systemic social problems"
-- In 1986, Union of International Associations catalogued 10,000 world problems awaiting solution—and the Silent Generation is running out of time
-
-### Historical Memory and Legacy
-
-- Nearly four decades after Korean War, no national memorial exists—fund-raiser complained veterans were being treated "as if they have never lived, never ennobled their time and place"
-- Planned memorial: thirty-eight life-size soldiers in two slightly crooked columns, walking through a forest to nowhere in particular—no Iwo Jima heroics, no moral statement like Vietnam Memorial walls
-
-### Looking Forward
-
-- **Neil Armstrong** and **Martin Luther King, Jr.** will likely remain among the most celebrated Americans
-- "Above all, the generation that took America from grinding bulldozers to user-friendly computers, from the circa-1960 'Nuclear Age' into the circa-1990 'Information Age,' has excelled at *personal communication*"
-- Have consistently tried to defuse conflict by encouraging people to talk to each other—"From therapeutic T-groups to 'Donahue'-style 'global town meetings'"
-- Have been pathbreakers for much of the 1960s-era "consciousness" (music, civil rights, ecology, feminism) for which Boomers too often claim credit
-- This most considerate of living generations has specialized not in grand bright institutions but in people—*life-size people* like the statues planned for the Korean War Memorial
-
----
-
-## Chapter 11: The Millennial Cycle
-
-### Woodstock Anniversary (1989)
-
-> "Suddenly the Woodstock generation was not wonderfully young, but wonderfully old, somehow, full of wisdom, a kind of Druidic savvy signaled by long hair, walking staffs and face paint accompanied by the thousand-yard squint they'd get after smoking marijuana." —**Henry Allen**, *Washington Post*, 1989
-
-- Twenty years had passed since late-1960s "generational consciousness"—roughly the span of another generation
-- 45-year-old **Grace Slick** reinterpreted old slogan "Feed your head" to mean "Go home and read a book"
-
-### The Three Generations at Woodstock's Anniversary
-
-**BOOM GENERATION** (Idealist, age 29-46): Overwhelming majority of original 400,000 attendees; now trying to keep own children from replaying their youthful exuberances; twentieth-anniversary reissue of *Hair* stripped it of offensive lyrics, turning "Sodomy" into a saxophone solo
-
-**THIRTEENTH GENERATION** (Reactive, age 8-28): The punkish part-timers behind the checkout counter; kept mouths shut while overhearing 40-year-olds revel—to them, rehashing Woodstock was waste of time: just look at the drug-related deaths of seven performers; revealed rising alienation: **Jeffrey Hoogeveen** told Boomers "the Sixties are history—history that the rest of us don't need repeated and crammed down our throats"
-
-**MILLENNIAL GENERATION** (Civic, age 7 and under): Where many a Boomer had hitchhiked to Woodstock, Millennial tots traveled there in car seats with safety belts
-
----
-
-## Boom Generation (Born 1943-1960)
-
-### Type: Idealist
-
-### Coming of Age Context
-
-- **1965:** *Time* declared teenagers "on the fringe of a golden era"—predicted they would build blight-proof cities, enrich the underdeveloped world
-- Boomer prophecies collapsed one by one as generation became "a surly political powerhouse" capable of sweeping candidates from White House
-- **Annie Gottlieb**: Boomers recall "time" as the 1960s, a decade with newfound solidarity over other generations
-
-### Generational Identity
-
-- **First cohort (1943)**: Born with G.I. optimism rewarded in victory over fascism
-- **Unlike Silent:** No childhood recollection of WWII; **unlike 13ers:** All reaching adolescence before draft ended
-- **1943 "victory babies"** ranked among most self-satisfied in American history
-- **VJ-Day forward:** Cultural and spiritual focal point—childhood America-obsessed, youth youth-obsessed, "yuppie" phase yuppie-obsessed
-- **Mission:** Not constructing society but **justifying and purifying it**—G.I.s learned basics, Boomers learned **critical thinking**
-
-> "We are Bomb Babies... We grew up with fallout in our milk." —23-year-old Ronald Allison, 1967
-
-- **1980:** 12-point October shift among Boom voters turned Reagan landslide
-
-### The Consciousness Revolution (1967-1980)
-
-- **McLoughlin's "Fourth Awakening"**: began 1967 with Summer of Love, inner-city riots, San Francisco counterculture
-- **Peaked 1970** with Kent State and Days of Rage
-- Throughout 1970s: Human potential movement, Aquarian Conspiracy, resurgent evangelicalism
-- **Ended 1980** as rates of crime and substance abuse peaked among coming-of-age Americans
-- Reagan's election (endorsed by Boom) marked acceptance of rising-adult social roles
-
-### Generational Gap and Family Dynamics
-
-- Waged across generation gap between Boomers and G.I.s—began within families as revolt against fathers
-- **Keniston**: attachment to mothers; **Malcolm**: oedipal rebellion; **Feuer**: patricide
-- Youth fury over Vietnam spread **patriphobia** beyond family—most memorable symbols were direct affronts against G.I. constructions: **hippie invasion of Disneyland, burning of Isla Vista Bank, Earth Day burial of automobile**
-
-### Self and Narcissism
-
-- **Tom Wolfe**: "voyage to the interior"; **Christopher Lasch**: "culture of narcissism"
-- Central theme: Rising adulthood through suspended animation, resisting permanent linkages to mates, children, corporations
-- **Katharine Ross** (*The Graduate*): Boomers approached life and heard something inside scream *"STOP!"*
-- Applied what sounded like pick-and-choose idealism
-
-### Boomer Perfectionism
-
-- Desire for ***the best*** within very personal definition of taste
-- If couldn't afford house/family, could at least afford **very best brand of mustard or ice cream**—"Zen luxuriousness" (Katy Butler: maximum enjoyment from minimum consumption)
-- **Fixation on self** forged instinct to make judgments according to **wholly internalized standards**, based on immutable principles of right and wrong
-- Gift for deductive logic—**better philosophers than scientists, better preachers than builders**
-- **Highest-testing Boom cohorts** reached age where scientific achievement peaks—yet "very late to win a Nobel Prize" (Lost, G.I., and Silent won two, four, and six respectively before Boom's first)
-
-> "Like Donald Trump, a prototype Boomer sees himself capable of becoming a titan of whatever world he chooses fully to inhabit." —Authors
-
-### Coming of Age: Spiritual Search
-
-- Sustained compelling urge for perfection and reducing dependence on physical self
-- **Drug phase:** Transcendence in first wave, crime in last wave; by 1990 stripped of spiritual trappings—subsequent search for spiritual euphoria: **flocked from drugs to religion**
-- Spawned most active era of church formation of the twentieth century
-
-### Gender and Sexuality
-
-- **Hermaphroditic quality**—**Urbanska**: exalted "self-sexuality"
-- **Men** intruding into domain of nurturance; **women** invading secular roles once reserved for G.I. males
-- Trends made Boomers more independent of each other yet more open to isolation and economic insecurity
-
-### First Wave vs. Last Wave Schism
-
-- **Schism between fortyish modernists/New Agers** and **thirtyish traditionalists/evangelicals**
-- **Anti-abortionist Bill Tickel**: "it's just easier to have blanket absolutes"
-- **"Victory babies" of mid-to-late 1940s**: Most pampered entirely by G.I.s, came of age during peak parental protectiveness
-- **Babies of conformist late 1950s**: Parented mostly by Silent, came of age at point of maximum freedom (some say chaos)
-- **Last-wave fared worse** in education, financial security, self-direction; **first-wave fared worse in marital stability**
-- But measured by inner-life standards, both ends feel equally serene
-
-### The "Great American Boom"
-
-- **1946:** *Fortune* declared start of "the Great American Boom"—not just fertility, but education, housing, science
-- If G.I.s measure worth objectively (by works they leave behind), **Boomers measure themselves subjectively** (by works they see within)
-- Many having difficulty matching parents' achievements in economic/family life—yet invariably consider their "consciousness" to be higher
-
-> "If it's by choice and it's not overwhelming, having no money can be a way of entering more deeply into your life." —**Katy Butler**
-
-## Boomer Facts
-
-### Demographics & Family
-- **Roughly half of "baby boom"** attributed to unusual fecundity, other half to unusual bunching of family formation
-- **Baby bulge 1946-1957** resulted from coincident babymaking of late-nesting G.I.s and early-nesting Silent
-- **No generation of American women can match G.I.s for intensity of nurture** in their children's upbringing
-- Among preschoolers with working mothers, four in five cared for in own homes—only 2% attended child care
-
-### Youth Pathologies
-- **By almost any standard, Boom = generation of worsening trends**: death rates for accidental death rose sharply; drunk driving, suicide, illegitimate births, teen unemployment all doubled or tripled
-- Crime rates mounted with each successive cohort—during 1970s, serious youth crime grew **twice as fast** as number of youths
-- **Criminals born in 1958** were more likely than those born in 1945 to commit multiple crimes—and **80% more likely to send victims to hospital or morgue**
-
-### Education Statistics
-- **17-year SAT slide** spanned nearly entire Boom (1946-1963 cohorts)—yet worst years coincided with greatest grade inflation ever measured
-- **1969:** 4% of freshmen claimed straight-A average; **1978:** nearly tripled to 11%
-- Average grade rose from C+ to A-; three-fourths of colleges offered alternatives to traditional marking
-
-### Sexual Revolution
-- More a women's than men's movement: **Boomer men showed only 3% increase** in sexual activity over Silent
-- **Boomer women doubled rate of premarital sex** over Silent (41% to 81%) and **tripled relative propensity to commit adultery**
-
-### Vietnam War
-- **Only one Boomer man in sixteen ever saw combat**; among all rest, two-thirds attributed avoidance to deliberate dodge
-- **1% of Boomer men committed draft-law felonies**—ten times percentage killed in combat
-- **Median soldier age during Vietnam (17)** = lowest in American history
-- **Only consensus "lesson"**: war was badly handled by G.I. leaders
-- Following Iraq's invasion of Kuwait (1990), Boomers **more inclined than any other generation** to believe sending troops was "the right thing"
-
-### Religion
-- During 1980s, overall Boom church attendance rose by nearly 30%
-- **America's fastest-growing church = Assembly of God** (membership quadrupled)
-- America now has more Muslims than Episcopalians
-- **Seven Boomers in ten believe in psychic phenomena** (versus five in ten among elders)
-- First-wave Boomers believe more in meditation and reincarnation; last-wavers more in "born-again" conversion
-
-### Economic Position
-- Were it not for employed women, Boomer family incomes would be well below what Silent earned at like age
-- 40-year-old first-waver earns about 15% more than Silent father at like age, but 30-year-old last-waver has fallen about 10% behind
-- Where typical G.I. worker enjoyed 63% inflation-adjusted rise between age 30 and 40, first-wave Boom worker suffered net 1% decline
-- Yet Boomers overwhelmingly consider careers better (5-to-1), personal freedoms greater (6-to-1), and lives more meaningful (9-to-1) than their fathers'
-
-## The Boom Lifecycle
-
-### YOUTH: Hothouse Nurture
-
-> "We wanted our children to be inner-directed... It seemed logical to us that fascism and communism... could not really succeed except in countries where children were raised in very authoritarian homes." —**Eda LeShan** (G.I.)
-
-- G.I. dads worked to pay bills; G.I. moms applied "democratic discipline"—dealing with children "thoughtfully, reasonably, and kindly"
-- Moms turned to **Dr. Spock**, who mixed science with friendliness and instructed that "we need idealistic children"
-- **Permissive feeding schedule** extended to older kids: "He'll-clean-up-his-room-when-he's-ready-to-have-a-clean-room"
-- First-wave Boomers passed through public schools in **Sputnik-era peak of institutional confidence**
-- **Cheryl Merser**: "Watching over them—God or a saint or a guardian angel... the future looked to be 'the way life was on *The Jetsons*'"
-- As successive cohorts passed through childhood, nurturing style leaned more toward tolerance than guidance
-- Reform-minded educators insisted adults had as much to learn from youths as vice versa
-- **Silent-era couples-only Saturday-night dance nearly vanished**, eclipsed by rock concerts where dateless teenagers danced alone
-
-### COMING OF AGE: Student Rebellion
-
-> "I Am a Student! Do Not Fold, Spindle, or Mutilate!" —Pickets outside Berkeley's Sproul Hall, 1964
-
-- Coffeehouse poets gave way to bullhorn-toting radicals—what Silent activists **Peter Collier and David Horowitz** recall as generational shift: "Those of us who had come of age in the fifties" gave way to "second wave of activists" more likely to heed simple motto: "*Do it!*"
-- **Free Speech Movement** served first notice of most emotionally intense and culturally influential youth rebellion in American history
-
-> "I want everyone to see me and say 'There goes an enemy of the state,' because that's what we are, we are at revolution biz." —**James Kunen**
-
-- **Daniel Moynihan**: "Who are these people? I suggest to you they are Christians arrived on the scene of Second Century Rome"
-- Screaming radicals represented just **10 to 15% of their generation**, but the righteous often prevailed in youth culture where purity of moral position counted most
-- **Keniston**: young radicals had "feelings of loneliness, solitude, and isolation," were profoundly mature by measures of ego strength, yet childlike in social skills
-- Collegians could issue "nonnegotiable demands" with little fear—supercharged G.I.-led economy offered good jobs to all comers
-- Urban black youths sparked deadly riots; non-college white Boomers **twice as likely as elders to vote for George Wallace** in 1968
-
-### Vietnam War and Youth Rebellion
-
-- Youth frenzy congealed around Vietnam—policy almost perfectly designed to create conflict between rationalist elders and spiritualist juniors
-- G.I. leaders waged it as limited, scientifically managed internationalist pest control while avoiding asking for sacrifice from noncombatants
-- Boomers had been raised to question, argue, and ultimately disobey orders not comporting with self-felt standards
-- **Draft's class bias** created festering divisions between those who went and those who didn't
-
-### 1969: Peak of Youth Rebellion
-
-- **1969:** Vietnam casualties peaked; Boom rebellion turned bloody with eighteen-month spate of radical bombings and shootings
-- **Gallup Poll 1970:** 44% of all college students believed violence was justified for social change
-- **Rap Brown**: violence "as American as apple pie"
-- Killing of six students at **Kent State and Jackson State** briefly mobilized generation in 1970
-- **Silent Charles Reich** wrote rapturous best seller about Boom's "Consciousness III" leading to *The Greening of America*
-
-### Post-1973: Grinding Pessimism
-
-- Boomers began heeding their Beatle mentors' "simple words of wisdom: *Let It Be*"
-- When economy went sour in 1973, youth mood turned to grinding pessimism
-- Last-wavers came of age amid gray generational drizzle of sex, drugs, unemployment
-- Boom settled in as more apathetic and illiberal than G.I. parents could have imagined
-
-### RISING ADULTHOOD: Searching for Inner Meaning
-
-> "I have made no plans because I have found no plans worth making... All too many people are just waiting for life rather than living." —*Berkeley Daily Californian*, 1971
-
-- **Exercise faddists** searched for "runner's high"; meditative diet faddists triggered what Levenstein terms "century's Second Golden Age of Food Quackery"
-- In athletics, first occupation they gained leverage over: proclaimed "Free agency"—sporting life grew more argumentative and less team-oriented
-- Insisted on "meaningful" careers; by mid-1970s America's postwar productivity surge came to abrupt end
-- **"New Age Man" with "Manifesto of the Person"**: "our sovereign right of self-discovery"
-- **Urbanska** termed personal religion "Sheilaism"—friend Sheila had "this little voice inside" saying "God is whatever I feel"
-- **Enter the "yuppie"**: Only ~5% match demographic definition (urban, professional, affluent), but much larger proportion fit subjective definition: self-immersion, impatient desire for personal satisfaction, weak civic instincts
-
-### APPROACHING MIDLIFE: New Puritanism
-
-- Where Silent prided themselves on ability to "grow young," Boomers see themselves as "growing up" to new responsibility—**P.J. O'Rourke's** "new seriousness"
-- Surveys show Boomers more apt to believe patience necessary to appreciate value
-- **More in parallel than collectively**, Boomers asserting judgments that reflect perfect moral order
-
-> "A generation that when young trusted nobody over 30 now trusts nobody under 30." —**Alan Kors**, history professor
-
-- **"New Puritanism" of circa-1990 America**: Fortyish Boomers policing "politically correct" behavior, passing "anti-ugly" zoning ordinances, banning obscene music, promoting "chastity," supporting novel forms of corporal punishment
-- **Smoking or regular drinking** becoming "new Scarlet Letters" among ex-flower children
-- **M.A.D.D.'s Candy Lightner** attacks social drinkers as dangerous, even immoral
-
-> "There is no such thing as being too rude to a smoker." —Boom activist
-
-- Now gaining real power, **Boomers do not inherently dislike government**—idea of using state to tell people what to do suits them just fine
-- Casting aside Silent preoccupation with process, Boomers (when focused) zero in on essentials, choose between right and wrong, and act
-- Boomers of all stripes—**Oliver North** to "Animal Rights" lab bombers—can be easily attracted to lawlessness in pursuit of higher purpose
-- **"Earth First!" eco-saboteurs**: "No Compromise in Defense of Mother Earth"
-- **Shelby Steele**: blacks should examine "the content of our character" and reject racial preferences as "kindness that kills"
-- Oregon's refusal to spend Medicaid on operations considered too expensive: the budgetary result can be less important than the no-pain-no-gain message
-
----
 
 ## Index of Names
 
