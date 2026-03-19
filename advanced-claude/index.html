@@ -416,8 +416,11 @@ li:hover > strong > .bm-btn { opacity: 0.5; }
     <a href="#part8">Permissions</a>
     <a href="#part9">Context</a>
     <a href="#part10">Git</a>
-    <a href="#part11">Shortcuts</a>
-    <a href="#part12">Pro Tips</a>
+    <a href="#part11">Headless</a>
+    <a href="#part12">Multi-Dir</a>
+    <a href="#part13">Skills</a>
+    <a href="#part14">Shortcuts</a>
+    <a href="#part15">Pro Tips</a>
   </div>
 </nav>
 
@@ -501,13 +504,31 @@ li:hover > strong > .bm-btn { opacity: 0.5; }
         and parallel development</span>
     </li>
     <li>
-      <a href="#part11">Keyboard Shortcuts</a>
+      <a href="#part11">Headless Mode &amp; Piping</a>
+      <span class="toc-desc">
+        Run Claude without the terminal UI
+        for scripts and automation</span>
+    </li>
+    <li>
+      <a href="#part12">Multi-Directory &amp; --add-dir</a>
+      <span class="toc-desc">
+        Let Claude see multiple projects
+        at once</span>
+    </li>
+    <li>
+      <a href="#part13">Custom Slash Commands</a>
+      <span class="toc-desc">
+        Build your own /commands
+        that expand into full prompts</span>
+    </li>
+    <li>
+      <a href="#part14">Keyboard Shortcuts</a>
       <span class="toc-desc">
         Every shortcut and
         interactive mode trick</span>
     </li>
     <li>
-      <a href="#part12">Pro Tips &amp; Cheat Sheet</a>
+      <a href="#part15">Pro Tips &amp; Cheat Sheet</a>
       <span class="toc-desc">
         Advanced patterns, troubleshooting,
         and quick reference</span>
@@ -2421,7 +2442,402 @@ it's already in the issue.
 
 <!-- ======== PART 11 ======== -->
 <div class="section" id="part11">
-<h2>Part 11: Keyboard Shortcuts</h2>
+<h2>Part 11: Headless Mode &amp; Piping</h2>
+<p class="section-sub">
+  Run Claude without the interactive terminal
+  for scripts, automation, and batch processing.
+</p>
+
+<p>
+Normally you type into Claude's terminal
+and have a conversation. But headless mode
+lets you pipe input in and capture output
+&mdash; turning Claude into a tool you can
+call from scripts, cron jobs, or other
+programs.
+</p>
+
+<h3>The -p Flag (Print Mode)</h3>
+
+<p>
+The <code>-p</code> flag sends a single
+prompt, gets the response, and exits.
+No interactive session, no follow-up &mdash;
+just in and out:
+</p>
+
+<pre><code># Analyze a file and save the output
+claude -p "Analyze this code for bugs" \
+  &lt; index.html &gt; analysis.txt
+
+# Quick question, answer to terminal
+claude -p "What does Array.reduce do?"
+
+# Process multiple files
+cat *.js | claude -p "List all functions
+  defined in this code"</code></pre>
+
+<h3>Piping Input and Output</h3>
+
+<p>
+Because Claude reads from stdin and writes
+to stdout in print mode, you can chain it
+with other commands:
+</p>
+
+<pre><code># Git diff → Claude → summary
+git diff | claude -p "Summarize what changed"
+
+# Read a file, ask about it
+cat service-worker.js | claude -p \
+  "What version is this service worker?"
+
+# Generate a commit message from changes
+git diff --staged | claude -p \
+  "Write a commit message for these changes"
+
+# Analyze an error log
+tail -100 error.log | claude -p \
+  "What's going wrong here?"</code></pre>
+
+<h3>Real Scenarios: Headless Power</h3>
+
+<h4>Scenario: Auto-Analyze After Push</h4>
+
+<p>
+You could add a git post-push hook that
+automatically asks Claude to review what
+you just pushed:
+</p>
+
+<pre><code>#!/bin/bash
+# .git/hooks/post-push
+git log -1 --format="%B" | claude -p \
+  "Rate this commit: is the message clear?
+   Are the changes well-scoped?"</code></pre>
+
+<h4>Scenario: Batch-Process Book Notes</h4>
+
+<p>
+When you have multiple book PDFs waiting
+to be processed, you could script it:
+</p>
+
+<pre><code># Process a batch of books
+for pdf in *.pdf; do
+  claude -p "Summarize the key ideas in
+    this book" &lt; "$pdf" &gt; "${pdf%.pdf}.md"
+done</code></pre>
+
+<h4>Scenario: Daily Dashboard Check</h4>
+
+<p>
+Imagine a morning script that checks
+your trade dashboards:
+</p>
+
+<pre><code># Check for new signals
+curl -s "your-apps-script-url?action=dashboard" \
+  | claude -p "Are there any new buy signals
+    that need attention today?"</code></pre>
+
+<div class="callout callout-orange">
+<div class="callout-title">JSON Output Mode</div>
+Add <code>--output-format json</code> for
+structured output you can parse in scripts:
+<pre><code>claude -p "List the functions" \
+  --output-format json | jq '.result'</code></pre>
+</div>
+</div>
+
+<!-- ======== PART 12 ======== -->
+<div class="section" id="part12">
+<h2>Part 12: Multi-Directory
+&amp; --add-dir</h2>
+<p class="section-sub">
+  Let Claude see multiple projects at once
+  for cross-project work.
+</p>
+
+<p>
+By default, Claude only sees the directory
+you started it from. But your apps share
+patterns &mdash; <code>fireGet()</code>,
+cloud sync, service workers &mdash; and
+sometimes you need Claude to see multiple
+projects simultaneously.
+</p>
+
+<h3>The --add-dir Flag</h3>
+
+<pre><code># Start in Bloom, but also see Cadence
+claude --add-dir ../Cadence
+
+# See three projects at once
+claude --add-dir ../Zercher \
+       --add-dir ../Cadence
+
+# Full path works too
+claude --add-dir /Users/alexbarnett/\
+Documents/Code/Claude/SPX</code></pre>
+
+<p>
+Now Claude can read files from both
+directories, compare patterns, and
+apply changes across projects.
+</p>
+
+<h3>Real Scenarios: Multi-Directory Work</h3>
+
+<h4>Scenario: Standardizing Cloud Sync</h4>
+
+<p>
+You want to make sure all your apps follow
+the same cloud sync pattern. Start Claude
+with all the apps visible:
+</p>
+
+<pre><code>cd ~/Documents/Code/Claude/Bloom
+claude --add-dir ../Cadence \
+       --add-dir ../Zercher \
+       --add-dir ../RomanChariots \
+       --add-dir ../Sora</code></pre>
+
+<p>
+Then: "Compare the cloud sync
+implementation across all five apps.
+Which ones are missing the syncReady gate?
+Which ones don't have the empty data guard?"
+</p>
+
+<p>
+Claude reads all five apps simultaneously,
+builds a comparison table, and can fix
+any that are out of date &mdash; all in
+one session.
+</p>
+
+<h4>Scenario: Sharing a New Pattern</h4>
+
+<p>
+You just built a great new feature in
+Bloom (like the stock picks buy alert)
+and want to adapt it for Zercher
+(maybe a PR alert for exercises):
+</p>
+
+<pre><code>cd ~/Documents/Code/Claude/Zercher
+claude --add-dir ../Bloom</code></pre>
+
+<p>
+"Look at the buy alert feature in Bloom's
+index.html. Adapt that same pattern for
+Zercher but for PR notifications."
+Claude reads both files and translates
+the pattern, keeping each app's theme
+and style.
+</p>
+
+<h4>Scenario: Debugging Cross-App Issues</h4>
+
+<p>
+The same bug (like CORS redirect failures)
+might affect multiple apps. With
+<code>--add-dir</code>, Claude can search
+all apps at once: "Find every place
+that uses fetch instead of fireGet for
+writes across all my apps."
+</p>
+
+<div class="callout callout-green">
+<div class="callout-title">When To Use This</div>
+Use <code>--add-dir</code> when:
+<ul style="margin-top:8px">
+<li>Standardizing patterns across apps</li>
+<li>Porting features from one app to another</li>
+<li>Debugging shared bugs</li>
+<li>Comparing implementations</li>
+</ul>
+Don't use it for everyday work on a
+single app &mdash; the extra context
+costs tokens.
+</div>
+</div>
+
+<!-- ======== PART 13 ======== -->
+<div class="section" id="part13">
+<h2>Part 13: Custom Slash Commands
+(Skills)</h2>
+<p class="section-sub">
+  Build your own /commands that expand into
+  full prompts and workflows.
+</p>
+
+<p>
+You already use slash commands like
+<code>/compact</code> and <code>/diff</code>.
+But you can create your own.
+A custom slash command is just a markdown
+file in <code>.claude/commands/</code>
+that expands into a full prompt when
+you type it.
+</p>
+
+<h3>Creating a Custom Command</h3>
+
+<pre><code># Create the commands directory
+mkdir -p .claude/commands
+
+# Create a command file
+# .claude/commands/push-all.md</code></pre>
+
+<p>
+The filename becomes the command name.
+<code>push-all.md</code> becomes
+<code>/push-all</code>.
+Inside the file, write the full prompt
+that should execute:
+</p>
+
+<pre><code># .claude/commands/push-all.md
+Commit all changes with a descriptive
+message, bump the service worker version
+in service-worker.js, push to origin,
+then ADB cachebust the app on my phone
+at device R3CW506ZK7N.</code></pre>
+
+<p>
+Now just type <code>/push-all</code>
+and Claude does the entire push workflow
+without you typing it out every time.
+</p>
+
+<h3>Ideas for Your Workflow</h3>
+
+<h4>/book-start</h4>
+
+<pre><code># .claude/commands/book-start.md
+I'm starting a new book project.
+Ask me for the book title, then:
+1. Create the directory in Books/
+2. Run bookai to process the PDF
+3. Back up raw notes as notes.md.raw
+4. Start the compaction step
+Follow all rules in CLAUDE.md for
+book projects.</code></pre>
+
+<h4>/sync-check</h4>
+
+<pre><code># .claude/commands/sync-check.md
+Check cloud sync health across all my
+apps. For each app (Cadence, Bloom,
+Zercher, Roman Chariots, Sora):
+1. Verify fireGet() exists
+2. Check for syncReady gate
+3. Check for empty data guard
+4. Verify auto-pull on visibilitychange
+5. Report any missing pieces</code></pre>
+
+<h4>/status</h4>
+
+<pre><code># .claude/commands/status.md
+Give me a status report:
+1. Run git status on all repos
+   (Books, Bloom, Zercher, Cadence,
+   SPX, Crypto, Sora, RomanChariots,
+   Gig Outreach)
+2. Show any uncommitted changes
+3. Show current service worker versions
+4. Note any that need pushing</code></pre>
+
+<h4>/app-new</h4>
+
+<pre><code># .claude/commands/app-new.md
+I'm creating a new PWA app. Ask me for
+the app name and theme colors, then:
+1. Create the directory
+2. Scaffold index.html with dark theme
+3. Add service-worker.js (v1)
+4. Add manifest.json with icons
+5. Include fireGet(), jsonpFetch(),
+   cloud sync with all 5 required pieces
+6. Set up Apps Script backend
+Follow all cloud sync rules in CLAUDE.md.</code></pre>
+
+<h3>Project-Scoped vs User-Scoped</h3>
+
+<p>
+Commands in the project's
+<code>.claude/commands/</code> are shared
+with anyone who clones the repo.
+Commands in <code>~/.claude/commands/</code>
+are just for you, available in every project.
+</p>
+
+<pre><code># Project-specific (in the repo)
+.claude/commands/deploy.md
+
+# Personal (available everywhere)
+~/.claude/commands/push-all.md
+~/.claude/commands/sync-check.md</code></pre>
+
+<p>
+Put personal workflow commands in
+<code>~/.claude/commands/</code>.
+Put project-specific commands (like build
+scripts or deploy procedures) in the
+project's <code>.claude/commands/</code>.
+</p>
+
+<div class="callout callout-blue">
+<div class="callout-title">The Power of Custom Commands</div>
+Think of custom commands as
+<strong>saved prompts</strong>.
+Every time you find yourself typing the
+same complex instruction, turn it into
+a command. Over time, you build a library
+of one-word shortcuts for your entire
+workflow. <code>/push-all</code>,
+<code>/book-start</code>,
+<code>/sync-check</code> &mdash;
+each replaces 5+ lines of instructions.
+</div>
+
+<div class="quiz">
+<div class="quiz-q">
+  You find yourself typing "commit, bump
+  service worker, push, cachebust" after
+  every change. What's the power user move?
+</div>
+<div class="quiz-opts">
+  <button class="quiz-opt" data-answer="cmd"
+    onclick="checkQuiz(this,'cmd','q13e')">
+    Create a custom /push-all command that
+    does all four steps automatically</button>
+  <button class="quiz-opt" data-answer="mem"
+    onclick="checkQuiz(this,'cmd','q13e')">
+    Add it to CLAUDE.md so Claude remembers
+    </button>
+  <button class="quiz-opt" data-answer="type"
+    onclick="checkQuiz(this,'cmd','q13e')">
+    Just keep typing it each time</button>
+</div>
+<div class="quiz-explain" id="q13e">
+  A custom command turns a repetitive
+  multi-step workflow into a single
+  <code>/push-all</code>. CLAUDE.md is
+  for <em>rules</em> (things Claude should
+  always do). Custom commands are for
+  <em>workflows</em> (things you want to
+  trigger on demand). Both are useful,
+  but commands are the right tool here.
+</div>
+</div>
+</div>
+
+<!-- ======== PART 14 ======== -->
+<div class="section" id="part14">
+<h2>Part 14: Keyboard Shortcuts</h2>
 <p class="section-sub">
   Speed up your workflow with these shortcuts.
 </p>
@@ -2555,9 +2971,9 @@ Claude receives all at once.
 </p>
 </div>
 
-<!-- ======== PART 12 ======== -->
-<div class="section" id="part12">
-<h2>Part 12: Pro Tips &amp; Cheat Sheet</h2>
+<!-- ======== PART 15 ======== -->
+<div class="section" id="part15">
+<h2>Part 15: Pro Tips &amp; Cheat Sheet</h2>
 <p class="section-sub">
   Advanced patterns and quick reference.
 </p>
@@ -2691,18 +3107,18 @@ claude --worktree feature-branch</code></pre>
 </div>
 <div class="quiz-opts">
   <button class="quiz-opt" data-answer="plan"
-    onclick="checkQuiz(this,'plan','q12e')">
+    onclick="checkQuiz(this,'plan','q15e')">
     Enter plan mode, explore the codebase,
     review the plan, then execute</button>
   <button class="quiz-opt" data-answer="yolo"
-    onclick="checkQuiz(this,'plan','q12e')">
+    onclick="checkQuiz(this,'plan','q15e')">
     Just say "change the DCA algorithm"
     and let Claude figure it out</button>
   <button class="quiz-opt" data-answer="manual"
-    onclick="checkQuiz(this,'plan','q12e')">
+    onclick="checkQuiz(this,'plan','q15e')">
     Read all the code yourself first</button>
 </div>
-<div class="quiz-explain" id="q12e">
+<div class="quiz-explain" id="q15e">
   Plan mode is perfect for this.
   Claude explores the DCA code,
   maps all dependencies, proposes
