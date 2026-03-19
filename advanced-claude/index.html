@@ -820,6 +820,88 @@ pending changes for vulnerabilities before
 you commit. <strong>/color purple</strong>
 sets your prompt bar color (try it!).
 </div>
+
+<h3>Real Scenarios: When You'd Use These</h3>
+
+<h4>Scenario: Building a Book HTML
+(Lessons of History)</h4>
+
+<p>
+You're 2 hours into building a book's
+index.html. It's going great but you're at
+3,000 lines and Claude is getting slow.
+Here's the power user move:
+</p>
+
+<pre><code>/rename book-lessons-history
+/compact "keep the HTML structure,
+  chapter list, and where we left off"</code></pre>
+
+<p>
+Now you've named the session (so you can
+resume it tomorrow if needed) and compressed
+the context so Claude has room to keep going.
+Without <code>/compact</code>, the session
+would've hit the context wall and lost track
+of what chapters were done.
+</p>
+
+<h4>Scenario: Switching Between Apps</h4>
+
+<p>
+You're working on Bloom's DCA splitter
+and get a bug report about Zercher's plate
+calculator. Instead of losing your Bloom
+context:
+</p>
+
+<pre><code>/rename bloom-splitter-fix</code></pre>
+
+<p>
+Then start a new session for Zercher.
+When you're done with the Zercher fix:
+</p>
+
+<pre><code>claude --resume bloom-splitter-fix</code></pre>
+
+<p>
+You're right back where you left off
+with Bloom, full context intact.
+</p>
+
+<h4>Scenario: "Did I Break Something?"</h4>
+
+<p>
+Claude just made a bunch of changes to
+Roman Chariots and you're not sure
+what all changed before committing:
+</p>
+
+<pre><code>/diff</code></pre>
+
+<p>
+Opens an interactive viewer showing
+every file changed, every line added
+and removed. You review it all before
+doing <code>git commit</code>.
+</p>
+
+<h4>Scenario: Quick Question Mid-Task</h4>
+
+<p>
+You're deep into building the crypto
+backtest and need to know what the
+<code>toFixed()</code> function does,
+but you don't want to distract Claude
+from the main task:
+</p>
+
+<pre><code>/btw what does toFixed(2) do in JavaScript?</code></pre>
+
+<p>
+Gets an instant answer without polluting
+the main conversation about the backtest.
+</p>
 </div>
 
 <!-- ======== PART 3 ======== -->
@@ -948,6 +1030,99 @@ this by starting in plan mode, reviewing
 the proposed structure, then switching
 to execution.
 </div>
+
+<h3>Real Scenarios: Plan Mode in Action</h3>
+
+<h4>Scenario: Redesigning the Bloom Splitter</h4>
+
+<p>
+The weekly DCA splitter needs a new feature:
+redirect money from portfolios that are
+at their hard cap to ones that aren't.
+This touches the splitter logic, the DCA
+algorithm, the UI, and the cloud sync.
+</p>
+
+<p>
+<strong>Without plan mode</strong> (what you
+did before): "Hey Claude, add cap
+redistribution to the splitter." Claude
+dives in and starts editing. Maybe it
+misses that the growth chart also depends
+on splitter data. You find the bug
+later during testing.
+</p>
+
+<p>
+<strong>With plan mode:</strong>
+</p>
+
+<pre><code>/plan
+"I want to add cap redistribution to the
+Bloom splitter. Before you change anything,
+explore how the splitter works, what depends
+on it, and propose a plan."</code></pre>
+
+<p>
+Claude reads the splitter function, traces
+what calls it, finds the growth chart
+dependency, and presents a plan:
+"Here are the 4 functions I'd change,
+here's the order, and here's the risk
+with the growth chart." You review,
+tweak the approach, then
+<code>Shift+Tab</code> to execute.
+</p>
+
+<h4>Scenario: Adding Cloud Sync
+to a New App</h4>
+
+<p>
+You just built a new app and need to add
+the full cloud sync pattern (auto-push,
+auto-pull, fireGet, empty data guard).
+Plan mode first:
+</p>
+
+<pre><code>/plan
+"Look at how Cadence does cloud sync
+and plan how to add the same pattern
+to this app. Show me every function
+I'll need."</code></pre>
+
+<p>
+Claude reads Cadence's sync code,
+understands the pattern, and writes you
+a plan with all 5 required pieces.
+You approve, it builds &mdash; no missed
+pieces, no data loss bugs.
+</p>
+
+<h4>Scenario: Investigating a Bug
+Without Breaking Things</h4>
+
+<p>
+The Crypto dashboard's 2-day timer
+resets randomly. You don't want Claude
+to start "fixing" things before you
+understand the root cause:
+</p>
+
+<pre><code>/plan
+"The 2-day timer in the crypto app
+is resetting randomly. Investigate
+the timer logic and tell me what
+could cause premature resets."</code></pre>
+
+<p>
+Claude traces the timer code, reads the
+localStorage keys, checks the
+<code>visibilitychange</code> handler,
+and identifies that the cloud sync pull
+is overwriting the timer data.
+Now you know the real cause before
+touching anything.
+</p>
 </div>
 
 <!-- ======== PART 4 ======== -->
@@ -1073,6 +1248,111 @@ for research, compacting notes, and
 running commands &mdash; but write
 final output directly.
 </div>
+
+<h3>Real Scenarios: Subagents at Work</h3>
+
+<h4>Scenario: Book Project Note Compaction
+(What We Already Do)</h4>
+
+<p>
+For "The General Theory" (485 pages),
+bookai produced ~5,000 lines of raw notes.
+Too much for the HTML build. Here's how
+we use subagents:
+</p>
+
+<pre><code>You: "Compact notes.md. Use two parallel
+agents — first half and second half.
+Target 1,500 lines total."</code></pre>
+
+<p>
+Two subagents run simultaneously.
+Agent 1 compacts chapters 1-12 (2,500 lines
+down to 750). Agent 2 compacts chapters
+13-24 (2,500 lines down to 750).
+Both finish at the same time.
+Claude merges the results.
+<strong>Total time: ~2 minutes instead of
+~4 minutes if done sequentially.</strong>
+</p>
+
+<h4>Scenario: Comparing Sync Patterns
+Across All Your Apps</h4>
+
+<p>
+You want to standardize cloud sync
+across all apps. Instead of reading
+each file one at a time:
+</p>
+
+<pre><code>You: "Use subagents in parallel to read
+the cloud sync code in Cadence, Bloom,
+Zercher, Roman Chariots, and Sora.
+Tell me what's different between them
+and which one is the gold standard."</code></pre>
+
+<p>
+Five Explore agents run simultaneously,
+each reading one app's sync code.
+Results come back in ~30 seconds instead
+of the 3+ minutes it would take to read
+all five sequentially. Claude compares
+them and gives you a table of differences.
+</p>
+
+<h4>Future: Testing After Every Change</h4>
+
+<p>
+You could create a custom agent that runs
+your app in the background and checks for
+errors after every code change:
+</p>
+
+<pre><code># .claude/agents/smoke-test.md
+---
+name: smoke-test
+description: Quick test after code changes
+tools: Bash, Read
+model: haiku
+background: true
+---
+
+Open the app in a headless browser,
+check the console for errors,
+verify the main functions load.
+Report only failures.</code></pre>
+
+<p>
+Every time Claude finishes editing,
+the smoke-test agent runs automatically
+in the background. If something broke,
+you get alerted immediately.
+</p>
+
+<h4>Future: Automatic Code Review</h4>
+
+<pre><code># .claude/agents/reviewer.md
+---
+name: reviewer
+description: Reviews code quality
+tools: Read, Glob, Grep
+model: sonnet
+maxTurns: 5
+---
+
+Review for:
+- Missing error handling on JSON.parse
+- localStorage without try/catch
+- fireGet without empty data guard
+- Missing service worker version bump
+- Hardcoded URLs that should be variables</code></pre>
+
+<p>
+Ask Claude to "use the reviewer
+to check Cadence" and it scans for
+all the patterns that have caused
+bugs in your apps before.
+</p>
 </div>
 
 <!-- ======== PART 5 ======== -->
@@ -1240,6 +1520,112 @@ paths:
 These rules only load when Claude touches
 files matching that pattern.
 </div>
+
+<h3>Real Scenarios: CLAUDE.md Power Moves</h3>
+
+<h4>Scenario: Your Book Build Rules
+(Already Working)</h4>
+
+<p>
+Your CLAUDE.md already has rules like
+"NEVER use agents to write HTML" and
+"ALWAYS bump service worker version."
+These exist because of real bugs that
+happened before the rules existed.
+That's the pattern: <strong>every time
+something goes wrong, add a rule
+so it never happens again.</strong>
+</p>
+
+<p>
+Before "NEVER skip pages" was in CLAUDE.md,
+bookai would sometimes skip content-filtered
+pages and move on. Now Claude retries,
+breaks into smaller chunks, tries single
+pages — because the rule says "no exceptions."
+</p>
+
+<h4>Scenario: Project-Specific
+vs. Global Rules</h4>
+
+<p>
+Right now your CLAUDE.md is in your home
+directory, so it applies to everything.
+But you could split it:
+</p>
+
+<pre><code># Global (~/.claude/CLAUDE.md):
+- Use fireGet() for all PWA writes
+- Always bump service worker on push
+- Never clear Chrome cache via ADB
+
+# Books project (Books/CLAUDE.md):
+- Book build pipeline rules
+- Never use agents for HTML
+- Referenced Works table required
+
+# Bloom project (Bloom/CLAUDE.md):
+- DCA splitter auto-refresh before calc
+- Shared tickers note (SCHD, VTIP)
+- Splitter hides on tab switch</code></pre>
+
+<p>
+Project-level rules only load when you're
+in that directory. This keeps the global
+CLAUDE.md lean (under 200 lines) while
+each project gets its own detailed rules.
+</p>
+
+<h4>Scenario: Memory Files
+for Debugging Insights</h4>
+
+<p>
+Right now your MEMORY.md tracks service
+worker versions and localStorage keys.
+You could add topic files:
+</p>
+
+<pre><code># ~/.claude/projects/.../memory/debugging.md
+## Bugs That Keep Coming Back
+- fireGet: POST silently fails on mobile
+  (always use GET for Apps Script writes)
+- Comma in price strings breaks parseFloat
+  (always strip commas first)
+- Cloud sync push before load complete
+  overwrites data (use syncReady gate)
+- Service worker not bumped = stale cache
+  on phone (ADB cachebust after push)</code></pre>
+
+<p>
+Now every session starts with Claude
+already knowing about your recurring bugs.
+It won't suggest POST for writes.
+It won't forget to strip commas.
+The knowledge persists.
+</p>
+
+<h4>Future: Trigger Words in CLAUDE.md</h4>
+
+<p>
+Your "run outreach" trigger already does
+this &mdash; when you say those exact words,
+CLAUDE.md tells Claude to run the discovery
+and pipeline scripts with no questions asked.
+You could add more:
+</p>
+
+<pre><code># Trigger words in CLAUDE.md:
+- "run outreach" → discover.sh && pipeline.sh
+- "book project" → go to Books/, ask which book
+- "push it" → commit, push, bump SW, cachebust
+- "sync check" → verify cloud sync on all apps
+- "status report" → show git status of all repos</code></pre>
+
+<p>
+Short trigger phrases that expand into
+complex multi-step workflows. Like
+keyboard shortcuts but for natural language.
+</p>
 </div>
 
 <!-- ======== PART 6 ======== -->
@@ -1355,6 +1741,105 @@ to inspect and decide.<br>
 <strong>HTTP</strong> &mdash; sends event data
 to a web endpoint (for logging/audit).
 </div>
+
+<h3>Real Scenarios: Hooks You Should Set Up</h3>
+
+<h4>Scenario: Auto-Bump Service Worker
+(Your #1 Pain Point)</h4>
+
+<p>
+How many times have you pushed changes
+and then the phone shows the old version
+because the service worker wasn't bumped?
+A hook can prevent this <em>forever</em>:
+</p>
+
+<pre><code>{
+  "hooks": {
+    "PreToolUse": [{
+      "matcher": "Bash",
+      "hooks": [{
+        "type": "command",
+        "command": "if echo \"$COMMAND\" | grep -q 'git push'; then if grep -rn 'CACHE.*=.*v' service-worker.js 2>/dev/null | head -1; then echo 'SW version check: OK'; else echo 'WARNING: No service worker version found' >&2; exit 2; fi; fi"
+      }]
+    }]
+  }
+}</code></pre>
+
+<p>
+Every time Claude tries to <code>git push</code>,
+this hook checks if a service worker exists
+and reminds about version bumping.
+Exit code 2 blocks the push until
+the version is bumped.
+</p>
+
+<h4>Scenario: Never Push .env or
+Credentials</h4>
+
+<pre><code>{
+  "hooks": {
+    "PreToolUse": [{
+      "matcher": "Edit|Write",
+      "hooks": [{
+        "type": "command",
+        "command": "if echo \"$FILE\" | grep -qE '\\.(env|key|credentials)'; then echo 'BLOCKED: Cannot edit sensitive files' >&2; exit 2; fi"
+      }]
+    }]
+  }
+}</code></pre>
+
+<h4>Scenario: Desktop Notification
+When Claude Finishes</h4>
+
+<p>
+You kick off a big task (like building
+a book HTML) and walk away. When Claude
+is done or needs your input:
+</p>
+
+<pre><code>{
+  "hooks": {
+    "Notification": [{
+      "matcher": "",
+      "hooks": [{
+        "type": "command",
+        "command": "osascript -e 'display notification \"Claude needs you!\" with title \"Claude Code\" sound name \"Glass\"'"
+      }]
+    }]
+  }
+}</code></pre>
+
+<p>
+Your Mac plays a sound and shows a
+notification. No more checking back
+every 30 seconds.
+</p>
+
+<h4>Future: Auto-Format Code After Edits</h4>
+
+<p>
+If you ever start using Prettier or
+another code formatter:
+</p>
+
+<pre><code>{
+  "hooks": {
+    "PostToolUse": [{
+      "matcher": "Edit|Write",
+      "hooks": [{
+        "type": "command",
+        "command": "npx prettier --write \"$FILE\""
+      }]
+    }]
+  }
+}</code></pre>
+
+<p>
+Every file Claude touches gets
+auto-formatted. Consistent style
+without ever thinking about it.
+</p>
 </div>
 
 <!-- ======== PART 7 ======== -->
@@ -1423,6 +1908,56 @@ Claude session). You could add GitHub MCP
 for managing your repos, or build a custom
 MCP server for your Apps Script endpoints.
 </div>
+
+<h3>Real Scenarios: MCP For Your Workflow</h3>
+
+<h4>Scenario: GitHub MCP for All Your Repos</h4>
+
+<p>
+Right now when Claude pushes to GitHub,
+it uses <code>git push</code>. But with
+GitHub MCP, Claude could also:
+</p>
+
+<ul>
+<li>Create issues: "Create an issue on
+  bloom-portfolios: splitter bug when
+  stocks at cap"</li>
+<li>Check deployment status: "Is the
+  GitHub Pages deployment done for
+  book-notes?"</li>
+<li>Review PRs: "Show me the comments
+  on my latest PR"</li>
+<li>Search across repos: "Find everywhere
+  I use fireGet across all my repos"</li>
+</ul>
+
+<pre><code>claude mcp add --transport http \
+  github https://mcp.github.com</code></pre>
+
+<h4>Future: Custom MCP for
+Your Apps Script</h4>
+
+<p>
+Imagine Claude could directly query your
+Google Sheets data without you having to
+open the dashboard. A custom MCP server
+wrapping your Apps Script endpoints would
+let Claude say: "There are 3 new crypto
+signals today &mdash; BTC buy, ETH sell,
+SOL buy. Want me to check the backtest
+data for each?"
+</p>
+
+<h4>Future: Slack MCP for Gig Notifications</h4>
+
+<p>
+When the gig outreach pipeline finds a
+new dream venue (French bistro, luxury
+hotel), Claude could send you a Slack
+message or Discord notification
+automatically.
+</p>
 </div>
 
 <!-- ======== PART 8 ======== -->
@@ -1484,6 +2019,109 @@ actions in your settings:
 <strong>Deny always wins.</strong>
 If both allow and deny match,
 the action is blocked.
+</p>
+
+<h3>Real Scenarios: Permissions in Practice</h3>
+
+<h4>Scenario: The "Just Build It" Mode</h4>
+
+<p>
+When you say "run outreach," you want
+Claude to run <code>discover.sh</code> and
+<code>pipeline.sh</code> without stopping
+to ask permission for every bash command.
+That's what
+<code>--dangerously-skip-permissions</code>
+is for:
+</p>
+
+<pre><code>claude --dangerously-skip-permissions</code></pre>
+
+<p>
+Claude runs everything without asking.
+Use this only when you trust the workflow
+(like your outreach scripts that you've
+already tested). Never use it on
+a new codebase you don't understand.
+</p>
+
+<h4>Scenario: Safe Experimentation</h4>
+
+<p>
+You want Claude to try a new approach
+to Zercher's plate calculator, but you're
+not sure if the approach will work.
+Start in plan mode, review the plan,
+then switch to accept-edits mode
+so Claude can modify files but still
+asks before running bash commands:
+</p>
+
+<pre><code># Start in plan mode
+/plan
+"How would you rewrite calcPlates to
+handle metric plates?"
+
+# Review the plan, approve it,
+# then switch to accept-edits
+Shift+Tab → "accept edits"</code></pre>
+
+<p>
+Now Claude can edit files freely
+but will ask before running tests
+or git commands. A nice middle ground.
+</p>
+
+<h4>Scenario: Pre-Approved Commands</h4>
+
+<p>
+You're tired of approving
+<code>git push</code> every single time.
+Add it to your allowed list:
+</p>
+
+<pre><code>{
+  "permissions": {
+    "allow": [
+      "Bash(git push)",
+      "Bash(git commit *)",
+      "Bash(adb -s R3CW506ZK7N *)"
+    ],
+    "deny": [
+      "Bash(rm -rf *)",
+      "Bash(git push --force *)",
+      "Bash(pm clear *)"
+    ]
+  }
+}</code></pre>
+
+<p>
+Now <code>git push</code>, commits, and ADB
+commands run without asking. But force push,
+<code>rm -rf</code>, and clearing Chrome
+cache are always blocked &mdash; protecting
+you from the mistakes in your
+Common Pitfalls list.
+</p>
+
+<h4>Scenario: The Permission Cycle
+(Shift+Tab)</h4>
+
+<p>
+<code>Shift+Tab</code> is the most
+underrated shortcut. It cycles:
+<strong>default → accept edits →
+plan → don't ask → default</strong>.
+Mid-conversation, you can tighten or
+loosen permissions without restarting.
+</p>
+
+<p>
+Working on a sensitive file?
+<code>Shift+Tab</code> to plan mode.
+Reviewed and ready?
+<code>Shift+Tab</code> to accept edits.
+It's instant and reversible.
 </p>
 </div>
 
@@ -1559,6 +2197,74 @@ Or the better fix: ask Claude to
 write in chunks. "Write the first 5
 sections, then I'll ask for the rest."
 </div>
+
+<h3>Real Scenarios: Context Management</h3>
+
+<h4>Scenario: The 1,300-Line Book Build</h4>
+
+<p>
+You're building "The Road to Serfdom"
+index.html. By chapter 8 of 15,
+Claude starts getting confused about which
+chapters are done. The context is filling
+up with all the HTML it's written plus
+all the notes it's read.
+</p>
+
+<p>
+<strong>Power move:</strong>
+</p>
+
+<pre><code>/compact "I'm building the Road to Serfdom
+book HTML. Chapters 1-8 are DONE and saved
+to disk. Keep the notes for chapters 9-15
+and the HTML template structure."</code></pre>
+
+<p>
+This tells Claude exactly what to remember
+(remaining chapters) and what to forget
+(the finished HTML). Now it has fresh
+context for the second half.
+</p>
+
+<h4>Scenario: Long Debug Session</h4>
+
+<p>
+You've been debugging the Bloom growth
+chart for 45 minutes. Tried 6 different
+approaches. Context is full of dead ends.
+</p>
+
+<pre><code>/compact "The growth chart bug is that
+costBasis comes from cloud sync data which
+gets trimmed. Keep ONLY the working
+solution approach — use portfolio.costBasis
+directly instead of summing history."</code></pre>
+
+<p>
+Throws away all the failed attempts
+and keeps only the solution path.
+Claude can now implement cleanly.
+</p>
+
+<h4>Scenario: Reducing Context Burn Rate</h4>
+
+<p>
+Building a new app with lots of reference
+code to read. Instead of Claude reading
+all 6 app files into the main context:
+</p>
+
+<pre><code>You: "Use a subagent to read the sync
+code from all my apps and write me a
+summary of the common pattern. Just
+give me the summary, not the raw code."</code></pre>
+
+<p>
+The subagent reads 30,000+ lines across
+6 apps. Your main context gets a ~200-line
+summary. Massive token savings.
+</p>
 </div>
 
 <!-- ======== PART 10 ======== -->
@@ -1621,6 +2327,96 @@ exposed API keys, SQL injection,
 XSS vulnerabilities, missing input
 validation.
 </p>
+
+<h3>Real Scenarios: Git in Your Workflow</h3>
+
+<h4>Scenario: The Multi-App Push
+(Your Daily Routine)</h4>
+
+<p>
+You just fixed bugs in Bloom and Zercher
+in the same session. Each has its own
+git repo. Here's how it goes:
+</p>
+
+<pre><code>You: "Commit and push the Bloom changes,
+then commit and push Zercher."
+
+Claude:
+1. cd Bloom/ → git add → commit → push
+2. Bump service-worker.js (v38 → v39)
+3. cd Zercher/ → git add → commit → push
+4. Bump service-worker.js (v170 → v171)
+5. ADB cachebust both apps</code></pre>
+
+<p>
+Claude handles staging, commit messages,
+service worker bumps, pushing, and cache
+busting — all in sequence. The commit
+messages follow each repo's style.
+</p>
+
+<h4>Scenario: "What Did I Change?"</h4>
+
+<p>
+It's been a long session. You've modified
+3 files but can't remember exactly what
+changed:
+</p>
+
+<pre><code>/diff</code></pre>
+
+<p>
+Interactive diff viewer shows every
+changed file, every line added/removed,
+color-coded. Scroll through, make sure
+nothing looks wrong, then:
+</p>
+
+<pre><code>You: "Looks good, commit it"</code></pre>
+
+<h4>Scenario: Worktrees for Experiments</h4>
+
+<p>
+You want to try a completely different
+approach to Sora's podcast player &mdash;
+maybe a new layout. But you don't want
+to mess up the working version:
+</p>
+
+<pre><code>claude --worktree sora-new-layout</code></pre>
+
+<p>
+Claude creates an isolated copy of the
+repo on a new branch. All changes happen
+there. If the experiment works, merge it.
+If it doesn't, delete the worktree.
+The original is untouched either way.
+</p>
+
+<p>
+This is particularly powerful because you
+can have <strong>two Claude sessions</strong>
+running simultaneously &mdash; one working
+on the main branch, one on the worktree.
+Parallel development without conflicts.
+</p>
+
+<h4>Scenario: Starting From a GitHub Issue</h4>
+
+<pre><code># Start a session from a specific issue
+claude --from-issue 42
+
+# Or from a PR to do code review
+claude --from-pr 15</code></pre>
+
+<p>
+Claude reads the issue/PR context
+automatically and starts with full
+understanding of what needs to be done.
+No need to explain the problem &mdash;
+it's already in the issue.
+</p>
 </div>
 
 <!-- ======== PART 11 ======== -->
@@ -1671,6 +2467,92 @@ Edit <code>~/.claude/keybindings.json</code>:
     ]
   }
 }</code></pre>
+
+<h3>Real Scenarios: Shortcuts That Save Time</h3>
+
+<h4>Scenario: The Long Build Session</h4>
+
+<p>
+You're building a book HTML and Claude is
+churning through chapters. You want to
+check your phone or do something else:
+</p>
+
+<ul>
+<li><strong><code>Ctrl+B</code></strong> &mdash;
+  backgrounds the current task. Claude keeps
+  working. You get a notification when it's
+  done or needs you.</li>
+<li><strong><code>Ctrl+C</code></strong> &mdash;
+  if Claude goes off track ("wait, that's
+  not what I wanted"), cancel immediately
+  and redirect</li>
+<li><strong><code>Ctrl+O</code></strong> &mdash;
+  toggle verbose mode to watch Claude's
+  thinking process. Useful for debugging
+  when Claude makes unexpected decisions</li>
+</ul>
+
+<h4>Scenario: Rapid Permission Switching</h4>
+
+<p>
+You're investigating a bug in the crypto
+app. Start in plan mode (safe):
+</p>
+
+<ul>
+<li><code>Shift+Tab</code> &rarr; plan mode</li>
+<li>"Investigate the 2-day timer reset bug"</li>
+<li>Claude traces the code, identifies the issue</li>
+<li><code>Shift+Tab</code> &rarr; accept edits</li>
+<li>"Fix it"</li>
+<li>Claude applies the fix</li>
+<li><code>Shift+Tab</code> &rarr; default mode</li>
+<li>"Commit and push" (Claude asks before
+  running git commands)</li>
+</ul>
+
+<p>
+Three permission levels in one session,
+each perfectly suited to the current task.
+No restarts, no lost context.
+</p>
+
+<h4>Scenario: Reviewing Past Messages</h4>
+
+<p>
+Claude gave you a great code snippet
+5 messages ago but you didn't copy it.
+Instead of scrolling back:
+</p>
+
+<pre><code>/copy 5    # copies 5th-most-recent response
+
+# Or search through your message history:
+Ctrl+R → type "fireGet"
+# Finds the message where you discussed fireGet</code></pre>
+
+<h4>Scenario: Multi-Line Prompts</h4>
+
+<p>
+You need to give Claude a detailed
+multi-line instruction. Remember:
+<code>Enter</code> = new line,
+<code>Shift+Enter</code> = submit.
+So you can write:
+</p>
+
+<pre><code>Build me a new section for the book.
+Chapter 9: The Role of Government.
+Use these notes: [paste notes]
+Follow the existing HTML structure.
+Target 80 lines for this chapter.
+[Shift+Enter to submit]</code></pre>
+
+<p>
+Clean multi-line instructions that
+Claude receives all at once.
+</p>
 </div>
 
 <!-- ======== PART 12 ======== -->
