@@ -641,9 +641,12 @@ li:hover > strong > .bm-btn { opacity: 0.5; }
     <a href="#part8">APIs</a>
     <a href="#part9">localStorage</a>
     <a href="#part10">Service Workers</a>
-    <a href="#part11">Console</a>
-    <a href="#part12">Bugs</a>
-    <a href="#part13">Cheat Sheet</a>
+    <a href="#part11">Flexbox &amp; Grid</a>
+    <a href="#part12">Async JS</a>
+    <a href="#part13">PWA</a>
+    <a href="#part14">Console</a>
+    <a href="#part15">Bugs</a>
+    <a href="#part16">Cheat Sheet</a>
   </div>
 </nav>
 
@@ -729,19 +732,37 @@ li:hover > strong > .bm-btn { opacity: 0.5; }
         caches your app</span>
     </li>
     <li>
-      <a href="#part11">The Developer Console</a>
+      <a href="#part11">CSS Layout: Flexbox &amp; Grid</a>
+      <span class="toc-desc">
+        How your apps arrange buttons, cards,
+        and columns on screen</span>
+    </li>
+    <li>
+      <a href="#part12">Async JavaScript</a>
+      <span class="toc-desc">
+        Why JavaScript waits for things
+        and how callbacks and Promises work</span>
+    </li>
+    <li>
+      <a href="#part13">PWA Fundamentals</a>
+      <span class="toc-desc">
+        How a website becomes an app
+        on your phone</span>
+    </li>
+    <li>
+      <a href="#part14">The Developer Console</a>
       <span class="toc-desc">
         Your secret debugging weapon
         in every browser</span>
     </li>
     <li>
-      <a href="#part12">Common Bugs Decoded</a>
+      <a href="#part15">Common Bugs Decoded</a>
       <span class="toc-desc">
         What error messages mean
         and how to fix them</span>
     </li>
     <li>
-      <a href="#part13">Cheat Sheet</a>
+      <a href="#part16">Cheat Sheet</a>
       <span class="toc-desc">
         Quick reference for everything
         in this guide</span>
@@ -2500,9 +2521,931 @@ go up by 1 every time Claude pushes changes.
 </div>
 </div>
 
-<!-- ======== PART 11: CONSOLE ======== -->
+<!-- ======== PART 11: FLEXBOX & GRID ======== -->
 <div class="section" id="part11">
-<h2>Part 11: The Developer Console</h2>
+<h2>Part 11: CSS Layout &mdash;
+Flexbox &amp; Grid</h2>
+<p class="section-sub">
+  How your apps arrange things
+  on screen without chaos.
+</p>
+
+<p>
+Part 3 covered CSS basics &mdash; colors,
+spacing, box model. But how do you put
+three buttons in a row? How does Bloom's
+tab bar spread evenly across the screen?
+How does the book shelf scroll horizontally?
+That's all layout, and two tools handle
+almost everything: <strong>Flexbox</strong>
+and <strong>Grid</strong>.
+</p>
+
+<h3>Flexbox: Arranging in a Line</h3>
+
+<p>
+Flexbox is the most-used layout tool
+in every single one of your apps.
+It arranges items in a row or column.
+The magic word is
+<code>display: flex</code>:
+</p>
+
+<pre><code>/* Put three buttons side by side */
+.button-row {
+  display: flex;
+  gap: 8px;
+}
+
+/* Result:
+   [Button 1] [Button 2] [Button 3]
+   Instead of stacking vertically */</code></pre>
+
+<p>
+Without <code>display: flex</code>,
+HTML elements stack vertically by default
+&mdash; each one on its own line like
+paragraphs. Flex changes that to a
+horizontal row. That's literally it.
+One line of CSS transforms the layout.
+</p>
+
+<h3>The Flex Properties You See Everywhere</h3>
+
+<p>
+Once you turn on flex, a handful of
+properties control the arrangement:
+</p>
+
+<pre><code>.container {
+  display: flex;
+
+  /* Direction */
+  flex-direction: row;      /* left to right (default) */
+  flex-direction: column;   /* top to bottom */
+
+  /* Spacing between items */
+  gap: 12px;               /* 12px between each child */
+
+  /* Horizontal alignment */
+  justify-content: center;         /* center */
+  justify-content: space-between;  /* spread out */
+  justify-content: flex-start;     /* push left */
+
+  /* Vertical alignment */
+  align-items: center;     /* vertically center */
+  align-items: stretch;    /* fill height (default) */
+
+  /* Wrap to next line when full */
+  flex-wrap: wrap;
+}</code></pre>
+
+<div class="diagram">
+<svg viewBox="0 0 520 300" width="520">
+  <!-- Row example -->
+  <text x="20" y="25" font-family="Inter"
+    font-size="13" font-weight="600"
+    fill="#58a6ff">flex-direction: row</text>
+  <rect x="20" y="35" width="480" height="60"
+    rx="8" fill="none"
+    stroke="#30363d" stroke-width="1"/>
+  <rect x="35" y="47" width="100" height="36"
+    rx="6" fill="rgba(88,166,255,0.15)"
+    stroke="#58a6ff" stroke-width="1"/>
+  <text x="85" y="70" text-anchor="middle"
+    font-family="Inter" font-size="11"
+    fill="#58a6ff">Item 1</text>
+  <rect x="155" y="47" width="100" height="36"
+    rx="6" fill="rgba(88,166,255,0.15)"
+    stroke="#58a6ff" stroke-width="1"/>
+  <text x="205" y="70" text-anchor="middle"
+    font-family="Inter" font-size="11"
+    fill="#58a6ff">Item 2</text>
+  <rect x="275" y="47" width="100" height="36"
+    rx="6" fill="rgba(88,166,255,0.15)"
+    stroke="#58a6ff" stroke-width="1"/>
+  <text x="325" y="70" text-anchor="middle"
+    font-family="Inter" font-size="11"
+    fill="#58a6ff">Item 3</text>
+  <text x="165" y="80" font-family="Inter"
+    font-size="9" fill="#8b949e">
+    &larr; gap: 20px &rarr;</text>
+
+  <!-- Column example -->
+  <text x="20" y="130" font-family="Inter"
+    font-size="13" font-weight="600"
+    fill="#3fb950">flex-direction: column</text>
+  <rect x="20" y="140" width="160" height="150"
+    rx="8" fill="none"
+    stroke="#30363d" stroke-width="1"/>
+  <rect x="35" y="152" width="130" height="32"
+    rx="6" fill="rgba(63,185,80,0.1)"
+    stroke="#3fb950" stroke-width="1"/>
+  <text x="100" y="173" text-anchor="middle"
+    font-family="Inter" font-size="11"
+    fill="#3fb950">Item 1</text>
+  <rect x="35" y="196" width="130" height="32"
+    rx="6" fill="rgba(63,185,80,0.1)"
+    stroke="#3fb950" stroke-width="1"/>
+  <text x="100" y="217" text-anchor="middle"
+    font-family="Inter" font-size="11"
+    fill="#3fb950">Item 2</text>
+  <rect x="35" y="240" width="130" height="32"
+    rx="6" fill="rgba(63,185,80,0.1)"
+    stroke="#3fb950" stroke-width="1"/>
+  <text x="100" y="261" text-anchor="middle"
+    font-family="Inter" font-size="11"
+    fill="#3fb950">Item 3</text>
+
+  <!-- justify-content example -->
+  <text x="240" y="130" font-family="Inter"
+    font-size="13" font-weight="600"
+    fill="#bc8cff">justify-content:
+    space-between</text>
+  <rect x="240" y="140" width="260" height="50"
+    rx="8" fill="none"
+    stroke="#30363d" stroke-width="1"/>
+  <rect x="252" y="150" width="60" height="30"
+    rx="6" fill="rgba(188,140,255,0.12)"
+    stroke="#bc8cff" stroke-width="1"/>
+  <text x="282" y="170" text-anchor="middle"
+    font-family="Inter" font-size="10"
+    fill="#bc8cff">Left</text>
+  <rect x="370" y="150" width="60" height="30"
+    rx="6" fill="rgba(188,140,255,0.12)"
+    stroke="#bc8cff" stroke-width="1"/>
+  <text x="400" y="170" text-anchor="middle"
+    font-family="Inter" font-size="10"
+    fill="#bc8cff">Right</text>
+</svg>
+<p class="diagram-caption">
+  Row = side by side. Column = stacked.
+  justify-content controls spacing.
+</p>
+</div>
+
+<h3>Real Flexbox in Your Apps</h3>
+
+<p>
+Here's the header from Cadence &mdash;
+the title on the left, buttons on the right:
+</p>
+
+<pre><code>/* Cadence header */
+.header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+/* Result: [App Title]  ......  [+ btn] [☀ btn] */</code></pre>
+
+<p>
+And the book shelf on the reading app
+scrolls horizontally because of
+flex-wrap and overflow:
+</p>
+
+<pre><code>/* Book shelf - horizontal scroll */
+.shelf {
+  display: flex;
+  gap: 1.2rem;
+  flex-wrap: nowrap;    /* don't wrap to next line */
+  overflow-x: auto;    /* scroll sideways */
+}</code></pre>
+
+<p>
+The nav bar on this very guide uses
+flexbox too &mdash;
+<code>display: flex</code> with
+<code>overflow-x: auto</code> so the
+tabs scroll horizontally on mobile.
+</p>
+
+<h3>Grid: Arranging in Rows AND Columns</h3>
+
+<p>
+Grid is for when you want items in a
+two-dimensional layout &mdash; rows and
+columns at the same time. Think of
+Sora's podcast grid or Bloom's portfolio
+cards:
+</p>
+
+<pre><code>/* Sora Signal podcast grid */
+.podcast-grid {
+  display: grid;
+  grid-template-columns:
+    repeat(4, 1fr);   /* 4 equal columns */
+  gap: 16px;
+}
+
+/* On desktop, switch to 6 columns */
+@media (min-width: 768px) {
+  .podcast-grid {
+    grid-template-columns:
+      repeat(6, 1fr);
+  }
+}</code></pre>
+
+<p>
+<code>1fr</code> means "one fraction of
+available space." So
+<code>repeat(4, 1fr)</code> divides the
+width into 4 equal parts. Each podcast
+card fills one part.
+</p>
+
+<h3>Flexbox vs Grid: When to Use Which</h3>
+
+<ul>
+<li><strong>Flexbox</strong> &mdash;
+  one direction at a time (row OR column).
+  Use for nav bars, button groups, headers,
+  centering things.</li>
+<li><strong>Grid</strong> &mdash;
+  two directions (rows AND columns).
+  Use for card grids, dashboards,
+  image galleries.</li>
+</ul>
+
+<div class="callout callout-green">
+<div class="callout-title">The 90/10 Rule</div>
+About 90% of layout in your apps uses
+flexbox. Grid shows up for card grids
+and podcast tiles. If you're ever reading
+CSS and see <code>display: flex</code>,
+you now know it's arranging children
+in a line. That's the key insight.
+</div>
+
+<h3>Responsive Design: @media Queries</h3>
+
+<p>
+Your crypto dashboard hides the 2-day
+timer on mobile but shows it on desktop.
+How? Media queries &mdash; CSS that only
+applies at certain screen sizes:
+</p>
+
+<pre><code>/* Default: visible on desktop */
+.need-2day-filter {
+  display: block;
+}
+
+/* On screens narrower than 768px (phones),
+   hide it */
+@media (max-width: 768px) {
+  .need-2day-filter {
+    display: none;
+  }
+}</code></pre>
+
+<p>
+Think of <code>@media</code> as an "if
+statement" for CSS. "If the screen is
+smaller than 768 pixels, apply these
+styles." That's how one HTML file looks
+different on your phone vs your laptop.
+</p>
+
+<div class="quiz">
+<div class="quiz-q">
+  You see this CSS in Cadence:
+  <code>display: flex;
+  justify-content: space-between;</code>
+  What does it do?
+</div>
+<div class="quiz-opts">
+  <button class="quiz-opt" data-answer="sb"
+    onclick="checkQuiz(this,'sb','q11e')">
+    Arranges children in a row with
+    equal space between them, pushing
+    first and last to the edges</button>
+  <button class="quiz-opt" data-answer="stack"
+    onclick="checkQuiz(this,'sb','q11e')">
+    Stacks children vertically</button>
+  <button class="quiz-opt" data-answer="hide"
+    onclick="checkQuiz(this,'sb','q11e')">
+    Hides the element on mobile</button>
+</div>
+<div class="quiz-explain" id="q11e">
+  <code>display: flex</code> arranges
+  children in a row (by default), and
+  <code>justify-content: space-between</code>
+  pushes the first child to the left edge
+  and the last child to the right edge,
+  with even spacing between. This is
+  the classic header pattern:
+  title on the left, buttons on the right.
+</div>
+</div>
+</div>
+
+<!-- ======== PART 12: ASYNC JAVASCRIPT ======== -->
+<div class="section" id="part12">
+<h2>Part 12: Async JavaScript</h2>
+<p class="section-sub">
+  Why JavaScript has to wait for things,
+  and how it does it without freezing.
+</p>
+
+<p>
+When you tap "save" in Cadence, the data
+needs to travel to Google Sheets. That
+takes time &mdash; maybe half a second,
+maybe two seconds. But your app can't
+just freeze and wait. You need to keep
+scrolling, tapping, using the app.
+This is the core problem async solves.
+</p>
+
+<h3>The Single Thread Problem</h3>
+
+<p>
+JavaScript runs on a single thread &mdash;
+it can only do one thing at a time.
+If it had to wait for every network
+request to finish before doing anything
+else, your app would freeze every time
+it talked to the server. So instead,
+JavaScript says: "Go fetch that data,
+and <em>call me back</em> when it's ready.
+I'll keep doing other stuff."
+</p>
+
+<div class="diagram">
+<svg viewBox="0 0 520 200" width="520">
+  <text x="20" y="25" font-family="Inter"
+    font-size="14" font-weight="600"
+    fill="#e6edf3">How Async Works</text>
+  <!-- Timeline -->
+  <line x1="20" y1="70" x2="500" y2="70"
+    stroke="#30363d" stroke-width="2"/>
+  <!-- Step 1 -->
+  <circle cx="60" cy="70" r="8"
+    fill="#58a6ff"/>
+  <text x="60" y="55" text-anchor="middle"
+    font-family="Inter" font-size="10"
+    fill="#58a6ff">tap save</text>
+  <!-- Step 2 -->
+  <circle cx="160" cy="70" r="8"
+    fill="#d4822a"/>
+  <text x="160" y="55" text-anchor="middle"
+    font-family="Inter" font-size="10"
+    fill="#d4822a">send request</text>
+  <!-- Waiting -->
+  <line x1="160" y1="80" x2="350" y2="80"
+    stroke="#d4822a" stroke-width="2"
+    stroke-dasharray="4"/>
+  <text x="255" y="100" text-anchor="middle"
+    font-family="Inter" font-size="9"
+    fill="#8b949e">waiting for server...</text>
+  <!-- Meanwhile -->
+  <rect x="180" y="115" width="140" height="30"
+    rx="6" fill="rgba(63,185,80,0.1)"
+    stroke="#3fb950" stroke-width="1"/>
+  <text x="250" y="135" text-anchor="middle"
+    font-family="Inter" font-size="10"
+    fill="#3fb950">app keeps working!</text>
+  <!-- Step 3 -->
+  <circle cx="350" cy="70" r="8"
+    fill="#3fb950"/>
+  <text x="350" y="55" text-anchor="middle"
+    font-family="Inter" font-size="10"
+    fill="#3fb950">response arrives</text>
+  <!-- Step 4 -->
+  <circle cx="450" cy="70" r="8"
+    fill="#bc8cff"/>
+  <text x="450" y="55" text-anchor="middle"
+    font-family="Inter" font-size="10"
+    fill="#bc8cff">callback runs</text>
+  <text x="450" y="100" text-anchor="middle"
+    font-family="Inter" font-size="9"
+    fill="#8b949e">toast('Saved!')</text>
+</svg>
+<p class="diagram-caption">
+  JavaScript fires the request, keeps working,
+  then runs your callback when the
+  response arrives.
+</p>
+</div>
+
+<h3>Callbacks: The Original Pattern</h3>
+
+<p>
+A callback is a function you pass to
+another function, saying "run this when
+you're done." You've seen this in your
+apps' JSONP pattern:
+</p>
+
+<pre><code>// jsonpFetch from your apps
+function jsonpFetch(url, callback) {
+  // Creates a &lt;script&gt; tag,
+  // loads data from the URL,
+  // then calls your callback
+  // with the result
+}
+
+// Using it:
+jsonpFetch(SYNC_URL + '?action=get_read',
+  function(err, data) {
+    // This runs LATER, when data arrives
+    if (!err && data.status === 'ok') {
+      saveRead(data.books_read);
+    }
+  }
+);</code></pre>
+
+<p>
+The <code>function(err, data)</code> part
+is the callback. It doesn't run immediately.
+It sits and waits until the server responds,
+then JavaScript calls it with the result.
+</p>
+
+<h3>setTimeout: The Simplest Async</h3>
+
+<p>
+You've seen <code>setTimeout</code>
+everywhere in your apps &mdash; it's
+the simplest form of async:
+</p>
+
+<pre><code>// Show a toast for 3.5 seconds
+function toast(msg) {
+  el.classList.add('visible');
+  setTimeout(function() {
+    // This runs 3500ms LATER
+    el.classList.remove('visible');
+  }, 3500);
+}
+
+// Debounce cloud sync (2 second delay)
+let syncTimer;
+function scheduleSave() {
+  clearTimeout(syncTimer);
+  syncTimer = setTimeout(function() {
+    pushToCloud();  // runs 2s after last change
+  }, 2000);
+}</code></pre>
+
+<p>
+The debounce pattern is in every one
+of your apps. When you edit a task in
+Cadence, it doesn't save to the cloud
+on every keystroke. It waits 2 seconds
+after you stop typing, then saves once.
+That's <code>clearTimeout</code> +
+<code>setTimeout</code> working together.
+</p>
+
+<h3>Promises: The Modern Way</h3>
+
+<p>
+Promises are the modern replacement for
+callbacks. Instead of passing a function
+inside another function, you chain
+<code>.then()</code> after it:
+</p>
+
+<pre><code>// Callback style (old)
+getData(url, function(err, result) {
+  doSomething(result);
+});
+
+// Promise style (modern)
+fetch(url)
+  .then(function(response) {
+    return response.json();
+  })
+  .then(function(data) {
+    doSomething(data);
+  })
+  .catch(function(error) {
+    console.error('Failed:', error);
+  });</code></pre>
+
+<p>
+<code>.then()</code> runs when the
+previous step succeeds.
+<code>.catch()</code> runs if anything
+fails. It reads more like a story:
+"fetch the URL, <em>then</em> parse
+the JSON, <em>then</em> do something
+with the data."
+</p>
+
+<h3>async/await: Promises Made Easy</h3>
+
+<p>
+<code>async/await</code> is just a prettier
+way to write Promises. Instead of
+chaining <code>.then()</code>, you write
+code that looks like it's running in order:
+</p>
+
+<pre><code>// Promise chain
+fetch(url)
+  .then(r => r.json())
+  .then(data => render(data));
+
+// Same thing with async/await
+async function loadData() {
+  const response = await fetch(url);
+  const data = await response.json();
+  render(data);
+}</code></pre>
+
+<p>
+The <code>await</code> keyword pauses
+<em>that function</em> until the result
+arrives, but the rest of your app keeps
+running normally. It's still async under
+the hood &mdash; it just reads like
+normal top-to-bottom code.
+</p>
+
+<h3>Why fireGet Exists</h3>
+
+<p>
+Your apps use <code>fireGet()</code>
+instead of <code>fetch()</code> for
+writes. Why? On mobile, <code>fetch()</code>
+POST requests to Google Apps Script get
+silently redirected (CORS issue), and
+the data never arrives. So Claude
+invented a workaround:
+</p>
+
+<pre><code>// fireGet creates an invisible image
+// and sets its src to the URL
+function fireGet(url) {
+  const img = new Image();
+  img.src = url;  // browser loads the URL
+  // No CORS issues because images
+  // can load from anywhere!
+}</code></pre>
+
+<p>
+It's a "fire and forget" pattern &mdash;
+send the request but don't wait for a
+response. The browser loads the URL
+(which triggers the Apps Script), and
+the server saves the data. Simple,
+reliable, works everywhere.
+</p>
+
+<div class="callout callout-orange">
+<div class="callout-title">
+  The Three Async Patterns in Your Apps
+</div>
+<strong>1. fireGet()</strong> &mdash;
+  fire and forget writes
+  (save to cloud, no response needed)<br>
+<strong>2. jsonpFetch()</strong> &mdash;
+  callback-based reads
+  (load data from cloud, need the result)<br>
+<strong>3. setTimeout()</strong> &mdash;
+  delayed actions
+  (toast dismissal, debounced saves)
+</div>
+
+<div class="quiz">
+<div class="quiz-q">
+  You see this in Cadence:
+  <code>setTimeout(pushToCloud, 2000)</code>
+  right after saving locally. Why the delay?
+</div>
+<div class="quiz-opts">
+  <button class="quiz-opt" data-answer="deb"
+    onclick="checkQuiz(this,'deb','q12e')">
+    It's a debounce &mdash; waits for
+    the user to stop making changes
+    before syncing to the cloud</button>
+  <button class="quiz-opt" data-answer="slow"
+    onclick="checkQuiz(this,'deb','q12e')">
+    The cloud server is slow and needs
+    time to warm up</button>
+  <button class="quiz-opt" data-answer="err"
+    onclick="checkQuiz(this,'deb','q12e')">
+    It's an error handling retry</button>
+</div>
+<div class="quiz-explain" id="q12e">
+  It's debouncing! If you're quickly editing
+  multiple tasks, the app saves locally
+  immediately (so you see changes fast)
+  but waits 2 seconds before syncing
+  to the cloud. If you make another change
+  within those 2 seconds,
+  <code>clearTimeout</code> cancels the
+  pending sync and restarts the 2-second
+  timer. This way, only one cloud request
+  fires after you're done editing,
+  instead of one per keystroke.
+</div>
+</div>
+</div>
+
+<!-- ======== PART 13: PWA FUNDAMENTALS ======== -->
+<div class="section" id="part13">
+<h2>Part 13: PWA Fundamentals</h2>
+<p class="section-sub">
+  How a website becomes an app
+  on your phone.
+</p>
+
+<p>
+Every app you use daily &mdash; Cadence,
+Bloom, Zercher, Sora, Roman Chariots &mdash;
+is a PWA (Progressive Web App). It's a
+regular website that the browser treats
+like a native app. No App Store, no
+downloads, no updates to approve.
+Just a website with superpowers.
+</p>
+
+<h3>What Makes a Website a PWA?</h3>
+
+<p>
+Three files turn an ordinary webpage
+into an installable app:
+</p>
+
+<div class="diagram">
+<svg viewBox="0 0 520 220" width="520">
+  <!-- Center: PWA -->
+  <circle cx="260" cy="110" r="40"
+    fill="rgba(88,166,255,0.15)"
+    stroke="#58a6ff" stroke-width="2"/>
+  <text x="260" y="106" text-anchor="middle"
+    font-family="Inter" font-size="16"
+    font-weight="700" fill="#58a6ff">PWA</text>
+  <text x="260" y="122" text-anchor="middle"
+    font-family="Inter" font-size="9"
+    fill="#8b949e">installable app</text>
+
+  <!-- manifest.json -->
+  <rect x="20" y="30" width="140" height="65"
+    rx="8" fill="rgba(63,185,80,0.1)"
+    stroke="#3fb950" stroke-width="1"/>
+  <text x="90" y="55" text-anchor="middle"
+    font-family="Inter" font-size="12"
+    font-weight="600" fill="#3fb950">
+    manifest.json</text>
+  <text x="90" y="72" text-anchor="middle"
+    font-family="Inter" font-size="9"
+    fill="#8b949e">name, icon, colors</text>
+  <text x="90" y="84" text-anchor="middle"
+    font-family="Inter" font-size="9"
+    fill="#8b949e">"app identity"</text>
+  <line x1="160" y1="63" x2="220" y2="100"
+    stroke="#30363d" stroke-width="1.5"/>
+
+  <!-- service-worker.js -->
+  <rect x="20" y="130" width="140" height="65"
+    rx="8" fill="rgba(188,140,255,0.1)"
+    stroke="#bc8cff" stroke-width="1"/>
+  <text x="90" y="155" text-anchor="middle"
+    font-family="Inter" font-size="12"
+    font-weight="600" fill="#bc8cff">
+    service-worker.js</text>
+  <text x="90" y="172" text-anchor="middle"
+    font-family="Inter" font-size="9"
+    fill="#8b949e">offline caching</text>
+  <text x="90" y="184" text-anchor="middle"
+    font-family="Inter" font-size="9"
+    fill="#8b949e">"version control"</text>
+  <line x1="160" y1="163" x2="220" y2="120"
+    stroke="#30363d" stroke-width="1.5"/>
+
+  <!-- index.html -->
+  <rect x="360" y="30" width="140" height="65"
+    rx="8" fill="rgba(212,130,42,0.1)"
+    stroke="#d4822a" stroke-width="1"/>
+  <text x="430" y="55" text-anchor="middle"
+    font-family="Inter" font-size="12"
+    font-weight="600" fill="#d4822a">
+    index.html</text>
+  <text x="430" y="72" text-anchor="middle"
+    font-family="Inter" font-size="9"
+    fill="#8b949e">the actual app</text>
+  <text x="430" y="84" text-anchor="middle"
+    font-family="Inter" font-size="9"
+    fill="#8b949e">HTML + CSS + JS</text>
+  <line x1="360" y1="63" x2="300" y2="100"
+    stroke="#30363d" stroke-width="1.5"/>
+
+  <!-- HTTPS -->
+  <rect x="360" y="130" width="140" height="65"
+    rx="8" fill="rgba(248,81,73,0.1)"
+    stroke="#f85149" stroke-width="1"/>
+  <text x="430" y="155" text-anchor="middle"
+    font-family="Inter" font-size="12"
+    font-weight="600" fill="#f85149">
+    HTTPS</text>
+  <text x="430" y="172" text-anchor="middle"
+    font-family="Inter" font-size="9"
+    fill="#8b949e">secure connection</text>
+  <text x="430" y="184" text-anchor="middle"
+    font-family="Inter" font-size="9"
+    fill="#8b949e">GitHub Pages = free</text>
+  <line x1="360" y1="163" x2="300" y2="120"
+    stroke="#30363d" stroke-width="1.5"/>
+</svg>
+<p class="diagram-caption">
+  Three ingredients make a PWA:
+  a manifest, a service worker, and HTTPS.
+</p>
+</div>
+
+<h3>manifest.json: Your App's ID Card</h3>
+
+<p>
+The manifest tells the browser "this is
+an app, not just a webpage." It defines
+the name, icon, colors, and how the app
+should open. Here's Cadence's manifest:
+</p>
+
+<pre><code>{
+  "name": "Cadence",
+  "short_name": "Cadence",
+  "start_url": "/cadence/index.html",
+  "display": "standalone",
+  "background_color": "#0c1a22",
+  "theme_color": "#0c1a22",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}</code></pre>
+
+<p>
+The key fields:
+</p>
+
+<ul>
+<li><strong><code>"display": "standalone"</code></strong>
+  &mdash; opens without a browser bar,
+  looks like a real app</li>
+<li><strong><code>"start_url"</code></strong>
+  &mdash; which page to load when
+  you tap the app icon</li>
+<li><strong><code>"theme_color"</code></strong>
+  &mdash; the status bar color on Android</li>
+<li><strong><code>"icons"</code></strong>
+  &mdash; the home screen icon
+  (192px for normal, 512px for splash)</li>
+</ul>
+
+<h3>Connecting It All: The HTML Tags</h3>
+
+<p>
+Your index.html needs a few special tags
+in the <code>&lt;head&gt;</code> to register
+as a PWA:
+</p>
+
+<pre><code>&lt;!-- Tell the browser about the manifest --&gt;
+&lt;link rel="manifest" href="manifest.json"&gt;
+
+&lt;!-- iOS specific (Apple ignores manifest) --&gt;
+&lt;meta name="apple-mobile-web-app-capable"
+  content="yes"&gt;
+&lt;meta name="apple-mobile-web-app-status-bar-style"
+  content="black-translucent"&gt;
+&lt;link rel="apple-touch-icon" href="icon.png"&gt;
+
+&lt;!-- Android status bar color --&gt;
+&lt;meta name="theme-color" content="#0c1a22"&gt;</code></pre>
+
+<p>
+And at the bottom, register the
+service worker:
+</p>
+
+<pre><code>&lt;script&gt;
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker
+    .register('service-worker.js');
+}
+&lt;/script&gt;</code></pre>
+
+<p>
+That "if" check is important &mdash;
+some browsers don't support service workers,
+and this prevents errors on those browsers.
+</p>
+
+<h3>Installing a PWA</h3>
+
+<p>
+On Android Chrome, when you visit a PWA,
+you get a "Add to Home Screen" banner.
+Once installed, it shows up in your app
+drawer with its own icon, opens in
+standalone mode (no browser bar), and
+feels exactly like a native app.
+</p>
+
+<p>
+The update process is different from
+the App Store though. There's no "Update"
+button. When you push new code to
+GitHub Pages and bump the service worker
+version, the browser automatically
+downloads the new version the next time
+you open the app. That's why version
+bumping is critical &mdash; without it,
+the browser thinks nothing changed.
+</p>
+
+<h3>The PWA Lifecycle in Your Workflow</h3>
+
+<ol>
+<li><strong>You ask Claude to build a feature</strong>
+  &mdash; Claude edits index.html</li>
+<li><strong>Claude commits and pushes to GitHub</strong>
+  &mdash; GitHub Pages deploys the new
+  version (takes ~30 seconds)</li>
+<li><strong>Claude bumps service-worker.js</strong>
+  &mdash; version number goes up
+  (e.g., v170 &rarr; v171)</li>
+<li><strong>Claude cachebusts via ADB</strong>
+  &mdash; forces your phone to reload:
+  <code>adb shell am start -a
+  android.intent.action.VIEW -d
+  'https://site.github.io/?cachebust=...'
+  </code></li>
+<li><strong>Your phone loads the new version</strong>
+  &mdash; the new service worker installs,
+  caches fresh files, done</li>
+</ol>
+
+<div class="callout callout-purple">
+<div class="callout-title">
+  Why Not Just Use the App Store?
+</div>
+PWAs have huge advantages for what you build:
+<strong>no review process</strong>
+  (deploy in seconds, not days),
+<strong>no 30% cut</strong>
+  (Apple/Google take nothing),
+<strong>instant updates</strong>
+  (push code, it's live),
+<strong>one codebase</strong>
+  (same HTML runs on any phone or computer),
+and <strong>free hosting</strong>
+  (GitHub Pages costs nothing).
+The tradeoff: PWAs can't do everything
+native apps can (no push notifications
+on iOS, limited background processing).
+But for your apps, PWA is perfect.
+</div>
+
+<div class="quiz">
+<div class="quiz-q">
+  What file tells the browser "this
+  website is actually an app"?
+</div>
+<div class="quiz-opts">
+  <button class="quiz-opt" data-answer="mf"
+    onclick="checkQuiz(this,'mf','q13e')">
+    manifest.json</button>
+  <button class="quiz-opt" data-answer="sw"
+    onclick="checkQuiz(this,'mf','q13e')">
+    service-worker.js</button>
+  <button class="quiz-opt" data-answer="ix"
+    onclick="checkQuiz(this,'mf','q13e')">
+    index.html</button>
+</div>
+<div class="quiz-explain" id="q13e">
+  <code>manifest.json</code> is the
+  app's identity card. It provides
+  the name, icon, theme colors, and
+  <code>"display": "standalone"</code>
+  which tells the browser to open it
+  without browser chrome. The service
+  worker handles caching, and index.html
+  is the app itself &mdash; but the
+  manifest is what makes it
+  <em>installable</em>.
+</div>
+</div>
+</div>
+
+<!-- ======== PART 14: CONSOLE ======== -->
+<div class="section" id="part14">
+<h2>Part 14: The Developer Console</h2>
 <p class="section-sub">
   Every browser has a secret panel
   that shows you what's happening
@@ -2556,9 +3499,9 @@ fix it immediately.
 </div>
 </div>
 
-<!-- ======== PART 12: COMMON BUGS ======== -->
-<div class="section" id="part12">
-<h2>Part 12: Common Bugs Decoded</h2>
+<!-- ======== PART 15: COMMON BUGS ======== -->
+<div class="section" id="part15">
+<h2>Part 15: Common Bugs Decoded</h2>
 <p class="section-sub">
   What error messages actually mean
   in plain English.
@@ -2633,9 +3576,9 @@ fix it immediately.
 </div>
 </div>
 
-<!-- ======== PART 13: CHEAT SHEET ======== -->
-<div class="section" id="part13">
-<h2>Part 13: Cheat Sheet</h2>
+<!-- ======== PART 16: CHEAT SHEET ======== -->
+<div class="section" id="part16">
+<h2>Part 16: Cheat Sheet</h2>
 <p class="section-sub">
   Quick reference for everything above.
 </p>
@@ -2665,7 +3608,52 @@ border: 1px solid #ccc;/* border */
 border-radius: 8px;    /* rounded corners */
 font-size: 16px;       /* text size */
 display: none;         /* hide element */
-display: flex;         /* flexbox layout */</code></pre>
+display: flex;         /* flexbox layout */
+display: grid;         /* grid layout */</code></pre>
+
+<h3>Flexbox &amp; Grid</h3>
+<pre><code>/* Flexbox - arrange in a row */
+display: flex;
+gap: 12px;                     /* space between items */
+justify-content: space-between;/* spread out */
+justify-content: center;       /* center items */
+align-items: center;           /* vertical center */
+flex-wrap: wrap;               /* allow wrapping */
+
+/* Grid - arrange in rows AND columns */
+display: grid;
+grid-template-columns: repeat(4, 1fr); /* 4 equal cols */
+gap: 16px;
+
+/* Responsive: change layout on mobile */
+@media (max-width: 768px) {
+  .grid { grid-template-columns: repeat(2, 1fr); }
+}</code></pre>
+
+<h3>Async Patterns</h3>
+<pre><code>// Callback (old pattern)
+getData(url, function(err, result) { });
+
+// Promise chain
+fetch(url).then(r => r.json()).then(data => { });
+
+// Async/await (modern)
+const data = await fetch(url).then(r => r.json());
+
+// Debounce (delay action)
+clearTimeout(timer);
+timer = setTimeout(fn, 2000);
+
+// Fire and forget (your apps)
+fireGet(url);           // writes via image src
+jsonpFetch(url, cb);    // reads via script tag</code></pre>
+
+<h3>PWA Files</h3>
+<pre><code>manifest.json          /* app identity: name, icon, colors */
+service-worker.js      /* offline cache + version control */
+index.html             /* the actual app */
+icon-192.png           /* home screen icon */
+icon-512.png           /* splash screen icon */</code></pre>
 
 <h3>JavaScript Essentials</h3>
 <pre><code>// Variables
