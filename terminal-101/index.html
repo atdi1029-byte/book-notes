@@ -1,0 +1,2282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"
+  content="width=device-width, initial-scale=1.0">
+<title>Terminal 101 for Vibe Coders</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Playfair+Display:wght@400;700&display=swap');
+
+:root {
+  --bg: #0d1117;
+  --bg2: #161b22;
+  --bg3: #1c2333;
+  --text: #e6edf3;
+  --muted: #8b949e;
+  --accent: #3fb950;
+  --accent2: #56d364;
+  --orange: #d4822a;
+  --blue: #58a6ff;
+  --red: #f85149;
+  --purple: #bc8cff;
+  --border: #30363d;
+  --code-bg: #0d1117;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Inter', -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.75;
+  overflow-x: hidden;
+}
+.progress-bar {
+  position: fixed; top: 0; left: 0;
+  height: 3px;
+  background: linear-gradient(90deg,
+    var(--accent), var(--accent2));
+  z-index: 1000; transition: width 0.2s;
+}
+.nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  background: rgba(13,17,23,0.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  z-index: 999; padding: 0 24px;
+  display: flex; align-items: center;
+  height: 52px; gap: 24px;
+}
+.nav-title {
+  font-weight: 600; font-size: 14px;
+  color: var(--accent); white-space: nowrap;
+}
+.nav-links {
+  display: flex; gap: 6px;
+  overflow-x: auto; scrollbar-width: none;
+}
+.nav-links::-webkit-scrollbar { display: none; }
+.nav-links a {
+  color: var(--muted); text-decoration: none;
+  font-size: 12px; padding: 6px 10px;
+  border-radius: 6px; white-space: nowrap;
+  transition: all 0.2s;
+}
+.nav-links a:hover, .nav-links a.active {
+  color: var(--text); background: var(--bg3);
+}
+.content {
+  max-width: 780px; margin: 0 auto;
+  padding: 80px 28px 100px;
+}
+.cover {
+  text-align: center; padding: 80px 0 70px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 60px;
+}
+.cover h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: 42px; font-weight: 700;
+  line-height: 1.2; margin-bottom: 16px;
+  background: linear-gradient(135deg,
+    var(--accent), var(--accent2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.cover .sub {
+  font-size: 18px; color: var(--muted);
+  font-weight: 300; margin-bottom: 32px;
+  line-height: 1.6;
+}
+.cover .meta {
+  font-size: 13px; color: var(--muted);
+  opacity: 0.7;
+}
+.toc {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 28px 32px; margin-bottom: 60px;
+}
+.toc-title {
+  font-weight: 600; font-size: 16px;
+  margin-bottom: 16px; color: var(--accent);
+}
+.toc ol { list-style: none; counter-reset: toc; }
+.toc li {
+  counter-increment: toc; margin-bottom: 8px;
+}
+.toc li::before {
+  content: counter(toc) ".";
+  color: var(--accent); font-weight: 600;
+  margin-right: 10px; font-size: 14px;
+}
+.toc a {
+  color: var(--text); text-decoration: none;
+  font-size: 15px; transition: color 0.2s;
+}
+.toc a:hover { color: var(--accent); }
+.toc .toc-desc {
+  color: var(--muted); font-size: 13px;
+  margin-left: 24px; display: block;
+}
+.section {
+  margin-bottom: 70px; padding-top: 20px;
+}
+.section h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 30px; font-weight: 700;
+  color: var(--accent); margin-bottom: 8px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--border);
+}
+.section .section-sub {
+  color: var(--muted); font-size: 15px;
+  margin-bottom: 28px;
+}
+h3 {
+  font-size: 20px; font-weight: 600;
+  margin: 36px 0 14px; color: var(--text);
+}
+h4 {
+  font-size: 16px; font-weight: 600;
+  margin: 24px 0 10px; color: var(--accent2);
+}
+p { margin-bottom: 16px; font-size: 15.5px; }
+ul, ol {
+  margin: 12px 0 18px 24px; font-size: 15.5px;
+}
+li { margin-bottom: 8px; }
+strong { color: #fff; font-weight: 600; }
+.callout {
+  background: var(--bg2);
+  border-left: 4px solid var(--accent);
+  padding: 18px 22px; margin: 22px 0;
+  border-radius: 0 10px 10px 0;
+  font-size: 14.5px;
+}
+.callout-title {
+  font-weight: 600; color: var(--accent);
+  margin-bottom: 6px; font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.callout-blue { border-left-color: var(--blue); }
+.callout-blue .callout-title {
+  color: var(--blue); }
+.callout-orange {
+  border-left-color: var(--orange); }
+.callout-orange .callout-title {
+  color: var(--orange); }
+.callout-red { border-left-color: var(--red); }
+.callout-red .callout-title {
+  color: var(--red); }
+.callout-purple {
+  border-left-color: var(--purple); }
+.callout-purple .callout-title {
+  color: var(--purple); }
+code {
+  font-family: 'JetBrains Mono', monospace;
+  background: var(--bg3); padding: 2px 7px;
+  border-radius: 4px; font-size: 13.5px;
+  color: var(--accent2);
+}
+pre {
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  padding: 20px 24px; border-radius: 10px;
+  overflow-x: auto; margin: 16px 0 22px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px; line-height: 1.7;
+  color: var(--text);
+}
+pre code {
+  background: none; padding: 0;
+  font-size: inherit; color: inherit;
+}
+.diagram {
+  text-align: center; margin: 28px 0;
+  padding: 24px; background: var(--bg2);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  overflow-x: auto;
+}
+.diagram svg {
+  max-width: 100%; height: auto;
+}
+.diagram-caption {
+  font-size: 13px; color: var(--muted);
+  margin-top: 12px; font-style: italic;
+}
+.quiz {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 12px; padding: 24px;
+  margin: 28px 0;
+}
+.quiz-q {
+  font-weight: 600; margin-bottom: 14px;
+  font-size: 15px;
+}
+.quiz-opts {
+  display: flex; flex-direction: column;
+  gap: 8px;
+}
+.quiz-opt {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  padding: 12px 16px; border-radius: 8px;
+  cursor: pointer; font-size: 14px;
+  transition: all 0.2s; text-align: left;
+  color: var(--text); font-family: inherit;
+  width: 100%;
+}
+.quiz-opt:hover {
+  border-color: var(--accent);
+  background: rgba(63,185,80,0.06);
+}
+.quiz-opt.correct {
+  border-color: var(--accent);
+  background: rgba(63,185,80,0.12);
+  color: var(--accent);
+}
+.quiz-opt.wrong {
+  border-color: var(--red);
+  background: rgba(248,81,73,0.08);
+  color: var(--red);
+}
+.quiz-explain {
+  margin-top: 14px; font-size: 14px;
+  color: var(--muted); display: none;
+  padding: 12px;
+  background: rgba(63,185,80,0.05);
+  border-radius: 8px;
+  border: 1px solid rgba(63,185,80,0.15);
+}
+/* Bookmark system */
+.bookmark-bar {
+  position: sticky; top: 52px; z-index: 998;
+  background: var(--bg2); color: var(--text);
+  padding: 0.5rem 1rem; display: none;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  cursor: pointer; font-family: 'Inter';
+  border-bottom: 1px solid var(--border);
+}
+.bookmark-bar:hover { background: var(--bg3); }
+.bookmark-bar .bm-label {
+  flex: 1; color: var(--text); }
+.bookmark-bar .bm-clear {
+  background: none;
+  border: 1px solid rgba(255,255,255,0.25);
+  color: var(--text); padding: 0.15rem 0.5rem;
+  border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; margin-left: 0.75rem;
+  font-family: inherit;
+}
+.bookmark-bar .bm-clear:hover {
+  background: rgba(255,255,255,0.1);
+}
+.bm-btn {
+  display: inline-block; cursor: pointer;
+  font-size: 0.75rem; opacity: 0;
+  margin-left: 0.5rem; vertical-align: middle;
+  transition: opacity 0.2s, transform 0.2s;
+  user-select: none;
+}
+h2:hover .bm-btn, h3:hover .bm-btn,
+h4:hover .bm-btn { opacity: 0.5; }
+p:hover > .bm-p { opacity: 0.5; }
+.bm-btn:hover {
+  opacity: 0.8 !important;
+  transform: scale(1.2);
+}
+.bm-btn.active {
+  opacity: 1 !important;
+  color: var(--accent);
+}
+.bm-p {
+  position: absolute; left: -1.8rem;
+  top: 0.15em; margin-left: 0;
+  font-size: 0.65rem;
+}
+p { position: relative; }
+li > strong > .bm-btn {
+  position: absolute; left: -2rem;
+  top: 0.15em; margin-left: 0;
+}
+li:has(> strong > .bm-btn) {
+  position: relative; }
+li:hover > strong > .bm-btn { opacity: 0.5; }
+.bm-toast {
+  position: fixed; bottom: 1.5rem;
+  left: 50%; transform: translateX(-50%);
+  background: var(--bg2); color: var(--text);
+  padding: 0.5rem 1.25rem; border-radius: 6px;
+  font-size: 0.85rem; z-index: 1100;
+  opacity: 0; transition: opacity 0.3s;
+  pointer-events: none;
+  border: 1px solid var(--border);
+  font-family: 'Inter', sans-serif;
+}
+.bm-toast.show { opacity: 1; }
+@media (max-width: 600px) {
+  .cover h1 { font-size: 28px; }
+  .cover .sub { font-size: 15px; }
+  .content { padding: 70px 18px 60px; }
+  .section h2 { font-size: 24px; }
+  h3 { font-size: 18px; }
+  .nav-title { display: none; }
+  .bookmark-bar { top: 0; }
+  .bm-p {
+    position: static; float: right; margin: 0;
+  }
+  li > strong > .bm-btn {
+    position: static; margin-left: 0.3rem;
+  }
+}
+</style>
+</head>
+<body>
+
+<div class="bookmark-bar" id="bookmarkBar"
+  onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel">
+    Resume reading</span>
+  <button class="bm-clear"
+    onclick="event.stopPropagation();clearBookmark()">
+    Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<div class="progress-bar" id="progressBar"></div>
+
+<nav class="nav">
+  <span class="nav-title">Terminal 101</span>
+  <div class="nav-links">
+    <a href="#part1">What Is It</a>
+    <a href="#part2">Navigation</a>
+    <a href="#part3">Files</a>
+    <a href="#part4">Pipes</a>
+    <a href="#part5">Env Vars</a>
+    <a href="#part6">Permissions</a>
+    <a href="#part7">Scripts</a>
+    <a href="#part8">Git</a>
+    <a href="#part9">ADB</a>
+    <a href="#part10">Power Moves</a>
+  </div>
+</nav>
+
+<div class="content">
+
+<div class="cover">
+  <h1>Terminal 101<br>for Vibe Coders</h1>
+  <p class="sub">
+    Understand the commands you already use.
+    <br>Every example is from YOUR workflow.
+  </p>
+  <p class="meta">
+    A personalized terminal guide
+    by Alex Barnett &amp; Claude
+  </p>
+</div>
+
+<div class="toc">
+  <div class="toc-title">Table of Contents</div>
+  <ol>
+    <li>
+      <a href="#part1">What Is the Terminal?</a>
+      <span class="toc-desc">
+        The text interface to your Mac
+        &mdash; what it is and why
+        you already use it</span>
+    </li>
+    <li>
+      <a href="#part2">Navigating the File System</a>
+      <span class="toc-desc">
+        cd, ls, pwd &mdash; moving around
+        your files like a pro</span>
+    </li>
+    <li>
+      <a href="#part3">Working with Files</a>
+      <span class="toc-desc">
+        Creating, copying, moving, deleting,
+        and reading files</span>
+    </li>
+    <li>
+      <a href="#part4">Pipes &amp; Redirection</a>
+      <span class="toc-desc">
+        The | and &gt; symbols that chain
+        commands together</span>
+    </li>
+    <li>
+      <a href="#part5">Environment Variables</a>
+      <span class="toc-desc">
+        What $PATH means and why
+        "command not found" happens</span>
+    </li>
+    <li>
+      <a href="#part6">Permissions &amp; chmod</a>
+      <span class="toc-desc">
+        Why scripts need chmod +x
+        and what file permissions mean</span>
+    </li>
+    <li>
+      <a href="#part7">Shell Scripts Decoded</a>
+      <span class="toc-desc">
+        Reading discover.sh, pipeline.sh,
+        and other automation scripts</span>
+    </li>
+    <li>
+      <a href="#part8">Git Under the Hood</a>
+      <span class="toc-desc">
+        What branches, remotes, and commits
+        actually are</span>
+    </li>
+    <li>
+      <a href="#part9">ADB Demystified</a>
+      <span class="toc-desc">
+        What those Android Debug Bridge
+        commands actually do</span>
+    </li>
+    <li>
+      <a href="#part10">Terminal Power Moves</a>
+      <span class="toc-desc">
+        caffeinate, aliases, tmux,
+        and other pro tricks</span>
+    </li>
+  </ol>
+</div>
+
+<!-- ======== PART 1 ======== -->
+<div class="section" id="part1">
+<h2>Part 1: What Is the Terminal?</h2>
+<p class="section-sub">
+  It's just a text-based way to talk
+  to your computer. That's it.
+</p>
+
+<p>
+Every time you open Terminal on your Mac
+and type <code>caffeinate claude</code>,
+you're using the terminal. It looks
+intimidating &mdash; black screen, blinking
+cursor, no buttons &mdash; but it's doing
+the same things your Finder does.
+Just with text instead of clicking.
+</p>
+
+<h3>GUI vs Terminal</h3>
+
+<p>
+You already know two ways to interact
+with your computer:
+</p>
+
+<ul>
+<li><strong>GUI</strong> (Graphical User Interface)
+  &mdash; clicking icons, dragging files,
+  using menus. Finder, Chrome, VS Code.</li>
+<li><strong>Terminal</strong> (Command Line Interface)
+  &mdash; typing text commands.
+  Faster for many things, the only way
+  to do others.</li>
+</ul>
+
+<div class="diagram">
+<svg viewBox="0 0 700 160" width="700">
+  <rect x="20" y="20" width="300" height="120"
+    rx="10" fill="rgba(88,166,255,0.08)"
+    stroke="#58a6ff" stroke-width="1.5"/>
+  <text x="170" y="50" text-anchor="middle"
+    font-family="Inter" font-size="15"
+    font-weight="600" fill="#58a6ff">
+    GUI (Finder)</text>
+  <text x="170" y="75" text-anchor="middle"
+    font-family="Inter" font-size="12"
+    fill="#8b949e">
+    Double-click folder to open</text>
+  <text x="170" y="95" text-anchor="middle"
+    font-family="Inter" font-size="12"
+    fill="#8b949e">
+    Drag file to trash to delete</text>
+  <text x="170" y="115" text-anchor="middle"
+    font-family="Inter" font-size="12"
+    fill="#8b949e">
+    Right-click &rarr; rename</text>
+  <rect x="380" y="20" width="300" height="120"
+    rx="10" fill="rgba(63,185,80,0.08)"
+    stroke="#3fb950" stroke-width="1.5"/>
+  <text x="530" y="50" text-anchor="middle"
+    font-family="Inter" font-size="15"
+    font-weight="600" fill="#3fb950">
+    Terminal</text>
+  <text x="530" y="75" text-anchor="middle"
+    font-family="JetBrains Mono" font-size="12"
+    fill="#8b949e">
+    cd Documents/Code</text>
+  <text x="530" y="95" text-anchor="middle"
+    font-family="JetBrains Mono" font-size="12"
+    fill="#8b949e">
+    rm oldfile.txt</text>
+  <text x="530" y="115" text-anchor="middle"
+    font-family="JetBrains Mono" font-size="12"
+    fill="#8b949e">
+    mv old.txt new.txt</text>
+</svg>
+<p class="diagram-caption">
+  Same actions, different interface.
+  Terminal is just faster for certain things.
+</p>
+</div>
+
+<h3>The Prompt</h3>
+
+<p>
+When you open Terminal, you see something
+like this:
+</p>
+
+<pre><code>alexbarnett@mac ~ %</code></pre>
+
+<p>
+That's the <strong>prompt</strong>.
+It's telling you:
+</p>
+
+<ul>
+<li><strong><code>alexbarnett</code></strong>
+  &mdash; who you are (your username)</li>
+<li><strong><code>@mac</code></strong>
+  &mdash; which computer</li>
+<li><strong><code>~</code></strong>
+  &mdash; where you are
+  (<code>~</code> means your home folder,
+  <code>/Users/alexbarnett</code>)</li>
+<li><strong><code>%</code></strong>
+  &mdash; "ready for input"
+  (zsh uses <code>%</code>,
+  bash uses <code>$</code>)</li>
+</ul>
+
+<p>
+After the prompt, you type a command
+and press Enter. The computer runs it
+and shows you the result.
+That's the entire interaction model.
+</p>
+
+<h3>Shells: bash vs zsh</h3>
+
+<p>
+The <strong>shell</strong> is the program
+that reads your commands and executes them.
+Your Mac uses <strong>zsh</strong>
+(Z Shell) by default. An older shell
+called <strong>bash</strong> is also
+available. They're 95% identical
+for everyday use. The main differences:
+</p>
+
+<ul>
+<li><strong>zsh</strong> &mdash;
+  macOS default since 2019.
+  Config file: <code>~/.zshrc</code>.
+  Prompt ends with <code>%</code>.</li>
+<li><strong>bash</strong> &mdash;
+  the classic. Used in most scripts.
+  Config file: <code>~/.bashrc</code>.
+  Prompt ends with <code>$</code>.</li>
+</ul>
+
+<div class="callout">
+<div class="callout-title">Why This Matters</div>
+When Claude tells you to "add this to
+your .zshrc," it's telling you to put
+a setting in your shell's configuration
+file. That file runs every time you open
+a new terminal tab, so anything in it
+is always available.
+</div>
+
+<div class="quiz">
+<div class="quiz-q">
+  You see <code>alexbarnett@mac ~/Documents
+  %</code> in your terminal. What does
+  <code>~/Documents</code> mean?
+</div>
+<div class="quiz-opts">
+  <button class="quiz-opt" data-answer="loc"
+    onclick="checkQuiz(this,'loc','q1e')">
+    You're currently in
+    /Users/alexbarnett/Documents</button>
+  <button class="quiz-opt" data-answer="file"
+    onclick="checkQuiz(this,'loc','q1e')">
+    You're editing a file called Documents
+    </button>
+  <button class="quiz-opt" data-answer="user"
+    onclick="checkQuiz(this,'loc','q1e')">
+    Documents is your username</button>
+</div>
+<div class="quiz-explain" id="q1e">
+  The <code>~</code> is shorthand for your
+  home directory (<code>/Users/alexbarnett
+  </code>). So <code>~/Documents</code>
+  means you're currently in
+  <code>/Users/alexbarnett/Documents</code>.
+  The prompt always shows where you are.
+</div>
+</div>
+</div>
+
+<!-- ======== PART 2 ======== -->
+<div class="section" id="part2">
+<h2>Part 2: Navigating the File System</h2>
+<p class="section-sub">
+  Moving around your files and folders
+  from the command line.
+</p>
+
+<p>
+Your Mac's file system is a tree.
+Everything starts at the root
+(<code>/</code>) and branches out into
+folders. Here's the part you use:
+</p>
+
+<pre><code>/Users/alexbarnett/
+  Documents/
+    Code/
+      Claude/
+        Books/          &lt;-- book notes project
+        Bloom/          &lt;-- DCA portfolios
+        Cadence/        &lt;-- task app
+        Zercher/        &lt;-- workout tracker
+        SPX/            &lt;-- stock dashboard
+        Crypto/         &lt;-- crypto dashboard
+        Email/          &lt;-- gig outreach
+        Sora/           &lt;-- podcast app
+        RomanChariots/  &lt;-- budgeting app</code></pre>
+
+<h3>The Essential Navigation Commands</h3>
+
+<h4>pwd: "Where Am I?"</h4>
+
+<pre><code>$ pwd
+/Users/alexbarnett/Documents/Code/Claude/Books</code></pre>
+
+<p>
+<code>pwd</code> stands for "print working
+directory." It tells you exactly where
+you are. Think of it as checking the map.
+</p>
+
+<h4>ls: "What's Here?"</h4>
+
+<pre><code>$ ls
+Bloom/  Books/  Cadence/  Crypto/  Email/
+RomanChariots/  SPX/  Sora/  Zercher/
+
+# Show more details
+$ ls -la
+drwxr-xr-x  12 alex  staff  384 Mar 19 10:30 Bloom/
+-rw-r--r--   1 alex  staff  93K Mar 19 10:15 index.html
+drwxr-xr-x   8 alex  staff  256 Mar 18 14:22 Zercher/</code></pre>
+
+<p>
+<code>ls</code> lists what's in the current
+folder. The <code>-l</code> flag shows
+details (permissions, size, date).
+The <code>-a</code> flag shows hidden files
+(names starting with a dot, like
+<code>.git</code>). We'll decode those
+permission letters in Part 6.
+</p>
+
+<h4>cd: "Go There"</h4>
+
+<pre><code># Go into a folder
+$ cd Documents/Code/Claude/Bloom
+
+# Go up one level
+$ cd ..
+
+# Go up two levels
+$ cd ../..
+
+# Go home (from anywhere)
+$ cd ~
+
+# Go to the previous directory
+$ cd -</code></pre>
+
+<p>
+<code>cd</code> stands for "change
+directory." It's like double-clicking
+a folder in Finder, except you type the
+name instead of clicking.
+</p>
+
+<h3>Path Types: Absolute vs Relative</h3>
+
+<p>
+There are two ways to specify a location:
+</p>
+
+<ul>
+<li><strong>Absolute path</strong> &mdash; starts
+  with <code>/</code>, the full address.
+  Like a street address:
+  <code>/Users/alexbarnett/Documents/Code/Claude/Bloom</code></li>
+<li><strong>Relative path</strong> &mdash;
+  starts from where you are now.
+  Like saying "two blocks north":
+  <code>../Bloom</code> (go up one folder,
+  then into Bloom)</li>
+</ul>
+
+<pre><code># These do the same thing if you're
+# in /Users/alexbarnett/Documents/Code/Claude:
+
+# Absolute (full address)
+$ cd /Users/alexbarnett/Documents/Code/Claude/Bloom
+
+# Relative (from current location)
+$ cd Bloom</code></pre>
+
+<h3>Special Shortcuts</h3>
+
+<ul>
+<li><code>~</code> &mdash; your home directory
+  (<code>/Users/alexbarnett</code>)</li>
+<li><code>.</code> &mdash; the current directory
+  (used in <code>./discover.sh</code>
+  to mean "run this file right here")</li>
+<li><code>..</code> &mdash; one directory up
+  (the parent folder)</li>
+<li><code>-</code> &mdash; the last directory
+  you were in (toggle back)</li>
+</ul>
+
+<div class="callout callout-blue">
+<div class="callout-title">Tab Completion</div>
+Start typing a file/folder name and press
+<code>Tab</code>. The terminal autocompletes
+it. If there are multiple matches, press
+<code>Tab</code> twice to see all options.
+This saves SO much typing and prevents
+typos. Use it constantly.
+</div>
+
+<div class="quiz">
+<div class="quiz-q">
+  You're in <code>~/Documents/Code/Claude/
+  Bloom</code> and want to get to
+  <code>Zercher</code>.
+  What's the shortest command?
+</div>
+<div class="quiz-opts">
+  <button class="quiz-opt" data-answer="rel"
+    onclick="checkQuiz(this,'rel','q2e')">
+    cd ../Zercher</button>
+  <button class="quiz-opt" data-answer="abs"
+    onclick="checkQuiz(this,'rel','q2e')">
+    cd /Users/alexbarnett/Documents/Code/
+    Claude/Zercher</button>
+  <button class="quiz-opt" data-answer="home"
+    onclick="checkQuiz(this,'rel','q2e')">
+    cd ~ then cd Documents/Code/Claude/Zercher
+    </button>
+</div>
+<div class="quiz-explain" id="q2e">
+  <code>cd ../Zercher</code> goes up one
+  folder (from Bloom to Claude/) then into
+  Zercher. Relative paths are almost always
+  shorter. The absolute path works too, but
+  it's way more typing.
+</div>
+</div>
+</div>
+
+<!-- ======== PART 3 ======== -->
+<div class="section" id="part3">
+<h2>Part 3: Working with Files</h2>
+<p class="section-sub">
+  Creating, copying, moving, and deleting
+  files from the command line.
+</p>
+
+<h3>Creating Files and Folders</h3>
+
+<pre><code># Create a new empty file
+$ touch notes.md
+
+# Create a new folder
+$ mkdir my-new-app
+
+# Create nested folders in one shot
+$ mkdir -p Books/new-book/images
+# -p means "create parent folders too"</code></pre>
+
+<h3>Copying and Moving</h3>
+
+<pre><code># Copy a file
+$ cp index.html backup.html
+
+# Copy a folder (need -r for "recursive")
+$ cp -r Bloom/ Bloom-backup/
+
+# Move (also used for renaming)
+$ mv old-name.html new-name.html
+
+# Move a file to another folder
+$ mv notes.md ../Books/general-theory/</code></pre>
+
+<p>
+<code>mv</code> does double duty: it moves
+files AND renames them. If the destination
+is a new name in the same folder, it's
+a rename. If it's a different folder,
+it's a move.
+</p>
+
+<h3>Deleting (Be Careful!)</h3>
+
+<pre><code># Delete a file
+$ rm notes.txt
+
+# Delete a folder and everything inside
+$ rm -r old-project/
+
+# The nuclear option (DANGEROUS)
+$ rm -rf folder/
+# -r = recursive, -f = force (no prompts)
+# This deletes EVERYTHING with no undo</code></pre>
+
+<div class="callout callout-red">
+<div class="callout-title">No Trash Can</div>
+Unlike dragging to Trash in Finder,
+<code>rm</code> is <strong>permanent</strong>.
+There is no undo, no trash folder,
+no recovery. Files are just gone.
+That's why Claude's CLAUDE.md says
+"NEVER run rm -rf unless explicitly asked."
+This command has destroyed more data
+than any bug in history.
+</div>
+
+<h3>Reading Files</h3>
+
+<pre><code># See the whole file
+$ cat index.html
+
+# See just the first 20 lines
+$ head -20 index.html
+
+# See just the last 20 lines
+$ tail -20 service-worker.js
+
+# Count lines in a file
+$ wc -l index.html
+2782 index.html</code></pre>
+
+<p>
+You've seen Claude use <code>wc -l</code>
+all the time to check how many lines a
+file is. That's "word count" with the
+<code>-l</code> (lines) flag.
+</p>
+
+<h3>Finding Files</h3>
+
+<pre><code># Find files by name
+$ find . -name "*.html"
+./index.html
+./plain.html
+./dca.html
+
+# Find files containing text
+$ grep -r "fireGet" .
+./Bloom/index.html:function fireGet(url) {
+./Cadence/index.html:function fireGet(url) {
+./Zercher/index.html:function fireGet(url) {</code></pre>
+
+<p>
+<code>find</code> searches by filename.
+<code>grep</code> searches by content.
+When Claude says "let me search the codebase,"
+it's essentially running grep across
+your files.
+</p>
+
+<div class="quiz">
+<div class="quiz-q">
+  What does <code>cp -r Bloom/ Bloom-backup/
+  </code> do?
+</div>
+<div class="quiz-opts">
+  <button class="quiz-opt" data-answer="copy"
+    onclick="checkQuiz(this,'copy','q3e')">
+    Copies the entire Bloom folder
+    and all its contents into a new
+    folder called Bloom-backup</button>
+  <button class="quiz-opt" data-answer="move"
+    onclick="checkQuiz(this,'copy','q3e')">
+    Moves Bloom to Bloom-backup
+    (original is deleted)</button>
+  <button class="quiz-opt" data-answer="link"
+    onclick="checkQuiz(this,'copy','q3e')">
+    Creates a shortcut to Bloom</button>
+</div>
+<div class="quiz-explain" id="q3e">
+  <code>cp -r</code> copies recursively
+  &mdash; the folder and everything inside
+  it. The original stays untouched.
+  <code>-r</code> is needed because
+  <code>cp</code> alone only copies
+  single files, not folders.
+</div>
+</div>
+</div>
+
+<!-- ======== PART 4 ======== -->
+<div class="section" id="part4">
+<h2>Part 4: Pipes &amp; Redirection</h2>
+<p class="section-sub">
+  The <code>|</code> and <code>&gt;</code>
+  symbols that make the terminal truly
+  powerful.
+</p>
+
+<p>
+This is where the terminal goes from
+"text-based Finder" to something
+genuinely more powerful than any GUI.
+Pipes let you chain commands together,
+passing the output of one into the input
+of the next.
+</p>
+
+<h3>The Pipe: <code>|</code></h3>
+
+<p>
+The pipe (<code>|</code>) takes the output
+of one command and feeds it as input to
+the next. Think of it as an assembly line:
+</p>
+
+<pre><code># Without pipe (two steps):
+$ ls -la > temp.txt
+$ grep ".html" temp.txt
+
+# With pipe (one step, no temp file):
+$ ls -la | grep ".html"
+-rw-r--r--  1 alex  staff  93K index.html
+-rw-r--r--  1 alex  staff  12K plain.html</code></pre>
+
+<p>
+<code>ls -la</code> lists all files.
+The pipe sends that list to
+<code>grep ".html"</code> which filters
+it down to only lines containing ".html".
+</p>
+
+<h3>Real Pipes from Your Workflow</h3>
+
+<pre><code># Count how many HTML files you have
+$ find . -name "*.html" | wc -l
+47
+
+# See the 5 biggest files
+$ ls -lS | head -5
+
+# Find all apps using fireGet
+$ grep -rl "fireGet" . | grep index.html
+./Bloom/index.html
+./Cadence/index.html
+./Zercher/index.html
+
+# Check git log in a readable format
+$ git log --oneline | head -10</code></pre>
+
+<div class="diagram">
+<svg viewBox="0 0 700 100" width="700">
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10"
+      refX="9" refY="5" markerWidth="6"
+      markerHeight="6"
+      orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z"
+        fill="#30363d"/>
+    </marker>
+  </defs>
+  <rect x="10" y="20" width="150" height="55"
+    rx="8" fill="rgba(88,166,255,0.1)"
+    stroke="#58a6ff" stroke-width="1.5"/>
+  <text x="85" y="45" text-anchor="middle"
+    font-family="JetBrains Mono" font-size="12"
+    fill="#58a6ff">ls -la</text>
+  <text x="85" y="62" text-anchor="middle"
+    font-family="Inter" font-size="10"
+    fill="#8b949e">All files</text>
+  <path d="M165 48 L210 48"
+    stroke="#3fb950" stroke-width="2"
+    marker-end="url(#arr)"/>
+  <text x="188" y="40" text-anchor="middle"
+    font-family="JetBrains Mono" font-size="14"
+    font-weight="700" fill="#3fb950">|</text>
+  <rect x="215" y="20" width="170" height="55"
+    rx="8" fill="rgba(63,185,80,0.1)"
+    stroke="#3fb950" stroke-width="1.5"/>
+  <text x="300" y="45" text-anchor="middle"
+    font-family="JetBrains Mono" font-size="12"
+    fill="#3fb950">grep ".html"</text>
+  <text x="300" y="62" text-anchor="middle"
+    font-family="Inter" font-size="10"
+    fill="#8b949e">Filter to .html only</text>
+  <path d="M390 48 L435 48"
+    stroke="#d4822a" stroke-width="2"
+    marker-end="url(#arr)"/>
+  <text x="413" y="40" text-anchor="middle"
+    font-family="JetBrains Mono" font-size="14"
+    font-weight="700" fill="#d4822a">|</text>
+  <rect x="440" y="20" width="150" height="55"
+    rx="8" fill="rgba(212,130,42,0.1)"
+    stroke="#d4822a" stroke-width="1.5"/>
+  <text x="515" y="45" text-anchor="middle"
+    font-family="JetBrains Mono" font-size="12"
+    fill="#d4822a">wc -l</text>
+  <text x="515" y="62" text-anchor="middle"
+    font-family="Inter" font-size="10"
+    fill="#8b949e">Count lines</text>
+  <path d="M595 48 L640 48"
+    stroke="#bc8cff" stroke-width="2"
+    marker-end="url(#arr)"/>
+  <text x="670" y="52" text-anchor="middle"
+    font-family="JetBrains Mono" font-size="16"
+    font-weight="700" fill="#bc8cff">47</text>
+</svg>
+<p class="diagram-caption">
+  Pipes chain commands: list files &rarr;
+  filter to .html &rarr; count them &rarr; 47
+</p>
+</div>
+
+<h3>Redirection: <code>&gt;</code>
+and <code>&gt;&gt;</code></h3>
+
+<p>
+Instead of showing output on screen,
+you can redirect it to a file:
+</p>
+
+<pre><code># Write output to a file (overwrites!)
+$ echo "Hello" > message.txt
+
+# Append to a file (adds to the end)
+$ echo "More stuff" >> message.txt
+
+# Save a command's output
+$ git log --oneline > git-history.txt
+
+# Redirect errors to a file
+$ npm install 2> errors.txt</code></pre>
+
+<p>
+<code>&gt;</code> <strong>overwrites</strong>
+the file. <code>&gt;&gt;</code>
+<strong>appends</strong> to it.
+This is important: if you use
+<code>&gt;</code> on a file that exists,
+the old content is gone.
+</p>
+
+<h3>Command Chaining: <code>&amp;&amp;</code>
+and <code>;</code></h3>
+
+<pre><code># Run second command ONLY if first succeeds
+$ git add . && git commit -m "update"
+# If git add fails, commit won't run
+
+# Run second command regardless
+$ cd Bloom ; ls
+# Even if cd fails, ls runs anyway
+
+# Chain multiple commands
+$ git add . && git commit -m "fix" && git push
+# All three must succeed in sequence</code></pre>
+
+<p>
+<code>&amp;&amp;</code> is "and then, if OK."
+<code>;</code> is "and then, no matter what."
+You see Claude use <code>&amp;&amp;</code>
+constantly when chaining git commands.
+</p>
+
+<div class="quiz">
+<div class="quiz-q">
+  What does <code>grep -r "toast" .
+  | wc -l</code> do?
+</div>
+<div class="quiz-opts">
+  <button class="quiz-opt" data-answer="count"
+    onclick="checkQuiz(this,'count','q4e')">
+    Searches all files for "toast" then
+    counts how many matches there are</button>
+  <button class="quiz-opt" data-answer="del"
+    onclick="checkQuiz(this,'count','q4e')">
+    Deletes all lines containing "toast"
+    </button>
+  <button class="quiz-opt" data-answer="show"
+    onclick="checkQuiz(this,'count','q4e')">
+    Shows the word "toast" with line numbers
+    </button>
+</div>
+<div class="quiz-explain" id="q4e">
+  <code>grep -r "toast" .</code> finds all
+  lines containing "toast" in all files.
+  The pipe sends those results to
+  <code>wc -l</code> which counts the lines.
+  So you get a number: how many times
+  "toast" appears across your codebase.
+</div>
+</div>
+</div>
+
+<!-- ======== PART 5 ======== -->
+<div class="section" id="part5">
+<h2>Part 5: Environment Variables</h2>
+<p class="section-sub">
+  Settings that control how your terminal
+  and programs behave.
+</p>
+
+<p>
+Environment variables are like global
+settings for your terminal. Programs
+read them to know how to behave.
+You've already used them without
+knowing it.
+</p>
+
+<h3>What Are They?</h3>
+
+<pre><code># See a variable's value
+$ echo $HOME
+/Users/alexbarnett
+
+$ echo $USER
+alexbarnett
+
+$ echo $SHELL
+/bin/zsh
+
+# See ALL environment variables
+$ env</code></pre>
+
+<p>
+The <code>$</code> prefix means "the value
+of this variable." <code>$HOME</code>
+expands to <code>/Users/alexbarnett</code>.
+That's why <code>~</code> works as
+a shortcut &mdash; it's actually
+<code>$HOME</code>.
+</p>
+
+<h3>Setting Variables</h3>
+
+<pre><code># Set a variable for this session only
+$ export MY_NAME="Alex"
+$ echo $MY_NAME
+Alex
+
+# Set for just one command
+$ CLAUDE_CODE_MAX_OUTPUT_TOKENS=64000 claude
+
+# Make it permanent (add to ~/.zshrc)
+$ echo 'export CLAUDE_CODE_MAX_OUTPUT_TOKENS=64000' \
+  >> ~/.zshrc</code></pre>
+
+<h3>PATH: The Most Important Variable</h3>
+
+<p>
+<code>$PATH</code> is the single most
+important environment variable. When you
+type a command like <code>git</code>,
+the shell doesn't magically know where
+the <code>git</code> program lives.
+It searches through a list of folders,
+and that list is <code>$PATH</code>.
+</p>
+
+<pre><code>$ echo $PATH
+/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</code></pre>
+
+<p>
+That's a list of folders separated by
+colons. When you type <code>git</code>,
+the shell checks each folder in order:
+</p>
+
+<ol>
+<li>Is <code>git</code> in
+  <code>/opt/homebrew/bin/</code>? Yes!
+  Run it.</li>
+<li>If not, check
+  <code>/usr/local/bin/</code></li>
+<li>If not, check <code>/usr/bin/</code></li>
+<li>If not found anywhere:
+  <strong>"command not found"</strong></li>
+</ol>
+
+<div class="callout callout-red">
+<div class="callout-title">
+  "Command Not Found" Decoded</div>
+This error just means the program isn't
+in any of the folders listed in $PATH.
+Common fixes:
+<ul style="margin-top:8px">
+<li>The program isn't installed
+  (install it with <code>brew install X</code>
+  or <code>npm install -g X</code>)</li>
+<li>It's installed but not in PATH
+  (add its folder to PATH in
+  <code>~/.zshrc</code>)</li>
+<li>You're missing the <code>./</code>
+  prefix for a local script
+  (<code>./discover.sh</code>
+  not <code>discover.sh</code>)</li>
+</ul>
+</div>
+
+<h3>Variables You've Already Used</h3>
+
+<pre><code># Claude's output limit
+export CLAUDE_CODE_MAX_OUTPUT_TOKENS=64000
+
+# Claude's effort level
+export CLAUDE_CODE_EFFORT_LEVEL=high
+
+# Which model to use
+export ANTHROPIC_MODEL=claude-opus-4-6
+
+# Auto-compaction threshold
+export CLAUDE_AUTOCOMPACT_PCT_OVERRIDE=50</code></pre>
+
+<p>
+These all work the same way: you set a
+variable, and Claude Code reads it when
+it starts up. The program checks
+"does this variable exist?" and if so,
+uses its value to configure itself.
+</p>
+
+<div class="quiz">
+<div class="quiz-q">
+  You type <code>bookai</code> and get
+  "command not found." What's most likely
+  the problem?
+</div>
+<div class="quiz-opts">
+  <button class="quiz-opt" data-answer="path"
+    onclick="checkQuiz(this,'path','q5e')">
+    bookai isn't installed, or its folder
+    isn't in $PATH</button>
+  <button class="quiz-opt" data-answer="typo"
+    onclick="checkQuiz(this,'path','q5e')">
+    bookai is misspelled</button>
+  <button class="quiz-opt" data-answer="perm"
+    onclick="checkQuiz(this,'path','q5e')">
+    You don't have permission to run it</button>
+</div>
+<div class="quiz-explain" id="q5e">
+  "Command not found" always means the
+  shell can't find the program in any PATH
+  folder. Either it's not installed, or
+  you need to specify the full path to it
+  (like <code>./bookai</code> if it's in
+  the current directory).
+</div>
+</div>
+</div>
+
+<!-- ======== PART 6 ======== -->
+<div class="section" id="part6">
+<h2>Part 6: Permissions &amp; chmod</h2>
+<p class="section-sub">
+  Why scripts need <code>chmod +x</code>
+  and what those <code>rwx</code> letters
+  mean.
+</p>
+
+<p>
+Every file on your Mac has permissions
+that control who can do what with it.
+When you see <code>-rwxr-xr-x</code>
+in an <code>ls -l</code> listing,
+those letters are the permission code.
+</p>
+
+<h3>Reading Permission Codes</h3>
+
+<pre><code>-rwxr-xr-x  1 alex  staff  discover.sh
+drwxr-xr-x  8 alex  staff  Bloom/</code></pre>
+
+<p>
+That first column is 10 characters.
+Here's what each position means:
+</p>
+
+<div class="diagram">
+<svg viewBox="0 0 700 140" width="700">
+  <!-- Characters -->
+  <text x="80" y="40" text-anchor="middle"
+    font-family="JetBrains Mono" font-size="28"
+    fill="#e6edf3">-</text>
+  <text x="140" y="40" text-anchor="middle"
+    font-family="JetBrains Mono" font-size="28"
+    fill="#3fb950">r</text>
+  <text x="180" y="40" text-anchor="middle"
+    font-family="JetBrains Mono" font-size="28"
+    fill="#3fb950">w</text>
+  <text x="220" y="40" text-anchor="middle"
+    font-family="JetBrains Mono" font-size="28"
+    fill="#3fb950">x</text>
+  <text x="290" y="40" text-anchor="middle"
+    font-family="JetBrains Mono" font-size="28"
+    fill="#58a6ff">r</text>
+  <text x="330" y="40" text-anchor="middle"
+    font-family="JetBrains Mono" font-size="28"
+    fill="#58a6ff">-</text>
+  <text x="370" y="40" text-anchor="middle"
+    font-family="JetBrains Mono" font-size="28"
+    fill="#58a6ff">x</text>
+  <text x="440" y="40" text-anchor="middle"
+    font-family="JetBrains Mono" font-size="28"
+    fill="#d4822a">r</text>
+  <text x="480" y="40" text-anchor="middle"
+    font-family="JetBrains Mono" font-size="28"
+    fill="#d4822a">-</text>
+  <text x="520" y="40" text-anchor="middle"
+    font-family="JetBrains Mono" font-size="28"
+    fill="#d4822a">x</text>
+  <!-- Labels -->
+  <text x="80" y="75" text-anchor="middle"
+    font-family="Inter" font-size="11"
+    fill="#8b949e">Type</text>
+  <text x="80" y="90" text-anchor="middle"
+    font-family="Inter" font-size="10"
+    fill="#8b949e">- = file</text>
+  <text x="80" y="103" text-anchor="middle"
+    font-family="Inter" font-size="10"
+    fill="#8b949e">d = dir</text>
+  <rect x="115" y="50" width="130" height="80"
+    rx="6" fill="rgba(63,185,80,0.06)"
+    stroke="#3fb950" stroke-width="1"
+    stroke-dasharray="3"/>
+  <text x="180" y="75" text-anchor="middle"
+    font-family="Inter" font-size="11"
+    font-weight="600" fill="#3fb950">Owner</text>
+  <text x="180" y="90" text-anchor="middle"
+    font-family="Inter" font-size="10"
+    fill="#8b949e">r=read w=write</text>
+  <text x="180" y="103" text-anchor="middle"
+    font-family="Inter" font-size="10"
+    fill="#8b949e">x=execute</text>
+  <rect x="265" y="50" width="130" height="80"
+    rx="6" fill="rgba(88,166,255,0.06)"
+    stroke="#58a6ff" stroke-width="1"
+    stroke-dasharray="3"/>
+  <text x="330" y="75" text-anchor="middle"
+    font-family="Inter" font-size="11"
+    font-weight="600" fill="#58a6ff">Group</text>
+  <text x="330" y="90" text-anchor="middle"
+    font-family="Inter" font-size="10"
+    fill="#8b949e">r=read -=no</text>
+  <text x="330" y="103" text-anchor="middle"
+    font-family="Inter" font-size="10"
+    fill="#8b949e">x=execute</text>
+  <rect x="415" y="50" width="130" height="80"
+    rx="6" fill="rgba(212,130,42,0.06)"
+    stroke="#d4822a" stroke-width="1"
+    stroke-dasharray="3"/>
+  <text x="480" y="75" text-anchor="middle"
+    font-family="Inter" font-size="11"
+    font-weight="600" fill="#d4822a">Everyone</text>
+  <text x="480" y="90" text-anchor="middle"
+    font-family="Inter" font-size="10"
+    fill="#8b949e">r=read -=no</text>
+  <text x="480" y="103" text-anchor="middle"
+    font-family="Inter" font-size="10"
+    fill="#8b949e">x=execute</text>
+</svg>
+<p class="diagram-caption">
+  -rwxr-xr-x: file, owner can read/write/
+  execute, everyone else can read/execute
+</p>
+</div>
+
+<h3>chmod: Changing Permissions</h3>
+
+<pre><code># Make a script executable
+$ chmod +x discover.sh
+
+# Now you can run it
+$ ./discover.sh</code></pre>
+
+<p>
+<code>chmod +x</code> adds the
+<strong>execute</strong> permission.
+Without it, the file is just text.
+With it, the system treats it as a
+program that can run. This is the
+most common chmod you'll ever use.
+</p>
+
+<p>
+When Claude tells you to run
+<code>chmod +x script.sh</code>,
+it's because you just created a new
+script file and it doesn't have
+execute permission yet.
+Without <code>chmod +x</code>,
+running <code>./script.sh</code> gives
+you "Permission denied."
+</p>
+
+<h3>Why <code>./</code> for Scripts?</h3>
+
+<p>
+When you type <code>discover.sh</code>,
+the shell looks in <code>$PATH</code>
+folders for a program named
+"discover.sh." It won't find it because
+your current folder isn't in PATH.
+</p>
+
+<p>
+<code>./discover.sh</code> says
+"run the file <em>right here</em>
+in this directory." The <code>./</code>
+is an explicit path, bypassing the
+PATH search entirely.
+</p>
+
+<div class="callout callout-orange">
+<div class="callout-title">Common Pattern</div>
+New script workflow:
+<ol style="margin-top:8px">
+<li>Create the file:
+  <code>touch myscript.sh</code></li>
+<li>Write code in it</li>
+<li>Make it executable:
+  <code>chmod +x myscript.sh</code></li>
+<li>Run it:
+  <code>./myscript.sh</code></li>
+</ol>
+Steps 3-4 are what you do with
+<code>discover.sh</code> and
+<code>pipeline.sh</code>.
+</div>
+</div>
+
+<!-- ======== PART 7 ======== -->
+<div class="section" id="part7">
+<h2>Part 7: Shell Scripts Decoded</h2>
+<p class="section-sub">
+  Reading the automation scripts Claude
+  writes for you.
+</p>
+
+<p>
+A shell script is just a text file
+full of terminal commands. Instead of
+typing them one by one, the script
+runs them all automatically.
+Your <code>discover.sh</code> and
+<code>pipeline.sh</code> are shell scripts.
+</p>
+
+<h3>Anatomy of a Script</h3>
+
+<pre><code>#!/bin/bash                  # 1. Shebang
+                             #    "Use bash"
+
+MAX_GIGS=5                   # 2. Variables
+
+echo "Starting discovery..." # 3. Commands
+
+if [ -f "venues.json" ]; then  # 4. Conditions
+  echo "Venues file exists"
+else
+  echo "No venues file!"
+  exit 1                     # Stop with error
+fi
+
+for venue in "${venues[@]}"; do  # 5. Loops
+  echo "Processing $venue"
+  curl -s "$API_URL?q=$venue"
+done</code></pre>
+
+<h3>The Building Blocks</h3>
+
+<h4>1. The Shebang: <code>#!/bin/bash</code></h4>
+
+<p>
+The first line of every script tells the
+system which program should run it.
+<code>#!/bin/bash</code> means "use bash."
+<code>#!/usr/bin/env python3</code> means
+"use Python." Without this line,
+the system doesn't know how to
+interpret the file.
+</p>
+
+<h4>2. Variables in Scripts</h4>
+
+<pre><code># Set a variable (no spaces around =!)
+MAX_GIGS=5
+VENUE_NAME="Bistrot Lepic"
+
+# Use a variable
+echo "Processing $MAX_GIGS gigs"
+echo "Venue: ${VENUE_NAME}"
+
+# Command-line arguments
+# $1 = first argument, $2 = second, etc.
+# ./discover.sh search "wineries VA"
+# $1 = "search", $2 = "wineries VA"</code></pre>
+
+<div class="callout callout-red">
+<div class="callout-title">Gotcha: No Spaces!</div>
+In bash, <code>NAME="Alex"</code> sets a
+variable. But <code>NAME = "Alex"</code>
+(with spaces) tries to run a command
+called "NAME" with arguments "=" and
+"Alex" and fails. No spaces around
+the equals sign!
+</div>
+
+<h4>3. Conditionals: if/then/fi</h4>
+
+<pre><code># Check if a file exists
+if [ -f "notes.md" ]; then
+  echo "Notes found"
+fi
+
+# Check if a variable is empty
+if [ -z "$RESULT" ]; then
+  echo "No results"
+fi
+
+# Check if a command succeeded
+if git push; then
+  echo "Push succeeded"
+else
+  echo "Push failed!"
+fi</code></pre>
+
+<p>
+Notice the <code>fi</code> at the end
+&mdash; it's "if" backwards.
+That's how bash marks the end of
+an if block. (Yes, it's weird.)
+</p>
+
+<h4>4. Loops: for and while</h4>
+
+<pre><code># Loop through a list
+for app in Bloom Cadence Zercher; do
+  echo "Checking $app..."
+  cd "$app" && git status && cd ..
+done
+
+# Loop through files
+for file in *.html; do
+  echo "$file has $(wc -l < "$file") lines"
+done
+
+# Loop while a condition is true
+while [ $count -lt 10 ]; do
+  echo "Attempt $count"
+  count=$((count + 1))
+done</code></pre>
+
+<h4>5. Functions in Scripts</h4>
+
+<pre><code># Define a function
+check_sw_version() {
+  local file="$1/service-worker.js"
+  if [ -f "$file" ]; then
+    grep "CACHE" "$file" | head -1
+  else
+    echo "No service worker found"
+  fi
+}
+
+# Call the function
+check_sw_version "Bloom"
+check_sw_version "Zercher"</code></pre>
+
+<h3>Reading Your Discover Script</h3>
+
+<p>
+Now when you look at
+<code>discover.sh</code>, you can read it:
+</p>
+
+<pre><code>#!/bin/bash
+# ^ Use bash to run this
+
+MAX_GIGS=${MAX_GIGS:-3}
+# ^ If MAX_GIGS isn't set, default to 3
+
+echo "Discovering venues from $MAX_GIGS gigs..."
+# ^ Print a status message
+
+for gig in "${past_gigs[@]}"; do
+  # ^ Loop through each past gig
+  osascript -e "tell application \"Chrome\"..."
+  # ^ Use AppleScript to control Chrome
+  sleep 5
+  # ^ Wait 5 seconds (don't overload the API)
+done</code></pre>
+
+<p>
+It's just a list of commands with some
+logic (loops, conditions) to control
+the flow. Nothing magical.
+</p>
+</div>
+
+<!-- ======== PART 8 ======== -->
+<div class="section" id="part8">
+<h2>Part 8: Git Under the Hood</h2>
+<p class="section-sub">
+  What branches, remotes, and commits
+  actually are.
+</p>
+
+<p>
+You use git every day through Claude.
+"Commit and push" is second nature.
+But understanding what git is actually
+doing makes you more confident and
+helps when things go wrong.
+</p>
+
+<h3>What Git Actually Is</h3>
+
+<p>
+Git is a <strong>time machine for your
+code</strong>. Every time you commit,
+git takes a snapshot of all your files.
+You can go back to any snapshot, compare
+snapshots, or create parallel timelines
+(branches).
+</p>
+
+<h3>The Three Stages</h3>
+
+<div class="diagram">
+<svg viewBox="0 0 700 120" width="700">
+  <defs>
+    <marker id="arr2" viewBox="0 0 10 10"
+      refX="9" refY="5" markerWidth="6"
+      markerHeight="6"
+      orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z"
+        fill="#30363d"/>
+    </marker>
+  </defs>
+  <rect x="20" y="20" width="170" height="75"
+    rx="8" fill="rgba(248,81,73,0.1)"
+    stroke="#f85149" stroke-width="1.5"/>
+  <text x="105" y="48" text-anchor="middle"
+    font-family="Inter" font-size="14"
+    font-weight="600" fill="#f85149">
+    Working Dir</text>
+  <text x="105" y="68" text-anchor="middle"
+    font-family="Inter" font-size="11"
+    fill="#8b949e">Your actual files</text>
+  <text x="105" y="82" text-anchor="middle"
+    font-family="Inter" font-size="10"
+    fill="#8b949e">(modified, unsaved)</text>
+  <path d="M195 58 L245 58"
+    stroke="#30363d" stroke-width="1.5"
+    marker-end="url(#arr2)"/>
+  <text x="220" y="50" text-anchor="middle"
+    font-family="JetBrains Mono" font-size="10"
+    fill="#8b949e">git add</text>
+  <rect x="250" y="20" width="170" height="75"
+    rx="8" fill="rgba(212,130,42,0.1)"
+    stroke="#d4822a" stroke-width="1.5"/>
+  <text x="335" y="48" text-anchor="middle"
+    font-family="Inter" font-size="14"
+    font-weight="600" fill="#d4822a">
+    Staging Area</text>
+  <text x="335" y="68" text-anchor="middle"
+    font-family="Inter" font-size="11"
+    fill="#8b949e">Ready to commit</text>
+  <text x="335" y="82" text-anchor="middle"
+    font-family="Inter" font-size="10"
+    fill="#8b949e">(selected changes)</text>
+  <path d="M425 58 L475 58"
+    stroke="#30363d" stroke-width="1.5"
+    marker-end="url(#arr2)"/>
+  <text x="450" y="50" text-anchor="middle"
+    font-family="JetBrains Mono" font-size="10"
+    fill="#8b949e">git commit</text>
+  <rect x="480" y="20" width="200" height="75"
+    rx="8" fill="rgba(63,185,80,0.1)"
+    stroke="#3fb950" stroke-width="1.5"/>
+  <text x="580" y="48" text-anchor="middle"
+    font-family="Inter" font-size="14"
+    font-weight="600" fill="#3fb950">
+    Repository</text>
+  <text x="580" y="68" text-anchor="middle"
+    font-family="Inter" font-size="11"
+    fill="#8b949e">Permanent snapshot</text>
+  <text x="580" y="82" text-anchor="middle"
+    font-family="Inter" font-size="10"
+    fill="#8b949e">(saved in .git/)</text>
+</svg>
+<p class="diagram-caption">
+  git add = "I want to save these changes."
+  git commit = "Save them permanently."
+</p>
+</div>
+
+<pre><code># See what's changed (working dir)
+$ git status
+
+# Stage specific files
+$ git add index.html service-worker.js
+
+# Commit (snapshot the staged changes)
+$ git commit -m "Add buy alert feature"
+
+# Push to GitHub (share the snapshot)
+$ git push</code></pre>
+
+<h3>What's a Commit?</h3>
+
+<p>
+A commit is a snapshot with metadata:
+</p>
+
+<ul>
+<li><strong>Hash</strong> &mdash; a unique ID
+  like <code>ae13b2c</code>
+  (the first 7 chars of a long hex string)</li>
+<li><strong>Author</strong> &mdash; who made it</li>
+<li><strong>Date</strong> &mdash; when</li>
+<li><strong>Message</strong> &mdash; why
+  ("Add buy alert feature")</li>
+<li><strong>Parent</strong> &mdash; which commit
+  came before it (forming a chain)</li>
+</ul>
+
+<pre><code>$ git log --oneline -5
+ae13b2c Add Terminal Power Moves section
+5b2b800 Add Headless Mode and Custom Commands
+e6c5516 Add APIs, localStorage, Service Workers
+4d0bbb3 Add Real Scenarios to all sections
+586e279 Initial Advanced Claude guide</code></pre>
+
+<h3>Remotes: Local vs GitHub</h3>
+
+<p>
+Your git repository exists in two places:
+</p>
+
+<ul>
+<li><strong>Local</strong> (on your Mac)
+  &mdash; in the <code>.git/</code> folder
+  inside your project</li>
+<li><strong>Remote</strong> (on GitHub)
+  &mdash; called <code>origin</code></li>
+</ul>
+
+<pre><code># See your remotes
+$ git remote -v
+origin  https://github.com/atdi1029-byte/
+  book-notes.git (fetch)
+origin  https://github.com/atdi1029-byte/
+  book-notes.git (push)
+
+# Push sends your local commits to GitHub
+$ git push origin main
+
+# Pull downloads GitHub's commits to local
+$ git pull origin main</code></pre>
+
+<p>
+<code>git push</code> = upload.
+<code>git pull</code> = download.
+<code>origin</code> is just a nickname
+for the GitHub URL.
+<code>main</code> is the branch name.
+</p>
+
+<h3>Branches: Parallel Timelines</h3>
+
+<p>
+A branch is like a copy of your project
+that you can change independently.
+The main branch is called
+<code>main</code> (or sometimes
+<code>master</code>).
+</p>
+
+<pre><code># See what branch you're on
+$ git branch
+* main
+
+# Create a new branch
+$ git checkout -b experiment
+
+# Switch between branches
+$ git checkout main
+
+# Merge a branch back into main
+$ git checkout main
+$ git merge experiment</code></pre>
+
+<p>
+This is what Claude's
+<code>--worktree</code> feature uses
+under the hood. Each worktree is a
+separate branch in its own directory.
+</p>
+
+<h3>The .git Folder</h3>
+
+<p>
+Every git repo has a hidden
+<code>.git/</code> folder that contains
+ALL of git's data &mdash; every commit,
+every branch, every version of every file.
+</p>
+
+<pre><code>$ ls .git/
+HEAD        # what branch you're on
+config      # remote URLs, settings
+objects/    # all the file snapshots
+refs/       # branch pointers</code></pre>
+
+<p>
+Never edit anything in <code>.git/</code>
+manually. Git manages it.
+If you delete <code>.git/</code>,
+you lose all git history (but keep
+the current files).
+</p>
+
+<div class="quiz">
+<div class="quiz-q">
+  What's the difference between
+  <code>git add</code> and
+  <code>git commit</code>?
+</div>
+<div class="quiz-opts">
+  <button class="quiz-opt" data-answer="stage"
+    onclick="checkQuiz(this,'stage','q8e')">
+    git add selects which changes to include;
+    git commit saves them permanently</button>
+  <button class="quiz-opt" data-answer="same"
+    onclick="checkQuiz(this,'stage','q8e')">
+    They do the same thing</button>
+  <button class="quiz-opt" data-answer="push"
+    onclick="checkQuiz(this,'stage','q8e')">
+    git add saves locally;
+    git commit pushes to GitHub</button>
+</div>
+<div class="quiz-explain" id="q8e">
+  <code>git add</code> moves changes to the
+  staging area &mdash; "these are the ones
+  I want to save." <code>git commit</code>
+  takes everything in staging and creates
+  a permanent snapshot. Neither one touches
+  GitHub &mdash; that's <code>git push</code>.
+</div>
+</div>
+</div>
+
+<!-- ======== PART 9 ======== -->
+<div class="section" id="part9">
+<h2>Part 9: ADB Demystified</h2>
+<p class="section-sub">
+  What those Android Debug Bridge commands
+  actually do.
+</p>
+
+<p>
+ADB (Android Debug Bridge) is how your Mac
+talks to your Android phone via USB.
+Claude uses it constantly to cachebust
+your apps after pushing changes.
+Let's decode what's actually happening.
+</p>
+
+<h3>The Basic Structure</h3>
+
+<pre><code>adb -s R3CW506ZK7N shell "am start ..."
+ |   |              |      |
+ |   |              |      +-- Android command
+ |   |              +-- "run on the phone"
+ |   +-- YOUR phone's serial number
+ +-- Android Debug Bridge</code></pre>
+
+<p>
+Every ADB command follows this pattern:
+<code>adb</code> (the program) +
+<code>-s SERIAL</code> (which phone) +
+<code>shell</code> (run on the phone) +
+the actual command to run.
+</p>
+
+<h3>Your Device Serial Number</h3>
+
+<p>
+<code>R3CW506ZK7N</code> is the unique ID
+of YOUR phone. If you ever get a new phone,
+this number changes and all the ADB
+commands in CLAUDE.md need updating.
+</p>
+
+<pre><code># See all connected devices
+$ adb devices
+List of devices attached
+R3CW506ZK7N	device</code></pre>
+
+<p>
+If you see "no devices" or "unauthorized,"
+the phone isn't connected properly or
+you need to approve USB debugging on
+the phone screen.
+</p>
+
+<h3>The Cachebust Command Decoded</h3>
+
+<pre><code>adb -s R3CW506ZK7N shell \
+  "am start \
+   -a android.intent.action.VIEW \
+   -d 'https://atdi1029-byte.github.io/\
+bloom-portfolios/?cachebust=1710847200'"</code></pre>
+
+<p>
+Breaking this down:
+</p>
+
+<ul>
+<li><code>am start</code> &mdash;
+  "Activity Manager, start something."
+  It's like tapping an app icon.</li>
+<li><code>-a android.intent.action.VIEW</code>
+  &mdash; "I want to VIEW something"
+  (opens in Chrome)</li>
+<li><code>-d 'URL'</code> &mdash;
+  the URL to open</li>
+<li><code>?cachebust=1710847200</code> &mdash;
+  a random number (timestamp) appended
+  to the URL so Chrome treats it as
+  a brand new page and doesn't serve
+  from cache</li>
+</ul>
+
+<p>
+So the whole command means:
+"Hey phone, open Chrome and load this
+URL with a unique parameter so the
+service worker fetches fresh files
+instead of using the cache."
+</p>
+
+<h3>Other Useful ADB Commands</h3>
+
+<pre><code># Take a screenshot
+$ adb -s R3CW506ZK7N exec-out \
+  screencap -p > screenshot.png
+
+# Install an APK
+$ adb -s R3CW506ZK7N install myapp.apk
+
+# See running apps
+$ adb -s R3CW506ZK7N shell \
+  pm list packages | grep chrome
+
+# View device logs (debugging)
+$ adb -s R3CW506ZK7N logcat | grep -i error</code></pre>
+
+<div class="callout callout-red">
+<div class="callout-title">
+  The Command You Must NEVER Run</div>
+<code>adb shell pm clear com.android.chrome</code>
+wipes ALL of Chrome's data &mdash; every
+cookie, every localStorage entry, every
+cached file. That means ALL your PWA apps
+(Cadence, Bloom, Zercher, Roman Chariots,
+Sora) lose their local data simultaneously.
+This happened on March 14 2026 and it's
+why CLAUDE.md has the rule:
+<strong>NEVER run pm clear.</strong>
+Always use cachebust instead.
+</div>
+
+<div class="quiz">
+<div class="quiz-q">
+  You push an update to Bloom but your
+  phone still shows the old version.
+  What should you do?
+</div>
+<div class="quiz-opts">
+  <button class="quiz-opt" data-answer="bust"
+    onclick="checkQuiz(this,'bust','q9e')">
+    ADB cachebust with a unique URL parameter
+    </button>
+  <button class="quiz-opt" data-answer="clear"
+    onclick="checkQuiz(this,'bust','q9e')">
+    Clear Chrome data on the phone</button>
+  <button class="quiz-opt" data-answer="wait"
+    onclick="checkQuiz(this,'bust','q9e')">
+    Just wait for it to update</button>
+</div>
+<div class="quiz-explain" id="q9e">
+  Cachebust via ADB opens the URL with a
+  fresh parameter, forcing Chrome to
+  check for new files. NEVER clear Chrome
+  data &mdash; that wipes localStorage
+  for every app. Waiting might work
+  eventually, but cachebusting is instant.
+</div>
+</div>
+</div>
+
+<!-- ======== PART 10 ======== -->
+<div class="section" id="part10">
+<h2>Part 10: Terminal Power Moves</h2>
+<p class="section-sub">
+  The tricks that make everything faster.
+</p>
+
+<h3>caffeinate: Keep Your Mac Awake</h3>
+
+<p>
+When Claude is building a 1,300-line
+book HTML or processing a PDF, the last
+thing you want is your Mac going to sleep.
+<code>caffeinate</code> prevents that:
+</p>
+
+<pre><code># Keep awake while Claude runs
+$ caffeinate claude
+
+# Keep awake indefinitely (in another tab)
+$ caffeinate -d -i -s
+# -d = no display sleep
+# -i = no idle sleep
+# -s = no system sleep (even on battery)
+
+# Keep awake for a specific time (2 hours)
+$ caffeinate -t 7200</code></pre>
+
+<p>
+When you run <code>caffeinate claude</code>,
+it wraps Claude in a "stay awake" wrapper.
+When Claude exits, caffeinate stops and
+your Mac can sleep normally again.
+</p>
+
+<h3>Shell Aliases: Custom Shortcuts</h3>
+
+<p>
+An alias turns a long command into
+a short one. Add these to your
+<code>~/.zshrc</code>:
+</p>
+
+<pre><code># Quick Claude
+alias cc="caffeinate claude"
+alias ccs="caffeinate claude \
+  --dangerously-skip-permissions"
+alias ccr="caffeinate claude --continue"
+
+# Quick navigation
+alias books="cd ~/Documents/Code/Claude/Books"
+alias bloom="cd ~/Documents/Code/Claude/Bloom"
+alias apps="cd ~/Documents/Code/Claude"
+
+# Quick cachebust
+bust() {
+  adb -s R3CW506ZK7N shell \
+    "am start -a android.intent.action.VIEW \
+    -d '$1?cachebust=$(date +%s)'"
+}
+
+# Usage: bust "https://...github.io/bloom-portfolios/"</code></pre>
+
+<p>
+After saving <code>~/.zshrc</code>,
+run <code>source ~/.zshrc</code> to reload
+it. Now <code>cc</code> starts Claude
+with caffeinate, <code>books</code> jumps
+to the Books folder, and
+<code>bust URL</code> cachebusts
+your phone.
+</p>
+
+<h3>History: What Did I Type Before?</h3>
+
+<pre><code># See command history
+$ history
+
+# Search history
+$ history | grep "git push"
+1234  git push origin main
+1567  git push
+
+# Re-run a previous command
+$ !1234
+
+# Re-run the LAST command
+$ !!
+
+# The up/down arrow keys scroll
+# through recent commands</code></pre>
+
+<p>
+You can also press <code>Ctrl+R</code>
+and start typing to search through
+your command history interactively.
+This works both in the regular terminal
+AND inside Claude Code.
+</p>
+
+<h3>Multiple Tabs and tmux</h3>
+
+<p>
+Use multiple terminal tabs for different
+things:
+</p>
+
+<ul>
+<li><strong>Tab 1:</strong>
+  <code>caffeinate claude</code>
+  (main session)</li>
+<li><strong>Tab 2:</strong>
+  local preview server or git commands</li>
+<li><strong>Tab 3:</strong>
+  ADB commands and phone debugging</li>
+</ul>
+
+<p>
+For even more power, <code>tmux</code>
+keeps your session alive even if the
+terminal window closes:
+</p>
+
+<pre><code># Start a named session
+$ tmux new -s claude-work
+
+# Detach (leave running in background)
+# Press: Ctrl+B then D
+
+# Reattach later
+$ tmux attach -t claude-work
+# Everything is still running!</code></pre>
+
+<h3>Watching Files in Real-Time</h3>
+
+<pre><code># Watch a file's line count update live
+$ watch -n 1 wc -l index.html
+Every 1.0s: wc -l index.html
+2782 index.html    # updates every second
+
+# Get notified when a file changes
+$ fswatch -o index.html | while read; do
+  echo "Changed at $(date +%H:%M:%S)"
+done</code></pre>
+
+<h3>Quick Reference: Keyboard Shortcuts</h3>
+
+<ul>
+<li><strong><code>Tab</code></strong> &mdash;
+  autocomplete file/folder names</li>
+<li><strong><code>Ctrl+C</code></strong> &mdash;
+  cancel the running command</li>
+<li><strong><code>Ctrl+L</code></strong> &mdash;
+  clear the screen</li>
+<li><strong><code>Ctrl+R</code></strong> &mdash;
+  search command history</li>
+<li><strong><code>Ctrl+A</code></strong> &mdash;
+  jump to beginning of line</li>
+<li><strong><code>Ctrl+E</code></strong> &mdash;
+  jump to end of line</li>
+<li><strong><code>Ctrl+W</code></strong> &mdash;
+  delete word before cursor</li>
+<li><strong><code>Up/Down</code></strong> &mdash;
+  scroll through command history</li>
+</ul>
+
+<div class="callout">
+<div class="callout-title">
+  Remember: This Guide Is Alive</div>
+Every time you learn a new terminal trick,
+ask Claude to add it here.
+The guide grows with your skills.
+</div>
+</div>
+
+</div><!-- end content -->
+
+<script>
+window.addEventListener('scroll', function() {
+  var h = document.documentElement;
+  var pct = (h.scrollTop /
+    (h.scrollHeight - h.clientHeight)) * 100;
+  document.getElementById('progressBar')
+    .style.width = pct + '%';
+});
+var sections = document.querySelectorAll('.section');
+var navLinks = document.querySelectorAll('.nav-links a');
+window.addEventListener('scroll', function() {
+  var current = '';
+  sections.forEach(function(s) {
+    if (window.scrollY >= s.offsetTop - 100)
+      current = s.id;
+  });
+  navLinks.forEach(function(a) {
+    a.classList.toggle('active',
+      a.getAttribute('href') === '#' + current);
+  });
+});
+function checkQuiz(btn, correct, explainId) {
+  var parent = btn.closest('.quiz');
+  var opts = parent.querySelectorAll('.quiz-opt');
+  var already = false;
+  opts.forEach(function(o) {
+    if (o.classList.contains('correct') ||
+        o.classList.contains('wrong'))
+      already = true;
+  });
+  if (already) return;
+  opts.forEach(function(o) {
+    if (o.dataset.answer === correct)
+      o.classList.add('correct');
+    else if (o === btn)
+      o.classList.add('wrong');
+  });
+  var ex = document.getElementById(explainId);
+  if (ex) ex.style.display = 'block';
+}
+</script>
+
+<script>var BM_KEY = 'bm_terminal_101';</script>
+<script src="../book.js?v=3"></script>
+
+</body>
+</html>
