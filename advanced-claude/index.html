@@ -3023,6 +3023,157 @@ Answers without affecting the main
 conversation flow.
 </p>
 
+<h3>Terminal Power Moves</h3>
+
+<p>
+These aren't Claude Code features &mdash;
+they're terminal tricks that make your
+Claude sessions smoother. The kind of
+things power users just do automatically.
+</p>
+
+<h4>caffeinate: Keep Your Mac Awake</h4>
+
+<p>
+When Claude is in the middle of a big task
+&mdash; building a 1,300-line book HTML,
+running a batch of note compactions,
+processing a PDF &mdash; the last thing
+you want is your Mac going to sleep and
+killing the session.
+</p>
+
+<pre><code># Wrap Claude in caffeinate
+caffeinate claude
+
+# Or if Claude is already running,
+# caffeinate in another terminal tab:
+caffeinate -d -i -s</code></pre>
+
+<p>
+<code>caffeinate</code> is a built-in macOS
+command that prevents sleep. When you run
+<code>caffeinate claude</code>, your Mac
+stays awake for the entire Claude session
+and goes back to normal sleep behavior
+when you exit. The flags:
+</p>
+
+<ul>
+<li><code>-d</code> &mdash; prevent display
+  sleep (screen stays on)</li>
+<li><code>-i</code> &mdash; prevent idle
+  sleep (system stays awake)</li>
+<li><code>-s</code> &mdash; prevent system
+  sleep (even on battery)</li>
+</ul>
+
+<div class="callout callout-green">
+<div class="callout-title">You're Already Doing This</div>
+Look at your terminal tab right now &mdash;
+it says "caffeinate" in the title.
+That's this command running, keeping your
+Mac awake while we build this guide.
+</div>
+
+<h4>tmux / screen: Persistent Sessions</h4>
+
+<p>
+What if your terminal closes accidentally?
+<code>tmux</code> keeps your session alive
+even if you close the terminal window:
+</p>
+
+<pre><code># Start a persistent session
+tmux new -s claude-work
+
+# Run Claude inside tmux
+caffeinate claude
+
+# If your terminal closes, reattach:
+tmux attach -t claude-work
+# Claude is still running!</code></pre>
+
+<p>
+This is like giving your Claude session
+an insurance policy. Terminal crash?
+SSH disconnect? Just reattach and
+everything is still there.
+</p>
+
+<h4>Multiple Terminal Tabs</h4>
+
+<p>
+Use separate terminal tabs for different
+concerns:
+</p>
+
+<ul>
+<li><strong>Tab 1:</strong>
+  <code>caffeinate claude</code>
+  (your main session)</li>
+<li><strong>Tab 2:</strong>
+  <code>cd Books && python3 -m http.server</code>
+  (preview your book HTML locally)</li>
+<li><strong>Tab 3:</strong>
+  git commands, file browsing,
+  ADB cachebust commands</li>
+</ul>
+
+<h4>Shell Aliases for Common Workflows</h4>
+
+<p>
+Add these to your <code>~/.zshrc</code>
+or <code>~/.bashrc</code> for quick access:
+</p>
+
+<pre><code># Quick Claude with caffeinate
+alias cc="caffeinate claude"
+
+# Claude with skip permissions
+alias ccs="caffeinate claude \
+  --dangerously-skip-permissions"
+
+# Claude in plan mode
+alias ccp="caffeinate claude \
+  --permission-mode plan"
+
+# Resume last session
+alias ccr="caffeinate claude --continue"
+
+# ADB cachebust a URL
+bust() {
+  adb -s R3CW506ZK7N shell \
+    "am start -a android.intent.action.VIEW \
+    -d '$1?cachebust=$(date +%s)'"
+}</code></pre>
+
+<p>
+Now instead of typing the full command,
+just: <code>cc</code> to start,
+<code>ccs</code> for automation mode,
+<code>bust "https://..."</code>
+to cachebust your phone.
+</p>
+
+<h4>Watching Files Change in Real-Time</h4>
+
+<pre><code># Watch a file for changes (useful when
+# Claude is editing while you watch)
+watch -n 1 wc -l index.html
+
+# Or use fswatch for file change events
+fswatch -o index.html | while read; do
+  echo "File changed at $(date)"
+done</code></pre>
+
+<p>
+When Claude is building a big file,
+you can watch the line count grow in
+real-time from another terminal tab.
+Satisfying and useful for tracking progress.
+</p>
+
 <h3>Troubleshooting Cheat Sheet</h3>
 
 <ul>
