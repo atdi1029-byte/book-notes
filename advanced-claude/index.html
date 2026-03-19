@@ -1,0 +1,1899 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"
+  content="width=device-width, initial-scale=1.0">
+<title>Advanced Claude Code Mastery</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Playfair+Display:wght@400;700&display=swap');
+
+:root {
+  --bg: #0d1117;
+  --bg2: #161b22;
+  --bg3: #1c2333;
+  --text: #e6edf3;
+  --muted: #8b949e;
+  --accent: #bc8cff;
+  --accent2: #d4a0ff;
+  --orange: #d4822a;
+  --blue: #58a6ff;
+  --green: #3fb950;
+  --red: #f85149;
+  --border: #30363d;
+  --code-bg: #0d1117;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Inter', -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.75;
+  overflow-x: hidden;
+}
+.progress-bar {
+  position: fixed; top: 0; left: 0;
+  height: 3px;
+  background: linear-gradient(90deg,
+    var(--accent), var(--accent2));
+  z-index: 1000; transition: width 0.2s;
+}
+.nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  background: rgba(13,17,23,0.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  z-index: 999; padding: 0 24px;
+  display: flex; align-items: center;
+  height: 52px; gap: 24px;
+}
+.nav-title {
+  font-weight: 600; font-size: 14px;
+  color: var(--accent); white-space: nowrap;
+}
+.nav-links {
+  display: flex; gap: 6px;
+  overflow-x: auto; scrollbar-width: none;
+}
+.nav-links::-webkit-scrollbar { display: none; }
+.nav-links a {
+  color: var(--muted); text-decoration: none;
+  font-size: 12px; padding: 6px 10px;
+  border-radius: 6px; white-space: nowrap;
+  transition: all 0.2s;
+}
+.nav-links a:hover, .nav-links a.active {
+  color: var(--text); background: var(--bg3);
+}
+.content {
+  max-width: 780px; margin: 0 auto;
+  padding: 80px 28px 100px;
+}
+.cover {
+  text-align: center; padding: 80px 0 70px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 60px;
+}
+.cover h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: 42px; font-weight: 700;
+  line-height: 1.2; margin-bottom: 16px;
+  background: linear-gradient(135deg,
+    var(--accent), var(--accent2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.cover .sub {
+  font-size: 18px; color: var(--muted);
+  font-weight: 300; margin-bottom: 32px;
+  line-height: 1.6;
+}
+.cover .meta {
+  font-size: 13px; color: var(--muted);
+  opacity: 0.7;
+}
+.toc {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 28px 32px; margin-bottom: 60px;
+}
+.toc-title {
+  font-weight: 600; font-size: 16px;
+  margin-bottom: 16px; color: var(--accent);
+}
+.toc ol { list-style: none; counter-reset: toc; }
+.toc li {
+  counter-increment: toc; margin-bottom: 8px;
+}
+.toc li::before {
+  content: counter(toc) ".";
+  color: var(--accent); font-weight: 600;
+  margin-right: 10px; font-size: 14px;
+}
+.toc a {
+  color: var(--text); text-decoration: none;
+  font-size: 15px; transition: color 0.2s;
+}
+.toc a:hover { color: var(--accent); }
+.toc .toc-desc {
+  color: var(--muted); font-size: 13px;
+  margin-left: 24px; display: block;
+}
+.section {
+  margin-bottom: 70px; padding-top: 20px;
+}
+.section h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 30px; font-weight: 700;
+  color: var(--accent); margin-bottom: 8px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--border);
+}
+.section .section-sub {
+  color: var(--muted); font-size: 15px;
+  margin-bottom: 28px;
+}
+h3 {
+  font-size: 20px; font-weight: 600;
+  margin: 36px 0 14px; color: var(--text);
+}
+h4 {
+  font-size: 16px; font-weight: 600;
+  margin: 24px 0 10px; color: var(--accent2);
+}
+p { margin-bottom: 16px; font-size: 15.5px; }
+ul, ol {
+  margin: 12px 0 18px 24px; font-size: 15.5px;
+}
+li { margin-bottom: 8px; }
+strong { color: #fff; font-weight: 600; }
+.callout {
+  background: var(--bg2);
+  border-left: 4px solid var(--accent);
+  padding: 18px 22px; margin: 22px 0;
+  border-radius: 0 10px 10px 0;
+  font-size: 14.5px;
+}
+.callout-title {
+  font-weight: 600; color: var(--accent);
+  margin-bottom: 6px; font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.callout-blue { border-left-color: var(--blue); }
+.callout-blue .callout-title {
+  color: var(--blue); }
+.callout-green { border-left-color: var(--green); }
+.callout-green .callout-title {
+  color: var(--green); }
+.callout-orange {
+  border-left-color: var(--orange); }
+.callout-orange .callout-title {
+  color: var(--orange); }
+.callout-red { border-left-color: var(--red); }
+.callout-red .callout-title {
+  color: var(--red); }
+code {
+  font-family: 'JetBrains Mono', monospace;
+  background: var(--bg3); padding: 2px 7px;
+  border-radius: 4px; font-size: 13.5px;
+  color: var(--accent2);
+}
+pre {
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  padding: 20px 24px; border-radius: 10px;
+  overflow-x: auto; margin: 16px 0 22px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px; line-height: 1.7;
+  color: var(--text);
+}
+pre code {
+  background: none; padding: 0;
+  font-size: inherit; color: inherit;
+}
+.cmd-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px; margin: 16px 0;
+}
+.cmd-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 8px; padding: 12px 16px;
+}
+.cmd-card code {
+  display: block; margin-bottom: 4px;
+  font-size: 13px;
+}
+.cmd-card .cmd-desc {
+  font-size: 12px; color: var(--muted);
+}
+.diagram {
+  text-align: center; margin: 28px 0;
+  padding: 24px; background: var(--bg2);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  overflow-x: auto;
+}
+.diagram svg {
+  max-width: 100%; height: auto;
+}
+.diagram-caption {
+  font-size: 13px; color: var(--muted);
+  margin-top: 12px; font-style: italic;
+}
+.quiz {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 12px; padding: 24px;
+  margin: 28px 0;
+}
+.quiz-q {
+  font-weight: 600; margin-bottom: 14px;
+  font-size: 15px;
+}
+.quiz-opts {
+  display: flex; flex-direction: column;
+  gap: 8px;
+}
+.quiz-opt {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  padding: 12px 16px; border-radius: 8px;
+  cursor: pointer; font-size: 14px;
+  transition: all 0.2s; text-align: left;
+  color: var(--text); font-family: inherit;
+  width: 100%;
+}
+.quiz-opt:hover {
+  border-color: var(--accent);
+  background: rgba(188,140,255,0.06);
+}
+.quiz-opt.correct {
+  border-color: var(--green);
+  background: rgba(63,185,80,0.12);
+  color: var(--green);
+}
+.quiz-opt.wrong {
+  border-color: var(--red);
+  background: rgba(248,81,73,0.08);
+  color: var(--red);
+}
+.quiz-explain {
+  margin-top: 14px; font-size: 14px;
+  color: var(--muted); display: none;
+  padding: 12px;
+  background: rgba(188,140,255,0.05);
+  border-radius: 8px;
+  border: 1px solid rgba(188,140,255,0.15);
+}
+.collapse-toggle {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  color: var(--text); padding: 14px 20px;
+  border-radius: 10px; cursor: pointer;
+  font-size: 15px; font-weight: 500;
+  width: 100%; text-align: left;
+  margin: 12px 0 0; transition: all 0.2s;
+  font-family: inherit; display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.collapse-toggle:hover {
+  border-color: var(--accent);
+}
+.collapse-toggle::after {
+  content: '+'; font-size: 18px;
+  color: var(--accent);
+  transition: transform 0.2s;
+}
+.collapse-toggle.open::after {
+  content: '-';
+}
+.collapse-body {
+  display: none; padding: 16px 20px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-top: none;
+  border-radius: 0 0 10px 10px;
+  margin-bottom: 12px;
+}
+.collapse-body.open { display: block; }
+/* Bookmark system */
+.bookmark-bar {
+  position: sticky; top: 52px; z-index: 998;
+  background: var(--bg2); color: var(--text);
+  padding: 0.5rem 1rem; display: none;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  cursor: pointer; font-family: 'Inter';
+  border-bottom: 1px solid var(--border);
+}
+.bookmark-bar:hover { background: var(--bg3); }
+.bookmark-bar .bm-label {
+  flex: 1; color: var(--text); }
+.bookmark-bar .bm-clear {
+  background: none;
+  border: 1px solid rgba(255,255,255,0.25);
+  color: var(--text); padding: 0.15rem 0.5rem;
+  border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; margin-left: 0.75rem;
+  font-family: inherit;
+}
+.bookmark-bar .bm-clear:hover {
+  background: rgba(255,255,255,0.1);
+}
+.bm-btn {
+  display: inline-block; cursor: pointer;
+  font-size: 0.75rem; opacity: 0;
+  margin-left: 0.5rem; vertical-align: middle;
+  transition: opacity 0.2s, transform 0.2s;
+  user-select: none;
+}
+h2:hover .bm-btn, h3:hover .bm-btn,
+h4:hover .bm-btn { opacity: 0.5; }
+p:hover > .bm-p { opacity: 0.5; }
+.bm-btn:hover {
+  opacity: 0.8 !important;
+  transform: scale(1.2);
+}
+.bm-btn.active {
+  opacity: 1 !important;
+  color: var(--accent);
+}
+.bm-p {
+  position: absolute; left: -1.8rem;
+  top: 0.15em; margin-left: 0;
+  font-size: 0.65rem;
+}
+p { position: relative; }
+li > strong > .bm-btn {
+  position: absolute; left: -2rem;
+  top: 0.15em; margin-left: 0;
+}
+li:has(> strong > .bm-btn) {
+  position: relative; }
+li:hover > strong > .bm-btn { opacity: 0.5; }
+.bm-toast {
+  position: fixed; bottom: 1.5rem;
+  left: 50%; transform: translateX(-50%);
+  background: var(--bg2); color: var(--text);
+  padding: 0.5rem 1.25rem; border-radius: 6px;
+  font-size: 0.85rem; z-index: 1100;
+  opacity: 0; transition: opacity 0.3s;
+  pointer-events: none;
+  border: 1px solid var(--border);
+  font-family: 'Inter', sans-serif;
+}
+.bm-toast.show { opacity: 1; }
+@media (max-width: 600px) {
+  .cover h1 { font-size: 28px; }
+  .cover .sub { font-size: 15px; }
+  .content { padding: 70px 18px 60px; }
+  .section h2 { font-size: 24px; }
+  h3 { font-size: 18px; }
+  .nav-title { display: none; }
+  .cmd-grid { grid-template-columns: 1fr; }
+  .bookmark-bar { top: 0; }
+  .bm-p {
+    position: static; float: right; margin: 0;
+  }
+  li > strong > .bm-btn {
+    position: static; margin-left: 0.3rem;
+  }
+}
+</style>
+</head>
+<body>
+
+<div class="bookmark-bar" id="bookmarkBar"
+  onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel">
+    Resume reading</span>
+  <button class="bm-clear"
+    onclick="event.stopPropagation();clearBookmark()">
+    Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<div class="progress-bar" id="progressBar"></div>
+
+<nav class="nav">
+  <span class="nav-title">Advanced Claude</span>
+  <div class="nav-links">
+    <a href="#part1">Power User</a>
+    <a href="#part2">Commands</a>
+    <a href="#part3">Plan Mode</a>
+    <a href="#part4">Subagents</a>
+    <a href="#part5">CLAUDE.md</a>
+    <a href="#part6">Hooks</a>
+    <a href="#part7">MCP</a>
+    <a href="#part8">Permissions</a>
+    <a href="#part9">Context</a>
+    <a href="#part10">Git</a>
+    <a href="#part11">Shortcuts</a>
+    <a href="#part12">Pro Tips</a>
+  </div>
+</nav>
+
+<div class="content">
+
+<div class="cover">
+  <h1>Advanced Claude Code<br>Mastery</h1>
+  <p class="sub">
+    Every feature, trick, and power move
+    in Claude Code &mdash; from slash commands
+    to custom subagents to hooks that
+    automate your entire workflow.
+  </p>
+  <p class="meta">
+    The complete power user guide
+    by Alex Barnett &amp; Claude
+  </p>
+</div>
+
+<div class="toc">
+  <div class="toc-title">Table of Contents</div>
+  <ol>
+    <li>
+      <a href="#part1">The Power User Mindset</a>
+      <span class="toc-desc">
+        What separates casual users
+        from Claude Code masters</span>
+    </li>
+    <li>
+      <a href="#part2">All 60+ Slash Commands</a>
+      <span class="toc-desc">
+        Every command organized
+        by what it does</span>
+    </li>
+    <li>
+      <a href="#part3">Plan Mode Deep Dive</a>
+      <span class="toc-desc">
+        Read-only exploration before
+        committing to changes</span>
+    </li>
+    <li>
+      <a href="#part4">Subagents &amp; Delegation</a>
+      <span class="toc-desc">
+        Parallel workers, custom agents,
+        background tasks</span>
+    </li>
+    <li>
+      <a href="#part5">CLAUDE.md &amp; Memory</a>
+      <span class="toc-desc">
+        The instruction hierarchy that
+        controls Claude's behavior</span>
+    </li>
+    <li>
+      <a href="#part6">Hooks: Automate Everything</a>
+      <span class="toc-desc">
+        Shell commands that fire
+        on every action</span>
+    </li>
+    <li>
+      <a href="#part7">MCP Servers</a>
+      <span class="toc-desc">
+        Connect Claude to external tools,
+        APIs, and databases</span>
+    </li>
+    <li>
+      <a href="#part8">Permissions &amp; Security</a>
+      <span class="toc-desc">
+        Permission modes, rules,
+        and sandboxing</span>
+    </li>
+    <li>
+      <a href="#part9">Context Window Mastery</a>
+      <span class="toc-desc">
+        Managing tokens, compaction,
+        and session efficiency</span>
+    </li>
+    <li>
+      <a href="#part10">Git Workflows</a>
+      <span class="toc-desc">
+        Commits, PRs, worktrees,
+        and parallel development</span>
+    </li>
+    <li>
+      <a href="#part11">Keyboard Shortcuts</a>
+      <span class="toc-desc">
+        Every shortcut and
+        interactive mode trick</span>
+    </li>
+    <li>
+      <a href="#part12">Pro Tips &amp; Cheat Sheet</a>
+      <span class="toc-desc">
+        Advanced patterns, troubleshooting,
+        and quick reference</span>
+    </li>
+  </ol>
+</div>
+
+<!-- ======== PART 1 ======== -->
+<div class="section" id="part1">
+<h2>Part 1: The Power User Mindset</h2>
+<p class="section-sub">
+  Claude Code is an operating system
+  for AI-assisted development.
+  Most people use 10% of it.
+</p>
+
+<p>
+Right now, you open Claude Code, type what
+you want, and Claude builds it. That works.
+But you're leaving massive power on the table.
+</p>
+
+<p>
+Think of it this way: you've been driving
+a sports car in first gear.
+This guide teaches you to use all the gears.
+Here's what most people never discover:
+</p>
+
+<ul>
+<li><strong>60+ slash commands</strong> that
+  control everything from models to themes
+  to session management</li>
+<li><strong>Plan mode</strong> where Claude
+  researches and plans without changing
+  anything, then you approve</li>
+<li><strong>Subagents</strong> &mdash; parallel
+  workers that do research, run tests,
+  and explore code simultaneously</li>
+<li><strong>Custom agents</strong> you design
+  yourself with specific roles and
+  permissions</li>
+<li><strong>Hooks</strong> that automatically run
+  shell commands every time Claude
+  edits a file, makes a commit,
+  or takes any action</li>
+<li><strong>MCP servers</strong> that connect
+  Claude to GitHub, Slack, databases,
+  APIs, and any external service</li>
+<li><strong>CLAUDE.md files</strong> that
+  permanently teach Claude your
+  project's rules, patterns,
+  and preferences</li>
+<li><strong>Memory files</strong> where Claude
+  records what it learns across sessions
+  so it never forgets</li>
+</ul>
+
+<div class="callout callout-green">
+<div class="callout-title">Your Setup Already Uses Some of This</div>
+Your CLAUDE.md already has rules for book
+projects, gig outreach, and app conventions.
+Your memory files track service worker
+versions, localStorage keys, and app
+architectures. But there's SO much more
+you can do with these systems.
+</div>
+
+<h3>The Three Levels of Claude Code Usage</h3>
+
+<div class="diagram">
+<svg viewBox="0 0 700 220" width="700">
+  <!-- Level 1 -->
+  <rect x="20" y="130" width="200" height="70"
+    rx="10" fill="rgba(88,166,255,0.1)"
+    stroke="#58a6ff" stroke-width="2"/>
+  <text x="120" y="158" text-anchor="middle"
+    font-family="Inter" font-size="14"
+    font-weight="600" fill="#58a6ff">
+    Level 1: Chat</text>
+  <text x="120" y="178" text-anchor="middle"
+    font-family="Inter" font-size="11"
+    fill="#8b949e">
+    "Build me X" &rarr; done</text>
+  <!-- Level 2 -->
+  <rect x="250" y="80" width="200" height="120"
+    rx="10" fill="rgba(188,140,255,0.1)"
+    stroke="#bc8cff" stroke-width="2"/>
+  <text x="350" y="108" text-anchor="middle"
+    font-family="Inter" font-size="14"
+    font-weight="600" fill="#bc8cff">
+    Level 2: Direct</text>
+  <text x="350" y="130" text-anchor="middle"
+    font-family="Inter" font-size="11"
+    fill="#8b949e">
+    CLAUDE.md + memory</text>
+  <text x="350" y="148" text-anchor="middle"
+    font-family="Inter" font-size="11"
+    fill="#8b949e">
+    /commit + /compact</text>
+  <text x="350" y="166" text-anchor="middle"
+    font-family="Inter" font-size="11"
+    fill="#8b949e">
+    Session naming</text>
+  <!-- Level 3 -->
+  <rect x="480" y="20" width="200" height="180"
+    rx="10" fill="rgba(63,185,80,0.1)"
+    stroke="#3fb950" stroke-width="2"/>
+  <text x="580" y="50" text-anchor="middle"
+    font-family="Inter" font-size="14"
+    font-weight="600" fill="#3fb950">
+    Level 3: Orchestrate</text>
+  <text x="580" y="72" text-anchor="middle"
+    font-family="Inter" font-size="11"
+    fill="#8b949e">Custom subagents</text>
+  <text x="580" y="90" text-anchor="middle"
+    font-family="Inter" font-size="11"
+    fill="#8b949e">Hooks automation</text>
+  <text x="580" y="108" text-anchor="middle"
+    font-family="Inter" font-size="11"
+    fill="#8b949e">MCP integrations</text>
+  <text x="580" y="126" text-anchor="middle"
+    font-family="Inter" font-size="11"
+    fill="#8b949e">Plan mode workflows</text>
+  <text x="580" y="144" text-anchor="middle"
+    font-family="Inter" font-size="11"
+    fill="#8b949e">Parallel worktrees</text>
+  <text x="580" y="162" text-anchor="middle"
+    font-family="Inter" font-size="11"
+    fill="#8b949e">Background tasks</text>
+  <text x="580" y="180" text-anchor="middle"
+    font-family="Inter" font-size="11"
+    fill="#8b949e">Headless automation</text>
+  <!-- You are here -->
+  <text x="120" y="125" text-anchor="middle"
+    font-family="Inter" font-size="12"
+    font-weight="600" fill="#d4822a">
+    You are here</text>
+  <path d="M120 130 L120 128"
+    stroke="#d4822a" stroke-width="2"/>
+  <!-- Arrow -->
+  <text x="580" y="210" text-anchor="middle"
+    font-family="Inter" font-size="12"
+    font-weight="600" fill="#3fb950">
+    Going here</text>
+</svg>
+</div>
+</div>
+
+<!-- ======== PART 2 ======== -->
+<div class="section" id="part2">
+<h2>Part 2: All 60+ Slash Commands</h2>
+<p class="section-sub">
+  Type <code>/</code> to see them all.
+  Here are the ones that matter most.
+</p>
+
+<h3>Session Control</h3>
+
+<div class="cmd-grid">
+<div class="cmd-card">
+  <code>/clear</code>
+  <span class="cmd-desc">Wipe conversation history
+  and start fresh. Also: /reset, /new</span>
+</div>
+<div class="cmd-card">
+  <code>/compact</code>
+  <span class="cmd-desc">Compress conversation to
+  save tokens. Add focus: /compact "keep the CSS changes"</span>
+</div>
+<div class="cmd-card">
+  <code>/resume</code>
+  <span class="cmd-desc">Resume a previous session
+  by name or pick from list. Also: /continue</span>
+</div>
+<div class="cmd-card">
+  <code>/branch</code>
+  <span class="cmd-desc">Fork the conversation at
+  this point. Try different approaches
+  without losing progress</span>
+</div>
+<div class="cmd-card">
+  <code>/rewind</code>
+  <span class="cmd-desc">Undo back to a previous
+  checkpoint in the conversation</span>
+</div>
+<div class="cmd-card">
+  <code>/rename</code>
+  <span class="cmd-desc">Name current session for
+  easy resuming later</span>
+</div>
+</div>
+
+<h3>Configuration</h3>
+
+<div class="cmd-grid">
+<div class="cmd-card">
+  <code>/config</code>
+  <span class="cmd-desc">Open settings UI &mdash;
+  theme, model, output style. Also: /settings</span>
+</div>
+<div class="cmd-card">
+  <code>/model</code>
+  <span class="cmd-desc">Switch AI model.
+  Opus (smartest), Sonnet (balanced),
+  Haiku (fastest)</span>
+</div>
+<div class="cmd-card">
+  <code>/effort</code>
+  <span class="cmd-desc">Set thinking depth:
+  low, medium, high, max.
+  Higher = slower but smarter</span>
+</div>
+<div class="cmd-card">
+  <code>/theme</code>
+  <span class="cmd-desc">Change color theme.
+  Light, dark, daltonized variants</span>
+</div>
+<div class="cmd-card">
+  <code>/permissions</code>
+  <span class="cmd-desc">View and update
+  what Claude is allowed to do</span>
+</div>
+<div class="cmd-card">
+  <code>/vim</code>
+  <span class="cmd-desc">Toggle Vim editing
+  mode for the input prompt</span>
+</div>
+</div>
+
+<h3>Development</h3>
+
+<div class="cmd-grid">
+<div class="cmd-card">
+  <code>/plan</code>
+  <span class="cmd-desc">Enter plan mode &mdash;
+  Claude researches but doesn't
+  change anything</span>
+</div>
+<div class="cmd-card">
+  <code>/diff</code>
+  <span class="cmd-desc">Open interactive diff viewer
+  showing all uncommitted changes</span>
+</div>
+<div class="cmd-card">
+  <code>/context</code>
+  <span class="cmd-desc">Visualize context usage
+  as a colored grid with
+  optimization tips</span>
+</div>
+<div class="cmd-card">
+  <code>/cost</code>
+  <span class="cmd-desc">Show token usage and
+  cost statistics for this session</span>
+</div>
+<div class="cmd-card">
+  <code>/hooks</code>
+  <span class="cmd-desc">View configured hooks
+  (automation rules)</span>
+</div>
+<div class="cmd-card">
+  <code>/mcp</code>
+  <span class="cmd-desc">Manage MCP server
+  connections and auth</span>
+</div>
+</div>
+
+<h3>Utilities</h3>
+
+<div class="cmd-grid">
+<div class="cmd-card">
+  <code>/btw</code>
+  <span class="cmd-desc">Ask a quick side question
+  without polluting the main conversation</span>
+</div>
+<div class="cmd-card">
+  <code>/copy</code>
+  <span class="cmd-desc">Copy last response to
+  clipboard. /copy 2 for second-to-last</span>
+</div>
+<div class="cmd-card">
+  <code>/export</code>
+  <span class="cmd-desc">Save conversation
+  as plain text file</span>
+</div>
+<div class="cmd-card">
+  <code>/stats</code>
+  <span class="cmd-desc">Visualize your usage
+  patterns, streaks, session history</span>
+</div>
+<div class="cmd-card">
+  <code>/voice</code>
+  <span class="cmd-desc">Toggle push-to-talk
+  voice dictation</span>
+</div>
+<div class="cmd-card">
+  <code>/doctor</code>
+  <span class="cmd-desc">Diagnose and verify
+  your Claude Code installation</span>
+</div>
+</div>
+
+<div class="callout callout-orange">
+<div class="callout-title">Hidden Gems</div>
+<strong>/insights</strong> generates a report
+analyzing all your sessions &mdash; what you
+build most, common patterns, time spent.
+<strong>/security-review</strong> analyzes
+pending changes for vulnerabilities before
+you commit. <strong>/color purple</strong>
+sets your prompt bar color (try it!).
+</div>
+</div>
+
+<!-- ======== PART 3 ======== -->
+<div class="section" id="part3">
+<h2>Part 3: Plan Mode Deep Dive</h2>
+<p class="section-sub">
+  Look before you leap. Plan mode lets Claude
+  research and design before touching code.
+</p>
+
+<p>
+Plan mode is read-only. Claude can explore
+your codebase, search files, read code,
+and think &mdash; but it <strong>cannot</strong>
+edit, write, or run commands.
+This is perfect when you want Claude to
+understand something before changing it.
+</p>
+
+<h3>How to Enter Plan Mode</h3>
+
+<ul>
+<li><strong>During a session:</strong>
+  Press <code>Shift+Tab</code> to cycle
+  through permission modes until you see
+  "plan mode on"</li>
+<li><strong>Via command:</strong>
+  Type <code>/plan</code></li>
+<li><strong>At startup:</strong>
+  <code>claude --permission-mode plan</code></li>
+</ul>
+
+<h3>When to Use Plan Mode</h3>
+
+<ul>
+<li><strong>New features:</strong> "How would you
+  add dark mode to Cadence?" &mdash; let Claude
+  explore the codebase and propose an
+  approach before writing code</li>
+<li><strong>Refactoring:</strong> "How should I
+  restructure the cloud sync?" &mdash;
+  Claude maps all the pieces first</li>
+<li><strong>Bug investigation:</strong> "Why does
+  the splitter sometimes show $0?" &mdash;
+  Claude traces the logic without
+  accidentally breaking things</li>
+<li><strong>Architecture decisions:</strong>
+  "Should I use a service worker or
+  just cache headers?" &mdash; Claude
+  researches trade-offs</li>
+</ul>
+
+<h3>The Plan Mode Workflow</h3>
+
+<div class="diagram">
+<svg viewBox="0 0 700 120" width="700">
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10"
+      refX="9" refY="5" markerWidth="6"
+      markerHeight="6"
+      orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z"
+        fill="#30363d"/>
+    </marker>
+  </defs>
+  <rect x="10" y="25" width="130" height="70"
+    rx="8" fill="rgba(188,140,255,0.1)"
+    stroke="#bc8cff" stroke-width="1.5"/>
+  <text x="75" y="53" text-anchor="middle"
+    font-family="Inter" font-size="13"
+    font-weight="600" fill="#bc8cff">
+    /plan</text>
+  <text x="75" y="73" text-anchor="middle"
+    font-family="Inter" font-size="11"
+    fill="#8b949e">Enter plan mode</text>
+  <path d="M145 60 L175 60"
+    stroke="#30363d" stroke-width="1.5"
+    marker-end="url(#arr)"/>
+  <rect x="180" y="25" width="130" height="70"
+    rx="8" fill="rgba(88,166,255,0.1)"
+    stroke="#58a6ff" stroke-width="1.5"/>
+  <text x="245" y="53" text-anchor="middle"
+    font-family="Inter" font-size="13"
+    font-weight="600" fill="#58a6ff">
+    Explore</text>
+  <text x="245" y="73" text-anchor="middle"
+    font-family="Inter" font-size="11"
+    fill="#8b949e">Read-only research</text>
+  <path d="M315 60 L345 60"
+    stroke="#30363d" stroke-width="1.5"
+    marker-end="url(#arr)"/>
+  <rect x="350" y="25" width="130" height="70"
+    rx="8" fill="rgba(212,130,42,0.1)"
+    stroke="#d4822a" stroke-width="1.5"/>
+  <text x="415" y="53" text-anchor="middle"
+    font-family="Inter" font-size="13"
+    font-weight="600" fill="#d4822a">
+    Plan</text>
+  <text x="415" y="73" text-anchor="middle"
+    font-family="Inter" font-size="11"
+    fill="#8b949e">You review &amp; approve</text>
+  <path d="M485 60 L515 60"
+    stroke="#30363d" stroke-width="1.5"
+    marker-end="url(#arr)"/>
+  <rect x="520" y="25" width="160" height="70"
+    rx="8" fill="rgba(63,185,80,0.1)"
+    stroke="#3fb950" stroke-width="1.5"/>
+  <text x="600" y="53" text-anchor="middle"
+    font-family="Inter" font-size="13"
+    font-weight="600" fill="#3fb950">
+    Execute</text>
+  <text x="600" y="73" text-anchor="middle"
+    font-family="Inter" font-size="11"
+    fill="#8b949e">Shift+Tab to allow edits</text>
+</svg>
+</div>
+
+<div class="callout callout-blue">
+<div class="callout-title">Real Example From Your Work</div>
+When building a new book HTML, Claude enters
+"plan mode" mentally &mdash; reading notes.md,
+checking the template, understanding the
+chapter structure &mdash; before writing a
+single line of HTML. You could formalize
+this by starting in plan mode, reviewing
+the proposed structure, then switching
+to execution.
+</div>
+</div>
+
+<!-- ======== PART 4 ======== -->
+<div class="section" id="part4">
+<h2>Part 4: Subagents &amp; Delegation</h2>
+<p class="section-sub">
+  Spawn parallel workers that research, explore,
+  and execute tasks independently.
+</p>
+
+<p>
+Subagents are separate Claude instances that
+run inside your session. They have their own
+context window, their own tools, and they
+report back when done. Think of them as
+interns you can send on errands.
+</p>
+
+<h3>Built-in Subagent Types</h3>
+
+<ul>
+<li><strong>Explore</strong> (uses Haiku &mdash;
+  fast and cheap) &mdash; searches files,
+  reads code, maps the codebase.
+  Perfect for "find where X is defined"
+  or "what files handle authentication?"</li>
+<li><strong>Plan</strong> (inherits your model)
+  &mdash; researches during plan mode,
+  gathers context before presenting
+  options</li>
+<li><strong>General-purpose</strong>
+  (inherits your model, all tools) &mdash;
+  complex multi-step tasks.
+  Can read, write, search, and run commands</li>
+<li><strong>Bash</strong> &mdash; runs terminal
+  commands in isolation</li>
+</ul>
+
+<h3>When Claude Uses Subagents</h3>
+
+<p>
+Claude automatically delegates when tasks
+benefit from parallelism or isolation:
+</p>
+
+<ul>
+<li><strong>Research in parallel:</strong>
+  "Read the Cadence sync code and the
+  Bloom sync code and compare them" &mdash;
+  two Explore agents run simultaneously</li>
+<li><strong>Keep main context clean:</strong>
+  verbose outputs (test results, large
+  file reads) go to a subagent so your
+  main conversation stays focused</li>
+<li><strong>Compacting notes:</strong> for book
+  projects, two agents compact the first
+  and second half of notes in parallel</li>
+</ul>
+
+<h3>Creating Custom Subagents</h3>
+
+<p>
+This is where it gets powerful. You can
+create your own specialized agents with
+specific roles, tools, and permissions.
+Create a markdown file in
+<code>.claude/agents/</code>:
+</p>
+
+<pre><code># .claude/agents/code-reviewer.md
+---
+name: code-reviewer
+description: Reviews code for quality
+tools: Read, Glob, Grep
+model: sonnet
+maxTurns: 10
+---
+
+You are a senior code reviewer.
+Check for:
+- Security vulnerabilities
+- Performance issues
+- Missing error handling
+- Inconsistent patterns</code></pre>
+
+<p>
+Now you can say "use the code-reviewer
+to check the Cadence sync function"
+and Claude spawns your custom agent.
+</p>
+
+<h4>Ideas for Custom Agents</h4>
+
+<ul>
+<li><strong>test-runner:</strong> runs tests
+  and reports only failures</li>
+<li><strong>docs-writer:</strong> generates
+  documentation from code</li>
+<li><strong>css-auditor:</strong> checks for
+  unused styles and inconsistencies</li>
+<li><strong>accessibility-checker:</strong>
+  scans HTML for a11y issues</li>
+<li><strong>perf-analyzer:</strong> profiles
+  JavaScript for bottlenecks</li>
+</ul>
+
+<h3>Background Tasks</h3>
+
+<p>
+Subagents can run in the background while
+you keep working. Press <code>Ctrl+B</code>
+to send a running task to the background.
+You'll be notified when it finishes.
+</p>
+
+<div class="callout callout-red">
+<div class="callout-title">Important Limitation</div>
+From your CLAUDE.md: <strong>NEVER use
+agents to write large HTML files.</strong>
+Agents consistently produce ~400 lines
+when 1000+ are needed. Agents are great
+for research, compacting notes, and
+running commands &mdash; but write
+final output directly.
+</div>
+</div>
+
+<!-- ======== PART 5 ======== -->
+<div class="section" id="part5">
+<h2>Part 5: CLAUDE.md &amp; Memory</h2>
+<p class="section-sub">
+  The instruction system that makes Claude
+  remember your rules permanently.
+</p>
+
+<p>
+CLAUDE.md is the single most important file
+for customizing Claude's behavior.
+It's loaded at the start of every session,
+before you type anything.
+Think of it as Claude's employee handbook.
+</p>
+
+<h3>The Instruction Hierarchy</h3>
+
+<div class="diagram">
+<svg viewBox="0 0 600 280" width="600">
+  <!-- Stack -->
+  <rect x="100" y="10" width="400" height="50"
+    rx="8" fill="rgba(248,81,73,0.15)"
+    stroke="#f85149" stroke-width="1.5"/>
+  <text x="300" y="32" text-anchor="middle"
+    font-family="Inter" font-size="13"
+    font-weight="600" fill="#f85149">
+    Managed Policy (IT/org-wide)</text>
+  <text x="300" y="48" text-anchor="middle"
+    font-family="Inter" font-size="11"
+    fill="#8b949e">
+    Highest priority &mdash; can't override</text>
+
+  <rect x="100" y="70" width="400" height="50"
+    rx="8" fill="rgba(188,140,255,0.15)"
+    stroke="#bc8cff" stroke-width="1.5"/>
+  <text x="300" y="92" text-anchor="middle"
+    font-family="Inter" font-size="13"
+    font-weight="600" fill="#bc8cff">
+    Project CLAUDE.md (in git repo)</text>
+  <text x="300" y="108" text-anchor="middle"
+    font-family="Inter" font-size="11"
+    fill="#8b949e">
+    Team-shared rules &amp; standards</text>
+
+  <rect x="100" y="130" width="400" height="50"
+    rx="8" fill="rgba(88,166,255,0.15)"
+    stroke="#58a6ff" stroke-width="1.5"/>
+  <text x="300" y="152" text-anchor="middle"
+    font-family="Inter" font-size="13"
+    font-weight="600" fill="#58a6ff">
+    User CLAUDE.md (~/.claude/CLAUDE.md)</text>
+  <text x="300" y="168" text-anchor="middle"
+    font-family="Inter" font-size="11"
+    fill="#8b949e">
+    Your personal preferences, all projects</text>
+
+  <rect x="100" y="190" width="400" height="50"
+    rx="8" fill="rgba(63,185,80,0.15)"
+    stroke="#3fb950" stroke-width="1.5"/>
+  <text x="300" y="212" text-anchor="middle"
+    font-family="Inter" font-size="13"
+    font-weight="600" fill="#3fb950">
+    Auto Memory (MEMORY.md)</text>
+  <text x="300" y="228" text-anchor="middle"
+    font-family="Inter" font-size="11"
+    fill="#8b949e">
+    Claude's own notes &mdash;
+    first 200 lines loaded</text>
+
+  <text x="50" y="40" text-anchor="middle"
+    font-family="Inter" font-size="20"
+    fill="#f85149">1</text>
+  <text x="50" y="100" text-anchor="middle"
+    font-family="Inter" font-size="20"
+    fill="#bc8cff">2</text>
+  <text x="50" y="160" text-anchor="middle"
+    font-family="Inter" font-size="20"
+    fill="#58a6ff">3</text>
+  <text x="50" y="220" text-anchor="middle"
+    font-family="Inter" font-size="20"
+    fill="#3fb950">4</text>
+
+  <text x="300" y="270" text-anchor="middle"
+    font-family="Inter" font-size="12"
+    fill="#d4822a">
+    Higher number = lower priority.
+    Higher layers override lower ones.</text>
+</svg>
+</div>
+
+<h3>Writing Effective CLAUDE.md Rules</h3>
+
+<p>
+Your current CLAUDE.md is already great.
+Here are principles that make it work:
+</p>
+
+<ul>
+<li><strong>Be specific:</strong>
+  "ALWAYS bump service worker version
+  in service-worker.js when pushing"
+  is way better than
+  "Don't forget about caching"</li>
+<li><strong>Use action words:</strong>
+  "NEVER use agents to write HTML"
+  is clear. "Agents aren't great at HTML"
+  is vague.</li>
+<li><strong>Include the WHY:</strong>
+  "Use fireGet() for writes (POST
+  silently fails due to CORS redirects)"
+  &mdash; Claude understands the reason
+  and can apply it to new situations</li>
+<li><strong>Keep it under 200 lines:</strong>
+  Longer CLAUDE.md = less adherence.
+  Move detailed stuff to separate files</li>
+</ul>
+
+<h3>Auto Memory</h3>
+
+<p>
+Memory is where Claude stores what it
+<em>learns</em> across sessions. When Claude
+hits a bug and figures out the fix,
+it records that insight so it doesn't
+repeat the mistake.
+</p>
+
+<p>
+Your memory file already tracks things like:
+</p>
+
+<ul>
+<li>Service worker versions for each app</li>
+<li>localStorage keys and their purposes</li>
+<li>App architectures and sync patterns</li>
+<li>Past bugs and their solutions</li>
+<li>Your preferences and workflow patterns</li>
+</ul>
+
+<p>
+Memory lives at
+<code>~/.claude/projects/&lt;project&gt;/memory/MEMORY.md</code>.
+Claude can create topic-specific files
+like <code>debugging.md</code> or
+<code>patterns.md</code> and link to them
+from the main MEMORY.md.
+</p>
+
+<div class="callout">
+<div class="callout-title">Pro Tip: Path-Scoped Rules</div>
+You can create rules that only apply to
+specific files. Put them in
+<code>.claude/rules/</code> with a
+<code>paths</code> frontmatter:
+<pre><code>---
+paths:
+  - "src/api/**/*.ts"
+---
+# API Rules
+- Include input validation
+- Use standard error format</code></pre>
+These rules only load when Claude touches
+files matching that pattern.
+</div>
+</div>
+
+<!-- ======== PART 6 ======== -->
+<div class="section" id="part6">
+<h2>Part 6: Hooks &mdash; Automate Everything</h2>
+<p class="section-sub">
+  Hooks are shell commands that fire
+  automatically when Claude takes actions.
+  They're your safety net and automation layer.
+</p>
+
+<p>
+Imagine if every time Claude edited a file,
+it automatically ran a code formatter.
+Or every time it tried to touch a protected
+file, it got blocked.
+Or every time it finished a task,
+it sent you a desktop notification.
+That's what hooks do.
+</p>
+
+<h3>Hook Events</h3>
+
+<p>
+Hooks fire at specific moments in
+Claude's workflow:
+</p>
+
+<ul>
+<li><strong>PreToolUse</strong> &mdash;
+  <em>before</em> Claude uses a tool
+  (edit, write, bash). You can block it.</li>
+<li><strong>PostToolUse</strong> &mdash;
+  <em>after</em> a tool runs.
+  Great for formatting, linting, testing.</li>
+<li><strong>SessionStart</strong> &mdash;
+  when a session begins or resumes
+  after compaction</li>
+<li><strong>Notification</strong> &mdash;
+  when Claude needs your attention
+  (permissions, idle)</li>
+<li><strong>Stop</strong> &mdash;
+  when Claude finishes responding</li>
+</ul>
+
+<h3>Practical Hook Examples</h3>
+
+<h4>1. Auto-Format After Every Edit</h4>
+
+<pre><code>// In .claude/settings.json
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [{
+          "type": "command",
+          "command": "prettier --write \"$FILE\""
+        }]
+      }
+    ]
+  }
+}</code></pre>
+
+<h4>2. Desktop Notification When Claude
+Needs You</h4>
+
+<pre><code>{
+  "hooks": {
+    "Notification": [
+      {
+        "matcher": "",
+        "hooks": [{
+          "type": "command",
+          "command": "osascript -e 'display notification \"Claude needs attention\" with title \"Claude Code\"'"
+        }]
+      }
+    ]
+  }
+}</code></pre>
+
+<h4>3. Block Edits to Protected Files</h4>
+
+<pre><code>{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [{
+          "type": "command",
+          "command": "if echo \"$FILE\" | grep -q '.env'; then exit 2; fi"
+        }]
+      }
+    ]
+  }
+}</code></pre>
+
+<p>
+Exit code <code>2</code> blocks the action.
+Exit code <code>0</code> allows it.
+The error message from stderr gets sent
+back to Claude as feedback.
+</p>
+
+<div class="callout callout-green">
+<div class="callout-title">Hook Types</div>
+<strong>Command</strong> &mdash; runs a shell
+command (most common).<br>
+<strong>Prompt</strong> &mdash; asks an AI to
+decide (yes/no with reasoning).<br>
+<strong>Agent</strong> &mdash; spawns a subagent
+to inspect and decide.<br>
+<strong>HTTP</strong> &mdash; sends event data
+to a web endpoint (for logging/audit).
+</div>
+</div>
+
+<!-- ======== PART 7 ======== -->
+<div class="section" id="part7">
+<h2>Part 7: MCP Servers</h2>
+<p class="section-sub">
+  Connect Claude to external tools, APIs,
+  databases, and services.
+</p>
+
+<p>
+MCP (Model Context Protocol) is how you give
+Claude access to the outside world.
+Instead of Claude just reading/writing files
+on your computer, MCP lets it talk to
+GitHub, Slack, databases, APIs &mdash;
+anything with an MCP server.
+</p>
+
+<h3>Adding MCP Servers</h3>
+
+<pre><code># HTTP server (cloud services)
+claude mcp add --transport http \
+  notion https://mcp.notion.com/mcp
+
+# With authentication
+claude mcp add --transport http \
+  github https://mcp.github.com \
+  --header "Authorization: Bearer TOKEN"
+
+# Local server (runs on your machine)
+claude mcp add --transport stdio \
+  airtable \
+  -- npx -y airtable-mcp-server</code></pre>
+
+<h3>Managing Servers</h3>
+
+<pre><code>claude mcp list       # see all servers
+claude mcp remove X   # remove one
+/mcp                  # check status in CLI</code></pre>
+
+<h3>What MCP Servers Can Do</h3>
+
+<ul>
+<li><strong>GitHub:</strong> create issues,
+  review PRs, search repos, manage
+  releases directly from Claude</li>
+<li><strong>Slack:</strong> send messages,
+  read channels, respond to threads</li>
+<li><strong>Databases:</strong> query data,
+  run migrations, inspect schemas</li>
+<li><strong>Sentry:</strong> look up errors,
+  analyze crash reports</li>
+<li><strong>Notion/Airtable:</strong>
+  read/write docs and databases</li>
+<li><strong>Custom APIs:</strong> anything
+  with an MCP-compatible endpoint</li>
+</ul>
+
+<div class="callout callout-blue">
+<div class="callout-title">Your Potential Use</div>
+You already have an Apollo.io MCP server
+connected (that's what powers the
+contact/company search tools in your
+Claude session). You could add GitHub MCP
+for managing your repos, or build a custom
+MCP server for your Apps Script endpoints.
+</div>
+</div>
+
+<!-- ======== PART 8 ======== -->
+<div class="section" id="part8">
+<h2>Part 8: Permissions &amp; Security</h2>
+<p class="section-sub">
+  Control exactly what Claude can and
+  cannot do.
+</p>
+
+<h3>Permission Modes</h3>
+
+<ul>
+<li><strong>Default:</strong> asks before
+  running commands or editing files</li>
+<li><strong>Accept Edits:</strong>
+  auto-approves file changes,
+  still asks for bash commands</li>
+<li><strong>Plan:</strong> read-only,
+  no changes allowed</li>
+<li><strong>Don't Ask:</strong>
+  auto-denies unless pre-approved
+  in settings</li>
+<li><strong>Bypass:</strong>
+  (<code>--dangerously-skip-permissions</code>)
+  skip all prompts.
+  Only for trusted automation.</li>
+</ul>
+
+<p>
+Cycle through modes with
+<code>Shift+Tab</code> during a session.
+</p>
+
+<h3>Permission Rules</h3>
+
+<p>
+You can pre-approve or block specific
+actions in your settings:
+</p>
+
+<pre><code>// In ~/.claude/settings.json
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run *)",
+      "Bash(git commit *)",
+      "Bash(git push)"
+    ],
+    "deny": [
+      "Bash(rm -rf *)",
+      "Read(./.env)",
+      "Edit(./.env)"
+    ]
+  }
+}</code></pre>
+
+<p>
+<strong>Deny always wins.</strong>
+If both allow and deny match,
+the action is blocked.
+</p>
+</div>
+
+<!-- ======== PART 9 ======== -->
+<div class="section" id="part9">
+<h2>Part 9: Context Window Mastery</h2>
+<p class="section-sub">
+  The context window is your session's memory.
+  Managing it well = longer, better sessions.
+</p>
+
+<p>
+Claude has a 200,000-token context window.
+That sounds huge, but it fills up faster
+than you think &mdash; every file Claude reads,
+every command output, every message back
+and forth consumes tokens.
+</p>
+
+<h3>How to Monitor Context</h3>
+
+<pre><code>/context   # visual grid of context usage
+/cost      # token count and costs</code></pre>
+
+<h3>Compaction: Your Best Friend</h3>
+
+<p>
+When context gets full, Claude auto-compacts
+&mdash; it summarizes the conversation so far
+to free up space. You can trigger this
+manually anytime:
+</p>
+
+<pre><code>/compact
+/compact "focus on the CSS theme changes"</code></pre>
+
+<p>
+The optional instruction tells Claude what
+to prioritize in the summary. Everything else
+gets compressed more aggressively.
+</p>
+
+<h3>Context Efficiency Tips</h3>
+
+<ul>
+<li><strong>Use subagents for verbose output:</strong>
+  "Use a subagent to run all the tests
+  and just tell me what failed" &mdash;
+  the full test output stays in the
+  subagent's context, not yours</li>
+<li><strong>Compact before big tasks:</strong>
+  If you've been chatting and are about to
+  start a big build, <code>/compact</code>
+  first to free up space</li>
+<li><strong>Name your sessions:</strong>
+  <code>/rename book-serfdom</code> so you
+  can resume exactly where you left off
+  instead of re-establishing context</li>
+<li><strong>Keep CLAUDE.md lean:</strong>
+  under 200 lines. Move details to
+  linked files that load on demand</li>
+</ul>
+
+<div class="callout callout-orange">
+<div class="callout-title">
+  The Output Token Limit</div>
+Remember that error you saw?
+<code>API Error: exceeded the 32000
+output token maximum</code>.
+You can increase it:
+<pre><code>export CLAUDE_CODE_MAX_OUTPUT_TOKENS=64000</code></pre>
+Or the better fix: ask Claude to
+write in chunks. "Write the first 5
+sections, then I'll ask for the rest."
+</div>
+</div>
+
+<!-- ======== PART 10 ======== -->
+<div class="section" id="part10">
+<h2>Part 10: Git Workflows</h2>
+<p class="section-sub">
+  Claude handles commits, PRs, branches,
+  and even parallel development.
+</p>
+
+<h3>Commits</h3>
+
+<p>
+Just say "commit these changes" and Claude
+handles everything: staging files, writing
+a descriptive message, running the commit.
+It follows your repo's commit style and
+adds its own co-author attribution.
+</p>
+
+<h3>Pull Requests</h3>
+
+<pre><code># Claude creates a PR with title and description
+"Create a PR for these changes"
+
+# Resume a session linked to a PR
+claude --from-pr 456</code></pre>
+
+<h3>Worktrees: Parallel Development</h3>
+
+<p>
+This is an advanced feature most people
+never use. Worktrees let Claude work on
+multiple branches simultaneously, each
+in an isolated copy of the repo:
+</p>
+
+<pre><code># Create an isolated worktree for a feature
+claude --worktree feature-dark-mode
+
+# Another worktree for a different task
+claude --worktree fix-sync-bug</code></pre>
+
+<p>
+Each worktree has its own files, its own
+git branch, and its own session.
+Changes in one don't affect the other.
+Perfect for parallel development.
+</p>
+
+<h3>Security Review</h3>
+
+<pre><code>/security-review</code></pre>
+
+<p>
+Analyzes all pending changes on your current
+branch for security vulnerabilities before
+you commit. Catches things like:
+exposed API keys, SQL injection,
+XSS vulnerabilities, missing input
+validation.
+</p>
+</div>
+
+<!-- ======== PART 11 ======== -->
+<div class="section" id="part11">
+<h2>Part 11: Keyboard Shortcuts</h2>
+<p class="section-sub">
+  Speed up your workflow with these shortcuts.
+</p>
+
+<h3>Essential Shortcuts</h3>
+
+<ul>
+<li><strong><code>Shift+Enter</code></strong>
+  &mdash; submit your message
+  (Enter alone = new line)</li>
+<li><strong><code>Ctrl+C</code></strong>
+  &mdash; cancel Claude's current response</li>
+<li><strong><code>Shift+Tab</code></strong>
+  &mdash; cycle through permission modes</li>
+<li><strong><code>Ctrl+B</code></strong>
+  &mdash; background the current task</li>
+<li><strong><code>Ctrl+O</code></strong>
+  &mdash; toggle verbose mode
+  (see Claude's thinking)</li>
+<li><strong><code>Option+T</code></strong>
+  (Mac) &mdash; toggle extended thinking
+  on/off</li>
+<li><strong><code>Ctrl+R</code></strong>
+  &mdash; reverse search through
+  message history</li>
+<li><strong><code>Ctrl+G</code></strong>
+  &mdash; open plan in text editor</li>
+</ul>
+
+<h3>Custom Keybindings</h3>
+
+<p>
+Edit <code>~/.claude/keybindings.json</code>:
+</p>
+
+<pre><code>{
+  "contexts": {
+    "chat": [
+      {
+        "key": "ctrl+j",
+        "action": "submit"
+      }
+    ]
+  }
+}</code></pre>
+</div>
+
+<!-- ======== PART 12 ======== -->
+<div class="section" id="part12">
+<h2>Part 12: Pro Tips &amp; Cheat Sheet</h2>
+<p class="section-sub">
+  Advanced patterns and quick reference.
+</p>
+
+<h3>Power User Patterns</h3>
+
+<h4>1. Explore Before Planning</h4>
+<p>
+Don't just say "build X."
+First: "Explore the codebase and tell me
+how you'd approach building X."
+Then review, iterate, then execute.
+</p>
+
+<h4>2. Isolate Verbose Operations</h4>
+<p>
+"Use a subagent to read all the CSS files
+and summarize the color scheme."
+The full content stays out of your
+main context.
+</p>
+
+<h4>3. Parallel Research</h4>
+<p>
+"Research the Cadence sync pattern,
+the Bloom sync pattern, and the Zercher
+sync pattern in parallel, then tell me
+what's different."
+Three subagents run simultaneously.
+</p>
+
+<h4>4. Session Naming Strategy</h4>
+<p>
+Name sessions by what you're working on:
+<code>claude -n bloom-splitter-fix</code>.
+Later, resume exactly where you left off:
+<code>claude --resume bloom-splitter-fix</code>.
+</p>
+
+<h4>5. The /btw Side Channel</h4>
+<p>
+Need a quick answer without derailing
+your current task?
+<code>/btw what's the CSS property
+for rounded corners?</code>
+Answers without affecting the main
+conversation flow.
+</p>
+
+<h3>Troubleshooting Cheat Sheet</h3>
+
+<ul>
+<li><strong>CLAUDE.md not being followed?</strong>
+  Run <code>/memory</code> to verify it
+  loaded. Check for conflicting rules.
+  Make instructions more specific.</li>
+<li><strong>Context running out?</strong>
+  <code>/compact "focus on X"</code>.
+  Move verbose work to subagents.
+  Keep CLAUDE.md under 200 lines.</li>
+<li><strong>MCP server not connecting?</strong>
+  <code>/mcp</code> to check status.
+  Verify environment variables.
+  Try <code>claude mcp list</code>.</li>
+<li><strong>Hook not firing?</strong>
+  <code>/hooks</code> to verify config.
+  Check matcher is exact (case-sensitive).
+  Verify correct event name.</li>
+<li><strong>Permissions too strict?</strong>
+  <code>/permissions</code> to view rules.
+  Deny rules override allow rules.</li>
+</ul>
+
+<h3>Environment Variables</h3>
+
+<pre><code># Increase output limit
+export CLAUDE_CODE_MAX_OUTPUT_TOKENS=64000
+
+# Set effort level
+export CLAUDE_CODE_EFFORT_LEVEL=high
+
+# Earlier auto-compaction (default ~95%)
+export CLAUDE_AUTOCOMPACT_PCT_OVERRIDE=50
+
+# Disable auto memory
+export CLAUDE_CODE_DISABLE_AUTO_MEMORY=1
+
+# Choose model
+export ANTHROPIC_MODEL=claude-opus-4-6
+
+# Limit thinking tokens
+export MAX_THINKING_TOKENS=10000</code></pre>
+
+<h3>Quick Command Reference</h3>
+
+<pre><code># Start with name
+claude -n my-session
+
+# Resume last session
+claude --continue
+
+# Resume by name
+claude --resume my-session
+
+# Plan mode
+claude --permission-mode plan
+
+# Skip all permissions
+claude --dangerously-skip-permissions
+
+# Use specific model
+claude --model claude-opus-4-6
+
+# Headless (pipe in/out)
+claude -p "analyze this" > output.txt
+
+# Add extra directory
+claude --add-dir ../shared-libs
+
+# Run as custom agent
+claude --agent code-reviewer
+
+# Create worktree
+claude --worktree feature-branch</code></pre>
+
+<div class="quiz">
+<div class="quiz-q">
+  You're about to make a big change to
+  Bloom's DCA algorithm. What's the
+  power user approach?
+</div>
+<div class="quiz-opts">
+  <button class="quiz-opt" data-answer="plan"
+    onclick="checkQuiz(this,'plan','q12e')">
+    Enter plan mode, explore the codebase,
+    review the plan, then execute</button>
+  <button class="quiz-opt" data-answer="yolo"
+    onclick="checkQuiz(this,'plan','q12e')">
+    Just say "change the DCA algorithm"
+    and let Claude figure it out</button>
+  <button class="quiz-opt" data-answer="manual"
+    onclick="checkQuiz(this,'plan','q12e')">
+    Read all the code yourself first</button>
+</div>
+<div class="quiz-explain" id="q12e">
+  Plan mode is perfect for this.
+  Claude explores the DCA code,
+  maps all dependencies, proposes
+  a plan &mdash; you review and approve
+  before any code changes. This prevents
+  Claude from accidentally breaking the
+  splitter, growth chart, or cloud sync
+  while changing the allocation logic.
+</div>
+</div>
+
+<div class="callout callout-green">
+<div class="callout-title">
+  Remember: This Guide Is Alive</div>
+Anytime you discover a new feature,
+learn a new trick, or want something
+explained &mdash; just ask Claude to add it.
+The more you use Claude Code, the more
+there is to learn. This guide grows with you.
+</div>
+</div>
+
+</div><!-- end content -->
+
+<script>
+window.addEventListener('scroll', function() {
+  var h = document.documentElement;
+  var pct = (h.scrollTop /
+    (h.scrollHeight - h.clientHeight)) * 100;
+  document.getElementById('progressBar')
+    .style.width = pct + '%';
+});
+var sections = document.querySelectorAll('.section');
+var navLinks = document.querySelectorAll('.nav-links a');
+window.addEventListener('scroll', function() {
+  var current = '';
+  sections.forEach(function(s) {
+    if (window.scrollY >= s.offsetTop - 100)
+      current = s.id;
+  });
+  navLinks.forEach(function(a) {
+    a.classList.toggle('active',
+      a.getAttribute('href') === '#' + current);
+  });
+});
+function checkQuiz(btn, correct, explainId) {
+  var parent = btn.closest('.quiz');
+  var opts = parent.querySelectorAll('.quiz-opt');
+  var already = false;
+  opts.forEach(function(o) {
+    if (o.classList.contains('correct') ||
+        o.classList.contains('wrong'))
+      already = true;
+  });
+  if (already) return;
+  opts.forEach(function(o) {
+    if (o.dataset.answer === correct)
+      o.classList.add('correct');
+    else if (o === btn)
+      o.classList.add('wrong');
+  });
+  var ex = document.getElementById(explainId);
+  if (ex) ex.style.display = 'block';
+}
+function toggleCollapse(btn) {
+  btn.classList.toggle('open');
+  var body = btn.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+
+<script>var BM_KEY = 'bm_advanced_claude';</script>
+<script src="../book.js?v=3"></script>
+
+</body>
+</html>
