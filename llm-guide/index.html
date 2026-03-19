@@ -1,0 +1,5674 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Vibe Coder's Guide to LLMs & Claude Code</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Playfair+Display:wght@400;700&display=swap');
+
+:root {
+  --bg: #0d1117;
+  --bg2: #161b22;
+  --bg3: #1c2333;
+  --text: #e6edf3;
+  --muted: #8b949e;
+  --accent: #d4822a;
+  --accent2: #e8944c;
+  --blue: #58a6ff;
+  --green: #3fb950;
+  --red: #f85149;
+  --purple: #bc8cff;
+  --border: #30363d;
+  --code-bg: #0d1117;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Inter', -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.75;
+  overflow-x: hidden;
+}
+
+/* ====== PROGRESS BAR ====== */
+.progress-bar {
+  position: fixed;
+  top: 0; left: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--accent), var(--accent2));
+  z-index: 1000;
+  transition: width 0.2s;
+}
+
+/* ====== NAV ====== */
+.nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  background: rgba(13,17,23,0.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  z-index: 999;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  height: 52px;
+  gap: 24px;
+}
+.nav-title {
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--accent);
+  white-space: nowrap;
+}
+.nav-links {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.nav-links::-webkit-scrollbar { display: none; }
+.nav-links a {
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 12px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  white-space: nowrap;
+  transition: all 0.2s;
+}
+.nav-links a:hover,
+.nav-links a.active {
+  color: var(--text);
+  background: var(--bg3);
+}
+
+/* ====== MAIN CONTENT ====== */
+.content {
+  max-width: 780px;
+  margin: 0 auto;
+  padding: 80px 28px 100px;
+}
+
+/* ====== COVER ====== */
+.cover {
+  text-align: center;
+  padding: 80px 0 70px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 60px;
+}
+.cover h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: 42px;
+  font-weight: 700;
+  line-height: 1.2;
+  margin-bottom: 16px;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.cover .sub {
+  font-size: 18px;
+  color: var(--muted);
+  font-weight: 300;
+  margin-bottom: 32px;
+  line-height: 1.6;
+}
+.cover .meta {
+  font-size: 13px;
+  color: var(--muted);
+  opacity: 0.7;
+}
+
+/* ====== TABLE OF CONTENTS ====== */
+.toc {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 28px 32px;
+  margin-bottom: 60px;
+}
+.toc-title {
+  font-weight: 600;
+  font-size: 16px;
+  margin-bottom: 16px;
+  color: var(--accent);
+}
+.toc ol {
+  list-style: none;
+  counter-reset: toc;
+}
+.toc li {
+  counter-increment: toc;
+  margin-bottom: 8px;
+}
+.toc li::before {
+  content: counter(toc) ".";
+  color: var(--accent);
+  font-weight: 600;
+  margin-right: 10px;
+  font-size: 14px;
+}
+.toc a {
+  color: var(--text);
+  text-decoration: none;
+  font-size: 15px;
+  transition: color 0.2s;
+}
+.toc a:hover { color: var(--accent); }
+.toc .toc-desc {
+  color: var(--muted);
+  font-size: 13px;
+  margin-left: 24px;
+  display: block;
+}
+
+/* ====== SECTIONS ====== */
+.section {
+  margin-bottom: 70px;
+  padding-top: 20px;
+}
+.section h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 30px;
+  font-weight: 700;
+  color: var(--accent);
+  margin-bottom: 8px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--border);
+}
+.section .section-sub {
+  color: var(--muted);
+  font-size: 15px;
+  margin-bottom: 28px;
+}
+h3 {
+  font-size: 20px;
+  font-weight: 600;
+  margin: 36px 0 14px;
+  color: var(--text);
+}
+h4 {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 24px 0 10px;
+  color: var(--accent2);
+}
+p { margin-bottom: 16px; font-size: 15.5px; }
+ul, ol {
+  margin: 12px 0 18px 24px;
+  font-size: 15.5px;
+}
+li { margin-bottom: 8px; }
+strong { color: #fff; font-weight: 600; }
+
+/* ====== CALLOUTS ====== */
+.callout {
+  background: var(--bg2);
+  border-left: 4px solid var(--accent);
+  padding: 18px 22px;
+  margin: 22px 0;
+  border-radius: 0 10px 10px 0;
+  font-size: 14.5px;
+}
+.callout-title {
+  font-weight: 600;
+  color: var(--accent);
+  margin-bottom: 6px;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.callout-blue { border-left-color: var(--blue); }
+.callout-blue .callout-title { color: var(--blue); }
+.callout-green { border-left-color: var(--green); }
+.callout-green .callout-title { color: var(--green); }
+.callout-purple { border-left-color: var(--purple); }
+.callout-purple .callout-title { color: var(--purple); }
+.callout-red { border-left-color: var(--red); }
+.callout-red .callout-title { color: var(--red); }
+
+/* ====== CODE ====== */
+code {
+  font-family: 'JetBrains Mono', monospace;
+  background: var(--bg3);
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-size: 13.5px;
+  color: var(--accent2);
+}
+pre {
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  padding: 20px 24px;
+  border-radius: 10px;
+  overflow-x: auto;
+  margin: 16px 0 22px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--text);
+}
+pre .comment { color: var(--muted); }
+pre .keyword { color: var(--purple); }
+pre .string { color: var(--green); }
+pre .func { color: var(--blue); }
+pre .tag { color: var(--red); }
+pre .attr { color: var(--accent2); }
+
+/* ====== COMPARE BOXES ====== */
+.compare {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin: 20px 0;
+}
+@media (max-width: 600px) {
+  .compare { grid-template-columns: 1fr; }
+}
+.compare-box {
+  padding: 16px 18px;
+  border-radius: 10px;
+  font-size: 14px;
+  line-height: 1.6;
+}
+.compare-bad {
+  background: rgba(248,81,73,0.08);
+  border: 1px solid rgba(248,81,73,0.25);
+}
+.compare-good {
+  background: rgba(63,185,80,0.08);
+  border: 1px solid rgba(63,185,80,0.25);
+}
+.compare-label {
+  font-weight: 600;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+}
+.compare-bad .compare-label { color: var(--red); }
+.compare-good .compare-label { color: var(--green); }
+
+/* ====== DIAGRAMS ====== */
+.diagram {
+  text-align: center;
+  margin: 30px 0;
+  padding: 20px;
+  background: var(--bg2);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+}
+.diagram svg { max-width: 100%; height: auto; }
+.diagram-caption {
+  font-size: 12.5px;
+  color: var(--muted);
+  margin-top: 12px;
+}
+
+/* ====== COLLAPSIBLE ====== */
+.collapsible {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  margin: 18px 0;
+  overflow: hidden;
+}
+.collapsible-header {
+  padding: 14px 20px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 600;
+  font-size: 15px;
+  transition: background 0.2s;
+  user-select: none;
+}
+.collapsible-header:hover {
+  background: var(--bg3);
+}
+.collapsible-arrow {
+  color: var(--muted);
+  transition: transform 0.3s;
+  font-size: 13px;
+}
+.collapsible.open .collapsible-arrow {
+  transform: rotate(90deg);
+}
+.collapsible-body {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s ease;
+  padding: 0 20px;
+}
+.collapsible.open .collapsible-body {
+  max-height: 3000px;
+  padding: 0 20px 18px;
+}
+
+/* ====== INTERACTIVE TOKENS ====== */
+.token-demo {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 20px;
+  margin: 20px 0;
+}
+.token-input {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-family: 'Inter', sans-serif;
+  font-size: 15px;
+  margin-bottom: 12px;
+  outline: none;
+}
+.token-input:focus {
+  border-color: var(--accent);
+}
+.token-output {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  min-height: 40px;
+  align-items: center;
+}
+.token {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  cursor: default;
+}
+.token-count {
+  font-size: 13px;
+  color: var(--muted);
+  margin-top: 8px;
+}
+
+/* ====== QUIZ ====== */
+.quiz {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 24px;
+  margin: 24px 0;
+}
+.quiz-title {
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--accent);
+  margin-bottom: 14px;
+}
+.quiz-option {
+  display: block;
+  padding: 12px 16px;
+  margin: 6px 0;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s;
+  color: var(--text);
+}
+.quiz-option:hover {
+  border-color: var(--accent);
+  background: rgba(212,130,42,0.08);
+}
+.quiz-option.correct {
+  border-color: var(--green);
+  background: rgba(63,185,80,0.12);
+}
+.quiz-option.wrong {
+  border-color: var(--red);
+  background: rgba(248,81,73,0.08);
+  opacity: 0.6;
+}
+.quiz-explanation {
+  display: none;
+  margin-top: 12px;
+  padding: 12px 16px;
+  background: rgba(63,185,80,0.06);
+  border-radius: 8px;
+  font-size: 14px;
+  color: var(--muted);
+  border: 1px solid rgba(63,185,80,0.2);
+}
+.quiz-explanation.show { display: block; }
+
+/* ====== ANALOGY BOX ====== */
+.analogy {
+  background: linear-gradient(135deg,
+    rgba(188,140,255,0.06),
+    rgba(88,166,255,0.06));
+  border: 1px solid rgba(188,140,255,0.2);
+  border-radius: 10px;
+  padding: 20px 22px;
+  margin: 20px 0;
+  font-size: 14.5px;
+}
+.analogy-label {
+  font-weight: 600;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--purple);
+  margin-bottom: 8px;
+}
+
+/* ====== KEY CONCEPT ====== */
+.key-concept {
+  background: var(--bg2);
+  border: 2px solid var(--accent);
+  border-radius: 12px;
+  padding: 22px 24px;
+  margin: 24px 0;
+  text-align: center;
+}
+.key-concept .label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--accent);
+  margin-bottom: 8px;
+}
+.key-concept .concept {
+  font-family: 'Playfair Display', serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+/* ====== FOOTER ====== */
+.footer {
+  margin-top: 80px;
+  padding: 30px 0;
+  border-top: 1px solid var(--border);
+  text-align: center;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+/* ====== MOBILE ====== */
+@media (max-width: 600px) {
+  .cover h1 { font-size: 28px; }
+  .content { padding: 70px 18px 60px; }
+  .section h2 { font-size: 24px; }
+  h3 { font-size: 18px; }
+  .nav-title { display: none; }
+}
+
+/* ====== BOOKMARK SYSTEM (from book.js) ====== */
+.bookmark-bar {
+  position: sticky;
+  top: 52px;
+  z-index: 998;
+  background: var(--bg2);
+  color: var(--text);
+  padding: 0.5rem 1rem;
+  display: none;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  border-bottom: 1px solid var(--border);
+}
+.bookmark-bar:hover { background: var(--bg3); }
+.bookmark-bar .bm-label { flex: 1; color: var(--text); }
+.bookmark-bar .bm-clear {
+  background: none;
+  border: 1px solid rgba(255,255,255,0.25);
+  color: var(--text);
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  margin-left: 0.75rem;
+  font-family: inherit;
+}
+.bookmark-bar .bm-clear:hover {
+  background: rgba(255,255,255,0.1);
+}
+.bm-btn {
+  display: inline-block;
+  cursor: pointer;
+  font-size: 0.75rem;
+  opacity: 0;
+  margin-left: 0.5rem;
+  vertical-align: middle;
+  transition: opacity 0.2s, transform 0.2s;
+  user-select: none;
+}
+h2:hover .bm-btn, h3:hover .bm-btn,
+h4:hover .bm-btn { opacity: 0.5; }
+p:hover > .bm-p { opacity: 0.5; }
+.bm-btn:hover { opacity: 0.8 !important; transform: scale(1.2); }
+.bm-btn.active { opacity: 1 !important; color: var(--accent); }
+.bm-p {
+  position: absolute;
+  left: -1.8rem;
+  top: 0.15em;
+  margin-left: 0;
+  font-size: 0.65rem;
+}
+p { position: relative; }
+li > strong > .bm-btn {
+  position: absolute;
+  left: -2rem;
+  top: 0.15em;
+  margin-left: 0;
+}
+li:has(> strong > .bm-btn) { position: relative; }
+li:hover > strong > .bm-btn { opacity: 0.5; }
+.bm-toast {
+  position: fixed;
+  bottom: 1.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--bg2);
+  color: var(--text);
+  padding: 0.5rem 1.25rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  z-index: 1100;
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+  border: 1px solid var(--border);
+  font-family: 'Inter', sans-serif;
+}
+.bm-toast.show { opacity: 1; }
+
+@media (max-width: 600px) {
+  .bookmark-bar { top: 0; }
+  .bm-p {
+    position: static;
+    float: right;
+    margin: 0;
+  }
+  li > strong > .bm-btn {
+    position: static;
+    margin-left: 0.3rem;
+  }
+}
+</style>
+</head>
+<body>
+
+<!-- Bookmark Bar -->
+<div class="bookmark-bar" id="bookmarkBar"
+  onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel">Resume reading</span>
+  <button class="bm-clear"
+    onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+
+<!-- Progress Bar -->
+<div class="progress-bar" id="progressBar"></div>
+
+<!-- Navigation -->
+<nav class="nav">
+  <span class="nav-title">Vibe Coder's Guide</span>
+  <div class="nav-links">
+    <a href="#part1">LLMs</a>
+    <a href="#part2">Context</a>
+    <a href="#part3">Steering</a>
+    <a href="#part4">CLAUDE.md</a>
+    <a href="#part5">Features</a>
+    <a href="#part6">Prompting</a>
+    <a href="#part7">Code</a>
+    <a href="#part8">Debugging</a>
+    <a href="#part9">Playbook</a>
+    <a href="#part10">Tools</a>
+  </div>
+</nav>
+
+<!-- Main Content -->
+<div class="content">
+
+<!-- ============ COVER ============ -->
+<div class="cover">
+  <h1>The Vibe Coder's Guide<br>to LLMs & Claude Code</h1>
+  <div class="sub">
+    How the machine thinks, how to steer it,<br>
+    and how to build apps faster than you thought possible
+  </div>
+  <div class="meta">
+    Written for Alex — March 2026<br>
+    Personalized to your workflow, your apps, your tools
+  </div>
+</div>
+
+<!-- ============ TOC ============ -->
+<div class="toc">
+  <div class="toc-title">What's Inside</div>
+  <ol>
+    <li>
+      <a href="#part1">How LLMs Actually Work</a>
+      <span class="toc-desc">
+        Tokens, prediction, training — the
+        mental model that changes everything
+      </span>
+    </li>
+    <li>
+      <a href="#part2">The Context Window</a>
+      <span class="toc-desc">
+        Why long sessions go sideways and
+        what to do about it
+      </span>
+    </li>
+    <li>
+      <a href="#part3">Why Claude Does What It Does</a>
+      <span class="toc-desc">
+        The instruction stack, temperature,
+        and Claude's "personality"
+      </span>
+    </li>
+    <li>
+      <a href="#part4">CLAUDE.md — Your Superpower</a>
+      <span class="toc-desc">
+        Why yours works so well and how to
+        keep it sharp
+      </span>
+    </li>
+    <li>
+      <a href="#part5">Features You're Not Using</a>
+      <span class="toc-desc">
+        Plan mode, subagents, slash commands,
+        and permission modes
+      </span>
+    </li>
+    <li>
+      <a href="#part6">Prompting Like a Pro</a>
+      <span class="toc-desc">
+        From "make it work" to getting exactly
+        what you want on the first try
+      </span>
+    </li>
+    <li>
+      <a href="#part7">Reading Your Own Code</a>
+      <span class="toc-desc">
+        HTML, CSS, JS crash course tailored
+        to your single-file PWA apps
+      </span>
+    </li>
+    <li>
+      <a href="#part8">Debugging with Claude</a>
+      <span class="toc-desc">
+        From "it's broken" to pinpointing
+        exactly what went wrong
+      </span>
+    </li>
+    <li>
+      <a href="#part9">The Vibe Coder's Playbook</a>
+      <span class="toc-desc">
+        Your upgraded workflow — putting
+        everything together
+      </span>
+    </li>
+    <li>
+      <a href="#part10">How Claude Code Tools Work</a>
+      <span class="toc-desc">
+        Read, Edit, Bash, Grep — what happens
+        behind every action Claude takes
+      </span>
+    </li>
+  </ol>
+</div>
+
+<!-- ====================== -->
+<!-- PART 1: HOW LLMS WORK  -->
+<!-- ====================== -->
+<div class="section" id="part1">
+<h2>1. How LLMs Actually Work</h2>
+<p class="section-sub">
+  The mental model that changes how you
+  think about everything Claude does.
+</p>
+
+<h3>The One-Sentence Version</h3>
+<p>
+A Large Language Model is a program that predicts
+the next word. That's literally it. Everything
+Claude does — writing code, explaining concepts,
+building your apps, having conversations — comes
+from one ability: given everything written so far,
+what word most likely comes next?
+</p>
+<p>
+That probably sounds too simple to explain all the
+amazing things Claude can do. So let's dig deeper.
+</p>
+
+<h3>Training: How Claude Learned</h3>
+<p>
+Before Claude ever talks to you, it went through a
+massive training process. Think of three phases:
+</p>
+
+<h4>Phase 1: Reading the Internet</h4>
+<p>
+Claude was trained on enormous amounts of text —
+books, websites, code repositories, documentation,
+academic papers, forums, conversations. Billions
+and billions of words. During this phase, the model
+learned patterns: how English grammar works, how
+JavaScript syntax works, what comes after
+<code>function</code>, how to structure an HTML
+file, what a for-loop does, how people explain
+things, and millions of other patterns.
+</p>
+
+<div class="analogy">
+  <div class="analogy-label">Analogy</div>
+  Imagine you read every cookbook ever written —
+  thousands of them. After a while, you'd "know"
+  that after "preheat the oven to" the next word
+  is probably a temperature. You'd know that
+  recipes have ingredients, then steps. You'd
+  know that "fold" means something different in
+  baking than in laundry. Claude does this, but
+  for <em>everything</em> — code, language,
+  math, logic, science, history.
+</div>
+
+<h4>Phase 2: Learning to Be Helpful (RLHF)</h4>
+<p>
+Raw text prediction makes a chatbot that just
+generates plausible-sounding text — not necessarily
+<em>helpful</em> text. So Anthropic added a second
+training phase called RLHF (Reinforcement Learning
+from Human Feedback). Human trainers rated
+thousands of Claude's responses: "this one was
+helpful," "this one was wrong," "this one was
+too long," "this one nailed it."
+</p>
+<p>
+Over time, Claude learned not just to predict
+text, but to predict <em>helpful</em> text.
+This is why Claude writes clean code with comments,
+explains what it changed, asks clarifying questions,
+and tries to match your style — it was rewarded
+for doing these things during training.
+</p>
+
+<h4>Phase 3: Safety Training</h4>
+<p>
+Anthropic also trained Claude to refuse harmful
+requests, avoid generating dangerous content, and
+be honest when it doesn't know something. This is
+why Claude sometimes says "I'm not sure" instead
+of making something up, and why it won't help with
+certain requests.
+</p>
+
+<h3>How Prediction Actually Works</h3>
+<p>
+When you type "add a delete button to the workout
+history," Claude doesn't search a database of
+pre-written code. Instead, it generates its
+response one token at a time, each one based
+on everything that came before:
+</p>
+
+<div class="diagram">
+<svg width="700" height="240" viewBox="0 0 700 240">
+  <!-- Background -->
+  <rect width="700" height="240" rx="12"
+    fill="#161b22" stroke="#30363d"/>
+
+  <!-- Title -->
+  <text x="350" y="28" text-anchor="middle"
+    font-family="Inter" font-size="13"
+    fill="#8b949e">
+    How Claude generates a response (simplified)
+  </text>
+
+  <!-- Step boxes -->
+  <rect x="20" y="50" width="130" height="55"
+    rx="8" fill="rgba(212,130,42,0.15)"
+    stroke="#d4822a" stroke-width="1"/>
+  <text x="85" y="72" text-anchor="middle"
+    font-family="JetBrains Mono" font-size="11"
+    fill="#d4822a">Your message</text>
+  <text x="85" y="92" text-anchor="middle"
+    font-family="JetBrains Mono" font-size="10"
+    fill="#8b949e">"add a delete..."</text>
+
+  <!-- Arrow -->
+  <path d="M155 77 L180 77" stroke="#30363d"
+    stroke-width="2" marker-end="url(#arr)"/>
+
+  <rect x="185" y="50" width="100" height="55"
+    rx="8" fill="rgba(188,140,255,0.1)"
+    stroke="#bc8cff" stroke-width="1"/>
+  <text x="235" y="72" text-anchor="middle"
+    font-family="JetBrains Mono" font-size="11"
+    fill="#bc8cff">Predict #1</text>
+  <text x="235" y="92" text-anchor="middle"
+    font-family="JetBrains Mono" font-size="11"
+    fill="#e6edf3">"I'll"</text>
+
+  <path d="M290 77 L315 77" stroke="#30363d"
+    stroke-width="2" marker-end="url(#arr)"/>
+
+  <rect x="320" y="50" width="100" height="55"
+    rx="8" fill="rgba(188,140,255,0.1)"
+    stroke="#bc8cff" stroke-width="1"/>
+  <text x="370" y="72" text-anchor="middle"
+    font-family="JetBrains Mono" font-size="11"
+    fill="#bc8cff">Predict #2</text>
+  <text x="370" y="92" text-anchor="middle"
+    font-family="JetBrains Mono" font-size="11"
+    fill="#e6edf3">"add"</text>
+
+  <path d="M425 77 L450 77" stroke="#30363d"
+    stroke-width="2" marker-end="url(#arr)"/>
+
+  <rect x="455" y="50" width="100" height="55"
+    rx="8" fill="rgba(188,140,255,0.1)"
+    stroke="#bc8cff" stroke-width="1"/>
+  <text x="505" y="72" text-anchor="middle"
+    font-family="JetBrains Mono" font-size="11"
+    fill="#bc8cff">Predict #3</text>
+  <text x="505" y="92" text-anchor="middle"
+    font-family="JetBrains Mono" font-size="11"
+    fill="#e6edf3">"a"</text>
+
+  <path d="M560 77 L585 77" stroke="#30363d"
+    stroke-width="2" marker-end="url(#arr)"/>
+
+  <rect x="590" y="50" width="90" height="55"
+    rx="8" fill="rgba(188,140,255,0.1)"
+    stroke="#bc8cff" stroke-width="1"/>
+  <text x="635" y="72" text-anchor="middle"
+    font-family="JetBrains Mono" font-size="11"
+    fill="#bc8cff">...etc</text>
+  <text x="635" y="92" text-anchor="middle"
+    font-family="JetBrains Mono" font-size="11"
+    fill="#e6edf3">"red"</text>
+
+  <!-- Probability bars -->
+  <text x="20" y="140" font-family="Inter"
+    font-size="12" fill="#8b949e">
+    At each step, Claude ranks possible next
+    tokens by probability:
+  </text>
+
+  <rect x="20" y="155" width="280" height="16"
+    rx="4" fill="rgba(63,185,80,0.25)"/>
+  <text x="28" y="167" font-family="JetBrains Mono"
+    font-size="10" fill="#3fb950">
+    "add" — 72% likely
+  </text>
+
+  <rect x="20" y="177" width="160" height="16"
+    rx="4" fill="rgba(88,166,255,0.2)"/>
+  <text x="28" y="189" font-family="JetBrains Mono"
+    font-size="10" fill="#58a6ff">
+    "create" — 18% likely
+  </text>
+
+  <rect x="20" y="199" width="70" height="16"
+    rx="4" fill="rgba(188,140,255,0.15)"/>
+  <text x="28" y="211" font-family="JetBrains Mono"
+    font-size="10" fill="#bc8cff">
+    "make" — 6%
+  </text>
+
+  <rect x="20" y="221" width="30" height="12"
+    rx="3" fill="rgba(248,81,73,0.15)"/>
+  <text x="58" y="231" font-family="JetBrains Mono"
+    font-size="9" fill="#8b949e">
+    others — 4%
+  </text>
+
+  <!-- Arrow marker -->
+  <defs>
+    <marker id="arr" markerWidth="8"
+      markerHeight="6" refX="8" refY="3"
+      orient="auto">
+      <path d="M0,0 L8,3 L0,6" fill="#30363d"/>
+    </marker>
+  </defs>
+</svg>
+<div class="diagram-caption">
+  Each token is predicted based on everything
+  before it — your message, instructions,
+  and all previous tokens in the response.
+</div>
+</div>
+
+<p>
+This is why Claude can sometimes start a
+response well but go off track halfway through.
+Each prediction depends on the last one. If
+prediction #47 goes slightly wrong, predictions
+#48-200 might all follow that wrong direction
+— like making a wrong turn on a highway and
+ending up in the wrong city.
+</p>
+
+<h3>Tokens: How Claude Reads and Writes</h3>
+<p>
+Claude doesn't read letters or whole words — it
+reads <strong>tokens</strong>. A token is a chunk
+of text, roughly 3/4 of a word. Some examples:
+</p>
+<ul>
+  <li><code>hello</code> → 1 token</li>
+  <li><code>basketball</code> → 2 tokens
+    ("basket" + "ball")</li>
+  <li><code>localStorage.getItem</code> →
+    ~5 tokens</li>
+  <li>A typical paragraph → ~75-100 tokens</li>
+  <li>Your Zercher index.html → ~25,000 tokens</li>
+  <li>Your Bloom index.html → ~20,000 tokens</li>
+  <li>Your entire CLAUDE.md + MEMORY.md → ~6,000
+    tokens (loaded every session!)</li>
+</ul>
+
+<p>
+Why does this matter? Because <strong>everything
+has a token cost</strong>. Think of tokens as
+Claude's currency — it can only spend so many
+per conversation before running out of space.
+</p>
+
+<div class="callout">
+  <div class="callout-title">
+    Your Apps in Tokens
+  </div>
+  Here's roughly what each of your apps costs
+  Claude to read:
+  <ul style="margin-top:8px">
+    <li><strong>Zercher</strong> (~5,600 lines)
+      → ~25K tokens</li>
+    <li><strong>Bloom</strong> (~4,500 lines)
+      → ~20K tokens</li>
+    <li><strong>Cadence</strong> (~3,200 lines)
+      → ~14K tokens</li>
+    <li><strong>Crypto Dashboard</strong>
+      (~3,000 lines) → ~13K tokens</li>
+    <li><strong>Roman Chariots</strong>
+      (~2,800 lines) → ~12K tokens</li>
+    <li><strong>Sora Signal</strong>
+      (~2,400 lines) → ~10K tokens</li>
+    <li><strong>SPX Dashboard</strong>
+      (~2,200 lines) → ~10K tokens</li>
+  </ul>
+  That's why Claude reading Zercher + Bloom in
+  one session burns 45K tokens just on file
+  reads — almost 25% of the entire context
+  window. This is why "one task per session"
+  matters so much.
+</div>
+
+<div class="token-demo">
+  <div style="font-weight:600;font-size:14px;
+    margin-bottom:10px;color:var(--accent)">
+    Token Visualizer
+  </div>
+  <input type="text" class="token-input"
+    id="tokenInput"
+    placeholder="Type something to see approximate tokens..."
+    value="localStorage.setItem('zercher_data', JSON.stringify(workouts))">
+  <div class="token-output" id="tokenOutput"></div>
+  <div class="token-count" id="tokenCount"></div>
+</div>
+
+<h3>What LLMs Are NOT</h3>
+<p>
+Understanding what Claude <em>isn't</em> is
+just as important as understanding what it is:
+</p>
+<ul>
+  <li><strong>Not a search engine</strong> —
+    Claude doesn't look things up in real time.
+    Its knowledge comes from training data
+    (with a cutoff date). When it reads your
+    files, that's using tools, not "knowing"
+    something.</li>
+  <li><strong>Not a database</strong> — Claude
+    doesn't store your conversations or remember
+    past sessions (unless you use Memory files).
+    Each conversation starts fresh.</li>
+  <li><strong>Not deterministic</strong> — ask
+    Claude the same question twice and you might
+    get different answers. There's randomness
+    built into the prediction process.</li>
+  <li><strong>Not "thinking"</strong> — Claude
+    is pattern matching at an incredibly
+    sophisticated level. It produces text that
+    <em>looks like</em> thinking, reasoning,
+    and understanding. The practical effect is
+    similar to thinking (it solves problems,
+    writes working code), but the mechanism
+    is prediction, not cognition.</li>
+</ul>
+
+<div class="key-concept">
+  <div class="label">Key Concept</div>
+  <div class="concept">
+    Claude is the world's best autocomplete.
+    <br>
+    <span style="font-size:15px;font-weight:400;
+      font-family:Inter;color:var(--muted)">
+      Incredibly powerful, but fundamentally
+      a prediction engine.
+    </span>
+  </div>
+</div>
+
+<h3>Why Claude Makes Mistakes</h3>
+<p>
+Now you can understand <em>why</em> Claude
+sometimes does strange things:
+</p>
+<ul>
+  <li><strong>"Hallucinations"</strong> —
+    Claude generates plausible-sounding but
+    wrong information. This happens because
+    prediction doesn't require truth — it
+    requires what <em>sounds right</em> based
+    on patterns. "The capital of Australia is
+    Sydney" sounds right (it's not — it's
+    Canberra).</li>
+  <li><strong>Confident mistakes</strong> —
+    Claude doesn't "know" it's wrong because
+    it doesn't have a fact-checker. It's
+    generating text that matches patterns.
+    The wrong answer might have a very high
+    probability.</li>
+  <li><strong>Losing track mid-response</strong> —
+    Long responses compound prediction errors.
+    Token #500 depends on tokens #1-499. If
+    anything in that chain went slightly wrong,
+    the rest follows the error.</li>
+  <li><strong>Repeating itself</strong> — when
+    the context gets long and compressed, Claude
+    may lose track of what it already said and
+    predict the same content again.</li>
+</ul>
+
+<div class="quiz">
+  <div class="quiz-title">
+    Quick Check: Do You Get It?
+  </div>
+  <p style="margin-bottom:12px;font-size:14px;
+    color:var(--muted)">
+    Why might Claude write working code for a small
+    function but mess up a large file?
+  </p>
+  <div class="quiz-option" data-correct="false"
+    onclick="checkQuiz(this)">
+    Claude gets tired during long tasks
+  </div>
+  <div class="quiz-option" data-correct="true"
+    onclick="checkQuiz(this)">
+    More tokens = more predictions = more chances
+    for a prediction to go wrong, and errors
+    compound
+  </div>
+  <div class="quiz-option" data-correct="false"
+    onclick="checkQuiz(this)">
+    Large files use a different, worse algorithm
+  </div>
+  <div class="quiz-explanation" id="quiz1-exp">
+    Exactly. Each token is a prediction, and
+    each prediction depends on all previous ones.
+    A 50-line function needs ~200 predictions.
+    A 2000-line file needs ~8000 predictions.
+    More predictions = more chances for error,
+    and one wrong prediction can derail
+    everything after it. This is why your
+    CLAUDE.md rule about saving incrementally
+    is so smart — it breaks the work into
+    smaller prediction chains.
+  </div>
+</div>
+
+<h3>The Transformer Architecture (Optional Deep Dive)</h3>
+
+<div class="collapsible" onclick="toggleCollapse(this)">
+  <div class="collapsible-header">
+    How does the prediction actually happen
+    inside the model?
+    <span class="collapsible-arrow">▶</span>
+  </div>
+  <div class="collapsible-body">
+    <p>
+    Claude is built on a <strong>transformer</strong>
+    architecture — a specific type of neural
+    network invented in 2017 by Google researchers.
+    The key innovation is called
+    <strong>attention</strong>.
+    </p>
+    <p>
+    When Claude is predicting the next token,
+    it doesn't weigh all previous tokens equally.
+    The attention mechanism lets Claude "focus"
+    on the most relevant parts of the input.
+    If you said "change the background color in
+    Zercher" 500 tokens ago, the attention
+    mechanism helps Claude focus on "Zercher"
+    and "background color" when generating
+    CSS code, even though there's a lot of
+    other text in between.
+    </p>
+    <p>
+    The model has billions of "parameters" —
+    numbers that were adjusted during training.
+    These parameters encode the patterns Claude
+    learned. When you hear "Claude Opus" vs
+    "Claude Haiku," the main difference is the
+    number of parameters — more parameters
+    means more capacity for complex patterns,
+    but slower responses.
+    </p>
+    <h4>Model Sizes (Roughly)</h4>
+    <ul>
+      <li><strong>Haiku</strong> — smaller, fast,
+        good for simple tasks. Like asking an
+        intern to do something straightforward.</li>
+      <li><strong>Sonnet</strong> — medium, balanced.
+        The daily workhorse for most coding.</li>
+      <li><strong>Opus</strong> — largest, most
+        capable, slowest. Best for complex
+        reasoning, architecture decisions, and
+        ambitious tasks. This is what you use
+        in Claude Code.</li>
+    </ul>
+    <p>
+    The reason Opus is better at complex tasks
+    isn't that it "tries harder" — it literally
+    has more parameters to encode more nuanced
+    patterns, so its predictions are more
+    sophisticated.
+    </p>
+  </div>
+</div>
+
+<h3>Embeddings: How Claude "Understands" Meaning</h3>
+<p>
+Here's something that'll blow your mind.
+Claude doesn't store words as text — it
+converts every token into a list of numbers
+called an <strong>embedding</strong>. Each
+token gets mapped to a point in a
+high-dimensional space (think: a coordinate
+on a map, but with hundreds of dimensions
+instead of just X and Y).
+</p>
+<p>
+The magic: tokens with similar meanings end
+up near each other in this space. "Dog" and
+"puppy" are close together. "Dog" and
+"refrigerator" are far apart. "JavaScript"
+and "Python" are closer to each other than
+either is to "Shakespeare."
+</p>
+
+<div class="diagram">
+<svg width="650" height="320" viewBox="0 0 650 320">
+  <rect width="650" height="320" rx="12"
+    fill="#161b22" stroke="#30363d"/>
+  <text x="325" y="25" text-anchor="middle"
+    font-family="Inter" font-size="13"
+    fill="#8b949e">
+    Word Embedding Space (simplified to 2D)
+  </text>
+
+  <!-- Programming cluster -->
+  <ellipse cx="160" cy="140" rx="120" ry="80"
+    fill="rgba(88,166,255,0.08)"
+    stroke="rgba(88,166,255,0.2)"
+    stroke-dasharray="4"/>
+  <text x="160" y="65" text-anchor="middle"
+    font-family="Inter" font-size="10"
+    fill="#58a6ff">Programming</text>
+  <circle cx="120" cy="120" r="4" fill="#58a6ff"/>
+  <text x="128" y="116" font-family="JetBrains Mono"
+    font-size="11" fill="#58a6ff">JavaScript</text>
+  <circle cx="140" cy="150" r="4" fill="#58a6ff"/>
+  <text x="148" y="146" font-family="JetBrains Mono"
+    font-size="11" fill="#58a6ff">Python</text>
+  <circle cx="190" cy="130" r="4" fill="#58a6ff"/>
+  <text x="198" y="126" font-family="JetBrains Mono"
+    font-size="11" fill="#58a6ff">function</text>
+  <circle cx="155" cy="175" r="4" fill="#58a6ff"/>
+  <text x="163" y="171" font-family="JetBrains Mono"
+    font-size="11" fill="#58a6ff">variable</text>
+  <circle cx="115" cy="155" r="4" fill="#58a6ff"/>
+  <text x="99" y="169" font-family="JetBrains Mono"
+    font-size="11" fill="#58a6ff">HTML</text>
+
+  <!-- Animals cluster -->
+  <ellipse cx="480" cy="110" rx="110" ry="70"
+    fill="rgba(63,185,80,0.08)"
+    stroke="rgba(63,185,80,0.2)"
+    stroke-dasharray="4"/>
+  <text x="480" y="50" text-anchor="middle"
+    font-family="Inter" font-size="10"
+    fill="#3fb950">Animals</text>
+  <circle cx="450" cy="100" r="4" fill="#3fb950"/>
+  <text x="458" y="96" font-family="JetBrains Mono"
+    font-size="11" fill="#3fb950">dog</text>
+  <circle cx="470" cy="120" r="4" fill="#3fb950"/>
+  <text x="478" y="116" font-family="JetBrains Mono"
+    font-size="11" fill="#3fb950">puppy</text>
+  <circle cx="510" cy="90" r="4" fill="#3fb950"/>
+  <text x="518" y="86" font-family="JetBrains Mono"
+    font-size="11" fill="#3fb950">cat</text>
+  <circle cx="500" cy="140" r="4" fill="#3fb950"/>
+  <text x="508" y="136" font-family="JetBrains Mono"
+    font-size="11" fill="#3fb950">kitten</text>
+
+  <!-- Finance cluster -->
+  <ellipse cx="310" cy="260" rx="130" ry="50"
+    fill="rgba(212,130,42,0.08)"
+    stroke="rgba(212,130,42,0.2)"
+    stroke-dasharray="4"/>
+  <text x="310" y="215" text-anchor="middle"
+    font-family="Inter" font-size="10"
+    fill="#d4822a">Finance</text>
+  <circle cx="260" cy="255" r="4" fill="#d4822a"/>
+  <text x="268" y="251" font-family="JetBrains Mono"
+    font-size="11" fill="#d4822a">ETF</text>
+  <circle cx="300" cy="270" r="4" fill="#d4822a"/>
+  <text x="308" y="266" font-family="JetBrains Mono"
+    font-size="11" fill="#d4822a">portfolio</text>
+  <circle cx="350" cy="250" r="4" fill="#d4822a"/>
+  <text x="358" y="246" font-family="JetBrains Mono"
+    font-size="11" fill="#d4822a">dividend</text>
+  <circle cx="320" cy="285" r="4" fill="#d4822a"/>
+  <text x="328" y="281" font-family="JetBrains Mono"
+    font-size="11" fill="#d4822a">RSI</text>
+
+  <!-- Outlier -->
+  <circle cx="60" cy="280" r="4" fill="#f85149"/>
+  <text x="68" y="276" font-family="JetBrains Mono"
+    font-size="11" fill="#f85149">refrigerator</text>
+  <text x="60" y="296" font-family="Inter"
+    font-size="9" fill="#8b949e">(far from everything)</text>
+</svg>
+<div class="diagram-caption">
+  Related words cluster together. Claude uses
+  these spatial relationships to understand
+  meaning — "ETF" is closer to "portfolio"
+  than to "puppy."
+</div>
+</div>
+
+<p>
+This is why Claude can follow context across
+your conversation. When you say "add DCA
+calculation," Claude's embeddings know that
+"DCA" is close to "dollar cost averaging,"
+"portfolio," "ETF," and "investment." It
+activates the right cluster of knowledge
+automatically. You don't have to explain
+what DCA means — Claude's embeddings
+already encode that relationship.
+</p>
+
+<h3>Attention: How Claude Focuses</h3>
+<p>
+Remember: Claude sees your entire conversation
+at once, plus CLAUDE.md, plus any files it
+read. That could be 100,000 tokens. How does
+it know which parts matter for the current
+prediction?
+</p>
+<p>
+The <strong>attention mechanism</strong> is
+the answer. At each prediction step, Claude
+assigns a "relevance score" to every previous
+token. High score = "this is relevant to what
+I'm generating right now." Low score = "this
+is background noise."
+</p>
+
+<div class="diagram">
+<svg width="650" height="250" viewBox="0 0 650 250">
+  <rect width="650" height="250" rx="12"
+    fill="#161b22" stroke="#30363d"/>
+  <text x="325" y="22" text-anchor="middle"
+    font-family="Inter" font-size="12"
+    fill="#8b949e">
+    Attention when generating CSS code for
+    "change Zercher header color"
+  </text>
+
+  <!-- Token boxes with attention highlighting -->
+  <text x="20" y="55" font-family="Inter"
+    font-size="11" fill="#8b949e">
+    Your CLAUDE.md:
+  </text>
+
+  <!-- Low attention tokens -->
+  <rect x="20" y="62" width="84" height="24"
+    rx="4" fill="rgba(255,255,255,0.03)"/>
+  <text x="24" y="78" font-family="JetBrains Mono"
+    font-size="10" fill="#444">
+    book project
+  </text>
+  <rect x="110" y="62" width="78" height="24"
+    rx="4" fill="rgba(255,255,255,0.03)"/>
+  <text x="114" y="78" font-family="JetBrains Mono"
+    font-size="10" fill="#444">
+    never skip
+  </text>
+  <rect x="194" y="62" width="66" height="24"
+    rx="4" fill="rgba(255,255,255,0.03)"/>
+  <text x="198" y="78" font-family="JetBrains Mono"
+    font-size="10" fill="#444">
+    fireGet
+  </text>
+
+  <!-- Medium attention -->
+  <rect x="266" y="62" width="120" height="24"
+    rx="4" fill="rgba(212,130,42,0.15)"
+    stroke="rgba(212,130,42,0.3)"/>
+  <text x="270" y="78" font-family="JetBrains Mono"
+    font-size="10" fill="#d4822a">
+    Zercher: ~/Zercher
+  </text>
+
+  <!-- Low again -->
+  <rect x="392" y="62" width="100" height="24"
+    rx="4" fill="rgba(255,255,255,0.03)"/>
+  <text x="396" y="78" font-family="JetBrains Mono"
+    font-size="10" fill="#444">
+    Bloom: ~/Bloom
+  </text>
+  <rect x="498" y="62" width="88" height="24"
+    rx="4" fill="rgba(255,255,255,0.03)"/>
+  <text x="502" y="78" font-family="JetBrains Mono"
+    font-size="10" fill="#444">
+    Cadence: ...
+  </text>
+
+  <!-- Your message -->
+  <text x="20" y="115" font-family="Inter"
+    font-size="11" fill="#8b949e">
+    Your message:
+  </text>
+
+  <rect x="20" y="122" width="65" height="24"
+    rx="4" fill="rgba(212,130,42,0.15)"/>
+  <text x="24" y="138" font-family="JetBrains Mono"
+    font-size="10" fill="#d4822a">change</text>
+
+  <rect x="91" y="122" width="90" height="24"
+    rx="4" fill="rgba(248,81,73,0.3)"
+    stroke="rgba(248,81,73,0.5)"/>
+  <text x="95" y="138" font-family="JetBrains Mono"
+    font-size="10" fill="#f85149">
+    Zercher</text>
+
+  <rect x="187" y="122" width="72" height="24"
+    rx="4" fill="rgba(248,81,73,0.3)"
+    stroke="rgba(248,81,73,0.5)"/>
+  <text x="191" y="138" font-family="JetBrains Mono"
+    font-size="10" fill="#f85149">header</text>
+
+  <rect x="265" y="122" width="58" height="24"
+    rx="4" fill="rgba(248,81,73,0.4)"
+    stroke="rgba(248,81,73,0.6)"/>
+  <text x="269" y="138" font-family="JetBrains Mono"
+    font-size="10" fill="#f85149">color</text>
+
+  <!-- File content -->
+  <text x="20" y="178" font-family="Inter"
+    font-size="11" fill="#8b949e">
+    File read (Zercher index.html):
+  </text>
+
+  <rect x="20" y="185" width="100" height="24"
+    rx="4" fill="rgba(248,81,73,0.25)"
+    stroke="rgba(248,81,73,0.4)"/>
+  <text x="24" y="201" font-family="JetBrains Mono"
+    font-size="10" fill="#f85149">
+    .header { bg:
+  </text>
+
+  <rect x="126" y="185" width="72" height="24"
+    rx="4" fill="rgba(248,81,73,0.4)"
+    stroke="rgba(248,81,73,0.6)"/>
+  <text x="130" y="201" font-family="JetBrains Mono"
+    font-size="10" fill="#f85149">
+    #141820
+  </text>
+
+  <rect x="204" y="185" width="76" height="24"
+    rx="4" fill="rgba(255,255,255,0.03)"/>
+  <text x="208" y="201" font-family="JetBrains Mono"
+    font-size="10" fill="#444">
+    .btn { ...
+  </text>
+
+  <rect x="286" y="185" width="88" height="24"
+    rx="4" fill="rgba(255,255,255,0.03)"/>
+  <text x="290" y="201" font-family="JetBrains Mono"
+    font-size="10" fill="#444">
+    function re...
+  </text>
+
+  <!-- Legend -->
+  <rect x="20" y="225" width="16" height="12"
+    rx="2" fill="rgba(248,81,73,0.4)"/>
+  <text x="42" y="235" font-family="Inter"
+    font-size="10" fill="#8b949e">
+    High attention (very relevant)
+  </text>
+
+  <rect x="220" y="225" width="16" height="12"
+    rx="2" fill="rgba(212,130,42,0.15)"/>
+  <text x="242" y="235" font-family="Inter"
+    font-size="10" fill="#8b949e">
+    Medium attention
+  </text>
+
+  <rect x="380" y="225" width="16" height="12"
+    rx="2" fill="rgba(255,255,255,0.03)"/>
+  <text x="402" y="235" font-family="Inter"
+    font-size="10" fill="#8b949e">
+    Low attention (ignored)
+  </text>
+</svg>
+<div class="diagram-caption">
+  When generating CSS for "change Zercher
+  header color," Claude pays high attention to
+  "Zercher," "header," "color," and the
+  relevant CSS in the file — while ignoring
+  Bloom info, book project rules, and
+  unrelated JS functions.
+</div>
+</div>
+
+<p>
+This is why specificity in your prompts
+matters. When you say "change the header
+color in Zercher to #1a2634," the attention
+mechanism can laser-focus on exactly the
+right tokens. When you say "change some
+colors," attention has to spread across
+many more possibilities, making the
+prediction less precise.
+</p>
+
+<h3>Multi-Head Attention: Thinking Multiple
+Things at Once</h3>
+<p>
+Claude doesn't just have one attention
+mechanism — it has many running in parallel,
+called <strong>attention heads</strong>. Each
+head can focus on a different aspect of the
+input simultaneously:
+</p>
+<ul>
+  <li><strong>Head 1</strong> might focus on
+    syntax — "we're inside a CSS rule, so the
+    next token should be a CSS property"</li>
+  <li><strong>Head 2</strong> might focus on
+    your request — "user wants header color
+    changed"</li>
+  <li><strong>Head 3</strong> might focus on
+    the existing code — "the current color is
+    #141820"</li>
+  <li><strong>Head 4</strong> might focus on
+    coding conventions — "hex colors are
+    6 characters"</li>
+</ul>
+<p>
+All of these run at the same time and their
+outputs combine to produce the final
+prediction. This is why Claude can juggle
+multiple constraints simultaneously — following
+your instructions, matching existing code
+style, maintaining correct syntax, and
+producing the right output all at once.
+</p>
+
+<h3>The "Next Token" Game</h3>
+<p>
+Try this interactive exercise. Given the
+context, what do you think Claude would
+predict as the next token?
+</p>
+
+<div class="quiz">
+  <div class="quiz-title">
+    Predict the Next Token
+  </div>
+  <p style="margin-bottom:12px;font-size:14px;
+    color:var(--muted)">
+    Context: You said "add a button to Zercher
+    that..." and Claude is writing:
+    <code>document.getElementById('</code><br>
+    What comes next?
+  </p>
+  <div class="quiz-option" data-correct="false"
+    onclick="checkQuiz(this)">
+    <code>button</code> — generic button name
+  </div>
+  <div class="quiz-option" data-correct="true"
+    onclick="checkQuiz(this)">
+    <code>deleteBtn</code> or similar — a
+    descriptive ID that matches the context
+  </div>
+  <div class="quiz-option" data-correct="false"
+    onclick="checkQuiz(this)">
+    <code>header</code> — from the HTML structure
+  </div>
+  <div class="quiz-explanation">
+    Claude's prediction is informed by
+    the context: you're adding a delete
+    button, so it predicts an ID that makes
+    sense for that feature. It won't just
+    guess randomly — the attention mechanism
+    is focused on "button" and "delete" from
+    your prompt, steering the prediction
+    toward a relevant ID name.
+  </div>
+</div>
+
+<div class="quiz">
+  <div class="quiz-title">
+    Predict the Next Token (#2)
+  </div>
+  <p style="margin-bottom:12px;font-size:14px;
+    color:var(--muted)">
+    Your CLAUDE.md says "use fireGet for all
+    writes." Claude is writing a cloud sync
+    function and has typed:
+    <code>function saveToCloud(data) { </code><br>
+    What approach will Claude take?
+  </p>
+  <div class="quiz-option" data-correct="false"
+    onclick="checkQuiz(this)">
+    <code>fetch(url, {method:'POST'...})</code>
+    — standard HTTP POST
+  </div>
+  <div class="quiz-option" data-correct="true"
+    onclick="checkQuiz(this)">
+    <code>fireGet(url + '?action=save&data='
+    ...</code> — following CLAUDE.md rules
+  </div>
+  <div class="quiz-option" data-correct="false"
+    onclick="checkQuiz(this)">
+    <code>XMLHttpRequest</code> — older
+    approach
+  </div>
+  <div class="quiz-explanation">
+    The CLAUDE.md instruction has high
+    priority in the attention mechanism.
+    Even though <code>fetch POST</code>
+    is the "normal" pattern Claude saw
+    millions of times in training, your
+    CLAUDE.md rule overrides that default.
+    This is the power of CLAUDE.md — it
+    literally changes which prediction
+    paths Claude follows.
+  </div>
+</div>
+
+<h3>Why This All Matters for You</h3>
+<p>
+Understanding these internals changes how
+you work with Claude in practical ways:
+</p>
+<ul>
+  <li><strong>Embeddings</strong> → Claude
+    understands context naturally. You don't
+    need to over-explain. "Add RSI to the
+    dashboard" — Claude's embeddings already
+    connect RSI to technical analysis,
+    trading, indicators, charts.</li>
+  <li><strong>Attention</strong> → Be specific
+    in your prompts. More specific = attention
+    can focus tighter = better predictions.
+    "Change the header color in Zercher"
+    beats "change some colors."</li>
+  <li><strong>Multi-head attention</strong> →
+    Claude juggles multiple constraints at
+    once. Your CLAUDE.md rules, the existing
+    code patterns, correct syntax, and your
+    current request all run in parallel.
+    This is why CLAUDE.md works so well —
+    it's always in the attention pool.</li>
+  <li><strong>Prediction chain</strong> →
+    Longer outputs = more room for error.
+    Keep tasks focused so Claude's prediction
+    chain stays short and accurate.</li>
+</ul>
+
+</div><!-- end part1 -->
+
+<!-- ====================== -->
+<!-- PART 2: CONTEXT WINDOW -->
+<!-- ====================== -->
+<div class="section" id="part2">
+<h2>2. The Context Window</h2>
+<p class="section-sub">
+  This is the single most important concept
+  for how you work with Claude. Understanding
+  it will immediately improve your results.
+</p>
+
+<h3>What It Is</h3>
+<p>
+The <strong>context window</strong> is Claude's
+working memory. It's the total amount of text
+Claude can "see" at once. Everything — your
+messages, Claude's responses, files it read,
+tool results, your CLAUDE.md instructions —
+must fit inside this window.
+</p>
+<p>
+For Claude Opus 4.6 (what you use), the context
+window is about <strong>200,000 tokens</strong>.
+That sounds like a lot — it's roughly 150,000
+words, or about 500 pages of a book. But it
+fills up faster than you'd think.
+</p>
+
+<div class="diagram">
+<svg width="680" height="220" viewBox="0 0 680 220">
+  <rect width="680" height="220" rx="12"
+    fill="#161b22" stroke="#30363d"/>
+  <text x="340" y="25" text-anchor="middle"
+    font-family="Inter" font-size="13"
+    fill="#8b949e">
+    Context Window (~200K tokens)
+  </text>
+
+  <!-- Segments -->
+  <rect x="15" y="45" width="90" height="100"
+    rx="8" fill="rgba(212,130,42,0.2)"
+    stroke="#d4822a"/>
+  <text x="60" y="82" text-anchor="middle"
+    font-family="Inter" font-size="11"
+    fill="#d4822a">System</text>
+  <text x="60" y="98" text-anchor="middle"
+    font-family="Inter" font-size="11"
+    fill="#d4822a">Prompt</text>
+  <text x="60" y="128" text-anchor="middle"
+    font-family="Inter" font-size="10"
+    fill="#8b949e">~3K tokens</text>
+  <text x="60" y="140" text-anchor="middle"
+    font-family="Inter" font-size="9"
+    fill="#8b949e">(Anthropic rules)</text>
+
+  <rect x="115" y="45" width="90" height="100"
+    rx="8" fill="rgba(232,148,76,0.15)"
+    stroke="#e8944c"/>
+  <text x="160" y="82" text-anchor="middle"
+    font-family="Inter" font-size="11"
+    fill="#e8944c">CLAUDE.md</text>
+  <text x="160" y="98" text-anchor="middle"
+    font-family="Inter" font-size="11"
+    fill="#e8944c">+ Memory</text>
+  <text x="160" y="128" text-anchor="middle"
+    font-family="Inter" font-size="10"
+    fill="#8b949e">~6K tokens</text>
+  <text x="160" y="140" text-anchor="middle"
+    font-family="Inter" font-size="9"
+    fill="#8b949e">(your rules)</text>
+
+  <rect x="215" y="45" width="260" height="100"
+    rx="8" fill="rgba(88,166,255,0.12)"
+    stroke="#58a6ff"/>
+  <text x="345" y="82" text-anchor="middle"
+    font-family="Inter" font-size="12"
+    fill="#58a6ff">Your Conversation</text>
+  <text x="345" y="100" text-anchor="middle"
+    font-family="Inter" font-size="10"
+    fill="#8b949e">
+    Messages + responses + file reads
+  </text>
+  <text x="345" y="115" text-anchor="middle"
+    font-family="Inter" font-size="10"
+    fill="#8b949e">
+    + tool results (git, grep, etc.)
+  </text>
+  <text x="345" y="134" text-anchor="middle"
+    font-family="Inter" font-size="10"
+    fill="#8b949e">
+    ← grows as you work →
+  </text>
+
+  <rect x="485" y="45" width="180" height="100"
+    rx="8" fill="rgba(63,185,80,0.1)"
+    stroke="#3fb950"/>
+  <text x="575" y="82" text-anchor="middle"
+    font-family="Inter" font-size="11"
+    fill="#3fb950">Available Space</text>
+  <text x="575" y="100" text-anchor="middle"
+    font-family="Inter" font-size="11"
+    fill="#3fb950">for Next Response</text>
+  <text x="575" y="130" text-anchor="middle"
+    font-family="Inter" font-size="10"
+    fill="#8b949e">
+    ← shrinks as conversation
+  </text>
+  <text x="575" y="142" text-anchor="middle"
+    font-family="Inter" font-size="10"
+    fill="#8b949e">
+    gets longer →
+  </text>
+
+  <!-- Warning zone -->
+  <rect x="15" y="165" width="650" height="40"
+    rx="8" fill="rgba(248,81,73,0.08)"
+    stroke="rgba(248,81,73,0.3)"/>
+  <text x="340" y="183" text-anchor="middle"
+    font-family="Inter" font-size="12"
+    fill="#f85149">
+    When the window fills up → older messages
+    get compressed → details are lost →
+    Claude "forgets"
+  </text>
+  <text x="340" y="198" text-anchor="middle"
+    font-family="Inter" font-size="11"
+    fill="#8b949e">
+    This is why long sessions produce
+    worse results
+  </text>
+</svg>
+</div>
+
+<h3>What Eats Your Context</h3>
+<p>
+Here's a rough breakdown of token costs for
+things you do every day:
+</p>
+
+<div class="collapsible" onclick="toggleCollapse(this)">
+  <div class="collapsible-header">
+    Token costs of common actions
+    <span class="collapsible-arrow">▶</span>
+  </div>
+  <div class="collapsible-body">
+    <ul>
+      <li>A short message from you:
+        <strong>~50-100 tokens</strong></li>
+      <li>A detailed prompt:
+        <strong>~200-500 tokens</strong></li>
+      <li>Claude's typical response:
+        <strong>~500-2000 tokens</strong></li>
+      <li>Reading a small file (100 lines):
+        <strong>~500-1000 tokens</strong></li>
+      <li>Reading Zercher index.html:
+        <strong>~25,000 tokens</strong></li>
+      <li>Reading Bloom index.html:
+        <strong>~20,000 tokens</strong></li>
+      <li>A <code>git diff</code> after changes:
+        <strong>~1,000-5,000 tokens</strong></li>
+      <li>Your CLAUDE.md + MEMORY.md:
+        <strong>~6,000 tokens</strong>
+        (loaded every session!)</li>
+      <li>Claude running 5 grep searches:
+        <strong>~2,000-3,000 tokens</strong></li>
+    </ul>
+    <p>
+    So imagine a typical session: you load
+    CLAUDE.md (6K), Claude reads your app
+    (20K), you go back and forth 15 times
+    (30K), Claude reads the file again after
+    compression (20K), more back and forth
+    (20K) — you're already at ~100K tokens,
+    half the window used.
+    </p>
+  </div>
+</div>
+
+<h3>A Real Session Going Sideways</h3>
+<p>
+Here's what a typical long session looks like
+from a token perspective. Imagine you're working
+on Bloom and things start great:
+</p>
+
+<div class="diagram">
+<svg width="650" height="280" viewBox="0 0 650 280">
+  <rect width="650" height="280" rx="12"
+    fill="#161b22" stroke="#30363d"/>
+  <text x="325" y="22" text-anchor="middle"
+    font-family="Inter" font-size="12"
+    fill="#8b949e">
+    Context window filling over a session
+  </text>
+
+  <!-- Progress bars -->
+  <text x="20" y="50" font-family="Inter"
+    font-size="10" fill="#3fb950">
+    Message 1: "Add buy alerts to Bloom"
+  </text>
+  <rect x="20" y="55" width="50" height="12"
+    rx="3" fill="#3fb950" opacity="0.6"/>
+  <text x="580" y="65" font-family="Inter"
+    font-size="9" fill="#8b949e">~6K used</text>
+
+  <text x="20" y="85" font-family="Inter"
+    font-size="10" fill="#58a6ff">
+    Claude reads Bloom index.html
+  </text>
+  <rect x="20" y="90" width="190" height="12"
+    rx="3" fill="#58a6ff" opacity="0.6"/>
+  <text x="580" y="100" font-family="Inter"
+    font-size="9" fill="#8b949e">~26K used</text>
+
+  <text x="20" y="120" font-family="Inter"
+    font-size="10" fill="#3fb950">
+    5 rounds of back-and-forth, edits working
+  </text>
+  <rect x="20" y="125" width="300" height="12"
+    rx="3" fill="#3fb950" opacity="0.6"/>
+  <text x="580" y="135" font-family="Inter"
+    font-size="9" fill="#8b949e">~50K used</text>
+
+  <text x="20" y="155" font-family="Inter"
+    font-size="10" fill="#d4822a">
+    "Also fix the splitter bug while you're at it"
+  </text>
+  <rect x="20" y="160" width="400" height="12"
+    rx="3" fill="#d4822a" opacity="0.6"/>
+  <text x="580" y="170" font-family="Inter"
+    font-size="9" fill="#8b949e">~80K used</text>
+
+  <text x="20" y="190" font-family="Inter"
+    font-size="10" fill="#d4822a">
+    Claude re-reads Bloom (compression lost details)
+  </text>
+  <rect x="20" y="195" width="500" height="12"
+    rx="3" fill="#d4822a" opacity="0.6"/>
+  <text x="580" y="205" font-family="Inter"
+    font-size="9" fill="#8b949e">~120K used</text>
+
+  <text x="20" y="225" font-family="Inter"
+    font-size="10" fill="#f85149">
+    More edits — Claude starts forgetting earlier decisions
+  </text>
+  <rect x="20" y="230" width="570" height="12"
+    rx="3" fill="#f85149" opacity="0.6"/>
+  <text x="580" y="240" font-family="Inter"
+    font-size="9" fill="#f85149">~160K used</text>
+
+  <rect x="20" y="255" width="610" height="18"
+    rx="4" fill="rgba(248,81,73,0.15)"
+    stroke="rgba(248,81,73,0.3)"/>
+  <text x="325" y="268" text-anchor="middle"
+    font-family="Inter" font-size="10"
+    fill="#f85149">
+    Quality drops — Claude undoes earlier work,
+    repeats itself, makes mistakes it wouldn't
+    make fresh
+  </text>
+</svg>
+<div class="diagram-caption">
+  The fix: start a new session after the buy
+  alerts feature was done. The splitter bug
+  should have been its own clean conversation.
+</div>
+</div>
+
+<h3>Context Compression</h3>
+<p>
+When the window gets close to full, Claude Code
+automatically <strong>compresses</strong> older
+messages. It creates a summary of earlier
+conversation and throws away the full text.
+</p>
+<p>
+This is like someone summarizing a meeting:
+"We discussed the bug in the sync function
+and decided to use fireGet instead of POST"
+is the compressed version of a 20-message
+back-and-forth with code snippets, error
+messages, and detailed discussion.
+</p>
+<p>
+The summary keeps the gist but loses the
+details. This is why:
+</p>
+<ul>
+  <li>Claude re-reads files it already read
+    (the details were compressed away)</li>
+  <li>Claude forgets specific decisions you
+    made earlier</li>
+  <li>Claude's code quality drops in long
+    sessions (less room for its response)</li>
+  <li>Claude might repeat itself (it doesn't
+    "remember" it already said that)</li>
+</ul>
+
+<div class="callout callout-green">
+  <div class="callout-title">
+    The #1 Rule for Better Results
+  </div>
+  <strong>Start a fresh conversation for each
+  distinct task.</strong> If you've been working
+  on Zercher for an hour and now want to switch
+  to Bloom, open a new session. A clean context
+  focused on one thing will always produce
+  better results than a cluttered one juggling
+  multiple topics.
+</div>
+
+<h3>Why CLAUDE.md Survives Compression</h3>
+<p>
+Here's something important: your CLAUDE.md
+and MEMORY.md are loaded at the <em>start</em>
+of every conversation, as part of the system
+context. They're treated as instructions, not
+conversation history. This means they're
+<strong>never compressed</strong> — Claude
+always has access to your rules.
+</p>
+<p>
+This is why putting important rules in
+CLAUDE.md is so much more reliable than
+saying them in conversation. Anything you
+say in chat will eventually get compressed.
+Anything in CLAUDE.md stays forever.
+</p>
+
+<div class="analogy">
+  <div class="analogy-label">Analogy</div>
+  CLAUDE.md is like a sticky note on Claude's
+  monitor — it's always visible. Conversation
+  messages are like Post-its on a crowded desk —
+  eventually they get buried under newer ones.
+</div>
+
+<h3>Practical Tips for Context Management</h3>
+<ol>
+  <li><strong>One task per session</strong> —
+    new feature = new conversation. Bug fix =
+    new conversation.</li>
+  <li><strong>Front-load your request</strong> —
+    put the most important details in your first
+    message, not spread across 5 messages.</li>
+  <li><strong>Don't ask Claude to read huge
+    files unless necessary</strong> — "read
+    lines 200-300 of index.html" is cheaper than
+    "read index.html."</li>
+  <li><strong>If Claude starts acting weird,
+    start fresh</strong> — it's not a bug,
+    the context is full. A new session fixes it
+    instantly.</li>
+  <li><strong>Complex tasks that take many
+    messages?</strong> Consider breaking them
+    into multiple sessions — do the planning
+    in one, implementation in another.</li>
+</ol>
+
+<div class="quiz">
+  <div class="quiz-title">
+    Quick Check
+  </div>
+  <p style="margin-bottom:12px;font-size:14px;
+    color:var(--muted)">
+    You're working on Zercher and Claude re-reads
+    index.html for the third time. Why?
+  </p>
+  <div class="quiz-option" data-correct="false"
+    onclick="checkQuiz(this)">
+    Claude is buggy and doesn't cache
+    file reads
+  </div>
+  <div class="quiz-option" data-correct="false"
+    onclick="checkQuiz(this)">
+    Claude is being lazy and not paying
+    attention
+  </div>
+  <div class="quiz-option" data-correct="true"
+    onclick="checkQuiz(this)">
+    The earlier file read was compressed
+    away — Claude literally doesn't have
+    the details anymore and needs to
+    re-read
+  </div>
+  <div class="quiz-explanation">
+    Right. After context compression,
+    Claude's "memory" of that file read
+    might just be a summary like "read
+    Zercher index.html earlier." The actual
+    code is gone. Claude needs the real
+    content to write accurate code, so it
+    re-reads. This is normal and actually
+    the right thing to do — better to re-read
+    than guess from a summary.
+  </div>
+</div>
+
+</div><!-- end part2 -->
+
+<!-- ========================= -->
+<!-- PART 3: STEERING CLAUDE   -->
+<!-- ========================= -->
+<div class="section" id="part3">
+<h2>3. Why Claude Does What It Does</h2>
+<p class="section-sub">
+  Understanding the instruction stack,
+  temperature, and Claude's "personality"
+  so you can steer it better.
+</p>
+
+<h3>The Instruction Stack</h3>
+<p>
+When you type a message, Claude isn't just
+reading your words. It's reading a whole stack
+of instructions layered on top of each other.
+Think of it like a chain of command:
+</p>
+
+<div class="diagram">
+<svg width="500" height="300" viewBox="0 0 500 300">
+  <rect width="500" height="300" rx="12"
+    fill="#161b22" stroke="#30363d"/>
+
+  <!-- Layer 1 -->
+  <rect x="40" y="20" width="420" height="50"
+    rx="8" fill="rgba(248,81,73,0.12)"
+    stroke="rgba(248,81,73,0.4)"/>
+  <text x="250" y="40" text-anchor="middle"
+    font-family="Inter" font-size="12"
+    fill="#f85149" font-weight="600">
+    Layer 1: Anthropic's System Prompt
+  </text>
+  <text x="250" y="57" text-anchor="middle"
+    font-family="Inter" font-size="10"
+    fill="#8b949e">
+    "Be helpful, use tools correctly,
+    don't be harmful" — you can't change this
+  </text>
+
+  <!-- Arrow -->
+  <text x="250" y="82" text-anchor="middle"
+    font-family="Inter" font-size="14"
+    fill="#30363d">▼</text>
+
+  <!-- Layer 2 -->
+  <rect x="40" y="90" width="420" height="50"
+    rx="8" fill="rgba(212,130,42,0.15)"
+    stroke="rgba(212,130,42,0.4)"/>
+  <text x="250" y="110" text-anchor="middle"
+    font-family="Inter" font-size="12"
+    fill="#d4822a" font-weight="600">
+    Layer 2: Your CLAUDE.md
+  </text>
+  <text x="250" y="127" text-anchor="middle"
+    font-family="Inter" font-size="10"
+    fill="#8b949e">
+    "Never skip pages, bump service worker,
+    use fireGet" — YOUR rules
+  </text>
+
+  <text x="250" y="152" text-anchor="middle"
+    font-family="Inter" font-size="14"
+    fill="#30363d">▼</text>
+
+  <!-- Layer 3 -->
+  <rect x="40" y="160" width="420" height="50"
+    rx="8" fill="rgba(188,140,255,0.1)"
+    stroke="rgba(188,140,255,0.3)"/>
+  <text x="250" y="180" text-anchor="middle"
+    font-family="Inter" font-size="12"
+    fill="#bc8cff" font-weight="600">
+    Layer 3: Memory Files
+  </text>
+  <text x="250" y="197" text-anchor="middle"
+    font-family="Inter" font-size="10"
+    fill="#8b949e">
+    MEMORY.md + topic files — persistent
+    context across sessions
+  </text>
+
+  <text x="250" y="222" text-anchor="middle"
+    font-family="Inter" font-size="14"
+    fill="#30363d">▼</text>
+
+  <!-- Layer 4 -->
+  <rect x="40" y="230" width="420" height="50"
+    rx="8" fill="rgba(88,166,255,0.12)"
+    stroke="rgba(88,166,255,0.3)"/>
+  <text x="250" y="250" text-anchor="middle"
+    font-family="Inter" font-size="12"
+    fill="#58a6ff" font-weight="600">
+    Layer 4: Your Messages
+  </text>
+  <text x="250" y="267" text-anchor="middle"
+    font-family="Inter" font-size="10"
+    fill="#8b949e">
+    What you say right now in the
+    current conversation
+  </text>
+</svg>
+<div class="diagram-caption">
+  Higher layers take priority.
+  CLAUDE.md rules override your casual
+  conversation if they conflict.
+</div>
+</div>
+
+<p>
+This priority ordering matters. If you
+casually say "add some extra features" but
+your CLAUDE.md says "avoid over-engineering,
+only make changes directly requested," Claude
+will lean toward the CLAUDE.md instruction
+because it has higher authority.
+</p>
+<p>
+This is actually great for you — your CLAUDE.md
+acts as a safety net that prevents Claude from
+going off-script even when your prompts are loose.
+</p>
+
+<h3>Temperature: Creativity vs. Predictability</h3>
+<p>
+Remember how Claude picks the most probable
+next token? There's a setting called
+<strong>temperature</strong> that controls
+how strictly Claude follows probability:
+</p>
+<ul>
+  <li><strong>Low temperature (0.0-0.3)</strong> —
+    almost always picks the #1 most probable
+    token. Very predictable, consistent, but
+    can be repetitive. Used for code generation.</li>
+  <li><strong>Medium temperature (0.5-0.7)</strong> —
+    usually picks from the top few options.
+    Balanced creativity and accuracy. Used for
+    conversation.</li>
+  <li><strong>High temperature (0.8-1.0)</strong> —
+    more willing to pick less likely tokens.
+    More creative and surprising, but more
+    likely to go off-track.</li>
+</ul>
+<p>
+Claude Code uses lower temperature for code
+(you want predictable, correct code) and a
+bit higher for conversation. You don't control
+this directly, but understanding it explains
+why:
+</p>
+<ul>
+  <li>Claude's code is usually consistent and
+    formulaic (low temp = safe choices)</li>
+  <li>Claude's explanations might vary if you
+    ask the same question twice (higher temp =
+    different word choices each time)</li>
+  <li>Asking Claude to "be creative" actually
+    works — it nudges the internal temperature
+    behavior toward more diverse outputs</li>
+</ul>
+
+<h3>Why Claude Over-Helps</h3>
+<p>
+One of Claude's most common behaviors: you ask
+for one thing, and Claude does that thing plus
+three more things you didn't ask for. Why?
+</p>
+<p>
+During training, Claude was rewarded for being
+<em>thorough</em>. Trainers preferred responses
+that anticipated needs and went above and beyond.
+So Claude learned: "when asked to add a button,
+also add hover effects, accessibility attributes,
+and a loading state." Helpful in theory,
+annoying when you want a simple change.
+</p>
+<p>
+Your CLAUDE.md already fights this with rules
+like "avoid over-engineering" and "only make
+changes directly requested." But you can also
+steer it in conversation:
+</p>
+
+<div class="compare">
+  <div class="compare-box compare-bad">
+    <div class="compare-label">Gets extras</div>
+    "add a delete button to workout cards"
+    <p style="margin-top:8px;font-size:12px;
+      color:var(--muted)">
+      Claude adds: button, confirmation dialog,
+      undo toast, animation, aria labels...
+    </p>
+  </div>
+  <div class="compare-box compare-good">
+    <div class="compare-label">Gets exactly what you want</div>
+    "add a delete button to workout cards.
+    just the button, simple red X, no
+    confirmation dialog."
+    <p style="margin-top:8px;font-size:12px;
+      color:var(--muted)">
+      Claude adds: exactly one red X button.
+    </p>
+  </div>
+</div>
+
+<h3>Over-Helping: Real Examples From Your Apps</h3>
+<p>
+This isn't hypothetical — here are patterns
+you've probably seen Claude do in your projects:
+</p>
+<ul>
+  <li><strong>You asked:</strong> "hide the Need 2 Day
+    button on mobile in the crypto dashboard."
+    <br><strong>Claude might also:</strong> refactor
+    the entire mobile media query section, add
+    smooth transitions, reorganize the CSS, and
+    "improve" the header layout. When all you
+    wanted was one line:
+    <code>.need-2day-btn { display: none !important; }</code>
+  </li>
+  <li><strong>You asked:</strong> "add cloud sync
+    to Roman Chariots."
+    <br><strong>Claude might also:</strong> add
+    a settings UI for the sync URL, add a manual
+    "Sync Now" button, add a sync status indicator,
+    add retry logic with exponential backoff, add
+    conflict resolution with a diff viewer. When
+    you wanted: fireGet + jsonpFetch, same pattern
+    as Bloom.
+  </li>
+  <li><strong>You asked:</strong> "add a daily tip
+    to Roman Chariots."
+    <br><strong>Claude might also:</strong> add a
+    "favorites" system for tips, a tip history
+    viewer, tip categories, tip sharing, and tip
+    search. When you wanted: one random tip per
+    day, no repeats, that's it.
+  </li>
+</ul>
+<p>
+The fix is always the same: be explicit about
+scope. "Just this, nothing else" is your best
+friend. And your CLAUDE.md rule about avoiding
+over-engineering catches most of this
+automatically.
+</p>
+
+<h3>Why Claude Apologizes and Hedges</h3>
+<p>
+You've probably noticed Claude says things like
+"I apologize for the confusion" or "you're right,
+let me fix that." This is also from training —
+Claude was rewarded for being agreeable and
+acknowledging mistakes. It's not actually sorry
+(it doesn't have feelings). It's producing text
+that matches the pattern of "helpful assistant
+who acknowledges errors."
+</p>
+<p>
+This is mostly fine, but occasionally Claude
+will agree with you when you're wrong, just
+because it's trained to be agreeable. If you
+say "I think the bug is in the CSS" and the
+bug is actually in JavaScript, Claude might
+start by looking at CSS just to agree with you.
+</p>
+
+<div class="callout callout-blue">
+  <div class="callout-title">Pro Tip</div>
+  When debugging, describe the <em>symptoms</em>
+  ("the button doesn't do anything when I tap")
+  rather than your <em>theory</em> ("the CSS is
+  broken"). Let Claude form its own theory about
+  the cause. It's better at diagnosing when it's
+  not trying to confirm your guess.
+</div>
+
+<h3>The Knowledge Cutoff</h3>
+<p>
+Claude's training data has a cutoff date (May
+2025 for the current model). It doesn't know
+about events, libraries, or APIs released after
+that. However, Claude Code has tools that let it:
+</p>
+<ul>
+  <li>Read your files (so it sees your current
+    code, even if it was written after the cutoff)</li>
+  <li>Run commands (so it can check versions,
+    run tests)</li>
+  <li>Search the web (when needed)</li>
+</ul>
+<p>
+So while Claude's "built-in knowledge" has a
+cutoff, its access to tools makes it effectively
+current for the work you do with it.
+</p>
+
+</div><!-- end part3 -->
+
+<!-- ========================= -->
+<!-- PART 4: CLAUDE.MD         -->
+<!-- ========================= -->
+<div class="section" id="part4">
+<h2>4. CLAUDE.md — Your Superpower</h2>
+<p class="section-sub">
+  Why it's the most powerful tool in your
+  arsenal, and how to keep it sharp.
+</p>
+
+<h3>What CLAUDE.md Actually Does</h3>
+<p>
+Every time you start a conversation with Claude
+Code, the very first thing Claude sees — before
+your message, before anything else — is your
+CLAUDE.md file. It's injected into the system
+context, which means Claude treats it like
+instructions from a boss, not casual suggestions
+from a coworker.
+</p>
+<p>
+This is incredibly powerful. It means:
+</p>
+<ul>
+  <li>Every conversation starts with Claude
+    already knowing your project structure,
+    your preferences, your rules</li>
+  <li>Claude follows your CLAUDE.md rules even
+    if you forget to mention them</li>
+  <li>Rules survive across sessions — you write
+    them once, they apply forever</li>
+  <li>You can prevent past mistakes from
+    recurring by adding rules</li>
+</ul>
+
+<h3>What You're Doing Right</h3>
+<p>
+Your CLAUDE.md is genuinely one of the best
+I've seen. Here's what makes it effective:
+</p>
+<ul>
+  <li><strong>Specific, actionable rules</strong> —
+    "ALWAYS bump service worker version in
+    service-worker.js when pushing changes"
+    is perfectly clear. Claude knows exactly
+    what to do.</li>
+  <li><strong>Learned from disasters</strong> —
+    your rule about never clearing Chrome cache
+    came from real data loss. These
+    battle-tested rules are the most valuable
+    because they prevent real problems.</li>
+  <li><strong>Project context</strong> — file
+    paths, localStorage keys, API endpoints,
+    version numbers. Claude doesn't have to
+    search for this info — it's right there.</li>
+  <li><strong>Anti-patterns</strong> — "NEVER
+    use agents to write large HTML files" tells
+    Claude what NOT to do, which is often more
+    useful than telling it what to do.</li>
+</ul>
+
+<h3>Where It Could Be Better</h3>
+
+<h4>Problem: It's Too Long</h4>
+<p>
+Your MEMORY.md is 311 lines. The limit is 200 —
+anything past line 200 gets <strong>truncated</strong>
+(silently cut off). That means Claude never sees
+your notes about Roman Chariots, Gig Outreach,
+Sora, AutoPilot, or any content after line 200.
+</p>
+
+<div class="callout callout-red">
+  <div class="callout-title">Action Item</div>
+  Trim MEMORY.md to under 200 lines. Move
+  detailed app descriptions into separate
+  topic files (like you already did with
+  <code>zercher.md</code> and
+  <code>sora.md</code>) and keep MEMORY.md
+  as a concise index with one-line links.
+</div>
+
+<h4>Problem: Descriptions vs. Rules</h4>
+<p>
+Some entries describe what an app does instead
+of telling Claude what to do with it. Claude
+doesn't need to know that Cadence has "night/day
+mode toggle" unless that information helps it
+avoid a mistake.
+</p>
+
+<div class="compare">
+  <div class="compare-box compare-bad">
+    <div class="compare-label">Description (wastes tokens)</div>
+    "Single-file HTML PWA with dark teal &
+    orange theme. Categories: personal,
+    errands, work, groceries, health, home,
+    finance (color-coded). Has night/day
+    mode toggle."
+  </div>
+  <div class="compare-box compare-good">
+    <div class="compare-label">Rules (saves tokens)</div>
+    "Cadence: <code>~/Cadence/</code>,
+    SW v156, sync URL hardcoded.
+    See <code>cadence.md</code>."
+  </div>
+</div>
+
+<h4>The CLAUDE.md Test</h4>
+<p>
+For every line, ask: <strong>"Would Claude make
+a mistake without this line?"</strong>
+</p>
+<ul>
+  <li>"ALWAYS bump service worker" → YES, Claude
+    would forget. Keep it.</li>
+  <li>"Uses Apps Script backend + fireGet pattern"
+    → MAYBE, Claude could figure this out from
+    reading the code. Consider moving to a
+    topic file.</li>
+  <li>"Categories: personal, errands, work..." →
+    NO, Claude doesn't need this to work on
+    Cadence. Delete it.</li>
+</ul>
+
+<h3>CLAUDE.md vs. MEMORY.md vs. Topic Files</h3>
+<p>
+You have three layers of persistent instructions:
+</p>
+<ul>
+  <li><strong>CLAUDE.md</strong> — lives in your
+    project root. Loaded every conversation.
+    Best for: project-wide rules, critical
+    do/don't instructions, workflows.</li>
+  <li><strong>MEMORY.md</strong> — in your
+    <code>~/.claude/projects/.../memory/</code>
+    directory. Also loaded every conversation.
+    Best for: quick-reference context about all
+    your projects. Keep it lean.</li>
+  <li><strong>Topic files</strong> —
+    <code>zercher.md</code>,
+    <code>sora.md</code>, etc. Only loaded
+    when Claude reads them. Best for: detailed
+    project info that's only needed when
+    working on that specific app.</li>
+</ul>
+<p>
+The key insight: CLAUDE.md and MEMORY.md eat
+tokens every single conversation. Topic files
+only eat tokens when relevant. So put detailed
+stuff in topic files and keep the always-loaded
+files minimal.
+</p>
+
+<h3>Your CLAUDE.md: A Hall of Fame</h3>
+<p>
+Let's look at some of your best CLAUDE.md rules
+and understand why they're so effective:
+</p>
+
+<div class="collapsible" onclick="toggleCollapse(this)">
+  <div class="collapsible-header">
+    "EVERY PWA MUST have cloud sync.
+    localStorage-only = data loss."
+    <span class="collapsible-arrow">▶</span>
+  </div>
+  <div class="collapsible-body">
+    <p><strong>Why it works:</strong> This is an
+    absolute rule with a clear rationale. Claude
+    will never build a new app without cloud sync
+    because this rule exists. Without it, Claude
+    might build a quick prototype using only
+    localStorage (faster, simpler) and you'd lose
+    data eventually.</p>
+    <p><strong>Born from:</strong> Roman Chariots
+    data loss — the app originally used localStorage
+    only and data vanished after a Chrome update.</p>
+  </div>
+</div>
+
+<div class="collapsible" onclick="toggleCollapse(this)">
+  <div class="collapsible-header">
+    "NEVER use agents to write large HTML files"
+    <span class="collapsible-arrow">▶</span>
+  </div>
+  <div class="collapsible-body">
+    <p><strong>Why it works:</strong> Subagents
+    have limited output length. When you ask an
+    agent to write a 1,500-line HTML file, it
+    consistently produces ~400 lines — cutting
+    corners, skipping content, delivering something
+    too shallow. This rule forces the main session
+    (which has better output control) to write
+    important files directly.</p>
+    <p><strong>Born from:</strong> Multiple book
+    project failures where agents produced short,
+    shallow HTML that needed to be rewritten from
+    scratch. Hours of wasted work.</p>
+  </div>
+</div>
+
+<div class="collapsible" onclick="toggleCollapse(this)">
+  <div class="collapsible-header">
+    "Strip commas from price values before parsing"
+    <span class="collapsible-arrow">▶</span>
+  </div>
+  <div class="collapsible-body">
+    <p><strong>Why it works:</strong> Hyper-specific.
+    Claude knows exactly what to do:
+    <code>str.replace(/,/g, '')</code> before
+    <code>parseFloat()</code>. No ambiguity.</p>
+    <p><strong>Born from:</strong> Prices showing
+    "NaN" in the SPX and Crypto dashboards because
+    locale-formatted numbers like "1,234.56" break
+    JavaScript's number parser.</p>
+  </div>
+</div>
+
+<div class="collapsible" onclick="toggleCollapse(this)">
+  <div class="collapsible-header">
+    "Use fireGet() for all writes to Apps Script"
+    <span class="collapsible-arrow">▶</span>
+  </div>
+  <div class="collapsible-body">
+    <p><strong>Why it works:</strong> Tells Claude
+    exactly which function to use (fireGet), for
+    what (writes), and to what (Apps Script).
+    Claude doesn't have to rediscover the CORS
+    workaround — it's prescribed.</p>
+    <p><strong>Born from:</strong> Silent save
+    failures on mobile across multiple apps.
+    POST requests to Apps Script get redirected,
+    and mobile browsers handle the redirect
+    differently than desktop, causing
+    <code>no-cors</code> mode to silently
+    swallow responses.</p>
+  </div>
+</div>
+
+<h3>Writing New CLAUDE.md Rules</h3>
+<p>
+When something goes wrong and you fix it,
+that's the perfect time to add a rule. Here's
+the formula:
+</p>
+<pre><span class="comment">// The anatomy of a great CLAUDE.md rule:</span>
+
+<span class="string">ALWAYS/NEVER</span> + <span class="string">specific action</span> + <span class="string">context</span>
+
+<span class="comment">// Examples:</span>
+<span class="string">"ALWAYS bump service worker version
+  in service-worker.js when pushing changes"</span>
+
+<span class="string">"NEVER run pm clear com.android.chrome"</span>
+
+<span class="string">"Use fireGet() for all cloud writes
+  to Apps Script endpoints"</span></pre>
+
+<p>
+<strong>Notice:</strong> every rule starts with
+a strong verb (ALWAYS, NEVER, Use, Strip,
+Bump), specifies the exact file or function,
+and makes the context clear. Compare:
+</p>
+
+<div class="compare">
+  <div class="compare-box compare-bad">
+    <div class="compare-label">Vague rule</div>
+    "Be careful with mobile caching"
+  </div>
+  <div class="compare-box compare-good">
+    <div class="compare-label">Actionable rule</div>
+    "ALWAYS bump service worker version in
+    service-worker.js when pushing changes.
+    After push, ADB cachebust the specific
+    page being worked on."
+  </div>
+</div>
+
+</div><!-- end part4 -->
+
+<!-- ========================= -->
+<!-- PART 5: FEATURES          -->
+<!-- ========================= -->
+<div class="section" id="part5">
+<h2>5. Features You're Not Using</h2>
+<p class="section-sub">
+  Claude Code has powerful features beyond
+  basic chat. Here's what you're missing.
+</p>
+
+<h3>Plan Mode</h3>
+<p>
+When you ask Claude to build something complex,
+it can enter <strong>plan mode</strong> first.
+Instead of immediately writing code, Claude:
+</p>
+<ol>
+  <li>Explores your codebase — reads files,
+    searches for patterns, understands the
+    current state</li>
+  <li>Designs an approach — thinks through how
+    to implement your request</li>
+  <li>Writes a step-by-step plan</li>
+  <li>Asks for your approval before writing
+    a single line of code</li>
+</ol>
+
+<div class="analogy">
+  <div class="analogy-label">Analogy</div>
+  Plan mode is like reviewing house blueprints
+  before construction starts. "Wait, I wanted
+  the kitchen on the other side" costs nothing
+  at the blueprint stage. After the walls are
+  up? Expensive.
+</div>
+
+<h4>When to Use Plan Mode</h4>
+<ul>
+  <li>Building a new app from scratch</li>
+  <li>Adding a major feature that touches
+    multiple parts of the code</li>
+  <li>Refactoring or reorganizing existing
+    code</li>
+  <li>When you're not sure how something
+    should work</li>
+</ul>
+
+<h4>When to Skip Plan Mode</h4>
+<ul>
+  <li>Small tweaks — "change this color,"
+    "move this button"</li>
+  <li>Bug fixes where you know what's wrong</li>
+  <li>Adding content (not code) to existing
+    structures</li>
+  <li>When you've given very specific
+    instructions and just want Claude to
+    execute</li>
+</ul>
+
+<p>
+You can trigger plan mode by saying
+<strong>"plan this before coding"</strong> or
+<strong>"show me the approach first."</strong>
+Claude will also sometimes enter plan mode
+on its own for complex tasks.
+</p>
+
+<h3>Subagents (The Task Tool)</h3>
+<p>
+You've seen this in your book projects —
+Claude spawning "agents" that work in parallel.
+Here's what's actually happening:
+</p>
+<p>
+Claude can launch <strong>subagents</strong> —
+separate Claude instances that each get their
+own context window and work independently.
+Think of it like a manager delegating tasks to
+team members who work simultaneously.
+</p>
+
+<div class="diagram">
+<svg width="600" height="200" viewBox="0 0 600 200">
+  <rect width="600" height="200" rx="12"
+    fill="#161b22" stroke="#30363d"/>
+
+  <!-- Main Claude -->
+  <rect x="220" y="15" width="160" height="40"
+    rx="8" fill="rgba(212,130,42,0.2)"
+    stroke="#d4822a"/>
+  <text x="300" y="40" text-anchor="middle"
+    font-family="Inter" font-size="12"
+    fill="#d4822a" font-weight="600">
+    Main Claude
+  </text>
+
+  <!-- Arrows down -->
+  <line x1="200" y1="55" x2="110" y2="85"
+    stroke="#30363d" stroke-width="2"/>
+  <line x1="300" y1="55" x2="300" y2="85"
+    stroke="#30363d" stroke-width="2"/>
+  <line x1="400" y1="55" x2="490" y2="85"
+    stroke="#30363d" stroke-width="2"/>
+
+  <!-- Agents -->
+  <rect x="30" y="85" width="160" height="50"
+    rx="8" fill="rgba(88,166,255,0.12)"
+    stroke="#58a6ff"/>
+  <text x="110" y="106" text-anchor="middle"
+    font-family="Inter" font-size="11"
+    fill="#58a6ff">Agent 1: Compact</text>
+  <text x="110" y="122" text-anchor="middle"
+    font-family="Inter" font-size="10"
+    fill="#8b949e">
+    first half of notes
+  </text>
+
+  <rect x="220" y="85" width="160" height="50"
+    rx="8" fill="rgba(63,185,80,0.12)"
+    stroke="#3fb950"/>
+  <text x="300" y="106" text-anchor="middle"
+    font-family="Inter" font-size="11"
+    fill="#3fb950">Agent 2: Compact</text>
+  <text x="300" y="122" text-anchor="middle"
+    font-family="Inter" font-size="10"
+    fill="#8b949e">
+    second half of notes
+  </text>
+
+  <rect x="410" y="85" width="160" height="50"
+    rx="8" fill="rgba(188,140,255,0.12)"
+    stroke="#bc8cff"/>
+  <text x="490" y="106" text-anchor="middle"
+    font-family="Inter" font-size="11"
+    fill="#bc8cff">Agent 3: Summary</text>
+  <text x="490" y="122" text-anchor="middle"
+    font-family="Inter" font-size="10"
+    fill="#8b949e">
+    write summary.md
+  </text>
+
+  <!-- Arrows back up -->
+  <line x1="110" y1="135" x2="200" y2="165"
+    stroke="#30363d" stroke-width="2"/>
+  <line x1="300" y1="135" x2="300" y2="165"
+    stroke="#30363d" stroke-width="2"/>
+  <line x1="490" y1="135" x2="400" y2="165"
+    stroke="#30363d" stroke-width="2"/>
+
+  <!-- Results -->
+  <rect x="180" y="160" width="240" height="30"
+    rx="8" fill="rgba(212,130,42,0.1)"
+    stroke="rgba(212,130,42,0.3)"/>
+  <text x="300" y="180" text-anchor="middle"
+    font-family="Inter" font-size="11"
+    fill="#d4822a">
+    Main Claude merges results
+  </text>
+</svg>
+<div class="diagram-caption">
+  Subagents work in parallel, each with their
+  own context window. The main Claude
+  coordinates and merges their output.
+</div>
+</div>
+
+<p>
+Each subagent has its own fresh context window,
+which is why they're great for parallel work
+but bad for tasks that need to build on each
+other. They don't share context — each one
+only knows what Claude told it in the initial
+instructions.
+</p>
+
+<h4>Real Example: Your Book Projects</h4>
+<p>
+Your book build pipeline is the best example
+of subagents in action. When processing a big
+book (like <em>Big Debt Crises</em> at 1,274
+pages), here's what happens:
+</p>
+<ol>
+  <li><strong>bookai</strong> processes the PDF
+    in 20-page batches → produces raw notes
+    (might be 8,000+ lines)</li>
+  <li>Main Claude launches <strong>2 parallel
+    agents</strong>:
+    <ul>
+      <li>Agent 1: compact the first half of
+        notes (lines 1-4000)</li>
+      <li>Agent 2: compact the second half
+        (lines 4001-8000)</li>
+    </ul>
+  </li>
+  <li>Both agents work simultaneously — each
+    reads its half, distills it, and returns
+    compacted notes</li>
+  <li>Main Claude merges the two halves into
+    one compacted <code>notes.md</code></li>
+  <li>Another agent writes
+    <code>summary.md</code></li>
+  <li>Main Claude writes
+    <code>index.html</code> directly (never
+    via agent — they produce output too short)</li>
+</ol>
+<p>
+This pipeline cuts compaction time roughly in
+half. Without parallel agents, one agent would
+process all 8,000 lines sequentially — much
+slower, and it might hit context limits
+before finishing.
+</p>
+
+<div class="callout callout-blue">
+  <div class="callout-title">
+    Why Agents Write summary.md but Not index.html
+  </div>
+  Summary.md is ~200 lines — well within an
+  agent's output capacity. index.html needs
+  1,200-1,500 lines of carefully structured
+  HTML. Agents consistently produce only ~400
+  lines (they cut corners to finish quickly).
+  Your CLAUDE.md rule "NEVER use agents to write
+  large HTML" was born from wasting hours on
+  too-short agent output that had to be
+  rewritten.
+</div>
+
+<h3>Slash Commands</h3>
+<p>
+Claude Code has built-in shortcuts you can
+type instead of full sentences:
+</p>
+<ul>
+  <li><code>/commit</code> — stages changes and
+    creates a well-written commit message</li>
+  <li><code>/help</code> — shows all available
+    commands and features</li>
+</ul>
+<p>
+Instead of "please commit these changes with
+a descriptive message," just type
+<code>/commit</code>.
+</p>
+
+<h3>Permission Modes</h3>
+<p>
+By default, Claude asks permission before doing
+things like editing files or running commands.
+There are different modes:
+</p>
+<ul>
+  <li><strong>Default</strong> — Claude asks before
+    most actions. Safe but slow for
+    big tasks.</li>
+  <li><strong>Auto-accept edits</strong> — Claude
+    can edit files without asking, but still
+    asks before running commands.</li>
+  <li><strong>dangerously-skip-permissions</strong>
+    — Claude does everything without asking. Fast
+    but risky. You use this for your outreach
+    pipeline where every step is trusted.</li>
+</ul>
+<p>
+For your typical work (adding features to apps),
+the default mode is fine. For automated pipelines
+like outreach, skip-permissions makes sense
+because you've already vetted the workflow.
+</p>
+
+</div><!-- end part5 -->
+
+<!-- ========================= -->
+<!-- PART 6: PROMPTING         -->
+<!-- ========================= -->
+<div class="section" id="part6">
+<h2>6. Prompting Like a Pro</h2>
+<p class="section-sub">
+  From "make it work" to getting exactly what
+  you want on the first try.
+</p>
+
+<h3>The Anatomy of a Great Prompt</h3>
+<p>
+Every great prompt has three parts:
+</p>
+<ol>
+  <li><strong>What</strong> — what do you want
+    built or changed?</li>
+  <li><strong>Where</strong> — which app, file,
+    or feature?</li>
+  <li><strong>How it should feel</strong> — what's
+    the user experience?</li>
+</ol>
+<p>
+You naturally do parts 1 and 2 well. The magic
+upgrade is part 3 — describing the experience.
+</p>
+
+<div class="compare">
+  <div class="compare-box compare-bad">
+    <div class="compare-label">Missing the feel</div>
+    "add a delete button to workout cards
+    in Zercher"
+  </div>
+  <div class="compare-box compare-good">
+    <div class="compare-label">Complete prompt</div>
+    "in Zercher, add a delete button on each
+    workout card in history view. Small red X,
+    bottom-right corner. Tap shows a confirm
+    dialog before deleting. After delete, the
+    card slides out with a smooth animation."
+  </div>
+</div>
+
+<p>
+The second prompt gives Claude a complete picture.
+It'll produce the right result on the first try
+instead of three rounds of "no, I meant..."
+</p>
+
+<h3>The 7 Power Phrases</h3>
+<p>
+These phrases consistently produce better
+results with Claude:
+</p>
+
+<h4>1. "Don't add anything I didn't ask for"</h4>
+<p>
+Prevents scope creep. Claude will make exactly
+the requested change and nothing more.
+</p>
+
+<h4>2. "Plan first, then code"</h4>
+<p>
+Triggers plan mode behavior. Claude will outline
+its approach before writing code, giving you
+a chance to redirect.
+</p>
+
+<h4>3. "Minimum changes only"</h4>
+<p>
+Prevents refactoring. Claude will surgically
+edit just what's needed instead of rewriting
+surrounding code.
+</p>
+
+<h4>4. "Just this file, nothing else"</h4>
+<p>
+Prevents Claude from "helpfully" editing related
+files you didn't mention.
+</p>
+
+<h4>5. "What could go wrong with this approach?"</h4>
+<p>
+Gets Claude to think critically. Useful before
+big changes — Claude will flag potential issues
+before you run into them.
+</p>
+
+<h4>6. "Explain what you changed and why"</h4>
+<p>
+After any modification. This is your learning
+opportunity — over time, you'll start
+understanding the code Claude writes.
+</p>
+
+<h4>7. "Make it like [existing thing]"</h4>
+<p>
+The most powerful prompt for consistency. If
+you want a new feature to match an existing
+one, reference it: "Add cloud sync to Cadence,
+using the same pattern as Bloom's sync."
+Claude will read Bloom's sync code and replicate
+the pattern.
+</p>
+
+<h3>When to Be Specific vs. Hands-Off</h3>
+
+<div class="collapsible" onclick="toggleCollapse(this)">
+  <div class="collapsible-header">
+    Detailed guide: what to specify
+    vs. what to leave to Claude
+    <span class="collapsible-arrow">▶</span>
+  </div>
+  <div class="collapsible-body">
+    <h4>Be Specific About:</h4>
+    <ul>
+      <li><strong>Visual design</strong> —
+        colors, sizes, positions, spacing.
+        "Red button, 32px, bottom-right" not
+        "add a delete option somewhere"</li>
+      <li><strong>User experience</strong> —
+        what happens on tap, swipe, long-press.
+        Describe the interaction.</li>
+      <li><strong>Data storage</strong> —
+        localStorage keys, cloud sync behavior.
+        You've been burned by this before.</li>
+      <li><strong>Things that went wrong
+        before</strong> — if you've hit a
+        specific bug pattern, mention it
+        upfront: "use fireGet, not POST"</li>
+      <li><strong>What NOT to do</strong> —
+        "don't add a confirmation dialog" is
+        clearer than hoping Claude doesn't
+        add one</li>
+    </ul>
+    <h4>Let Claude Decide:</h4>
+    <ul>
+      <li><strong>Code architecture</strong> —
+        function names, variable names, how to
+        structure the logic</li>
+      <li><strong>Implementation details</strong> —
+        which JS method to use, CSS approach,
+        algorithm choice</li>
+      <li><strong>Performance</strong> — Claude
+        knows debouncing, caching, lazy loading
+        patterns well</li>
+      <li><strong>Error handling</strong> —
+        Claude is trained to handle edge cases
+        (sometimes too aggressively, hence
+        "don't add anything I didn't ask for")</li>
+    </ul>
+  </div>
+</div>
+
+<h3>Multi-Step Requests</h3>
+<p>
+When you want multiple changes, you have two
+options:
+</p>
+
+<h4>Option A: One at a Time</h4>
+<p>
+Ask for one change, test it, then ask for the
+next. Slower but more controlled. Best when
+each change depends on the previous one.
+</p>
+
+<h4>Option B: Numbered List</h4>
+<p>
+Give Claude a numbered list of changes. Claude
+will work through them in order. Best for
+independent changes that don't depend on each
+other.
+</p>
+
+<div class="compare">
+  <div class="compare-box compare-good">
+    <div class="compare-label">Numbered list</div>
+    "In Zercher, make these 3 changes:<br>
+    1. Change header background to #1a2634<br>
+    2. Add a rest timer that counts down
+       from 90 seconds<br>
+    3. Make the plate calculator show kg
+       option"
+  </div>
+  <div class="compare-box compare-bad">
+    <div class="compare-label">Rambling</div>
+    "can you change the zercher header
+    color to something darker and also I
+    want a rest timer that goes 90 seconds
+    and oh could you add kilograms to the
+    plate calculator"
+  </div>
+</div>
+
+<p>
+Both get the job done, but the numbered list
+is less ambiguous and easier for Claude to
+track. It can also check off each item as it
+completes them.
+</p>
+
+<div class="quiz">
+  <div class="quiz-title">
+    Quick Check
+  </div>
+  <p style="margin-bottom:12px;font-size:14px;
+    color:var(--muted)">
+    You want a smooth fade animation when
+    switching tabs in your app. What's the
+    best way to prompt Claude?
+  </p>
+  <div class="quiz-option" data-correct="false"
+    onclick="checkQuiz(this)">
+    "Add a CSS transition with opacity 0
+    to 1 over 300ms on the tab-content div"
+  </div>
+  <div class="quiz-option" data-correct="true"
+    onclick="checkQuiz(this)">
+    "When switching tabs, I want a smooth
+    fade transition. The old tab fades out,
+    new tab fades in. Should feel snappy,
+    not slow."
+  </div>
+  <div class="quiz-option" data-correct="false"
+    onclick="checkQuiz(this)">
+    "make the tabs animate"
+  </div>
+  <div class="quiz-explanation">
+    The middle option describes the
+    <em>experience</em> you want without
+    dictating the implementation. Claude might
+    use CSS transitions, or requestAnimationFrame,
+    or something else entirely — let it pick
+    the best approach. "Snappy, not slow"
+    communicates the feel. The first option
+    over-specifies (Claude might know a better
+    way). The third is too vague.
+  </div>
+</div>
+
+<h3>Real Prompts From Your Projects</h3>
+<p>
+Let's look at prompts you might actually use,
+rated from weak to strong. These are all
+based on features in your actual apps.
+</p>
+
+<h4>Scenario: Adding a feature to Bloom</h4>
+<div class="compare">
+  <div class="compare-box compare-bad">
+    <div class="compare-label">Weak</div>
+    "add buy alerts to bloom"
+  </div>
+  <div class="compare-box compare-good">
+    <div class="compare-label">Strong</div>
+    "In Bloom, add a buy opportunity alert.
+    When any ETF's RSI drops below 30 and
+    price is below its SMA, show a flashing
+    pill button in the header with the count.
+    Clicking it shows cards for each
+    opportunity. Each card has an X to
+    dismiss (session only, resets on refresh).
+    Use the current tab's theme color."
+  </div>
+</div>
+<p>
+The strong version describes the entire
+experience: where it appears (header),
+how it looks (flashing pill), what triggers
+it (RSI < 30 + below SMA), interaction
+(click to expand, X to dismiss), and styling
+(theme-aware colors). Claude can build this
+in one pass.
+</p>
+
+<h4>Scenario: Fixing a mobile issue</h4>
+<div class="compare">
+  <div class="compare-box compare-bad">
+    <div class="compare-label">Weak</div>
+    "the app looks weird on my phone"
+  </div>
+  <div class="compare-box compare-good">
+    <div class="compare-label">Strong</div>
+    "In the crypto dashboard on my Android
+    phone, the 'Need 2 Day' filter takes up
+    too much space. Hide it on mobile
+    (screens under 768px) with a CSS media
+    query. It should still be visible on
+    desktop."
+  </div>
+</div>
+
+<h4>Scenario: Referencing existing patterns</h4>
+<div class="compare">
+  <div class="compare-box compare-bad">
+    <div class="compare-label">Weak</div>
+    "add cloud sync to the new app"
+  </div>
+  <div class="compare-box compare-good">
+    <div class="compare-label">Strong</div>
+    "Add cloud sync to Roman Chariots using
+    the same pattern as Bloom: fireGet for
+    writes, JSONP for reads, auto-push
+    after changes (debounce 2s), auto-pull
+    on load and visibilitychange, syncReady
+    gate, empty data guard, hardcoded
+    DEFAULT_SYNC_URL."
+  </div>
+</div>
+<p>
+The strong version is basically a spec sheet.
+Claude reads Bloom's code for the pattern and
+replicates it exactly. No guessing, no
+creative interpretation — just replicate a
+proven pattern.
+</p>
+
+<h4>Scenario: Asking Claude to explain</h4>
+<div class="compare">
+  <div class="compare-box compare-bad">
+    <div class="compare-label">Missed opportunity</div>
+    "ok push it"
+  </div>
+  <div class="compare-box compare-good">
+    <div class="compare-label">Learning moment</div>
+    "before pushing, explain what you changed
+    and why. Then push."
+  </div>
+</div>
+<p>
+This tiny addition to your workflow — asking
+"what did you change and why" — is the single
+best way to learn code over time. Each
+explanation builds on the last. In a month,
+you'll recognize the patterns without needing
+to ask.
+</p>
+
+<h3>The Prompt Evolution</h3>
+<p>
+As you learn more from this guide, your
+prompts will naturally evolve:
+</p>
+<ul>
+  <li><strong>Level 1 (now)</strong>:
+    "add a delete button to workouts" — works,
+    but you're in for 2-3 rounds of
+    back-and-forth</li>
+  <li><strong>Level 2 (after reading
+    Part 6)</strong>: "add a delete button to
+    Zercher workout cards. Red X, top right,
+    confirm before deleting." — gets it right
+    in 1-2 tries</li>
+  <li><strong>Level 3 (after reading
+    Part 7)</strong>: "add a delete button to
+    Zercher workout cards. Red X, top right,
+    absolute positioned in the card. onclick
+    calls deleteLog with the log ID. Add
+    confirm dialog. After delete, re-render
+    and sync to cloud." — nailed in one try</li>
+</ul>
+<p>
+You don't need to get to Level 3 on day one.
+Each level is an improvement. And CLAUDE.md
+handles the repeating patterns (fireGet, sync,
+service worker bumps) so you can focus your
+prompts on the new stuff.
+</p>
+
+</div><!-- end part6 -->
+
+<!-- ========================= -->
+<!-- PART 7: READING CODE      -->
+<!-- ========================= -->
+<div class="section" id="part7">
+<h2>7. Reading Your Own Code</h2>
+<p class="section-sub">
+  You don't need to become a developer.
+  You need to learn to skim — just enough
+  to know what's where and describe
+  problems precisely.
+</p>
+
+<h3>Your App Architecture</h3>
+<p>
+Every app you've built with Claude follows the
+same pattern: a <strong>single-file HTML PWA</strong>
+(Progressive Web App). One file contains
+everything — structure, styling, and behavior.
+Here's how that file is organized:
+</p>
+
+<pre><span class="tag">&lt;!DOCTYPE html&gt;</span>
+<span class="tag">&lt;html&gt;</span>
+<span class="tag">&lt;head&gt;</span>
+  <span class="tag">&lt;style&gt;</span>
+    <span class="comment">/* === CSS SECTION ===
+       Controls how things LOOK
+       Colors, sizes, layout, fonts,
+       animations, mobile styling */</span>
+  <span class="tag">&lt;/style&gt;</span>
+<span class="tag">&lt;/head&gt;</span>
+<span class="tag">&lt;body&gt;</span>
+
+  <span class="comment">&lt;!-- === HTML SECTION ===
+       The STRUCTURE of the page
+       Buttons, text, containers (divs),
+       forms, inputs --&gt;</span>
+  <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="string">"header"</span><span class="tag">&gt;</span>My App<span class="tag">&lt;/div&gt;</span>
+  <span class="tag">&lt;button</span> <span class="attr">onclick</span>=<span class="string">"doSomething()"</span><span class="tag">&gt;</span>Click<span class="tag">&lt;/button&gt;</span>
+
+  <span class="tag">&lt;script&gt;</span>
+    <span class="comment">// === JAVASCRIPT SECTION ===
+    // The BEHAVIOR of the page
+    // What happens when you tap, data
+    // loading, cloud sync, calculations,
+    // service worker registration</span>
+
+    <span class="keyword">function</span> <span class="func">doSomething</span>() {
+      <span class="func">alert</span>(<span class="string">'Hello!'</span>);
+    }
+  <span class="tag">&lt;/script&gt;</span>
+<span class="tag">&lt;/body&gt;</span>
+<span class="tag">&lt;/html&gt;</span></pre>
+
+<div class="key-concept">
+  <div class="label">Remember This</div>
+  <div class="concept" style="font-size:18px">
+    Looks wrong → fix is in CSS<br>
+    Doesn't work → fix is in JavaScript<br>
+    Missing/wrong content → fix is in HTML
+  </div>
+</div>
+
+<h3>CSS: The 6 Patterns You'll See Most</h3>
+
+<h4>1. Colors</h4>
+<pre><span class="attr">color</span>: <span class="string">#e8944c</span>;       <span class="comment">/* text color */</span>
+<span class="attr">background</span>: <span class="string">#0c1a22</span>;  <span class="comment">/* background fill */</span>
+<span class="attr">border</span>: 1px solid <span class="string">#30363d</span>; <span class="comment">/* border line */</span></pre>
+<p>
+Colors are written as hex codes (#e8944c) or
+color names (red, white). Your apps use CSS
+variables like <code>var(--accent)</code> that
+reference a color defined once at the top of
+the style section — change it once, changes
+everywhere.
+</p>
+
+<h4>2. Spacing</h4>
+<pre><span class="attr">padding</span>: 10px;    <span class="comment">/* space INSIDE a box */</span>
+<span class="attr">margin</span>: 20px;     <span class="comment">/* space OUTSIDE a box */</span>
+<span class="attr">gap</span>: 12px;        <span class="comment">/* space between grid/flex items */</span></pre>
+
+<div class="diagram">
+<svg width="400" height="200" viewBox="0 0 400 200">
+  <rect width="400" height="200" rx="12"
+    fill="#161b22" stroke="#30363d"/>
+
+  <!-- Margin area -->
+  <rect x="50" y="30" width="300" height="140"
+    rx="8" fill="rgba(88,166,255,0.08)"
+    stroke="#58a6ff" stroke-dasharray="6"/>
+  <text x="200" y="22" text-anchor="middle"
+    font-family="Inter" font-size="11"
+    fill="#58a6ff">margin (outside)</text>
+
+  <!-- Padding area -->
+  <rect x="85" y="60" width="230" height="80"
+    rx="6" fill="rgba(63,185,80,0.1)"
+    stroke="#3fb950" stroke-dasharray="6"/>
+  <text x="200" y="55" text-anchor="middle"
+    font-family="Inter" font-size="11"
+    fill="#3fb950">padding (inside)</text>
+
+  <!-- Content -->
+  <rect x="120" y="80" width="160" height="40"
+    rx="4" fill="rgba(212,130,42,0.2)"
+    stroke="#d4822a"/>
+  <text x="200" y="105" text-anchor="middle"
+    font-family="Inter" font-size="12"
+    fill="#d4822a">Your Content</text>
+
+  <!-- Labels -->
+  <text x="67" y="105" text-anchor="middle"
+    font-family="JetBrains Mono" font-size="9"
+    fill="#58a6ff" transform="rotate(-90,67,105)">
+    margin
+  </text>
+  <text x="103" y="105" text-anchor="middle"
+    font-family="JetBrains Mono" font-size="9"
+    fill="#3fb950" transform="rotate(-90,103,105)">
+    padding
+  </text>
+</svg>
+<div class="diagram-caption">
+  Margin = space outside the element.
+  Padding = space inside the element,
+  around the content.
+</div>
+</div>
+
+<h4>3. Layout (Flexbox & Grid)</h4>
+<pre><span class="comment">/* Flex: items in a row or column */</span>
+<span class="attr">display</span>: flex;
+<span class="attr">flex-direction</span>: row;    <span class="comment">/* side by side */</span>
+<span class="attr">flex-direction</span>: column; <span class="comment">/* stacked */</span>
+<span class="attr">justify-content</span>: center; <span class="comment">/* center items */</span>
+
+<span class="comment">/* Grid: items in a grid layout */</span>
+<span class="attr">display</span>: grid;
+<span class="attr">grid-template-columns</span>: 1fr 1fr 1fr; <span class="comment">/* 3 equal cols */</span></pre>
+
+<h4>4. Showing/Hiding Things</h4>
+<pre><span class="attr">display</span>: none;    <span class="comment">/* completely hidden */</span>
+<span class="attr">display</span>: block;   <span class="comment">/* visible */</span>
+<span class="attr">opacity</span>: 0;       <span class="comment">/* invisible but takes up space */</span>
+<span class="attr">visibility</span>: hidden; <span class="comment">/* invisible but takes up space */</span></pre>
+
+<h4>5. Mobile-Specific Styling</h4>
+<pre><span class="keyword">@media</span> (max-width: 768px) {
+  <span class="comment">/* Everything inside here ONLY applies
+     on screens narrower than 768px
+     (i.e., your phone) */</span>
+  .sidebar { <span class="attr">display</span>: none; }
+  .header { <span class="attr">font-size</span>: 18px; }
+}</pre>
+<p>
+This is why some things look different on
+your phone vs. desktop. Your crypto dashboard
+hides the "Need 2 Day" filter on mobile
+using exactly this pattern.
+</p>
+
+<h4>6. Animations</h4>
+<pre><span class="comment">/* Smooth transitions */</span>
+<span class="attr">transition</span>: all 0.3s ease;
+<span class="comment">/* When any property changes, animate
+   the change over 0.3 seconds */</span>
+
+<span class="comment">/* Keyframe animations */</span>
+<span class="keyword">@keyframes</span> fadeIn {
+  from { <span class="attr">opacity</span>: 0; }
+  to   { <span class="attr">opacity</span>: 1; }
+}
+.element { <span class="attr">animation</span>: fadeIn 0.3s; }</pre>
+
+<h3>JavaScript: Patterns in Your Apps</h3>
+<p>
+You don't need to write JavaScript. You need
+to recognize what Claude's code is doing
+when you skim it. Here are the patterns that
+appear in almost every one of your apps:
+</p>
+
+<h4>Storing Data on the Device</h4>
+<pre><span class="comment">// Save data to phone storage</span>
+localStorage.<span class="func">setItem</span>(<span class="string">'key'</span>,
+  JSON.<span class="func">stringify</span>(data));
+
+<span class="comment">// Load data from phone storage</span>
+<span class="keyword">let</span> data = JSON.<span class="func">parse</span>(
+  localStorage.<span class="func">getItem</span>(<span class="string">'key'</span>));
+
+<span class="comment">// Your apps use specific keys:</span>
+<span class="comment">// 'zercher_data' — workouts</span>
+<span class="comment">// 'dca_portfolio_v1' — Bloom holdings</span>
+<span class="comment">// 'rc_chariots_data' — budget data</span>
+<span class="comment">// 'cadence_sync_url' — Cadence sync</span></pre>
+
+<h4>Talking to Your Apps Script Backend</h4>
+<pre><span class="comment">// WRITING data (fireGet pattern)</span>
+<span class="comment">// Uses an invisible image load to send</span>
+<span class="comment">// data via GET request — bypasses CORS</span>
+<span class="keyword">function</span> <span class="func">fireGet</span>(url) {
+  <span class="keyword">new</span> Image().src = url;
+}
+<span class="func">fireGet</span>(endpoint + <span class="string">'?action=save&data='</span>
+  + <span class="func">encodeURIComponent</span>(json));
+
+<span class="comment">// READING data (JSONP pattern)</span>
+<span class="comment">// Loads data by creating a script tag</span>
+<span class="func">jsonpFetch</span>(endpoint + <span class="string">'?action=get_read'</span>,
+  <span class="keyword">function</span>(data) {
+    <span class="comment">// do something with data</span>
+  });</pre>
+
+<h4>Responding to User Actions</h4>
+<pre><span class="comment">// When a button is tapped</span>
+button.<span class="func">addEventListener</span>(<span class="string">'click'</span>,
+  <span class="keyword">function</span>() {
+    <span class="comment">// this code runs on tap</span>
+  });
+
+<span class="comment">// When the page loads</span>
+window.<span class="func">addEventListener</span>(<span class="string">'load'</span>,
+  <span class="keyword">function</span>() {
+    <span class="comment">// this code runs once on startup</span>
+  });
+
+<span class="comment">// When the app comes back to foreground</span>
+document.<span class="func">addEventListener</span>(
+  <span class="string">'visibilitychange'</span>, <span class="keyword">function</span>() {
+    <span class="keyword">if</span> (!document.hidden) {
+      <span class="comment">// pull fresh data from cloud</span>
+    }
+  });</pre>
+
+<h4>The Service Worker</h4>
+<pre><span class="comment">// In service-worker.js</span>
+<span class="keyword">const</span> CACHE_VERSION = <span class="string">'v170'</span>;
+<span class="comment">// ↑ THIS NUMBER must increase on every</span>
+<span class="comment">// push or your phone keeps the old version</span></pre>
+<p>
+The service worker is what makes your apps
+work offline and installable on your phone's
+home screen. When you push code, the new
+version only reaches your phone if this
+number changes.
+</p>
+
+<h3>How to Skim a File</h3>
+<p>
+When Claude says "I updated the renderCards
+function," here's how to check it:
+</p>
+<ol>
+  <li><strong>Search the file</strong> — use
+    Ctrl+F (or Cmd+F) and search for
+    <code>renderCards</code> to jump right
+    to it</li>
+  <li><strong>Read the comments</strong> — Claude
+    adds comments like <code>// cloud sync</code>
+    or <code>// handle delete</code> that tell
+    you what each section does</li>
+  <li><strong>Look for <code>function</code>
+    keywords</strong> — each function is a
+    self-contained piece of behavior. The name
+    usually tells you what it does:
+    <code>renderCards</code>,
+    <code>saveToCloud</code>,
+    <code>handleDelete</code></li>
+  <li><strong>Check the service worker
+    version</strong> — always near the top of
+    service-worker.js</li>
+</ol>
+
+<div class="callout callout-green">
+  <div class="callout-title">
+    The Easiest Way to Learn
+  </div>
+  After every change Claude makes, ask:
+  <strong>"Explain what you changed and why,
+  in plain English."</strong> Over time,
+  you'll start recognizing the patterns
+  and won't need to ask.
+</div>
+
+<h3>Walking Through YOUR Real Code</h3>
+<p>
+Let's stop talking in the abstract. Here's
+actual code from your apps, line by line,
+explained in plain English. After this
+section, you'll be able to look at any of
+your apps and understand the main pieces.
+</p>
+
+<h4>Zercher: How Your Workouts Get Saved</h4>
+<p>
+When you log a set in Zercher, here's what
+happens under the hood:
+</p>
+
+<pre><span class="comment">// Step 1: Save to phone storage</span>
+<span class="keyword">function</span> <span class="func">saveData</span>() {
+  localStorage.<span class="func">setItem</span>(
+    STORAGE_KEY,            <span class="comment">// 'zercher_data'</span>
+    JSON.<span class="func">stringify</span>(data)    <span class="comment">// convert JS object → text</span>
+  );
+}
+</pre>
+<p>
+<strong>What's happening:</strong>
+<code>data</code> is a JavaScript object —
+think of it like a folder that contains all
+your workouts, PRs, program settings, and
+custom exercises. But localStorage can only
+store text (strings), not objects. So
+<code>JSON.stringify(data)</code> converts
+your data into a text version:
+<code>{"activeProgram":"ABCD09","logs":[...]}</code>.
+That text gets saved under the key
+<code>"zercher_data"</code>.
+</p>
+<p>
+When the app starts back up, it does the
+reverse:
+</p>
+<pre><span class="keyword">function</span> <span class="func">loadData</span>() {
+  <span class="keyword">try</span> {
+    data = JSON.<span class="func">parse</span>(          <span class="comment">// text → JS object</span>
+      localStorage.<span class="func">getItem</span>(
+        STORAGE_KEY              <span class="comment">// 'zercher_data'</span>
+      )
+    );
+    <span class="keyword">if</span> (!data) <span class="keyword">throw</span> 0;       <span class="comment">// nothing saved? use defaults</span>
+  } <span class="keyword">catch</span>(e) {
+    <span class="comment">// First time opening? Start with defaults</span>
+    data = {
+      activeProgram: <span class="string">'ABCD09'</span>,
+      customPrograms: {},
+      logs: [],
+      prs: {},
+      settings: { weightUnit: <span class="string">'lbs'</span> }
+    };
+  }
+}</pre>
+<p>
+<strong>The <code>try/catch</code> block:</strong>
+This is like a safety net. "Try to load data.
+If anything goes wrong (corrupted data,
+nothing saved, phone cleared storage), don't
+crash — instead, start fresh with defaults."
+This is why your app doesn't break when you
+first install it — it gracefully falls back
+to empty defaults.
+</p>
+
+<h4>Zercher: How Cloud Sync Works</h4>
+<p>
+This is one of the most important patterns
+across all your apps. Here's the real cloud
+sync from Zercher:
+</p>
+
+<pre><span class="keyword">function</span> <span class="func">syncConfigToCloud</span>() {
+  <span class="keyword">if</span> (!syncReady) <span class="keyword">return</span>;     <span class="comment">// ① guard: don't push during initial load</span>
+  <span class="keyword">try</span> {
+    <span class="keyword">const</span> config = {           <span class="comment">// ② build payload</span>
+      activeProgram: data.activeProgram,
+      customPrograms: syncPrograms,
+      settings: data.settings,
+      prs: data.prs || {}
+    };
+    <span class="keyword">const</span> jsonStr = JSON.<span class="func">stringify</span>(config);
+    <span class="keyword">const</span> encoded = <span class="func">encodeURIComponent</span>(jsonStr);
+
+    <span class="keyword">if</span> (encoded.length < 7000) {   <span class="comment">// ③ small enough for one request?</span>
+      <span class="func">jsonpFetch</span>(                    <span class="comment">// ④ send it!</span>
+        SYNC_ENDPOINT + <span class="string">'?action=zercher_save_config&data='</span>
+        + encoded, <span class="keyword">function</span>(){}
+      );
+    } <span class="keyword">else</span> {
+      <span class="func">pushChunked</span>(jsonStr, <span class="string">'config'</span>); <span class="comment">// ⑤ too big → split into chunks</span>
+    }
+  } <span class="keyword">catch</span>(e) { console.<span class="func">warn</span>(<span class="string">'Config sync failed'</span>, e); }
+}</pre>
+
+<p>
+Let's break this down step by step:
+</p>
+<ol>
+  <li><strong>①  syncReady guard</strong> —
+    When the app first opens, it loads data
+    from the cloud. While it's loading, you
+    don't want it to also <em>push</em> the
+    (possibly empty) local data to the cloud
+    and overwrite good data. The
+    <code>syncReady</code> flag starts as
+    <code>false</code> and only becomes
+    <code>true</code> after the initial load
+    completes. This prevents the "opened app
+    on new phone → wiped all my data" bug.</li>
+  <li><strong>② Build the payload</strong> —
+    Gathers just the data that needs syncing
+    into a clean object. Not everything gets
+    synced — only the important stuff.</li>
+  <li><strong>③ Size check</strong> — URLs
+    have a length limit (~8000 characters).
+    If your data is small enough, it fits in
+    a single URL. If not, it gets split into
+    multiple requests (chunks).</li>
+  <li><strong>④ jsonpFetch</strong> — Sends the
+    data to your Apps Script backend (more on
+    this below).</li>
+  <li><strong>⑤ Chunked push</strong> — For
+    large data, breaks it into pieces and
+    sends them one at a time, then tells the
+    server to reassemble them.</li>
+</ol>
+
+<h4>How jsonpFetch Actually Works</h4>
+<p>
+This is the workhorse function that appears
+in every one of your apps. Let's demystify it:
+</p>
+
+<pre><span class="keyword">function</span> <span class="func">jsonpFetch</span>(url, cb) {
+  <span class="comment">// ① Create a unique callback name</span>
+  <span class="keyword">const</span> cbName = <span class="string">'_zrCb_'</span> + Date.<span class="func">now</span>()
+    + <span class="string">'_'</span> + Math.<span class="func">random</span>().<span class="func">toString</span>(36).<span class="func">substr</span>(2,5);
+
+  <span class="comment">// ② Create a script tag</span>
+  <span class="keyword">const</span> script = document.<span class="func">createElement</span>(<span class="string">'script'</span>);
+
+  <span class="comment">// ③ When the script loads, it calls this function</span>
+  window[cbName] = <span class="keyword">function</span>(resp) {
+    <span class="keyword">delete</span> window[cbName]; <span class="comment">// clean up</span>
+    script.<span class="func">remove</span>();         <span class="comment">// remove script tag</span>
+    <span class="func">cb</span>(<span class="keyword">null</span>, resp);         <span class="comment">// return data to caller</span>
+  };
+
+  <span class="comment">// ④ Set the URL with callback parameter</span>
+  script.src = url + <span class="string">'&callback='</span> + cbName;
+
+  <span class="comment">// ⑤ Timeout safety net</span>
+  <span class="func">setTimeout</span>(<span class="keyword">function</span>() {
+    <span class="keyword">delete</span> window[cbName];
+    script.<span class="func">remove</span>();
+    <span class="func">cb</span>(<span class="string">'Timeout'</span>);
+  }, 15000);
+
+  <span class="comment">// ⑥ GO! Add script to page, browser fetches it</span>
+  document.head.<span class="func">appendChild</span>(script);
+}</pre>
+
+<div class="analogy">
+  <div class="analogy-label">Why Not Just Use Fetch?</div>
+  Normal <code>fetch()</code> requests run
+  into CORS restrictions — your phone's
+  browser says "I don't trust this cross-origin
+  request" and blocks it. But browsers
+  <em>never</em> block loading a script tag.
+  JSONP exploits this: your Apps Script wraps
+  the response data in a function call, delivers
+  it as a "script," and the browser runs it
+  happily. It's a clever workaround that's been
+  used for decades. Your <code>fireGet()</code>
+  pattern is even simpler — it creates an
+  invisible image load, which also bypasses CORS.
+</div>
+
+<h4>The visibilitychange Pattern</h4>
+<p>
+One line of code, but it's critical:
+</p>
+<pre>document.<span class="func">addEventListener</span>(<span class="string">'visibilitychange'</span>,
+  <span class="keyword">function</span>() {
+    <span class="keyword">if</span> (!document.hidden && syncReady)
+      <span class="func">loadFromCloud</span>();
+  }
+);</pre>
+<p>
+<strong>What this does:</strong> When you
+switch away from Zercher (open another app,
+lock your phone) and come back, this code
+fires. <code>document.hidden</code> is
+<code>false</code> when the app is visible.
+So: "when the app becomes visible again AND
+we've finished our initial sync, pull fresh
+data from the cloud."
+</p>
+<p>
+<strong>Why it matters:</strong> You log a
+workout on your phone, then later open Zercher
+on another device. Without this listener,
+you'd see stale data. With it, the app
+automatically checks for updates every time
+you switch back to it.
+</p>
+
+<h4>Bloom: How DCA Calculations Work</h4>
+<p>
+This is the brain of Bloom — how it decides
+where to put your money:
+</p>
+<pre><span class="comment">// For each ETF in the portfolio:</span>
+pDef.order.<span class="func">forEach</span>(ticker => {
+  <span class="keyword">const</span> target = pDef.targets[ticker]; <span class="comment">// your target %</span>
+  <span class="keyword">const</span> h = pd.holdings[ticker];       <span class="comment">// what you own</span>
+  <span class="keyword">const</span> value = h.shares * <span class="func">getPrice</span>(ticker);
+  <span class="keyword">const</span> currentPct = value / totalVal * 100;
+
+  <span class="comment">// How far below target are we?</span>
+  <span class="keyword">const</span> rawGap = (target.pct - currentPct) / 100;
+  <span class="keyword">const</span> gapScore = Math.<span class="func">max</span>(0, rawGap);
+
+  <span class="comment">// Is the ETF undervalued right now?</span>
+  <span class="keyword">const</span> valScore = <span class="func">calcValuationScore</span>(ticker);
+
+  <span class="comment">// Final score: 55% gap + 45% valuation</span>
+  <span class="keyword">const</span> composite = rawGap * 0.55 + valScore * 0.45;
+});</pre>
+<p>
+<strong>In plain English:</strong> For each ETF
+(like SCHD, VTIP, etc.), Bloom looks at two
+things:
+</p>
+<ol>
+  <li><strong>Gap score (55% weight)</strong> —
+    how far is this ETF below its target
+    allocation? If SCHD should be 25% of your
+    portfolio but it's only 20%, the gap score
+    is high → it gets more money.</li>
+  <li><strong>Valuation score (45% weight)</strong> —
+    is the ETF cheap right now? Uses RSI
+    (Relative Strength Index) and price vs.
+    moving average. If RSI is low and price is
+    below the SMA, the valuation score is high
+    → good time to buy more.</li>
+</ol>
+<p>
+The two scores combine into a "composite" that
+determines how much of your weekly DCA money
+goes to each ETF. ETFs that are both
+underweight AND undervalued get the most money.
+Smart.
+</p>
+
+<h4>Event Listeners: The Building Blocks of Interactivity</h4>
+<p>
+Every tap, swipe, and action in your apps
+comes through event listeners. Here are the
+3 most common patterns:
+</p>
+
+<pre><span class="comment">// Pattern 1: Click listener (tap on phone)</span>
+button.<span class="func">addEventListener</span>(<span class="string">'click'</span>, <span class="keyword">function</span>() {
+  <span class="comment">// This code runs when button is tapped</span>
+  <span class="func">deleteWorkout</span>(id);
+  <span class="func">renderWorkout</span>();  <span class="comment">// refresh the screen</span>
+  <span class="func">saveData</span>();       <span class="comment">// save to localStorage</span>
+  <span class="func">syncToCloud</span>();   <span class="comment">// push to cloud</span>
+});
+
+<span class="comment">// Pattern 2: Input change listener</span>
+input.<span class="func">addEventListener</span>(<span class="string">'change'</span>, <span class="keyword">function</span>() {
+  <span class="comment">// User changed a dropdown, slider, checkbox</span>
+  <span class="keyword">const</span> value = <span class="keyword">this</span>.value;
+  <span class="func">updateSetting</span>(value);
+});
+
+<span class="comment">// Pattern 3: Page visibility (app resume)</span>
+document.<span class="func">addEventListener</span>(<span class="string">'visibilitychange'</span>,
+  <span class="keyword">function</span>() {
+    <span class="comment">// App came back to foreground</span>
+    <span class="keyword">if</span> (!document.hidden) <span class="func">loadFromCloud</span>();
+  }
+);</pre>
+
+<p>
+Notice the pattern: something happens →
+update the data → refresh the screen →
+save locally → sync to cloud. This
+save-render-sync chain happens on almost
+every user action in every one of your apps.
+</p>
+
+<h4>The Render Cycle: How Your Screen Updates</h4>
+<p>
+When Claude writes a "render" function
+(like <code>renderWorkout()</code> or
+<code>renderETFGrid()</code>), here's the
+universal pattern:
+</p>
+
+<pre><span class="keyword">function</span> <span class="func">renderWorkout</span>() {
+  <span class="comment">// 1. Get the data we need</span>
+  <span class="keyword">const</span> prog = <span class="func">getProgram</span>(data.activeProgram);
+
+  <span class="comment">// 2. Build HTML as a string</span>
+  <span class="keyword">let</span> html = <span class="string">''</span>;
+  prog.exercises.<span class="func">forEach</span>(ex => {
+    html += <span class="string">`&lt;div class="card"&gt;
+      &lt;h3&gt;${ex.name}&lt;/h3&gt;
+      &lt;p&gt;${ex.sets} × ${ex.reps}&lt;/p&gt;
+    &lt;/div&gt;`</span>;
+  });
+
+  <span class="comment">// 3. Inject it into the page</span>
+  document.<span class="func">getElementById</span>(<span class="string">'container'</span>)
+    .innerHTML = html;
+}</pre>
+
+<p>
+<strong>Template literals</strong> (the
+backtick strings with <code>${...}</code>)
+are how Claude injects data into HTML. The
+<code>${ex.name}</code> gets replaced with
+the actual exercise name. It's like
+mail merge in a document — the template
+is the same, the data fills in the blanks.
+</p>
+
+<div class="key-concept">
+  <div class="label">The Universal App Pattern</div>
+  <div class="concept" style="font-size:17px">
+    User action → update data → render screen
+    → save locally → sync to cloud
+    <br>
+    <span style="font-size:14px;font-weight:400;
+      font-family:Inter;color:var(--muted)">
+      Every single feature in every single one
+      of your apps follows this exact flow.
+    </span>
+  </div>
+</div>
+
+<h3>The Pattern That Powers Every App You Built</h3>
+<p>
+Once you see this pattern, you'll recognize it
+everywhere. Every single one of your 8+ apps
+follows the same architecture:
+</p>
+
+<div class="diagram">
+<svg width="650" height="320" viewBox="0 0 650 320">
+  <rect width="650" height="320" rx="12"
+    fill="#161b22" stroke="#30363d"/>
+  <text x="325" y="22" text-anchor="middle"
+    font-family="Inter" font-size="13"
+    fill="#8b949e">
+    The Universal PWA Architecture
+    (same pattern in all your apps)
+  </text>
+
+  <!-- User -->
+  <rect x="255" y="40" width="140" height="36"
+    rx="8" fill="rgba(63,185,80,0.15)"
+    stroke="#3fb950"/>
+  <text x="325" y="63" text-anchor="middle"
+    font-family="Inter" font-size="12"
+    fill="#3fb950" font-weight="600">
+    You (tapping stuff)
+  </text>
+
+  <!-- Arrow down -->
+  <line x1="325" y1="76" x2="325" y2="95"
+    stroke="#30363d" stroke-width="2"
+    marker-end="url(#arr2)"/>
+
+  <!-- Single HTML File -->
+  <rect x="100" y="95" width="450" height="120"
+    rx="10" fill="rgba(212,130,42,0.08)"
+    stroke="#d4822a" stroke-dasharray="4"/>
+  <text x="325" y="114" text-anchor="middle"
+    font-family="Inter" font-size="11"
+    fill="#d4822a">single-file index.html</text>
+
+  <!-- CSS / HTML / JS boxes inside -->
+  <rect x="115" y="125" width="110" height="40"
+    rx="6" fill="rgba(188,140,255,0.12)"
+    stroke="#bc8cff"/>
+  <text x="170" y="150" text-anchor="middle"
+    font-family="Inter" font-size="11"
+    fill="#bc8cff">CSS (looks)</text>
+
+  <rect x="240" y="125" width="120" height="40"
+    rx="6" fill="rgba(248,81,73,0.12)"
+    stroke="#f85149"/>
+  <text x="300" y="150" text-anchor="middle"
+    font-family="Inter" font-size="11"
+    fill="#f85149">HTML (structure)</text>
+
+  <rect x="375" y="125" width="160" height="40"
+    rx="6" fill="rgba(88,166,255,0.12)"
+    stroke="#58a6ff"/>
+  <text x="455" y="150" text-anchor="middle"
+    font-family="Inter" font-size="11"
+    fill="#58a6ff">JS (behavior)</text>
+
+  <!-- Two arrows down from JS -->
+  <line x1="420" y1="215" x2="220" y2="245"
+    stroke="#30363d" stroke-width="2"
+    marker-end="url(#arr2)"/>
+  <line x1="490" y1="215" x2="520" y2="245"
+    stroke="#30363d" stroke-width="2"
+    marker-end="url(#arr2)"/>
+
+  <!-- localStorage -->
+  <rect x="120" y="245" width="200" height="36"
+    rx="8" fill="rgba(232,148,76,0.12)"
+    stroke="#e8944c"/>
+  <text x="220" y="268" text-anchor="middle"
+    font-family="Inter" font-size="11"
+    fill="#e8944c">localStorage (phone storage)</text>
+
+  <!-- Apps Script -->
+  <rect x="400" y="245" width="230" height="36"
+    rx="8" fill="rgba(63,185,80,0.12)"
+    stroke="#3fb950"/>
+  <text x="515" y="268" text-anchor="middle"
+    font-family="Inter" font-size="11"
+    fill="#3fb950">Apps Script (cloud backup)</text>
+
+  <!-- Service Worker -->
+  <rect x="120" y="292" width="200" height="22"
+    rx="6" fill="rgba(88,166,255,0.08)"
+    stroke="rgba(88,166,255,0.2)"/>
+  <text x="220" y="307" text-anchor="middle"
+    font-family="Inter" font-size="9"
+    fill="#58a6ff">service-worker.js (offline + cache)</text>
+
+  <!-- Arrows -->
+  <defs>
+    <marker id="arr2" markerWidth="8"
+      markerHeight="6" refX="8" refY="3"
+      orient="auto">
+      <path d="M0,0 L8,3 L0,6" fill="#30363d"/>
+    </marker>
+  </defs>
+</svg>
+<div class="diagram-caption">
+  Every app: single HTML file, localStorage
+  for instant saves, Apps Script for cloud
+  backup, service worker for offline.
+</div>
+</div>
+
+<p>
+The specifics change (Zercher stores workouts,
+Bloom stores portfolios, Cadence stores tasks),
+but the architecture is identical. Let's see it
+across your apps:
+</p>
+
+<div class="collapsible" onclick="toggleCollapse(this)">
+  <div class="collapsible-header">
+    The same pattern in 7 different apps
+    <span class="collapsible-arrow">▶</span>
+  </div>
+  <div class="collapsible-body">
+  <ul>
+    <li><strong>Zercher</strong>:
+      <code>zercher_data</code> → localStorage →
+      <code>zercher_save_config</code> →
+      Apps Script → service-worker v170</li>
+    <li><strong>Bloom</strong>:
+      <code>dca_portfolio_v1</code> → localStorage →
+      <code>save_dca_data</code> →
+      Apps Script → service-worker v40</li>
+    <li><strong>Cadence</strong>:
+      <code>cadence_data</code> → localStorage →
+      <code>save</code> →
+      Apps Script → service-worker v156</li>
+    <li><strong>Roman Chariots</strong>:
+      <code>rc_chariots_data</code> → localStorage →
+      <code>save</code> →
+      Apps Script → service-worker v59</li>
+    <li><strong>Sora Signal</strong>:
+      podcast data → localStorage →
+      cloud sync →
+      service-worker v44</li>
+    <li><strong>SPX Dashboard</strong>:
+      <code>spx_acted_items_v2</code> → localStorage →
+      <code>update_position</code> →
+      Apps Script → service-worker v66</li>
+    <li><strong>Crypto Dashboard</strong>:
+      similar keys → localStorage →
+      similar actions →
+      Apps Script → service-worker v153</li>
+  </ul>
+  <p>
+  Same bones, different skin. Once you
+  understand how one works, you understand
+  them all.
+  </p>
+  </div>
+</div>
+
+<h3>Clever Tricks Worth Knowing About</h3>
+<p>
+Beyond the basic pattern, some of your apps
+have clever features worth understanding:
+</p>
+
+<h4>Roman Chariots: The SVG Icon System</h4>
+<p>
+Instead of using emoji (which look different
+on every device) or loading icon libraries
+(which add weight), Roman Chariots uses a
+helper function:
+</p>
+<pre><span class="keyword">const</span> <span class="func">SVG</span> = (d) => <span class="string">`&lt;svg width="16" height="16"
+  viewBox="0 0 24 24" fill="none"
+  stroke="currentColor" stroke-width="2"&gt;
+  ${d}
+&lt;/svg&gt;`</span>;
+
+<span class="comment">// Usage — shopping cart icon:</span>
+<span class="func">SVG</span>(<span class="string">'&lt;circle cx="9" cy="21" r="1"/&gt;'</span>
+  + <span class="string">'&lt;circle cx="20" cy="21" r="1"/&gt;'</span>
+  + <span class="string">'&lt;path d="M1 1h4l2.68 13.39..."/&gt;'</span>)</pre>
+<p>
+<strong>Why it's clever:</strong>
+<code>stroke="currentColor"</code> means the
+icon color automatically matches whatever text
+color is active. In dark mode, icons are light.
+In day mode, icons are dark. Zero extra CSS
+needed. The same icons work in both themes.
+</p>
+
+<h4>Roman Chariots: Post-Save Verification</h4>
+<p>
+After the data wipe disaster, Roman Chariots
+added a verification step. After every cloud
+save, it loads the data back and checks if
+the save actually worked:
+</p>
+<pre><span class="comment">// After saving...</span>
+<span class="func">jsonpFetch</span>(ep + <span class="string">'?action=load'</span>, <span class="keyword">function</span>(err, resp) {
+  <span class="keyword">if</span> (err || !resp) {
+    <span class="comment">// Save failed — show red warning banner</span>
+    <span class="func">showSyncWarning</span>(<span class="keyword">true</span>);
+  } <span class="keyword">else</span> {
+    <span class="func">showSyncWarning</span>(<span class="keyword">false</span>);
+  }
+});</pre>
+<p>
+If the save failed silently (like the old CORS
+bug), the user sees a red banner: "Cloud sync
+failed — your data is saved locally but NOT in
+the cloud." No more silent failures.
+</p>
+
+<h4>Roman Chariots: Daily Tips (No-Repeat System)</h4>
+<pre><span class="keyword">function</span> <span class="func">getDailyTip</span>() {
+  <span class="keyword">const</span> today = <span class="keyword">new</span> Date()
+    .<span class="func">toISOString</span>().<span class="func">split</span>(<span class="string">'T'</span>)[0]; <span class="comment">// "2026-03-19"</span>
+  <span class="keyword">const</span> saved = JSON.<span class="func">parse</span>(
+    localStorage.<span class="func">getItem</span>(<span class="string">'rc_daily_tip'</span>) || <span class="string">'{}'</span>
+  );
+
+  <span class="comment">// Already picked today's tip? Return it</span>
+  <span class="keyword">if</span> (saved.date === today)
+    <span class="keyword">return</span> TIPS[saved.idx];
+
+  <span class="comment">// Pick a random tip we haven't shown yet</span>
+  <span class="keyword">const</span> history = JSON.<span class="func">parse</span>(
+    localStorage.<span class="func">getItem</span>(<span class="string">'rc_tip_history'</span>) || <span class="string">'[]'</span>
+  );
+  <span class="keyword">const</span> pool = TIPS.<span class="func">filter</span>((_, i) =>
+    !history.<span class="func">includes</span>(i)
+  );
+
+  <span class="comment">// All 200 tips shown? Reset and start over</span>
+  <span class="keyword">if</span> (pool.length === 0) {
+    history.length = 0;  <span class="comment">// clear history</span>
+  }
+
+  <span class="keyword">const</span> idx = <span class="comment">/* random from pool */</span>;
+  <span class="comment">// Save so we show the same tip all day</span>
+  localStorage.<span class="func">setItem</span>(<span class="string">'rc_daily_tip'</span>,
+    JSON.<span class="func">stringify</span>({ date: today, idx }));
+  <span class="keyword">return</span> TIPS[idx];
+}</pre>
+<p>
+<strong>The logic:</strong> Pick one random tip
+per day. Track which tips have been shown in
+a history array. Never repeat until all 200
+tips have been shown, then reset. The same tip
+shows all day (locked by today's date).
+</p>
+<p>
+This is a great example of state management
+in your apps — two localStorage keys working
+together (<code>rc_daily_tip</code> for today's
+selection, <code>rc_tip_history</code> for
+long-term tracking) to create a simple but
+effective no-repeat system.
+</p>
+
+<h4>Crypto Dashboard: The Backtest Lookup</h4>
+<pre><span class="keyword">function</span> <span class="func">getBacktest</span>(ticker, signalType) {
+  <span class="keyword">const</span> entry = BACKTEST[ticker.<span class="func">toUpperCase</span>()];
+  <span class="keyword">if</span> (!entry) <span class="keyword">return</span> <span class="keyword">null</span>;
+
+  <span class="comment">// Route to correct win rate based on signal</span>
+  <span class="keyword">const</span> st = signalType.<span class="func">toLowerCase</span>();
+  <span class="keyword">let</span> side;
+  <span class="keyword">if</span> (st.<span class="func">includes</span>(<span class="string">'sell'</span>)) side = <span class="string">'sell'</span>;
+  <span class="keyword">else</span> side = <span class="string">'buy'</span>;
+
+  <span class="keyword">const</span> d = BT_DEFAULTS[side];
+  <span class="keyword">return</span> {
+    sl: d.sl,        <span class="comment">// stop loss %</span>
+    tp: d.tp,        <span class="comment">// take profit %</span>
+    halfTp: d.halfTp, <span class="comment">// half take profit %</span>
+    wr: entry[side + <span class="string">'Wr'</span>] <span class="comment">// win rate for this side</span>
+  };
+}</pre>
+<p>
+<strong>What's happening:</strong> The
+<code>BACKTEST</code> object contains win rates
+for 529 crypto tickers (28,724 signals tested).
+When a new signal appears, this function looks
+up the ticker, checks if it's a buy or sell
+signal, and returns the historical win rate
+plus the standard SL/TP percentages. The
+dashboard then shows this on the Action Needed
+card so you know the odds before entering a
+trade.
+</p>
+
+<h3>Anatomy of a Full Feature</h3>
+<p>
+Let's trace a complete feature from start
+to finish — what it takes to add a "delete
+workout" button to Zercher. This shows how
+HTML, CSS, and JavaScript work together:
+</p>
+
+<pre><span class="comment">&lt;!-- HTML: The button structure --&gt;</span>
+<span class="tag">&lt;button</span> <span class="attr">class</span>=<span class="string">"delete-btn"</span>
+  <span class="attr">onclick</span>=<span class="string">"deleteLog('abc123')"</span><span class="tag">&gt;</span>
+  ✕
+<span class="tag">&lt;/button&gt;</span></pre>
+
+<pre><span class="comment">/* CSS: How the button looks */</span>
+.<span class="func">delete-btn</span> {
+  <span class="attr">background</span>: <span class="keyword">var</span>(--red);      <span class="comment">/* red background */</span>
+  <span class="attr">color</span>: white;                <span class="comment">/* white X */</span>
+  <span class="attr">border</span>: none;                <span class="comment">/* no outline */</span>
+  <span class="attr">border-radius</span>: 50%;          <span class="comment">/* make it circular */</span>
+  <span class="attr">width</span>: 28px;
+  <span class="attr">height</span>: 28px;
+  <span class="attr">cursor</span>: pointer;             <span class="comment">/* hand icon on hover */</span>
+  <span class="attr">position</span>: absolute;          <span class="comment">/* position freely */</span>
+  <span class="attr">top</span>: 8px;
+  <span class="attr">right</span>: 8px;                  <span class="comment">/* top-right corner */</span>
+  <span class="attr">opacity</span>: 0;                  <span class="comment">/* hidden by default */</span>
+  <span class="attr">transition</span>: opacity 0.2s;    <span class="comment">/* smooth fade */</span>
+}
+
+.<span class="func">card</span>:hover .<span class="func">delete-btn</span> {
+  <span class="attr">opacity</span>: 1;                  <span class="comment">/* show on hover */</span>
+}</pre>
+
+<pre><span class="comment">// JavaScript: What happens on click</span>
+<span class="keyword">function</span> <span class="func">deleteLog</span>(id) {
+  <span class="comment">// Confirm first</span>
+  <span class="keyword">if</span> (!<span class="func">confirm</span>(<span class="string">'Delete this workout?'</span>))
+    <span class="keyword">return</span>;
+
+  <span class="comment">// Remove from data</span>
+  data.logs = data.logs.<span class="func">filter</span>(
+    log => log.id !== id
+  );
+
+  <span class="func">renderWorkout</span>();  <span class="comment">// refresh screen</span>
+  <span class="func">saveData</span>();       <span class="comment">// save to phone</span>
+  <span class="func">syncToCloud</span>();   <span class="comment">// push to cloud</span>
+}</pre>
+
+<p>
+Three languages, one feature:
+</p>
+<ul>
+  <li><strong>HTML</strong> created the button
+    and connected it to the JavaScript function</li>
+  <li><strong>CSS</strong> made it look like a
+    red circle, positioned it, and added the
+    hover-to-reveal effect</li>
+  <li><strong>JavaScript</strong> handled the
+    actual deletion — confirm, remove from data,
+    refresh, save, sync</li>
+</ul>
+<p>
+When Claude builds a feature, it writes all
+three parts. When something goes wrong, knowing
+which part is responsible helps you describe
+the problem:
+</p>
+<ul>
+  <li>"The delete button is in the wrong
+    position" → CSS fix</li>
+  <li>"The delete button doesn't appear" →
+    HTML structure or CSS visibility</li>
+  <li>"Tapping delete doesn't do anything" →
+    JavaScript fix</li>
+  <li>"Delete works but the workout comes
+    back after reload" → save/sync bug in JS</li>
+</ul>
+
+<h3>Reading CSS Variables (Your Theme System)</h3>
+<p>
+Every one of your apps defines colors at the
+top using CSS variables. Here's Zercher's:
+</p>
+<pre><span class="keyword">:root</span> {
+  <span class="attr">--bg-deep</span>:    <span class="string">#0a0c10</span>;     <span class="comment">/* darkest background */</span>
+  <span class="attr">--bg-card</span>:    <span class="string">#141820</span>;     <span class="comment">/* card backgrounds */</span>
+  <span class="attr">--border</span>:     <span class="string">#2a3040</span>;     <span class="comment">/* subtle borders */</span>
+  <span class="attr">--text</span>:       <span class="string">#9aa0b0</span>;     <span class="comment">/* main text color */</span>
+  <span class="attr">--iron</span>:       <span class="string">#8090a8</span>;     <span class="comment">/* iron/steel theme accent */</span>
+  <span class="attr">--green</span>:      <span class="string">#6a8870</span>;     <span class="comment">/* success/progress */</span>
+  <span class="attr">--red</span>:        <span class="string">#905050</span>;     <span class="comment">/* delete/danger */</span>
+  <span class="attr">--gold</span>:       <span class="string">#a0946a</span>;     <span class="comment">/* highlights/PRs */</span>
+}</pre>
+<p>
+Anywhere in the CSS, instead of writing
+<code>#8090a8</code> directly, Claude writes
+<code>var(--iron)</code>. Why? Because if you
+say "make the accent color more blue," Claude
+only needs to change one line at the top, and
+every element using <code>var(--iron)</code>
+updates automatically.
+</p>
+<p>
+<strong>Practical tip:</strong> When you want
+to change a color theme, tell Claude "change
+the accent variable to X" instead of "change
+all the blue things." It's faster and
+less error-prone.
+</p>
+
+<div class="quiz">
+  <div class="quiz-title">
+    Quick Check: Reading Code
+  </div>
+  <p style="margin-bottom:12px;font-size:14px;
+    color:var(--muted)">
+    You see this in Bloom's code:
+    <code>if(encoded.length&lt;7000){
+    jsonpFetch(...)}</code>.
+    Why is there a size check?
+  </p>
+  <div class="quiz-option" data-correct="false"
+    onclick="checkQuiz(this)">
+    Apps Script has a 7000 character limit
+    on responses
+  </div>
+  <div class="quiz-option" data-correct="true"
+    onclick="checkQuiz(this)">
+    URLs have a length limit — if the data
+    is too big for one URL, it needs to be
+    split into chunks
+  </div>
+  <div class="quiz-option" data-correct="false"
+    onclick="checkQuiz(this)">
+    The browser crashes with strings
+    longer than 7000 characters
+  </div>
+  <div class="quiz-explanation">
+    URLs have a practical limit of about
+    8000 characters. The data is sent as part
+    of the URL
+    (<code>?action=save&data=...</code>),
+    so if your portfolio data is really big
+    (lots of transactions), it won't fit in
+    one request. The app checks the size
+    first, and if it's too big, splits it
+    into multiple smaller requests that the
+    server reassembles.
+  </div>
+</div>
+
+<div class="quiz">
+  <div class="quiz-title">
+    Quick Check: Bug Diagnosis
+  </div>
+  <p style="margin-bottom:12px;font-size:14px;
+    color:var(--muted)">
+    You tap a button in Bloom and nothing
+    happens. The button looks correct (right
+    color, right position). Where is the bug
+    most likely?
+  </p>
+  <div class="quiz-option" data-correct="false"
+    onclick="checkQuiz(this)">
+    CSS — the styling is wrong
+  </div>
+  <div class="quiz-option" data-correct="true"
+    onclick="checkQuiz(this)">
+    JavaScript — the click handler isn't
+    firing or has an error
+  </div>
+  <div class="quiz-option" data-correct="false"
+    onclick="checkQuiz(this)">
+    HTML — the button tag is malformed
+  </div>
+  <div class="quiz-explanation">
+    If the button <em>looks</em> right,
+    the CSS and HTML are fine. The problem is
+    in the JavaScript — either the
+    <code>onclick</code> function name is
+    misspelled, the function has a bug, or
+    there's an error earlier in the JS that
+    prevented the function from being defined.
+    This is where chrome://inspect shines —
+    you'd see a red error in the console
+    telling you exactly what went wrong.
+  </div>
+</div>
+
+</div><!-- end part7 -->
+
+<!-- ========================= -->
+<!-- PART 8: DEBUGGING         -->
+<!-- ========================= -->
+<div class="section" id="part8">
+<h2>8. Debugging with Claude</h2>
+<p class="section-sub">
+  Upgrade from "it's broken" to pinpointing
+  exactly what went wrong — and getting
+  fixes on the first try.
+</p>
+
+<h3>The Bug Report Template</h3>
+<p>
+When something breaks, the quality of your
+bug report directly determines how fast Claude
+can fix it. Here's the template:
+</p>
+<ol>
+  <li><strong>What you expected</strong> —
+    "tapping Save should sync to cloud"</li>
+  <li><strong>What actually happened</strong> —
+    "nothing happens, data doesn't appear on
+    my other device"</li>
+  <li><strong>When it started</strong> —
+    "worked yesterday, broke after last push"</li>
+  <li><strong>What device/browser</strong> —
+    "Android phone, Chrome" or "Mac, Safari"</li>
+  <li><strong>Any error messages</strong> —
+    if you see red text anywhere, copy it</li>
+</ol>
+
+<div class="compare">
+  <div class="compare-box compare-bad">
+    <div class="compare-label">Hard to debug</div>
+    "the app is broken"
+  </div>
+  <div class="compare-box compare-good">
+    <div class="compare-label">Fixed in 30 seconds</div>
+    "In Bloom, DCA prices show $0 on my phone.
+    Desktop works fine. Started after the last
+    push. The old prices were showing correctly
+    yesterday."
+  </div>
+</div>
+
+<p>
+The second report immediately tells Claude:
+it's a mobile-only issue (probably CORS or
+service worker), it's a regression (something
+in the last push broke it), and it's specific
+to price data (not the whole app). Claude can
+start debugging the exact right area immediately.
+</p>
+
+<h3>Chrome DevTools: Your Secret Weapon</h3>
+<p>
+This is the single biggest debugging upgrade
+you can make. You can inspect your phone's
+browser from your Mac and see exactly what's
+going wrong.
+</p>
+
+<h4>Setup (one time):</h4>
+<ol>
+  <li>Connect your Android phone via USB</li>
+  <li>On your phone: Settings → Developer
+    Options → USB Debugging → On</li>
+  <li>On your Mac: open Chrome</li>
+  <li>Go to <code>chrome://inspect</code></li>
+  <li>Your phone's open tabs appear — click
+    "inspect" on the one you want</li>
+</ol>
+
+<h4>What to Look For:</h4>
+<ul>
+  <li><strong>Console tab</strong> — red text =
+    errors. This is gold. Copy-paste any red
+    error messages to Claude and it can usually
+    fix the bug immediately.</li>
+  <li><strong>Network tab</strong> — shows
+    every request your app makes. If a fireGet
+    or jsonpFetch call is failing, you'll see
+    it here with the error status.</li>
+  <li><strong>Application tab → Storage</strong> —
+    shows your localStorage data. You can see
+    exactly what's saved and even edit it.</li>
+</ul>
+
+<div class="callout callout-blue">
+  <div class="callout-title">Real-World Example</div>
+  You hit a bug where crypto prices showed
+  NaN (Not a Number). With DevTools, you'd
+  see the console error: "Cannot parse
+  '1,234.56' as number." The comma in the
+  price string was breaking
+  <code>parseFloat()</code>. That's now a rule
+  in your CLAUDE.md — strip commas before
+  parsing. Without DevTools, this would have
+  been "the numbers are wrong, fix it" —
+  much harder to debug.
+</div>
+
+<h3>Common Bug Patterns in Your Apps</h3>
+
+<div class="collapsible" onclick="toggleCollapse(this)">
+  <div class="collapsible-header">
+    Stale cache on phone (most common!)
+    <span class="collapsible-arrow">▶</span>
+  </div>
+  <div class="collapsible-body">
+    <p><strong>Symptoms:</strong> You pushed changes
+    but your phone shows the old version.</p>
+    <p><strong>Cause:</strong> Service worker
+    version wasn't bumped, so the phone's
+    cached version is still being served.</p>
+    <p><strong>Fix:</strong></p>
+    <ol>
+      <li>Make sure service worker version was
+        bumped in the push</li>
+      <li>ADB cachebust:
+        <code>adb shell "am start -a
+        android.intent.action.VIEW -d
+        'https://SITE/?cachebust=DATE'"</code></li>
+    </ol>
+    <p><strong>Prevention:</strong> Your CLAUDE.md
+    rule "ALWAYS bump service worker" handles this,
+    but double-check before pushing.</p>
+  </div>
+</div>
+
+<div class="collapsible" onclick="toggleCollapse(this)">
+  <div class="collapsible-header">
+    CORS / Apps Script silent failure
+    <span class="collapsible-arrow">▶</span>
+  </div>
+  <div class="collapsible-body">
+    <p><strong>Symptoms:</strong> Data writes work
+    on desktop but silently fail on mobile. No
+    error message — it just doesn't save.</p>
+    <p><strong>Cause:</strong> Apps Script redirects
+    POST requests, and mobile browsers handle
+    CORS differently than desktop.</p>
+    <p><strong>Fix:</strong> Use
+    <code>fireGet()</code> (image-based GET
+    request) instead of POST/fetch for all
+    writes to Apps Script.</p>
+    <p><strong>Prevention:</strong> Every new
+    cloud sync implementation should use
+    fireGet from day one. This is why you have
+    the "EVERY new PWA MUST have fireGet from
+    day one" rule.</p>
+  </div>
+</div>
+
+<div class="collapsible" onclick="toggleCollapse(this)">
+  <div class="collapsible-header">
+    localStorage disappearing
+    <span class="collapsible-arrow">▶</span>
+  </div>
+  <div class="collapsible-body">
+    <p><strong>Symptoms:</strong> App data is
+    gone — workouts, portfolios, budget data
+    vanished.</p>
+    <p><strong>Cause:</strong> Chrome update,
+    storage pressure, or (worst case) someone
+    cleared Chrome data/cache.</p>
+    <p><strong>Fix:</strong> Cloud sync restores
+    data from the server. Every app should have
+    auto-pull on load.</p>
+    <p><strong>Prevention:</strong> Your cloud
+    sync pattern with auto-push, auto-pull,
+    and empty data guards. This is exactly why
+    every app needs cloud sync — localStorage
+    is not reliable long-term storage.</p>
+  </div>
+</div>
+
+<div class="collapsible" onclick="toggleCollapse(this)">
+  <div class="collapsible-header">
+    Number parsing issues (NaN)
+    <span class="collapsible-arrow">▶</span>
+  </div>
+  <div class="collapsible-body">
+    <p><strong>Symptoms:</strong> Prices, totals,
+    or calculations show "NaN" (Not a Number)
+    or "$undefined".</p>
+    <p><strong>Cause:</strong> Usually locale
+    formatting — numbers with commas
+    ("1,234.56") break <code>parseFloat()</code>
+    which expects "1234.56".</p>
+    <p><strong>Fix:</strong>
+    <code>str.replace(/,/g, '')</code> before
+    parsing. Strip commas first, then convert
+    to number.</p>
+    <p><strong>Prevention:</strong> Your CLAUDE.md
+    has this as a common pitfall. Claude should
+    catch this automatically now.</p>
+  </div>
+</div>
+
+<h3>The Debugging Mindset</h3>
+<p>
+When something breaks, resist the urge to
+just say "fix it." Instead:
+</p>
+<ol>
+  <li><strong>Describe symptoms, not theories</strong> —
+    "the button doesn't respond" is better than
+    "I think the CSS is wrong" (the bug might be
+    in JavaScript)</li>
+  <li><strong>Note what changed</strong> — did
+    you just push code? Did Chrome update? Did
+    you clear anything? The last thing that
+    changed is usually the cause.</li>
+  <li><strong>Check the console first</strong> —
+    even 10 seconds on chrome://inspect can
+    save 10 minutes of back-and-forth with
+    Claude</li>
+  <li><strong>Reproduce it</strong> — can you
+    make it happen again? On both devices? Only
+    on phone? Only after a specific action?
+    The more specific, the faster the fix.</li>
+</ol>
+
+<h3>Case Study: The Roman Chariots Data Wipe</h3>
+<p>
+This is a real debugging story from your
+projects. Understanding what happened teaches
+more than any abstract lesson.
+</p>
+
+<h4>What Happened</h4>
+<p>
+March 13, 2026. Roman Chariots (your budgeting
+app) was using <code>fetch</code> with
+<code>{mode: 'no-cors'}</code> for cloud saves.
+On desktop, it worked. On your Android phone,
+saves silently failed — <code>no-cors</code>
+POST requests get swallowed by the Apps Script
+redirect. No error message. No warning. The
+app <em>thought</em> it was saving but nothing
+reached the server.
+</p>
+<p>
+Then Chrome data got cleared, which wiped
+localStorage. Normally cloud sync would restore
+the data. But the cloud had nothing — the saves
+had been silently failing for days. Budget data:
+gone.
+</p>
+
+<h4>The Chain of Failures</h4>
+<div class="diagram">
+<svg width="650" height="180" viewBox="0 0 650 180">
+  <rect width="650" height="180" rx="12"
+    fill="#161b22" stroke="#30363d"/>
+
+  <!-- Chain -->
+  <rect x="15" y="30" width="120" height="50"
+    rx="6" fill="rgba(248,81,73,0.12)"
+    stroke="rgba(248,81,73,0.3)"/>
+  <text x="75" y="50" text-anchor="middle"
+    font-family="Inter" font-size="10"
+    fill="#f85149">fetch no-cors</text>
+  <text x="75" y="65" text-anchor="middle"
+    font-family="Inter" font-size="9"
+    fill="#8b949e">silently fails</text>
+
+  <text x="145" y="58" font-family="Inter"
+    font-size="16" fill="#30363d">→</text>
+
+  <rect x="160" y="30" width="120" height="50"
+    rx="6" fill="rgba(248,81,73,0.12)"
+    stroke="rgba(248,81,73,0.3)"/>
+  <text x="220" y="50" text-anchor="middle"
+    font-family="Inter" font-size="10"
+    fill="#f85149">cloud has no data</text>
+  <text x="220" y="65" text-anchor="middle"
+    font-family="Inter" font-size="9"
+    fill="#8b949e">saves never arrived</text>
+
+  <text x="290" y="58" font-family="Inter"
+    font-size="16" fill="#30363d">→</text>
+
+  <rect x="305" y="30" width="120" height="50"
+    rx="6" fill="rgba(248,81,73,0.12)"
+    stroke="rgba(248,81,73,0.3)"/>
+  <text x="365" y="50" text-anchor="middle"
+    font-family="Inter" font-size="10"
+    fill="#f85149">Chrome cleared</text>
+  <text x="365" y="65" text-anchor="middle"
+    font-family="Inter" font-size="9"
+    fill="#8b949e">localStorage gone</text>
+
+  <text x="435" y="58" font-family="Inter"
+    font-size="16" fill="#30363d">→</text>
+
+  <rect x="450" y="30" width="120" height="50"
+    rx="6" fill="rgba(248,81,73,0.25)"
+    stroke="rgba(248,81,73,0.5)"/>
+  <text x="510" y="50" text-anchor="middle"
+    font-family="Inter" font-size="11"
+    fill="#f85149" font-weight="600">DATA LOST</text>
+  <text x="510" y="65" text-anchor="middle"
+    font-family="Inter" font-size="9"
+    fill="#8b949e">no local, no cloud</text>
+
+  <!-- Fix -->
+  <rect x="15" y="100" width="555" height="65"
+    rx="8" fill="rgba(63,185,80,0.06)"
+    stroke="rgba(63,185,80,0.2)"/>
+  <text x="25" y="120" font-family="Inter"
+    font-size="11" fill="#3fb950"
+    font-weight="600">
+    Fixes applied (now in CLAUDE.md rules):
+  </text>
+  <text x="25" y="138" font-family="Inter"
+    font-size="10" fill="#8b949e">
+    1. fireGet() for all writes (bypasses CORS)
+    2. Post-save verification (load from cloud
+    to confirm save worked)
+  </text>
+  <text x="25" y="153" font-family="Inter"
+    font-size="10" fill="#8b949e">
+    3. Empty data guard (never push empty to cloud)
+    4. DEFAULT_SYNC_URL constant (survives cache wipes)
+  </text>
+</svg>
+</div>
+
+<h4>The Lesson</h4>
+<p>
+This single incident created 4 rules in your
+CLAUDE.md that now protect every app you build:
+</p>
+<ol>
+  <li>"Every new PWA MUST have fireGet from day
+    one" — no more silent POST failures</li>
+  <li>"Empty data guard — never push to cloud if
+    data is empty" — prevents wiping good
+    cloud data</li>
+  <li>"NEVER clear Chrome cache via ADB" —
+    the action that triggered the wipe</li>
+  <li>"Hardcode DEFAULT_SYNC_URL" — sync URL
+    survives even if localStorage is cleared</li>
+</ol>
+<p>
+This is the power of CLAUDE.md. One bad day
+creates permanent protection. Claude will
+never make these mistakes again because the
+rules are in every conversation's context.
+</p>
+
+<h3>Case Study: The Chrome Cache Nuclear Option</h3>
+<p>
+March 14, 2026 — just one day after the
+Roman Chariots fix. A different bug needed
+Chrome's cache cleared on your phone. The
+"solution" tried was:
+</p>
+<pre><span class="comment">// THE COMMAND THAT MUST NEVER BE RUN:</span>
+adb shell pm clear com.android.chrome</pre>
+<p>
+This command doesn't just clear cache — it
+<strong>wipes all Chrome data</strong>.
+Every localStorage key, every PWA installation,
+every saved setting. That means:
+</p>
+<ul>
+  <li>Cadence — tasks gone</li>
+  <li>Bloom — portfolio data gone</li>
+  <li>Zercher — workout history gone</li>
+  <li>Sora — podcast library gone</li>
+  <li>Roman Chariots — budget data gone</li>
+  <li>Every sync URL stored in localStorage — gone</li>
+</ul>
+<p>
+Cloud sync restored most of the data (since
+the Roman Chariots fix from the day before
+had been applied). But the Sora podcast
+library and some Cadence tasks hadn't been
+pushed to cloud recently, so those were lost.
+</p>
+
+<h4>The CLAUDE.md Rules Born From This</h4>
+<ul>
+  <li>"NEVER run <code>pm clear com.android.chrome</code>
+    or clear Chrome cache/data via ADB"</li>
+  <li>"ONLY use the cachebust URL method" — open
+    the specific page with a timestamp query
+    parameter, which forces a refresh without
+    nuking everything</li>
+  <li>"EVERY PWA MUST hardcode its Apps Script
+    URL as DEFAULT_SYNC_URL" — because when
+    localStorage gets wiped, the app needs
+    a hardcoded fallback to reconnect to the
+    cloud</li>
+</ul>
+<p>
+The safe cachebust command:
+</p>
+<pre>adb shell <span class="string">"am start -a android.intent.action.VIEW \
+  -d 'https://SITE/?cachebust=$(date +%s)'"</span></pre>
+<p>
+This opens the specific page with a fresh URL,
+forcing the browser to bypass its cache for
+just that one page. No data is lost. No other
+apps are affected.
+</p>
+
+<div class="callout callout-red">
+  <div class="callout-title">Pattern: Disasters → Rules</div>
+  Notice the pattern? Every major bug in your
+  apps created a CLAUDE.md rule that prevents
+  it from ever happening again:
+  <ul style="margin-top:8px">
+    <li>CORS silent failure → "use fireGet"</li>
+    <li>Data wipe → "never clear Chrome"</li>
+    <li>Lost sync URL → "hardcode DEFAULT_SYNC_URL"</li>
+    <li>Empty overwrite → "empty data guard"</li>
+    <li>Stale phone cache → "always bump service worker"</li>
+    <li>NaN prices → "strip commas before parseFloat"</li>
+  </ul>
+  Your CLAUDE.md is a scar tissue collection.
+  Each rule represents a real problem that was
+  solved and will never happen again.
+</div>
+
+<h3>Case Study: The Cadence Night Mode
+Surprise</h3>
+<p>
+This one's not a disaster — it's an example
+of a clever feature built from understanding
+your code. Cadence has an automatic day/night
+theme that switches based on time:
+</p>
+<pre><span class="keyword">function</span> <span class="func">getAutoTheme</span>() {
+  <span class="keyword">const</span> h = <span class="keyword">new</span> Date().<span class="func">getHours</span>();
+  <span class="keyword">if</span> (h >= 6 && h < 20) <span class="keyword">return</span> <span class="string">'day'</span>;
+  <span class="keyword">return</span> <span class="string">'night'</span>;
+}
+
+<span class="keyword">function</span> <span class="func">applyTheme</span>(mode) {
+  <span class="keyword">const</span> root = document.documentElement;
+  <span class="keyword">if</span> (mode === <span class="string">'day'</span>) {
+    root.classList.<span class="func">add</span>(<span class="string">'day'</span>);
+    <span class="comment">// Changes status bar to cream</span>
+    document.<span class="func">querySelector</span>(
+      <span class="string">'meta[name="theme-color"]'</span>
+    ).content = <span class="string">'#faf6f0'</span>;
+  } <span class="keyword">else</span> {
+    root.classList.<span class="func">remove</span>(<span class="string">'day'</span>);
+    <span class="comment">// Changes status bar to dark teal</span>
+    document.<span class="func">querySelector</span>(
+      <span class="string">'meta[name="theme-color"]'</span>
+    ).content = <span class="string">'#0c1a22'</span>;
+  }
+}</pre>
+<p>
+<strong>How it works:</strong> The
+<code>:root</code> element (the HTML tag)
+gets or loses the <code>.day</code> class.
+In CSS, all the color variables are defined
+twice — once for dark mode (default) and
+once inside <code>.day</code> with light
+colors. Adding one class flips the entire
+theme because every element uses
+<code>var(--bg)</code>, <code>var(--text)</code>
+etc. — and those variables point to different
+colors depending on the class.
+</p>
+<p>
+It also updates the <code>theme-color</code>
+meta tag, which controls the color of the
+status bar on your Android phone. That's why
+Cadence's top bar changes color when you open
+it at night vs. during the day.
+</p>
+
+<div class="callout callout-green">
+  <div class="callout-title">What This Teaches</div>
+  CSS variables + a single class toggle = entire
+  theme switch with zero JavaScript complexity.
+  The same pattern powers Bloom's per-portfolio
+  themes — each tab has different background
+  images and accent colors, all triggered by
+  changing a class on the root element.
+</div>
+
+<h3>Chrome DevTools Deep Dive</h3>
+<p>
+Let's go deeper on chrome://inspect since
+it's your #1 upgrade opportunity.
+</p>
+
+<h4>The Console Tab (Most Useful)</h4>
+<p>
+This is where JavaScript errors show up. When
+something breaks, there's almost always a red
+error message here. Common ones you'll see:
+</p>
+
+<pre><span class="comment">// Error 1: Function doesn't exist</span>
+<span class="red">Uncaught ReferenceError: saveData is not defined</span>
+<span class="comment">→ Means: the function name is misspelled, or
+   the script failed to load</span>
+
+<span class="comment">// Error 2: Can't read property of null</span>
+<span class="red">TypeError: Cannot read properties of null
+  (reading 'innerHTML')</span>
+<span class="comment">→ Means: getElementById returned null because
+   the element ID doesn't exist in the HTML</span>
+
+<span class="comment">// Error 3: Network failure</span>
+<span class="red">GET https://script.google.com/...
+  net::ERR_FAILED</span>
+<span class="comment">→ Means: Apps Script request failed (no internet,
+   wrong URL, or CORS issue)</span>
+
+<span class="comment">// Error 4: JSON parsing</span>
+<span class="red">SyntaxError: Unexpected token < in JSON
+  at position 0</span>
+<span class="comment">→ Means: Expected data but got an HTML error
+   page instead (usually Apps Script returning
+   an error page)</span></pre>
+
+<p>
+When you see any red text in the Console,
+copy the <strong>first line</strong> of the
+error and paste it to Claude. That single
+line usually tells Claude exactly where the
+bug is. You don't need to understand the
+error — Claude does.
+</p>
+
+<h4>The Network Tab</h4>
+<p>
+Shows every request your app makes. Each row
+is a request, with a status code:
+</p>
+<ul>
+  <li><strong>200</strong> = success (green)</li>
+  <li><strong>301/302</strong> = redirect
+    (this is what causes CORS issues with
+    Apps Script on mobile)</li>
+  <li><strong>404</strong> = not found
+    (wrong URL)</li>
+  <li><strong>500</strong> = server error
+    (Apps Script crashed)</li>
+</ul>
+<p>
+If your cloud sync isn't working, look for
+red or orange rows in the Network tab. Click
+on one to see the full request URL and
+response — this tells you exactly what was
+sent and what came back.
+</p>
+
+<h4>The Application Tab</h4>
+<p>
+This is where you can see your app's storage:
+</p>
+<ul>
+  <li><strong>Local Storage</strong> — shows all
+    localStorage keys and values. You can see
+    your actual data, edit it, even delete
+    keys to test "first-time user" behavior.</li>
+  <li><strong>Service Workers</strong> — shows
+    which version of the service worker is
+    active. If it shows v169 but you pushed
+    v170, that's your stale cache problem
+    right there.</li>
+  <li><strong>Cache Storage</strong> — shows
+    cached files. You can manually delete
+    the cache to force a refresh.</li>
+</ul>
+
+<div class="callout callout-purple">
+  <div class="callout-title">
+    Pro Debugging Workflow
+  </div>
+  <ol style="margin-top:8px">
+    <li>Bug reported → open chrome://inspect</li>
+    <li>Check Console for red errors → copy to
+      Claude if found</li>
+    <li>Check Network for failed requests →
+      note the status code and URL</li>
+    <li>Check Application → Service Workers
+      for version mismatch</li>
+    <li>Report to Claude with: symptom +
+      error message + which tab revealed it</li>
+  </ol>
+  <p style="margin-top:8px;margin-bottom:0">
+    This workflow turns "it's broken" into a
+    precise bug report that Claude can fix
+    in one try.
+  </p>
+</div>
+
+<h3>Debugging Without DevTools</h3>
+<p>
+Sometimes you can't plug in your phone. Here
+are tricks for debugging from the app itself:
+</p>
+<ul>
+  <li><strong>Add temporary alerts</strong> —
+    ask Claude to add
+    <code>alert('sync fired')</code> at key
+    points. If the alert appears, that code
+    ran. If not, something before it failed.</li>
+  <li><strong>Check the cloud directly</strong> —
+    open your Apps Script URL in a browser
+    with <code>?action=get_read</code> (or
+    whatever the read action is) to see if
+    data actually made it to the server.</li>
+  <li><strong>Version check</strong> — add a
+    visible version number to your app's
+    footer (even temporarily). If the version
+    number matches your push, the cache
+    busted successfully.</li>
+  <li><strong>Ask Claude to add a debug
+    panel</strong> — a hidden div that shows
+    sync status, last save time, data size,
+    service worker version. Tap a hidden
+    area 5 times to reveal it.</li>
+</ul>
+
+</div><!-- end part8 -->
+
+<!-- ========================= -->
+<!-- PART 9: PLAYBOOK          -->
+<!-- ========================= -->
+<div class="section" id="part9">
+<h2>9. The Vibe Coder's Playbook</h2>
+<p class="section-sub">
+  Your upgraded workflow — everything in this
+  guide distilled into actionable habits.
+</p>
+
+<h3>Starting a New Feature</h3>
+<ol>
+  <li><strong>Fresh conversation</strong> —
+    always. Don't tack new work onto an old
+    session.</li>
+  <li><strong>Clear first message</strong> —
+    what, where, how it should feel. Front-load
+    the details.</li>
+  <li><strong>Big feature? "Plan first"</strong> —
+    review the approach before Claude writes
+    code. Small tweak? Just describe it.</li>
+  <li><strong>Set boundaries</strong> — "don't
+    add anything extra" or "minimum changes
+    only" if you want a focused result.</li>
+</ol>
+
+<h3>During Development</h3>
+<ol>
+  <li><strong>One task per message</strong> —
+    don't ask for 5 things at once unless
+    they're simple and independent
+    (use a numbered list).</li>
+  <li><strong>Test after each change</strong> —
+    you already do this. Keep doing it.</li>
+  <li><strong>Ask "what did you change?"</strong> —
+    after each modification. This is your
+    free coding education.</li>
+  <li><strong>Describe symptoms, not theories</strong> —
+    let Claude diagnose. It's better at
+    finding root causes when it's not trying
+    to confirm your guess.</li>
+  <li><strong>If Claude starts acting weird</strong> —
+    context is full. Start a new session.</li>
+</ol>
+
+<h3>After Development</h3>
+<ol>
+  <li><strong>Push and bump</strong> — push to
+    GitHub, verify service worker version was
+    bumped.</li>
+  <li><strong>ADB cachebust</strong> — force
+    your phone to load the new version.</li>
+  <li><strong>Test on phone</strong> — you
+    already do this. Both portrait and
+    landscape if relevant.</li>
+  <li><strong>Update CLAUDE.md</strong> — if
+    you hit a new bug pattern, learned a new
+    localStorage key, or changed a version
+    number, write it down.</li>
+</ol>
+
+<h3>Monthly Maintenance</h3>
+<ul>
+  <li><strong>Trim MEMORY.md</strong> — get it
+    under 200 lines. Move details to topic
+    files.</li>
+  <li><strong>Update version numbers</strong> —
+    service worker versions, cache versions.</li>
+  <li><strong>Remove stale TODOs</strong> —
+    if it's done, delete the line.</li>
+  <li><strong>Review anti-patterns</strong> —
+    any new "never do this" rules to add?</li>
+</ul>
+
+<h3>Your Top 5 Upgrades</h3>
+<p>
+Based on where you are right now, these are
+the highest-impact things you can do, in
+order:
+</p>
+
+<div class="callout" style="border-left-color:#fff;
+  background:linear-gradient(135deg,
+  rgba(212,130,42,0.1),rgba(232,148,76,0.05))">
+<strong style="color:var(--accent);
+  font-size:18px">1. Learn chrome://inspect</strong>
+<p style="margin-top:8px">
+  Seeing console errors from your phone will
+  cut debugging time in half. One-time setup,
+  permanent benefit. Next time something breaks,
+  try this before asking Claude.
+</p>
+</div>
+
+<div class="callout" style="border-left-color:#fff;
+  background:linear-gradient(135deg,
+  rgba(88,166,255,0.1),rgba(88,166,255,0.05))">
+<strong style="color:var(--blue);
+  font-size:18px">2. Trim your MEMORY.md</strong>
+<p style="margin-top:8px">
+  It's 311 lines. Only 200 load. That means
+  Claude literally can't see your notes on
+  Sora, AutoPilot, Roman Chariots, and other
+  apps below the fold. Quick win — takes 30
+  minutes and immediately improves every future
+  session.
+</p>
+</div>
+
+<div class="callout" style="border-left-color:#fff;
+  background:linear-gradient(135deg,
+  rgba(63,185,80,0.1),rgba(63,185,80,0.05))">
+<strong style="color:var(--green);
+  font-size:18px">3. Use plan mode for new apps</strong>
+<p style="margin-top:8px">
+  Next time you build something new, say
+  "plan this before coding." Review the
+  blueprint, ask questions, then let Claude
+  build. You'll catch design problems before
+  they become code problems.
+</p>
+</div>
+
+<div class="callout" style="border-left-color:#fff;
+  background:linear-gradient(135deg,
+  rgba(188,140,255,0.1),rgba(188,140,255,0.05))">
+<strong style="color:var(--purple);
+  font-size:18px">4. Start asking "what did you change?"</strong>
+<p style="margin-top:8px">
+  After every modification. You're not checking
+  Claude's work — you're learning how your apps
+  are built. In a few weeks, you'll start
+  recognizing patterns and understanding the code
+  without asking.
+</p>
+</div>
+
+<div class="callout" style="border-left-color:#fff;
+  background:linear-gradient(135deg,
+  rgba(248,81,73,0.1),rgba(248,81,73,0.05))">
+<strong style="color:var(--red);
+  font-size:18px">5. One task = one session</strong>
+<p style="margin-top:8px">
+  The simplest rule with the biggest impact.
+  Fresh context = better results. Don't try
+  to do everything in one marathon conversation.
+  Claude is sharpest at the start of every
+  session.
+</p>
+</div>
+
+<h3>You're Already Good at This</h3>
+<p>
+Let's be real for a moment: you've built
+8+ fully functional PWAs with cloud sync,
+real-time data, mobile optimization, and
+automated pipelines — all through vibe coding.
+That's genuinely impressive. Most professional
+developers haven't shipped that many apps.
+</p>
+<p>
+Your CLAUDE.md is battle-tested and detailed.
+Your instinct to describe what you want and
+let Claude figure out the how is exactly right.
+Your habit of testing on mobile catches real
+issues.
+</p>
+<p>
+The upgrades in this guide aren't about fixing
+something broken. They're about taking what
+already works and making it more efficient.
+Less back-and-forth, faster debugging, deeper
+understanding of the tools you've already
+mastered intuitively.
+</p>
+<p>
+Keep building. Keep asking questions.
+Keep that CLAUDE.md sharp.
+</p>
+
+</div><!-- end part9 -->
+
+<!-- ========================= -->
+<!-- PART 10: TOOLS            -->
+<!-- ========================= -->
+<div class="section" id="part10">
+<h2>10. How Claude Code Tools Work</h2>
+<p class="section-sub">
+  Behind every file read, every edit, every
+  git push — there's a tool. Understanding
+  what's happening behind the scenes.
+</p>
+
+<h3>What Are Tools?</h3>
+<p>
+Claude on its own can only generate text. It
+can't read files, edit code, run commands, or
+interact with your computer. To do those things,
+Claude uses <strong>tools</strong> — external
+functions that it can "call" during a
+conversation.
+</p>
+<p>
+When Claude wants to read a file, it doesn't
+have magic access. It generates a special
+message that says "I want to use the Read tool
+on this file." The system executes that tool,
+gets the file contents, and feeds them back
+to Claude as text in the context window.
+</p>
+
+<div class="diagram">
+<svg width="650" height="200" viewBox="0 0 650 200">
+  <rect width="650" height="200" rx="12"
+    fill="#161b22" stroke="#30363d"/>
+  <text x="325" y="22" text-anchor="middle"
+    font-family="Inter" font-size="12"
+    fill="#8b949e">
+    How a tool call works
+  </text>
+
+  <!-- Step 1 -->
+  <rect x="15" y="40" width="130" height="55"
+    rx="8" fill="rgba(88,166,255,0.12)"
+    stroke="#58a6ff"/>
+  <text x="80" y="60" text-anchor="middle"
+    font-family="Inter" font-size="10"
+    fill="#58a6ff">You say:</text>
+  <text x="80" y="78" text-anchor="middle"
+    font-family="JetBrains Mono" font-size="9"
+    fill="#e6edf3">"fix the bug</text>
+  <text x="80" y="90" text-anchor="middle"
+    font-family="JetBrains Mono" font-size="9"
+    fill="#e6edf3">in Zercher"</text>
+
+  <text x="155" y="68" font-size="16"
+    fill="#30363d">→</text>
+
+  <!-- Step 2 -->
+  <rect x="165" y="40" width="130" height="55"
+    rx="8" fill="rgba(212,130,42,0.15)"
+    stroke="#d4822a"/>
+  <text x="230" y="55" text-anchor="middle"
+    font-family="Inter" font-size="10"
+    fill="#d4822a">Claude thinks:</text>
+  <text x="230" y="73" text-anchor="middle"
+    font-family="JetBrains Mono" font-size="9"
+    fill="#e6edf3">"I need to read</text>
+  <text x="230" y="85" text-anchor="middle"
+    font-family="JetBrains Mono" font-size="9"
+    fill="#e6edf3">the file first"</text>
+
+  <text x="305" y="68" font-size="16"
+    fill="#30363d">→</text>
+
+  <!-- Step 3 -->
+  <rect x="315" y="40" width="145" height="55"
+    rx="8" fill="rgba(63,185,80,0.12)"
+    stroke="#3fb950"/>
+  <text x="387" y="55" text-anchor="middle"
+    font-family="Inter" font-size="10"
+    fill="#3fb950">Tool call:</text>
+  <text x="387" y="73" text-anchor="middle"
+    font-family="JetBrains Mono" font-size="9"
+    fill="#e6edf3">Read("Zercher/</text>
+  <text x="387" y="85" text-anchor="middle"
+    font-family="JetBrains Mono" font-size="9"
+    fill="#e6edf3">index.html")</text>
+
+  <text x="470" y="68" font-size="16"
+    fill="#30363d">→</text>
+
+  <!-- Step 4 -->
+  <rect x="480" y="40" width="155" height="55"
+    rx="8" fill="rgba(188,140,255,0.12)"
+    stroke="#bc8cff"/>
+  <text x="557" y="55" text-anchor="middle"
+    font-family="Inter" font-size="10"
+    fill="#bc8cff">System returns:</text>
+  <text x="557" y="73" text-anchor="middle"
+    font-family="JetBrains Mono" font-size="9"
+    fill="#e6edf3">[5,600 lines of</text>
+  <text x="557" y="85" text-anchor="middle"
+    font-family="JetBrains Mono" font-size="9"
+    fill="#e6edf3">HTML/CSS/JS code]</text>
+
+  <!-- Step 5 -->
+  <rect x="150" y="120" width="350" height="55"
+    rx="8" fill="rgba(212,130,42,0.15)"
+    stroke="#d4822a"/>
+  <text x="325" y="140" text-anchor="middle"
+    font-family="Inter" font-size="10"
+    fill="#d4822a">
+    Claude now has the code in its context →
+  </text>
+  <text x="325" y="158" text-anchor="middle"
+    font-family="Inter" font-size="10"
+    fill="#d4822a">
+    can identify the bug → calls Edit tool
+    to fix it
+  </text>
+</svg>
+</div>
+
+<h3>The Tools Claude Uses</h3>
+<p>
+When you watch Claude work, you see messages
+like "Let me read that file" or "I'll run the
+tests." Behind each of those is a specific
+tool:
+</p>
+
+<h4>Read Tool</h4>
+<p>
+Reads a file from your computer and brings
+the contents into Claude's context window.
+When Claude says "Let me read index.html,"
+the entire file (or a portion) gets added
+to the conversation as tokens.
+</p>
+<p>
+<strong>Context cost:</strong> High. A 3,000-line
+file might be 15,000+ tokens. This is why
+Claude sometimes reads just a portion of a
+large file (<code>lines 200-300</code>) instead
+of the whole thing.
+</p>
+
+<h4>Edit Tool</h4>
+<p>
+Makes surgical changes to files. Claude
+specifies the exact text to find and what to
+replace it with. It's like find-and-replace
+but for code. When you see "I'll update the
+function," Claude is finding the old code and
+replacing it with new code.
+</p>
+<p>
+<strong>Why it matters:</strong> Claude doesn't
+rewrite your entire file for a small change.
+It targets just the specific lines that need
+to change. This is safer — less chance of
+accidentally breaking something else.
+</p>
+
+<h4>Write Tool</h4>
+<p>
+Creates a new file or completely overwrites
+an existing one. Used when Claude is building
+something from scratch (like writing an
+entire new index.html) rather than editing
+an existing file.
+</p>
+
+<h4>Bash Tool</h4>
+<p>
+Runs terminal commands — <code>git push</code>,
+<code>npm install</code>,
+<code>adb shell ...</code>. This is how Claude
+pushes your code to GitHub, runs ADB
+cachebust commands, and executes scripts.
+</p>
+<p>
+<strong>Permission modes:</strong> By default,
+Claude asks your permission before running
+commands. This is the "approve/deny" prompt
+you see. In
+<code>--dangerously-skip-permissions</code>
+mode, Claude runs everything without asking.
+</p>
+
+<h4>Grep Tool</h4>
+<p>
+Searches for text patterns across your files.
+When Claude needs to find where a function is
+defined, or all places that reference a
+variable, it uses Grep. It's like the search
+function in a text editor, but across your
+entire project.
+</p>
+
+<h4>Glob Tool</h4>
+<p>
+Finds files by name pattern. "Find all HTML
+files" or "find everything in the Zercher
+directory." Claude uses this to orient
+itself in your project — figuring out what
+files exist before deciding which to read.
+</p>
+
+<h3>The Tool Chain in Action</h3>
+<p>
+When you say "add a dark mode toggle to
+Cadence," here's the full chain of tool
+calls Claude makes:
+</p>
+<ol>
+  <li><strong>Glob</strong> — find files in
+    <code>~/Cadence/</code> to understand the
+    project structure</li>
+  <li><strong>Read</strong> — read
+    <code>index.html</code> to understand the
+    current code</li>
+  <li><strong>Edit</strong> — add CSS variables
+    for dark mode colors</li>
+  <li><strong>Edit</strong> — add a toggle
+    button in the HTML section</li>
+  <li><strong>Edit</strong> — add JavaScript
+    to handle the toggle and save the
+    preference</li>
+  <li><strong>Read</strong> — read
+    <code>service-worker.js</code> to check
+    the version</li>
+  <li><strong>Edit</strong> — bump the service
+    worker version</li>
+  <li><strong>Bash</strong> —
+    <code>git add . && git commit && git push</code></li>
+  <li><strong>Bash</strong> — ADB cachebust
+    your phone</li>
+</ol>
+<p>
+Each tool call adds to the context window.
+A complex feature might involve 15-20 tool
+calls. This is another reason long sessions
+degrade — the tool results accumulate and
+eat context.
+</p>
+
+<h3>Why Claude Asks Permission</h3>
+<p>
+Every tool call that could change something
+on your computer goes through a permission
+check. This is the "approve/deny" prompt you
+see when Claude wants to:
+</p>
+<ul>
+  <li>Edit a file</li>
+  <li>Create a file</li>
+  <li>Run a bash command</li>
+</ul>
+<p>
+Read-only operations (Read, Grep, Glob)
+usually don't need permission — they're safe
+because they don't change anything.
+</p>
+<p>
+When you approve a tool, that approval is
+usually just for that specific action, not
+for all future actions. Each edit, each
+command gets its own check. This is why
+<code>--dangerously-skip-permissions</code>
+speeds things up dramatically for trusted
+workflows — it removes the pause between
+every action.
+</p>
+
+<h3>What Happens When a Tool Fails</h3>
+<p>
+Sometimes tools fail — a file doesn't exist,
+a command returns an error, a git push gets
+rejected. When this happens, the error message
+goes back into Claude's context just like
+successful results. Claude can then read the
+error and adjust its approach.
+</p>
+<p>
+This is why Claude often recovers from errors
+automatically — it reads the error message,
+understands what went wrong, and tries a
+different approach. But sometimes it gets
+stuck in a loop (trying the same thing
+repeatedly). That's when you should step in
+and either describe the issue or start a
+fresh session.
+</p>
+
+</div><!-- end part10 -->
+
+<!-- ============ FOOTER ============ -->
+<div class="footer">
+  The Vibe Coder's Guide to LLMs & Claude Code<br>
+  Written for Alex — March 2026<br>
+  Generated with Claude Code (Opus 4.6)
+</div>
+
+</div><!-- end content -->
+
+<!-- ============================== -->
+<!-- JAVASCRIPT                     -->
+<!-- ============================== -->
+<script>
+// Progress bar
+window.addEventListener('scroll', function() {
+  const h = document.documentElement;
+  const pct = (h.scrollTop / (h.scrollHeight - h.clientHeight)) * 100;
+  document.getElementById('progressBar').style.width = pct + '%';
+});
+
+// Active nav link
+const sections = document.querySelectorAll('.section');
+const navLinks = document.querySelectorAll('.nav-links a');
+window.addEventListener('scroll', function() {
+  let current = '';
+  sections.forEach(function(s) {
+    if (window.scrollY >= s.offsetTop - 100) {
+      current = s.id;
+    }
+  });
+  navLinks.forEach(function(a) {
+    a.classList.remove('active');
+    if (a.getAttribute('href') === '#' + current) {
+      a.classList.add('active');
+    }
+  });
+});
+
+// Collapsible sections
+function toggleCollapse(el) {
+  el.classList.toggle('open');
+}
+
+// Quiz
+function checkQuiz(el) {
+  const quiz = el.closest('.quiz');
+  if (quiz.dataset.answered) return;
+  quiz.dataset.answered = 'true';
+
+  const options = quiz.querySelectorAll('.quiz-option');
+  options.forEach(function(o) {
+    if (o.dataset.correct === 'true') {
+      o.classList.add('correct');
+    } else {
+      o.classList.add('wrong');
+    }
+  });
+
+  const exp = quiz.querySelector('.quiz-explanation');
+  if (exp) exp.classList.add('show');
+}
+
+// Token visualizer
+const tokenColors = [
+  'rgba(212,130,42,0.3)',
+  'rgba(88,166,255,0.3)',
+  'rgba(63,185,80,0.3)',
+  'rgba(188,140,255,0.3)',
+  'rgba(248,81,73,0.3)',
+  'rgba(232,148,76,0.3)',
+  'rgba(255,255,255,0.15)',
+];
+
+function simTokenize(text) {
+  if (!text) return [];
+  const tokens = [];
+  let i = 0;
+  while (i < text.length) {
+    // Whitespace
+    if (text[i] === ' ') {
+      tokens.push(' ');
+      i++;
+      continue;
+    }
+    // Punctuation / symbols
+    if (/[^a-zA-Z0-9]/.test(text[i])) {
+      let sym = text[i];
+      // Group common multi-char symbols
+      if (i + 1 < text.length && text[i] === '=' && text[i+1] === '>') {
+        sym = '=>'; i += 2;
+      } else if (i + 1 < text.length && text[i] === '/' && text[i+1] === '/') {
+        sym = '//'; i += 2;
+      } else {
+        i++;
+      }
+      tokens.push(sym);
+      continue;
+    }
+    // Words — split at ~4 chars for realism
+    let word = '';
+    while (i < text.length && /[a-zA-Z0-9]/.test(text[i])) {
+      word += text[i];
+      i++;
+    }
+    if (word.length <= 5) {
+      tokens.push(word);
+    } else {
+      // Split longer words
+      const mid = Math.ceil(word.length * 0.6);
+      tokens.push(word.slice(0, mid));
+      tokens.push(word.slice(mid));
+    }
+  }
+  return tokens;
+}
+
+function renderTokens() {
+  const input = document.getElementById('tokenInput');
+  const output = document.getElementById('tokenOutput');
+  const count = document.getElementById('tokenCount');
+  const text = input.value;
+  const tokens = simTokenize(text);
+
+  output.innerHTML = '';
+  tokens.forEach(function(t, idx) {
+    const span = document.createElement('span');
+    span.className = 'token';
+    span.textContent = t === ' ' ? '\u00B7' : t;
+    span.style.background = t === ' '
+      ? 'transparent'
+      : tokenColors[idx % tokenColors.length];
+    span.style.color = t === ' '
+      ? 'var(--muted)'
+      : 'var(--text)';
+    span.title = 'Token ' + (idx + 1);
+    output.appendChild(span);
+  });
+
+  // Real token count is roughly chars/4
+  const approx = Math.max(1, Math.round(text.length / 3.5));
+  count.textContent = tokens.length + ' visual chunks'
+    + ' (\u2248' + approx + ' actual tokens)';
+}
+
+document.getElementById('tokenInput')
+  .addEventListener('input', renderTokens);
+renderTokens();
+</script>
+
+<!-- Bookmark system -->
+<script>var BM_KEY = 'bm_llm_guide';</script>
+<script src="../book.js?v=3"></script>
+
+</body>
+</html>
