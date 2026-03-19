@@ -638,9 +638,12 @@ li:hover > strong > .bm-btn { opacity: 0.5; }
     <a href="#part5">Reading Code</a>
     <a href="#part6">Patterns</a>
     <a href="#part7">Architecture</a>
-    <a href="#part8">Console</a>
-    <a href="#part9">Bugs</a>
-    <a href="#part10">Cheat Sheet</a>
+    <a href="#part8">APIs</a>
+    <a href="#part9">localStorage</a>
+    <a href="#part10">Service Workers</a>
+    <a href="#part11">Console</a>
+    <a href="#part12">Bugs</a>
+    <a href="#part13">Cheat Sheet</a>
   </div>
 </nav>
 
@@ -708,19 +711,37 @@ li:hover > strong > .bm-btn { opacity: 0.5; }
         from top to bottom</span>
     </li>
     <li>
-      <a href="#part8">The Developer Console</a>
+      <a href="#part8">APIs &amp; Fetch</a>
+      <span class="toc-desc">
+        How data moves between your phone
+        and Google Sheets</span>
+    </li>
+    <li>
+      <a href="#part9">localStorage Deep Dive</a>
+      <span class="toc-desc">
+        Your app's memory &mdash; how it works,
+        why it breaks, and how to protect it</span>
+    </li>
+    <li>
+      <a href="#part10">Service Workers Explained</a>
+      <span class="toc-desc">
+        What actually happens when the browser
+        caches your app</span>
+    </li>
+    <li>
+      <a href="#part11">The Developer Console</a>
       <span class="toc-desc">
         Your secret debugging weapon
         in every browser</span>
     </li>
     <li>
-      <a href="#part9">Common Bugs Decoded</a>
+      <a href="#part12">Common Bugs Decoded</a>
       <span class="toc-desc">
         What error messages mean
         and how to fix them</span>
     </li>
     <li>
-      <a href="#part10">Cheat Sheet</a>
+      <a href="#part13">Cheat Sheet</a>
       <span class="toc-desc">
         Quick reference for everything
         in this guide</span>
@@ -1734,9 +1755,754 @@ your API credits.
 </div>
 </div>
 
-<!-- ======== PART 8: CONSOLE ======== -->
+<!-- ======== PART 8: APIs & FETCH ======== -->
 <div class="section" id="part8">
-<h2>Part 8: The Developer Console</h2>
+<h2>Part 8: APIs &amp; Fetch</h2>
+<p class="section-sub">
+  How data travels between your phone
+  and Google Sheets.
+</p>
+
+<p>
+When you tap "Save" in Cadence or enter a
+DCA amount in Bloom, that data needs to get
+from your phone to Google Sheets and back.
+That's what an <strong>API</strong> does &mdash;
+it's a messenger that carries data between
+two places.
+</p>
+
+<h3>The Journey of Your Data</h3>
+
+<div class="diagram">
+<svg viewBox="0 0 700 160" width="700">
+  <defs>
+    <marker id="arr2" viewBox="0 0 10 10"
+      refX="9" refY="5" markerWidth="6"
+      markerHeight="6"
+      orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z"
+        fill="#30363d"/>
+    </marker>
+  </defs>
+  <!-- Step 1: Phone -->
+  <rect x="10" y="30" width="120" height="100"
+    rx="10" fill="rgba(88,166,255,0.1)"
+    stroke="#58a6ff" stroke-width="1.5"/>
+  <text x="70" y="60" text-anchor="middle"
+    font-family="Inter" font-size="13"
+    font-weight="600" fill="#58a6ff">
+    Your Phone</text>
+  <text x="70" y="80" text-anchor="middle"
+    font-family="Inter" font-size="11"
+    fill="#8b949e">Taps "Save"</text>
+  <text x="70" y="98" text-anchor="middle"
+    font-family="Inter" font-size="10"
+    fill="#8b949e">fireGet(url)</text>
+  <!-- Arrow 1 -->
+  <path d="M135 80 L185 80"
+    stroke="#30363d" stroke-width="1.5"
+    marker-end="url(#arr2)"/>
+  <text x="160" y="72" text-anchor="middle"
+    font-family="Inter" font-size="9"
+    fill="#d4822a">GET request</text>
+  <!-- Step 2: Apps Script -->
+  <rect x="190" y="30" width="140" height="100"
+    rx="10" fill="rgba(212,130,42,0.1)"
+    stroke="#d4822a" stroke-width="1.5"/>
+  <text x="260" y="60" text-anchor="middle"
+    font-family="Inter" font-size="13"
+    font-weight="600" fill="#d4822a">
+    Apps Script</text>
+  <text x="260" y="80" text-anchor="middle"
+    font-family="Inter" font-size="11"
+    fill="#8b949e">Reads the URL</text>
+  <text x="260" y="98" text-anchor="middle"
+    font-family="Inter" font-size="10"
+    fill="#8b949e">Processes action</text>
+  <!-- Arrow 2 -->
+  <path d="M335 80 L385 80"
+    stroke="#30363d" stroke-width="1.5"
+    marker-end="url(#arr2)"/>
+  <text x="360" y="72" text-anchor="middle"
+    font-family="Inter" font-size="9"
+    fill="#3fb950">writes</text>
+  <!-- Step 3: Google Sheet -->
+  <rect x="390" y="30" width="130" height="100"
+    rx="10" fill="rgba(63,185,80,0.1)"
+    stroke="#3fb950" stroke-width="1.5"/>
+  <text x="455" y="60" text-anchor="middle"
+    font-family="Inter" font-size="13"
+    font-weight="600" fill="#3fb950">
+    Google Sheet</text>
+  <text x="455" y="80" text-anchor="middle"
+    font-family="Inter" font-size="11"
+    fill="#8b949e">Stores data</text>
+  <text x="455" y="98" text-anchor="middle"
+    font-family="Inter" font-size="10"
+    fill="#8b949e">Cell A1, B1, etc.</text>
+  <!-- Arrow 3 (return) -->
+  <path d="M525 80 L575 80"
+    stroke="#30363d" stroke-width="1.5"
+    marker-end="url(#arr2)"/>
+  <text x="550" y="72" text-anchor="middle"
+    font-family="Inter" font-size="9"
+    fill="#bc8cff">JSON response</text>
+  <!-- Step 4: Back to phone -->
+  <rect x="580" y="30" width="110" height="100"
+    rx="10" fill="rgba(188,140,255,0.1)"
+    stroke="#bc8cff" stroke-width="1.5"/>
+  <text x="635" y="60" text-anchor="middle"
+    font-family="Inter" font-size="13"
+    font-weight="600" fill="#bc8cff">
+    Phone</text>
+  <text x="635" y="80" text-anchor="middle"
+    font-family="Inter" font-size="11"
+    fill="#8b949e">Gets data back</text>
+  <text x="635" y="98" text-anchor="middle"
+    font-family="Inter" font-size="10"
+    fill="#8b949e">Updates screen</text>
+</svg>
+<p class="diagram-caption">
+  Save: Phone &rarr; Apps Script &rarr; Sheet.
+  Load: Sheet &rarr; Apps Script &rarr; Phone.
+</p>
+</div>
+
+<h3>What's a URL Really Doing?</h3>
+
+<p>
+When your app sends data, it builds a URL
+with the data packed into it.
+It looks like a normal web address with
+extra stuff tacked on:
+</p>
+
+<pre><code>https://script.google.com/macros/s/ABC123/exec
+  ?action=save
+  &amp;data={"tasks":["Buy milk","Walk dog"]}</code></pre>
+
+<p>
+That <code>?action=save</code> part is called
+a <strong>query parameter</strong>. It's how
+your app tells Apps Script what to do.
+The <code>&amp;data=...</code> part carries
+the actual data. It's just like filling out
+a form and clicking submit &mdash; the URL
+carries the answers.
+</p>
+
+<h3>The Two Ways to Talk: GET vs POST</h3>
+
+<p>
+There are two main ways to send data:
+</p>
+
+<ul>
+<li><strong>GET</strong> &mdash; puts everything
+  in the URL. Like writing a message on
+  a postcard &mdash; anyone can read it,
+  but it gets there. This is what
+  <code>fireGet()</code> does.</li>
+<li><strong>POST</strong> &mdash; puts data inside
+  the request body (hidden). Like putting
+  a letter in an envelope. More secure,
+  but <strong>breaks on mobile</strong>
+  because of CORS redirects.</li>
+</ul>
+
+<div class="callout callout-red">
+<div class="callout-title">Why fireGet Exists</div>
+On mobile Chrome, when your app sends a
+POST request to Apps Script, Google redirects
+it (changes the URL). The browser sees
+a different domain and blocks it for
+security (that's CORS). The request
+<strong>silently fails</strong> &mdash;
+no error, just lost data.
+<code>fireGet()</code> uses a GET request
+disguised as an image load, which bypasses
+the redirect problem entirely. It's a hack,
+but it works perfectly.
+</div>
+
+<h3>JSONP: Reading Data Back</h3>
+
+<p>
+When your apps <em>read</em> data from
+the cloud, they use JSONP
+(<code>jsonpFetch</code>).
+Normal <code>fetch()</code> also has CORS
+problems when reading from Apps Script.
+JSONP works by creating a
+<code>&lt;script&gt;</code> tag that loads
+the data as JavaScript:
+</p>
+
+<pre><code>function jsonpFetch(url) {
+  return new Promise(function(resolve) {
+    // Create a unique callback name
+    var cb = 'jsonp_' + Date.now();
+    // When the server responds,
+    // it calls this function
+    window[cb] = function(data) {
+      resolve(data);
+      delete window[cb];
+    };
+    // Add a script tag that loads
+    // the URL with callback parameter
+    var s = document.createElement('script');
+    s.src = url + '&amp;callback=' + cb;
+    document.head.appendChild(s);
+  });
+}</code></pre>
+
+<p>
+Think of it this way: instead of asking
+for data and getting blocked by security,
+you ask the server to deliver the data
+<em>as a script</em> that runs automatically.
+The server wraps your data in a function
+call, and your app picks it up.
+</p>
+
+<h3>JSON: The Language of Data</h3>
+
+<p>
+JSON (JavaScript Object Notation) is how
+data is formatted when it travels between
+your phone and the server. It looks like
+JavaScript objects:
+</p>
+
+<pre><code>// This is JSON — it's just text
+{
+  "tasks": [
+    {"name": "Buy milk", "done": false},
+    {"name": "Walk dog", "done": true}
+  ],
+  "lastModified": "2026-03-19T10:30:00Z"
+}
+
+// JSON.stringify = JavaScript → text
+var text = JSON.stringify(myData);
+
+// JSON.parse = text → JavaScript
+var data = JSON.parse(text);</code></pre>
+
+<p>
+Every time your app saves or loads data,
+it converts between JavaScript objects
+(which the app understands) and JSON text
+(which can travel over the internet).
+<code>JSON.stringify</code> packs it up,
+<code>JSON.parse</code> unpacks it.
+</p>
+
+<div class="quiz">
+<div class="quiz-q">
+  Why do your apps use fireGet() instead
+  of the normal fetch() to save data?
+</div>
+<div class="quiz-opts">
+  <button class="quiz-opt" data-answer="cors"
+    onclick="checkQuiz(this,'cors','q8e')">
+    fetch() silently fails on mobile because
+    of CORS redirect issues with Apps Script
+    </button>
+  <button class="quiz-opt" data-answer="fast"
+    onclick="checkQuiz(this,'cors','q8e')">
+    fireGet() is faster</button>
+  <button class="quiz-opt" data-answer="old"
+    onclick="checkQuiz(this,'cors','q8e')">
+    fetch() is an old/deprecated method</button>
+</div>
+<div class="quiz-explain" id="q8e">
+  Mobile Chrome blocks POST requests to
+  Apps Script because of CORS redirects.
+  <code>fireGet()</code> uses a GET request
+  disguised as an image load, which
+  bypasses the problem. It's why every
+  single one of your apps uses it.
+</div>
+</div>
+</div>
+
+<!-- ======== PART 9: LOCALSTORAGE ======== -->
+<div class="section" id="part9">
+<h2>Part 9: localStorage Deep Dive</h2>
+<p class="section-sub">
+  Your app's memory &mdash; powerful,
+  essential, and surprisingly fragile.
+</p>
+
+<p>
+Part 6 introduced localStorage briefly.
+Now let's go deeper, because understanding
+localStorage is the difference between
+"my data disappeared" panic and knowing
+exactly what happened and how to fix it.
+</p>
+
+<h3>How localStorage Actually Works</h3>
+
+<p>
+Think of localStorage as a <strong>filing
+cabinet</strong> inside Chrome. Each website
+gets its own drawer. Your apps on
+<code>atdi1029-byte.github.io</code>
+all share one drawer (same domain),
+but each app uses different labeled
+folders (keys):
+</p>
+
+<pre><code>// Each app uses its own keys:
+'cadence_data'        // Cadence tasks
+'rc_chariots_data'    // Roman Chariots budget
+'zercher_data'        // Zercher workouts
+'bloom_data'          // Bloom portfolios
+'sora_data'           // Sora podcasts</code></pre>
+
+<p>
+The important thing: localStorage stores
+<strong>only text</strong>. No numbers, no
+objects, no arrays &mdash; just text strings.
+That's why you always see
+<code>JSON.stringify</code> (convert to text)
+and <code>JSON.parse</code> (convert back):
+</p>
+
+<pre><code>// SAVING: object → text → localStorage
+var myData = { tasks: ['Buy milk'] };
+var text = JSON.stringify(myData);
+localStorage.setItem('cadence_data', text);
+
+// LOADING: localStorage → text → object
+var text = localStorage.getItem('cadence_data');
+var myData = JSON.parse(text);
+
+// What if there's nothing saved yet?
+var text = localStorage.getItem('new_app_data');
+// text is null — nothing was saved before
+// JSON.parse(null) would crash!
+// So always check:
+var myData = text ? JSON.parse(text) : [];</code></pre>
+
+<h3>The Storage Limits</h3>
+
+<p>
+localStorage gives you about <strong>5MB</strong>
+per domain. That sounds small, but text
+compresses well &mdash; 5MB of JSON is a
+LOT of task lists and workout logs.
+Your apps are nowhere near this limit.
+</p>
+
+<p>
+However, there's no way to ask "how full
+am I?" without calculating it yourself:
+</p>
+
+<pre><code>// Check how much localStorage is used
+var total = 0;
+for (var key in localStorage) {
+  if (localStorage.hasOwnProperty(key)) {
+    total += localStorage[key].length;
+  }
+}
+console.log((total / 1024).toFixed(1) + ' KB used');</code></pre>
+
+<h3>Why localStorage Breaks
+(And How to Protect Against It)</h3>
+
+<p>
+localStorage is <strong>not permanent</strong>.
+It can disappear in several ways:
+</p>
+
+<ul>
+<li><strong>Clearing Chrome data</strong> &mdash;
+  this is the big one. If you go to
+  Android Settings → Apps → Chrome →
+  Clear Storage, ALL localStorage for
+  ALL websites is gone. Every app loses
+  its data simultaneously.</li>
+<li><strong>Incognito/Private mode</strong> &mdash;
+  localStorage exists during the session
+  but is wiped when you close the window</li>
+<li><strong>Storage pressure</strong> &mdash;
+  if the device runs very low on storage,
+  the browser may evict localStorage data</li>
+<li><strong>Corrupt data</strong> &mdash;
+  if the app crashes mid-save, the JSON
+  could be partially written, making
+  <code>JSON.parse</code> fail</li>
+</ul>
+
+<div class="callout callout-red">
+<div class="callout-title">The March 14 Incident</div>
+Running <code>pm clear com.android.chrome</code>
+via ADB wiped ALL localStorage for every
+app &mdash; Cadence, Bloom, Zercher,
+Roman Chariots, Sora, everything.
+That's why the rule in CLAUDE.md says
+<strong>"NEVER run pm clear"</strong> and
+why every app now has cloud sync as a backup.
+localStorage is the fast local copy;
+cloud sync is the safety net.
+</div>
+
+<h3>The try/catch Safety Pattern</h3>
+
+<p>
+Because <code>JSON.parse</code> can crash
+if the data is corrupt, good code wraps
+it in a safety net:
+</p>
+
+<pre><code>function loadData() {
+  try {
+    var text = localStorage.getItem('myapp_data');
+    if (text) {
+      data = JSON.parse(text);
+    }
+  } catch (e) {
+    // JSON was corrupt — start fresh
+    console.error('Failed to load:', e);
+    data = { tasks: [] };
+  }
+}</code></pre>
+
+<p>
+<code>try/catch</code> says "try this code,
+and if it crashes, run this other code
+instead of breaking the whole app."
+It's like having a safety net under
+a tightrope walker.
+</p>
+
+<h3>Key Versioning: The Reset Trick</h3>
+
+<p>
+Sometimes you need to wipe an app's data
+and start fresh &mdash; maybe the data
+structure changed. Instead of manually
+deleting, just change the key name:
+</p>
+
+<pre><code>// Old version
+localStorage.getItem('tasks_v1');
+
+// New version — old data is ignored,
+// app starts fresh
+localStorage.getItem('tasks_v2');</code></pre>
+
+<p>
+The old <code>tasks_v1</code> data still
+exists but the app never reads it again.
+This is why several of your apps have
+<code>_v2</code> in their key names.
+</p>
+
+<div class="quiz">
+<div class="quiz-q">
+  All your apps are on
+  atdi1029-byte.github.io.
+  If you clear Chrome data, what happens?
+</div>
+<div class="quiz-opts">
+  <button class="quiz-opt" data-answer="all"
+    onclick="checkQuiz(this,'all','q9e')">
+    ALL apps lose their local data at once
+    (same domain = same filing cabinet)
+    </button>
+  <button class="quiz-opt" data-answer="one"
+    onclick="checkQuiz(this,'all','q9e')">
+    Only the app you were using loses data
+    </button>
+  <button class="quiz-opt" data-answer="none"
+    onclick="checkQuiz(this,'all','q9e')">
+    Nothing happens — data is in the cloud
+    </button>
+</div>
+<div class="quiz-explain" id="q9e">
+  All apps share the same domain, so they
+  share the same localStorage drawer.
+  Clearing Chrome data empties the whole
+  drawer. The cloud sync backup is what
+  saves you &mdash; when the apps reload,
+  they pull data back from Google Sheets.
+</div>
+</div>
+</div>
+
+<!-- ======== PART 10: SERVICE WORKERS ======== -->
+<div class="section" id="part10">
+<h2>Part 10: Service Workers Explained</h2>
+<p class="section-sub">
+  What actually happens when the browser
+  caches your app &mdash; and why version
+  bumping matters so much.
+</p>
+
+<p>
+Every time Claude pushes an update, the
+mantra is "bump the service worker."
+But what is a service worker, and why does
+bumping a number make your phone show
+the new version? Let's demystify it.
+</p>
+
+<h3>What Is a Service Worker?</h3>
+
+<p>
+A service worker is a <strong>middleman
+that lives between your app and the
+internet</strong>. When your phone requests
+a file (like <code>index.html</code>),
+the service worker intercepts the request
+and decides: "Do I already have this cached,
+or should I fetch a fresh copy?"
+</p>
+
+<div class="diagram">
+<svg viewBox="0 0 700 180" width="700">
+  <defs>
+    <marker id="arr3" viewBox="0 0 10 10"
+      refX="9" refY="5" markerWidth="6"
+      markerHeight="6"
+      orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z"
+        fill="#30363d"/>
+    </marker>
+  </defs>
+  <!-- App -->
+  <rect x="20" y="40" width="130" height="80"
+    rx="10" fill="rgba(88,166,255,0.1)"
+    stroke="#58a6ff" stroke-width="1.5"/>
+  <text x="85" y="70" text-anchor="middle"
+    font-family="Inter" font-size="13"
+    font-weight="600" fill="#58a6ff">
+    Your App</text>
+  <text x="85" y="90" text-anchor="middle"
+    font-family="Inter" font-size="11"
+    fill="#8b949e">Requests files</text>
+  <!-- Arrow -->
+  <path d="M155 80 L215 80"
+    stroke="#30363d" stroke-width="1.5"
+    marker-end="url(#arr3)"/>
+  <!-- SW -->
+  <rect x="220" y="20" width="180" height="120"
+    rx="10" fill="rgba(188,140,255,0.1)"
+    stroke="#bc8cff" stroke-width="1.5"/>
+  <text x="310" y="50" text-anchor="middle"
+    font-family="Inter" font-size="13"
+    font-weight="600" fill="#bc8cff">
+    Service Worker</text>
+  <text x="310" y="72" text-anchor="middle"
+    font-family="Inter" font-size="11"
+    fill="#8b949e">"Do I have this</text>
+  <text x="310" y="88" text-anchor="middle"
+    font-family="Inter" font-size="11"
+    fill="#8b949e">cached already?"</text>
+  <text x="310" y="110" text-anchor="middle"
+    font-family="Inter" font-size="11"
+    fill="#3fb950">YES → serve cache</text>
+  <text x="310" y="126" text-anchor="middle"
+    font-family="Inter" font-size="11"
+    fill="#d4822a">NO → fetch from web</text>
+  <!-- Arrow to cache -->
+  <path d="M400 60 L460 60"
+    stroke="#3fb950" stroke-width="1.5"
+    marker-end="url(#arr3)"/>
+  <!-- Arrow to web -->
+  <path d="M400 110 L460 110"
+    stroke="#d4822a" stroke-width="1.5"
+    marker-end="url(#arr3)"/>
+  <!-- Cache -->
+  <rect x="465" y="30" width="100" height="50"
+    rx="8" fill="rgba(63,185,80,0.1)"
+    stroke="#3fb950" stroke-width="1"/>
+  <text x="515" y="60" text-anchor="middle"
+    font-family="Inter" font-size="12"
+    fill="#3fb950">Cache</text>
+  <!-- Web -->
+  <rect x="465" y="90" width="100" height="50"
+    rx="8" fill="rgba(212,130,42,0.1)"
+    stroke="#d4822a" stroke-width="1"/>
+  <text x="515" y="120" text-anchor="middle"
+    font-family="Inter" font-size="12"
+    fill="#d4822a">GitHub Pages</text>
+</svg>
+<p class="diagram-caption">
+  The service worker intercepts requests
+  and decides: serve from cache or fetch
+  fresh from the internet?
+</p>
+</div>
+
+<p>
+This is why your apps work offline.
+The first time you visit, the service
+worker downloads everything and caches it.
+After that, even without internet,
+the cached files load instantly.
+</p>
+
+<h3>The Version Number: How Refresh Works</h3>
+
+<p>
+Here's the critical piece. Your service
+worker file has a version number:
+</p>
+
+<pre><code>// service-worker.js
+const CACHE = 'bloom-v38';
+
+// List of files to cache
+const FILES = [
+  '/',
+  '/index.html',
+  '/manifest.json',
+  '/icon-192.png'
+];</code></pre>
+
+<p>
+When the browser checks for updates, it
+compares the new service worker file to
+the cached one. If <strong>even one byte
+is different</strong>, the browser installs
+the new version. That's why changing
+<code>v38</code> to <code>v39</code> triggers
+a refresh &mdash; it's a different file now.
+</p>
+
+<h3>The Update Lifecycle</h3>
+
+<ol>
+<li><strong>You push code</strong> &mdash;
+  GitHub Pages serves new files</li>
+<li><strong>Browser checks</strong> &mdash;
+  next time the app opens, Chrome checks
+  if service-worker.js changed</li>
+<li><strong>New version detected</strong> &mdash;
+  Chrome downloads and installs it
+  in the background</li>
+<li><strong>Old version still running</strong>
+  &mdash; the new SW waits until all tabs
+  are closed</li>
+<li><strong>Next visit</strong> &mdash;
+  the new SW activates, deletes old cache,
+  caches new files</li>
+</ol>
+
+<p>
+Step 4 is why changes don't always show
+up immediately. The old service worker
+is still "in charge" until the app is
+fully closed and reopened.
+</p>
+
+<h3>Why Cachebusting Exists</h3>
+
+<p>
+Waiting for the natural update cycle is
+too slow when you're actively developing.
+That's why Claude runs ADB cachebust
+commands:
+</p>
+
+<pre><code>adb shell "am start -a android.intent.action.VIEW
+  -d 'https://atdi1029-byte.github.io/
+  bloom-portfolios/?cachebust=1710847200'"</code></pre>
+
+<p>
+The <code>?cachebust=...</code> parameter
+tricks Chrome into treating it as a new URL,
+which forces a fresh load instead of
+serving from cache. The actual number
+is just a timestamp &mdash; it doesn't
+matter what it is, just that it's different
+each time.
+</p>
+
+<h3>What Happens When You
+Forget to Bump</h3>
+
+<p>
+If you push new code but don't change
+the version number in
+<code>service-worker.js</code>:
+</p>
+
+<ol>
+<li>Chrome checks service-worker.js</li>
+<li>File is identical to cached version
+  (same version number)</li>
+<li>Chrome thinks: "Nothing changed"</li>
+<li>Keeps serving old cached files</li>
+<li>You see the old version on your phone</li>
+<li>You wonder "why didn't it update?"</li>
+</ol>
+
+<p>
+That's literally the entire reason
+"ALWAYS bump service worker version"
+is in the CLAUDE.md rules.
+It's the single most common cause of
+"my changes aren't showing up."
+</p>
+
+<div class="callout callout-green">
+<div class="callout-title">Version Numbers at a Glance</div>
+<strong>Bloom:</strong> v38 &nbsp;
+<strong>Zercher:</strong> v170 &nbsp;
+<strong>Cadence:</strong> v156 &nbsp;
+<strong>Sora:</strong> v44 &nbsp;
+<strong>Roman Chariots:</strong> v59 &nbsp;
+<strong>SPX:</strong> v66<br>
+Zercher has the most versions because it
+gets updated most frequently. These numbers
+go up by 1 every time Claude pushes changes.
+</div>
+
+<div class="quiz">
+<div class="quiz-q">
+  You push a new feature to Cadence.
+  You bump the service worker to v157.
+  You open the app on your phone but
+  see the old version. Why?
+</div>
+<div class="quiz-opts">
+  <button class="quiz-opt" data-answer="wait"
+    onclick="checkQuiz(this,'wait','q10e')">
+    The old service worker is still active
+    — need to fully close and reopen,
+    or cachebust via ADB</button>
+  <button class="quiz-opt" data-answer="broke"
+    onclick="checkQuiz(this,'wait','q10e')">
+    The service worker is broken</button>
+  <button class="quiz-opt" data-answer="gh"
+    onclick="checkQuiz(this,'wait','q10e')">
+    GitHub Pages hasn't deployed yet</button>
+</div>
+<div class="quiz-explain" id="q10e">
+  The old service worker is still in charge.
+  It won't let go until you fully close the
+  app and reopen it. Cachebusting via ADB
+  forces an immediate refresh, which is
+  why Claude runs the ADB command right
+  after pushing.
+  (GitHub Pages deploys usually take
+  under a minute, so that's rarely
+  the issue.)
+</div>
+</div>
+</div>
+
+<!-- ======== PART 11: CONSOLE ======== -->
+<div class="section" id="part11">
+<h2>Part 11: The Developer Console</h2>
 <p class="section-sub">
   Every browser has a secret panel
   that shows you what's happening
@@ -1790,9 +2556,9 @@ fix it immediately.
 </div>
 </div>
 
-<!-- ======== PART 9: COMMON BUGS ======== -->
-<div class="section" id="part9">
-<h2>Part 9: Common Bugs Decoded</h2>
+<!-- ======== PART 12: COMMON BUGS ======== -->
+<div class="section" id="part12">
+<h2>Part 12: Common Bugs Decoded</h2>
 <p class="section-sub">
   What error messages actually mean
   in plain English.
@@ -1867,9 +2633,9 @@ fix it immediately.
 </div>
 </div>
 
-<!-- ======== PART 10: CHEAT SHEET ======== -->
-<div class="section" id="part10">
-<h2>Part 10: Cheat Sheet</h2>
+<!-- ======== PART 13: CHEAT SHEET ======== -->
+<div class="section" id="part13">
+<h2>Part 13: Cheat Sheet</h2>
 <p class="section-sub">
   Quick reference for everything above.
 </p>
@@ -1955,65 +2721,6 @@ service-worker.js (offline cache, version = freshness)</code></pre>
 
 <script>
 // Progress bar
-window.addEventListener('scroll', function() {
-  var h = document.documentElement;
-  var pct = (h.scrollTop /
-    (h.scrollHeight - h.clientHeight)) * 100;
-  document.getElementById('progressBar')
-    .style.width = pct + '%';
-});
-
-// Active nav link
-var sections = document.querySelectorAll('.section');
-var navLinks = document.querySelectorAll('.nav-links a');
-window.addEventListener('scroll', function() {
-  var current = '';
-  sections.forEach(function(s) {
-    if (window.scrollY >= s.offsetTop - 100) {
-      current = s.id;
-    }
-  });
-  navLinks.forEach(function(a) {
-    a.classList.toggle('active',
-      a.getAttribute('href') === '#' + current);
-  });
-});
-
-// Quiz handler
-function checkQuiz(btn, correct, explainId) {
-  var parent = btn.closest('.quiz');
-  var opts = parent.querySelectorAll('.quiz-opt');
-  var already = false;
-  opts.forEach(function(o) {
-    if (o.classList.contains('correct') ||
-        o.classList.contains('wrong'))
-      already = true;
-  });
-  if (already) return;
-  opts.forEach(function(o) {
-    if (o.dataset.answer === correct)
-      o.classList.add('correct');
-    else if (o === btn)
-      o.classList.add('wrong');
-  });
-  var ex = document.getElementById(explainId);
-  if (ex) ex.style.display = 'block';
-}
-
-// Collapse toggle
-function toggleCollapse(btn) {
-  btn.classList.toggle('open');
-  var body = btn.nextElementSibling;
-  body.classList.toggle('open');
-}
-</script>
-
-<!-- Bookmark system -->
-<script>var BM_KEY = 'bm_code_101';</script>
-<script src="../book.js?v=3"></script>
-
-</body>
-</html>
 window.addEventListener('scroll', function() {
   var h = document.documentElement;
   var pct = (h.scrollTop /
