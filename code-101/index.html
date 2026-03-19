@@ -1,0 +1,2075 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"
+  content="width=device-width, initial-scale=1.0">
+<title>Code 101 for Vibe Coders</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Playfair+Display:wght@400;700&display=swap');
+
+:root {
+  --bg: #0d1117;
+  --bg2: #161b22;
+  --bg3: #1c2333;
+  --text: #e6edf3;
+  --muted: #8b949e;
+  --accent: #58a6ff;
+  --accent2: #79c0ff;
+  --orange: #d4822a;
+  --green: #3fb950;
+  --red: #f85149;
+  --purple: #bc8cff;
+  --border: #30363d;
+  --code-bg: #0d1117;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Inter', -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.75;
+  overflow-x: hidden;
+}
+
+/* ====== PROGRESS BAR ====== */
+.progress-bar {
+  position: fixed;
+  top: 0; left: 0;
+  height: 3px;
+  background: linear-gradient(90deg,
+    var(--accent), var(--accent2));
+  z-index: 1000;
+  transition: width 0.2s;
+}
+
+/* ====== NAV ====== */
+.nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  background: rgba(13,17,23,0.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  z-index: 999;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  height: 52px;
+  gap: 24px;
+}
+.nav-title {
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--accent);
+  white-space: nowrap;
+}
+.nav-links {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.nav-links::-webkit-scrollbar { display: none; }
+.nav-links a {
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 12px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  white-space: nowrap;
+  transition: all 0.2s;
+}
+.nav-links a:hover,
+.nav-links a.active {
+  color: var(--text);
+  background: var(--bg3);
+}
+
+/* ====== MAIN CONTENT ====== */
+.content {
+  max-width: 780px;
+  margin: 0 auto;
+  padding: 80px 28px 100px;
+}
+
+/* ====== COVER ====== */
+.cover {
+  text-align: center;
+  padding: 80px 0 70px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 60px;
+}
+.cover h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: 42px;
+  font-weight: 700;
+  line-height: 1.2;
+  margin-bottom: 16px;
+  background: linear-gradient(135deg,
+    var(--accent), var(--accent2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.cover .sub {
+  font-size: 18px;
+  color: var(--muted);
+  font-weight: 300;
+  margin-bottom: 32px;
+  line-height: 1.6;
+}
+.cover .meta {
+  font-size: 13px;
+  color: var(--muted);
+  opacity: 0.7;
+}
+
+/* ====== TABLE OF CONTENTS ====== */
+.toc {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 28px 32px;
+  margin-bottom: 60px;
+}
+.toc-title {
+  font-weight: 600;
+  font-size: 16px;
+  margin-bottom: 16px;
+  color: var(--accent);
+}
+.toc ol {
+  list-style: none;
+  counter-reset: toc;
+}
+.toc li {
+  counter-increment: toc;
+  margin-bottom: 8px;
+}
+.toc li::before {
+  content: counter(toc) ".";
+  color: var(--accent);
+  font-weight: 600;
+  margin-right: 10px;
+  font-size: 14px;
+}
+.toc a {
+  color: var(--text);
+  text-decoration: none;
+  font-size: 15px;
+  transition: color 0.2s;
+}
+.toc a:hover { color: var(--accent); }
+.toc .toc-desc {
+  color: var(--muted);
+  font-size: 13px;
+  margin-left: 24px;
+  display: block;
+}
+
+/* ====== SECTIONS ====== */
+.section {
+  margin-bottom: 70px;
+  padding-top: 20px;
+}
+.section h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 30px;
+  font-weight: 700;
+  color: var(--accent);
+  margin-bottom: 8px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--border);
+}
+.section .section-sub {
+  color: var(--muted);
+  font-size: 15px;
+  margin-bottom: 28px;
+}
+h3 {
+  font-size: 20px;
+  font-weight: 600;
+  margin: 36px 0 14px;
+  color: var(--text);
+}
+h4 {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 24px 0 10px;
+  color: var(--accent2);
+}
+p { margin-bottom: 16px; font-size: 15.5px; }
+ul, ol {
+  margin: 12px 0 18px 24px;
+  font-size: 15.5px;
+}
+li { margin-bottom: 8px; }
+strong { color: #fff; font-weight: 600; }
+
+/* ====== CALLOUTS ====== */
+.callout {
+  background: var(--bg2);
+  border-left: 4px solid var(--accent);
+  padding: 18px 22px;
+  margin: 22px 0;
+  border-radius: 0 10px 10px 0;
+  font-size: 14.5px;
+}
+.callout-title {
+  font-weight: 600;
+  color: var(--accent);
+  margin-bottom: 6px;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.callout-green { border-left-color: var(--green); }
+.callout-green .callout-title { color: var(--green); }
+.callout-orange { border-left-color: var(--orange); }
+.callout-orange .callout-title { color: var(--orange); }
+.callout-purple { border-left-color: var(--purple); }
+.callout-purple .callout-title { color: var(--purple); }
+.callout-red { border-left-color: var(--red); }
+.callout-red .callout-title { color: var(--red); }
+
+/* ====== CODE ====== */
+code {
+  font-family: 'JetBrains Mono', monospace;
+  background: var(--bg3);
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-size: 13.5px;
+  color: var(--accent2);
+}
+pre {
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  padding: 20px 24px;
+  border-radius: 10px;
+  overflow-x: auto;
+  margin: 16px 0 22px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--text);
+}
+pre code {
+  background: none;
+  padding: 0;
+  font-size: inherit;
+  color: inherit;
+}
+
+/* ====== COMPARE BOXES ====== */
+.compare {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin: 20px 0;
+}
+.compare-box {
+  padding: 16px 18px;
+  border-radius: 10px;
+  font-size: 14px;
+  line-height: 1.6;
+}
+.compare-bad {
+  background: rgba(248,81,73,0.08);
+  border: 1px solid rgba(248,81,73,0.25);
+}
+.compare-good {
+  background: rgba(63,185,80,0.08);
+  border: 1px solid rgba(63,185,80,0.25);
+}
+.compare-label {
+  font-weight: 600;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+}
+.compare-bad .compare-label { color: var(--red); }
+.compare-good .compare-label { color: var(--green); }
+
+/* ====== DIAGRAMS ====== */
+.diagram {
+  text-align: center;
+  margin: 28px 0;
+  padding: 24px;
+  background: var(--bg2);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  overflow-x: auto;
+}
+.diagram svg { max-width: 100%; height: auto; }
+.diagram-caption {
+  font-size: 13px;
+  color: var(--muted);
+  margin-top: 12px;
+  font-style: italic;
+}
+
+/* ====== QUIZ ====== */
+.quiz {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 24px;
+  margin: 28px 0;
+}
+.quiz-q {
+  font-weight: 600;
+  margin-bottom: 14px;
+  font-size: 15px;
+}
+.quiz-opts { display: flex; flex-direction: column;
+  gap: 8px; }
+.quiz-opt {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  padding: 12px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s;
+  text-align: left;
+  color: var(--text);
+  font-family: inherit;
+  width: 100%;
+}
+.quiz-opt:hover {
+  border-color: var(--accent);
+  background: rgba(88,166,255,0.06);
+}
+.quiz-opt.correct {
+  border-color: var(--green);
+  background: rgba(63,185,80,0.12);
+  color: var(--green);
+}
+.quiz-opt.wrong {
+  border-color: var(--red);
+  background: rgba(248,81,73,0.08);
+  color: var(--red);
+}
+.quiz-explain {
+  margin-top: 14px;
+  font-size: 14px;
+  color: var(--muted);
+  display: none;
+  padding: 12px;
+  background: rgba(88,166,255,0.05);
+  border-radius: 8px;
+  border: 1px solid rgba(88,166,255,0.15);
+}
+
+/* ====== INTERACTIVE DEMO ====== */
+.demo {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 24px;
+  margin: 28px 0;
+}
+.demo-title {
+  font-weight: 600;
+  color: var(--accent);
+  margin-bottom: 12px;
+  font-size: 14px;
+}
+.demo-preview {
+  background: #fff;
+  border-radius: 8px;
+  padding: 20px;
+  margin: 12px 0;
+  color: #333;
+  min-height: 60px;
+}
+.demo-controls {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+.demo-btn {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  font-family: inherit;
+  transition: all 0.2s;
+}
+.demo-btn:hover {
+  border-color: var(--accent);
+  background: rgba(88,166,255,0.08);
+}
+.demo-btn.active {
+  border-color: var(--accent);
+  background: rgba(88,166,255,0.15);
+  color: var(--accent);
+}
+
+/* ====== COLLAPSIBLE ====== */
+.collapse-toggle {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 14px 20px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 500;
+  width: 100%;
+  text-align: left;
+  margin: 12px 0 0;
+  transition: all 0.2s;
+  font-family: inherit;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.collapse-toggle:hover {
+  border-color: var(--accent);
+}
+.collapse-toggle::after {
+  content: '+';
+  font-size: 18px;
+  color: var(--accent);
+  transition: transform 0.2s;
+}
+.collapse-toggle.open::after {
+  content: '-';
+}
+.collapse-body {
+  display: none;
+  padding: 16px 20px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-top: none;
+  border-radius: 0 0 10px 10px;
+  margin-bottom: 12px;
+}
+.collapse-body.open { display: block; }
+
+/* ====== ANNOTATION ====== */
+.annotated-code {
+  position: relative;
+}
+.code-annotation {
+  position: absolute;
+  right: -10px;
+  background: var(--accent);
+  color: var(--bg);
+  font-size: 11px;
+  font-weight: 700;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: help;
+  font-family: 'Inter', sans-serif;
+}
+.annotation-list {
+  margin: 12px 0;
+  font-size: 14px;
+}
+.annotation-list li {
+  margin-bottom: 8px;
+}
+.annotation-num {
+  display: inline-block;
+  background: var(--accent);
+  color: var(--bg);
+  font-size: 11px;
+  font-weight: 700;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  text-align: center;
+  line-height: 20px;
+  margin-right: 8px;
+}
+
+/* ====== BOOKMARK SYSTEM ====== */
+.bookmark-bar {
+  position: sticky;
+  top: 52px;
+  z-index: 998;
+  background: var(--bg2);
+  color: var(--text);
+  padding: 0.5rem 1rem;
+  display: none;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  border-bottom: 1px solid var(--border);
+}
+.bookmark-bar:hover { background: var(--bg3); }
+.bookmark-bar .bm-label {
+  flex: 1; color: var(--text);
+}
+.bookmark-bar .bm-clear {
+  background: none;
+  border: 1px solid rgba(255,255,255,0.25);
+  color: var(--text);
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  margin-left: 0.75rem;
+  font-family: inherit;
+}
+.bookmark-bar .bm-clear:hover {
+  background: rgba(255,255,255,0.1);
+}
+.bm-btn {
+  display: inline-block;
+  cursor: pointer;
+  font-size: 0.75rem;
+  opacity: 0;
+  margin-left: 0.5rem;
+  vertical-align: middle;
+  transition: opacity 0.2s, transform 0.2s;
+  user-select: none;
+}
+h2:hover .bm-btn, h3:hover .bm-btn,
+h4:hover .bm-btn { opacity: 0.5; }
+p:hover > .bm-p { opacity: 0.5; }
+.bm-btn:hover {
+  opacity: 0.8 !important;
+  transform: scale(1.2);
+}
+.bm-btn.active {
+  opacity: 1 !important;
+  color: var(--accent);
+}
+.bm-p {
+  position: absolute;
+  left: -1.8rem;
+  top: 0.15em;
+  margin-left: 0;
+  font-size: 0.65rem;
+}
+p { position: relative; }
+li > strong > .bm-btn {
+  position: absolute;
+  left: -2rem;
+  top: 0.15em;
+  margin-left: 0;
+}
+li:has(> strong > .bm-btn) {
+  position: relative;
+}
+li:hover > strong > .bm-btn { opacity: 0.5; }
+.bm-toast {
+  position: fixed;
+  bottom: 1.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--bg2);
+  color: var(--text);
+  padding: 0.5rem 1.25rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  z-index: 1100;
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+  border: 1px solid var(--border);
+  font-family: 'Inter', sans-serif;
+}
+.bm-toast.show { opacity: 1; }
+
+/* ====== MOBILE ====== */
+@media (max-width: 600px) {
+  .cover h1 { font-size: 28px; }
+  .cover .sub { font-size: 15px; }
+  .content { padding: 70px 18px 60px; }
+  .section h2 { font-size: 24px; }
+  h3 { font-size: 18px; }
+  .nav-title { display: none; }
+  .compare { grid-template-columns: 1fr; }
+  .bookmark-bar { top: 0; }
+  .bm-p {
+    position: static;
+    float: right;
+    margin: 0;
+  }
+  li > strong > .bm-btn {
+    position: static;
+    margin-left: 0.3rem;
+  }
+}
+</style>
+</head>
+<body>
+
+<!-- Bookmark Bar -->
+<div class="bookmark-bar" id="bookmarkBar"
+  onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel">
+    Resume reading</span>
+  <button class="bm-clear"
+    onclick="event.stopPropagation();clearBookmark()">
+    Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+
+<!-- Progress Bar -->
+<div class="progress-bar" id="progressBar"></div>
+
+<!-- Navigation -->
+<nav class="nav">
+  <span class="nav-title">Code 101</span>
+  <div class="nav-links">
+    <a href="#part1">Big Picture</a>
+    <a href="#part2">HTML</a>
+    <a href="#part3">CSS</a>
+    <a href="#part4">JavaScript</a>
+    <a href="#part5">Reading Code</a>
+    <a href="#part6">Patterns</a>
+    <a href="#part7">Architecture</a>
+    <a href="#part8">Console</a>
+    <a href="#part9">Bugs</a>
+    <a href="#part10">Cheat Sheet</a>
+  </div>
+</nav>
+
+<!-- Main Content -->
+<div class="content">
+
+<!-- ============ COVER ============ -->
+<div class="cover">
+  <h1>Code 101<br>for Vibe Coders</h1>
+  <p class="sub">
+    Learn to read and understand the code
+    Claude writes for you.<br>
+    Every example is from YOUR apps.
+  </p>
+  <p class="meta">
+    A personalized coding guide
+    by Alex Barnett &amp; Claude
+  </p>
+</div>
+
+<!-- ============ TOC ============ -->
+<div class="toc">
+  <div class="toc-title">Table of Contents</div>
+  <ol>
+    <li>
+      <a href="#part1">The Big Picture</a>
+      <span class="toc-desc">
+        HTML, CSS, and JavaScript &mdash;
+        what each one does</span>
+    </li>
+    <li>
+      <a href="#part2">HTML: The Skeleton</a>
+      <span class="toc-desc">
+        Tags, nesting, and structure
+        from your real apps</span>
+    </li>
+    <li>
+      <a href="#part3">CSS: The Clothing</a>
+      <span class="toc-desc">
+        Making things look good &mdash;
+        colors, layout, themes</span>
+    </li>
+    <li>
+      <a href="#part4">JavaScript: The Brain</a>
+      <span class="toc-desc">
+        Variables, functions, events,
+        and making things happen</span>
+    </li>
+    <li>
+      <a href="#part5">Reading Code Like a Map</a>
+      <span class="toc-desc">
+        How to scan what Claude writes
+        without getting lost</span>
+    </li>
+    <li>
+      <a href="#part6">Patterns You Already Use</a>
+      <span class="toc-desc">
+        localStorage, cloud sync, fireGet,
+        and other recurring tricks</span>
+    </li>
+    <li>
+      <a href="#part7">Your App Architecture</a>
+      <span class="toc-desc">
+        How a single-file PWA works
+        from top to bottom</span>
+    </li>
+    <li>
+      <a href="#part8">The Developer Console</a>
+      <span class="toc-desc">
+        Your secret debugging weapon
+        in every browser</span>
+    </li>
+    <li>
+      <a href="#part9">Common Bugs Decoded</a>
+      <span class="toc-desc">
+        What error messages mean
+        and how to fix them</span>
+    </li>
+    <li>
+      <a href="#part10">Cheat Sheet</a>
+      <span class="toc-desc">
+        Quick reference for everything
+        in this guide</span>
+    </li>
+  </ol>
+</div>
+<!-- ======== PART 1: THE BIG PICTURE ======== -->
+<div class="section" id="part1">
+<h2>Part 1: The Big Picture</h2>
+<p class="section-sub">
+  Three languages work together to make
+  every web page and app you use.
+</p>
+
+<p>
+Every app Claude builds for you &mdash;
+Cadence, Bloom, Zercher, Roman Chariots,
+this guide you're reading right now &mdash;
+is made of exactly three things:
+</p>
+
+<div class="diagram">
+<svg viewBox="0 0 700 200" width="700">
+  <!-- HTML Box -->
+  <rect x="20" y="40" width="180" height="120"
+    rx="12" fill="none"
+    stroke="#f85149" stroke-width="2"/>
+  <text x="110" y="80" text-anchor="middle"
+    font-family="Inter" font-size="18"
+    font-weight="700" fill="#f85149">HTML</text>
+  <text x="110" y="105" text-anchor="middle"
+    font-family="Inter" font-size="13"
+    fill="#8b949e">The Skeleton</text>
+  <text x="110" y="125" text-anchor="middle"
+    font-family="Inter" font-size="12"
+    fill="#8b949e">Structure &amp; Content</text>
+  <text x="110" y="145" text-anchor="middle"
+    font-family="Inter" font-size="11"
+    fill="#58a6ff">"What's on the page"</text>
+  <!-- Arrow -->
+  <path d="M210 100 L250 100"
+    stroke="#30363d" stroke-width="2"
+    marker-end="url(#arrow)"/>
+  <!-- CSS Box -->
+  <rect x="260" y="40" width="180" height="120"
+    rx="12" fill="none"
+    stroke="#bc8cff" stroke-width="2"/>
+  <text x="350" y="80" text-anchor="middle"
+    font-family="Inter" font-size="18"
+    font-weight="700" fill="#bc8cff">CSS</text>
+  <text x="350" y="105" text-anchor="middle"
+    font-family="Inter" font-size="13"
+    fill="#8b949e">The Clothing</text>
+  <text x="350" y="125" text-anchor="middle"
+    font-family="Inter" font-size="12"
+    fill="#8b949e">Colors &amp; Layout</text>
+  <text x="350" y="145" text-anchor="middle"
+    font-family="Inter" font-size="11"
+    fill="#58a6ff">"How it looks"</text>
+  <!-- Arrow -->
+  <path d="M450 100 L490 100"
+    stroke="#30363d" stroke-width="2"
+    marker-end="url(#arrow)"/>
+  <!-- JS Box -->
+  <rect x="500" y="40" width="180" height="120"
+    rx="12" fill="none"
+    stroke="#3fb950" stroke-width="2"/>
+  <text x="590" y="80" text-anchor="middle"
+    font-family="Inter" font-size="18"
+    font-weight="700" fill="#3fb950">JavaScript</text>
+  <text x="590" y="105" text-anchor="middle"
+    font-family="Inter" font-size="13"
+    fill="#8b949e">The Brain</text>
+  <text x="590" y="125" text-anchor="middle"
+    font-family="Inter" font-size="12"
+    fill="#8b949e">Logic &amp; Behavior</text>
+  <text x="590" y="145" text-anchor="middle"
+    font-family="Inter" font-size="11"
+    fill="#58a6ff">"What it does"</text>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10"
+      refX="9" refY="5" markerWidth="6"
+      markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z"
+        fill="#30363d"/>
+    </marker>
+  </defs>
+</svg>
+<p class="diagram-caption">
+  Every web app is made of these three pieces
+</p>
+</div>
+
+<p>
+Think of building a house.
+<strong>HTML</strong> is the framing &mdash;
+the walls, the rooms, where the doors go.
+<strong>CSS</strong> is the paint, wallpaper,
+and furniture &mdash; it makes everything
+look good.
+<strong>JavaScript</strong> is the electricity
+and plumbing &mdash; it makes things
+actually work when you flip a switch.
+</p>
+
+<h3>A Real Example: Your Cadence App</h3>
+
+<p>
+When you open Cadence on your phone,
+the browser reads one big file:
+<code>index.html</code>.
+Inside that file are all three languages
+stacked on top of each other:
+</p>
+
+<pre><code>&lt;!DOCTYPE html&gt;        &lt;!-- "This is a web page" --&gt;
+&lt;html&gt;
+&lt;head&gt;
+  &lt;style&gt;
+    /* CSS goes here - colors, fonts, layout */
+    --accent: #6ecfcf;     /* Cadence's teal */
+    --orange: #e8944c;     /* The orange accent */
+  &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;!-- HTML goes here - buttons, text, cards --&gt;
+  &lt;h1&gt;Cadence&lt;/h1&gt;
+  &lt;div class="task-card"&gt;Buy groceries&lt;/div&gt;
+
+  &lt;script&gt;
+    // JavaScript goes here - logic, saving data
+    function addTask(name) {
+      data.tasks.push({ name: name });
+      saveData();
+    }
+  &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+
+<div class="callout callout-green">
+<div class="callout-title">Key Insight</div>
+All your apps are <strong>single-file apps</strong>.
+HTML, CSS, and JavaScript all live in one
+<code>index.html</code> file. That's why Claude
+can build entire apps in one shot &mdash;
+everything is in one place.
+</div>
+
+<h3>Why This Matters for Vibe Coding</h3>
+
+<p>
+You don't need to write code. But understanding
+what the three pieces do helps you:
+</p>
+
+<ul>
+<li><strong>Describe what you want better</strong> &mdash;
+  "Change the CSS" vs "make the button bigger"
+  both work, but knowing which is which
+  helps you be precise</li>
+<li><strong>Understand what Claude changed</strong> &mdash;
+  when Claude says "I updated the event handler,"
+  you'll know that's JavaScript, not styling</li>
+<li><strong>Debug faster</strong> &mdash;
+  if something looks wrong, it's probably CSS.
+  If something doesn't work, it's probably
+  JavaScript. If something is missing,
+  it's probably HTML.</li>
+</ul>
+
+<div class="quiz">
+<div class="quiz-q">
+  Quick check: Your Zercher app's plate calculator
+  shows the wrong number of plates.
+  Which language is the bug probably in?
+</div>
+<div class="quiz-opts">
+  <button class="quiz-opt" data-answer="js"
+    onclick="checkQuiz(this,'js','q1e')">
+    JavaScript (the brain)</button>
+  <button class="quiz-opt" data-answer="css"
+    onclick="checkQuiz(this,'js','q1e')">
+    CSS (the clothing)</button>
+  <button class="quiz-opt" data-answer="html"
+    onclick="checkQuiz(this,'js','q1e')">
+    HTML (the skeleton)</button>
+</div>
+<div class="quiz-explain" id="q1e">
+  Correct! The plate calculator is
+  <strong>logic</strong> &mdash; it calculates
+  numbers. That's always JavaScript.
+  CSS only affects how things look,
+  and HTML only affects what's on the page.
+</div>
+</div>
+</div>
+
+<!-- ======== PART 2: HTML ======== -->
+<div class="section" id="part2">
+<h2>Part 2: HTML &mdash; The Skeleton</h2>
+<p class="section-sub">
+  Tags are containers. That's really the
+  whole idea.
+</p>
+
+<p>
+HTML is the simplest of the three languages.
+Everything in HTML is a <strong>tag</strong> &mdash;
+a container that wraps around content.
+Tags have an opening and closing:
+</p>
+
+<pre><code>&lt;h1&gt;This is a heading&lt;/h1&gt;
+&lt;p&gt;This is a paragraph.&lt;/p&gt;
+&lt;button&gt;Click me&lt;/button&gt;</code></pre>
+
+<p>
+That's it. Tags wrap content.
+The tag name tells the browser what
+kind of content it is.
+Here are the ones you'll see most often:
+</p>
+
+<h3>The Tags You'll See Everywhere</h3>
+
+<ul>
+<li><strong><code>&lt;div&gt;</code></strong> &mdash;
+  a generic box. Like a cardboard box &mdash;
+  it can hold anything.
+  Most of your apps are built from divs.</li>
+<li><strong><code>&lt;p&gt;</code></strong> &mdash;
+  a paragraph of text</li>
+<li><strong><code>&lt;h1&gt;</code> through
+  <code>&lt;h4&gt;</code></strong> &mdash;
+  headings, from biggest to smallest</li>
+<li><strong><code>&lt;button&gt;</code></strong> &mdash;
+  a clickable button</li>
+<li><strong><code>&lt;input&gt;</code></strong> &mdash;
+  a text field the user can type in</li>
+<li><strong><code>&lt;img&gt;</code></strong> &mdash;
+  an image</li>
+<li><strong><code>&lt;a&gt;</code></strong> &mdash;
+  a link (the "a" stands for "anchor")</li>
+<li><strong><code>&lt;span&gt;</code></strong> &mdash;
+  a small inline container, like
+  wrapping a word in highlighter</li>
+</ul>
+
+<h3>Tags Inside Tags (Nesting)</h3>
+
+<p>
+Tags go inside other tags, like
+Russian nesting dolls. Here's a task card
+from Cadence:
+</p>
+
+<pre><code>&lt;div class="task-card"&gt;          &lt;!-- outer box --&gt;
+  &lt;div class="task-header"&gt;      &lt;!-- inner box --&gt;
+    &lt;span class="task-name"&gt;     &lt;!-- text wrapper --&gt;
+      Buy groceries
+    &lt;/span&gt;
+    &lt;button class="delete-btn"&gt;  &lt;!-- button --&gt;
+      X
+    &lt;/button&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</code></pre>
+
+<p>
+The indentation shows you what's inside what.
+Each level of indent means "this is inside
+the tag above me." Claude always indents
+code this way &mdash; it's how you read the
+structure at a glance.
+</p>
+
+<h3>Attributes: Extra Info on Tags</h3>
+
+<p>
+Tags can have <strong>attributes</strong> &mdash;
+extra info inside the opening tag.
+The two most important ones:
+</p>
+
+<ul>
+<li><strong><code>class</code></strong> &mdash;
+  gives the tag a name so CSS can style it.
+  Like a label on a box that says
+  "style me like a card"</li>
+<li><strong><code>id</code></strong> &mdash;
+  a unique name so JavaScript can find it.
+  Like a serial number &mdash; only
+  one element can have each id</li>
+</ul>
+
+<pre><code>&lt;!-- class = for styling (CSS) --&gt;
+&lt;div class="task-card"&gt;...&lt;/div&gt;
+
+&lt;!-- id = for targeting (JavaScript) --&gt;
+&lt;div id="splitterTotal"&gt;...&lt;/div&gt;
+
+&lt;!-- Both together --&gt;
+&lt;button class="demo-btn" id="saveBtn"&gt;
+  Save
+&lt;/button&gt;</code></pre>
+
+<div class="callout callout-orange">
+<div class="callout-title">Your Apps</div>
+When Claude writes something like
+<code>document.getElementById('toast')</code>,
+that's JavaScript reaching into the HTML
+to grab the element with
+<code>id="toast"</code>.
+That's the bridge between HTML and JavaScript.
+</div>
+
+<div class="quiz">
+<div class="quiz-q">
+  What does <code>&lt;div class="card"
+  id="main"&gt;</code> mean?
+</div>
+<div class="quiz-opts">
+  <button class="quiz-opt" data-answer="both"
+    onclick="checkQuiz(this,'both','q2e')">
+    A box styled as "card" that JavaScript
+    can find by "main"</button>
+  <button class="quiz-opt" data-answer="x"
+    onclick="checkQuiz(this,'both','q2e')">
+    A card that is the main page</button>
+  <button class="quiz-opt" data-answer="y"
+    onclick="checkQuiz(this,'both','q2e')">
+    Two separate elements</button>
+</div>
+<div class="quiz-explain" id="q2e">
+  It's one box (<code>div</code>) with a
+  styling label (<code>class="card"</code>)
+  and a unique ID
+  (<code>id="main"</code>)
+  so JavaScript can find it.
+</div>
+</div>
+</div>
+
+<!-- ======== PART 3: CSS ======== -->
+<div class="section" id="part3">
+<h2>Part 3: CSS &mdash; The Clothing</h2>
+<p class="section-sub">
+  CSS is how you tell the browser what
+  things should look like.
+</p>
+
+<p>
+CSS stands for "Cascading Style Sheets."
+Every visual detail you see &mdash;
+colors, spacing, fonts, rounded corners,
+animations &mdash; is CSS.
+The basic pattern is dead simple:
+</p>
+
+<pre><code>selector {
+  property: value;
+}</code></pre>
+
+<p>
+That's literally it. Pick what to style
+(the selector), then say what to change
+(property) and what to change it to (value).
+</p>
+
+<pre><code>/* Make all buttons blue with round corners */
+button {
+  background: #58a6ff;
+  border-radius: 8px;
+  color: white;
+  padding: 10px 20px;
+}
+
+/* Make anything with class "card" have a border */
+.card {
+  border: 1px solid #30363d;
+  border-radius: 12px;
+  padding: 16px;
+}</code></pre>
+
+<h3>Selectors: Pointing at Things</h3>
+
+<p>
+The selector is how CSS finds what to style.
+Three kinds cover 95% of what you'll see:
+</p>
+
+<ul>
+<li><strong><code>button</code></strong> &mdash;
+  tag name (styles ALL buttons)</li>
+<li><strong><code>.card</code></strong> &mdash;
+  dot + class name (styles everything
+  with <code>class="card"</code>)</li>
+<li><strong><code>#toast</code></strong> &mdash;
+  hash + id (styles the ONE element
+  with <code>id="toast"</code>)</li>
+</ul>
+
+<h3>CSS Variables: Your Apps' Theme System</h3>
+
+<p>
+This is one of the coolest patterns in your apps.
+Instead of writing the same color everywhere,
+you define it once and reference it by name:
+</p>
+
+<pre><code>/* Cadence defines its colors at the top */
+:root {
+  --accent: #6ecfcf;     /* teal */
+  --orange: #e8944c;     /* orange */
+  --bg: #0c1a22;         /* dark background */
+}
+
+/* Then uses them everywhere */
+button {
+  background: var(--accent);  /* uses the teal */
+  color: white;
+}
+.header {
+  background: var(--bg);      /* uses the dark bg */
+}</code></pre>
+
+<p>
+This is why changing a color in one place
+changes it everywhere. Claude just updates
+the variable at the top, and every element
+that references it automatically updates.
+</p>
+
+<div class="callout callout-purple">
+<div class="callout-title">Each App Has Its Own Palette</div>
+<strong>Cadence:</strong> teal (#6ecfcf) + orange (#e8944c)<br>
+<strong>Zercher:</strong> iron gray (#8090a8) + gold (#a0946a)<br>
+<strong>Bloom:</strong> rose (#e88b93) + sky (#5ba4e6)<br>
+<strong>Roman Chariots:</strong> gold (#d0a840) + sky (#52b4c8)<br>
+<strong>Sora Signal:</strong> neo-tokyo teal (#00e5c8)<br>
+All defined as CSS variables at the top
+of each app's file.
+</div>
+
+<h3>The Box Model: Spacing Things Out</h3>
+
+<p>
+Every element on screen is a box.
+CSS controls the spacing around and
+inside that box with three properties:
+</p>
+
+<div class="diagram">
+<svg viewBox="0 0 500 300" width="500">
+  <!-- Margin -->
+  <rect x="20" y="20" width="460" height="260"
+    rx="8" fill="rgba(248,81,73,0.08)"
+    stroke="#f85149" stroke-width="1"
+    stroke-dasharray="4"/>
+  <text x="40" y="45" font-family="Inter"
+    font-size="12" fill="#f85149">margin
+    (space outside)</text>
+  <!-- Border -->
+  <rect x="60" y="60" width="380" height="180"
+    rx="8" fill="rgba(188,140,255,0.08)"
+    stroke="#bc8cff" stroke-width="2"/>
+  <text x="80" y="85" font-family="Inter"
+    font-size="12" fill="#bc8cff">border</text>
+  <!-- Padding -->
+  <rect x="100" y="100" width="300" height="100"
+    rx="6" fill="rgba(63,185,80,0.08)"
+    stroke="#3fb950" stroke-width="1"
+    stroke-dasharray="4"/>
+  <text x="120" y="125" font-family="Inter"
+    font-size="12" fill="#3fb950">padding
+    (space inside)</text>
+  <!-- Content -->
+  <rect x="140" y="130" width="220" height="50"
+    rx="4" fill="rgba(88,166,255,0.15)"
+    stroke="#58a6ff" stroke-width="1"/>
+  <text x="250" y="160" text-anchor="middle"
+    font-family="Inter" font-size="14"
+    fill="#58a6ff">Your Content</text>
+</svg>
+<p class="diagram-caption">
+  Margin = outside space,
+  Padding = inside space,
+  Border = the edge
+</p>
+</div>
+
+<pre><code>.task-card {
+  margin: 12px 0;      /* 12px space above/below */
+  padding: 16px;       /* 16px space inside */
+  border: 1px solid #30363d;
+  border-radius: 12px; /* rounded corners */
+}</code></pre>
+</div>
+
+<!-- ======== PART 4: JAVASCRIPT ======== -->
+<div class="section" id="part4">
+<h2>Part 4: JavaScript &mdash; The Brain</h2>
+<p class="section-sub">
+  This is where things actually happen.
+</p>
+
+<p>
+JavaScript is the only one of the three
+that can <em>do</em> things. HTML and CSS
+just sit there. JavaScript responds to clicks,
+saves data, talks to servers, and changes
+what's on screen.
+</p>
+
+<h3>Variables: Storing Things</h3>
+
+<p>
+A variable is a labeled box that holds a value.
+Like putting a name tag on a shelf:
+</p>
+
+<pre><code>// Three ways to create variables
+var name = 'Alex';         // old style (still works)
+let score = 42;            // modern, can change later
+const MAX_TASKS = 100;     // constant, never changes
+
+// You can change let variables
+score = 43;                // fine!
+// But not const
+MAX_TASKS = 200;           // ERROR! Can't change const</code></pre>
+
+<div class="callout">
+<div class="callout-title">In Your Apps</div>
+Claude usually uses <code>const</code>
+for things that don't change
+(like settings and functions)
+and <code>let</code> for things that do
+(like counters and user data).
+<code>var</code> is the old way &mdash;
+you'll see it in older code.
+</div>
+
+<h3>Functions: Reusable Instructions</h3>
+
+<p>
+A function is a recipe you write once and
+use whenever you need it. Here's a real one
+from Cadence:
+</p>
+
+<pre><code>// This shows a popup message at the bottom
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('visible');
+  setTimeout(function() {
+    el.classList.remove('visible');
+  }, 3500);
+}</code></pre>
+
+<p>
+Breaking that down:
+</p>
+
+<ol>
+<li><code>function toast(msg)</code> &mdash;
+  defines a function named "toast" that
+  takes a message</li>
+<li><code>document.getElementById('toast')</code>
+  &mdash; finds the HTML element with
+  <code>id="toast"</code></li>
+<li><code>el.textContent = msg</code> &mdash;
+  puts the message text inside it</li>
+<li><code>el.classList.add('visible')</code> &mdash;
+  adds a CSS class to make it appear</li>
+<li><code>setTimeout(..., 3500)</code> &mdash;
+  waits 3.5 seconds, then hides it</li>
+</ol>
+
+<h3>Events: Responding to User Actions</h3>
+
+<p>
+JavaScript listens for things happening &mdash;
+clicks, typing, scrolling &mdash; and runs
+code in response. That's an "event":
+</p>
+
+<pre><code>// When this button is clicked, run addTask
+&lt;button onclick="addTask()"&gt;Add&lt;/button&gt;
+
+// Or attach the listener in JavaScript
+document.getElementById('saveBtn')
+  .addEventListener('click', function() {
+    saveData();
+    toast('Saved!');
+  });</code></pre>
+
+<h3>The DOM: JavaScript Talking to HTML</h3>
+
+<p>
+The DOM (Document Object Model) is how
+JavaScript sees the HTML. Think of it as
+JavaScript's map of the page.
+The main ways JavaScript interacts with HTML:
+</p>
+
+<pre><code>// FIND an element
+document.getElementById('myBtn')
+document.querySelector('.card')
+document.querySelectorAll('.task')
+
+// CHANGE what's inside it
+element.textContent = 'New text';
+element.innerHTML = '&lt;b&gt;Bold text&lt;/b&gt;';
+
+// CHANGE how it looks
+element.style.color = 'red';
+element.classList.add('hidden');
+element.classList.remove('hidden');
+element.classList.toggle('active');
+
+// CREATE new elements
+const div = document.createElement('div');
+div.textContent = 'I am new!';
+parent.appendChild(div);</code></pre>
+
+<div class="quiz">
+<div class="quiz-q">
+  What does
+  <code>document.getElementById('toast')
+  .classList.add('visible')</code> do?
+</div>
+<div class="quiz-opts">
+  <button class="quiz-opt" data-answer="a"
+    onclick="checkQuiz(this,'a','q4e')">
+    Finds the toast element and adds the
+    "visible" CSS class to it</button>
+  <button class="quiz-opt" data-answer="b"
+    onclick="checkQuiz(this,'a','q4e')">
+    Creates a new visible toast</button>
+  <button class="quiz-opt" data-answer="c"
+    onclick="checkQuiz(this,'a','q4e')">
+    Deletes the toast</button>
+</div>
+<div class="quiz-explain" id="q4e">
+  It finds the element with
+  <code>id="toast"</code> in the HTML,
+  then adds <code>class="visible"</code>
+  to it. The CSS for <code>.visible</code>
+  makes it appear on screen. This is
+  how most show/hide works in your apps.
+</div>
+</div>
+</div>
+
+<!-- ======== PART 5: READING CODE ======== -->
+<div class="section" id="part5">
+<h2>Part 5: Reading Code Like a Map</h2>
+<p class="section-sub">
+  You don't need to understand every line.
+  Here's how to skim effectively.
+</p>
+
+<p>
+When Claude writes code for you, you don't
+need to read every character. You need to
+<strong>scan for landmarks</strong> &mdash;
+like reading a map instead of memorizing
+every street name.
+</p>
+
+<h3>The Top-Down Scan</h3>
+
+<p>
+Every one of your apps follows the same
+structure. When you open the file,
+scan from top to bottom:
+</p>
+
+<ol>
+<li><strong>Lines 1-20:</strong> the
+  <code>&lt;head&gt;</code> section.
+  Meta tags, title, font imports.
+  Skip this &mdash; it's boilerplate.</li>
+<li><strong>CSS section</strong>
+  (<code>&lt;style&gt;</code> tag):
+  all the visual styling.
+  Look here if something
+  <em>looks wrong</em>.</li>
+<li><strong>HTML body:</strong>
+  the actual page content &mdash;
+  buttons, cards, inputs.
+  Look here if something is
+  <em>missing</em>.</li>
+<li><strong>JavaScript section</strong>
+  (<code>&lt;script&gt;</code> tag):
+  all the logic. Look here if something
+  <em>doesn't work</em>.</li>
+</ol>
+
+<h3>Reading Function Names</h3>
+
+<p>
+Claude names functions descriptively.
+You can usually guess what they do
+without reading the code inside:
+</p>
+
+<pre><code>// From your real apps:
+function loadData()        // loads saved data
+function saveData()        // saves data
+function toast(msg)        // shows a popup message
+function calcPlates(w)     // calculates plates
+function syncToCloud()     // syncs to the cloud
+function toggleRead()      // toggles read status
+function getDailyTip()     // gets the daily tip
+function renderTokens()    // displays the tokens
+function addTask(name)     // adds a new task
+function fireGet(url)      // fires a GET request</code></pre>
+
+<div class="callout callout-green">
+<div class="callout-title">Pro Tip</div>
+If you want to find where something happens
+in your code, search for the function name.
+If the delete button is broken, search for
+<code>delete</code> in the file.
+Claude can also do this for you &mdash;
+just say "find where the delete function is."
+</div>
+
+<h3>Comments: Claude's Notes to You</h3>
+
+<p>
+Comments are notes in the code that don't
+do anything &mdash; they're just explanations.
+They look different in each language:
+</p>
+
+<pre><code>&lt;!-- This is an HTML comment --&gt;
+
+/* This is a CSS comment */
+
+// This is a JavaScript comment
+/* This is also a JS comment */</code></pre>
+
+<p>
+Claude leaves comments to explain
+what sections do. They're your
+best friend when scanning code.
+</p>
+</div>
+
+<!-- ======== PART 6: PATTERNS ======== -->
+<div class="section" id="part6">
+<h2>Part 6: Patterns You Already Use</h2>
+<p class="section-sub">
+  These patterns appear in every one
+  of your apps.
+</p>
+
+<h3>localStorage: Your App's Memory</h3>
+
+<p>
+<code>localStorage</code> is how your apps
+remember things between visits.
+It's like a tiny filing cabinet built
+into your browser. Every app uses it:
+</p>
+
+<pre><code>// SAVE something
+localStorage.setItem('tasks',
+  JSON.stringify(myTasks));
+
+// LOAD it back
+const saved = localStorage.getItem('tasks');
+const myTasks = JSON.parse(saved);
+
+// DELETE it
+localStorage.removeItem('tasks');</code></pre>
+
+<p>
+<code>JSON.stringify</code> converts
+JavaScript data into a text string
+(because localStorage can only store text).
+<code>JSON.parse</code> converts it back.
+Think of it as packing and unpacking a box.
+</p>
+
+<div class="callout callout-red">
+<div class="callout-title">The Big Warning</div>
+localStorage lives in your browser.
+If you clear Chrome's data, it's gone forever.
+That's why every app has
+<strong>cloud sync</strong> &mdash;
+to back up your data to Google Sheets
+via Apps Script.
+</div>
+
+<h3>fireGet: The Mobile Fix</h3>
+
+<p>
+This is one of the most important patterns
+in your apps. Normally, sending data to a
+server uses <code>fetch()</code>.
+But on mobile, Apps Script redirects
+cause <code>fetch()</code> to silently fail.
+</p>
+
+<p>
+The fix? Create an invisible image that
+"loads" the URL. The browser makes the request
+to load the image, the server processes it,
+and it doesn't matter that the "image"
+isn't real:
+</p>
+
+<pre><code>function fireGet(url) {
+  const img = new Image();
+  img.src = url;  // browser hits this URL
+  // The server processes the request
+  // We don't care about the "image" response
+}</code></pre>
+
+<p>
+This is in Cadence, Bloom, Zercher, Crypto,
+SPX, Roman Chariots &mdash; every app that
+saves to the cloud uses this trick.
+</p>
+
+<h3>Cloud Sync: The Safety Net</h3>
+
+<p>
+Every app follows the same sync pattern:
+</p>
+
+<ol>
+<li><strong>Auto-push:</strong> after every change,
+  wait 2 seconds then save to cloud</li>
+<li><strong>Auto-pull on load:</strong> when the app
+  opens, check the cloud for newer data</li>
+<li><strong>Auto-pull on resume:</strong> when you
+  switch back to the app, check again</li>
+<li><strong>Empty data guard:</strong> never push
+  empty data to the cloud (prevents
+  accidentally wiping your data)</li>
+</ol>
+</div>
+
+<!-- ======== PART 7: ARCHITECTURE ======== -->
+<div class="section" id="part7">
+<h2>Part 7: Your App Architecture</h2>
+<p class="section-sub">
+  How all the pieces fit together.
+</p>
+
+<div class="diagram">
+<svg viewBox="0 0 700 350" width="700">
+  <!-- Phone -->
+  <rect x="20" y="20" width="200" height="310"
+    rx="20" fill="none"
+    stroke="#8b949e" stroke-width="2"/>
+  <text x="120" y="55" text-anchor="middle"
+    font-family="Inter" font-size="14"
+    font-weight="600" fill="#e6edf3">Your Phone</text>
+  <!-- Browser -->
+  <rect x="40" y="70" width="160" height="80"
+    rx="8" fill="rgba(88,166,255,0.1)"
+    stroke="#58a6ff" stroke-width="1"/>
+  <text x="120" y="95" text-anchor="middle"
+    font-family="Inter" font-size="12"
+    fill="#58a6ff">Chrome Browser</text>
+  <text x="120" y="115" text-anchor="middle"
+    font-family="Inter" font-size="11"
+    fill="#8b949e">index.html</text>
+  <text x="120" y="135" text-anchor="middle"
+    font-family="Inter" font-size="10"
+    fill="#8b949e">(HTML + CSS + JS)</text>
+  <!-- localStorage -->
+  <rect x="40" y="170" width="160" height="50"
+    rx="8" fill="rgba(63,185,80,0.1)"
+    stroke="#3fb950" stroke-width="1"/>
+  <text x="120" y="195" text-anchor="middle"
+    font-family="Inter" font-size="12"
+    fill="#3fb950">localStorage</text>
+  <text x="120" y="210" text-anchor="middle"
+    font-family="Inter" font-size="10"
+    fill="#8b949e">Local copy of data</text>
+  <!-- Service Worker -->
+  <rect x="40" y="240" width="160" height="40"
+    rx="8" fill="rgba(188,140,255,0.1)"
+    stroke="#bc8cff" stroke-width="1"/>
+  <text x="120" y="265" text-anchor="middle"
+    font-family="Inter" font-size="12"
+    fill="#bc8cff">Service Worker</text>
+  <!-- Arrows inside phone -->
+  <path d="M120 150 L120 170"
+    stroke="#30363d" stroke-width="1.5"
+    marker-end="url(#arrow)"/>
+  <path d="M120 220 L120 240"
+    stroke="#30363d" stroke-width="1.5"
+    marker-end="url(#arrow)"/>
+  <!-- Cloud -->
+  <rect x="380" y="60" width="280" height="230"
+    rx="16" fill="none"
+    stroke="#8b949e" stroke-width="2"
+    stroke-dasharray="6"/>
+  <text x="520" y="90" text-anchor="middle"
+    font-family="Inter" font-size="14"
+    font-weight="600" fill="#e6edf3">
+    The Cloud</text>
+  <!-- GitHub Pages -->
+  <rect x="400" y="105" width="120" height="55"
+    rx="8" fill="rgba(88,166,255,0.1)"
+    stroke="#58a6ff" stroke-width="1"/>
+  <text x="460" y="130" text-anchor="middle"
+    font-family="Inter" font-size="11"
+    fill="#58a6ff">GitHub Pages</text>
+  <text x="460" y="148" text-anchor="middle"
+    font-family="Inter" font-size="10"
+    fill="#8b949e">Hosts your app</text>
+  <!-- Apps Script -->
+  <rect x="540" y="105" width="100" height="55"
+    rx="8" fill="rgba(212,130,42,0.1)"
+    stroke="#d4822a" stroke-width="1"/>
+  <text x="590" y="130" text-anchor="middle"
+    font-family="Inter" font-size="11"
+    fill="#d4822a">Apps Script</text>
+  <text x="590" y="148" text-anchor="middle"
+    font-family="Inter" font-size="10"
+    fill="#8b949e">API backend</text>
+  <!-- Google Sheet -->
+  <rect x="460" y="195" width="140" height="55"
+    rx="8" fill="rgba(63,185,80,0.1)"
+    stroke="#3fb950" stroke-width="1"/>
+  <text x="530" y="220" text-anchor="middle"
+    font-family="Inter" font-size="11"
+    fill="#3fb950">Google Sheet</text>
+  <text x="530" y="238" text-anchor="middle"
+    font-family="Inter" font-size="10"
+    fill="#8b949e">Your data (cloud)</text>
+  <!-- Arrows -->
+  <path d="M220 110 L380 110"
+    stroke="#58a6ff" stroke-width="1.5"
+    stroke-dasharray="4"
+    marker-end="url(#arrow)"/>
+  <text x="300" y="103" text-anchor="middle"
+    font-family="Inter" font-size="10"
+    fill="#8b949e">loads app</text>
+  <path d="M220 195 L455 195"
+    stroke="#d4822a" stroke-width="1.5"
+    marker-end="url(#arrow)"/>
+  <text x="340" y="188" text-anchor="middle"
+    font-family="Inter" font-size="10"
+    fill="#8b949e">fireGet / jsonpFetch</text>
+  <path d="M590 160 L590 195"
+    stroke="#30363d" stroke-width="1.5"
+    marker-end="url(#arrow)"/>
+</svg>
+<p class="diagram-caption">
+  How your apps work:
+  GitHub Pages hosts the code,
+  Apps Script handles data,
+  Google Sheets stores it
+</p>
+</div>
+
+<p>
+Every app you have follows this exact pattern.
+When Claude pushes code to GitHub,
+GitHub Pages makes it available as a website.
+When you tap a button that saves data,
+the app calls Apps Script via
+<code>fireGet()</code>, which writes to
+a Google Sheet.
+</p>
+
+<h3>The Service Worker: Offline Cache</h3>
+
+<p>
+The service worker is a special file
+(<code>service-worker.js</code>) that
+caches your app so it works offline.
+The version number tells the browser
+when to refresh:
+</p>
+
+<pre><code>// service-worker.js
+const CACHE = 'app-v38';  // bump this to refresh!</code></pre>
+
+<p>
+This is why Claude always says
+"bump the service worker version" after
+making changes. If the version doesn't
+change, your phone keeps showing
+the old cached version &mdash; which is
+why you sometimes open the app and
+don't see the changes yet.
+</p>
+
+<div class="callout callout-orange">
+<div class="callout-title">That Error You Saw!</div>
+Remember seeing <code>API Error: Claude's
+response exceeded the 32000 output token
+maximum</code>? That happens when Claude tries
+to write more than 32,000 tokens in one
+response. The fix is either writing in
+smaller chunks, or setting
+<code>CLAUDE_CODE_MAX_OUTPUT_TOKENS=64000</code>
+in your terminal. The default limit exists
+to prevent runaway responses from eating
+your API credits.
+</div>
+</div>
+
+<!-- ======== PART 8: CONSOLE ======== -->
+<div class="section" id="part8">
+<h2>Part 8: The Developer Console</h2>
+<p class="section-sub">
+  Every browser has a secret panel
+  that shows you what's happening
+  under the hood.
+</p>
+
+<p>
+The console is where you can see errors,
+test code, and inspect your apps.
+On desktop Chrome: press <code>F12</code>
+or right-click and choose "Inspect."
+</p>
+
+<h3>What the Console Shows You</h3>
+
+<ul>
+<li><strong>Red errors:</strong> something broke.
+  The message usually tells you what
+  and which line number.</li>
+<li><strong>Yellow warnings:</strong> something
+  might be wrong but the app still works.</li>
+<li><strong>Blue info:</strong>
+  just informational messages.</li>
+</ul>
+
+<h3>Useful Console Commands</h3>
+
+<pre><code>// See what's in localStorage
+localStorage.getItem('cadence_data')
+
+// Clear a stuck cache
+localStorage.removeItem('cadence_data')
+
+// Check if a function exists
+typeof addTask  // "function" if it exists
+
+// Run a function manually
+toast('Hello from the console!')
+
+// See all CSS variables
+getComputedStyle(document.documentElement)
+  .getPropertyValue('--accent')</code></pre>
+
+<div class="callout callout-green">
+<div class="callout-title">Pro Tip</div>
+If your app is acting weird, open the console
+first. 90% of the time there's a red error
+message telling you exactly what went wrong.
+Tell Claude the error message and it can
+fix it immediately.
+</div>
+</div>
+
+<!-- ======== PART 9: COMMON BUGS ======== -->
+<div class="section" id="part9">
+<h2>Part 9: Common Bugs Decoded</h2>
+<p class="section-sub">
+  What error messages actually mean
+  in plain English.
+</p>
+
+<h3>The Most Common Errors</h3>
+
+<ul>
+<li><strong><code>Uncaught TypeError:
+  Cannot read properties of null</code></strong>
+  <br>Meaning: JavaScript tried to use
+  an element that doesn't exist.
+  Usually means an <code>id</code>
+  is misspelled or the element
+  hasn't loaded yet.</li>
+
+<li><strong><code>Unexpected token</code></strong>
+  <br>Meaning: there's a typo in the code.
+  A missing comma, bracket, or quote.
+  The line number in the error points
+  to where it noticed the problem.</li>
+
+<li><strong><code>CORS error</code></strong>
+  <br>Meaning: the browser blocked a request
+  to another website for security.
+  This is why your apps use
+  <code>fireGet()</code> instead of
+  regular <code>fetch()</code> on mobile.</li>
+
+<li><strong><code>net::ERR_FAILED</code></strong>
+  <br>Meaning: the network request failed.
+  Could be no internet, wrong URL,
+  or the server is down.</li>
+
+<li><strong>App shows old version after push</strong>
+  <br>Meaning: the service worker is serving
+  cached files. The version wasn't bumped,
+  or the cache hasn't refreshed yet.
+  Fix: cachebust via ADB or wait.</li>
+
+<li><strong>Data disappeared</strong>
+  <br>Meaning: localStorage was cleared
+  (Chrome data wipe) or cloud sync
+  pushed empty data. That's why every app
+  has the empty-data guard.</li>
+</ul>
+
+<div class="quiz">
+<div class="quiz-q">
+  You push a change to Bloom but your phone
+  still shows the old version. What's most
+  likely the problem?
+</div>
+<div class="quiz-opts">
+  <button class="quiz-opt" data-answer="sw"
+    onclick="checkQuiz(this,'sw','q9e')">
+    Service worker is serving the cached
+    old version</button>
+  <button class="quiz-opt" data-answer="gh"
+    onclick="checkQuiz(this,'sw','q9e')">
+    GitHub Pages is down</button>
+  <button class="quiz-opt" data-answer="js"
+    onclick="checkQuiz(this,'sw','q9e')">
+    JavaScript error preventing load</button>
+</div>
+<div class="quiz-explain" id="q9e">
+  Almost always the service worker cache.
+  The fix is bumping the version number
+  in <code>service-worker.js</code> and
+  cachebusting the phone with ADB.
+</div>
+</div>
+</div>
+
+<!-- ======== PART 10: CHEAT SHEET ======== -->
+<div class="section" id="part10">
+<h2>Part 10: Cheat Sheet</h2>
+<p class="section-sub">
+  Quick reference for everything above.
+</p>
+
+<h3>HTML Tags</h3>
+<pre><code>&lt;div&gt;    &lt;!-- generic box --&gt;
+&lt;p&gt;      &lt;!-- paragraph --&gt;
+&lt;h1-h4&gt;  &lt;!-- headings --&gt;
+&lt;button&gt; &lt;!-- clickable button --&gt;
+&lt;input&gt;  &lt;!-- text field --&gt;
+&lt;img&gt;    &lt;!-- image --&gt;
+&lt;a&gt;      &lt;!-- link --&gt;
+&lt;span&gt;   &lt;!-- inline wrapper --&gt;</code></pre>
+
+<h3>CSS Selectors</h3>
+<pre><code>div { }       /* all divs */
+.card { }     /* class="card" */
+#toast { }    /* id="toast" */
+div:hover { } /* div when mouse is over it */</code></pre>
+
+<h3>CSS Properties</h3>
+<pre><code>color: #fff;           /* text color */
+background: #000;      /* background color */
+padding: 16px;         /* space inside */
+margin: 12px;          /* space outside */
+border: 1px solid #ccc;/* border */
+border-radius: 8px;    /* rounded corners */
+font-size: 16px;       /* text size */
+display: none;         /* hide element */
+display: flex;         /* flexbox layout */</code></pre>
+
+<h3>JavaScript Essentials</h3>
+<pre><code>// Variables
+const x = 10;
+let y = 'hello';
+
+// Functions
+function doThing(arg) { ... }
+
+// Find elements
+document.getElementById('id')
+document.querySelector('.class')
+
+// Change elements
+el.textContent = 'new text';
+el.style.color = 'red';
+el.classList.add('active');
+el.classList.remove('active');
+
+// Events
+el.addEventListener('click', fn);
+
+// Data storage
+localStorage.setItem('key', 'value');
+localStorage.getItem('key');
+
+// Timers
+setTimeout(fn, 3000);  // run once after 3s
+setInterval(fn, 1000); // run every 1s</code></pre>
+
+<h3>Your App Stack</h3>
+<pre><code>Phone &rarr; Chrome &rarr; index.html (from GitHub Pages)
+  &darr;
+localStorage (local data copy)
+  &darr;
+fireGet() / jsonpFetch() &rarr; Apps Script &rarr; Google Sheet
+  &darr;
+service-worker.js (offline cache, version = freshness)</code></pre>
+
+<h3>Debug Checklist</h3>
+<ol>
+<li>Open the console (F12)</li>
+<li>Look for red errors</li>
+<li>Check if it's CSS (looks wrong),
+  HTML (missing), or JS (doesn't work)</li>
+<li>Tell Claude the error message</li>
+<li>If app shows old version &rarr;
+  bump service worker + cachebust</li>
+</ol>
+</div>
+
+</div>
+
+<script>
+// Progress bar
+window.addEventListener('scroll', function() {
+  var h = document.documentElement;
+  var pct = (h.scrollTop /
+    (h.scrollHeight - h.clientHeight)) * 100;
+  document.getElementById('progressBar')
+    .style.width = pct + '%';
+});
+
+// Active nav link
+var sections = document.querySelectorAll('.section');
+var navLinks = document.querySelectorAll('.nav-links a');
+window.addEventListener('scroll', function() {
+  var current = '';
+  sections.forEach(function(s) {
+    if (window.scrollY >= s.offsetTop - 100) {
+      current = s.id;
+    }
+  });
+  navLinks.forEach(function(a) {
+    a.classList.toggle('active',
+      a.getAttribute('href') === '#' + current);
+  });
+});
+
+// Quiz handler
+function checkQuiz(btn, correct, explainId) {
+  var parent = btn.closest('.quiz');
+  var opts = parent.querySelectorAll('.quiz-opt');
+  var already = false;
+  opts.forEach(function(o) {
+    if (o.classList.contains('correct') ||
+        o.classList.contains('wrong'))
+      already = true;
+  });
+  if (already) return;
+  opts.forEach(function(o) {
+    if (o.dataset.answer === correct)
+      o.classList.add('correct');
+    else if (o === btn)
+      o.classList.add('wrong');
+  });
+  var ex = document.getElementById(explainId);
+  if (ex) ex.style.display = 'block';
+}
+
+// Collapse toggle
+function toggleCollapse(btn) {
+  btn.classList.toggle('open');
+  var body = btn.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+
+<!-- Bookmark system -->
+<script>var BM_KEY = 'bm_code_101';</script>
+<script src="../book.js?v=3"></script>
+
+</body>
+</html>
+window.addEventListener('scroll', function() {
+  var h = document.documentElement;
+  var pct = (h.scrollTop /
+    (h.scrollHeight - h.clientHeight)) * 100;
+  document.getElementById('progressBar')
+    .style.width = pct + '%';
+});
+
+// Active nav link
+var sections = document.querySelectorAll('.section');
+var navLinks = document.querySelectorAll('.nav-links a');
+window.addEventListener('scroll', function() {
+  var current = '';
+  sections.forEach(function(s) {
+    if (window.scrollY >= s.offsetTop - 100) {
+      current = s.id;
+    }
+  });
+  navLinks.forEach(function(a) {
+    a.classList.toggle('active',
+      a.getAttribute('href') === '#' + current);
+  });
+});
+
+// Quiz handler
+function checkQuiz(btn, correct, explainId) {
+  var parent = btn.closest('.quiz');
+  var opts = parent.querySelectorAll('.quiz-opt');
+  var already = false;
+  opts.forEach(function(o) {
+    if (o.classList.contains('correct') ||
+        o.classList.contains('wrong'))
+      already = true;
+  });
+  if (already) return;
+  opts.forEach(function(o) {
+    if (o.dataset.answer === correct)
+      o.classList.add('correct');
+    else if (o === btn)
+      o.classList.add('wrong');
+  });
+  var ex = document.getElementById(explainId);
+  if (ex) ex.style.display = 'block';
+}
+
+// Collapse toggle
+function toggleCollapse(btn) {
+  btn.classList.toggle('open');
+  var body = btn.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+
+<!-- Bookmark system -->
+<script>var BM_KEY = 'bm_code_101';</script>
+<script src="../book.js?v=3"></script>
+
+</body>
+</html>
