@@ -682,175 +682,978 @@ you can do with these systems.
 <div class="section" id="part2">
 <h2>Part 2: All 60+ Slash Commands</h2>
 <p class="section-sub">
-  Type <code>/</code> to see them all.
-  Here are the ones that matter most.
+  Type <code>/</code> in the prompt to see
+  a filterable list. Every command explained
+  below &mdash; what it does, when you'd
+  reach for it, and real examples.
 </p>
 
-<h3>Session Control</h3>
+<!-- ---- SESSION & CONTEXT ---- -->
+<h3>Session &amp; Context Management</h3>
 
-<div class="cmd-grid">
-<div class="cmd-card">
-  <code>/clear</code>
-  <span class="cmd-desc">Wipe conversation history
-  and start fresh. Also: /reset, /new</span>
-</div>
-<div class="cmd-card">
-  <code>/compact</code>
-  <span class="cmd-desc">Compress conversation to
-  save tokens. Add focus: /compact "keep the CSS changes"</span>
-</div>
-<div class="cmd-card">
-  <code>/resume</code>
-  <span class="cmd-desc">Resume a previous session
-  by name or pick from list. Also: /continue</span>
-</div>
-<div class="cmd-card">
-  <code>/branch</code>
-  <span class="cmd-desc">Fork the conversation at
-  this point. Try different approaches
-  without losing progress</span>
-</div>
-<div class="cmd-card">
-  <code>/rewind</code>
-  <span class="cmd-desc">Undo back to a previous
-  checkpoint in the conversation</span>
-</div>
-<div class="cmd-card">
-  <code>/rename</code>
-  <span class="cmd-desc">Name current session for
-  easy resuming later</span>
-</div>
-</div>
+<p>
+These are the commands you'll use most.
+They control your conversation's memory,
+let you jump between projects, and keep
+Claude from forgetting what you're doing.
+</p>
 
+<h4 id="cmd-clear"><code>/clear</code></h4>
+<p>
+Wipes the entire conversation and starts
+fresh. Claude forgets everything &mdash;
+what files it read, what changes it made,
+what you were building. The session itself
+stays (you can scroll up), but Claude's
+working memory is gone.
+Also available as <code>/reset</code>
+or <code>/new</code>.
+</p>
+<p>
+<strong>When to use it:</strong> You've
+finished one task and want to start
+something completely unrelated. You were
+fixing a Zercher bug, now you want to
+work on the book shelf. There's no reason
+for Claude to remember the workout code.
+</p>
+<pre><code>/clear</code></pre>
+<p>
+<strong>When NOT to use it:</strong> If you
+might come back to what you were doing.
+Use <code>/rename</code> first, then
+<code>/clear</code>. Or better &mdash;
+just open a new terminal tab.
+</p>
+
+<h4 id="cmd-compact"><code>/compact</code></h4>
+<p>
+Compresses the conversation to free up
+context space. Claude summarizes everything
+that's happened so far into a condensed
+form, then continues with room to work.
+You can add focus instructions in quotes
+to tell Claude what to prioritize keeping.
+</p>
+<p>
+<strong>When to use it:</strong> Long
+sessions where Claude starts slowing
+down, repeating itself, or forgetting
+earlier decisions. Building a 1,500-line
+book HTML is the classic case &mdash;
+you're on chapter 15 and Claude forgot
+the CSS structure from chapter 1.
+</p>
+<pre><code>/compact "keep the HTML structure,
+  chapter list, and which chapters are done"</code></pre>
+<p>
+The focus instruction matters. Without
+it, Claude compresses everything equally
+and might drop the details you care about.
+With it, Claude knows to preserve your
+HTML progress and drop the earlier
+back-and-forth about cover images.
+</p>
+<p>
+<strong>Pro tip:</strong> You can compact
+preemptively. Don't wait until Claude is
+confused &mdash; compact after every major
+milestone (every 3-4 chapters of a book
+build, after finishing a big feature).
+</p>
+
+<h4 id="cmd-resume"><code>/resume</code></h4>
+<p>
+Picks up a previous session right where
+you left off. Claude gets back its full
+context from that session &mdash; what
+files it was working on, what decisions
+were made, everything. Shows a picker if
+you don't specify a name. Also available
+as <code>/continue</code>.
+</p>
+<p>
+<strong>When to use it:</strong> You named
+a session yesterday with <code>/rename</code>,
+went to bed, and now want to keep going.
+Or you're juggling Bloom and Zercher and
+need to switch back.
+</p>
+<pre><code>/resume bloom-splitter-fix</code></pre>
+<p>
+You can also resume from the command line
+without starting Claude first:
+</p>
+<pre><code>claude --resume bloom-splitter-fix</code></pre>
+
+<h4 id="cmd-branch"><code>/branch</code></h4>
+<p>
+Forks the conversation at this exact
+point. Both branches keep the full history
+up to now, but diverge from here. The
+original session continues untouched.
+Also available as <code>/fork</code>.
+</p>
+<p>
+<strong>When to use it:</strong> You want
+to try two different approaches and see
+which works better. Maybe you're debating
+whether to refactor the Bloom splitter as
+a separate component or keep it inline.
+Branch, try approach A. If it doesn't work,
+go back to the original and try approach B.
+</p>
+<pre><code>/branch try-component-approach</code></pre>
+<p>
+<strong>Key difference from /clear:</strong>
+<code>/clear</code> erases everything.
+<code>/branch</code> preserves everything
+and gives you a safe copy to experiment in.
+It's like git branching but for your
+conversation.
+</p>
+
+<h4 id="cmd-rewind"><code>/rewind</code></h4>
+<p>
+Undoes Claude's work back to a previous
+point in the conversation. Shows you a
+list of checkpoints and lets you pick
+which one to revert to. This undoes both
+the conversation AND the file changes
+Claude made after that point.
+Also available as <code>/checkpoint</code>.
+</p>
+<p>
+<strong>When to use it:</strong> Claude
+went down a wrong path. It refactored
+your service worker and broke cloud sync,
+or it changed 5 files when it should've
+changed 1. Instead of manually undoing
+everything, rewind to before it started.
+</p>
+<pre><code>/rewind</code></pre>
+<p>
+<strong>Important:</strong> This actually
+reverts file changes on disk, not just
+the conversation. It's like a targeted
+<code>git checkout</code> for everything
+Claude touched since that checkpoint.
+</p>
+
+<h4 id="cmd-rename"><code>/rename</code></h4>
+<p>
+Gives the current session a human-readable
+name so you can find it later with
+<code>/resume</code>. Without a name,
+sessions get auto-generated IDs that
+are impossible to remember.
+</p>
+<p>
+<strong>When to use it:</strong> Any time
+you're doing meaningful work you might
+want to come back to. Name it right away
+so you don't forget.
+</p>
+<pre><code>/rename zercher-plate-calc-fix
+/rename book-road-to-serfdom
+/rename bloom-stock-picks-feature</code></pre>
+<p>
+<strong>Pro tip:</strong> Use descriptive
+names with the app name first. When you
+<code>/resume</code> later and see the
+picker list, "bloom-stock-picks-feature"
+tells you exactly what that session was.
+"fix-bug" tells you nothing.
+</p>
+
+<h4 id="cmd-context"><code>/context</code></h4>
+<p>
+Shows a visual grid of how much context
+(memory) Claude is using. Each colored
+block represents a chunk of the
+conversation. When the grid is mostly
+full, Claude is running out of room and
+will start forgetting things.
+</p>
+<p>
+<strong>When to use it:</strong> Claude
+starts acting confused, repeating itself,
+or forgetting instructions you gave
+earlier. Check <code>/context</code> to
+see if it's a memory problem. If the grid
+is 80%+ full, time to <code>/compact</code>.
+</p>
+<pre><code>/context</code></pre>
+
+<h4 id="cmd-btw"><code>/btw</code></h4>
+<p>
+Asks a quick side question without adding
+it to the conversation history. Claude
+answers your question, but the exchange
+doesn't take up context space or distract
+from the main task.
+</p>
+<p>
+<strong>When to use it:</strong> You're
+deep into building a crypto backtest and
+need to quickly check what
+<code>toFixed(2)</code> does, or how
+<code>Array.reduce()</code> works. You
+don't want Claude to lose track of the
+backtest just because you asked a
+JavaScript question.
+</p>
+<pre><code>/btw what does toFixed(2) do?
+/btw how do I center a div vertically?
+/btw what's the git command to see
+  the last 5 commits?</code></pre>
+
+<h4 id="cmd-exit"><code>/exit</code></h4>
+<p>
+Closes Claude Code. Also available as
+<code>/quit</code>. Same as pressing
+Ctrl+C twice or Ctrl+D. Your session
+is auto-saved &mdash; you can
+<code>/resume</code> it later.
+</p>
+
+<!-- ---- MODEL & PERFORMANCE ---- -->
+<h3>Model &amp; Performance</h3>
+
+<p>
+These commands let you switch between
+AI models and tune how hard Claude
+thinks. Different tasks need different
+levels of brainpower.
+</p>
+
+<h4 id="cmd-model"><code>/model</code></h4>
+<p>
+Switches which AI model Claude uses.
+The three main options: <strong>Opus</strong>
+(smartest, slowest, most expensive),
+<strong>Sonnet</strong> (balanced),
+<strong>Haiku</strong> (fastest, cheapest,
+less capable). Changes take effect
+immediately for the next message.
+</p>
+<p>
+<strong>When to use it:</strong> You're
+doing something complex (planning an
+architecture, writing nuanced book HTML)
+and want Opus. Or you're doing something
+simple (renaming variables, formatting)
+and Haiku is plenty.
+</p>
+<pre><code>/model opus
+/model sonnet
+/model haiku</code></pre>
+<p>
+<strong>Pro tip:</strong> Start complex
+tasks on Opus for the planning phase,
+then switch to Sonnet for the repetitive
+implementation. You get the best thinking
+upfront without burning through your
+quota on mechanical work.
+</p>
+
+<h4 id="cmd-effort"><code>/effort</code></h4>
+<p>
+Controls how deeply Claude thinks before
+responding. <strong>Low</strong> gives quick,
+shallow answers. <strong>High</strong> makes
+Claude reason more carefully.
+<strong>Max</strong> is the deepest thinking
+mode (Opus only, session-only &mdash;
+doesn't persist). <strong>Auto</strong>
+resets to default.
+</p>
+<p>
+<strong>When to use it:</strong> You're
+debugging a tricky cloud sync race
+condition &mdash; set effort to high so
+Claude really thinks through the timing.
+Or you're just asking Claude to add a
+CSS class &mdash; low effort is fine.
+</p>
+<pre><code>/effort high
+/effort low
+/effort max</code></pre>
+
+<h4 id="cmd-fast"><code>/fast</code></h4>
+<p>
+Toggles fast mode on or off. When on,
+Claude uses cheaper, quicker processing.
+Responses come faster but may be less
+thorough.
+</p>
+<p>
+<strong>When to use it:</strong> You're
+doing a bunch of small, simple tasks in
+a row &mdash; renaming files, adding
+console.logs, quick lookups. Fast mode
+saves time and cost.
+</p>
+<pre><code>/fast on
+/fast off</code></pre>
+
+<!-- ---- CODE & GIT ---- -->
+<h3>Code &amp; Git</h3>
+
+<h4 id="cmd-diff"><code>/diff</code></h4>
+<p>
+Opens an interactive diff viewer showing
+every uncommitted change in the project.
+You can see exactly what Claude modified,
+line by line, file by file. Use arrow keys
+to navigate between files. Left/right
+switches between the full git diff and
+per-turn diffs (what changed in each
+Claude response).
+</p>
+<p>
+<strong>When to use it:</strong> Before
+committing. Claude just made a bunch of
+changes to Roman Chariots' receipt scanner
+and you want to review every line before
+pushing. Or Claude changed something
+unexpected and you want to see what.
+</p>
+<pre><code>/diff</code></pre>
+<p>
+<strong>Pro tip:</strong> Get in the
+habit of running <code>/diff</code> before
+every commit. It catches things Claude
+might have changed that you didn't ask
+for &mdash; extra imports, reformatted
+code, removed comments.
+</p>
+
+<h4 id="cmd-plan"><code>/plan</code></h4>
+<p>
+Puts Claude into plan mode. In this mode,
+Claude can read files, search code, and
+explore the project, but it <em>cannot</em>
+make any changes. It can only propose
+changes for you to approve. Think of it
+as read-only reconnaissance.
+</p>
+<p>
+<strong>When to use it:</strong> Before
+starting a big change. You want Claude
+to understand how the Bloom growth chart
+works before modifying it. Or you want
+a plan for adding a new feature to the
+gig outreach app before Claude starts
+writing code.
+</p>
+<pre><code>/plan</code></pre>
+<p>
+Plan mode is covered in depth in Part 3.
+</p>
+
+<h4 id="cmd-pr-comments">
+<code>/pr-comments</code></h4>
+<p>
+Fetches comments from a GitHub pull
+request and displays them in your
+session. Auto-detects the PR for your
+current branch, or you can pass a PR
+number or URL. Requires the
+<code>gh</code> CLI to be installed.
+</p>
+<p>
+<strong>When to use it:</strong> Someone
+left review comments on your PR and you
+want Claude to see them and help address
+the feedback.
+</p>
+<pre><code>/pr-comments
+/pr-comments 42</code></pre>
+
+<h4 id="cmd-security-review">
+<code>/security-review</code></h4>
+<p>
+Analyzes all pending changes on your
+current branch for security vulnerabilities.
+Looks for injection risks, auth issues,
+exposed credentials, data leaks, and
+other OWASP top-10 problems.
+</p>
+<p>
+<strong>When to use it:</strong> Before
+merging a PR that touches user input,
+API endpoints, or authentication. Good
+habit for any change that handles data
+from outside your app.
+</p>
+<pre><code>/security-review</code></pre>
+
+<!-- ---- CONFIGURATION ---- -->
 <h3>Configuration</h3>
 
-<div class="cmd-grid">
-<div class="cmd-card">
-  <code>/config</code>
-  <span class="cmd-desc">Open settings UI &mdash;
-  theme, model, output style. Also: /settings</span>
-</div>
-<div class="cmd-card">
-  <code>/model</code>
-  <span class="cmd-desc">Switch AI model.
-  Opus (smartest), Sonnet (balanced),
-  Haiku (fastest)</span>
-</div>
-<div class="cmd-card">
-  <code>/effort</code>
-  <span class="cmd-desc">Set thinking depth:
-  low, medium, high, max.
-  Higher = slower but smarter</span>
-</div>
-<div class="cmd-card">
-  <code>/theme</code>
-  <span class="cmd-desc">Change color theme.
-  Light, dark, daltonized variants</span>
-</div>
-<div class="cmd-card">
-  <code>/permissions</code>
-  <span class="cmd-desc">View and update
-  what Claude is allowed to do</span>
-</div>
-<div class="cmd-card">
-  <code>/vim</code>
-  <span class="cmd-desc">Toggle Vim editing
-  mode for the input prompt</span>
-</div>
-</div>
+<p>
+Settings, appearance, and permissions.
+Most of these you'll set once and forget.
+</p>
 
-<h3>Development</h3>
+<h4 id="cmd-config"><code>/config</code></h4>
+<p>
+Opens a settings interface where you can
+change your model, theme, output style,
+and other preferences. A one-stop shop
+for all settings. Also available as
+<code>/settings</code>.
+</p>
+<p>
+<strong>When to use it:</strong> When
+you want to change multiple settings at
+once, or you're not sure which specific
+command to use. Instead of remembering
+<code>/theme</code> vs <code>/model</code>
+vs <code>/effort</code>, just open
+<code>/config</code> and browse.
+</p>
+<pre><code>/config</code></pre>
 
-<div class="cmd-grid">
-<div class="cmd-card">
-  <code>/plan</code>
-  <span class="cmd-desc">Enter plan mode &mdash;
-  Claude researches but doesn't
-  change anything</span>
-</div>
-<div class="cmd-card">
-  <code>/diff</code>
-  <span class="cmd-desc">Open interactive diff viewer
-  showing all uncommitted changes</span>
-</div>
-<div class="cmd-card">
-  <code>/context</code>
-  <span class="cmd-desc">Visualize context usage
-  as a colored grid with
-  optimization tips</span>
-</div>
-<div class="cmd-card">
-  <code>/cost</code>
-  <span class="cmd-desc">Show token usage and
-  cost statistics for this session</span>
-</div>
-<div class="cmd-card">
-  <code>/hooks</code>
-  <span class="cmd-desc">View configured hooks
-  (automation rules)</span>
-</div>
-<div class="cmd-card">
-  <code>/mcp</code>
-  <span class="cmd-desc">Manage MCP server
-  connections and auth</span>
-</div>
-</div>
+<h4 id="cmd-theme"><code>/theme</code></h4>
+<p>
+Changes the color theme of Claude Code.
+Options include light, dark, and several
+colorblind-accessible variants
+(daltonized). Also ANSI terminal palettes
+if your terminal has custom colors.
+</p>
+<pre><code>/theme</code></pre>
 
-<h3>Utilities</h3>
+<h4 id="cmd-color"><code>/color</code></h4>
+<p>
+Sets the color of your prompt bar for
+the current session. Purely cosmetic
+but useful if you run multiple Claude
+sessions in different terminal tabs &mdash;
+color-code them so you know which is which
+at a glance.
+</p>
+<pre><code>/color red
+/color purple
+/color default</code></pre>
+<p>
+Available colors: red, blue, green,
+yellow, purple, orange, pink, cyan.
+</p>
 
-<div class="cmd-grid">
-<div class="cmd-card">
-  <code>/btw</code>
-  <span class="cmd-desc">Ask a quick side question
-  without polluting the main conversation</span>
-</div>
-<div class="cmd-card">
-  <code>/copy</code>
-  <span class="cmd-desc">Copy last response to
-  clipboard. /copy 2 for second-to-last</span>
-</div>
-<div class="cmd-card">
-  <code>/export</code>
-  <span class="cmd-desc">Save conversation
-  as plain text file</span>
-</div>
-<div class="cmd-card">
-  <code>/stats</code>
-  <span class="cmd-desc">Visualize your usage
-  patterns, streaks, session history</span>
-</div>
-<div class="cmd-card">
-  <code>/voice</code>
-  <span class="cmd-desc">Toggle push-to-talk
-  voice dictation</span>
-</div>
-<div class="cmd-card">
-  <code>/doctor</code>
-  <span class="cmd-desc">Diagnose and verify
-  your Claude Code installation</span>
-</div>
-</div>
+<h4 id="cmd-permissions">
+<code>/permissions</code></h4>
+<p>
+Shows what Claude is currently allowed
+to do and lets you update it. Covers
+file editing, bash commands, network
+access, and other tool permissions.
+</p>
+<p>
+<strong>When to use it:</strong> Claude
+keeps asking for permission and you
+want to pre-approve certain actions.
+Or you want to lock things down for
+a sensitive task &mdash; restrict Claude
+to read-only while you explore.
+</p>
+<pre><code>/permissions</code></pre>
 
-<div class="callout callout-orange">
-<div class="callout-title">Hidden Gems</div>
-<strong>/insights</strong> generates a report
-analyzing all your sessions &mdash; what you
-build most, common patterns, time spent.
-<strong>/security-review</strong> analyzes
-pending changes for vulnerabilities before
-you commit. <strong>/color purple</strong>
-sets your prompt bar color (try it!).
-</div>
+<h4 id="cmd-vim"><code>/vim</code></h4>
+<p>
+Toggles Vim editing mode for the input
+prompt. When on, you can use Vim
+keybindings (hjkl, i for insert, Esc
+for normal mode, etc.) while typing
+your messages to Claude.
+</p>
+<p>
+<strong>When to use it:</strong> If you're
+a Vim user and your muscle memory keeps
+hitting Esc and j/k when writing prompts.
+</p>
+<pre><code>/vim</code></pre>
 
-<h3>Real Scenarios: When You'd Use These</h3>
+<h4 id="cmd-terminal-setup">
+<code>/terminal-setup</code></h4>
+<p>
+Configures terminal keybindings for
+Shift+Enter (multi-line input) and
+other shortcuts. Only appears in
+terminals that need it (VS Code
+integrated terminal, Alacritty, Warp).
+If your terminal already handles these
+keys natively, you won't see this command.
+</p>
+<pre><code>/terminal-setup</code></pre>
+
+<h4 id="cmd-keybindings">
+<code>/keybindings</code></h4>
+<p>
+Opens or creates the keybindings config
+file at <code>~/.claude/keybindings.json</code>.
+Lets you rebind keyboard shortcuts,
+add chord bindings, or change the
+submit key.
+</p>
+<pre><code>/keybindings</code></pre>
+
+<h4 id="cmd-statusline">
+<code>/statusline</code></h4>
+<p>
+Configures the status line that appears
+at the bottom of Claude Code. You can
+describe what you want to see (context
+usage, model name, token count) or run
+it without arguments to auto-configure
+from your shell prompt.
+</p>
+<pre><code>/statusline</code></pre>
+
+<!-- ---- PROJECT & MEMORY ---- -->
+<h3>Project &amp; Memory</h3>
+
+<p>
+These commands manage how Claude
+remembers things across sessions &mdash;
+your project's <code>CLAUDE.md</code>,
+auto-memory, and working directories.
+</p>
+
+<h4 id="cmd-init"><code>/init</code></h4>
+<p>
+Creates a <code>CLAUDE.md</code> file in
+your project root. This file gives Claude
+persistent instructions &mdash; project
+structure, coding conventions, build
+commands, things to always remember.
+Claude reads it at the start of every
+session.
+</p>
+<p>
+<strong>When to use it:</strong> Starting
+a brand new project. You want Claude to
+always know that "this is a single-file
+HTML PWA that uses fireGet() for writes"
+or "always bump the service worker version
+when pushing."
+</p>
+<pre><code>/init</code></pre>
+
+<h4 id="cmd-memory"><code>/memory</code></h4>
+<p>
+Opens your memory files for editing.
+These are the <code>CLAUDE.md</code> files
+(project-level and user-level) plus
+auto-memory entries that Claude creates
+as it learns about your codebase. You
+can enable/disable auto-memory, edit
+entries, or delete things Claude
+remembered incorrectly.
+</p>
+<p>
+<strong>When to use it:</strong> Claude
+keeps forgetting something important
+(like always stripping commas from
+price strings) &mdash; add it to memory
+so it sticks. Or Claude learned something
+wrong and you need to correct it.
+</p>
+<pre><code>/memory</code></pre>
+
+<h4 id="cmd-add-dir">
+<code>/add-dir</code></h4>
+<p>
+Adds another directory to the current
+session's scope. By default, Claude can
+only see files in the directory where you
+launched it. This command expands that.
+</p>
+<p>
+<strong>When to use it:</strong> You
+started Claude in the Bloom directory
+but now need to reference the SPX
+dashboard's Apps Script code too.
+</p>
+<pre><code>/add-dir ../SPX
+/add-dir ~/Documents/Code/Claude/Books</code></pre>
+
+<!-- ---- DATA & USAGE ---- -->
+<h3>Data &amp; Usage</h3>
+
+<h4 id="cmd-cost"><code>/cost</code></h4>
+<p>
+Shows how many tokens you've used in this
+session and how much it cost. Breaks down
+input vs output tokens and shows the
+running total.
+</p>
+<p>
+<strong>When to use it:</strong> You want
+to know how expensive this session has
+been, or you're curious whether switching
+models would save money. Also useful for
+understanding which tasks are token-heavy.
+</p>
+<pre><code>/cost</code></pre>
+
+<h4 id="cmd-usage"><code>/usage</code></h4>
+<p>
+Shows your plan's usage limits and
+current rate limit status. Different
+from <code>/cost</code> which shows
+session costs &mdash; <code>/usage</code>
+shows your overall quota and how much
+is left.
+</p>
+<pre><code>/usage</code></pre>
+
+<h4 id="cmd-stats"><code>/stats</code></h4>
+<p>
+Visualizes your Claude Code usage over
+time: daily activity, session counts,
+streaks, which models you use most.
+A fun dashboard of your coding habits.
+</p>
+<pre><code>/stats</code></pre>
+
+<h4 id="cmd-copy"><code>/copy</code></h4>
+<p>
+Copies Claude's last response to your
+clipboard. Pass a number to copy an
+older response. If the response contains
+code blocks, shows a picker so you can
+copy just the code.
+</p>
+<p>
+<strong>When to use it:</strong> Claude
+generated a function and you want to
+paste it into a different file manually.
+Or Claude gave you a git command and
+you want to paste it into another
+terminal.
+</p>
+<pre><code>/copy
+/copy 2</code></pre>
+
+<h4 id="cmd-export"><code>/export</code></h4>
+<p>
+Saves the entire conversation as a
+plain text file. You can specify a
+filename or let Claude pick one.
+</p>
+<p>
+<strong>When to use it:</strong> You want
+a record of a particularly good session
+&mdash; maybe Claude explained something
+well and you want to save it. Or you need
+to share the conversation with someone.
+</p>
+<pre><code>/export
+/export session-notes.txt</code></pre>
+
+<h4 id="cmd-tasks"><code>/tasks</code></h4>
+<p>
+Lists all background tasks (running
+shell commands, background agents).
+Shows their status and lets you stop
+them if needed.
+</p>
+<p>
+<strong>When to use it:</strong> You
+kicked off a background build or test
+and want to check if it's done, or
+you need to kill a hung process.
+</p>
+<pre><code>/tasks</code></pre>
+
+<h4 id="cmd-insights"><code>/insights</code></h4>
+<p>
+Generates an analytics report about
+your Claude Code usage. Analyzes your
+sessions to show what you build most,
+common patterns, where you spend time,
+and potential friction points. Takes a
+minute to generate.
+</p>
+<p>
+<strong>When to use it:</strong> Curiosity,
+mostly. Interesting to see which projects
+eat the most tokens, what times of day
+you code, and what patterns Claude notices
+in how you work.
+</p>
+<pre><code>/insights</code></pre>
+
+<!-- ---- TOOLS & INTEGRATIONS ---- -->
+<h3>Tools &amp; Integrations</h3>
+
+<h4 id="cmd-mcp"><code>/mcp</code></h4>
+<p>
+Manages MCP (Model Context Protocol)
+server connections. MCP lets Claude
+connect to external tools and services
+&mdash; databases, APIs, custom
+toolchains. This command shows connected
+servers, lets you add new ones, and
+handle OAuth authentication.
+</p>
+<p>
+<strong>When to use it:</strong> Setting
+up a new MCP integration (like connecting
+Claude to a database or a custom API),
+or troubleshooting a broken MCP
+connection.
+</p>
+<pre><code>/mcp</code></pre>
+
+<h4 id="cmd-hooks"><code>/hooks</code></h4>
+<p>
+Shows all configured hooks &mdash;
+automation rules that run shell commands
+in response to Claude events. For example,
+you could hook into "after file edit" to
+auto-format code, or "before commit" to
+run linting.
+</p>
+<pre><code>/hooks</code></pre>
+
+<h4 id="cmd-ide"><code>/ide</code></h4>
+<p>
+Shows the status of IDE integrations.
+Claude Code can connect to VS Code and
+JetBrains IDEs so your editor stays in
+sync with what Claude is doing.
+</p>
+<pre><code>/ide</code></pre>
+
+<h4 id="cmd-desktop"><code>/desktop</code></h4>
+<p>
+Moves the current session from the
+terminal to the Claude Code desktop
+app. The session transfers with full
+context. Only available on macOS and
+Windows. Also available as
+<code>/app</code>.
+</p>
+<pre><code>/desktop</code></pre>
+
+<h4 id="cmd-remote-control">
+<code>/remote-control</code></h4>
+<p>
+Makes this terminal session available
+for remote control from claude.ai in
+your browser. Useful if you want to
+switch from terminal to web UI without
+losing your session. Also available as
+<code>/rc</code>.
+</p>
+<pre><code>/remote-control</code></pre>
+
+<!-- ---- CUSTOM COMMANDS ---- -->
+<h3>Custom Commands</h3>
+
+<h4 id="cmd-skills"><code>/skills</code></h4>
+<p>
+Lists all available skills &mdash; both
+the built-in ones and any custom skills
+you've created. Skills are like mini
+programs Claude can run, defined in
+markdown files.
+</p>
+<pre><code>/skills</code></pre>
+
+<h4 id="cmd-agents"><code>/agents</code></h4>
+<p>
+Manage subagent configurations. Lets you
+create, edit, or list custom agent types
+that Claude can spawn for specialized
+tasks.
+</p>
+<pre><code>/agents</code></pre>
+
+<h4 id="cmd-plugin"><code>/plugin</code></h4>
+<p>
+Manage Claude Code plugins. Install,
+enable, or disable plugins that extend
+Claude's capabilities.
+</p>
+<pre><code>/plugin</code></pre>
+
+<h4 id="cmd-reload-plugins">
+<code>/reload-plugins</code></h4>
+<p>
+Reloads all active plugins to apply any
+changes. Reports how many loaded
+successfully and flags errors.
+</p>
+<pre><code>/reload-plugins</code></pre>
+
+<!-- ---- ACCOUNT ---- -->
+<h3>Account &amp; Auth</h3>
+
+<h4 id="cmd-login"><code>/login</code></h4>
+<p>
+Signs in to your Anthropic account.
+You'll need this if your session expired
+or you're on a new machine.
+</p>
+
+<h4 id="cmd-logout"><code>/logout</code></h4>
+<p>
+Signs out from your Anthropic account.
+</p>
+
+<h4 id="cmd-status"><code>/status</code></h4>
+<p>
+Shows your Claude Code version, current
+model, account info, and connectivity
+status. Good first thing to check when
+something seems off.
+</p>
+<pre><code>/status</code></pre>
+
+<h4 id="cmd-upgrade"><code>/upgrade</code></h4>
+<p>
+Opens the upgrade page to switch to a
+higher plan tier. Only shows for
+subscription plans.
+</p>
+
+<h4 id="cmd-privacy-settings">
+<code>/privacy-settings</code></h4>
+<p>
+View and update your privacy settings.
+Controls whether your conversations are
+used for training. Pro/Max plans only.
+</p>
+<pre><code>/privacy-settings</code></pre>
+
+<h4 id="cmd-extra-usage">
+<code>/extra-usage</code></h4>
+<p>
+Configure extra usage to keep working
+when you hit rate limits. If you've
+burned through your plan's allocation,
+this lets you pay for more.
+</p>
+<pre><code>/extra-usage</code></pre>
+
+<!-- ---- HELP & MISC ---- -->
+<h3>Help &amp; Miscellaneous</h3>
+
+<h4 id="cmd-help"><code>/help</code></h4>
+<p>
+Shows a help overview with available
+commands and basic usage info. Good
+starting point if you're new.
+</p>
+
+<h4 id="cmd-doctor"><code>/doctor</code></h4>
+<p>
+Runs diagnostics on your Claude Code
+installation. Checks that everything
+is configured correctly, API keys are
+valid, and dependencies are present.
+</p>
+<p>
+<strong>When to use it:</strong> Something
+isn't working and you're not sure why.
+Claude won't connect, tools are failing,
+or commands aren't recognized.
+</p>
+<pre><code>/doctor</code></pre>
+
+<h4 id="cmd-feedback"><code>/feedback</code></h4>
+<p>
+Submit feedback or bug reports about
+Claude Code directly from your session.
+Also available as <code>/bug</code>.
+</p>
+<pre><code>/feedback
+/bug</code></pre>
+
+<h4 id="cmd-release-notes">
+<code>/release-notes</code></h4>
+<p>
+Shows the changelog with the most recent
+updates first. Check what's new after an
+update, or see if a feature you want has
+been added.
+</p>
+<pre><code>/release-notes</code></pre>
+
+<h4 id="cmd-voice"><code>/voice</code></h4>
+<p>
+Toggles push-to-talk voice dictation.
+Speak your instructions instead of
+typing them. Useful for long explanations
+or when you're away from the keyboard.
+</p>
+<pre><code>/voice</code></pre>
+
+<h4 id="cmd-mobile"><code>/mobile</code></h4>
+<p>
+Shows a QR code to download the Claude
+mobile app. Also available as
+<code>/ios</code> or <code>/android</code>.
+</p>
+
+<h4 id="cmd-stickers"><code>/stickers</code></h4>
+<p>
+Order Claude Code stickers. Yes, really.
+</p>
+
+<h4 id="cmd-passes"><code>/passes</code></h4>
+<p>
+Share a free week of Claude Code with
+friends. Eligibility-based.
+</p>
+
+<!-- ---- REMOTE & CLOUD ---- -->
+<h3>Remote &amp; Cloud</h3>
+
+<h4 id="cmd-remote-env">
+<code>/remote-env</code></h4>
+<p>
+Configure defaults for remote cloud
+environments used with
+<code>claude --remote</code>. Sets up
+the machine image, resources, and
+environment for web-based sessions.
+</p>
+<pre><code>/remote-env</code></pre>
+
+<h4 id="cmd-install-github-app">
+<code>/install-github-app</code></h4>
+<p>
+Sets up the Claude GitHub Actions app
+for a repository. Walks you through
+repo selection and configuration so
+Claude can respond to issues and PRs.
+</p>
+<pre><code>/install-github-app</code></pre>
+
+<h4 id="cmd-install-slack-app">
+<code>/install-slack-app</code></h4>
+<p>
+Installs the Claude Slack app. Opens
+your browser for the OAuth flow.
+</p>
+<pre><code>/install-slack-app</code></pre>
+
+<!-- ---- SCENARIOS ---- -->
+<h3>Real Scenarios: Putting It Together</h3>
 
 <h4>Scenario: Building a Book HTML
 (Lessons of History)</h4>
 
 <p>
 You're 2 hours into building a book's
-index.html. It's going great but you're at
-3,000 lines and Claude is getting slow.
+index.html. It's going great but you're
+at 3,000 lines and Claude is getting slow.
 Here's the power user move:
 </p>
 
@@ -860,20 +1663,21 @@ Here's the power user move:
 
 <p>
 Now you've named the session (so you can
-resume it tomorrow if needed) and compressed
-the context so Claude has room to keep going.
-Without <code>/compact</code>, the session
-would've hit the context wall and lost track
-of what chapters were done.
+resume it tomorrow if needed) and
+compressed the context so Claude has room
+to keep going. Without
+<code>/compact</code>, the session
+would've hit the context wall and lost
+track of what chapters were done.
 </p>
 
 <h4>Scenario: Switching Between Apps</h4>
 
 <p>
 You're working on Bloom's DCA splitter
-and get a bug report about Zercher's plate
-calculator. Instead of losing your Bloom
-context:
+and get a bug report about Zercher's
+plate calculator. Instead of losing your
+Bloom context:
 </p>
 
 <pre><code>/rename bloom-splitter-fix</code></pre>
@@ -890,12 +1694,49 @@ You're right back where you left off
 with Bloom, full context intact.
 </p>
 
+<h4>Scenario: Trying Two Approaches</h4>
+
+<p>
+You're adding a recommendation engine
+to the gig outreach app. You could score
+venues by distance, or by similarity to
+past gigs. You want to try both:
+</p>
+
+<pre><code>/branch distance-approach</code></pre>
+
+<p>
+Try the distance-based scoring. If it
+feels wrong, go back to the original
+session and try similarity-based instead.
+Both branches are saved &mdash; you can
+compare them later.
+</p>
+
+<h4>Scenario: "Wait, Undo That"</h4>
+
+<p>
+You asked Claude to refactor the cloud
+sync in Roman Chariots, but it changed
+the JSONP fetch pattern that was working
+fine. Files are already modified on disk.
+</p>
+
+<pre><code>/rewind</code></pre>
+
+<p>
+Pick the checkpoint from before the
+refactor. Claude reverts all the file
+changes back to that point. No need
+to manually undo anything.
+</p>
+
 <h4>Scenario: "Did I Break Something?"</h4>
 
 <p>
-Claude just made a bunch of changes to
-Roman Chariots and you're not sure
-what all changed before committing:
+Claude just made changes across 4 files
+in the Sora podcast app and you're not
+sure what all changed before committing:
 </p>
 
 <pre><code>/diff</code></pre>
@@ -917,12 +1758,24 @@ but you don't want to distract Claude
 from the main task:
 </p>
 
-<pre><code>/btw what does toFixed(2) do in JavaScript?</code></pre>
+<pre><code>/btw what does toFixed(2) do
+  in JavaScript?</code></pre>
 
 <p>
 Gets an instant answer without polluting
 the main conversation about the backtest.
 </p>
+
+<div class="callout callout-orange">
+<div class="callout-title">Quick Reference</div>
+<strong>Lost?</strong> Type <code>/</code>
+and start typing to filter. You don't need
+to memorize all of these. The five you'll
+use daily are <code>/compact</code>,
+<code>/rename</code>, <code>/resume</code>,
+<code>/diff</code>, and <code>/clear</code>.
+Everything else is there when you need it.
+</div>
 </div>
 
 <!-- ======== PART 3 ======== -->
