@@ -23,6 +23,41 @@
   --code-bg: #0d1117;
 }
 
+/* ====== NEW BADGE ====== */
+.new-badge {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: #0d1117;
+  background: var(--green);
+  padding: 2px 8px;
+  border-radius: 4px;
+  margin-left: 10px;
+  vertical-align: middle;
+}
+.new-nav-btn {
+  background: var(--green);
+  color: #0d1117;
+  border: none;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  padding: 4px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  white-space: nowrap;
+  animation: new-pulse 2s ease-in-out infinite;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+.new-nav-btn:hover { filter: brightness(1.15); }
+@keyframes new-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 html { scroll-behavior: smooth; }
@@ -635,6 +670,10 @@ li:hover > strong > .bm-btn { opacity: 0.5; }
     <a href="#part10">Tools</a>
     <a href="#part11">History</a>
   </div>
+  <button class="new-nav-btn" id="newNavBtn"
+    style="display:none" onclick="jumpToNext()">
+    NEW
+  </button>
 </nav>
 
 <!-- Main Content -->
@@ -1146,6 +1185,129 @@ sometimes does strange things:
     CLAUDE.md rule about saving incrementally
     is so smart — it breaks the work into
     smaller prediction chains.
+  </div>
+</div>
+
+<h3>Prediction in Action: Summarizing a Book
+<span class="new-badge">New</span></h3>
+<p>
+Here's a question that trips people up: if Claude
+is "just predicting the next word," how does it
+actually read and summarize a 300-page book?
+Isn't it just making stuff up?
+</p>
+<p>
+The answer comes down to what's in the
+<strong>context window</strong>. When your book
+notes are sitting in Claude's context, every
+prediction is <em>conditioned on that actual
+text</em>. Claude isn't pulling from vague
+training memories — it's working from the
+real words right in front of it.
+</p>
+
+<div class="analogy">
+  <div class="analogy-label">Analogy</div>
+  Imagine you're taking an open-book exam.
+  You have the textbook right there on your
+  desk. Your answers aren't coming from fuzzy
+  memories of reading it last week — you're
+  looking at the actual pages. That's what
+  Claude does when your notes are in context.
+  The source material dominates the prediction.
+</div>
+
+<p>
+Think about how this works step by step.
+Claude sees your notes plus the instruction
+"summarize Chapter 5." During training, it
+saw millions of examples where dense text
+was followed by concise summaries. So the
+highest-probability next tokens form a
+<em>summary of what's actually there</em>
+— not a copy, not an invention, but a
+compression based on learned patterns for
+how to distill ideas.
+</p>
+<p>
+Each predicted word then shifts what comes
+next. If Claude starts with "This chapter
+argues that..." the most probable continuation
+is a synthesis, not a repetition. Each token
+steers the next one down the summarization
+path.
+</p>
+<p>
+This is why prediction produces surprisingly
+good analysis. During training, Claude learned:
+</p>
+<ul>
+  <li><strong>Compression patterns</strong> —
+    how to distill 10 paragraphs into 2
+    sentences without losing the core idea</li>
+  <li><strong>Hierarchical importance</strong> —
+    which ideas are central arguments vs.
+    supporting evidence</li>
+  <li><strong>Structural conventions</strong> —
+    what a "key takeaway" looks like vs.
+    a "quote" vs. a "framework"</li>
+</ul>
+
+<h4>Where It Can Go Wrong</h4>
+<p>
+Grounding in context isn't perfect. There are
+three situations where Claude might fabricate
+instead of summarize:
+</p>
+<ul>
+  <li><strong>Gaps in the input</strong> — if a
+    page was skipped or a section is missing,
+    Claude doesn't know there's a hole. It
+    smooths over the gap with something
+    plausible but potentially invented. This
+    is exactly why the book project rules say
+    "never skip pages."</li>
+  <li><strong>Context overflow</strong> — if the
+    text is too long and gets truncated or
+    compressed, Claude loses access to parts
+    of it. Now it's predicting from incomplete
+    information — like taking that open-book
+    exam but someone ripped out Chapter 7.</li>
+  <li><strong>Over-generalizing</strong> — Claude
+    might phrase something slightly different
+    from what the author actually said. Not
+    wrong, but not precise. The prediction
+    engine reaches for the "most likely"
+    phrasing rather than the exact one.</li>
+</ul>
+
+<div class="callout">
+  <div class="callout-title">
+    Real-World Example: The Book Pipeline
+  </div>
+  This is why the book project processes books
+  in 20-page batches through bookai. Each batch
+  keeps the full text in context — nothing gets
+  lost or truncated. The notes come from the
+  <em>actual pages</em>, not Claude's training
+  memory. Then when building the final HTML,
+  the notes are in context, so the chapter
+  prose is grounded in real content, not
+  hallucination. Every step keeps the source
+  material front and center.
+</div>
+
+<div class="key-concept">
+  <div class="label">Key Concept</div>
+  <div class="concept">
+    Text in context = grounded prediction.
+    <br>
+    <span style="font-size:15px;font-weight:400;
+      font-family:Inter;color:var(--muted)">
+      Claude isn't making things up when your
+      content is right there. It's synthesizing
+      what it can see — like an open-book exam.
+    </span>
   </div>
 </div>
 
@@ -6205,6 +6367,84 @@ function renderTokens() {
 document.getElementById('tokenInput')
   .addEventListener('input', renderTokens);
 renderTokens();
+
+// ====== NEW CONTENT TRACKER ======
+(function() {
+  var KEY = 'llm_guide_seen';
+  var seen = JSON.parse(localStorage.getItem(KEY) || '[]');
+  var badges = document.querySelectorAll('.new-badge');
+  var unseen = [];
+
+  // Each new-badge needs an id on its parent h3
+  badges.forEach(function(b, i) {
+    var h3 = b.closest('h3');
+    if (!h3.id) h3.id = 'new-section-' + i;
+    if (seen.indexOf(h3.id) === -1) {
+      unseen.push(h3);
+    } else {
+      // Already seen — remove badge
+      b.remove();
+    }
+  });
+
+  var btn = document.getElementById('newNavBtn');
+  if (unseen.length === 0) return;
+
+  // Show button with count
+  btn.style.display = '';
+  btn.textContent = 'NEW (' + unseen.length + ')';
+  var idx = 0;
+
+  function doScroll(target) {
+    var y = target.getBoundingClientRect().top
+      + window.scrollY - 80;
+    window.scrollTo({ top: y, behavior: 'smooth' });
+  }
+
+  window.jumpToNext = function() {
+    if (unseen.length === 0) return;
+    // Cancel any pending bookmark auto-scroll
+    window.__skipBookmarkScroll = true;
+    var target = unseen[idx];
+    // Scroll now, and again after a delay to beat
+    // any async bookmark scroll that fires late
+    doScroll(target);
+    setTimeout(function() { doScroll(target); }, 300);
+    setTimeout(function() { doScroll(target); }, 600);
+
+    // Mark as seen
+    if (seen.indexOf(target.id) === -1) {
+      seen.push(target.id);
+      localStorage.setItem(KEY, JSON.stringify(seen));
+    }
+
+    // Remove badge from this one
+    var badge = target.querySelector('.new-badge');
+    if (badge) {
+      badge.style.animation = 'none';
+      badge.style.opacity = '0.4';
+      badge.style.textDecoration = 'line-through';
+    }
+
+    idx++;
+    var remaining = unseen.length - idx;
+    if (remaining > 0) {
+      btn.textContent = 'NEW (' + remaining + ')';
+    } else {
+      // All seen — clear everything
+      btn.style.animation = 'none';
+      btn.textContent = 'ALL READ';
+      btn.style.background = 'var(--muted)';
+      setTimeout(function() {
+        btn.style.display = 'none';
+        unseen.forEach(function(h) {
+          var b = h.querySelector('.new-badge');
+          if (b) b.remove();
+        });
+      }, 1500);
+    }
+  };
+})();
 </script>
 
 <!-- Bookmark system -->

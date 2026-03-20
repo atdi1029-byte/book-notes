@@ -128,6 +128,10 @@
   if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
 
   function scrollToBookmarkData(d) {
+    // If new content exists, don't auto-scroll —
+    // let user read new stuff first
+    if (window.__skipBookmarkScroll ||
+        document.querySelectorAll('.new-badge').length > 0) return;
     var target = document.getElementById(d.id);
     if (target) {
       var rect = target.getBoundingClientRect();
