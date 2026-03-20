@@ -455,8 +455,9 @@ async function loadBookData() {
 
   const sections = shelfDoc.querySelectorAll('.section-title');
   sections.forEach(section => {
-    // Skip "Currently Reading" section
+    // Skip non-book sections
     if (section.id === 'readingTitle') return;
+    if (category === 'Guides') return;
     const category = section.textContent.trim();
     const shelf = section.nextElementSibling;
     if (!shelf || !shelf.classList.contains('shelf')) return;
@@ -466,6 +467,8 @@ async function loadBookData() {
       if (!href) return;
       // Skip hidden books
       if (bookEl.style.display === 'none') return;
+      // Skip plain English companion versions
+      if (href.includes('plain.html')) return;
       const dir = href.split('/')[0];
       const title = bookEl.querySelector('.book-title')?.textContent?.trim() || dir;
       const author = bookEl.querySelector('.book-author')?.textContent?.trim() || '';
