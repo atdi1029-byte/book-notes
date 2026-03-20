@@ -943,6 +943,58 @@ see if it's a memory problem. If the grid
 is 80%+ full, time to <code>/compact</code>.
 </p>
 <pre><code>/context</code></pre>
+<p>
+<strong>Real-world example &mdash; the book
+build:</strong> Building a book HTML is one of
+the longest, most context-heavy tasks you'll do.
+Here's what happens to your context window
+during a full book build:
+</p>
+<p>
+<strong>Phase 1 (bookai):</strong> Hundreds of
+PDF pages get processed into notes. Each 20-page
+batch eats context. By the time bookai finishes
+a 400-page book, you've generated 2,000+ lines
+of notes and the context is already half full
+from all that reading and writing.
+</p>
+<p>
+<strong>Phase 2 (compaction):</strong> You read
+the raw notes (5,000+ lines for big books) and
+compress them. More context consumed. Then you
+write summary.md. By now, context is 50-70% full.
+</p>
+<p>
+<strong>Phase 3 (HTML build):</strong> This is
+where it gets tight. You're reading notes.md,
+summary.md, and writing 1,200+ lines of HTML
+chapter by chapter. By chapter 15 of 20, Claude
+might start forgetting the CSS structure from
+chapter 1, or lose track of the line count target,
+or drop quality &mdash; shorter paragraphs, fewer
+examples. That's context exhaustion.
+</p>
+<p>
+<strong>The fix:</strong> Use <code>/compact</code>
+between phases. After bookai finishes and notes are
+saved to disk, compact before starting the HTML.
+That clears out all the PDF processing history and
+gives Claude room to focus on writing chapters.
+If you're mid-HTML-build and notice Claude slipping,
+compact again with focus instructions:
+</p>
+<pre><code>/compact "keep the HTML progress —
+  which chapters are written, which remain,
+  section order, and the 1,200-line target"</code></pre>
+<p>
+Your CLAUDE.md rules (section order, line targets,
+"never combine chapters") get reloaded after every
+compact, so Claude never forgets the rules &mdash;
+even when it forgets the conversation. That's why
+saving incrementally matters too: if context fills
+up completely, your progress is on disk, not lost
+in memory.
+</p>
 
 <h4 id="cmd-btw"><code>/btw</code></h4>
 <p>
