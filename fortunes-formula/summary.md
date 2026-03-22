@@ -1,0 +1,234 @@
+# Fortune's Formula
+## by William Poundstone (2005, 367 pages)
+
+### Overview
+
+Fortune's Formula traces the intellectual thread connecting
+Claude Shannon's information theory, John Kelly's gambling
+formula, and Ed Thorp's conquest of both Las Vegas and Wall
+Street. The book argues that a single mathematical idea --
+that information has measurable economic value and can be
+converted into capital growth at a calculable optimal rate --
+links the worlds of organized crime, Bell Labs, MIT, and
+modern hedge funds. It is part intellectual history, part
+true crime narrative, and part meditation on the meaning of
+risk, luck, and rationality in financial markets.
+
+The key characters are Claude Shannon (father of information
+theory), John Kelly Jr. (Bell Labs physicist who derived the
+optimal betting formula), Ed Thorp (mathematician who beat
+blackjack and then Wall Street), and Paul Samuelson (Nobel
+economist who waged a decades-long intellectual war against
+the Kelly criterion). Supporting them is a vivid cast of
+gangsters, gamblers, and financiers including Manny Kimmel,
+Michael Milken, Ivan Boesky, John Meriwether, and Warren
+Buffett.
+
+---
+
+### Part-by-Part Summary
+
+**Part One: Entropy**
+Introduces information as a commodity through the story of
+early 20th-century race wire services controlled by gangsters
+like Mont Tennes, Moe Annenberg, and Longy Zwillman. The
+narrative then shifts to Claude Shannon's foundational work
+at Bell Labs -- his master's thesis linking Boolean algebra to
+circuits, his invention of information theory in 1948, and
+the concept of entropy as measurable uncertainty. Shannon
+meets Ed Thorp at MIT, and together they build the first
+wearable computer to beat roulette. John Kelly Jr. publishes
+his 1956 paper proving that a gambler with a private wire can
+compound wealth at a rate equal to the information
+transmission rate -- the equation G_max = R.
+
+**Part Two: Blackjack**
+Thorp develops card counting for blackjack and tests it in
+Reno and Las Vegas with mob-connected financier Manny Kimmel.
+Shannon advises Thorp to use the Kelly formula for bet
+sizing. The trips prove the system works -- $10,000 becomes
+$21,000 in 30 hours of play -- but casinos respond with
+countermeasures including multiple-deck shoes, early
+shuffling, harassment, drugged drinks, and cheating dealers.
+Kelly dies of a brain hemorrhage at age 41 while walking to a
+meeting at IBM. His computer singing "Bicycle Built for Two"
+had earlier inspired the HAL scene in 2001: A Space Odyssey.
+
+**Part Three: Arbitrage**
+Paul Samuelson and the efficient market hypothesis take center
+stage. Samuelson champions the random walk model of stock
+prices, building on the forgotten work of Louis Bachelier.
+Shannon turns his attention to the stock market, studying
+arbitrage and developing a rebalancing strategy that extracts
+profit from volatility alone. Thorp transitions from casinos
+to Wall Street, discovers warrant mispricing, invents delta
+hedging, and co-founds hedge fund Princeton-Newport Partners
+with Jay Regan. The fund posts an unbroken streak of positive
+returns over 19 years, averaging 15.1% annually after fees,
+with remarkably low volatility.
+
+**Part Four: St. Petersburg Wager**
+The intellectual foundations of the Kelly-Samuelson debate.
+Daniel Bernoulli's 1738 resolution of the St. Petersburg
+paradox introduced utility theory and the geometric mean.
+Henry Latane independently applied Bernoulli's geometric mean
+to portfolio selection. Samuelson attacks the Kelly criterion
+as a "fallacy" and a "complete swindle," arguing that
+maximizing long-term compound return does not necessarily
+maximize expected utility. The debate polarizes economists
+and information theorists for decades. Thorp and the
+practical Kelly users argue that compound return is the only
+reasonable scorecard for long-term investors.
+
+**Part Five: RICO**
+The rise and fall of Princeton-Newport Partners through the
+lens of Rudy Giuliani's insider trading prosecutions. Ivan
+Boesky's insider trading network leads prosecutors to Michael
+Milken and then to Princeton-Newport's stock parking
+arrangements with Drexel Burnham. Giuliani uses RICO
+racketeering charges against the fund -- the first time the
+organized crime statute is applied to a securities firm. Jay
+Regan is convicted (later overturned on appeal), and the fund
+is dissolved in 1988, ending a 19-year run that turned $1
+into $14.78.
+
+**Part Six: Blowing Up**
+The cautionary tale of Long-Term Capital Management. John
+Meriwether recruits Nobel laureates Robert Merton and Myron
+Scholes, raises $1 billion, and uses 30x leverage to extract
+profit from tiny bond price discrepancies. Russia's 1998
+default triggers a global flight to quality that turns
+LTCM's "diversified" bets into correlated losses. The fund
+loses 90% of its value and requires a $3.6 billion bailout
+organized by the Federal Reserve. Poundstone argues the core
+problem was overbetting -- operating at roughly twice the
+Kelly-optimal leverage -- which left no margin for the fat-
+tail events that inevitably occur.
+
+**Part Seven: Signal and Noise**
+Shannon's stock portfolio reveals a 28% annual return over
+35 years, built on three inspired technology picks (Teledyne,
+Motorola, Hewlett-Packard). Thorp's statistical arbitrage
+systems at Princeton-Newport and later Ridgeline Partners
+demonstrate that persistent, algorithm-driven market
+inefficiencies can be profitably exploited. The Hong Kong
+horse racing syndicate of Bill Benter and Alan Woods proves
+the Kelly criterion works in pari-mutuel markets at scale.
+Shannon dies of Alzheimer's in 2001. The book ends with the
+Kelly debate unresolved, each side convinced posterity will
+vindicate its position.
+
+---
+
+### Key Themes
+
+- Information has quantifiable economic value; those who
+  possess it before others can convert it to wealth.
+- The line between gambling and investing is a minus sign --
+  favorable bets are investments, unfavorable ones are gambles.
+- Overbetting destroys wealth even when the bettor has a
+  genuine edge; position sizing matters as much as stock
+  selection or edge identification.
+- The tension between theoretical elegance (efficient market
+  hypothesis, utility theory) and practical results (Thorp's
+  track record, Shannon's portfolio) is never fully resolved.
+- Secrecy is essential to maintaining an information edge --
+  once a strategy becomes public knowledge, the market adapts
+  and the advantage disappears.
+
+---
+
+### Key People and Their Roles
+
+- **Claude Shannon**: Father of information theory; connected
+  entropy, gambling, and investment; built roulette computer
+  with Thorp; achieved 28% annual stock returns.
+- **John Kelly Jr.**: Bell Labs physicist; proved optimal bet
+  sizing equals edge/odds; died at 41 before seeing his
+  formula's influence on finance.
+- **Ed Thorp**: Beat blackjack, invented delta hedging, ran
+  Princeton-Newport Partners and Ridgeline Partners; the
+  living embodiment of the Kelly criterion applied to markets.
+- **Paul Samuelson**: Nobel economist; championed efficient
+  markets; called Kelly criterion a "fallacy" and waged
+  decades-long campaign against it.
+- **Manny Kimmel**: Mob-connected parking lot magnate who
+  bankrolled Thorp's first casino blackjack experiments.
+- **Jay Regan**: Thorp's East Coast partner at Princeton-
+  Newport; convicted under RICO (later overturned).
+- **Michael Milken**: Junk bond king; served as Princeton-
+  Newport's primary broker; convicted of securities fraud.
+- **John Meriwether**: Founded LTCM; his overbetting and
+  excessive leverage led to the most famous blowup in hedge
+  fund history.
+- **Warren Buffett**: Appears throughout as the practical
+  counterexample to efficient market theory; endorsed Thorp
+  early in his career.
+
+---
+
+### The Kelly Criterion Explained Simply
+
+The Kelly formula tells you what fraction of your bankroll to
+bet on a favorable opportunity:
+
+**Bet size = edge / odds**
+
+- **Edge** is your average expected profit per dollar wagered.
+- **Odds** are the payoff ratio (how much you win per dollar
+  if you win).
+
+For example: a coin lands heads 60% of the time, paying even
+money. Your edge is 20% (you win $1.20 on average per $1
+bet). The odds are 1-to-1. Kelly says bet 20% of your
+bankroll.
+
+The formula has three key properties:
+1. It maximizes the long-term compound growth rate of wealth.
+2. It never risks total ruin (bets are proportional to
+   current wealth, so they shrink as you lose).
+3. It reaches any wealth target faster than any other system.
+
+The catch: Kelly betting is volatile. You will frequently
+lose half your bankroll before recovering. Most practitioners
+use "fractional Kelly" -- betting half or less of the full
+Kelly amount -- to reduce gut-wrenching drawdowns while
+sacrificing only modest return.
+
+---
+
+### How the Book Connects Gambling, Information Theory,
+### and Wall Street
+
+The central insight threading through the book is that
+Shannon's information theory, Kelly's gambling formula, and
+modern quantitative finance are the same mathematics applied
+to different domains.
+
+Shannon proved that information -- the reduction of
+uncertainty -- is measurable in bits. Kelly showed that a
+gambler with an information edge can compound wealth at a
+rate exactly equal to the rate of information flow. Thorp
+proved this works in practice, first at blackjack tables
+(where card counting provides information about the deck),
+then in financial markets (where mispriced warrants and
+options provide information about true value versus market
+price).
+
+The connection runs deeper than analogy. Shannon's
+rebalancing strategy for stocks is mathematically equivalent
+to Kelly-optimal gambling. The Hong Kong Syndicate's horse
+racing algorithms use the same factor analysis and Kelly
+position sizing that Thorp's statistical arbitrage funds
+used on Wall Street. And the LTCM disaster is best
+understood not through the lens of efficient market theory or
+Value at Risk, but through Kelly's framework: the fund was
+overbetting by roughly 2x, which Kelly's theory predicts
+will eventually produce a compound return of zero.
+
+The book's ultimate argument is that information theory
+provides a unified language for understanding risk across
+all domains -- from telegraph wires to roulette wheels to
+government bond spreads -- and that the Kelly criterion is
+the mathematical key to converting information advantages
+into sustainable wealth.
