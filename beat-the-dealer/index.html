@@ -1,0 +1,1934 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"
+  content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style"
+  content="black-translucent">
+<meta name="theme-color" content="#f4efe8">
+<title>Beat the Dealer - Notes</title>
+<link rel="stylesheet" href="../book.css?v=3">
+</head>
+<body>
+
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar"
+  style="display:none" onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+    onclick="event.stopPropagation();clearBookmark()">
+    Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+
+<h1>Beat the Dealer</h1>
+<p class="subtitle">By Edward O. Thorp &middot;
+1962 (revised 1966) &middot; 215 pages</p>
+
+<nav class="toc">
+<h2>Contents</h2>
+<ol>
+<li><a href="#ch1">Introduction</a></li>
+<li><a href="#ch2">The Rules of Blackjack</a></li>
+<li><a href="#ch3">The Basic Strategy</a></li>
+<li><a href="#ch4">A Winning Strategy</a></li>
+<li><a href="#ch5">My Ideas Are Tested in Nevada</a></li>
+<li><a href="#ch6">The Simple Point-Count System</a></li>
+<li><a href="#ch7">The Complete Point-Count System</a></li>
+<li><a href="#ch8">Counting Tens</a></li>
+<li><a href="#ch9">Beating the Casino Countermeasures</a></li>
+<li><a href="#ch10">How to Spot Cheating</a></li>
+<li><a href="#ch11">Can the Cheating Be Stopped?</a></li>
+<li><a href="#ch12">Science Versus Chance</a></li>
+<li><a href="#takeaways">Key Takeaways</a></li>
+<li><a href="#contrarian">Contrarian Ideas</a></li>
+<li><a href="#quotes">Notable Quotes</a></li>
+<li><a href="#frameworks">Frameworks &amp; Systems</a></li>
+<li><a href="#references">Referenced Works</a></li>
+</ol>
+</nav>
+
+<!-- =================== CHAPTER 1 =================== -->
+
+<h2 id="ch1">Chapter 1: Introduction</h2>
+
+<p>
+<strong>Blackjack</strong> is one of the most widely
+played gambling games on earth. In the early 1960s you
+could find it in Nevada casinos, Caribbean resorts,
+London clubs, and backroom games from Hong Kong to
+Macao. The English called it "van-john," Australians
+said "pontoon," and the French knew it as
+<em>vingt-et-un</em>. Whatever the name, the game was
+everywhere &mdash; and everywhere, the house won.
+</p>
+
+<p>
+What made blackjack different from every other casino
+game was a mathematical fact that no one had yet
+exploited: the game has memory. In roulette, the ball
+has no recollection of where it landed last. In craps,
+the dice start fresh every throw. But in blackjack,
+cards dealt in one round are gone from the deck until
+the next shuffle. This means the odds shift
+continuously as cards are consumed. Sometimes the
+remaining deck favors the player. Sometimes it favors
+the house. If you could tell the difference, you could
+bet accordingly &mdash; and win.
+</p>
+
+<p>
+<strong>Edward O. Thorp</strong>, a mathematics professor
+at MIT and later UC Irvine, was the first person to
+prove this rigorously. Using an <strong>IBM 704</strong>
+computer, he calculated the exact effect of removing
+each type of card from the deck and discovered that
+certain depletions gave the player a significant
+mathematical edge. He then designed a hierarchy of
+increasingly powerful systems that any dedicated player
+could learn.
+</p>
+
+<p>
+The simplest system &mdash; the <strong>basic
+strategy</strong> &mdash; required no card counting at
+all. It was just a set of memorized rules for every
+possible decision: when to hit, stand, split, or double
+down. Played correctly, it gave the player roughly a
+0.1% advantage over the house in a typical Las Vegas
+game. That alone was revolutionary. No other casino game
+offered the player an edge of any kind.
+</p>
+
+<p>
+Beyond basic strategy lay the counting systems. The
+<strong>Five-count system</strong> tracked only the four
+Fives in the deck. When all four had been played, the
+player enjoyed a 3.6% advantage and bet big. It was
+startlingly simple &mdash; most people were amazed they
+only needed to track four cards, not all fifty-two. The
+<strong>point-count system</strong> assigned +1 to low
+cards and &minus;1 to high cards, identifying favorable
+situations far more frequently. The <strong>Ten-count
+method</strong> tracked the ratio of Tens to non-Tens
+with even greater precision.
+</p>
+
+<p>
+Thorp tested these systems with real money in real
+casinos. Backed by two millionaires with $10,000 in
+cash, he played thirty hours in Nevada and turned the
+stake into over $21,000 &mdash; never dipping more than
+$1,300 into the original capital. The theory worked
+exactly as predicted. Casinos responded with panic:
+shuffling after every hand, switching dealers,
+introducing cheating mechanics, and ultimately changing
+the rules of blackjack for the first time in the game's
+history.
+</p>
+
+<blockquote>
+"When a lamb goes to the slaughter, the lamb
+<em>might</em> kill the butcher. But we always bet on
+the butcher."
+<cite>&mdash; A casino operator on national television</cite>
+</blockquote>
+
+<p>
+Thorp's reply was quiet and devastating: "The day of the
+lamb had come." <em>Beat the Dealer</em> sold over a
+million copies, hit the <strong>New York Times</strong>
+bestseller list, and launched an entire industry of
+advantage play. Readers used its methods not just at
+blackjack tables but as launching pads for horse racing
+syndicates, stock option trading firms, and hedge funds.
+The bet-sizing methods Thorp developed for blackjack are
+now standard tools in quantitative finance.
+</p>
+
+<!-- =================== CHAPTER 2 =================== -->
+
+<h2 id="ch2">Chapter 2: The Rules of Blackjack</h2>
+
+<p>
+Understanding blackjack's rules precisely is the
+foundation of everything that follows. Most players
+think they know the rules, but few grasp the exact
+effect of each variation &mdash; and those variations
+are where the mathematical edge lives. A casino that
+lets you double down on any two cards gives you a
+measurably different game than one restricting doubles
+to hard 11 only. The difference might be less than a
+percentage point, but over thousands of hands, fractions
+of a percent compound into serious money.
+</p>
+
+<p>
+The basic structure is simple. One dealer faces one to
+seven players. Each receives two cards. The dealer shows
+one card face up. Players decide whether to hit
+(take another card), stand, split pairs into separate
+hands, or double down (double the bet for exactly one
+more card). The goal is to beat the dealer's total
+without exceeding 21. Go over, and you "bust" &mdash;
+losing immediately, regardless of what the dealer holds.
+</p>
+
+<p>
+This bust rule is the casino's structural advantage. If
+both the player and the dealer bust on the same hand,
+the dealer wins. The player busts first because the
+player must act first. Even if both sides play identical
+strategies, this asymmetry gives the house roughly a
+5.7% edge. Against that, the player has one powerful
+compensation: a natural blackjack (an Ace plus a
+ten-value card) pays 3-to-2 instead of even money. That
+bonus is worth about 2.3% to the player, cutting the
+house edge significantly but not eliminating it.
+</p>
+
+<p>
+The critical distinction between <strong>hard</strong>
+and <strong>soft</strong> hands governs optimal play.
+A soft hand contains an Ace counted as 11 without the
+total exceeding 21. A hard hand is everything else.
+The best strategy for a soft 17 differs sharply from a
+hard 17 &mdash; drawing to a soft 17 has almost no
+downside, while drawing to a hard 17 risks busting.
+This distinction trips up even experienced players who
+play both types identically.
+</p>
+
+<p>
+<strong>Splitting pairs</strong> lets you turn one bad
+hand into two potentially better ones. Always split Aces
+and Eights. Never split Fours, Fives, or Tens. Aces are
+the best pair to split because each gives you a strong
+chance at 21. Eights should be split because 16 is the
+worst possible total &mdash; you're replacing one
+terrible hand with two average ones. Tens should never
+be split because you're breaking up a 20, one of the
+strongest hands possible, for two hands that are merely
+above average.
+</p>
+
+<p>
+<strong>Doubling down</strong> lets you double your bet
+in exchange for receiving exactly one more card. It's
+most profitable on totals of 10 or 11, where drawing a
+ten-value card gives you an excellent total. Nevada
+casinos generally allowed doubling on any two cards,
+while Puerto Rico restricted it to hard 11 only &mdash;
+a restriction worth nearly a full percentage point to
+the house. The <strong>insurance</strong> side bet,
+offered when the dealer shows an Ace, pays 2-to-1 if
+the dealer has a natural. On average it carries a 5.9%
+house edge, but as Thorp would later show, card counters
+can turn it into a weapon against the casino.
+</p>
+
+<p>
+One rule variation deserves special contempt: games
+where the dealer wins all ties. This gives the house a
+crushing 9% edge and should be avoided absolutely.
+Similarly, games where the dealer draws on soft 17
+(rather than standing) cost the player about 0.2%.
+These details seem minor but they accumulate. Thorp's
+<strong>Table 9.2</strong> catalogues the precise effect
+of every common rule variation, allowing players to
+evaluate any casino in the world.
+</p>
+
+<p>
+Beyond the printed rules lie the customs &mdash;
+unwritten practices that vary from casino to casino,
+shift to shift, even dealer to dealer. <strong>Shills
+</strong> are house employees who pretend to be players,
+betting house money to attract customers. They follow
+rigid rules: never double down, never split pairs, never
+insure. Understanding these customs matters because the
+winning strategies depend on the exact conditions of
+play. How often does the dealer shuffle? How many decks
+are used? How deep into the deck does play go before a
+reshuffle? Each factor changes the math.
+</p>
+
+<!-- =================== CHAPTER 3 =================== -->
+
+<h2 id="ch3">Chapter 3: The Basic Strategy</h2>
+
+<p>
+The basic strategy was born during a Christmas vacation.
+Thorp and his wife visited Las Vegas &mdash; not as
+gamblers but as tourists, enjoying shows and swimming
+pools. A UCLA colleague, <strong>Professor
+Sorgenfrey</strong>, had told him about a mathematics
+journal article by <strong>Baldwin, Cantey, Maisel, and
+McDermott</strong> that computed a blackjack strategy
+limiting the house edge to just 0.62%. Intrigued, Thorp
+wrote the strategy on a card and took it to a $10
+blackjack table.
+</p>
+
+<p>
+The scene was almost comical. The dealer was scornful of
+this "system player" consulting a card. Bystanders
+pitied his bizarre plays: splitting Eights, doubling on
+(Ace,2) against a dealer Five, standing on hard 12
+against a Four. But after twenty minutes of play, during
+which the dealer ran hot and other players hemorrhaged
+chips, Thorp's ten silver dollars held steady. Then he
+drew to a soft 18 and received an Ace for a seven-card
+21 &mdash; a hand that occurs once in several thousand
+deals. The atmosphere shifted from amusement to respect.
+Thorp left up $8.50 and thinking: there might be a way
+to beat this game.
+</p>
+
+<blockquote>
+"There might be a way to beat it."
+<cite>&mdash; Thorp's realization after his first
+casino visit</cite>
+</blockquote>
+
+<p>
+Back home, Thorp began intensive study. He used the
+<strong>IBM 704</strong> computer to improve upon
+Baldwin's strategy, producing what he called the "basic
+strategy" &mdash; the mathematically optimal way to
+play every possible blackjack hand when you have no
+information about the remaining deck beyond your own
+cards and the dealer's up card. His calculations showed
+that a player using the correct basic strategy had a
+0.12% advantage in a typical single-deck Las Vegas game.
+In some casinos the edge reached 0.6%. Even under the
+most adverse rules, the disadvantage was less than 1%.
+</p>
+
+<p>
+The strategy boils down to a set of standing numbers.
+Against a dealer showing 7 or higher, stand on hard 17
+or more and draw on 16 or less. Against a dealer showing
+6 or lower, stand on hard 12 or more &mdash; the dealer
+is likely to bust. For soft hands, the standing numbers
+are higher because drawing cannot make your hand worse
+when the Ace can flex between 1 and 11. You can draw to
+a soft 16 with zero risk of making your hand poorer.
+</p>
+
+<p>
+Doubling down follows clear patterns. Always double hard
+11. Double hard 10 against everything except an Ace or
+Ten. Hard 9 doubles less frequently. Soft doubling is
+most profitable against dealer up cards of 2 through 6.
+Thorp tells a story from the <strong>Silver
+Slipper</strong> in Las Vegas: he shoved out $30 on
+(Ace,2) against a dealer Five in a 6% advantage
+situation. The dealer's hole card was a Four, and he
+drew a Ten for 19. Thorp's third card was a Seven,
+giving him only 10. The dealer wore a strange expression
+&mdash; Thorp's enormous advance bet on such weak
+hole cards seemed either prescient or insane. The basic
+strategy didn't win that particular hand, but over
+thousands of hands, it makes you "luckier" than any
+other approach.
+</p>
+
+<p>
+For pair splitting, the approximate rules are
+beautifully simple: always split Aces and Eights, never
+split Fours, Fives, or Tens, and split everything else
+against a dealer showing 2 through 7. This
+approximation introduces only five errors and adds just
+0.13% to the house advantage. The logic is intuitive.
+Splitting Aces gives you a strong chance at 21 on each
+hand. Splitting Eights replaces the worst total in
+blackjack (16) with two average starting hands. Splitting
+Tens destroys a near-perfect 20 for two slightly
+above-average hands &mdash; a terrible trade.
+</p>
+
+<p>
+How does the basic strategy compare to how people
+actually play? The numbers are stark. A basic strategy
+player has a +0.1% edge. A player following the advice
+of card game "experts" faces a &minus;3.2% disadvantage.
+A player who mimics the dealer (drawing to 16, standing
+on 17) faces &minus;5.7%. A "never bust" strategy
+&mdash; standing on any hand of hard 12 or higher
+&mdash; costs between 5% and 8%. The typical casino
+player loses between 2% and 15%. In other words, the
+gap between optimal and average play is enormous.
+Compared to other casino games, basic strategy blackjack
+is the only game where the player has any edge at all.
+Craps at best play costs &minus;1.4%. European roulette
+costs &minus;1.35%. American roulette costs up to
+&minus;5.26%.
+</p>
+
+<p>
+<strong>Professor John Blattner</strong> of San Fernando
+Valley State College provided a perfect cautionary tale.
+His barber insisted that "anyone can win by just refusing
+to go bust" &mdash; standing on hard 12 always. After an
+after-hours game where Blattner lost $1,500 to the
+barber (who was dealing), the barber agreed to settle
+the debt with free haircuts for a year. Did Blattner
+trim his barber? Absolutely &mdash; the never-bust
+strategy guarantees the house a crushing edge. The
+barber was simply dealing himself the house advantage
+and collecting.
+</p>
+
+<!-- =================== CHAPTER 4 =================== -->
+
+<h2 id="ch4">Chapter 4: A Winning Strategy</h2>
+
+<p>
+Every casino game has a house edge &mdash; a built-in
+mathematical advantage that ensures the casino wins over
+time. The casino adjusts its rules to cover expenses and
+yield a profit on invested capital. Players, meanwhile,
+chase the dream of beating the house with betting
+systems. The most famous is the <strong>Martingale
+</strong> (doubling-up system): bet $1, and if you lose,
+bet $2, then $4, then $8, continuing to double until you
+win. The first win recoups all previous losses plus $1
+in profit. It sounds foolproof. It isn't.
+</p>
+
+<p>
+A string of nine consecutive losses requires a $512 bet.
+Casino table limits (typically $500) prevent you from
+continuing. Even without limits, mathematicians proved
+long ago that no betting system can overcome a house
+edge in an <strong>independent trials process</strong>
+&mdash; a game where each round is unaffected by
+previous rounds. The cards, as the saying goes, have no
+memory. This is true for roulette and craps. But
+blackjack is fundamentally different.
+</p>
+
+<blockquote>
+"The cards have no memory."
+<cite>&mdash; Popular gambling phrase (which happens
+to be wrong for blackjack)</cite>
+</blockquote>
+
+<p>
+In blackjack, what happens in one round directly
+influences the next. If all four Aces appear in the
+first round, there will be no naturals, no soft hands,
+and no Ace splits for the remainder of that deck &mdash;
+a situation that costs the player nearly 3% until the
+next shuffle. The deck literally remembers what has been
+dealt. This dependence is the crack in the casino's
+armor, and Thorp drove a mathematical truck through it.
+</p>
+
+<p>
+One Nevada casino was caught exploiting this same
+principle dishonestly. They removed four Tens and a Nine
+from their deck, adding 2.5% to the house advantage.
+The <strong>Nevada Gaming Control Board</strong> caught
+them and brought them to trial. Ironically, the casino's
+operators knew the short deck helped them but had no
+idea how much. An expert witness testified the
+disadvantage was 25% &mdash; ten times the actual effect
+&mdash; and the casino had no counter-argument. Their
+license was revoked.
+</p>
+
+<p>
+Thorp asked the IBM 704 a series of questions: what
+happens to the player's advantage when all four cards
+of a single denomination are removed from the deck?
+The answers revealed a striking pattern. Removing
+low cards (2 through 7) helped the player; removing
+high cards (9, 10, Ace) hurt the player. And one card
+stood out above all others: the <strong>Five</strong>.
+Removing all four Fives shifted the player's advantage
+by an enormous 3.58% &mdash; the largest single-card
+effect in the game.
+</p>
+
+<p>
+This discovery led to the <strong>Five-count
+strategy</strong>. The method was astonishingly simple:
+play basic strategy while watching for Fives. When all
+four Fives had been dealt, the remaining deck gave the
+player a 3.6% advantage. At that moment, bet big. The
+rest of the time, bet small. The player would lose
+fractional pennies on the small bets and win dollars on
+the big ones. The math was overwhelmingly favorable.
+Playing head-on at 100 hands per hour with $1 small bets
+and $500 big bets, the expected profit was roughly $170
+per hour.
+</p>
+
+<p>
+An even more refined approach tracked the ratio of
+unseen cards to unseen Fives (the <strong>U/F
+ratio</strong>). A normal deck has a U/F ratio of 13
+(52 cards divided by 4 Fives). When the ratio exceeded
+13, the deck was Five-poor and the casino had the edge.
+When it dropped below 13, the deck was Five-rich and the
+player had the edge. This method found many more
+favorable situations than simply waiting for all Fives
+to disappear, and it worked against any number of decks
+without modification.
+</p>
+
+<blockquote>
+"You must NEVER, NEVER play with money that it will
+hurt you to lose."
+<cite>&mdash; Edward O. Thorp</cite>
+</blockquote>
+
+<p>
+Capital management was essential. Playing with "scared
+money" produced psychological disintegration, bad
+decisions, and a higher chance of ruin. With a stake of
+150 units (small bets of 1 unit, big bets of 3 units),
+the chance of losing everything was less than 1 in 10.
+With 75 units, the chance of ruin rose to about 3 in 10.
+The Five-count was the simplest winning system, but
+far more powerful methods were waiting.
+</p>
+
+<!-- =================== CHAPTER 5 =================== -->
+
+<h2 id="ch5">Chapter 5: My Ideas Are Tested
+in Nevada</h2>
+
+<p>
+Before going to Nevada, Thorp had to go public. He
+submitted a paper titled <strong>"Fortune's Formula: A
+Winning Strategy for Blackjack"</strong> to the
+<strong>American Mathematical Society</strong>'s annual
+meeting in Washington, D.C. The abstract was published
+before the meeting, and a reporter from the
+<em>Boston Globe</em> called. The story ran on the front
+page. News services picked it up. Thousands of
+newspapers across America carried the story of a math
+professor who claimed he could beat the casinos.
+</p>
+
+<p>
+Thorp's office at MIT was flooded with mail. Hundreds
+of letters requested copies of the paper. A remarkable
+number included offers to bankroll casino tests &mdash;
+over $100,000 in total backing was proffered by
+strangers. Thorp chose two New York multimillionaires he
+calls <strong>Mr. X</strong> and <strong>Mr. Y</strong>.
+Mr. Y had once lost $100,000 in a single casino session
+without serious financial distress. Mr. X was familiar
+with card counting and had made large sums at blackjack
+himself. More importantly, Mr. X had the practical
+knowledge to spot casino cheating.
+</p>
+
+<p>
+They arrived in Reno at 2 A.M. during MIT's one-week
+spring recess, carrying $10,000 in cash &mdash; a
+hundred hundred-dollar bills. Thorp used the
+<strong>Ten-count method</strong>, tracking the ratio of
+non-Tens to Tens in the remaining deck. A full deck has
+a ratio of 36/16 = 2.25. When the ratio dropped below
+2.25, the player had the edge. Thorp's betting was
+conservative: 2x minimum at 1% advantage, 4x at 2%,
+leveling off at 10x minimum at 5% or more.
+</p>
+
+<p>
+The results validated the mathematics perfectly. The
+$10,000 grew to over $21,000 in about thirty hours of
+play. They never had to dig more than $1,300 into the
+original capital. But the casinos fought back with
+everything they had. Dealers shuffled whenever Thorp
+changed his bet size &mdash; or scratched his nose.
+Casino owners refused to sell large-denomination chips.
+Four new decks appeared in five minutes at one table.
+The dealer at one Reno casino accused Thorp of having
+"unusually acute vision" and memorizing every card &mdash;
+Thorp challenged him to demonstrate this skill for $5,
+then $50, then $500. The dealer refused.
+</p>
+
+<blockquote>
+"It is well known to students of mnemotechny that one
+can readily learn to memorize in proper order part or
+all of a deck of cards as it is dealt out."
+<cite>&mdash; Edward O. Thorp, responding to
+accusations of impossible memory</cite>
+</blockquote>
+
+<p>
+At the Primadonna casino, Thorp disposed of three silver
+dollars at a blackjack table and caught a great sequence
+of favorable situations &mdash; $3 became $35 in five
+minutes. But the most telling moment came when a balding
+man at the next club looked at them nervously and said,
+"No, thank you" &mdash; they had been recognized as
+system players and were being turned away. The system
+worked. The casinos knew it worked. The only question
+was how they would respond.
+</p>
+
+<p>
+Thorp returned to MIT satisfied. The system had
+performed in practice exactly as theory predicted. He
+had proven something that no mathematician had ever
+proven before: a casino gambling game could be beaten
+consistently by a player using nothing but his brain
+and a sound understanding of probability.
+</p>
+
+<!-- =================== CHAPTER 6 =================== -->
+
+<h2 id="ch6">Chapter 6: The Simple Point-Count
+System</h2>
+
+<p>
+The point-count system refined and simplified the
+Five-count into something far more powerful. The idea
+was elegant: assign a value of +1 to every low card
+(2 through 6) and &minus;1 to every high card (10, Ace).
+Cards 7 through 9 count as zero. As you watch cards
+being played, keep a running total. When the total is
+positive, the remaining deck is rich in high cards and
+the player has the edge. When it's negative, the deck
+favors the house.
+</p>
+
+<p>
+Betting was proportional to the count. If the count was
+zero or negative, bet the minimum. If positive, bet as
+many units as the count. A count of +4 meant the deck
+was as favorable as if all four Fives had been removed
+&mdash; but the point count found these situations far
+more frequently and far earlier in the deck. Players
+using this system could win several times faster than
+with the Five-count alone.
+</p>
+
+<p>
+The system got its most spectacular test in
+<strong>Puerto Rico</strong>. After <em>Beat the
+Dealer</em> was published, Thorp appeared on the TV
+show <em>I've Got a Secret</em>, where comedian
+<strong>Henry Morgan</strong> was dispatched to test the
+system with a $200 bankroll. Thorp spent an afternoon
+teaching Morgan the basics, but Morgan's jokes proved
+more interesting than the training. Meanwhile, Thorp
+flew to Puerto Rico with two young entrepreneurs,
+<strong>Mr. M</strong> and <strong>Mr. N</strong>, for
+serious play.
+</p>
+
+<p>
+Puerto Rico was a different world from Nevada. The
+government posted official rules on casino walls.
+Casinos couldn't suddenly change rules as in Nevada. A
+government official sat in the playing area at all
+times. No liquor was served. Two decks were dealt face
+up from a shoe, and &mdash; crucially &mdash; the
+dealing went all the way to the last card before
+reshuffling. This created perfect conditions for card
+counting. The betting limits were small ($1 to $50), but
+Thorp could play up to seven hands simultaneously at
+empty tables, multiplying his edge.
+</p>
+
+<p>
+At the tables, Thorp encountered a legend. The casino
+called him <strong>the Salmon</strong> (Puerto Rican
+slang for "jerk"), and he cultivated that image
+brilliantly. The Salmon would stack chips in towering
+irregular columns, scatter them across the layout to
+block other players, and keep up a stream of amusing
+chatter with the dealers. He would sometimes hit a
+blackjack until it busted, or stand on a pair of deuces.
+The casino staff thought he was a madman. He was, in
+fact, using <strong>end play</strong> &mdash; a
+devastating technique made possible by the deal-to-the-
+last-card rule.
+</p>
+
+<p>
+End play worked like this: near the end of the shoe,
+the Salmon would bet $1 on four or five hands,
+deliberately busting strong hands and standing on weak
+ones. This separated the high cards (Tens and Aces) from
+the low cards, routing the good cards into the discard
+pile. When the shoe ran out and the discards were
+reshuffled, the new shoe was rich in high cards.
+The Salmon then bet the maximum $50 on every hand.
+The advantage frequently reached 10% or more, sometimes
+approaching certainty.
+</p>
+
+<p>
+The Salmon had started with $200 and a 99% chance of
+winning indefinitely. Over nine months of play &mdash;
+roughly 40 hours per week, 240,000 hands total &mdash;
+his $200 grew to <strong>$50,000</strong>. He never bet
+more than $50 per hand. In Las Vegas, with a $500 limit,
+the same results would have yielded $500,000. It was one
+of the great marathon feats in gambling history, and it
+proved the point-count system beyond any reasonable
+doubt.
+</p>
+
+<p>
+Thorp also realized during this trip that a complete
+count of all cards &mdash; using a helper with a tally
+sheet &mdash; could reveal the dealer's exact hole card
+near the end of the shoe. <strong>Julian Braun</strong>
+of IBM had calculated that knowing the dealer's hole
+card gave the player a 9.9% advantage. At $50 per hand
+across six hands per hour, this translated to $900 per
+evening. Puerto Rican casinos changed their rules soon
+after, and the opportunity disappeared &mdash; but not
+before the Salmon's exploits had proven the mathematics
+spectacularly.
+</p>
+
+<!-- =================== CHAPTER 7 =================== -->
+
+<h2 id="ch7">Chapter 7: The Complete Point-Count
+System</h2>
+
+<p>
+The complete point count &mdash; also known as the
+<strong>high-low system</strong> &mdash; was independently
+discovered by many readers of the first edition. The
+first person to announce it scientifically was
+<strong>Harvey Dubner</strong> of Simmons Precision
+Products, who presented it at a panel session of the
+<strong>1963 Fall Joint Computer Conference</strong>
+in Las Vegas. The panel included Dubner, <strong>Julian
+Braun</strong> of IBM (whose computer analysis was the
+most accurate in existence), <strong>Allan Wilson</strong>
+(author of <em>The Casino Gambler's Guide</em>), and
+<strong>Robert Kalaba</strong> of the RAND Corporation.
+Thorp moderated.
+</p>
+
+<p>
+The complete point count perfected the simple version
+by dividing the running point total by the number of
+unseen cards to produce the <strong>high-low
+index</strong>. This normalization made the count work
+accurately across any number of decks. With one deck,
+if four cards had fallen (5, 5, 3, 8), the point total
+was +3 and 48 cards remained unseen, giving an index of
+3/48 &asymp; 6%. With four decks, the same point total
+over a larger pool of unseen cards would produce a
+smaller index, reflecting the reduced advantage.
+</p>
+
+<p>
+The betting scheme was straightforward: bet 1 unit for
+an index of 2 or less. At index 4, bet 2 units. The
+general rule was to bet half the index &mdash; index 6
+meant 3 units, index 8 meant 4, and index 10 or more
+meant 5 units (the cap, because larger variations
+excited casinos too much). The system also adjusted
+playing strategy based on the count. When the deck was
+rich in high cards, you stood more often, doubled down
+more often, and split pairs more often. When it was
+poor, you drew more aggressively.
+</p>
+
+<p>
+The strategy variations were codified in detailed
+tables. <strong>Table 7.1</strong> governed hard standing
+decisions: for each combination of dealer up card and
+player total, a threshold index determined whether to
+stand or draw. If your index exceeded the threshold, you
+stood; otherwise you drew. The tables also covered soft
+hands, hard and soft doubling down, pair splitting, and
+insurance. The insurance threshold was simple: if the
+index exceeded 8, take insurance. Otherwise, don't.
+</p>
+
+<p>
+Braun's computer analysis confirmed that the complete
+point count was comparable in power to the Ten-count
+method. In an era when casinos were learning to spot
+counters and tightening their rules, having two
+independent counting systems was a significant tactical
+advantage. A player caught using one could switch to the
+other. Thorp's recommendation: beginners should master
+either the point count or the Ten count (not both),
+while experts should learn both as alternate weapons.
+</p>
+
+<p>
+The frequency data told the story of profitability.
+Based on 200,000 random shuffles, after five cards were
+dealt, the index fell between +5 and +15 about 9.5%
+of the time &mdash; situations where the player had a
+meaningful edge. The index fell between &minus;5 and +5
+about 81% of the time &mdash; essentially neutral
+territory. The beauty of the system was that the player
+gained more from positive-index situations than they
+lost from negative-index situations, because they could
+vary both their bets and their strategy.
+</p>
+
+<!-- =================== CHAPTER 8 =================== -->
+
+<h2 id="ch8">Chapter 8: Counting Tens</h2>
+
+<p>
+The Ten-count strategy was the workhorse system of the
+first edition &mdash; the method Thorp used to win
+$21,000 in Nevada and the one that thousands of readers
+took into casinos around the world. It tracked two
+numbers: the count of non-Tens ("others") and the
+count of Tens remaining in the deck. A full deck starts
+at (36, 16). The ratio of others to Tens &mdash; 36/16
+= 2.25 &mdash; is the key metric. When the ratio drops
+below 2.25, the remaining deck is Ten-rich and the
+player has the advantage. When it rises above 2.25,
+the house has the edge.
+</p>
+
+<p>
+Learning to count required practice. Thorp recommended
+turning over a shuffled deck one card at a time while
+maintaining the running count. A speed of 25 to 50
+seconds per deck was the target &mdash; 50 seconds
+was "more than adequate," 25 seconds was "excellent."
+Thorp himself had trouble breaking below 25 seconds
+until he realized it took nearly that long just to
+physically turn over the cards. The real test was
+maintaining the count while playing and making
+conversation &mdash; which required a different kind
+of practice, best done with a partner dealing hands.
+</p>
+
+<p>
+The counting skill also served as a cheating detector.
+At one casino, Thorp watched a dealer spread a deck
+for examination after the joker vanished mid-deal.
+Players demanded to inspect the cards. The dealer spread
+and scooped the deck in about four seconds &mdash; far
+too fast for a normal examination. Thorp managed to
+count 38 cards in the fraction of time available, then
+quickly counted the remaining pile: 20 cards. The deck
+had 58 cards. The pit boss counted the deck privately,
+wore an odd expression, and walked away with it. The
+trusting players continued their game without a second
+thought.
+</p>
+
+<p>
+The conservative betting scheme (<strong>Table
+8.2</strong>) scaled wagers to the ratio: 1 unit above
+2.00, 2 units between 2.00 and 1.75, 4 units between
+1.75 and 1.65, and 5 units below 1.65. Bets capped
+at 5 units to avoid alarming the casino. The insurance
+rule was clean: insure when the ratio was below 2.00,
+don't insure when above. This turned the insurance bet
+&mdash; originally introduced by casinos as a trap for
+suckers &mdash; into a profitable weapon for the
+counter.
+</p>
+
+<p>
+Two widespread misconceptions about insurance drove
+Thorp to distraction. The first was "always insure a
+natural." The reasoning sounded airtight: if the dealer
+also has a natural, you tie but win the insurance bet
+(1 unit). If the dealer doesn't, you win 1.5 units on
+your natural but lose 0.5 on insurance (net 1 unit).
+Either way, you lock in exactly 1 unit of profit. Why
+not take the sure thing? Because when the deck is
+depleted of Tens, the dealer can't possibly have a
+natural. In that case, not insuring nets you 1.5 units
+instead of 1. Insuring throws away half a unit.
+</p>
+
+<p>
+The second misconception &mdash; "insure good hands,
+never poor ones" &mdash; was equally wrong. The decision
+to insure should depend entirely on the deck composition,
+not on your hand. Insurance is a side bet on whether
+the dealer has a Ten in the hole. Your cards are
+irrelevant to that question. When the ratio is below
+2.00, insure everything. When it's above, insure
+nothing. It really was that simple.
+</p>
+
+<p>
+Near the end of the deck, the Ten-count revealed
+extraordinary information. With a $250 hand, Thorp once
+knew from his count that only two Tens remained as the
+last cards. He held hard 18 against the dealer's Ten up.
+The dealer's hole card was certain to be the other Ten,
+giving the dealer 20. Drawing would expose the last card
+and force a shuffle. Thorp drew a 3 for 21 and won $250.
+In another hand, he avoided drawing on hard 19 against
+a dealer's certain 20, because the only remaining card
+was either an Ace or a deuce &mdash; neither of which
+could improve his hand past 20.
+</p>
+
+<p>
+The <strong>end play</strong> &mdash; the technique of
+manipulating the deck composition near its end &mdash;
+produced the most dramatic gains. A legendary player
+Thorp calls "the little dark-haired guy" negotiated
+a high-stakes private game at a Reno casino under the
+condition that the deck would be dealt to the last card.
+He won $10,000 to $15,000 on the first night, lost and
+won similar amounts on successive nights (keeping the
+casino engaged), and then cleaned them out for somewhere
+between $40,000 and $86,000 on the final session. He
+sold the same proposition to other Nevada casinos over
+two years and won more than <strong>$250,000</strong>
+before being barred statewide.
+</p>
+
+<!-- =================== CHAPTER 9 =================== -->
+
+<h2 id="ch9">Chapter 9: Beating the Casino
+Countermeasures</h2>
+
+<p>
+Once <em>Beat the Dealer</em> hit the bestseller list,
+casinos had to respond. Their first instinct was the
+<strong>shuffle-up</strong> &mdash; reshuffling the deck
+whenever a player raised their bet. Thorp had initially
+feared this would neutralize card counting. He was
+wrong. Even with reshuffling after every hand, the
+player at a single-deck table still held the basic
+strategy's 0.13% edge. And a player taking six hands
+at once could gain roughly 1% just from seeing their
+own cards across the table before making decisions on
+later hands.
+</p>
+
+<p>
+Some casinos taught their dealers to count cards. The
+purpose was twofold: spot counting players, and shuffle
+when the deck favored the player while continuing to
+deal when it favored the house. Thorp's counter-tactic
+was to sit in the last seat, where he could see the most
+cards before acting, and bet heavily on the first deal
+off a fresh shuffle (where the basic strategy edge
+applied). Against "fake" counters &mdash; dealers who
+pretended to count but actually had no idea &mdash; the
+solution was even sweeter. Start with a big bet when the
+deck was bad. The fake counter would reshuffle,
+destroying the unfavorable deck. Then bet normally
+against the fresh neutral deck. The fake counter was
+essentially shuffling away all the bad situations and
+leaving the player with nothing but average-to-good
+decks. It was money in the bank.
+</p>
+
+<p>
+Multiple decks were another popular countermeasure.
+Some casinos moved to two or four decks, believing this
+would make counting impossibly difficult. It was
+slightly more work, but manageable for any practiced
+counter. The real drawback was that advantages in
+multi-deck games were smaller (about 0.4% less with two
+decks, 0.5% less with four) and favorable situations
+occurred less frequently. But multi-deck games had a
+compensating virtue: when a multi-deck shoe went good,
+it <strong>stayed good much longer</strong>. A player
+could sit down to a favorable situation and ride it for
+many hands without the composition shifting back.
+</p>
+
+<p>
+The most dramatic countermeasure came on
+<strong>April 1, 1964</strong>. The <strong>Las Vegas
+Resort Hotel Association</strong> changed the rules of
+blackjack &mdash; the first time in history that a major
+casino game's rules had been significantly altered.
+Splitting Aces was forbidden. Doubling down was
+restricted to hard 11 only. <strong>Gabriel
+Vogliatti</strong>, the Association's spokesman,
+explained:
+</p>
+
+<blockquote>
+"In the last 15 years there hasn't been one plane that
+landed without at least one person in possession of a
+system. This guy [Thorp] is the first in Las Vegas
+history to have a system that works."
+<cite>&mdash; Gabriel Vogliatti, Las Vegas Resort
+Hotel Association</cite>
+</blockquote>
+
+<p>
+The system players went back the next day and continued
+winning. The rules changes cut their win rate but
+didn't eliminate it. What the changes did eliminate was
+<em>tourist traffic</em>. Overnight, blackjack play fell
+off. All gaming table play declined. Casino employees
+whose income depended on tips began screaming that the
+new rules were "the bane of the industry." As journalist
+<strong>Jude Wanniski</strong> reported in the
+<em>National Observer</em>, one casino quietly scuttled
+the new rules, then another. Within weeks, Las Vegas
+threw in the towel and restored the original rules.
+They would rather have system players winning than no
+players at all.
+</p>
+
+<p>
+The <strong>paper-route technique</strong> provided
+the ultimate defense against all countermeasures. Set
+aside 20-25 units before each session. Play until you
+win or lose that amount, or until one hour has passed.
+Then move to the next casino. Stroll from casino to
+casino "collecting money, much as a newsboy for a paper
+route goes from door to door." No single dealer gets
+enough time to identify you. No single session creates
+enough drama to attract management attention. Return to
+dealers you win against. Avoid the ones you lose to
+(they might be cheating). The method was the practical
+application of all the theory that came before.
+</p>
+
+<p>
+Thorp's own camouflage grew increasingly elaborate.
+After intense publicity and wide photo distribution made
+getting a normal game nearly impossible, he grew a beard,
+got contact lenses, and switched to sweep-around
+sunglasses. He won for two days in Las Vegas before
+casinos began treating all bearded players with
+suspicion. Later, after shaving the beard and changing
+his entire appearance, he returned to the same table
+where a blonde dealer had watched him play the night
+before. Zero recognition. He was, as he noted, "a
+springy, crew-cut young executive of twenty-five"
+instead of the "aging unkempt man of forty-five" he'd
+appeared the night before.
+</p>
+
+<!-- =================== CHAPTER 10 =================== -->
+
+<h2 id="ch10">Chapter 10: How to Spot Cheating</h2>
+
+<p>
+Before becoming a blackjack researcher, Thorp believed
+what everyone believed: casinos <em>could</em> cheat
+but generally didn't. The reasoning seemed sound &mdash;
+why risk exposure and license revocation when the house
+already had a mathematical advantage? The answer, Thorp
+discovered through painful personal experience, was that
+organized crime didn't care about mathematical
+arguments. The <strong>Mafia</strong> and <strong>Cosa
+Nostra</strong> controlled many of the largest casinos.
+Men who bribed officials, financed drug operations, and
+committed murder to settle disputes were not going to
+stop short at a little cheating at cards.
+</p>
+
+<p>
+Thorp estimated that the average player faced cheating
+about 5-10% of the time. The most common method was
+<strong>dealing seconds</strong>. The dealer would mark
+the deck (or use a pre-marked deck &mdash; millions of
+which were manufactured annually and available by mail
+order), peek at the top card, and deal the second card
+instead if the top card would help the player. A skilled
+"mechanic" could deal seconds so smoothly that even
+experienced observers couldn't see it. The telltale
+sign was a subtle wrist flick as the dealer released
+each card &mdash; an otherwise unnecessary motion that
+helped prevent the second card from hanging.
+</p>
+
+<p>
+<strong>Mr. X</strong> learned this the hard way. Playing
+the Ten-count system at a large hotel, he won $13,000 in
+a few hours. The hotel brought in a <strong>"knockout"
+dealer</strong> &mdash; a cheat employed specifically to
+dispose of big winners. She peeked at the top card when
+drawing to her own hand. If she liked it, she dealt it
+to herself honestly. If she didn't, she dealt the second
+card. She worked in 40-minute shifts with 20-minute
+breaks (during which the game was honest). Mr. X's fatal
+error was continuing to bet at full scale against the
+knockout dealer instead of reducing to minimum bets.
+In ten hours he lost back $20,000 &mdash; wiping out his
+$13,000 win and putting him $7,000 in the hole.
+</p>
+
+<p>
+Thorp witnessed cheating firsthand the next morning at
+the same casino. The dealer &mdash; a thinnish,
+grim-faced woman of about forty with black hair
+beginning to gray &mdash; bent the top card back
+slightly to peek at it. Thorp and Mr. Y watched her
+see the <strong>Queen of Hearts</strong>, which would
+have busted her. She dealt the second card instead
+(an Eight, giving her 21). When they angrily spelled
+out what she had done, she reddened, looked down, and
+said nothing. The pit boss showed no reaction. It was
+their word against hers.
+</p>
+
+<p>
+The <strong>step-up</strong> was another elegant cheat.
+The dealer would stack discarded cards in a specific
+sequence and preserve that arrangement through
+apparently thorough shuffles. The result was
+predetermined winning hands for the house. A
+<strong>Newport, Kentucky dealer</strong> claimed to
+have invented the technique and wanted royalties from
+the casinos using it. At one casino, Thorp's team bet
+$1, and the dealer offered them a cut of an unshuffled
+deck. The cut revealed a step-up going to the top. The
+dealer received a 20 followed by a 21. When Thorp's
+team commented on the cheat, the dealer laughed happily,
+"proud of his handiwork."
+</p>
+
+<blockquote>
+"We commented on how we had been cheated by a step-up
+and the dealer laughed happily, proud of his handiwork
+and proud that someone finally appreciated it."
+<cite>&mdash; Edward O. Thorp</cite>
+</blockquote>
+
+<p>
+<strong>Anchor men</strong> were among the subtlest
+weapons. These were inconspicuous house plants who sat
+at the table and took signals from the dealer. When the
+dealer wanted to keep the top card for himself, the
+anchor man stood pat. When the dealer wanted to deny a
+player the top card, the anchor man drew. This made
+dealing seconds unnecessary &mdash; the anchor man
+simply controlled the flow of cards. Thorp's team
+learned to counter this by waiting until their turn to
+look at their own cards, denying the anchor man (and
+dealer) any information about their likely action.
+</p>
+
+<p>
+One cheat dealer showed Thorp a novel card-marking
+method. He pressed his thumbnail against the top edges
+of Aces and Tens, creating a barely perceptible rounding.
+The cards looked identical to all others in the deck.
+But when held at a certain angle to the light, the
+marked edges gleamed just enough for a trained eye.
+Because of the reflection angles, when the dealer could
+see the gleam, no one else could. The <strong>Nevada
+Gaming Control Board</strong> had confiscated decks
+marked this way, projected them greatly enlarged on a
+wall, and still couldn't detect the markings. As this
+dealer confided to Thorp, he and his friends fell asleep
+at night "thinking up new ways to cheat 'em."
+</p>
+
+<!-- =================== CHAPTER 11 =================== -->
+
+<h2 id="ch11">Chapter 11: Can the Cheating
+Be Stopped?</h2>
+
+<p>
+<strong>Life</strong> magazine broke the story. Reporter
+<strong>Paul O'Neil</strong> spent a week studying
+Thorp's methods in Las Cruces and four days with him in
+Las Vegas during the 1963 Fall Joint Computer
+Conference. O'Neil watched Thorp win $420 in 4.5 hours
+of spare-time play, betting $1 to $25. During 20 minutes
+of posing for photographs at the Tropicana (where Thorp
+was unrecognized), the tables rewarded him with $62.50.
+The twelve-page <em>Life</em> article was painstakingly
+accurate and thoroughly researched.
+</p>
+
+<p>
+The response from Nevada was predictable. <strong>Edward
+A. Olsen</strong>, chairman of the Nevada Gaming Control
+Board, accused <em>Life</em> of libeling the state. He
+demanded evidence for the claim that Thorp had been
+"victimized by crooked dealers in almost all of the
+major casinos in Nevada" and suggested that Thorp's
+ability to sense cheating "in his nerve ends" was more
+worthy of investigation than his card counting system.
+Shortly after writing this letter, Olsen's own agency
+closed the <strong>Silver Slipper</strong> casino on
+cheating charges &mdash; crooked dice at the craps
+tables and a blackjack dealer caught cheating by
+undercover agents.
+</p>
+
+<p>
+Thorp proposed a concrete solution to casino cheating:
+movies. A sub-miniature camera concealed on a player
+could capture the dealer's hands frame by frame,
+revealing seconds, step-ups, and other sleight-of-hand.
+The footage would need to show the cheating move, the
+dealer's face for identification, and the casino's
+emblems on the table layout. Nevada state law prohibited
+photography inside casinos without permission, but
+Thorp argued the legal difficulties were surmountable
+and the evidence would be devastating.
+</p>
+
+<p>
+Even more provocatively, Thorp proposed <strong>
+"Operation Moneypump"</strong> to the U.S. Treasury
+Department. A federal agent had told him that certain
+Nevada casinos were taking enormous sums "off the top"
+&mdash; recording lower gross revenues than they
+actually received, thereby evading taxes. If declared
+casino gambling income was $220 million in 1961, and
+about one-third was being skimmed, the government was
+losing over $25 million in tax revenue annually.
+</p>
+
+<p>
+The plan was elegant. A team of twelve agents (male and
+female) would learn the winning strategy in two to three
+days of training. They would gamble at selected tables,
+purchasing chips with hundred-dollar bills whose serial
+numbers had been pre-recorded. After the casino counted
+its drop boxes, investigators could check whether the
+marked bills appeared in the reported totals. If money
+was being taken off the top, the marked bills would
+disappear from the records at a statistically detectable
+rate. Since the agents were using a winning strategy,
+the same $30,000 bankroll could pump millions through
+the system.
+</p>
+
+<p>
+Operation Moneypump was filed away in a dusty federal
+drawer. Certain casinos continued taking money off the
+top. The national tax collection continued falling
+short of expenditures. As Thorp ruefully observed, the
+plan died not because it was flawed but because it was
+too effective &mdash; its success would have embarrassed
+too many powerful people.
+</p>
+
+<!-- =================== CHAPTER 12 =================== -->
+
+<h2 id="ch12">Chapter 12: Science Versus Chance</h2>
+
+<p>
+The history of system players began long before Thorp.
+<strong>Greasy John</strong> was the first known
+successful blackjack player &mdash; a large, obese man
+who acquired his name by bringing an enormous bag of
+fried chicken to the casino. He would play for twenty
+hours at a stretch, never leaving the table, his
+hands perpetually dripping with chicken fat. The grease
+transferred to the cards so aggressively that even
+frequent deck changes couldn't keep the table playable.
+Other players fled. Women were eventually banned from
+sitting at his table. Greasy John played for months,
+became wealthy enough to retire, and then suffered a
+fatal heart attack. Thorp believed he had discovered
+end play empirically.
+</p>
+
+<p>
+<strong>Benjamin F. "System Smitty" Smith</strong> was,
+to Thorp's knowledge, the first person to employ a
+Ten-count system in casino play. Smitty spent years
+playing out 100,000 hands by hand to determine standing
+numbers for various Tens-to-others ratios. His system
+had moderate errors (no detailed strategy for doubling
+or splitting, which cost 2-3% of edge) and he likely
+overbet his bankroll &mdash; leading to spectacular
+swings. <strong>Mr. Z</strong>, a mutual acquaintance,
+watched Smitty win $108,000 at the blackjack tables in
+one night and lose it all back by breakfast, not even
+retaining the price of a meal.
+</p>
+
+<p>
+Smitty's system spread to a small group: an old-time
+gambler called <strong>Mr. F</strong>, Mr. F's mistress,
+Mr. X and Mr. Z from Thorp's Nevada test, and a young
+player known as <strong>Junior</strong> (also "Sonny").
+The group collectively pumped large sums out of Nevada
+blackjack tables &mdash; the grapevine credited Mr. F
+with $50,000, Mr. Z with $56,000, Mr. X with $100,000
+to $150,000, and the "little dark-haired guy" with
+$250,000. After being universally barred, Junior went to
+a Hollywood movie studio makeup department and paid $500
+to be disguised as a middle-aged Chinese man, complete
+with a fitted carapace over his torso. He tested the
+disguise at a casino with six employees who knew him.
+Five paid no attention. The sixth wandered over from
+the bar and exclaimed: "Hey, look everybody. There's
+Sonny all dressed up like a Chinese."
+</p>
+
+<p>
+Beyond blackjack, Thorp applied the same mathematical
+approach to other games. He and trained players attacked
+<strong>baccarat side bets</strong> in Nevada, averaging
+$100 per hour for seven nights at one casino (which then
+removed the side bet) and $1,000 per hour at a second
+casino before being barred after two hours. Baccarat
+side bets disappeared from Nevada entirely after their
+success. He also developed a method for beating
+<strong>roulette</strong> &mdash; not by finding biased
+wheels, but through physical prediction. Testing on a
+regulation wheel in a famous scientist's basement
+laboratory, he averaged a <strong>44% profit</strong>
+betting $25 per number, winning a fictional $8,000 in
+one hour.
+</p>
+
+<p>
+Thorp's vision extended far beyond casinos. He drew
+explicit parallels between gambling and the stock market,
+calling Wall Street "the greatest gambling game on
+earth" with daily betting of $250 million. The
+similarities were striking: croupiers became customers'
+men, commissions became the house percentage, board
+rooms became casinos. He observed that stock prices
+showed mathematical patterns &mdash; that fractional
+endings (halves, quarters, eighths) were not uniformly
+distributed &mdash; and predicted that computer
+technology would enable "dramatic progress in predicting
+stock prices." Within a few years, he would prove
+himself right by founding <strong>Princeton Newport
+Partners</strong>, one of the first and most successful
+quantitative hedge funds.
+</p>
+
+<blockquote>
+"With the advance in computer technology and
+mathematical theory, we can expect dramatic progress
+in predicting stock prices."
+<cite>&mdash; Edward O. Thorp, 1966</cite>
+</blockquote>
+
+<p>
+The trajectory from Beat the Dealer to Wall Street was
+logical and inevitable. The same mathematical framework
+&mdash; identify situations where you have an edge, size
+your bets proportionally, manage your bankroll to
+survive the inevitable losing streaks &mdash; applied
+to securities markets exactly as it applied to
+blackjack. The <strong>Kelly criterion</strong> (bet
+a fraction of your capital equal to your percentage
+advantage) worked in both domains. Thorp had not just
+beaten a card game. He had demonstrated a universal
+principle: wherever probability could be calculated
+more accurately than the market consensus, there was
+money to be made.
+</p>
+
+<!-- =================== KEY TAKEAWAYS =============== -->
+
+<h2 id="takeaways">Key Takeaways</h2>
+
+<div class="summary-section">
+
+<h3>Blackjack is not an independent trials process</h3>
+<p>
+Unlike roulette or craps, blackjack has memory. Cards
+dealt in previous rounds change the probabilities of
+future rounds. This dependence is the mathematical
+foundation that makes card counting possible. No betting
+system can beat an independent trials game, but
+blackjack's dependence creates exploitable shifts in
+player advantage.
+</p>
+
+<h3>The Five is the most important card in the deck</h3>
+<p>
+Removing all four Fives from a single deck shifts the
+player's advantage by 3.58% &mdash; the largest
+single-card effect. This is why tracking Fives was the
+simplest winning strategy and why the Five-count system
+worked despite tracking only four cards out of
+fifty-two.
+</p>
+
+<h3>Basic strategy alone nearly eliminates the
+house edge</h3>
+<p>
+A player using the correct basic strategy faces a house
+edge of roughly 0.1% in favorable conditions &mdash;
+essentially even. This compares to 2-15% for typical
+casino players. Basic strategy is the foundation upon
+which all counting systems are built.
+</p>
+
+<h3>The point count identifies favorable situations
+far more frequently than tracking single cards</h3>
+<p>
+The simple point count (+1 for low cards, &minus;1 for
+high cards) identifies favorable situations earlier and
+more often than the Five-count. The complete point count,
+normalized by unseen cards, provides the most precise
+measure of player advantage and works across any number
+of decks.
+</p>
+
+<h3>Casino countermeasures consistently failed</h3>
+<p>
+Shuffle-ups, multiple decks, barring known players, and
+rule changes all reduced but never eliminated the
+counter's advantage. The April 1964 rule changes in
+Las Vegas were reversed within weeks because they drove
+away tourists faster than they stopped counters.
+</p>
+
+<h3>Bankroll management is as important as the
+counting system</h3>
+<p>
+Playing with scared money produces psychological
+collapse and bad decisions. Betting proportionally to
+your advantage (the Kelly criterion) maximizes long-term
+growth while managing ruin risk. A stake of 150 units
+with a 1:3 bet ratio gives less than a 10% chance of
+total ruin.
+</p>
+
+<h3>Casino cheating was widespread and organized</h3>
+<p>
+Thorp documented dealing seconds, marked cards,
+step-ups, anchor men, and knockout dealers at casinos
+across Nevada. An estimated 5-10% of all blackjack play
+involved some form of cheating, much of it connected to
+organized crime operations.
+</p>
+
+<h3>The same principles apply to financial markets</h3>
+<p>
+Thorp explicitly drew the connection between advantage
+play in blackjack and quantitative investing. Identify
+edge, size bets proportionally, manage risk. He proved
+this by going on to found one of the most successful
+quantitative hedge funds in history.
+</p>
+
+</div>
+
+<!-- ================== CONTRARIAN IDEAS ============= -->
+
+<h2 id="contrarian">Contrarian Ideas</h2>
+
+<div class="summary-section">
+
+<h3>Consensus: No one can beat a casino game</h3>
+<p>
+For centuries, mathematicians proved that no betting
+system could overcome a house edge. Thorp showed this
+was true only for independent trials games. Blackjack's
+dependent structure meant the house edge fluctuated
+continuously, and a player who tracked these
+fluctuations could bet selectively and win.
+</p>
+
+<h3>Consensus: Always insure a natural</h3>
+<p>
+The logic seems watertight &mdash; lock in a guaranteed
+profit of 1 unit. But when the deck is depleted of Tens,
+the dealer cannot have a natural. Not insuring nets 1.5
+units instead of 1. The decision to insure should depend
+entirely on deck composition, not on your hand.
+</p>
+
+<h3>Consensus: Conservative play (never bust)
+is the safest strategy</h3>
+<p>
+Standing on hard 12 to avoid busting seems prudent but
+costs 5-8% &mdash; worse than mimicking the dealer.
+Drawing to a hard 12 against a dealer's high card is
+mathematically superior, even though it sometimes
+causes you to bust. The "safe" play is actually the
+most expensive.
+</p>
+
+<h3>Consensus: Casino gambling is purely
+entertainment</h3>
+<p>
+Thorp proved that blackjack could be played as a
+profession. The Salmon turned $200 into $50,000 over
+nine months of disciplined play. System Smitty's group
+collectively extracted hundreds of thousands. Blackjack
+was not entertainment &mdash; it was a job with
+calculable hourly wages.
+</p>
+
+<h3>Consensus: Casinos are too heavily regulated
+to cheat</h3>
+<p>
+The Nevada Gaming Control Board closed more than twenty
+casinos for cheating in its first five years alone.
+Organized crime controlled many of the largest
+establishments. Mechanics were on 24-hour call.
+Regulation existed, but enforcement was sporadic and
+the incentives for cheating were enormous.
+</p>
+
+</div>
+
+<!-- ================== NOTABLE QUOTES =============== -->
+
+<h2 id="quotes">Notable Quotes</h2>
+
+<div class="summary-section">
+
+<blockquote>
+"You must NEVER, NEVER play with money that it will
+hurt you to lose."
+<cite>&mdash; Edward O. Thorp</cite>
+</blockquote>
+
+<blockquote>
+"When a lamb goes to the slaughter, the lamb
+<em>might</em> kill the butcher. But we always bet on
+the butcher."
+<cite>&mdash; A Nevada casino operator</cite>
+</blockquote>
+
+<blockquote>
+"In the last 15 years there hasn't been one plane that
+landed without at least one person in possession of a
+system. This guy is the first in Las Vegas history to
+have a system that works."
+<cite>&mdash; Gabriel Vogliatti, Las Vegas Resort
+Hotel Association</cite>
+</blockquote>
+
+<blockquote>
+"It sometimes takes a little will power to follow
+these instructions."
+<cite>&mdash; Edward O. Thorp, on drawing to
+soft 17</cite>
+</blockquote>
+
+<blockquote>
+"Are men of the Cosa Nostra, who bribe public
+officials, who steal money off the top, who help to
+finance their rackets with their casino profits, who
+commit murder to settle their differences &mdash; are
+these men going to stop short at a little cheating
+at cards?"
+<cite>&mdash; Edward O. Thorp</cite>
+</blockquote>
+
+<blockquote>
+"Disguises do work. They are a lot of trouble, but
+they can be fun, too."
+<cite>&mdash; Edward O. Thorp</cite>
+</blockquote>
+
+<blockquote>
+"Some people fall asleep at night thinking about their
+jobs, or their stocks, or their families.
+Mathematicians fall asleep thinking out problems in
+higher mathematics. But this dealer confided that he
+and his friends fall asleep thinking up new ways to
+cheat 'em."
+<cite>&mdash; Edward O. Thorp, quoting a
+cheat dealer</cite>
+</blockquote>
+
+<blockquote>
+"Take from it what you will, I hope you enjoy reading
+about my adventures and my ideas."
+<cite>&mdash; Edward O. Thorp, 2016 Preface</cite>
+</blockquote>
+
+</div>
+
+<!-- =============== FRAMEWORKS & SYSTEMS ============= -->
+
+<h2 id="frameworks">Frameworks &amp; Systems</h2>
+
+<div class="summary-section">
+
+<h3>The Five Levels of Blackjack Play</h3>
+<table>
+<thead>
+<tr>
+<th>Level</th>
+<th>System</th>
+<th>Edge</th>
+<th>Difficulty</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Basic Strategy</td>
+<td>~0.1%</td>
+<td>Memorize charts</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Five-Count</td>
+<td>~3%</td>
+<td>Track 4 cards</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Simple Point Count</td>
+<td>~3%+</td>
+<td>Running total</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Complete Point Count</td>
+<td>~3-5%+</td>
+<td>Index calculation</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Ten-Count Method</td>
+<td>~1-10%+</td>
+<td>Two running counts</td>
+</tr>
+</tbody>
+</table>
+
+<h3>The Kelly Criterion for Bet Sizing</h3>
+<p>
+Bet a percentage of your bankroll equal to your
+percentage advantage. With a $200 bankroll and a 3%
+edge, bet $6. As your bankroll grows, bets grow
+proportionally. This maximizes the long-term growth
+rate of your capital while keeping the risk of ruin
+mathematically manageable.
+</p>
+
+<h3>The Paper-Route Technique</h3>
+<p>
+Divide your stake into equal portions (e.g., $200 into
+ten $20 parts). At each casino, buy in for one portion.
+Play until you double it or lose it, or until one hour
+passes. Move to the next casino. Return to dealers
+you win against. Never return to dealers you lose to.
+No single cheat can hurt you significantly, and no
+casino gets enough exposure to identify your system.
+</p>
+
+<h3>Rule Variation Effects
+(Selected from Table 9.2)</h3>
+<table>
+<thead>
+<tr>
+<th>Rule Change</th>
+<th>Effect on Player</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2-to-1 blackjack payout</td>
+<td>+2.32%</td>
+</tr>
+<tr>
+<td>Forbid doubling hard 11</td>
+<td>&minus;0.89%</td>
+</tr>
+<tr>
+<td>Forbid doubling hard 10</td>
+<td>&minus;0.56%</td>
+</tr>
+<tr>
+<td>Four decks instead of one</td>
+<td>&minus;0.51%</td>
+</tr>
+<tr>
+<td>Forbid pair splitting</td>
+<td>&minus;0.46%</td>
+</tr>
+<tr>
+<td>Two decks instead of one</td>
+<td>&minus;0.35%</td>
+</tr>
+<tr>
+<td>Dealer draws to soft 17</td>
+<td>&minus;0.20%</td>
+</tr>
+<tr>
+<td>Allow doubling any 3 cards</td>
+<td>+0.19%</td>
+</tr>
+<tr>
+<td>No splitting Aces</td>
+<td>&minus;0.16%</td>
+</tr>
+<tr>
+<td>Surrender option</td>
+<td>+0.15%</td>
+</tr>
+</tbody>
+</table>
+
+<h3>Deck Composition Effects
+(from IBM 704 Analysis)</h3>
+<table>
+<thead>
+<tr>
+<th>Cards Removed</th>
+<th>Player Advantage</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Complete deck (baseline)</td>
+<td>+0.13%</td>
+</tr>
+<tr>
+<td>All Fives removed</td>
+<td>+3.58%</td>
+</tr>
+<tr>
+<td>All Fours removed</td>
+<td>+2.64%</td>
+</tr>
+<tr>
+<td>All Sixes removed</td>
+<td>+2.40%</td>
+</tr>
+<tr>
+<td>All Threes removed</td>
+<td>+2.14%</td>
+</tr>
+<tr>
+<td>All Sevens removed</td>
+<td>+2.05%</td>
+</tr>
+<tr>
+<td>All Twos removed</td>
+<td>+1.75%</td>
+</tr>
+<tr>
+<td>All Tens removed</td>
+<td>+1.62%</td>
+</tr>
+<tr>
+<td>All Eights removed</td>
+<td>+0.43%</td>
+</tr>
+<tr>
+<td>All Nines removed</td>
+<td>&minus;0.41%</td>
+</tr>
+<tr>
+<td>All Aces removed</td>
+<td>&minus;2.42%</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+
+<!-- =============== REFERENCED WORKS ================ -->
+
+<h2 id="references">Books &amp; Thinkers Referenced</h2>
+
+<div class="summary-section">
+<table>
+<thead>
+<tr>
+<th>Work / Thinker</th>
+<th>Context</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Baldwin, Cantey, Maisel &amp;
+McDermott</strong> &mdash; <em>Playing Blackjack
+to Win</em> (1957)</td>
+<td>First correct blackjack strategy; Thorp's
+starting point</td>
+</tr>
+<tr>
+<td><strong>Julian Braun</strong> (IBM)</td>
+<td>Calculated refined strategies, hole-card
+advantages, point-count tables</td>
+</tr>
+<tr>
+<td><strong>Claude Shannon</strong></td>
+<td>Father of information theory; acknowledged
+for suggestions</td>
+</tr>
+<tr>
+<td><strong>Harvey Dubner</strong></td>
+<td>Independently discovered and announced the
+complete point-count system</td>
+</tr>
+<tr>
+<td><strong>J. L. Kelly</strong> &mdash;
+"A New Interpretation of Information Rate"
+(1956)</td>
+<td>The Kelly criterion for optimal bet sizing,
+later applied to stock markets</td>
+</tr>
+<tr>
+<td><strong>Gerolamo Cardano</strong> &mdash;
+<em>Book on Games of Chance</em> (~1520)</td>
+<td>Earliest systematic study of gambling
+probability</td>
+</tr>
+<tr>
+<td><strong>Ed Reid &amp; Ovid Demaris</strong>
+&mdash; <em>The Green Felt Jungle</em>
+(1963)</td>
+<td>Expos&eacute; of organized crime in
+Las Vegas casinos</td>
+</tr>
+<tr>
+<td><strong>Allan Wilson</strong> &mdash;
+<em>The Casino Gambler's Guide</em> (1965)</td>
+<td>Panel member at 1963 Computer Conference;
+biased roulette wheel analysis</td>
+</tr>
+<tr>
+<td><strong>William Feller</strong> &mdash;
+<em>An Introduction to Probability Theory</em>
+(1957)</td>
+<td>Standard probability textbook referenced
+for mathematical foundations</td>
+</tr>
+<tr>
+<td><strong>Paul O'Neil</strong> (Life
+magazine)</td>
+<td>Broke the story of Nevada casino cheating
+in a 12-page feature article</td>
+</tr>
+<tr>
+<td><strong>Henri Poincar&eacute;</strong>
+&mdash; <em>Science and Method</em></td>
+<td>Concluded roulette prediction was
+impossible; Thorp proved him wrong</td>
+</tr>
+<tr>
+<td><strong>Karl Pearson</strong></td>
+<td>Spent years analyzing roulette records
+without devising a winning system</td>
+</tr>
+<tr>
+<td><strong>Nicholas Darvas</strong> &mdash;
+<em>Wall Street, The Second Las Vegas</em>
+(1962)</td>
+<td>Drew parallels between stock trading and
+casino gambling</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<!-- ===================== FOOTER ==================== -->
+
+<div class="book-footer">
+<p><strong>Beat the Dealer: A Winning Strategy for
+the Game of Twenty-One</strong><br>
+By Edward O. Thorp<br>
+First published 1962; revised edition 1966<br>
+~215 pages<br>
+The first book to prove mathematically that a casino
+game could be beaten, launching the card counting
+industry and pioneering quantitative approaches to
+both gambling and financial markets.</p>
+</div>
+
+<!-- =============== ABOUT THE AUTHOR ================ -->
+
+<h2 id="author">About the Author</h2>
+
+<p>
+<strong>Edward Oakley Thorp</strong> (born 1932) is an
+American mathematics professor, hedge fund manager,
+and author. He received his Ph.D. in mathematics from
+UCLA and held teaching positions at MIT, New Mexico
+State University, and UC Irvine, where he became a
+professor of mathematics and finance. His academic work
+spans probability theory, functional analysis, and
+mathematical finance.
+</p>
+
+<p>
+Thorp is best known for two revolutionary applications
+of mathematics. First, <em>Beat the Dealer</em> (1962)
+demonstrated that blackjack could be beaten through
+card counting, making him the father of advantage play.
+The book sold over a million copies and hit the
+<em>New York Times</em> bestseller list. Second, he
+applied the same quantitative framework to financial
+markets, co-founding <strong>Princeton Newport
+Partners</strong> in 1969 &mdash; one of the first
+market-neutral hedge funds, which generated annualized
+returns of roughly 20% over nearly two decades with
+virtually no losing periods.
+</p>
+
+<p>
+Along the way, Thorp co-invented the first wearable
+computer (with <strong>Claude Shannon</strong>) to
+predict roulette outcomes, developed early statistical
+arbitrage strategies, and helped expose the
+<strong>Bernie Madoff</strong> fraud years before
+regulators caught on. His later memoir, <em>A Man for
+All Markets</em> (2017), traces the thread from
+Las Vegas blackjack tables to Wall Street trading
+floors. At its core, Thorp's career demonstrates a
+single principle: wherever probability can be calculated
+more precisely than the market believes, there is an
+exploitable edge.
+</p>
+
+<!-- ============= WHY THIS BOOK MATTERS ============= -->
+
+<h2 id="matters">Why This Book Matters</h2>
+
+<p>
+<em>Beat the Dealer</em> is not just a gambling manual
+&mdash; it is one of the most influential applications
+of mathematics to the real world ever published.
+Before Thorp, the consensus among mathematicians was
+that no player could consistently beat a casino game.
+After Thorp, that consensus was shattered. The book
+proved that probability theory was not merely an
+abstract academic discipline but a practical tool for
+extracting profit from complex systems.
+</p>
+
+<p>
+Its influence rippled far beyond the casino floor.
+The card counters who learned from this book went on
+to create horse racing syndicates, options trading
+firms, and hedge funds. The <strong>Kelly
+criterion</strong> for bet sizing, which Thorp
+popularized, became a standard tool in quantitative
+finance. The concept of identifying an "edge" and
+sizing your position accordingly &mdash; now fundamental
+to every systematic trading operation &mdash; traces
+directly to the blackjack table.
+</p>
+
+<p>
+Perhaps most remarkably, Thorp's methods were validated
+by the casinos themselves. Las Vegas changed its rules
+for the first time in history to combat card counting.
+When that failed, they reversed the changes within weeks
+&mdash; an implicit admission that the math was right
+and the casino industry simply had to live with it. Over
+sixty years later, card counting remains legal, casinos
+remain profitable, and <em>Beat the Dealer</em> remains
+in print. It is the rare book that changed both an
+industry and a scientific discipline.
+</p>
+
+<script>var BM_KEY = 'bm_beat_the_dealer';</script>
+<script src="../book.js?v=3"></script>
+</body>
+</html>
