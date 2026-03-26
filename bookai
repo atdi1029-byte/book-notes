@@ -5,27 +5,59 @@
 # Merges results in page order after each wave.
 #
 # Usage:
-#   ./process-book.sh "/path/to/book.pdf" "Book_Folder" [start] [end] [batch] [sleep] [parallel]
+#   ./bookai "/path/to/book.pdf" "Book_Folder" [start] [end] [batch] [sleep] [parallel] [--ta]
+#   ./bookai "/path/to/book.pdf" /full/path/to/Book_Folder/notes.md   # also works (auto-extracts folder)
 #
 # Examples:
-#   ./process-book.sh "/path/to/book.pdf" "My_Book" 1 300 20 5 3
-#   ./process-book.sh "/path/to/book.pdf" "My_Book"              # auto-detect pages, defaults
+#   ./bookai "/path/to/book.pdf" "My_Book" 1 300 20 5 3
+#   ./bookai "/path/to/book.pdf" "My_Book"              # auto-detect pages, defaults
+#   ./bookai "/path/to/book.pdf" "My_Book" 1 0 20 5 3 --ta   # technical analysis mode
 
 set -euo pipefail
 
 BOOKS_DIR="$(cd "$(dirname "$0")" && pwd)"
 
-PDF="$1"
-FOLDER="$2"
-START="${3:-1}"
-END_PAGE="${4:-0}"
-BATCH="${5:-20}"
-SLEEP="${6:-5}"
-PARALLEL="${7:-3}"
+# Parse --ta flag from any position
+TA_MODE=false
+POSITIONAL=()
+for arg in "$@"; do
+  case "$arg" in
+    --ta) TA_MODE=true ;;
+    *) POSITIONAL+=("$arg") ;;
+  esac
+done
+
+PDF="${POSITIONAL[0]}"
+RAW_FOLDER="${POSITIONAL[1]}"
+START="${POSITIONAL[2]:-1}"
+END_PAGE="${POSITIONAL[3]:-0}"
+BATCH="${POSITIONAL[4]:-20}"
+SLEEP="${POSITIONAL[5]:-5}"
+PARALLEL="${POSITIONAL[6]:-3}"
+
+# Normalize folder: if user passed a full path or a path ending in notes.md, extract just the folder name
+if [[ "$RAW_FOLDER" == *"/notes.md" ]]; then
+  # User passed /path/to/Book_Folder/notes.md — strip notes.md and extract folder name
+  FOLDER="$(basename "$(dirname "$RAW_FOLDER")")"
+  echo "NOTE: Detected notes.md path — using folder name '$FOLDER' instead."
+elif [[ "$RAW_FOLDER" == /* ]]; then
+  # User passed an absolute path like /path/to/Book_Folder — extract folder name
+  FOLDER="$(basename "$RAW_FOLDER")"
+  echo "NOTE: Detected absolute path — using folder name '$FOLDER' instead."
+else
+  FOLDER="$RAW_FOLDER"
+fi
+
 DIR="$BOOKS_DIR/$FOLDER"
 NOTES="$DIR/notes.md"
 LOG="$DIR/process.log"
 PAGES_DONE="$DIR/.pages_done"
+
+# Safety check: if notes.md exists as a directory, something went wrong previously
+if [ -d "$NOTES" ]; then
+  echo "ERROR: $NOTES is a directory, not a file. Remove it first: rm -rf '$NOTES'"
+  exit 1
+fi
 
 # Auto-detect total pages if not specified
 if [ "$END_PAGE" -eq 0 ]; then
@@ -44,6 +76,9 @@ echo "Book PDF Processor — $(date)" | tee -a "$LOG"
 echo "PDF:    $PDF" | tee -a "$LOG"
 echo "Output: $NOTES" | tee -a "$LOG"
 echo "Pages:  $START → $END_PAGE (batch: $BATCH, parallel: $PARALLEL, sleep: ${SLEEP}s)" | tee -a "$LOG"
+if [ "$TA_MODE" = true ]; then
+  echo "Mode:   TECHNICAL ANALYSIS (chart tagging enabled)" | tee -a "$LOG"
+fi
 echo "========================================" | tee -a "$LOG"
 
 MAX_RETRIES=2
@@ -60,6 +95,21 @@ record_pages() {
 # Function: build the prompt for a page range
 make_prompt() {
   local P_START="$1" P_END="$2" OUT_FILE="$3"
+
+  local TA_INSTRUCTIONS=""
+  if [ "$TA_MODE" = true ]; then
+    TA_INSTRUCTIONS="
+CHART TAGGING (Technical Analysis mode):
+This book contains important charts, diagrams, and visual patterns. For EVERY figure/chart you see:
+- Add a tag on its own line: [CHART: p.XX \"Figure N.N — brief description\"]
+- XX = the PDF page number where the chart appears
+- Include the figure number and a short description of what it shows
+- Tag ALL charts — conceptual diagrams, real market charts, pattern illustrations
+- Place the tag right after the text that references the chart
+- Example: [CHART: p.87 \"Figure 4.1d — Dow 20 Bonds showing downtrend to sideways to uptrend\"]
+"
+  fi
+
   cat <<PROMPT_EOF
 You are creating study notes from a book PDF. This is a personal, educational book-analysis project.
 
@@ -72,7 +122,7 @@ WRITE the notes to '$OUT_FILE' using the Write tool. Target ~150-200 lines for t
 - Key points as bullet points (-)
 - Notable quotes as > blockquotes with attribution
 - **Bold** for key terms, concepts, and names
-
+$TA_INSTRUCTIONS
 Content guidelines — be CONCISE but THOROUGH:
 - Capture the core argument and reasoning chain for each section
 - Keep the BEST examples, data points, and evidence — not every single one
