@@ -1,0 +1,1884 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"
+  content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style"
+  content="black-translucent">
+<meta name="theme-color" content="#f4efe8">
+<title>The Intelligent Asset Allocator - Notes</title>
+<link rel="stylesheet" href="../book.css">
+</head>
+<body>
+
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar"
+  style="display:none" onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+    onclick="event.stopPropagation();clearBookmark()">
+    Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+
+<h1>The Intelligent Asset Allocator</h1>
+<p class="subtitle">By William Bernstein &middot;
+  2001 &middot; 241 pages</p>
+
+<nav class="toc">
+  <h2>Contents</h2>
+  <ol>
+    <li><a href="#preface">Preface</a></li>
+    <li><a href="#intro">Introduction</a></li>
+    <li><a href="#ch1">Ch 1: General
+      Considerations</a></li>
+    <li><a href="#ch2">Ch 2: Risk and Return</a></li>
+    <li><a href="#ch3">Ch 3: Multiple-Asset
+      Portfolios</a></li>
+    <li><a href="#ch4">Ch 4: Real-World
+      Portfolios</a></li>
+    <li><a href="#ch5">Ch 5: Optimal Asset
+      Allocations</a></li>
+    <li><a href="#ch6">Ch 6: Market
+      Efficiency</a></li>
+    <li><a href="#ch7">Ch 7: Odds and Ends</a></li>
+    <li><a href="#ch8">Ch 8: Implementation</a></li>
+    <li><a href="#takeaways">Key Takeaways</a></li>
+    <li><a href="#contrarian">Contrarian Ideas</a></li>
+    <li><a href="#quotes">Notable Quotes</a></li>
+    <li><a href="#allegories">Allegories</a></li>
+    <li><a href="#frameworks">Frameworks</a></li>
+    <li><a href="#references">Referenced Works</a></li>
+    <li><a href="#author">About the Author</a></li>
+    <li><a href="#matters">Why This Book
+      Matters</a></li>
+  </ol>
+</nav>
+
+<!-- PREFACE -->
+<h2 id="preface">Preface</h2>
+
+<p>In July 1993, <strong>William Bernstein</strong>
+stumbled across a <strong>Wall Street Journal</strong>
+article that would redirect the course of his
+intellectual life. The piece described a
+<strong>T. Rowe Price</strong> study examining the
+performance of various fixed asset mixes between 1973
+and 1992. The results were startling: simple,
+unchanging blends of U.S. large stocks, U.S. small
+stocks, foreign stocks, and U.S. bonds had
+outperformed the vast majority of professional money
+managers&mdash;with significantly less risk.</p>
+
+<p>The most elegant combination was what Bernstein
+calls the <strong>Simpleton's Portfolio</strong>:
+equal parts U.S. large stocks, U.S. small stocks,
+foreign stocks, and U.S. high-quality bonds. This
+naive allocation delivered higher returns and much
+lower risk than the S&amp;P 500 alone. And the
+S&amp;P 500 itself had already beaten 75% of
+professional managers over the same period. A fixed
+mix of dumb index funds, rebalanced periodically,
+was beating nearly everyone.</p>
+
+<p>Bernstein went deeper. He built spreadsheet models
+stretching back to 1926 and collected data across
+multiple historical epochs. The numbers told the
+same story again and again: wild divergences between
+asset classes&mdash;U.S. large stocks up 5% while
+foreign stocks soared 25%, or small stocks jumping
+23% while foreign stocks fell 12%&mdash;were not a
+problem to solve but the very engine that made
+allocation work. The years 1995 through 1998, when
+the biggest U.S. growth stocks battered everything
+else, were a temporary aberration in a long history
+of rotating leadership.</p>
+
+<blockquote>
+"Nobody consistently calls the market, and almost
+nobody picks stocks or mutual funds with any
+persistent skill."
+<cite>&mdash; William Bernstein</cite>
+</blockquote>
+
+<p>The intellectual foundation came from a landmark
+set of studies by <strong>Gary Brinson</strong> and
+colleagues in the late 1980s. Examining 82 large
+pension funds, Brinson found that
+<strong>asset allocation policy accounted for over
+90% of return variability</strong> among funds. Stock
+picking and market timing combined explained less
+than 10%. Some critics argued the true figure was
+closer to 50%, but they missed the deeper point:
+nobody achieves long-term success at either timing
+or selection, so the portion of performance you can
+actually control&mdash;your asset mix&mdash;is the
+only one worth agonizing over.</p>
+
+<p>The media, of course, focused on exactly the wrong
+things. Enormous ink and airtime went to analyst
+predictions and stock recommendations. In 1994,
+<strong>Louis Rukeyser</strong> hosted Brinson
+himself on <strong>Wall Street Week</strong>&mdash;
+and even then, the conversation drifted to market
+timing rather than allocation. The gambling instinct
+is deeply ingrained in human nature. Few can resist
+the siren song of speculation.</p>
+
+<p>After placing the first edition of this book
+online at <strong>efficientfrontier.com</strong> in
+1996, Bernstein was overwhelmed by the response.
+Small investors were hungry for portfolio theory that
+had previously been locked inside institutional walls.
+This led to a stronger emphasis on indexing&mdash;
+active management, he now argued, was a
+"sucker's game"&mdash;and an appreciation for the
+proliferation of inexpensive indexed vehicles that
+were democratizing sophisticated portfolio
+construction.</p>
+
+<!-- INTRODUCTION -->
+<h2 id="intro">Introduction</h2>
+
+<p>Bernstein opens with a vivid analogy: imagine being
+transported to an unfamiliar country and handed the
+keys to a car. Your destination is an airport hundreds
+of miles away, and you have no map. The wise choice
+is obvious&mdash;find a bookshop, buy a detailed road
+map, and plot an efficient route before turning the
+ignition. Yet millions of investors commit large sums
+to risky sectors at or near market tops, depending on
+the advice of strangers whose interests differ
+fundamentally from their own.</p>
+
+<p>The book is that road map. Bernstein lays out a
+six-step sequence for the journey. First, take a deep
+breath and do nothing for weeks or even months.
+Second, develop an appreciation for the
+<strong>risk-and-reward relationship</strong>&mdash;
+the idea that higher expected returns always come
+bundled with higher risk, no exceptions. Third, learn
+the specific risk and return characteristics of
+individual asset classes. Fourth, understand that
+diversified portfolios behave very differently from
+their individual components&mdash;like a cake that
+tastes nothing like shortening, flour, or sugar
+alone. This is <strong>portfolio theory</strong>.
+Fifth, estimate your own risk tolerance and use
+portfolio theory to build an allocation that matches
+it. Sixth&mdash;and only then&mdash;actually purchase
+the investments. This final step, Bernstein notes, is
+by far the easiest.</p>
+
+<!-- CHAPTER 1 -->
+<h2 id="ch1">Chapter 1: General Considerations</h2>
+
+<p>The chapter opens with what may be the most
+memorable thought experiment in all of personal
+finance: <strong>Uncle Fred's coin toss</strong>.
+You are 30 years old, you will work until 65, and
+Uncle Fred will contribute $5,000 per year to your
+pension. He offers two options. The first is a
+certificate of deposit paying 3% annualized, which
+will grow to $302,310 over 35 years&mdash;but after
+adjusting for 3% inflation, that sum is worth only
+$107,436 in today's purchasing power. The second
+option is a coin toss: heads returns +30% on the
+year, tails returns &minus;10%.</p>
+
+<p>The thought of losing 10% of your hard-earned
+retirement money feels unbearable. But the
+mathematics tell a different story. Over a two-year
+cycle with one head and one tail, the compound
+factor is 1.3 &times; 0.9 = 1.17, giving an
+<strong>annualized return of 8.17%</strong>. You
+would need 12 heads and 23 tails&mdash;an event
+with less than a 5% probability&mdash;to come out
+worse than the safe CD option. The coin toss, it
+turns out, closely approximates the actual returns
+and risks of common stocks from 1926 to 1998, when
+the S&amp;P 500 returned 11.22% annualized.</p>
+
+<p>Bernstein uses this thought experiment to drive
+home a critical distinction: the difference between
+<strong>average return</strong> and
+<strong>annualized return</strong>. The arithmetic
+average of +30% and &minus;10% is +10%. But the
+annualized (geometric) return&mdash;the one you
+actually earn&mdash;is only 8.17%. The gap becomes
+dramatic in extreme cases. A stock that doubles
+(+100%) and then halves (&minus;50%) has an average
+return of 25% but an annualized return of exactly
+zero. You made no money.</p>
+
+<blockquote>
+"You pay your bills with annualized return, not
+average return."
+<cite>&mdash; William Bernstein</cite>
+</blockquote>
+
+<p>This leads to the <strong>First Fundamental Law
+of Investing</strong>: in the long run, you are
+compensated for bearing risk; conversely, if you
+seek safety, your returns will be low. The safe CD
+at 3% is not actually safe at all&mdash;it will
+almost certainly condemn you to poverty in
+retirement. The coin toss, for all its
+stomach-churning volatility, is the path to
+financial security. Any promise of excessive
+returns with low risk is a hallmark of fraud.</p>
+
+<p>Risk measurement requires a precise tool, and
+Bernstein introduces <strong>standard deviation
+(SD)</strong> as that tool&mdash;the statistical
+measure of how widely returns scatter around their
+average. He recommends asking any salesperson
+pitching a security what its standard deviation is.
+If they don't know, don't think about buying it.</p>
+
+<table>
+<caption>Standard Deviation by Asset Class</caption>
+<thead>
+<tr><th>Asset Class</th><th>SD Range</th></tr>
+</thead>
+<tbody>
+<tr><td>Money market (cash)</td><td>2&ndash;3%</td></tr>
+<tr><td>Short-term bonds</td><td>3&ndash;5%</td></tr>
+<tr><td>Long-term bonds</td><td>6&ndash;8%</td></tr>
+<tr><td>Domestic stocks (conservative)</td>
+  <td>10&ndash;14%</td></tr>
+<tr><td>Domestic stocks (aggressive)</td>
+  <td>15&ndash;25%</td></tr>
+<tr><td>Foreign stocks</td>
+  <td>15&ndash;25%</td></tr>
+<tr><td>Emerging markets</td>
+  <td>25&ndash;35%</td></tr>
+</tbody>
+</table>
+
+<p>Interpreting standard deviation is intuitive once
+you know the rule of thumb: about 68% of the time,
+returns will fall within plus or minus one SD of the
+average. There is a one-in-six chance of losing more
+than the mean minus one SD, a one-in-44 chance of
+losing more than two SDs, and a one-in-740 chance of
+a three-SD disaster. A Latin American fund with 15%
+expected return and 35% SD carries a one-in-six chance
+of losing more than 20% in any given year, and a
+one-in-44 chance of losing more than 55%.</p>
+
+<blockquote>
+"One sign of a dangerously overbought market is a
+generalized underappreciation of the risks inherent
+in it."
+<cite>&mdash; William Bernstein</cite>
+</blockquote>
+
+<p>Bernstein acknowledges that returns don't follow
+a perfect <strong>normal distribution</strong>&mdash;
+they more closely follow a <strong>lognormal
+distribution</strong> with skew and kurtosis. He
+mentions alternative risk measures like
+<strong>semivariance</strong> (measuring only
+downside scatter), but notes these yield similar
+rankings in practice. The collapse of
+<strong>Long Term Capital Management</strong>
+illustrated that even simple SD calculations would
+have flagged danger years before the fund's
+implosion.</p>
+
+<p>The chapter closes with a taxonomy of risk
+measures: probability of nominal loss, probability of
+inflation-adjusted loss, probability of
+underperforming an index or T-bills. Bernstein calls
+each a <strong>utility function</strong>&mdash;a
+different lens on the same underlying reality. No
+single measure captures everything, but standard
+deviation remains the workhorse.</p>
+
+<!-- CHAPTER 2 -->
+<h2 id="ch2">Chapter 2: Risk and Return</h2>
+
+<p>The intellectual backbone of this chapter is
+the <strong>Ibbotson</strong> monograph,
+<strong>Stocks, Bonds, Bills, and Inflation</strong>
+&mdash;the gold standard for U.S. asset class returns.
+Bernstein warns that you need 20 to 30 years of data
+for reliable return estimates, though risk estimates
+stabilize with as few as five to ten years.</p>
+
+<table>
+<caption>U.S. Asset Class Returns, 1926&ndash;1998
+</caption>
+<thead>
+<tr><th>Asset</th><th>Ann. Return</th><th>SD</th>
+<th>Worst Year</th><th>1929&ndash;32</th></tr>
+</thead>
+<tbody>
+<tr><td>T-bills</td><td>3.77%</td><td>3.22%</td>
+  <td>0.00%</td><td>+9.49%</td></tr>
+<tr><td>5-yr Treasuries</td><td>5.31%</td>
+  <td>5.71%</td><td>&minus;5.13%</td>
+  <td>+20.27%</td></tr>
+<tr><td>20-yr Treasuries</td><td>5.34%</td>
+  <td>9.21%</td><td>&minus;9.19%</td>
+  <td>+19.73%</td></tr>
+<tr><td>Large stocks (S&amp;P)</td><td>11.22%</td>
+  <td>20.26%</td><td>&minus;43.35%</td>
+  <td>&minus;64.23%</td></tr>
+<tr><td>Small stocks</td><td>12.18%</td>
+  <td>38.09%</td><td>&minus;59.12%</td>
+  <td>&minus;87.98%</td></tr>
+</tbody>
+</table>
+
+<p>The table reveals the fundamental bargain of
+investing. T-bills barely keep pace with the 3.08%
+historical inflation rate. Five-year Treasury notes
+carry modest <strong>interest rate risk</strong>&mdash;
+when rates rise, fixed-coupon bonds decline, and
+longer maturities suffer worse damage. Over 73 years,
+five-year notes had only seven negative years and a
+worst-case loss of just 2.65%. The real return was
+roughly 2%. Twenty-year bonds are the paradox:
+nearly identical returns to five-year notes despite
+dramatically higher risk, with 20 losing years and
+a worst-case decline approaching 10%.</p>
+
+<p>Large stocks delivered a real return above 8%,
+doubling wealth roughly every nine years. Ten
+thousand dollars invested at birth would become
+$470,000 after fifty years. But the 1929&ndash;1932
+bear market wiped out nearly two-thirds of that
+wealth in real terms. Small stocks&mdash;the bottom
+20% of NYSE companies by market capitalization&mdash;
+earned a real return above 9%, turning that same
+$10,000 into $785,000. The price was
+"industrial-grade" risk: an 88% loss during the
+Depression.</p>
+
+<p>Time softens risk but doesn't eliminate it.
+Over 30-year rolling periods, large stocks never
+returned less than 8%&mdash;but a 5% gap between the
+best and worst 30-year outcomes compounds to nearly
+a fourfold difference in ending wealth. When
+measuring the standard deviation of terminal wealth
+rather than annualized returns, stocks actually
+become <strong>riskier</strong> with time, not safer.
+The most relevant risk for any investor is the
+likelihood of running out of money.</p>
+
+<p><strong>John J. Raskob</strong> appeared in
+<strong>Ladies Home Journal</strong> in the summer
+of 1929, claiming that $15 per month in stocks would
+grow to $80,000 in 20 years&mdash;implying returns
+above 25%. It was bubble-era madness. Yet someone
+who actually invested $15 per month from January 1926
+through December 1994 would have accumulated
+$2,462,295 in large stocks and an astonishing
+$11,730,165 in small stocks. The problem was never
+the math&mdash;it was that novices pile in during
+bull markets, develop no appreciation for risk, and
+then sell at the worst possible moment.</p>
+
+<blockquote>
+"I do not feel that selling at very low prices is a
+remedy for having failed to sell at high ones. ...
+I would say that it is from time to time the duty of
+the serious investor to accept the depreciation of
+his holdings with equanimity."
+<cite>&mdash; John Maynard Keynes</cite>
+</blockquote>
+
+<p>From 1970 onward, richer data became available:
+<strong>REITs</strong> (equity real estate, from the
+<strong>NAREIT</strong> index), European stocks
+(via <strong>Morgan Stanley Capital Indexes</strong>),
+Pacific Rim, Japanese, precious metals, and
+international small stocks (tracked by
+<strong>Dimensional Fund Advisors</strong>). The
+risk-return relationship held up well across these
+new classes, with two notable exceptions:
+<strong>precious metals</strong> and the
+<strong>Pacific Rim</strong>, where returns were not
+remotely commensurate with risks.</p>
+
+<p>The most important lesson of the chapter is that
+extrapolating the past into the future is hazardous.
+For bonds, the coupon rate is a surprisingly good
+predictor of future returns&mdash;a 1926 AAA
+corporate bond yielding 4.9% actually returned 5.77%
+through 1998. But the brutal bond bear market of
+1958&ndash;1983, when rates rose from below 3% to
+above 14%, reduced 20-year Treasury returns to a
+paltry 3.5% over a half-century. In 1984, conversely,
+anyone buying a 14% coupon had a far better future
+than historical averages would suggest.</p>
+
+<p>For stocks, Bernstein introduces the
+<strong>discounted dividend model</strong>:
+expected return equals dividend yield plus dividend
+growth rate plus any change in the price multiple.
+Historically, this worked perfectly: 4.5% yield plus
+5% growth plus 1.7% multiple expansion equaled
+11.2%&mdash;matching the actual 11.22%. But by the
+late 1990s, with yields at just 1.3% and no reason
+to expect further multiple expansion, the formula
+gave a sobering 6.3% expected return. With long
+bonds yielding 6%, the <strong>equity risk
+premium</strong> had nearly vanished.</p>
+
+<blockquote>
+"In the short run the stock market is a voting
+machine, but in the long run it is a weighing
+machine. What it weighs are earnings."
+<cite>&mdash; Benjamin Graham</cite>
+</blockquote>
+
+<table>
+<caption>Expected Asset Class Characteristics</caption>
+<thead>
+<tr><th>Asset</th><th>Expected Real Return</th>
+<th>Worst Bear Market Loss</th></tr>
+</thead>
+<tbody>
+<tr><td>T-bills</td><td>0&ndash;3%</td>
+  <td>None</td></tr>
+<tr><td>High-quality bonds</td><td>3%</td>
+  <td>0% (short) / 10% (long)</td></tr>
+<tr><td>Large stocks (U.S./foreign)</td><td>4%</td>
+  <td>40&ndash;50%</td></tr>
+<tr><td>REITs, small stocks, emerging mkts</td>
+  <td>6%</td><td>50&ndash;60%</td></tr>
+<tr><td>Precious metals</td><td>0&ndash;4%</td>
+  <td>50&ndash;60%</td></tr>
+</tbody>
+</table>
+
+<p>A practical example brings the numbers to life.
+A 50/50 stock-bond portfolio holding 25% small
+stocks at 6% real, 25% large stocks at 4%, and 50%
+bonds at 3% would deliver roughly 4% real. By the
+<strong>Rule of 72</strong>&mdash;dividing 72 by
+the return rate gives you the years to double&mdash;
+that means your purchasing power doubles every 18
+years. Not spectacular, but enough for a comfortable
+retirement with discipline and time.</p>
+
+<!-- CHAPTER 3 -->
+<h2 id="ch3">Chapter 3: The Behavior of
+  Multiple-Asset Portfolios</h2>
+
+<p>Uncle Fred returns with a more generous offer.
+Instead of one coin toss, he proposes splitting the
+pension in half, with a separate, independent coin
+toss for each side. Each toss still returns +30% on
+heads and &minus;10% on tails. The four possible
+outcomes per year are now HH (+30%), HT (+10%),
+TH (+10%), and TT (&minus;10%). Over a full cycle
+of all four outcomes, the compound factor is
+1.3 &times; 1.1 &times; 1.1 &times; 0.9 = 1.4157,
+giving an <strong>annualized return of 9.08%</strong>
+&mdash;nearly a full percentage point higher than the
+single toss's 8.17%&mdash;while reducing standard
+deviation from 20% to just 14.14%.</p>
+
+<blockquote>
+"Dividing your portfolio between assets with
+uncorrelated results increases return while
+decreasing risk."
+<cite>&mdash; William Bernstein</cite>
+</blockquote>
+
+<p>The magic word is <strong>uncorrelated</strong>:
+the result of one toss has no influence on the other.
+If the two tosses were perfectly correlated&mdash;
+always landing the same way&mdash;you'd be right
+back to a single toss. If perfectly inversely
+correlated, you'd earn a guaranteed 10% every year
+with zero risk. Real-world assets live somewhere in
+between, but meaningful negative correlations are
+never sustained over long periods.</p>
+
+<p>Bernstein builds a more realistic model: a
+"stock" that returns +30% or &minus;10%, and a
+"bond" that returns +10% or 0%. The critical
+requirement is <strong>rebalancing</strong>&mdash;
+returning the portfolio to its target mix at the end
+of each year. If bonds gain 10% while stocks lose
+10%, you must sell some bonds and buy more stock.
+Rebalancing accomplishes three things: it increases
+long-term returns while reducing risk, it prevents
+the portfolio from drifting to an all-stock
+allocation, and it instills the discipline to
+systematically buy low and sell high.</p>
+
+<p>A 75/25 stock/bond mix produces an annualized
+return of 7.70% with a standard deviation of 15.05%.
+The return is only 0.47% less than 100% stocks,
+while the risk drops by roughly five percentage
+points. One-quarter of the risk has been eliminated
+at the cost of only one-seventeenth of the return.
+That is a spectacular tradeoff.</p>
+
+<p>But the truly remarkable insight is on the left
+side of the return-versus-risk graph. Starting from
+100% bonds, adding small amounts of stock
+<strong>increases return while actually decreasing
+risk</strong>. The minimum-risk portfolio contains
+about 7% stock. A 12% stock allocation carries the
+same risk as an all-bond portfolio but higher return.
+This phenomenon appears repeatedly throughout
+portfolio theory and carries a profound implication:
+even an investor whose sole aim is to minimize risk
+must own some stock.</p>
+
+<p>With two identical uncorrelated assets, the
+optimal mix is close to 50/50&mdash;but there is
+plenty of margin for error. A 65/35 split differs
+from 50/50 by less than 0.1% in return and 0.5% in
+standard deviation. This is deeply reassuring:
+<strong>sticking to any reasonable allocation through
+thick and thin matters far more than finding the
+mathematically perfect one</strong>.</p>
+
+<p>Adding more assets introduces complexity rapidly.
+Two assets have one correlation to track; three
+assets have three; four have six; ten assets have 45.
+It is difficult to find two uncorrelated assets in
+the real world, practically impossible to find three,
+and absolutely impossible to find more than three
+that are mutually uncorrelated. Bernstein compares
+this to office politics: the more people involved,
+the more complicated the relationships become.</p>
+
+<p>The <strong>correlation coefficient</strong>
+ranges from &minus;1 (perfectly inverse) to +1
+(perfectly correlated), with zero meaning no
+relationship at all. The S&amp;P 500 and U.S. small
+stocks show a correlation of .777&mdash;high enough
+that poor performance in one reliably accompanies
+poor performance in the other. The S&amp;P 500 and
+<strong>EAFE</strong> (Europe, Australasia, Far East)
+have a correlation of .483&mdash;moderate, and
+sufficient for meaningful diversification. Japanese
+small-cap stocks and <strong>REITs</strong> show a
+correlation of just .068, producing a scatter plot
+with no discernible pattern at all.</p>
+
+<!-- CHAPTER 4 -->
+<h2 id="ch4">Chapter 4: The Behavior of
+  Real-World Portfolios</h2>
+
+<p>Moving from coin tosses to actual markets,
+Bernstein plots stock/bond mixes from 1926 to 1998
+on a <strong>return-versus-risk chart</strong>.
+The shape is revealing. Starting from 100% bonds,
+the first 15% of stock exposure dramatically
+increases return with almost no additional risk.
+Past 50/50, further stock additions produce
+diminishing marginal returns while adding
+considerable risk. The "bulge" in the curve
+represents the diversification benefit&mdash;the
+more pronounced the bulge, the greater the free
+lunch.</p>
+
+<p>Bond maturity matters. When Bernstein plots three
+different bond maturities mixed with stocks,
+<strong>five-year Treasury notes</strong> prove
+superior across most risk levels. T-bills are only
+desirable at the very lowest risk levels, and
+long-term bonds add volatility without commensurate
+return. The general rule: stick to bond maturities of
+six months to five years for the risk-diluting
+portion of your portfolio.</p>
+
+<p><strong>Risk dilution</strong>&mdash;substituting
+short-term bonds for stocks&mdash;is the
+conservative investor's best friend. It preserves
+whatever stock strategy you've chosen while simply
+dialing down the volume. High-risk and low-risk
+portfolios should differ mainly in their broad
+stock/bond allocation, not in the composition of
+their stock holdings. A conservative portfolio
+almost always requires some exposure to very risky
+assets; the risk is managed by keeping that exposure
+small.</p>
+
+<p>International diversification is essential because
+an all-U.S. database provides only two broadly
+uncorrelated categories: stocks and bonds. The
+<strong>EAFE index</strong> tells three different
+stories depending on which 20-year window you
+examine. From 1969 to 1988, adding EAFE to a U.S.
+portfolio was "talk about a free lunch"&mdash;
+returns rose roughly 2% with almost no extra risk,
+mostly because the yen and European currencies were
+rising against the dollar. From 1979 to 1998, the
+free lunch vanished: EAFE decreased both risk and
+return. By 2000, conventional wisdom held that
+foreign stocks were poison.</p>
+
+<blockquote>
+"Diversify abroad only at your peril. And, if you
+must invest abroad, do so only where you can drink
+the water."
+<cite>&mdash; Popular wisdom, late 1990s</cite>
+</blockquote>
+
+<p>But over the full 30 years from 1969 to 1998, the
+S&amp;P 500 returned 12.67% and EAFE returned
+12.39%&mdash;virtually identical. The combined
+return-risk plot was beautifully "bulgy," with
+portfolios up to 80% foreign earning more than
+either component alone and portfolios up to 40%
+foreign carrying less risk than either. International
+diversification worked superbly when you measured it
+properly: over a full generation, not a cherry-picked
+decade.</p>
+
+<p><strong>Recency</strong>&mdash;extrapolating
+recent trends indefinitely&mdash;is the single
+biggest mistake investors make. In the 1970s, only
+real estate and gold seemed viable. By the late
+1980s, Japanese economic prowess appeared unstoppable.
+Both views proved disastrous. Bernstein's advice is
+characteristically blunt: identify the diverse
+strains of current financial wisdom in order to
+ignore them.</p>
+
+<p>Small stocks add another dimension. Their
+"potency" is roughly 1.5 times that of large
+stocks&mdash;more bang for the buck in both risk
+and return. The <strong>DFA international small-cap
+index</strong> returned an extraordinary 26.14%
+annualized from 1970 to 1989, then an awful
+&minus;1.08% from 1990 to 1998. The lesson is that
+tracking error&mdash;the psychological pain of
+underperforming while others profit&mdash;is the real
+price of exotic asset classes. If you can't handle
+it, you won't stick with the allocation long enough
+to earn the reward.</p>
+
+<p>The <strong>efficient frontier</strong>&mdash;the
+upper-left edge of a cloud of random portfolios on a
+risk-return chart, representing the maximum return
+for each level of risk&mdash;is a central concept
+but also a source of mischief. <strong>David
+Wilkinson</strong> generated 800 random portfolios
+of seven assets for 1992&ndash;1996 and plotted them.
+The efficient frontier looked compelling&mdash;until
+you realized that next year's frontier would be
+nowhere near this year's. Bernstein compares chasing
+it to placing a battery where lightning last struck.
+Anyone claiming to be "on the efficient frontier"
+also talks to Elvis and the Easter Bunny.</p>
+
+<blockquote>
+"The real purpose of portfolio analysis is not to
+find the 'best' asset mix. Rather, it is to find a
+mix that will not be too far off the mark under a
+wide variety of circumstances."
+<cite>&mdash; William Bernstein</cite>
+</blockquote>
+
+<p>Rebalancing is what makes the whole system work.
+The target allocation is the <strong>policy
+allocation</strong>, and when an asset soars, you
+must sell some and reinvest in the laggards. This
+requires enormous discipline&mdash;doing the
+opposite of what the investment world is doing.
+A psychologist friend of Bernstein's called it the
+most effective way to become a contrarian, because
+you are always moving opposite to the crowd. The
+great buying opportunities of 1974 and 1970 felt
+like throwing money down a rat hole at the time.</p>
+
+<p>The small investor holds three advantages over
+professionals. First, the ability to
+<strong>aggressively rebalance</strong> without
+anxious clients complaining&mdash;Bernstein likens
+it to driving the wrong way up a one-way street,
+which is difficult enough in your own car but nearly
+impossible when chauffeuring a Rolls Royce with the
+owner squawking at every pothole. Second, access to
+small stocks that large institutions cannot buy
+without bidding up the price. Third, no pressure
+after bad quarters&mdash;even <strong>Joe DiMaggio
+</strong> had slumps, and even <strong>Warren
+Buffett</strong> occasionally gets burned.</p>
+
+<!-- CHAPTER 5 -->
+<h2 id="ch5">Chapter 5: Optimal Asset
+  Allocations</h2>
+
+<p>Bernstein opens with a bracing reality check:
+there are three types of "optimal" portfolio. The
+<strong>future optimal</strong> is unknowable&mdash;
+you cannot predict it any more than you can sprout
+wings and fly. The <strong>hypothetical optimal</strong>
+depends on assumed inputs that may be wildly wrong.
+And the <strong>historical optimal</strong> tells you
+where lightning struck last, not where it will strike
+next. The investor's task is not to find the best
+allocation but to find one that does reasonably well
+under a wide variety of circumstances.</p>
+
+<p><strong>Harry Markowitz</strong> won the Nobel
+Prize for developing <strong>mean-variance analysis
+</strong>, and the software that implements it&mdash;
+the <strong>mean-variance optimizer (MVO)</strong>
+&mdash;requires just three inputs for each asset:
+expected return, standard deviation, and correlations
+with every other asset. The optimizer then computes
+the set of <strong>corner portfolios</strong> that
+define the efficient frontier. It sounds scientific
+and precise.</p>
+
+<p>The fatal weakness is that the optimizer is
+<strong>overly fond of assets with the highest
+recent returns</strong>. Manipulating the return
+inputs by just a few percentage points can produce
+almost any portfolio you want. Assets exhibit
+<strong>mean reversion</strong> over long periods:
+stellar performance in one decade is frequently
+followed by below-average performance in the next.
+Optimizers have been called <strong>"error
+maximizers"</strong> for precisely this reason.</p>
+
+<blockquote>
+"If you can predict the optimizer inputs well enough
+to come close to the future efficient frontier, then
+you don't need an optimizer in the first place."
+<cite>&mdash; William Bernstein</cite>
+</blockquote>
+
+<p>Bernstein proves the point with a devastating
+five-period test. He optimizes each five-year period
+from 1970 to 1994 and uses the result as the
+portfolio for the following five years.</p>
+
+<table>
+<caption>Optimization vs. Coward's Portfolio,
+  1975&ndash;1998</caption>
+<thead>
+<tr><th>Optimized On</th><th>Optimal Asset</th>
+<th>Forward Return</th>
+<th>Coward's Portfolio</th></tr>
+</thead>
+<tbody>
+<tr><td>1970&ndash;74</td>
+  <td>99.8% precious metals</td>
+  <td>14.71%</td><td>25.38%</td></tr>
+<tr><td>1975&ndash;79</td>
+  <td>100% U.S. small</td>
+  <td>21.59%</td><td>14.75%</td></tr>
+<tr><td>1980&ndash;84</td>
+  <td>73% small + 27% PM</td>
+  <td>11.83%</td><td>14.00%</td></tr>
+<tr><td>1985&ndash;89</td>
+  <td>100% Japanese</td>
+  <td>&minus;3.50%</td><td>7.54%</td></tr>
+<tr><td>1990&ndash;94</td>
+  <td>100% Pacific Rim</td>
+  <td>&minus;3.22%</td><td>6.61%</td></tr>
+</tbody>
+</table>
+
+<p>Over the full 1975&ndash;1998 period, optimization
+returned 8.40% while the naive equal-weighted
+"coward's portfolio" returned <strong>15.79%</strong>.
+In the late 1980s, the optimizer loaded entirely into
+Japanese stocks because "a few square miles of Tokyo
+real estate were worth more than all of California."
+In 1994, it bet everything on the Asian Tigers
+because "everybody knew" they would achieve American
+living standards within a decade. Optimizing
+historical returns is, in Bernstein's memorable
+phrase, "a one-way ticket to the poor house."</p>
+
+<p>Even well-diversified portfolios cannot eliminate
+risk entirely. Economic catastrophes do not respect
+national borders: both 1929&ndash;32 and
+1973&ndash;74 hammered all markets, varying only by
+degree. Below-average returns have higher
+correlations than above-average returns&mdash;a
+phenomenon called <strong>negative
+semicorrelations</strong>. <strong>Bruno Solnik</strong>
+captured it perfectly: "Diversification fails us just
+when we need it most." The maximum risk reduction
+achievable through diversification is roughly
+one-quarter to one-third.</p>
+
+<p>Bernstein's practical approach is a three-step
+process. <strong>Step one</strong>: decide how many
+asset classes to include. A <strong>level-one
+palette</strong> contains just four&mdash;U.S. large
+stocks, U.S. small stocks, foreign stocks, and U.S.
+short-term bonds. Equal portions of these four will
+outperform the overwhelming majority of professionals
+over decades. A <strong>level-two palette</strong>
+adds foreign large, emerging markets, foreign small,
+REITs, and possibly precious metals. A
+<strong>level-three palette</strong> slices equity by
+nationality, size, and value-versus-growth
+orientation, yielding 40 or more possible asset
+classes&mdash;recommended only for investors who
+genuinely enjoy the process.</p>
+
+<p><strong>Step two</strong>: decide how conventional
+you want to be. A conventional portfolio keeps 60%
+in U.S. large stocks, minimizing
+<strong>tracking error</strong>&mdash;the extent
+to which your returns differ from the S&amp;P 500
+benchmark that everyone uses for comparison. An
+equal-weight "coward's portfolio" distributes evenly
+across all three stock classes, producing higher
+tracking error but similar long-term returns. Over
+six consecutive five-year periods starting in 1969,
+the long-term returns were very similar, but the
+coward's portfolio trailed the S&amp;P 500 by 4%
+per year in some periods and over 8% in others.</p>
+
+<p><strong>Step three</strong>: determine your
+stock/bond split based on risk tolerance. At the
+beginning of the millennium, expected stock returns
+only slightly exceeded bonds. An aggressive investor
+might hold up to 75% stocks; moderate, 50/50;
+conservative, 30% stocks. The aggressiveness of the
+portfolio is reflected in the overall stock/bond mix,
+not in the types of equities held.</p>
+
+<p>Two sample portfolios illustrate the extremes. The
+<strong>Madonna Portfolio</strong>&mdash;bold,
+unconventional, high risk&mdash;spreads 10% each
+across seven equity classes (S&amp;P 500, U.S. small,
+REITs, international large, international small,
+emerging markets, precious metals) with 30% in
+short-term bonds. The <strong>Gap Portfolio</strong>
+&mdash;complex, conventional, low risk&mdash;holds 15
+asset classes including value/growth splits, with a
+conservative 40/60 stock/bond allocation. The Gap
+Portfolio rarely varies more than a few percent from
+a simple domestic 40/60 S&amp;P/T-bill mix.</p>
+
+<!-- CHAPTER 6 -->
+<h2 id="ch6">Chapter 6: Market Efficiency</h2>
+
+<p>Bernstein opens with a taxonomy of investors:
+those who don't know where the market is headed,
+those who don't know that they don't know, and
+investment professionals who know they don't know
+but whose livelihoods depend on appearing otherwise.
+The chapter is built on a single organizing
+principle: <strong>skill should produce persistent
+results over time</strong>. Baseball's .300 hitters
+consistently outperform the .260 average by margins
+wide enough to prove genuine ability. But the "hot
+hand" in basketball&mdash;the belief that recent
+shooting success predicts future accuracy&mdash;fails
+statistical analysis entirely. Humans see patterns
+where none exist. This insight is the key to
+understanding financial markets.</p>
+
+<p><strong>Michael Jensen's</strong> landmark 1968
+study in the <strong>Journal of Finance</strong>
+examined mutual fund performance from 1945 to 1964
+and found <strong>no evidence of persistent
+outperformance</strong>. Dozens of subsequent studies
+confirmed the finding: whatever tiny persistence
+exists disappears after expenses. A
+<strong>DFA</strong> study of the top 30 diversified
+funds over sequential five-year periods from 1970 to
+1998 showed that top performers in one period
+underperformed the S&amp;P 500 in the next. Success
+or failure was a purely random affair, resembling
+"chimpanzees throwing darts at the stock page."</p>
+
+<p>The case of <strong>Robert Sanborn</strong> and
+the <strong>Oakmark Fund</strong> is the chapter's
+central parable. From 1991 to 1998, Sanborn
+annualized 24.91% versus the S&amp;P's 19.56%.
+In 1992 alone, he beat his benchmark by 41
+percentage points. But then investors piled in,
+assets ballooned from $328 million to $7.67 billion,
+and the fund's edge vanished. Dollar-weighted
+returns&mdash;what the average investor actually
+earned&mdash;underperformed the S&amp;P by 7.55%
+per year because most shareholders arrived after the
+best returns had already occurred.</p>
+
+<table>
+<caption>Oakmark Fund: Performance and Asset Growth
+</caption>
+<thead>
+<tr><th>Year</th><th>Return vs S&amp;P</th>
+<th>Fund Assets</th></tr>
+</thead>
+<tbody>
+<tr><td>1992</td><td>+41.30%</td>
+  <td>$328M</td></tr>
+<tr><td>1993</td><td>+20.40%</td>
+  <td>$1.21B</td></tr>
+<tr><td>1994</td><td>+2.00%</td>
+  <td>$1.63B</td></tr>
+<tr><td>1995</td><td>&minus;3.10%</td>
+  <td>$3.30B</td></tr>
+<tr><td>1996</td><td>&minus;6.70%</td>
+  <td>$4.19B</td></tr>
+<tr><td>1997</td><td>&minus;0.80%</td>
+  <td>$7.30B</td></tr>
+<tr><td>1998</td><td>&minus;24.90%</td>
+  <td>$7.67B</td></tr>
+</tbody>
+</table>
+
+<p>Successful actively managed funds sow the seeds
+of their own destruction. Performance attracts
+assets; assets create <strong>market-impact
+costs</strong> as the manager tries to buy and sell
+in size; the impact drag overwhelms whatever skill
+existed. Sanborn was "modestly skilled"&mdash;99% of
+managers show none at all&mdash;but his skill was
+crushed under the weight of billions.</p>
+
+<p>The mathematics of fund costs are damning.
+Bernstein dissects four layers of expense: the
+<strong>expense ratio</strong> (advisory and
+administrative fees), <strong>commissions</strong>,
+the <strong>bid-ask spread</strong> (stocks are
+always bought slightly above the price at which
+they can be sold), and <strong>market-impact
+costs</strong> (large block trades move prices
+against you).</p>
+
+<table>
+<caption>Active vs. Index Fund Annual Costs</caption>
+<thead>
+<tr><th>Cost Layer</th><th>Active Large</th>
+<th>Active Small/Foreign</th>
+<th>Index Large</th>
+<th>Index Small/Foreign</th></tr>
+</thead>
+<tbody>
+<tr><td>Expense ratio</td><td>1.30%</td>
+  <td>1.60%</td><td>0.18%</td><td>0.20%</td></tr>
+<tr><td>Commissions</td><td>0.30%</td>
+  <td>0.50%</td><td>0.01%</td><td>0.10%</td></tr>
+<tr><td>Bid-ask spread</td><td>0.30%</td>
+  <td>1.00%</td><td>0.02%</td><td>0.15%</td></tr>
+<tr><td>Impact costs</td><td>0.30%</td>
+  <td>1.00%</td><td>0.02%</td><td>0.15%</td></tr>
+<tr><td><strong>Total</strong></td>
+  <td><strong>2.20%</strong></td>
+  <td><strong>4.10%</strong></td>
+  <td><strong>0.23%</strong></td>
+  <td><strong>0.60%</strong></td></tr>
+<tr><td><strong>Index Advantage</strong></td>
+  <td colspan="2"></td>
+  <td><strong>1.97%</strong></td>
+  <td><strong>3.50%</strong></td></tr>
+</tbody>
+</table>
+
+<p>Over 25 years, these advantages compound
+ferociously. The large-cap indexing advantage of
+roughly 1.6% equals one standard deviation above the
+mean of active-manager scatter, meaning a large-cap
+index fund should beat <strong>84% of active
+funds</strong>. For small and foreign stocks, the
+3.2% advantage reaches two standard deviations:
+<strong>97% of active funds</strong> should lose.
+For emerging markets, where active costs can reach
+9%, indexing should best virtually every active peer
+over a generation.</p>
+
+<p><strong>Charles Ellis</strong>, in his famous 1972
+article <strong>"The Loser's Game"</strong>, compared
+professional investing to amateur tennis. In amateur
+tennis, the player who simply returns the ball with
+minimum fancy moves usually wins. In investing, the
+easiest way to lose is to incur high costs through
+excessive trading. Indexing is the investment
+equivalent of hitting the ball back: buy and hold
+the entire market, minimize all four cost layers,
+and let compounding do the work.</p>
+
+<p><strong>Dunn's Law</strong>, named after
+<strong>Steve Dunn</strong>, captures a subtlety:
+when an asset class does relatively well, an index
+fund in that class does even better, because the
+index fund takes the full brunt of asset-class
+performance while active managers drift into
+neighboring size categories. During the 15-year
+reign of large-cap dominance ending in 1998, most
+small-cap active managers owned some midsize and
+large stocks, which helped them versus the small-cap
+index but masked the true indexing advantage.</p>
+
+<p><strong>Survivorship bias</strong> further inflates
+the apparent performance of active funds.
+<strong>Burton Malkiel</strong> estimated that
+survivorship&mdash;the killing off or merging of the
+worst performers&mdash;adds roughly 1.5% to reported
+average fund returns, and as much as 3% for some
+categories. When Bernstein screened Morningstar data
+for small-cap funds with five-year records, the
+average was 12.19%, but the true average including
+dead funds was probably 9&ndash;10%. Indexing wins
+decisively.</p>
+
+<p>The chapter closes with a brief exploration of
+<strong>momentum</strong> and
+<strong>mean reversion</strong>. Monthly S&amp;P 500
+returns from 1926 to 1998 show a small but
+statistically significant autocorrelation of 0.081,
+confirming that asset prices exhibit some short-term
+momentum. For the taxable investor, this is
+irrelevant&mdash;any advantage is obliterated by
+capital gains from frequent trading. But for
+tax-sheltered portfolios, it implies a practical
+rule: <strong>rebalance no more than once per year
+</strong>, allowing momentum to run its course before
+buying the laggards.</p>
+
+<!-- CHAPTER 7 -->
+<h2 id="ch7">Chapter 7: Odds and Ends</h2>
+
+<p>Value investing gets the most thorough treatment in
+this chapter, and Bernstein builds the case from
+first principles. Investors instinctively believe
+that the most profitable stocks come from companies
+with the hottest products&mdash;the
+<strong>growth companies</strong>. The technological
+marvels of the twentieth century&mdash;air transport,
+radio, television, automobiles, computers&mdash;
+created enormous wealth. But fatal extrapolation
+leads investors to overpay for that growth.</p>
+
+<p>Three valuation measures separate cheap from
+expensive: <strong>price-to-earnings (P/E)</strong>,
+<strong>price-to-book (P/B)</strong>, and
+<strong>dividend yield</strong>. Of these, P/B is the
+most stable because book value is hard for accountants
+to fudge, while earnings can be manipulated. As
+<strong>Ben Graham</strong> warned, earnings are only
+useful when averaged over several years. High P/E
+and P/B signal expensive "growth" companies; low P/E
+and P/B signal cheap "value" companies.</p>
+
+<p>A landmark study by <strong>Paul Miller</strong> of
+<strong>Drexel &amp; Co.</strong> examined the 30 Dow
+stocks from July 1936 to June 1964, buying the 10
+cheapest by P/E and comparing them to the 10 most
+expensive.</p>
+
+<table>
+<caption>Dow Stocks by P/E, 1936&ndash;1964</caption>
+<thead>
+<tr><th>Group</th><th>Ann. Return</th><th>SD</th>
+<th>Losing Years</th><th>Worst Year</th></tr>
+</thead>
+<tbody>
+<tr><td>All 30 Dow</td><td>+6.54%</td>
+  <td>16.3%</td><td>10</td><td>&minus;20.9%</td></tr>
+<tr><td>Highest 10 P/E</td><td>+1.50%</td>
+  <td>15.7%</td><td>12</td><td>&minus;24.6%</td></tr>
+<tr><td>Lowest 10 P/E</td><td>+12.18%</td>
+  <td>21.1%</td><td>7</td><td>&minus;30.5%</td></tr>
+</tbody>
+</table>
+
+<p>The cheap stocks earned eight times the return of
+the expensive ones. Their higher standard deviation
+came almost entirely from very large gains in
+several years&mdash;by measures of actual losing
+years and losses exceeding 10%, the cheap stocks were
+less risky. The
+<strong>Dow Dividend Strategy</strong>&mdash;buying
+the five highest-yielding Dow stocks each year&mdash;
+told the same story. The "terrible" companies like
+<strong>Philip Morris</strong>,
+<strong>J.P. Morgan</strong>, and
+<strong>Chevron</strong> outperformed the "good"
+companies like <strong>Wal-Mart</strong>,
+<strong>McDonald's</strong>, and
+<strong>Disney</strong>.</p>
+
+<p>The definitive academic evidence came in 1992 when
+<strong>Eugene Fama</strong> and
+<strong>Kenneth French</strong> published their
+landmark study in the <strong>Journal of Finance
+</strong>. Examining stock returns from July 1963 to
+December 1990, they found that all variation in
+returns could be explained by just two factors:
+company size and P/B ratio. The cheapest tenth of
+stocks by P/B returned 19.6% annually, while the
+most expensive returned just 7.7%. The smallest,
+cheapest stocks returned 23% annually. P/E was
+useful but added no predictive power once P/B was
+accounted for.</p>
+
+<blockquote>
+"Good companies are generally bad stocks, and bad
+companies are generally good stocks."
+<cite>&mdash; William Bernstein</cite>
+</blockquote>
+
+<p><strong>David Dreman</strong> documented the
+mechanism beautifully. The largest price movements
+occur when earnings greatly exceed or fall short of
+analysts' expectations. Value stocks fall much less
+on earnings disappointments and rise much more on
+positive surprises. When <strong>Tom Peters</strong>
+published <strong>In Search of Excellence</strong> in
+1982, identifying objectively "excellent" companies,
+<strong>Michelle Clayman</strong> of Oklahoma State
+tracked their stock performance and found that the
+<strong>"unexcellent" companies outperformed the
+excellent by 11% per year</strong> over the
+following five years. The unexcellent companies
+were simply cheaper.</p>
+
+<p>The <strong>Fama-French three-factor model</strong>
+frames returns as the sum of the risk-free rate, a
+<strong>market-risk premium</strong> (5.65%
+annualized, positive in 78% of rolling five-year
+periods), a <strong>size premium</strong> (1.71%,
+positive only 53% of the time), and a
+<strong>value premium</strong> (3.77%, positive in
+87% of rolling periods&mdash;the most consistent
+of the three). There is likely a fourth factor,
+<strong>momentum</strong>, though its nature remains
+debated.</p>
+
+<p>The late 1990s produced the inevitable "new era"
+arguments. Dividend yields had fallen to 1.3%,
+P/B ratios had ballooned to 8, and P/E ratios
+hovered near 30&mdash;all historically unprecedented.
+But the mathematics were unforgiving: 1.3% yield
+plus 5% earnings growth equals 6.3% expected nominal
+return, barely above bonds. The steam engine and
+telegraph&mdash;arguably more transformative than
+anything in the 1990s&mdash;produced only 4.2% equity
+returns between 1830 and 1860. New-era arguments had
+appeared before, in 1926&ndash;1929 and the late
+1960s, and both times the old valuation methods were
+declared obsolete. Both times they weren't.</p>
+
+<p>Bernstein dissects <strong>James Glassman</strong>
+and <strong>Kevin Hassett's</strong>
+<strong>Dow 36,000</strong> thesis with surgical
+precision. The argument rested on the
+<strong>discounted dividend model</strong>,
+originally formulated in 1938 by <strong>John Burr
+Williams</strong>. Glassman and Hassett assumed a
+discount rate barely exceeding the dividend growth
+rate, which made the formula produce enormous
+valuations&mdash;or infinity. Bernstein shows that
+moving the inputs by just 1% in the wrong direction
+drops the Dow to 6,250; slightly more optimism sends
+it to infinity. The model is "like balancing an
+elephant on a fence post." Moreover, if the discount
+rate really were 5.5% and the Dow were correctly
+priced at 36,000, the future return on stocks would
+also be 5.5%&mdash;less than TIPS were guaranteeing
+at 4% real.</p>
+
+<p>Currency hedging is a surprisingly ambiguous topic.
+Over 20 years ending in October 1999, hedged
+European stocks had a standard deviation of 14.92%
+versus 16.25% unhedged&mdash;only slightly different.
+Because currency returns are uncorrelated with stock
+returns, hedging could actually increase portfolio
+risk over short periods. <strong>Jeremy Siegel</strong>
+showed that the pound fell from $4.80 in 1910 to
+roughly $1.60 by the 1990s, but higher British
+interest rates made hedging costs substantial enough
+that British investors were better off unhedged.
+Bernstein's practical advice: all recommended foreign
+stock funds are unhedged; only low-cost foreign bond
+funds should be hedged.</p>
+
+<p><strong>Dynamic asset allocation</strong>&mdash;
+varying your policy weights based on market
+valuations&mdash;is the closest thing to legitimate
+market timing, but Bernstein warns that you shouldn't
+attempt it until you've successfully rebalanced
+through multiple market cycles. You cannot pilot a
+jet fighter before mastering the trainer. The
+approach is simple in theory: increase an asset's
+target weight slightly (perhaps 0.1%) for every 1%
+it falls in value, and vice versa. This is just
+rebalancing in a more vigorous form&mdash;what
+Bernstein calls <strong>"overbalancing."</strong>
+Changes must be driven purely by market valuation
+(P/B, dividend yield), never by economic or political
+forecasts.</p>
+
+<p>The chapter closes with three concepts from
+<strong>behavioral finance</strong>. First,
+<strong>overconfidence</strong>: after the summer
+1998 market decline, average investors expected to
+beat the market by 2%&mdash;mathematically impossible
+for the average. Eighty-two percent of U.S. drivers
+consider themselves in the top 30% for safety.
+Second, <strong>recency</strong>: after prices fell
+in 1998, investors expected lower future
+returns&mdash;exactly backwards, since cheaper prices
+mean higher future returns. <strong>William Sharpe
+</strong> and <strong>Andre Perold</strong> called
+investors who buy as prices rise and sell as they
+fall "convex" traders. Because the overwhelming
+majority are convex, the rational investor must be
+concave&mdash;buying when others panic, selling when
+others celebrate. Third,
+<strong>risk aversion myopia</strong>: human beings
+evolved to focus on immediate threats, not long-term
+strategic optimization. This visceral short-termism
+explains why anyone owns bonds at all given the
+long-term superiority of stocks.</p>
+
+<!-- CHAPTER 8 -->
+<h2 id="ch8">Chapter 8: Implementing Your
+  Asset Allocation Strategy</h2>
+
+<p>Theory is easy; implementation is hard. Bernstein
+frames the challenge with a line from
+<strong>Full Metal Jacket</strong>: "I see you can
+talk the talk, but can you walk the walk?"</p>
+
+<p>The first step is determining your stock/bond
+split through an honest assessment of risk tolerance.
+Bernstein provides a clean mapping: if you can
+tolerate a 35% maximum portfolio loss, hold 80%
+stocks; 30% tolerance maps to 70% stocks; 25% to
+60%; 20% to 50%; down to zero tolerance at 10%
+stocks. Time horizon adds a constraint: your maximum
+stock allocation should be no more than 10 times the
+number of years until you need the money. If you
+need it in two years, keep stocks to 20% regardless
+of your psychological tolerance.</p>
+
+<table>
+<caption>Risk Tolerance &rarr; Stock Allocation
+</caption>
+<thead>
+<tr><th>Max Tolerable Loss</th>
+<th>Stock Allocation</th></tr>
+</thead>
+<tbody>
+<tr><td>35%</td><td>80%</td></tr>
+<tr><td>30%</td><td>70%</td></tr>
+<tr><td>25%</td><td>60%</td></tr>
+<tr><td>20%</td><td>50%</td></tr>
+<tr><td>15%</td><td>40%</td></tr>
+<tr><td>10%</td><td>30%</td></tr>
+<tr><td>5%</td><td>20%</td></tr>
+<tr><td>0%</td><td>10%</td></tr>
+</tbody>
+</table>
+
+<p>The second step is choosing your investment
+vehicles. <strong>Vanguard</strong> stands alone in
+the fund industry because of its unique ownership
+structure: the Vanguard Group is owned entirely by
+its individual funds and thus by its shareholders.
+Profits flow back to investors in the form of lower
+expenses. Almost every other fund company is owned
+by external stockholders or private partners whose
+profits come at the expense of fund shareholders.
+This structural advantage makes Vanguard the default
+choice for index investors.</p>
+
+<p>Bernstein catalogs the key Vanguard index funds:
+the <strong>500 Index Fund</strong> (tracking the
+S&amp;P 500), the <strong>Tax-Managed Growth and
+Income</strong> fund (a tax-efficient version), the
+<strong>Total Stock Market Index</strong> (roughly
+75% large, 15% mid, 10% small), the <strong>Value
+Index</strong> and <strong>Small-Cap Index</strong>
+funds (best suited for tax-sheltered accounts due to
+high turnover), and European, Pacific, and Emerging
+Markets index funds. Vanguard's gaps&mdash;no
+international small-cap, no international value&mdash;
+can be filled by <strong>Dimensional Fund Advisors
+(DFA)</strong>, whose strategies were designed by
+<strong>Gene Fama</strong>,
+<strong>Ken French</strong>, and
+<strong>Rex Sinquefield</strong>. DFA funds carry
+expenses almost as low as Vanguard's but are
+available only through approved advisors.</p>
+
+<p>Tax efficiency demands careful placement. REITs
+distribute most of their return as dividends taxed at
+full marginal rates&mdash;they belong exclusively in
+tax-sheltered accounts. Small-cap and value index
+funds generate high turnover as stocks graduate
+between categories, creating unwanted capital gains
+distributions. The principle is straightforward: put
+tax-efficient assets (total market, large-cap,
+European and Pacific indexes) in taxable accounts and
+tax-inefficient assets (value, small-cap, REITs,
+bonds) in IRAs and 401(k)s.</p>
+
+<p>For investors with $50,000 or more in bonds,
+Bernstein recommends building a
+<strong>Treasury ladder</strong>&mdash;buying notes
+directly at auction with no spread and minimal
+commissions. Purchase five-year notes at regular
+intervals to create a steady stream of maturing
+securities. <strong>Fidelity</strong> charges no
+commission on auction purchases above $20,000.
+The gap between Treasury and corporate bond yields
+is the "price of safety"&mdash;when it's small,
+buy Treasuries.</p>
+
+<p>Getting started is the hardest part, and
+Bernstein advocates wading in slowly.
+<strong>Dollar cost averaging (DCA)</strong>&mdash;
+investing a fixed amount at regular intervals&mdash;
+ensures you buy more shares when prices are low and
+fewer when prices are high, producing an average
+cost per share below the simple average price.
+But DCA requires real fortitude at the
+"point of maximum pessimism"&mdash;continuing to
+invest during the crashes of October 1987, January
+1991, or October 1998.</p>
+
+<p><strong>Value averaging (VA)</strong>, developed by
+<strong>Michael Edleson</strong>, is a superior
+refinement. Instead of investing a fixed dollar
+amount each month, you set a target value path that
+rises by a fixed amount&mdash;say $100 per month.
+When the market declines, you contribute more than
+$100 to reach the target; when it rises sharply, you
+contribute nothing or even withdraw. Value averaging
+mandates the largest purchases at market bottoms and
+the smallest at tops. It works in reverse for
+retirees, selling more at peaks and less at troughs,
+stretching assets further.</p>
+
+<p>For rebalancing, the rules differ by account type.
+In tax-sheltered accounts, you can rebalance as often
+as you wish without tax consequences. The optimal
+frequency depends on finding the interval where
+correlations are lowest and variances highest, but
+since asset prices exhibit short-term momentum,
+longer intervals are generally preferred. Bernstein's
+rule of thumb: <strong>rebalance every year or two
+and you won't go far wrong</strong>. In taxable
+accounts, rebalance as sparingly as possible&mdash;
+there is a good case for never rebalancing at all,
+since each sale triggers capital gains taxes. Instead,
+redirect distributions from overweight funds to
+underweight ones.</p>
+
+<p>The chapter's most sobering section addresses
+retirement. Bernstein applies the concept of
+<strong>duration</strong>&mdash;the time it takes for
+reinvested income to overcome an initial price
+shock&mdash;to stocks. At a 1.3% dividend yield, a
+75% market decline has a <strong>33-year
+duration</strong>, meaning it would take 33 years
+for reinvested dividends to make you whole. In
+1929, with a 2.6% yield, the same decline had only
+a 19-year duration. Today's lower yields make the
+mathematics more frightening, not less.</p>
+
+<p>But regular contributions dramatically shorten
+duration. A $10,000 initial investment with no
+additions and a 75% decline at 1.3% yield takes 33
+years to recover. Add $200 per month, and break-even
+drops to just over 11 years. Retirees face the
+opposite problem: they cannot shorten duration and
+can be devastated if it exceeds their remaining
+horizon. Young investors, paradoxically, should pray
+for a market crash early in their saving years.</p>
+
+<p>The <strong>Trinity University study</strong> by
+<strong>Philip Cooley</strong>,
+<strong>Carl Hubbard</strong>, and
+<strong>Daniel Walz</strong> found that only a
+<strong>4&ndash;5% withdrawal rate</strong> had a
+reasonable expectation of lasting a full retirement.
+Testing this against the brutal 1966&ndash;1995
+period&mdash;when large stocks earned a real return
+of zero for the first 17 years&mdash;confirms that
+at a 4% withdrawal rate most portfolios survive, but
+at 7% all eventually run dry. Two percent of
+additional fund expenses translates into a
+<strong>doubling of your retirement savings
+requirement</strong>.</p>
+
+<blockquote>
+"2% of additional costs translates into a doubling
+of your retirement savings requirement."
+<cite>&mdash; William Bernstein</cite>
+</blockquote>
+
+<p>Sequence-of-returns risk makes everything worse.
+Using Uncle Fred's coin toss again, a retiree who
+experiences 15 straight tails before 15 heads can
+withdraw only $18,600 per year from a million-dollar
+portfolio. The same retiree with 15 heads first can
+withdraw $248,600. The order of good and bad years
+matters enormously&mdash;a fact that
+flat-rate retirement calculators completely miss.</p>
+
+<!-- KEY TAKEAWAYS -->
+<h2 id="takeaways">Key Takeaways</h2>
+
+<h3>Asset allocation is everything</h3>
+<p>The Brinson studies proved that allocation policy
+explains over 90% of return variability among
+institutional portfolios. Stock picking and market
+timing are nearly irrelevant by comparison. The
+Simpleton's Portfolio&mdash;equal parts U.S. large,
+U.S. small, foreign, and bonds&mdash;beats 75% of
+professionals.</p>
+
+<h3>Risk and return are inseparable</h3>
+<p>Higher expected returns always come with higher
+standard deviation. The "safe" option of T-bills
+and CDs virtually guarantees poverty in retirement.
+Any promise of high returns with low risk is a
+signal of fraud.</p>
+
+<h3>Diversification is the only free lunch</h3>
+<p>Mixing uncorrelated assets reduces risk while
+increasing returns through the rebalancing bonus.
+Uncle Fred's two-coin toss added nearly 1% in
+annualized return while cutting standard deviation
+by 30%. Even investors who care only about
+minimizing risk must own some stocks.</p>
+
+<h3>Nobody can time the market</h3>
+<p>Expert opinion underperforms the market roughly
+75% of the time. Newsletter writers performed worse
+than chance. Investment managers show no persistent
+skill. The appropriate response is to index.</p>
+
+<h3>Costs are the primary determinant of returns</h3>
+<p>Active funds carry 2&ndash;9% in annual costs
+versus 0.2&ndash;1.5% for index funds. Over 25
+years, a large-cap index fund should beat 84% of
+active peers; a small or foreign index fund should
+beat 97%.</p>
+
+<h3>Value beats growth over time</h3>
+<p>The Fama-French three-factor model shows a 3.77%
+value premium that is positive 87% of the time.
+Bad companies are generally good stocks because
+they are cheap and have nowhere to go but up, while
+good companies are expensive and vulnerable to
+disappointment.</p>
+
+<h3>Recency is the enemy</h3>
+<p>Whatever has performed best recently will be
+embraced by the crowd and whatever has performed
+worst will be abandoned. The rational investor does
+the opposite&mdash;systematically, through
+rebalancing.</p>
+
+<h3>Rebalancing is the only effective market timing</h3>
+<p>Periodically selling winners and buying losers
+to restore target allocations forces the investor to
+buy low and sell high. It works best annually or
+less frequently, allowing short-term momentum to
+run its course.</p>
+
+<h3>Implementation is simpler than theory</h3>
+<p>Four index funds from Vanguard&mdash;U.S. large,
+U.S. small, foreign, and short-term bonds&mdash;
+provide nearly all the diversification benefit.
+Complexity beyond this is optional and increases
+tracking error.</p>
+
+<!-- CONTRARIAN IDEAS -->
+<h2 id="contrarian">Contrarian Ideas</h2>
+
+<h3>Even risk-minimizers need stocks</h3>
+<p>The minimum-risk portfolio contains about 7%
+stocks. Adding stocks to an all-bond portfolio
+actually reduces risk slightly while increasing
+return&mdash;a deeply counterintuitive finding.</p>
+
+<h3>Optimizers are error maximizers</h3>
+<p>Mean-variance optimization consistently
+underperformed a naive equal-weight portfolio by
+nearly 2:1 over 25 years. The technology is
+seductive but dangerous because it chases whatever
+performed best recently.</p>
+
+<h3>International diversification is primarily
+  about risk, not return</h3>
+<p>Goetzmann and Jorion showed that U.S. markets had
+the world's highest equity returns. The main
+advantage of global diversification is decreased
+risk, not increased return. Most of the "free lunch"
+from foreign stocks in the 1970s and 1980s came from
+currency gains that subsequently reversed.</p>
+
+<h3>Fund expenses matter more than performance</h3>
+<p>Active fund costs of 2&ndash;9% dwarf any skill
+premium. The pension fund industry spends roughly
+$100 billion annually cycling through managers who
+show no persistent ability. Only 8% of the largest
+pension plans beat an indexed 60/40 mix over a
+decade.</p>
+
+<h3>Don't hedge foreign stocks</h3>
+<p>Currency risk adds only slightly to total
+portfolio volatility because currency returns are
+uncorrelated with stock returns. Hedging costs can
+be substantial, and over long periods, the unhedged
+investor is typically no worse off.</p>
+
+<h3>Today's market is more frightening than 1929</h3>
+<p>At a 1.3% dividend yield, a 75% market decline
+carries a 33-year duration&mdash;nearly twice the
+19 years at 1929's 2.6% yield. The lower the yield,
+the longer the recovery.</p>
+
+<!-- NOTABLE QUOTES -->
+<h2 id="quotes">Notable Quotes</h2>
+
+<blockquote>
+"Asset allocation is the only factor affecting your
+investments that you can actually influence."
+<cite>&mdash; William Bernstein</cite>
+</blockquote>
+
+<blockquote>
+"In the long run you are compensated for bearing
+risk. Conversely, if you seek safety, your returns
+will be low."
+<cite>&mdash; William Bernstein (First Fundamental
+  Law of Investing)</cite>
+</blockquote>
+
+<blockquote>
+"Something that everyone knows isn't worth knowing."
+<cite>&mdash; Bernard Baruch</cite>
+</blockquote>
+
+<blockquote>
+"For the taxable investor, indexing means never
+having to say you're sorry."
+<cite>&mdash; William Bernstein</cite>
+</blockquote>
+
+<blockquote>
+"When it comes to newsletter writers, remember
+Malcolm Forbes' famous dictum: the only money made
+in newsletters is through subscriptions, not from
+taking the advice."
+<cite>&mdash; William Bernstein</cite>
+</blockquote>
+
+<blockquote>
+"The four most expensive words in the English
+language are 'this time it's different.'"
+<cite>&mdash; John Templeton</cite>
+</blockquote>
+
+<blockquote>
+"As much as it pains me to admit it, momentum
+exists."
+<cite>&mdash; William Bernstein</cite>
+</blockquote>
+
+<blockquote>
+"We are in 'deep doo-doo.' We can't predict
+returns, SDs, and correlations accurately enough.
+If we could, we wouldn't need the optimizer in the
+first place."
+<cite>&mdash; William Bernstein</cite>
+</blockquote>
+
+<!-- ALLEGORIES -->
+<h2 id="allegories">Allegories &amp; Cultural
+  References</h2>
+
+<h3>Uncle Fred's Coin Toss</h3>
+<p>The book's signature device. Uncle Fred's pension
+plan&mdash;choose between a 3% CD and a coin toss
+returning +30%/&minus;10%&mdash;makes the risk-return
+tradeoff visceral. The two-coin extension
+demonstrates diversification. The retirement
+version illustrates sequence-of-returns risk.</p>
+
+<h3>The Foreign Country Road Map</h3>
+<p>Investing without understanding portfolio theory
+is like driving across an unfamiliar country without
+a map. The wise move is to stop, find a bookshop,
+and learn the terrain before touching the
+accelerator.</p>
+
+<h3>The Cake Analogy</h3>
+<p>A diversified portfolio behaves nothing like its
+individual components, just as a cake tastes nothing
+like shortening, flour, butter, or sugar alone.</p>
+
+<h3>Driving the Wrong Way Up a One-Way Street</h3>
+<p>Rebalancing is like driving against traffic&mdash;
+difficult in your own car, nearly impossible when
+chauffeuring a Rolls Royce with the owner screaming
+at every pothole. The small investor can rebalance
+aggressively; the institutional manager cannot.</p>
+
+<h3>Mr. Market</h3>
+<p><strong>Ben Graham's</strong> manic-depressive
+store owner who marks prices up in euphoria and down
+in despair. Smart townspeople learned to buy during
+depressed periods. Graham's practical version: buy
+stocks like groceries (looking for bargains), not
+like perfume.</p>
+
+<h3>The Loser's Game</h3>
+<p><strong>Charles Ellis's</strong> comparison of
+professional investing to amateur tennis: the winner
+is the player who makes the fewest unforced errors,
+not the one who hits the most spectacular shots.</p>
+
+<h3>Lake Wobegon</h3>
+<p><strong>Garrison Keillor's</strong> fictional town
+where "all the children are above average"&mdash;
+the perfect metaphor for investor overconfidence,
+since the average investor cannot outperform the
+average by definition.</p>
+
+<!-- FRAMEWORKS -->
+<h2 id="frameworks">Frameworks &amp; Models</h2>
+
+<h3>The Three-Step Allocation Process</h3>
+<p>(1) Choose how many asset classes to include.
+(2) Decide how conventional to be&mdash;how much
+tracking error you can tolerate. (3) Set the
+stock/bond split based on risk tolerance and time
+horizon.</p>
+
+<h3>The Discounted Dividend Model</h3>
+<p>Expected stock return = dividend yield + dividend
+growth rate + multiple change. At 1.3% yield and 5%
+growth with no further multiple expansion, expected
+return is 6.3%&mdash;barely above bonds.</p>
+
+<h3>The Fama-French Three-Factor Model</h3>
+<p>Returns decompose into the risk-free rate plus
+three premiums: market risk (5.65%), size (1.71%),
+and value (3.77%). Value is the most consistent,
+positive in 87% of rolling five-year periods.</p>
+
+<h3>Duration Applied to Stocks</h3>
+<p>The time for reinvested dividends to overcome a
+price shock. At 1.3% yield and a 75% decline:
+33 years. At 2.6% yield (1929): 19 years. Regular
+contributions dramatically shorten duration.</p>
+
+<h3>The 4% Rule</h3>
+<p>The Trinity University study found that only a
+4&ndash;5% annual withdrawal rate provides a
+reasonable probability of lasting through a full
+retirement. Each 1% of additional fund expenses
+dramatically increases the savings required.</p>
+
+<h3>Rebalancing Bonus</h3>
+<p>The excess return earned by systematically buying
+low and selling high through periodic rebalancing.
+Works best at annual or longer intervals due to
+short-term momentum in asset prices.</p>
+
+<!-- REFERENCED WORKS -->
+<h2 id="references">Books &amp; Thinkers
+  Referenced</h2>
+
+<table>
+<thead>
+<tr><th>Work / Thinker</th><th>Context</th></tr>
+</thead>
+<tbody>
+<tr><td><strong>Benjamin Graham</strong>,
+  <em>Security Analysis</em> &amp;
+  <em>The Intelligent Investor</em></td>
+  <td>The Mr. Market parable, value investing
+  foundations, earnings as the long-run weighing
+  machine</td></tr>
+<tr><td><strong>Burton Malkiel</strong>,
+  <em>A Random Walk Down Wall Street</em></td>
+  <td>Random walk theory, survivorship bias in
+  fund performance, the case for indexing</td></tr>
+<tr><td><strong>Eugene Fama</strong> &amp;
+  <strong>Kenneth French</strong></td>
+  <td>Three-factor model (market, size, value),
+  the landmark 1992 <em>Journal of Finance</em>
+  study</td></tr>
+<tr><td><strong>Harry Markowitz</strong></td>
+  <td>Mean-variance analysis and the efficient
+  frontier&mdash;the Nobel Prize-winning foundation
+  of portfolio theory</td></tr>
+<tr><td><strong>Charles Ellis</strong>,
+  <em>"The Loser's Game"</em></td>
+  <td>Investing as amateur tennis: win by making
+  the fewest errors, not the most brilliant
+  shots</td></tr>
+<tr><td><strong>Jeremy Siegel</strong>,
+  <em>Stocks for the Long Run</em></td>
+  <td>Long-term historical equity data; currency
+  hedging analysis</td></tr>
+<tr><td><strong>David Dreman</strong>,
+  <em>Contrarian Market Strategy</em></td>
+  <td>Value stocks absorb bad news better than
+  growth stocks; expert opinion underperforms 75%
+  of the time</td></tr>
+<tr><td><strong>Gary Brinson</strong></td>
+  <td>The landmark pension fund studies showing
+  allocation explains 90%+ of return
+  variability</td></tr>
+<tr><td><strong>Ibbotson Associates</strong>,
+  <em>Stocks, Bonds, Bills, and Inflation</em></td>
+  <td>The gold standard database for U.S. asset
+  class returns since 1926</td></tr>
+<tr><td><strong>Michael Edleson</strong>,
+  <em>Value Averaging</em></td>
+  <td>The superior alternative to dollar cost
+  averaging for building positions</td></tr>
+<tr><td><strong>John Maynard Keynes</strong></td>
+  <td>Quoted on accepting portfolio depreciation
+  with equanimity; long-term investing
+  discipline</td></tr>
+<tr><td><strong>James Glassman</strong> &amp;
+  <strong>Kevin Hassett</strong>,
+  <em>Dow 36,000</em></td>
+  <td>The late-1990s bull case demolished via
+  discounted dividend model sensitivity
+  analysis</td></tr>
+<tr><td><strong>John Burr Williams</strong></td>
+  <td>Formulated the discounted dividend model
+  in 1938</td></tr>
+<tr><td><strong>Robert Haugen</strong>,
+  <em>The New Finance</em></td>
+  <td>Growth stocks produce less than half the
+  long-term earnings per dollar invested</td></tr>
+<tr><td><strong>Campbell, Lo, MacKinlay</strong>,
+  <em>The Econometrics of Financial Markets</em>
+  </td>
+  <td>Momentum data: daily, weekly, monthly
+  autocorrelations for large and small stocks</td>
+  </tr>
+<tr><td><strong>Bruno Solnik</strong></td>
+  <td>"Diversification fails us just when we
+  need it most"&mdash;correlations rise in
+  bear markets</td></tr>
+<tr><td><strong>Tom Peters</strong>,
+  <em>In Search of Excellence</em></td>
+  <td>"Excellent" companies subsequently
+  underperformed "unexcellent" ones by 11%/yr
+  &mdash;the representativeness trap</td></tr>
+<tr><td><strong>Will Goetzmann</strong> &amp;
+  <strong>Philippe Jorion</strong></td>
+  <td>Survivorship bias in global equity
+  returns; U.S. markets had highest returns
+  post-1920</td></tr>
+</tbody>
+</table>
+
+<!-- ABOUT THE AUTHOR -->
+<h2 id="author">About the Author</h2>
+
+<p><strong>William J. Bernstein</strong> is a
+neurologist by training who became one of the most
+influential voices in modern portfolio theory for
+individual investors. After discovering the T. Rowe
+Price asset allocation research in 1993, he taught
+himself finance and launched
+<strong>efficientfrontier.com</strong>, one of the
+early internet resources devoted to quantitative
+portfolio construction. His ability to translate
+complex academic research into accessible prose
+made him a bridge between the ivory tower and the
+kitchen table.</p>
+
+<p>Bernstein went on to write several more books,
+including <strong>The Four Pillars of Investing
+</strong>, <strong>The Birth of Plenty</strong>,
+<strong>A Splendid Exchange</strong>, and
+<strong>The Investor's Manifesto</strong>. He serves
+as a principal in the investment advisory firm
+<strong>Efficient Frontier Advisors</strong>. His
+dual identity&mdash;practicing physician and
+self-taught financial theorist&mdash;gives his work
+an unusual combination of scientific rigor and
+practical empathy for the small investor.</p>
+
+<p>What distinguishes Bernstein from other personal
+finance writers is his refusal to oversimplify. He
+expects readers to engage with standard deviations,
+correlation coefficients, and discounted dividend
+models, but he wraps each concept in a memorable
+analogy&mdash;Uncle Fred's coin toss, the cake that
+tastes nothing like its ingredients, the Rolls Royce
+chauffeur. The result is a book that respects the
+reader's intelligence while making dense material
+genuinely enjoyable.</p>
+
+<!-- WHY THIS BOOK MATTERS -->
+<h2 id="matters">Why This Book Matters</h2>
+
+<p><strong>The Intelligent Asset Allocator</strong>
+was one of the first books to bring institutional-
+quality portfolio theory to individual investors.
+Before Bernstein, the concepts of efficient
+frontiers, correlation matrices, and mean-variance
+optimization existed almost exclusively in the
+world of pension funds and endowments. By 2001, a
+self-directed investor with a Vanguard account could
+implement the same strategies that billion-dollar
+institutions used&mdash;and Bernstein provided the
+intellectual framework to do it wisely rather than
+blindly.</p>
+
+<p>The book's lasting contribution is its unflinching
+honesty about what investors can and cannot control.
+You cannot predict returns. You cannot pick winning
+funds. You cannot time the market. But you can
+control your allocation, your costs, your
+rebalancing discipline, and your behavioral
+response to volatility. These controllable factors,
+Bernstein demonstrates with decades of data,
+determine the vast majority of your investment
+outcome.</p>
+
+<p>Twenty-five years after publication, the core
+arguments have only strengthened. The proliferation
+of low-cost ETFs has made implementation even easier.
+The Fama-French three-factor model has been
+confirmed across dozens of international markets.
+And the behavioral traps Bernstein identified&mdash;
+recency, overconfidence, myopic risk aversion&mdash;
+continue to cost investors billions every year. This
+is a book that teaches you to think about investing
+the right way, and that lesson does not expire.</p>
+
+<!-- FOOTER -->
+<footer>
+<p><strong>The Intelligent Asset Allocator</strong>
+  by William Bernstein &middot; McGraw-Hill,
+  2001 &middot; 241 pages</p>
+<p>A quantitative guide to portfolio construction
+  showing why asset allocation&mdash;not stock
+  picking or market timing&mdash;is the primary
+  driver of investment success, and how individual
+  investors can build diversified, low-cost,
+  periodically rebalanced portfolios of index funds
+  to outperform the vast majority of
+  professionals.</p>
+</footer>
+
+<script>var BM_KEY = 'bm_intelligent_asset';</script>
+<script src="../book.js"></script>
+</body>
+</html>
