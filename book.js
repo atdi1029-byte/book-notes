@@ -168,6 +168,51 @@
     }
   });
 
+  // Preserve scroll position across orientation changes
+  var _anchorEl = null;
+  var _anchorOffset = 0;
+
+  function findAnchorElement() {
+    // Find the element closest to the top of the viewport
+    var candidates = document.querySelectorAll(
+      'h1, h2[id], h3[id], h4[id], p[id], blockquote'
+    );
+    var best = null;
+    var bestDist = Infinity;
+    for (var i = 0; i < candidates.length; i++) {
+      var rect = candidates[i].getBoundingClientRect();
+      // Pick the element whose top is closest to viewport top
+      var dist = Math.abs(rect.top);
+      if (dist < bestDist) {
+        bestDist = dist;
+        best = candidates[i];
+      }
+    }
+    return best;
+  }
+
+  window.addEventListener('orientationchange', function() {
+    // Capture anchor before resize happens
+    _anchorEl = findAnchorElement();
+    if (_anchorEl) {
+      _anchorOffset = _anchorEl.getBoundingClientRect().top;
+    }
+  });
+
+  window.addEventListener('resize', function() {
+    if (_anchorEl) {
+      var el = _anchorEl;
+      var offset = _anchorOffset;
+      // Use rAF to let the browser finish layout
+      requestAnimationFrame(function() {
+        var newRect = el.getBoundingClientRect();
+        window.scrollBy(0, newRect.top - offset);
+        _anchorEl = null;
+        _anchorOffset = 0;
+      });
+    }
+  });
+
   // Initialize progress bar on load
   setTimeout(updateProgress, 100);
 })();
