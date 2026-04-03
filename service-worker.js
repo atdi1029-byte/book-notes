@@ -1,13 +1,15 @@
-// Book Notes Service Worker v1
 // Caches books you're reading for offline access
 
-var CACHE = 'books-v1';
+// Book Notes Service Worker v2
+var CACHE = 'books-v2';
 
 // Core assets always cached
 var CORE = [
   './',
+  './index.html',
   './book.css',
-  './book.js'
+  './book.js',
+  './manifest.json'
 ];
 
 self.addEventListener('install', function(e) {
@@ -65,13 +67,16 @@ self.addEventListener('fetch', function(e) {
   );
 });
 
-// Cache book pages, CSS, JS, and cover images
+// Cache book pages, CSS, JS, images
 function shouldCache(path) {
   if (path.endsWith('/index.html') ||
       path.endsWith('/') ||
       path.endsWith('.css') ||
       path.endsWith('.js') ||
-      path.endsWith('.json')) {
+      path.endsWith('.json') ||
+      path.endsWith('.jpg') ||
+      path.endsWith('.png') ||
+      path.endsWith('.webp')) {
     return true;
   }
   return false;
