@@ -77,24 +77,40 @@ function shouldCache(path) {
   return false;
 }
 
-// Listen for messages from book.js
+// Listen for messages from book.js / shelf
 self.addEventListener('message', function(e) {
   if (!e.data) return;
 
   // Cache a book for offline reading
   if (e.data.type === 'cache-book') {
     var bookPath = e.data.path;
+    // Resolve to absolute URL
+    var url = new URL(bookPath, self.location).href;
     caches.open(CACHE).then(function(cache) {
-      // Cache the book's index.html
-      cache.add(bookPath).catch(function() {});
+      cache.match(url).then(function(existing) {
+        if (!existing) {
+          console.log('[SW] Caching for offline: ' +
+            bookPath);
+          cache.add(url).catch(function(err) {
+            console.warn('[SW] Failed to cache: ' +
+              bookPath, err);
+          });
+        }
+      });
     });
   }
 
   // Remove a book from offline cache
   if (e.data.type === 'uncache-book') {
     var bookPath = e.data.path;
+    var url = new URL(bookPath, self.location).href;
     caches.open(CACHE).then(function(cache) {
-      cache.delete(bookPath).catch(function() {});
+      cache.delete(url).then(function(deleted) {
+        if (deleted) {
+          console.log('[SW] Removed from offline: ' +
+            bookPath);
+        }
+      });
     });
   }
 });

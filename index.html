@@ -1278,7 +1278,17 @@
   function syncFromBackend() {
     if (!SYNC_URL || SYNC_URL === 'YOUR_APPS_SCRIPT_URL_HERE') { syncReady = true; return; }
     var got = 0;
-    function checkDone() { got++; if (got >= 2) { syncReady = true; render(); } }
+    function checkDone() {
+      got++;
+      if (got >= 2) {
+        syncReady = true;
+        render();
+        // Pre-cache reading books after sync completes
+        if (typeof precacheReadingBooks === 'function') {
+          precacheReadingBooks();
+        }
+      }
+    }
     jsonpFetch(SYNC_URL + '?action=get_read', function(err, readData) {
       if (!err && readData && readData.status === 'ok' && readData.books_read) {
         saveRead(readData.books_read);
@@ -1303,30 +1313,35 @@
 <script>
 // Register service worker for offline reading
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('./service-worker.js')
-    .then(function() {
-      // Once SW is ready, cache all currently-reading books
-      navigator.serviceWorker.ready.then(function(reg) {
-        // Wait a moment for activeBookmarks to be populated
-        setTimeout(function() {
-          if (!activeBookmarks) return;
-          // Find all books with active bookmarks
-          document.querySelectorAll('.book[data-bmkey]')
-            .forEach(function(el) {
-              var bmkey = el.dataset.bmkey;
-              if (bmkey && activeBookmarks[bmkey]) {
-                var href = el.getAttribute('href');
-                if (href && reg.active) {
-                  reg.active.postMessage({
-                    type: 'cache-book',
-                    path: './' + href
-                  });
-                }
-              }
+  navigator.serviceWorker.register('./service-worker.js');
+}
+
+// Called after bookmark sync completes to pre-cache reading books
+function precacheReadingBooks() {
+  if (!navigator.serviceWorker) return;
+  navigator.serviceWorker.ready.then(function(reg) {
+    var sw = reg.active || reg.installing || reg.waiting;
+    if (!sw) return;
+    var cached = 0;
+    document.querySelectorAll('.book[data-bmkey]')
+      .forEach(function(el) {
+        var bmkey = el.dataset.bmkey;
+        if (bmkey && activeBookmarks[bmkey]) {
+          var href = el.getAttribute('href');
+          if (href) {
+            sw.postMessage({
+              type: 'cache-book',
+              path: './' + href
             });
-        }, 3000); // Wait for sync to finish
+            cached++;
+          }
+        }
       });
-    });
+    if (cached > 0) {
+      console.log('[SW] Pre-caching ' + cached +
+        ' reading books for offline');
+    }
+  });
 }
 </script>
 
