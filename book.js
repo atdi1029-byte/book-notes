@@ -74,12 +74,19 @@
     localStorage.setItem(BM_KEY, JSON.stringify(d));
     bar.style.display = 'flex';
     label.textContent = 'Resume: ' + d.title;
-    showToast('Bookmark saved');
+    showToast('Bookmark saved \u2014 available offline');
     // Sync to backend
     jsonpFetch(SYNC_URL + '?action=set_bookmark&key=' + encodeURIComponent(BM_KEY) + '&data=' + encodeURIComponent(JSON.stringify(d)), function(){});
     document.querySelectorAll('.bm-btn').forEach(function(b) { b.classList.remove('active'); });
     var activeBtn = el.querySelector('.bm-btn');
     if (activeBtn) activeBtn.classList.add('active');
+    // Cache this book for offline reading
+    if (navigator.serviceWorker && navigator.serviceWorker.controller) {
+      navigator.serviceWorker.controller.postMessage({
+        type: 'cache-book',
+        path: location.pathname
+      });
+    }
   };
 
   window.jumpToBookmark = function() {
@@ -98,6 +105,13 @@
     showToast('Bookmark cleared');
     // Sync clear to backend
     jsonpFetch(SYNC_URL + '?action=set_bookmark&key=' + encodeURIComponent(BM_KEY) + '&data=', function(){});
+    // Remove this book from offline cache
+    if (navigator.serviceWorker && navigator.serviceWorker.controller) {
+      navigator.serviceWorker.controller.postMessage({
+        type: 'uncache-book',
+        path: location.pathname
+      });
+    }
   };
 
   function showToast(msg) {
@@ -215,4 +229,9 @@
 
   // Initialize progress bar on load
   setTimeout(updateProgress, 100);
+
+  // Register service worker from book pages too
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('../service-worker.js');
+  }
 })();
