@@ -318,15 +318,44 @@ profiles.
 If a business line&rsquo;s RAROC falls below the
 bank&rsquo;s cost of equity, that line is destroying
 shareholder value and should reprice or exit.
-Worked examples demonstrate break-even loan
-pricing: a loan funded at five percent with a ten
-percent ROE target and twenty percent tax rate
-requires a minimum lending rate of 5.75 percent
-just to break even &mdash; only seventy-five basis
-points of margin.
-Add a five percent default probability with forty
-percent recovery and the break-even jumps to
-11.1 percent.
+Worked examples demonstrate how thin the margins
+in banking actually are.
+
+<table>
+<thead>
+<tr>
+  <th>Scenario</th>
+  <th>Assumptions</th>
+  <th>Break-Even Loan Rate</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>Simple (no defaults)</td>
+  <td>Loan 100, Equity 10, Deposits 90,
+  Deposit rate 5%, Target ROE 10%, Tax 20%</td>
+  <td><strong>5.75%</strong>
+  (only 75 bps of margin)</td>
+</tr>
+<tr>
+  <td>With credit risk</td>
+  <td>Same + 5% default probability in Year 2,
+  40% recovery</td>
+  <td><strong>11.1%</strong>
+  (more than doubles)</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+The jump from 5.75% to 11.1% when credit risk
+is introduced demonstrates how dramatically default
+assumptions affect loan pricing.
+A bank that ignores default probability in its
+pricing &mdash; or uses optimistic assumptions
+during a boom &mdash; will discover too late that
+its apparently profitable loans were actually
+under-priced.
 &ldquo;One would be surprised just how many banks
 do not observe this very basic principle,&rdquo;
 Choudhry observes.
@@ -772,9 +801,72 @@ eliminates this assumption by pricing each cash
 flow at its own discount rate.
 Bootstrapping &mdash; the technique of deriving
 spot rates sequentially from observed bond prices
-&mdash; is worked through step by step, with full
-numerical examples showing how discount factors
-are calculated from market data.
+&mdash; is worked through step by step.
+The process starts with the shortest maturity,
+where the spot rate is directly observable, then
+uses each derived rate to solve for the next
+one along the curve.
+</p>
+
+<p>
+A simplified bootstrapping example illustrates
+the logic.
+Suppose a 1-year zero-coupon bond trades at 96.15,
+implying a 1-year spot rate of 4.0%.
+A 2-year bond with a 5% coupon trades at par (100).
+Its first coupon of 5 is discounted at the known
+1-year spot rate (4.0%), leaving a present value
+of 4.808 for the first cash flow.
+The remaining 95.192 must equal 105 discounted
+at the unknown 2-year spot rate, which solves
+to approximately 5.03%.
+Each successive maturity is bootstrapped from
+the rates already derived.
+</p>
+
+<table>
+<thead>
+<tr>
+  <th>Maturity</th>
+  <th>Coupon</th>
+  <th>Price</th>
+  <th>Spot Rate</th>
+  <th>Discount Factor</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>1 year</td>
+  <td>0% (zero)</td>
+  <td>96.15</td>
+  <td>4.00%</td>
+  <td>0.9615</td>
+</tr>
+<tr>
+  <td>2 year</td>
+  <td>5%</td>
+  <td>100.00</td>
+  <td>5.03%</td>
+  <td>0.9065</td>
+</tr>
+<tr>
+  <td>3 year</td>
+  <td>6%</td>
+  <td>101.50</td>
+  <td>5.80%</td>
+  <td>0.8453</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+The discount factor column is particularly important
+for practitioners: it represents the present value
+of one unit of currency received at that maturity.
+Multiplying any future cash flow by its discount
+factor gives the present value directly.
+The entire pricing framework for bonds, swaps, and
+derivatives rests on this discount function.
 </p>
 
 <p>
@@ -790,6 +882,39 @@ and rolling at the implied forward rate.
 This <strong>break-even principle</strong> is the
 mathematical foundation of the no-arbitrage
 framework that underlies all fixed-income pricing.
+</p>
+
+<p>
+A concrete example makes this tangible.
+If the 1-year spot rate is 4.0% and the 2-year
+spot rate is 5.03%, the implied 1-year forward
+rate starting in one year can be calculated:
+(1.0503)&sup2; / (1.04) &minus; 1 = approximately
+6.07%.
+This means that an investor earning 5.03% per
+year for two years earns exactly the same total
+return as an investor earning 4.0% for one year
+and then 6.07% for the second year.
+If the actual 1-year rate in one year turns out
+to be lower than 6.07%, the 2-year investor did
+better; if higher, the 1-year-and-roll strategy wins.
+The forward rate is the knife edge between these
+two outcomes.
+</p>
+
+<p>
+Choudhry emphasises that this does not mean
+the market &ldquo;expects&rdquo; rates to be 6.07%
+next year.
+The expectations hypothesis claims this, but the
+liquidity preference theory argues that forward
+rates contain a term premium &mdash; compensation
+for the additional risk of holding longer-dated
+bonds.
+In practice, forward rates systematically
+overestimate future spot rates, suggesting that
+liquidity preference effects dominate pure
+expectations in most market conditions.
 </p>
 
 <p>
@@ -914,11 +1039,91 @@ The chapter also covers the <strong>swap spread</strong>
 &mdash; the difference between swap rates and
 government bond yields at the same maturity &mdash;
 as a measure of credit and liquidity conditions.
-The OIS (overnight indexed swap) discounting
-framework, adopted after the crisis when the
-Libor&ndash;OIS spread blew out from near zero to
-over 360 basis points, represents a fundamental
-shift in derivatives valuation.
+In normal markets, the swap spread is positive
+(swap rates above government yields) reflecting
+the credit risk of the banking sector embedded
+in Libor-based swaps.
+Choudhry examines the historical relationship
+between swap spreads and the VIX volatility index,
+finding a strong positive correlation: when market
+fear rises, swap spreads widen as banks are
+perceived as riskier relative to sovereigns.
+</p>
+
+<p>
+The relationship between government borrowing
+and swap spreads is counterintuitive.
+When governments issue large volumes of debt,
+bond yields rise, but swap rates may not move
+as much because the banking sector&rsquo;s
+credit risk has not changed.
+This can compress or even invert the swap spread,
+as occurred in certain maturities during periods
+of heavy government issuance.
+Understanding these dynamics is essential for
+ALM practitioners who use swaps to hedge
+interest-rate risk on government bond portfolios.
+</p>
+
+<p>
+The <strong>OIS</strong> (overnight indexed swap)
+discounting framework represents perhaps the most
+significant technical shift in fixed-income pricing
+since the crisis.
+Before 2008, the Libor&ndash;OIS spread averaged
+two to three basis points at short maturities and
+twelve to fifteen basis points at longer ones &mdash;
+banks treated them as essentially interchangeable.
+In October 2008, the FRA&ndash;OIS basis reached
+<strong>364 basis points in USD</strong>, revealing
+that Libor and OIS were fundamentally different rates
+reflecting different credit and liquidity conditions.
+</p>
+
+<table>
+<thead>
+<tr>
+  <th>Period</th>
+  <th>USD Libor&ndash;OIS Spread</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>Pre-August 2007</td>
+  <td>2&ndash;3 bps</td>
+</tr>
+<tr>
+  <td>August 2007 (crisis onset)</td>
+  <td>~80 bps</td>
+</tr>
+<tr>
+  <td>October 2008 (peak)</td>
+  <td>364 bps</td>
+</tr>
+<tr>
+  <td>2011 (new normal)</td>
+  <td>35&ndash;40 bps</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+Post-crisis, the market consensus shifted:
+collateralised derivatives must be discounted
+at the OIS rate, not Libor.
+LCH Clearnet adopted OIS discounting, and banks
+that continued using Libor-based curves for
+collateralised trades were systematically
+mispricing their portfolios.
+Multi-currency CSA (Credit Support Annex)
+arrangements added further complexity: the
+collateral poster chooses the currency with the
+lowest funding cost, creating an embedded
+<strong>collateral option</strong> that must be
+valued separately.
+</p>
+
+<p>
 The <strong>secured funding curve</strong> is
 introduced as a practical alternative for pricing
 collateralised transactions, reflecting the post-crisis
@@ -1557,23 +1762,87 @@ Choudhry presents <strong>ten principles of bank
 liquidity risk management</strong>, adapted from the
 HSBC model, that constitute his prescription for
 sound practice.
-Fund illiquid assets with core customer deposits.
-Where deposits are insufficient, use long-term
-wholesale funding with a maturity exceeding one year.
-Never allow short-term wholesale funding to
-dominate the liability base.
-Maintain liquidity buffers of instantly liquid,
-sovereign risk-free securities.
-Establish and test a contingency funding plan.
-Know and practise central bank facility access
-before it is needed in a crisis.
-Be aware of all liability-side exposures, including
-reputational obligations.
-Calculate a comprehensive battery of liquidity
-metrics, not just the loan-to-deposit ratio.
-Set internal funds pricing correctly.
-Centralise liquidity risk policy under Group
-Management Board authority.
+Each principle addresses a specific failure mode
+observed during the crisis.
+</p>
+
+<p>
+The first and foundational principle is to fund
+illiquid assets with core customer deposits.
+<strong>Northern Rock</strong> violated this
+textbook rule, funding long-dated mortgage assets
+with short-term wholesale funding and
+securitisation proceeds.
+When securitisation markets seized up in August
+2007 and wholesale counterparties withdrew credit
+lines, Northern Rock had no deposit base to fall
+back on and was nationalised within months.
+</p>
+
+<p>
+Where customer deposits are insufficient, the
+second principle directs banks to use long-term
+wholesale funding with maturities exceeding one
+year.
+The appropriate tenor should match the maturity
+profile of the assets being funded &mdash; a
+five-year loan should not be funded with three-month
+commercial paper.
+The third principle sets an explicit cap:
+no more than twenty to thirty percent of the
+balance sheet should be funded by sub-three-month
+wholesale borrowing.
+</p>
+
+<p>
+The fourth principle &mdash; maintaining liquidity
+buffers of instantly liquid, sovereign risk-free
+securities &mdash; was the one most systematically
+violated before the crisis.
+Banks had abandoned the traditional practice of
+holding government bonds as a liquidity reserve,
+because the opportunity cost (lending the money
+at higher rates instead) seemed wasteful in an
+environment where wholesale funding was assumed
+to be always available.
+The key 2008 lesson was brutal: investment-grade
+bank FRNs, bank CDs, and even some corporate
+bonds that were previously considered liquid
+became completely impossible to sell or repo in
+the fourth quarter.
+Only sovereign bonds and central bank reserves
+retained genuine market liquidity.
+</p>
+
+<p>
+Principles five through seven address
+contingency planning.
+Banks must establish and regularly test a
+contingency funding plan (CFP) that specifies
+exactly which actions to take, in what order,
+with what amounts and lead times, if normal
+funding channels close.
+Central bank facility access must be practised
+operationally &mdash; the dealing room must
+know how to access the discount window before
+a crisis forces them to learn on the fly.
+And banks must be aware of all liability-side
+exposures, including reputational obligations:
+ABCP conduits and structured investment vehicles
+that the bank might feel compelled to support
+even though it has no contractual obligation
+to do so.
+</p>
+
+<p>
+The final three principles address governance.
+A comprehensive battery of liquidity metrics must
+be calculated (not just LTD), internal funds
+pricing must be set correctly (the subject of an
+entire chapter), and liquidity risk policy must
+be centralised under Group Management Board
+authority with no exceptions permitted without
+Board pre-authorisation.
 </p>
 
 <p>
@@ -1608,6 +1877,78 @@ central bank reserves: Level 1 assets with no cap
 and no haircut, supplemented by up to forty percent
 Level 2 assets (agency and high-quality corporate
 bonds) with a fifteen percent haircut.
+</p>
+
+<p>
+Choudhry presents a ranking of liability types by
+their liquidity value &mdash; how stable and reliable
+each funding source is during stress:
+
+<table>
+<thead>
+<tr>
+  <th>Rank</th>
+  <th>Liability Type</th>
+  <th>Stability</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>1 (best)</td>
+  <td>Retail current accounts</td>
+  <td>Highest &mdash; behaviorally long-term
+  despite contractual demand maturity</td>
+</tr>
+<tr>
+  <td>2</td>
+  <td>Retail deposit/savings accounts</td>
+  <td>Very high</td>
+</tr>
+<tr>
+  <td>3</td>
+  <td>Retail fixed-term deposits</td>
+  <td>High &mdash; locked in for term</td>
+</tr>
+<tr>
+  <td>4</td>
+  <td>Corporate operating accounts</td>
+  <td>Moderate-high</td>
+</tr>
+<tr>
+  <td>5</td>
+  <td>Corporate fixed-term deposits</td>
+  <td>Moderate</td>
+</tr>
+<tr>
+  <td>6</td>
+  <td>Private-placement MTNs</td>
+  <td>Moderate</td>
+</tr>
+<tr>
+  <td>7</td>
+  <td>Wholesale fixed-term deposits</td>
+  <td>Low-moderate</td>
+</tr>
+<tr>
+  <td>8</td>
+  <td>Money market CDs/CP</td>
+  <td>Low &mdash; most volatile;
+  disappears first in stress</td>
+</tr>
+<tr>
+  <td>9 (worst)</td>
+  <td>Interbank deposits</td>
+  <td>Lowest &mdash; vanishes overnight
+  when rumors spread</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+The lesson is stark: maximise funding from the top
+of this table and minimise reliance on the bottom.
+Every bank that failed in 2007&ndash;2009 was
+over-concentrated in the bottom three categories.
 </p>
 
 <p>
@@ -2369,6 +2710,49 @@ central ALCO book, not individual business lines,
 preventing distortion of line-level return
 calculations.
 </p>
+
+<p>
+The Basel III capital framework substantially
+increased requirements:
+
+<table>
+<thead>
+<tr>
+  <th>Component</th>
+  <th>Minimum %</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>Common equity Tier 1</td>
+  <td>4.5%</td>
+</tr>
+<tr>
+  <td>Conservation buffer</td>
+  <td>2.5%</td>
+</tr>
+<tr>
+  <td><strong>CET1 + buffer</strong></td>
+  <td><strong>7.0%</strong></td>
+</tr>
+<tr>
+  <td>Tier 1 minimum + buffer</td>
+  <td>8.5%</td>
+</tr>
+<tr>
+  <td>Total capital + buffer</td>
+  <td>10.5%</td>
+</tr>
+<tr>
+  <td>Countercyclical buffer (variable)</td>
+  <td>0&ndash;2.5%</td>
+</tr>
+<tr>
+  <td><strong>Potential maximum</strong></td>
+  <td><strong>13.0%</strong></td>
+</tr>
+</tbody>
+</table>
 
 <p>
 <strong>Contingent capital</strong> instruments
