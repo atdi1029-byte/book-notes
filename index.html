@@ -259,6 +259,45 @@
   .book.hidden-read { display: none; }
   .book.hidden-reading { display: none; }
 
+  .tab-row {
+    display: flex;
+    gap: 0;
+    margin-bottom: 1.5rem;
+  }
+
+  .tab-btn {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.15);
+    color: rgba(255,255,255,0.5);
+    padding: 0.5rem 1.5rem;
+    cursor: pointer;
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 0.95rem;
+    transition: all 0.2s;
+  }
+
+  .tab-btn:first-child {
+    border-radius: 8px 0 0 8px;
+  }
+
+  .tab-btn:last-child {
+    border-radius: 0 8px 8px 0;
+    border-left: none;
+  }
+
+  .tab-btn:hover {
+    background: rgba(255,255,255,0.12);
+    color: rgba(255,255,255,0.8);
+  }
+
+  .tab-btn.active {
+    background: rgba(180,120,40,0.3);
+    border-color: rgba(180,120,40,0.6);
+    color: #fff;
+  }
+
+  .view-hidden { display: none !important; }
+
 
   @media (max-width: 600px) {
     .bg { background-size: auto 100%; background-position: center center; }
@@ -292,6 +331,12 @@
     <button class="filter-btn" id="filterReading" onclick="toggleReading()">Reading</button>
   </p>
 
+  <div class="tab-row">
+    <button class="tab-btn active" id="tabShelf" onclick="switchTab('shelf')">Shelf</button>
+    <button class="tab-btn" id="tabToRead" onclick="switchTab('toread')">To Read</button>
+  </div>
+
+  <div id="shelfView">
   <h2 class="section-title" id="readingTitle" style="display:none">Currently Reading</h2>
   <div class="shelf" id="readingShelf" style="display:none"></div>
 
@@ -1214,9 +1259,17 @@
     </a>
   </div>
 
-  <h2 class="section-title" style="opacity: 0.6;">To Read</h2>
-  <div class="shelf" style="opacity: 0.55;">
-  </div>
+  </div><!-- end shelfView -->
+
+  <div id="toReadView" class="view-hidden">
+    <h2 class="section-title" style="margin-top:0;">To Read</h2>
+    <p style="color:rgba(255,255,255,0.5);font-style:italic;margin-bottom:1.5rem;font-size:0.9rem;">
+      Books built and ready &mdash; waiting to be read and
+      promoted to the main shelf.
+    </p>
+    <div class="shelf">
+    </div>
+  </div><!-- end toReadView -->
 
   <h2 class="section-title">Guides</h2>
   <div class="shelf">
@@ -1331,6 +1384,24 @@
     // Sync individual toggle to backend (safe — never wipes other data)
     if (syncReady && SYNC_URL && SYNC_URL !== 'YOUR_APPS_SCRIPT_URL_HERE') {
       jsonpFetch(SYNC_URL + '?action=toggle_read&book=' + encodeURIComponent(id) + '&read=' + nowRead, function(){});
+    }
+  }
+
+  function switchTab(tab) {
+    var shelfView = document.getElementById('shelfView');
+    var toReadView = document.getElementById('toReadView');
+    var tabShelf = document.getElementById('tabShelf');
+    var tabToRead = document.getElementById('tabToRead');
+    if (tab === 'shelf') {
+      shelfView.classList.remove('view-hidden');
+      toReadView.classList.add('view-hidden');
+      tabShelf.classList.add('active');
+      tabToRead.classList.remove('active');
+    } else {
+      shelfView.classList.add('view-hidden');
+      toReadView.classList.remove('view-hidden');
+      tabShelf.classList.remove('active');
+      tabToRead.classList.add('active');
     }
   }
 
