@@ -1,0 +1,1840 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"
+  content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style"
+  content="black-translucent">
+<meta name="theme-color" content="#f4efe8">
+<title>Definitive Guide to Position Sizing - Notes</title>
+<link rel="stylesheet" href="../book.css?v=3">
+</head>
+<body>
+
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar"
+  style="display:none" onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+    onclick="event.stopPropagation();clearBookmark()">
+    Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+
+<h1>Van Tharp's Definitive Guide to
+Position Sizing Strategies</h1>
+<p class="subtitle">By Van K. Tharp, Ph.D.
+&middot; 2008 &middot; 399 pages</p>
+
+<nav class="toc">
+<h2>Contents</h2>
+<ol>
+  <li><a href="#glossary">Glossary</a></li>
+  <li><a href="#ch1">The Golden Rules of Trading</a></li>
+  <li><a href="#ch2">Risk (R) and R-Multiples</a></li>
+  <li><a href="#ch3">Evaluating the Quality of
+    Your Trading System</a></li>
+  <li><a href="#ch4">What Can I Expect
+    in the Future?</a></li>
+  <li><a href="#ch5">Are You Doomed to Failure?</a></li>
+  <li><a href="#ch6">The Most Important Factor
+    (Besides You)</a></li>
+  <li><a href="#ch7">CPR for Traders
+    and Investors</a></li>
+  <li><a href="#ch8">Core Position Sizing Models</a></li>
+  <li><a href="#ch9">More Position Sizing Models</a></li>
+  <li><a href="#ch10">Comparing the Impact of
+    Various Models</a></li>
+  <li><a href="#ch11">Meeting Your Objectives</a></li>
+  <li><a href="#ch12">Market's Money Methods</a></li>
+  <li><a href="#ch13">Fixed Ratio Position Sizing</a></li>
+  <li><a href="#ch14">Position Sizing Methods
+    to Help You Avoid Ruin</a></li>
+  <li><a href="#ch15">Position Sizing Strategies
+    to Avoid</a></li>
+  <li><a href="#ch16">Putting It All Together</a></li>
+  <li><a href="#trading">Trading &amp;
+    Investing Lessons</a></li>
+  <li><a href="#takeaways">Key Takeaways</a></li>
+  <li><a href="#contrarian">Contrarian Ideas</a></li>
+  <li><a href="#quotes">Notable Quotes</a></li>
+  <li><a href="#allegories">Allegories &amp;
+    Cultural References</a></li>
+  <li><a href="#frameworks">Proposals
+    &amp; Frameworks</a></li>
+  <li><a href="#references">Referenced Works</a></li>
+  <li><a href="#didntfit">What Didn't Fit</a></li>
+  <li><a href="#author">About the Author</a></li>
+  <li><a href="#matters">Why This Book Matters</a></li>
+</ol>
+</nav>
+
+<!-- GLOSSARY -->
+<h2 id="glossary">Glossary</h2>
+
+<h4>Core Concepts</h4>
+<p><strong>R-Multiple:</strong> Any trade's profit or
+loss expressed as a multiple of its initial risk.
+A $500 profit on a trade where the stop-loss
+risked $100 per share is a 5R winner.
+Normalizes results across instruments and timeframes.</p>
+
+<p><strong>Initial Risk (R):</strong> The amount you
+stand to lose per unit if your stop is hit.
+Buy at $50 with a stop at $45 means R = $5/share.
+This is the fundamental unit of measurement for
+everything in the book.</p>
+
+<p><strong>Expectancy:</strong> The mean of your
+R-multiple distribution &mdash; how much you can
+expect to earn per dollar risked over many trades.
+A system with 0.50R expectancy earns fifty cents
+for every dollar put at risk, on average.</p>
+
+<p><strong>Expectunity:</strong> Expectancy multiplied
+by opportunity (number of trades). A 0.60R system
+trading 100 times per year produces 60R of
+expectunity annually.</p>
+
+<p><strong>System Quality Number (SQN):</strong>
+A t-score measuring whether your system's expectancy
+is significantly different from zero. Formula:
+(Expectancy / Std Dev of R) &times; &radic;N.
+Rates from &lt;1.0 (hard to trade) up to
+7.0+ (Holy Grail).</p>
+
+<p><strong>Position Sizing:</strong> The algorithm
+that tells you "how much" or "how many" to trade
+per position. Not diversification, not risk control,
+not money management &mdash; specifically the
+quantity decision. Coined by Tharp in
+<em>Trade Your Way to Financial Freedom</em>.</p>
+
+<h4>Position Sizing Models</h4>
+<p><strong>Percent Risk (Fixed Fractional):</strong>
+Risk a fixed percentage of total equity on each trade.
+At 2% risk on a $100K account with a $5 stop,
+you'd buy 400 shares ($2,000 / $5).</p>
+
+<p><strong>Percent Volatility:</strong> Size positions
+inversely to their volatility (typically ATR).
+High-volatility instruments get smaller positions,
+equalizing fluctuation exposure across the portfolio.</p>
+
+<p><strong>Fixed Ratio Position Sizing (FRPS):</strong>
+Developed by <strong>Ryan Jones</strong>. Increase
+unit size when equity grows by (current units &times;
+delta). Scales up fast initially, then decelerates.
+Requires careful delta selection based on
+simulated maximum drawdown.</p>
+
+<p><strong>Portfolio Heat:</strong> Total open risk
+across all positions at any given time. Generally
+should not exceed 20%. With correlated positions,
+effective heat is much higher than the sum of
+individual position risks.</p>
+
+<p><strong>CPR Formula:</strong> P = C / R.
+Cash at risk (C) = percentage of equity &times;
+account size. Risk per unit (R) = distance from
+entry to stop &times; unit size. Position size (P) =
+number of units to buy.</p>
+
+<h4>Equity Models</h4>
+<p><strong>Core Equity:</strong> Starting equity minus
+initial allocations of all open positions. Most
+conservative &mdash; each new position is sized off
+a shrinking base, and equity only adjusts when
+positions close.</p>
+
+<p><strong>Total Equity:</strong> Cash plus
+current market value of all open positions.
+Most aggressive &mdash; rising positions immediately
+enable larger new positions.</p>
+
+<p><strong>Reduced Total Equity:</strong> A hybrid
+that adds locked-in profits from trailing stops
+back to core equity. Changes only when stops
+are moved, creating a middle ground between
+core and total equity.</p>
+
+<h4>Risk Concepts</h4>
+<p><strong>Anti-Martingale:</strong> Increase position
+size when winning, decrease when losing. Every
+recommended model in this book is anti-Martingale.
+Compounds winners while shrinking during drawdowns.</p>
+
+<p><strong>Martingale:</strong> Increase position size
+after losses, decrease after wins. Based on the
+gambler's fallacy that losses make wins more likely.
+All four Martingale models in Chapter 15 are
+classified as dangerous.</p>
+
+<p><strong>Kelly Criterion:</strong> W &minus;
+[(1 &minus; W) / R], where W = win probability and
+R = average win/loss ratio. Designed for binary
+outcomes, not R-multiple distributions. Can
+grossly overestimate appropriate position size.</p>
+
+<p><strong>Optimal <em>f</em>:</strong>
+<strong>Ralph Vince</strong>'s method of finding
+the fixed fraction of your largest historical loss
+to bet on each trade to maximize Terminal Wealth
+Relative. Assumes worst loss has already occurred
+&mdash; Tharp considers this a fatal flaw.</p>
+
+<p><strong>Peak-to-Trough Drawdown:</strong> Maximum
+decline from highest equity peak to lowest subsequent
+trough before a new high. Money managers carry the
+label of their worst drawdown for their entire career.</p>
+
+<!-- CHAPTER 1 -->
+<h2 id="ch1">Chapter 1: The Golden Rules of Trading</h2>
+
+<p><strong>Van Tharp</strong>'s trading education began
+in 1962 with a single stock purchase that taught him
+everything about what not to do. He bought
+<strong>Poloron</strong>, a mobile home manufacturer,
+at $8 per share after spotting it on a
+<em>Fortune</em> magazine top-growth list. The stock
+climbed beautifully to $20, and young Tharp watched
+his paper profits pile up with no plan for what
+to do next. When the price began falling, he made
+every classic mistake in sequence: he had no
+stop-loss, so there was no predetermined exit point.
+He had no trailing stop, which would have locked in
+a 3.5R profit from the $20 peak. He had put his
+entire $800 into the trade, violating any
+reasonable position sizing rule. And when the stock
+dropped, he added to the losing position rather
+than cutting it. Five mistakes on one trade, and
+each one would become the basis for a golden rule.</p>
+
+<p>The ten golden rules that emerge from this
+experience and decades of coaching form the
+foundation of everything that follows. The first
+four rules are essentially the old trading maxim
+restated in precise, measurable language: never
+open a position without knowing your initial risk,
+define all profits and losses as R-multiples,
+limit losses to 1R or less, and make sure your
+average profit exceeds 1R. A trader who follows
+only these four rules &mdash; cutting losses short
+and letting profits run &mdash; is already ahead of
+most market participants. <strong>Daniel Kahneman</strong>
+and <strong>Amos Tversky</strong> won the 2002
+Nobel Prize partly for demonstrating that human
+psychology naturally produces the exact opposite
+behavior: people become more risk-tolerant when
+losing and less tolerant when winning.</p>
+
+<blockquote>"Cut your losses short and let your
+profits run."<cite>&mdash; The Golden Rule summary
+of rules 1&ndash;4</cite></blockquote>
+
+<p>Rules five through ten build the quantitative
+framework. Understand your system as an R-multiple
+distribution whose mean is your expectancy and whose
+standard deviation measures variability. Design core
+trading objectives before touching position sizing.
+Practice proper position sizing &mdash; the question
+<strong>Ed Seykota</strong> calls the most important
+in trading: "How much should I invest?" Calculate
+your <strong>System Quality Number</strong> and
+simulate random R-multiple samples to stress-test
+your position size. Know the macro environment and
+have a way to exploit or hedge it. And finally,
+master all ten tasks of trading to tie everything
+together. These rules aren't aspirational &mdash;
+they're the minimum viable framework for any
+trader who wants to survive long enough to profit.</p>
+
+<!-- CHAPTER 2 -->
+<h2 id="ch2">Chapter 2: Risk (R)
+and R-Multiples</h2>
+
+<p>Risk, as Tharp defines it, is not volatility,
+not beta, not the VIX. Risk is the specific,
+controllable amount of money you lose per unit
+if your trade is wrong. Buy a stock at $50 with a
+stop at $40 and your risk is $10 per share &mdash;
+that is 1R. Buy 100 shares and your total risk is
+$1,000. This simplicity is the point. A soybean
+futures contract at $5.20 per bushel with a
+ten-cent stop and a 5,000-bushel contract has
+R = $500 per contract. A stock bought at $8 with
+a $6 stop that climbs to $28 before you sell
+has produced a 10R winner. Every trade, every
+instrument, every timeframe can be reduced to this
+single unit of measurement, and that reduction is
+what makes systematic position sizing possible.</p>
+
+<p>The R-multiple framework exposes a critical
+error in the traditional expectancy formula.
+The textbook version &mdash; average profit times
+win probability minus average loss times loss
+probability &mdash; gives you an average profit
+in dollar terms, but tells you nothing about
+profit per dollar risked. Tharp corrects this by
+dividing the result by average risk, yielding
+expectancy in R-units. Using his sample trades
+from Table 2-1, the system shows an expectancy of
+0.966R with a standard deviation of 3.14. That
+0.966R means you can expect to earn about
+ninety-seven cents for every dollar you risk,
+on average, over many trades. The standard
+deviation of 3.14 tells you individual trades will
+vary wildly around that average &mdash; and that
+variability is where position sizing either saves
+you or destroys you.</p>
+
+<blockquote>"Your expectancy is the average of the
+R-multiples (both positive and negative) of your
+system."<cite>&mdash; Van Tharp</cite></blockquote>
+
+<p>The practical implications cascade immediately.
+A 25% trailing stop on a stock that runs from $8
+to $20 sets the stop at $15, locking in a $7
+profit on $2 of initial risk &mdash; a 3.5R gain.
+Without the trailing stop, you watch profits
+evaporate. With a rigid stop that gets moved
+against you, a planned 1R loss becomes a 4R
+catastrophe that requires multiple winners just
+to recover. The entire system of position sizing
+taught in this book rests on the assumption that
+you can define R before entering, that you will
+honor your stops, and that you will let your
+winners run as multiples of that initial risk.
+Violate any of these and no position sizing
+model can save you.</p>
+
+<!-- CHAPTER 3 -->
+<h2 id="ch3">Chapter 3: Evaluating the Quality
+of Your Trading System</h2>
+
+<p>Tharp builds his argument for the System Quality
+Number through a brilliant pedagogical sequence.
+He presents six sample trading systems and asks the
+reader to rank them. System 3-3 has a 90% win rate,
+and most people pick it immediately. System 3-5
+wins only 10% of the time and looks terrible at
+first glance. The reveal is devastating: System 3-3
+has a negative expectancy of &minus;0.10R &mdash; it
+loses money over time despite winning nine out of
+ten trades, because its rare 10R loser wipes out all
+those small winners. System 3-5, with its lonely
+10% win rate, has the highest expectancy of all at
+4.10R, because its rare winners are 50R monsters
+that dwarf the steady stream of 1R losses.</p>
+
+<blockquote>"If you picked System 3-3 as your
+favorite, then you picked a system that will lose
+money in the long run."
+<cite>&mdash; Van Tharp</cite></blockquote>
+
+<p>Win rate is the most naive ranking method, but
+expectancy alone isn't much better. Tharp calls
+it "one of the most naive ways to evaluate systems"
+because it ignores both frequency and variability.
+Expectunity &mdash; expectancy times number of
+trades &mdash; is better still, producing rankings
+like 3-5 at 61.5R per month and 3-3 at &minus;6.0R
+per month. But even expectunity misses the critical
+dimension of drawdown. When Tharp runs 10,000
+Monte Carlo simulations of 100 trades for each
+system, System 3-6 (second-best expectancy at
+1.04R) shows an average drawdown of 53.4R and a
+maximum drawdown of 199R &mdash; near-ruinous
+territory. High-variance, high-expectancy systems
+produce catastrophic drawdowns that force
+traders to quit before the math works out.</p>
+
+<p>The <strong>System Quality Number</strong> resolves
+this by incorporating all three dimensions:
+expectancy, variability, and sample size. The
+formula &mdash; expectancy divided by standard
+deviation, multiplied by the square root of the
+number of trades &mdash; is mathematically equivalent
+to a t-score testing whether expectancy is
+significantly different from zero. Using
+trades-per-month as N, the ranking flips
+completely: System 3-2 (0.15R expectancy, the
+lowest positive system) ranks first at SQN 1.13
+because its extremely low variance makes its
+small edge reliable and tradeable. When
+normalized to 100 trades, System 3-5 jumps to
+the top at 2.60, reflecting the power of its
+enormous expectancy over a larger sample.</p>
+
+<p>Tharp provides a rating scale that becomes a
+reference throughout the book. An SQN below 1.0 is
+probably untradeable. Between 1.7 and 2.0 achieves
+statistical significance. A score of 3.0 to 5.0
+is excellent, 5.0 to 7.0 is superb with few
+systems achieving it, and 7.0 or above is what
+Tharp calls Holy Grail territory. Real-world
+examples include <strong>Steve Sjuggerud</strong>'s
+<em>True Wealth</em> newsletter at approximately
+SQN 3, and <strong>Ken Long</strong>'s ETF workshop
+systems scoring above 5. A critical warning: SQN
+inflates with large sample sizes, so Tharp
+recommends capping N at 100 for comparisons.
+A system showing SQN 5.19 over 198 trades drops
+to 3.68 when normalized &mdash; merely "good"
+rather than "superb."</p>
+
+<p>One counterintuitive finding deserves attention:
+adding very large R-multiple winners actually hurts
+your SQN. Adding two 30R winners to a good system
+reduced its SQN by 20% because the standard
+deviation ballooned from approximately 4.5 to 5.99.
+To improve SQN, add consistent small winners rather
+than lottery-ticket trades. This has profound
+implications for system design &mdash; the steadiest
+edge, not the flashiest, produces the most
+tradeable system.</p>
+
+<!-- CHAPTER 4 -->
+<h2 id="ch4">Chapter 4: What Can I Expect
+in the Future?</h2>
+
+<p>Backtesting is a necessary evil and a dangerous
+seduction. Optimizing parameters until the equity
+curve looks smooth is what Tharp calls a
+"prescription for disaster" &mdash; even twenty years
+of historical data is just one sample path from
+a universe of possibilities. The solution is Monte
+Carlo simulation, which takes your R-multiple
+distribution and randomly reorders the trades
+thousands of times to generate a probability
+distribution of outcomes. Running this on a sample
+system of 130 trades produces sobering numbers:
+the average peak-to-trough drawdown is 30.5R, the
+maximum observed drawdown reaches 162R, the average
+streak of consecutive losses is 6 with a maximum
+of 15, and the probability of breaking even or
+better is 97.6%. These are the numbers a trader
+actually needs &mdash; not the single equity
+curve from a backtest, but the full range of
+what could happen.</p>
+
+<p>Perhaps the most valuable concept in this chapter
+is market-type analysis. Tharp defines six market
+types along two dimensions: direction (up, sideways,
+down) and volatility (quiet, volatile). A system
+with an overall SQN of 1.94 &mdash; looking mediocre
+&mdash; might score above 4.0 in quiet trending
+markets and &minus;1.13 in sideways volatile markets.
+That system isn't mediocre; it's excellent with a
+filter. Using S&P 500 data from 1995 to 2005,
+secular bull markets were up 70% of the time with
+mostly quiet conditions, while the post-2000 secular
+bear was down or sideways 67% of the time. A trader
+who knows which market type suits their system can
+sit on the sidelines during hostile environments
+rather than grinding through drawdowns.</p>
+
+<p>The chapter introduces seven model systems
+(SQN1 through SQN7) that serve as reference points
+throughout the rest of the book. SQN1 has an
+expectancy of 0.76R with massive standard deviation
+of 7.54 and a 22% win rate &mdash; a classic
+trend-following system with few big winners and
+many small losses. SQN7, at the other extreme,
+has 3.42R expectancy, 90% win rate, and a 6.99
+SQN score. Between these extremes, every position
+sizing model is tested, and the results consistently
+show that system quality determines what position
+sizing strategies are even viable. A poor system
+has almost no safe position sizing options; a
+superb system makes almost any approach work.</p>
+
+<!-- CHAPTER 5 -->
+<h2 id="ch5">Chapter 5: Are You Doomed
+to Failure?</h2>
+
+<p>Before getting to the mechanics of position sizing,
+Tharp devotes an entire chapter to the psychological
+biases that prevent traders from implementing what
+they learn. The information overload is staggering:
+French economist <strong>George Anderla</strong>
+calculated that the total stock of human knowledge
+doubled in the 1,500 years from Jesus to Da Vinci,
+then again by 1750, again by 1900, again by 1960,
+and now doubles in under a year. The conscious mind
+processes only seven (plus or minus two) chunks of
+information at a time. To cope, the brain
+generalizes, deletes, and distorts &mdash; survival
+mechanisms in daily life that become fatal
+errors in trading.</p>
+
+<p>The <strong>Locus of Control bias</strong> makes
+traders believe the key to success is picking the
+right stock. About 30% of all stock market books
+have "picking" in the title. Lottery players believe
+choosing their own numbers gives them an edge &mdash;
+the same illusion drives stock selection obsession.
+Mutual funds stay 95% or more invested because
+their mandate is defined as picking, not managing
+risk. The remedy is recognizing that you control
+your exits, not the market's direction. Stops cap
+losses at 1R while trailing stops let profits run
+to multiples of R. The entry is the least
+important part of any trade.</p>
+
+<p>The <strong>Need to Be Right bias</strong> runs
+even deeper. Education trains us to equate being
+wrong with failure &mdash; a 70% score passes,
+94% earns an A. In trading, a 40% win rate can be
+wildly profitable if average winners are large
+enough. But the psychological pain of being "wrong"
+on six out of ten trades leads to the classic
+destructive pattern: holding losers beyond stops
+because selling would confirm being wrong, and
+cutting winners short because taking a small profit
+feels like being "right." <strong>Kahneman</strong>
+and <strong>Tversky</strong> demonstrated this
+formally: people become more risk-tolerant when
+losing and less tolerant when winning &mdash;
+the precise inverse of profitable trading.</p>
+
+<p>The <strong>Percent Gain bias</strong> distorts
+how people evaluate newsletters and stock tips.
+A headline screaming "XYZ went up 150%" makes
+you visualize your entire portfolio gaining 150%.
+In reality, if you risked 1% of your equity on
+that trade with a 25% trailing stop, a move from
+$10 to $25 with a stop at $18.75 produces a
+3.5R profit &mdash; a 3.5% gain on equity, not 150%.
+Tharp shows a newsletter example with ten
+recommendations: three winners (6R, 2R, and 8R)
+and seven losers averaging 2R. The net result is
+negative 1R, but the advisor markets only the
+winners. The solution is demanding all claims be
+translated into R-multiples and asking for the
+complete track record, not the highlight reel.</p>
+
+<p>Other biases compound the problem.
+<strong>Repetition bias</strong> creates belief through
+frequency of exposure &mdash; "stock picking is
+important" appears across every financial network
+and hundreds of books. <strong>Authority bias</strong>
+defers to high-paid analysts and famous investors,
+spawning titles like <em>How to Pick Stocks Like
+Warren Buffett</em> (which <strong>Buffett</strong>
+himself never wrote). <strong>Prediction bias</strong>
+convinces traders they must understand <em>why</em>
+markets move to trade them profitably. The
+<strong>Law of Small Numbers</strong> lets traders
+find six chart patterns that worked and declare a
+system, ignoring the 7,124 times out of 300
+consolidation periods when those patterns did
+nothing. <strong>Belief Perseverance</strong> makes
+arbitrageurs who made a fortune continue trading
+a broken strategy until they lose everything. Each
+bias is a specific, identifiable reason why traders
+fail to implement the position sizing rules that
+follow &mdash; and recognizing them is the necessary
+first step.</p>
+
+<!-- CHAPTER 6 -->
+<h2 id="ch6">Chapter 6: The Most Important
+Factor (Besides You)</h2>
+
+<p>The most devastating experiment in the book comes
+from <strong>Ralph Vince</strong>, who gave forty PhDs
+a computer game with a 60% win rate, fixed 1R
+wins and losses, and $10,000 in starting capital
+over 100 trials. This is a game that beats any
+Las Vegas casino. The result: only two of the
+forty made money. Ninety-five percent of highly
+educated people lost money in a game mathematically
+guaranteed to produce profits, and the sole variable
+was position sizing. The typical failure path was
+the gambler's fallacy: start betting $1,000, lose
+three in a row, convince yourself you're "due"
+for a win, bet $3,000, lose again, and suddenly
+need a 150% gain just to recover to breakeven.
+The probability of four consecutive losses in a
+60/40 game is only 2.56%, but over 100 trials
+it's virtually certain to occur at least once.</p>
+
+<blockquote>"A low-risk idea is an idea with a
+long-term positive expectancy that's traded at
+a risk level to allow for the worst possible
+occurrence in the short term so that you are able
+to realize the long-term positive expectancy."
+<cite>&mdash; Van Tharp</cite></blockquote>
+
+<p>Position sizing is the mechanism that converts
+a positive-expectancy system into a low-risk idea.
+The recovery asymmetry makes this urgent: a 20%
+drawdown requires a 25% gain to recover, 40%
+requires 66.7%, 50% requires 100%, and 75%
+requires a staggering 300%. At 90% drawdown, you
+need a 900% gain &mdash; statistically improbable
+for virtually any system. When you risk too much
+and suffer a large loss, compounding switches from
+ally to enemy, and the hole becomes mathematically
+inescapable. The <strong>Market Wizards</strong>
+are unanimous on this point.
+<strong>Bruce Kovner</strong>: "Undertrade, undertrade,
+undertrade is my second piece of advice. Whatever
+you think your position ought to be, cut it at
+least in half." <strong>Larry Hite</strong>:
+"Never risk more than 1% of your total equity in
+any one trade." <strong>Richard Dennis</strong>:
+"Minimize your losses and try to preserve capital
+for those very few instances where you can make a
+lot in a very short period of time."</p>
+
+<p>The <strong>Secrets of the Masters</strong> trading
+game drives the psychological point home. A tester
+who knew the exact odds started with $10,000 and
+built his account to $1,045,960 on 23 consecutive
+winners &mdash; odds of about eight in a million.
+On trade 24, he risked $1,000,000 of his
+$1,045,960 balance. It was his first loss. He
+ended approximately one million dollars in debt
+despite winning 28 out of 31 trades. A long
+winning streak doesn't change the underlying
+probabilities; it changes your perception of them,
+which is far more dangerous. In a 60% win-rate
+system over 100 trades, there is a 100% probability
+of encountering at least a four-loss streak, with
+an average longest streak of five and maximum
+observed streaks reaching fourteen.</p>
+
+<!-- CHAPTER 7 -->
+<h2 id="ch7">Chapter 7: CPR for Traders
+and Investors</h2>
+
+<p>The marble game experiment strips away every
+variable except position sizing and psychology.
+Three hundred people receive the same sequence of
+R-multiple draws from System 3-1. Same entries,
+same exits, same trade outcomes in the same order.
+Starting from $100,000, final equities ranged from
+zero to over one million dollars. The only
+differences were how much each person risked per
+trade and the psychological decisions that drove
+those choices. This isn't a theoretical exercise;
+it's a direct demonstration that the "how much"
+decision dominates all others. The academic
+confirmation comes from <strong>Brinson, Singer,
+and Beebower</strong>'s landmark 1991 study in the
+<em>Financial Analysts Journal</em>: examining 82
+portfolio managers over ten years, they found that
+more than 91% of performance variance was
+attributable to asset allocation &mdash; the
+institutional version of "how much."</p>
+
+<p>The <strong>CPR formula</strong> is Tharp's
+universal position sizing equation: P = C / R.
+Cash at risk (C) equals your chosen risk percentage
+times your account size. Risk per unit (R) equals
+the distance from entry to stop times the
+contract or share size. Position size (P) is simply
+C divided by R. A $30,000 account risking 2% on a
+stock at $50 with a $5 stop: C = $600, R = $5,
+P = 120 shares. The total position costs $6,000
+but only $600 is actually at risk. For futures, a
+soybean contract with $500 in account risk and a
+$1,000-per-contract stop yields P = 0.5 &mdash;
+you can't even enter the trade, and the formula
+tells you so before you lose money discovering it.
+The CPR formula works for stocks, futures, forex,
+and options, and its simplicity makes it impossible
+to excuse not using it.</p>
+
+<p>Three equity models determine what number goes
+into the "account size" variable. <strong>Core
+Equity</strong> is the most conservative: starting
+equity minus the initial allocation of all open
+positions. Each new trade is sized off a shrinking
+base that only resets when positions close.
+<strong>Total Equity</strong> is the most aggressive:
+cash plus the current market value of all open
+positions, meaning rising positions immediately
+enable larger new ones. <strong>Tom Basso</strong>
+used this to maintain constant risk as a percentage
+of true portfolio value. <strong>Reduced Total
+Equity</strong> splits the difference, adding
+locked-in profits from trailing stops back to core
+equity. The risk ranking from most to least
+conservative is core, reduced total, then total
+equity. The book uses total equity as its default,
+but the choice should match your risk tolerance
+and objectives.</p>
+
+<!-- CHAPTER 8 -->
+<h2 id="ch8">Chapter 8: Core Position
+Sizing Models</h2>
+
+<p>All models are tested against the same baseline
+system: <strong>Donchian</strong>'s 55-day channel
+breakout with a 21-day trailing stop, run across ten
+commodities from 1981 to 1991 with $1,000,000
+starting equity. This constant backdrop isolates the
+pure effect of position sizing choices. Model 1,
+<strong>Units per Fixed Amount of Money</strong>,
+is the most common default &mdash; one futures
+contract per $50,000 of equity. Its advantage is
+that it never rejects a trade for being too risky.
+Its fatal disadvantage is that all contracts are not
+alike: a Treasury bond futures contract ($116,000
+notional, roughly $2,325 daily range) completely
+dominates a corn contract ($12,000 notional, $550
+per day) in any portfolio, creating an 85/15
+imbalance that the model cannot see. The results
+tell the story: at $100,000 per contract, the
+system earns $5 million with a 36.9% maximum
+drawdown. At $20,000 per contract, it loses
+$1.7 million with a 112% drawdown and 402 rejected
+trades. To keep drawdowns below 50%, you need at
+least $70,000 per contract.</p>
+
+<p>Model 2, <strong>Equal Units / Equal Leverage</strong>,
+divides capital into five to ten equal slices &mdash;
+a step up from Model 1 but still blind to
+volatility differences. Model 3,
+<strong>Percent Margin</strong>, sizes by exchange
+margin requirements, which fluctuate daily and are
+set arbitrarily by exchanges with no relationship to
+actual risk. Model 4, <strong>Percent Volatility</strong>,
+is the first genuinely sophisticated approach: it
+equalizes market fluctuation exposure by sizing
+inversely to volatility. If a contract's daily range
+is $3 and your equity allows $1,000 of daily
+fluctuation, you take 3.3 contracts. At 2%
+volatility allocation, the 55/21 breakout system
+generates $236 million in gains &mdash; but with
+drawdowns reaching 69-86% annually. The volatility
+model produces enormous returns precisely because
+it sizes aggressively into trending markets, but
+the drawdowns require extraordinary psychological
+resilience.</p>
+
+<p>Model 5, <strong>Percent Risk (Fixed Fractional
+Position Sizing)</strong>, is the workhorse of
+professional trading. Instead of sizing by
+volatility, it sizes by the distance to your stop
+&mdash; the actual risk of the trade. At 2.5% risk
+on $50,000 equity with a $1,000 stop per contract,
+you trade 1.25 contracts (rounded down to one).
+At 5% risk the system generates $5.6 million, while
+the percent volatility model at 2% produces $236
+million. Percent risk is far more conservative but
+far safer, and this is the central trade-off of
+position sizing: the model that makes the most
+money also demands the highest tolerance for
+drawdowns. Each trader must find their own point
+on this continuum based on their personal
+objectives and psychology.</p>
+
+<!-- CHAPTER 9 -->
+<h2 id="ch9">Chapter 9: More Position
+Sizing Models</h2>
+
+<p>Beyond the five core models, Tharp catalogs
+additional approaches for specific situations.
+<strong>Group Control</strong> limits exposure to any
+single sector or correlated group &mdash; essential
+when commodity or stock groups move together during
+crises. <strong>Portfolio Heat</strong> tracks total
+open risk across all positions, typically capped at
+20%, and is the aggregate version of individual
+percent risk. <strong>Long versus Short</strong>
+position sizing applies different risk parameters
+to long and short trades, recognizing that short
+positions have theoretically unlimited risk and
+different behavioral dynamics. <strong>Equity
+Crossover</strong> position sizing reduces or
+eliminates trading when the equity curve drops below
+its own moving average &mdash; a meta-system that
+treats your account equity as a price chart.</p>
+
+<p>The models for unusual circumstances address real
+institutional constraints. <strong>Asset Allocation
+to Determine Position Sizing</strong> works for
+investors who want their position sizing to flow
+from their asset allocation framework rather than
+the other way around. <strong>Position Sizing for
+Portfolio Managers</strong> handles the constraint
+that most managers must remain 95% or more invested
+with no discretion to go to cash. And the model for
+<strong>Professional Traders Who Don't Know How Much
+Equity They Have</strong> &mdash; bank and prop
+traders &mdash; solves the problem by asking a
+simple question: how much could you lose before
+you'd be fired? That number becomes your effective
+equity for sizing purposes. The
+<strong>Bankers Trust</strong> case study from
+mid-1990s Australia illustrates the institutional
+failure mode: they implemented this plan beautifully,
+but when New York traders underperformed, nobody
+got bonuses regardless of individual results. The
+motivation destruction was total, and the bank was
+eventually acquired by <strong>Deutsche Bank</strong>.</p>
+
+<!-- CHAPTER 10 -->
+<h2 id="ch10">Chapter 10: Comparing the Impact
+of Various Models</h2>
+
+<p>The comparison test is the most striking
+demonstration in the entire book. Six position
+sizing models are applied to a system with
+<strong>random entries</strong> &mdash; a literal
+coin flip determining whether to go long or short
+&mdash; across twelve commodities from 1985 to 1995.
+Exits use a three-times-volatility trailing stop
+recalculated daily. The system is profitable
+approximately 80% of the time despite random
+entries, because the exit strategy captures trends
+while cutting losses. Starting from $1,000,000
+with $100 per trade in slippage and commissions,
+the baseline of one unit per trade produces a
+modest $382,853 net profit with a 4.72% maximum
+drawdown.</p>
+
+<p>Position sizing alone then causes final equity
+to vary from $382,000 to $640 million &mdash; a
+1,700-times difference using identical entry signals
+and identical exits. One unit per $100,000 reaches
+$23.76 million. Percent risk at 2.5% hits $75.74
+million. <strong>Tom Basso</strong>'s scale-out rules
+produce $78.65 million. Percent volatility at 2.5%
+reaches $154 million. And percent risk with
+<strong>William Eckhardt</strong>'s scaling-in method
+(used by the <strong>Turtles</strong>) peaks at $640
+million with an 82.2% maximum drawdown. Of thirty
+scale-out variants tested, twenty-seven improved
+performance over the base model. The Eckhardt
+scaling method starts at 2.5% risk and adds
+positions equal to half the original size when the
+initial risk has been reduced by 50%, up to five
+times, creating a maximum position 350% of the
+original &mdash; capped at 50% portfolio heat.</p>
+
+<blockquote>"Perhaps you can now begin to
+understand why 90% of your system results are
+really due to position sizing."
+<cite>&mdash; Van Tharp</cite></blockquote>
+
+<p>The critical lesson isn't that one model is
+inherently better. It's that every model represents
+a specific point on the return-versus-drawdown
+continuum, and the choice must be driven by the
+trader's objectives, not by chasing maximum returns.
+If you cannot tolerate drawdowns exceeding 25%, you
+would have lost money on every model except the
+baseline one-unit-per-trade approach. The model
+that produces $640 million also produces an 82%
+drawdown that would cause virtually any trader or
+investor to quit. Position sizing is not about
+finding the "best" model; it's about finding the
+model that matches your psychology and objectives
+well enough that you'll actually follow it through
+the inevitable drawdowns.</p>
+
+<!-- CHAPTER 11 -->
+<h2 id="ch11">Chapter 11: Meeting
+Your Objectives</h2>
+
+<p>At least 50% of system design should be spent on
+defining objectives, and "I want to make as much as
+possible" does not qualify. That statement is
+avoidance masquerading as ambition. Real objectives
+specify a target return, an acceptable drawdown, or
+both. With an SQN above 3.0 and appropriate position
+sizing, specific objectives become achievable. The
+test system used throughout Part III has an expectancy
+of 0.75R, an SQN of 2.05 on 100 trades per year,
+and a distribution including 2% chance of a 20R
+winner, 5% chance of a 5R loser, and the usual
+mix of small wins and losses in between.</p>
+
+<p>The "optimal" position size turns out to be
+a meaningless concept when defined as the one that
+maximizes average ending equity. Simulating at 16%
+risk per trade produces the highest average ending
+equity of $216 million, with a maximum of $31.8
+billion &mdash; but the minimum ending equity at
+that risk level is $32,286. A math professor
+explains why: the largest risk percentage before
+guaranteed bankruptcy will always produce the
+highest mean equity in simulations, because rare
+astronomical wins (like 100 consecutive 20R trades)
+dominate the average while being irrelevant to any
+individual trader's experience. Chasing maximum mean
+return is statistically absurd, and Tharp proves
+it with six competing definitions of "optimal."</p>
+
+<p>The six definitions, tested on System 11-1 with
+10,000 Monte Carlo runs, tell a complete story.
+Maximum mean return at 30% risk produces a 99.8%
+probability of ruin and a negative median ending
+equity. Maximum median return at 4.2% risk gives
+a 69% probability of reaching the 300% target with
+28% ruin. Greatest probability of achieving the
+objective comes at 2.4% risk: 79.6% success with
+10.3% ruin. Less than 1% chance of ruin requires
+dropping to 1.0% risk, where the objective
+probability falls to 47.3%. Tharp's personal
+preference is the "maximum spread" definition at
+1.8% risk: 76.4% probability of achieving the
+objective with only 4.9% probability of ruin,
+producing a 206% median gain. The gap between the
+math professor's optimal and Tharp's practical
+optimal could not be wider.</p>
+
+<!-- CHAPTER 12 -->
+<h2 id="ch12">Chapter 12: Market's
+Money Methods</h2>
+
+<p>The core insight of the <strong>Market's Money</strong>
+approach is separating your starting capital from
+your profits and treating them with different risk
+parameters. You might risk 1% of your original
+$100,000 capital while risking 4% of accumulated
+profits. The psychological logic is powerful: losing
+profits hurts less than losing original capital, so
+you can be more aggressive with money you've already
+"won" without the psychological pain of drawdown on
+your core equity. The practical result is faster
+compounding during winning streaks while preserving
+the ability to restart near your original capital
+if a drawdown wipes out the more aggressively
+traded portion.</p>
+
+<p>The five reset methods define when you reclassify
+profits as "your money" rather than "the market's
+money." Percentage gain resets at a fixed return
+target like 100% annually. Calendar date resets
+on December 31 or quarterly. Monetary goal resets
+when you hit a specific dollar target like paying
+off a mortgage. Trade count resets after a
+specified number of trades. The mathematical
+formula approach is the most sophisticated: it
+calculates a moving average of recent equity
+changes and allocates risk as a combination of base
+risk on starting equity plus a larger percentage
+of the running average of recent profits, capped at
+a maximum total risk percentage. As equity grows
+the formula automatically increases risk capacity,
+and it contracts during drawdowns without the
+abrupt transitions of the simpler methods.</p>
+
+<!-- CHAPTER 13 -->
+<h2 id="ch13">Chapter 13: Fixed Ratio
+Position Sizing</h2>
+
+<p><strong>Fixed Ratio Position Sizing</strong>,
+developed by <strong>Ryan Jones</strong>, represents
+a fundamentally different approach to scaling.
+Instead of maintaining a fixed percentage of equity
+at risk, you increase your unit size by one when
+equity grows by the product of current units and a
+fixed increment called the <strong>delta</strong>.
+The scaling is rapid at first &mdash; going from
+one to two units requires gaining only one delta
+&mdash; but decelerates as position size grows,
+since going from ten to eleven units requires
+gaining ten deltas. This concave scaling curve
+means small accounts can increase position size
+very quickly, which makes FRPS attractive to
+traders starting with limited capital.</p>
+
+<p>Tharp tests FRPS across six systems ranging from
+negative expectancy to superb, with delta values
+of $1,000, $2,000, and $5,000 and initial bet
+sizes of $500, $1,000, and $2,000. The results
+are stark. For System 13-4 (expectancy 1.20R,
+SQN 5.04), the most aggressive FRPS setting
+produces average equity of $4.49 million versus
+$332,000 at a flat 0.5% risk. But for System 13-3
+(positive but weak, SQN 0.20), the same
+aggressive setting produces 82% ruin. System 13-5
+(negative expectancy, high win rate) hits 90.4% ruin.
+Overall, approximately 40% of FRPS model
+configurations result in ruin when delta is
+selected without reference to the system's
+maximum drawdown characteristics.</p>
+
+<p>The remedy is using simulated maximum drawdown to
+select the delta. Run approximately 100 simulations
+of 300 trades, use the average maximum drawdown,
+and set delta to half that value. With this
+discipline, FRPS performs well for strong systems
+and shows little difference from percent risk for
+weak ones. An enhanced version &mdash; switching
+from FRPS to percent risk whenever percent risk
+offers a larger position &mdash; produces the best
+results of all: average equity of $5.3 million
+versus $2.7 million for the baseline, rising to
+$12.87 million when the maximum drawdown estimate
+is intentionally underestimated (with a 4.6% ruin
+trade-off). Tharp's personal assessment is cautious:
+FRPS is not intuitively logical, is complex when
+simpler alternatives exist, and carries high
+bankruptcy risk during price shocks. His
+prerequisites for using it include an SQN of
+at least 2.5, hundreds of simulations to establish
+maximum drawdown, and a paper-trading circuit
+breaker when equity drops half the historical
+maximum drawdown.</p>
+
+<!-- CHAPTER 14 -->
+<h2 id="ch14">Chapter 14: Position Sizing Methods
+to Help You Avoid Ruin</h2>
+
+<p>Money managers carry the label of their worst
+peak-to-trough drawdown for the rest of their
+careers, regardless of overall performance. An
+account that goes from $50,000 to $80,000 to
+$60,000 has a $20,000 decline that feels like a
+real loss even though every trade was a winner.
+Most of the job of limiting drawdowns falls on
+position sizing strategy, not the trading system
+itself, and this chapter provides six specific
+models for keeping drawdowns within tolerable
+bounds.</p>
+
+<p>Model 17 uses the <strong>SQN</strong> to
+determine maximum allowable risk. Running 10,000
+simulations of 100 trades at risk levels from 0.2%
+to 10% for all seven SQN systems produces the ruin
+tables that become the book's most practical
+reference. At less than 1% chance of ruin with a
+25% drawdown level, an SQN 4 system allows 2.4%
+portfolio heat, while an SQN 1 system allows only
+0.2%. At 10% ruin tolerance, SQN 4 can handle
+4.8% and SQN 7 can reach 9.8%. Correlated
+positions dramatically compress allowable heat:
+ten correlated positions at SQN 4 with a 25%
+ruin level allows only 0.3% per position. The
+implication is clear &mdash; traders running many
+positions in correlated markets need extremely
+small individual position sizes or face inevitable
+ruin during drawdowns.</p>
+
+<p><strong>Two-Tier Position Sizing</strong> (Model 18)
+pursues two objectives simultaneously: never
+reaching ruin on core equity while using profits
+aggressively to reach a growth target. The base
+level might risk 0.4% with only a 1.4% chance of
+ruin, then switch to 1.2% risk after equity grows
+40% from the starting point. The worst-case scenario
+at the higher tier brings the account back to 84%
+of starting equity, still above the ruin threshold.
+<strong>Multiple Tier</strong> (Model 19) refines
+this with gradual increments &mdash; adding 0.2% of
+risk every 5% equity increase up to a maximum of
+1.2%, with a dampening factor for scaling back down
+during drawdowns.</p>
+
+<p>Model 20 uses <strong>Maximum R-Drawdown</strong>
+from simulations to set position size directly.
+If simulations show a 10% probability of a 60R
+drawdown and you want to limit real drawdowns to
+25%, you divide 25% by 60R to get 0.4% risk per
+trade. Model 21, from <strong>Tom Basso</strong>,
+monitors open risk and open volatility in real time
+&mdash; Basso did this every minute by computer &mdash;
+and scales out when thresholds are exceeded. If four
+gold contracts at $440 with a $410 stop create
+$12,000 of open risk but 3% of $216,000 equity
+is only $6,480, you must reduce to two contracts.
+Crucially, you do not raise the stop to keep
+the contracts &mdash; that merges exit and sizing
+decisions, which must remain separate. Model 22,
+the <strong>Basso-Schwager</strong> rebalancing
+technique, applies Martingale logic across
+managers rather than within a single system: monthly
+rebalancing among 79 CTAs reduced maximum drawdown
+from 34.26% to 28.29% while sacrificing only 0.65%
+annual return, and could be leveraged 1.211 times
+to produce 15.28% annualized return at the
+same drawdown level.</p>
+
+<!-- CHAPTER 15 -->
+<h2 id="ch15">Chapter 15: Position Sizing
+Strategies to Avoid</h2>
+
+<p>Every Martingale strategy shares the same fatal
+premise: increase position size after losses on
+the assumption that a win becomes more likely. In
+a casino doubling system starting at $1, five
+consecutive losses require a $32 bet, ten losses
+require $1,024, and twelve losses on a $5,000
+account leave you with $905 and needing a $4,096
+bet. The math is merciless. <strong>Larry
+Williams</strong>' Model 23 increases commitment
+when recent win rate falls below the expected
+baseline &mdash; but you may not know the true
+baseline, market conditions may have changed, and
+each trade's probability is independent of the
+streak. Model 24, also from Williams, increases
+position size by one unit after every loss and
+decreases after every win. In a 30% win-rate
+system over 100 trades, position size grows to
+41 units &mdash; Tharp calls it "probably one of the
+most dangerous and foolhardy methods of position
+sizing I've ever seen presented anywhere."</p>
+
+<p>Model 26, <strong>Regression toward the Mean
+Position Sizing</strong>, switches to risking 10%
+of remaining equity after a 20R cumulative drawdown
+on the theory that mean reversion will rescue you.
+All Martingale models share three fatal flaws: the
+original sample may overestimate performance, each
+next trade's probability is unchanged by the streak,
+and any variable set too high leads directly to
+ruin. The chapter then catalogs five more dangerous
+non-Martingale models. <strong>Intuitive Position
+Sizing</strong> (Model 27) risks more on trades you
+"feel strongly" about, but psychological research
+shows zero correlation between trader confidence and
+trade outcome. The <strong>Joe Ross Method</strong>
+(Model 28) opens at maximum size and sells 60% when
+profitable enough to cover initial risk &mdash;
+ensuring that every loss hits at 100% size while
+every big winner is captured at only 40%.
+<strong>Percent Risk Based on Winning
+Percentage</strong> (Model 29) uses a formula that
+assumes payoff ratios of exactly 1, which never
+holds in real trading.</p>
+
+<p>The <strong>Kelly Criterion</strong> (Model 30),
+adapted by <strong>Edward Thorp</strong> from
+<strong>J.L. Kelly</strong>'s 1956 Bell System
+paper, was designed for binary outcomes and can
+grossly overestimate appropriate position sizes for
+R-multiple distributions. At 25% Kelly on a 50%
+win system, losing ten to twenty trades in a row
+is a statistical certainty over time.
+<strong>Optimal <em>f</em></strong> (Model 31), from
+<strong>Ralph Vince</strong>, iteratively finds the
+fixed fraction of your largest historical loss that
+maximizes Terminal Wealth Relative. Vince himself
+declared that anyone not trading optimal f "belongs
+on a psychiatrist's couch," but the method assumes
+you've already experienced your worst loss &mdash;
+a spectacularly dangerous assumption. Tharp's
+simulation of a system with SQN 0.21 shows that
+at optimal f of 15%, the probability of ruin is
+42.5% and the median ending equity is negative.
+The book's total count reaches 31 models times
+three equity models, yielding 93 different position
+sizing approaches &mdash; and nine of the 31 should
+never be used.</p>
+
+<!-- CHAPTER 16 -->
+<h2 id="ch16">Chapter 16: Putting It
+All Together</h2>
+
+<p>The final substantive chapter is an interview with
+<strong>Dr. Chris Anderson</strong>, a PhD in
+electrical engineering from NC State who specializes
+in radar and optical systems for complex
+decision-making in random environments. Anderson's
+contributions to the book are foundational: he
+validated Fixed Ratio Position Sizing under certain
+assumptions, originated thinking about drawdowns in
+R-multiple terms, pointed Tharp toward the System
+Quality Number, and developed the Monte Carlo
+simulator used throughout. His five crucial elements
+of trading success provide a concise summary of
+everything the book teaches: understand your
+objectives, pick a system matching your wants and
+comfort levels, choose a system stable enough to
+let its edge work, position size to achieve
+objectives without crossing your pain threshold,
+and determine when market conditions change enough
+to stop trading the system.</p>
+
+<p>Anderson's marble bag metaphor crystallizes the
+simulation approach. A backtest produces one outcome
+&mdash; one sequence of drawing marbles from the bag.
+Simulation draws marbles in random orders thousands
+of times to show the full distribution of possible
+outcomes. Running 5,000 simulations on a system
+with ten 1.5R winners and ten 1R losers produces
+forty or more distinct equity paths, some reaching
+positive 40R and others negative 20R, all from the
+same underlying system. The <strong>Coefficient of
+Variation</strong> &mdash; standard deviation times
+100 divided by expectancy &mdash; measures how bumpy
+the ride will be. A system with 0.8R expectancy
+and 4.82 standard deviation has a CV of 602.5%,
+meaning extreme variability relative to its edge.
+Smaller CV means smoother equity curves and faster
+drawdown recovery.</p>
+
+<p>Three reasons justify running multiple systems:
+diversification against any single edge breaking,
+increased trading frequency while maintaining
+quality, and the dramatic impact of frequency on
+drawdown recovery time. A system trading 12 times
+per month requires 25 to 200 trades to recover
+from a long drawdown, while 50 trades per month
+recovers much faster. Each system must be
+independently strong and uncorrelated, with separate
+position sizing per system to prevent concentration
+risk. When bringing a new system online, start with
+minimal position sizes (perhaps 0.6% risk) and grow
+only after demonstrated live profitability. Tharp's
+personal standard requires a minimum 3:1
+reward-to-risk ratio before considering a system
+and drawdown duration preferably under 2.5 months.</p>
+
+<!-- TRADING LESSONS -->
+<h2 id="trading">Trading &amp; Investing Lessons</h2>
+
+<h3>Position Sizing Is the Leverage Dial, Not
+the Entry Signal</h3>
+<p>The random-entry experiment proves that a coin flip
+with a good exit and proper position sizing can be
+profitable 80% of the time. Most traders spend 90%
+of their energy on entries and 10% on position
+sizing; this book argues the ratio should be
+inverted. When evaluating any trading system or
+newsletter, the first question should be "what is
+the R-multiple distribution?" not "what is the
+win rate?"</p>
+
+<h3>The Recovery Asymmetry as Risk Ceiling</h3>
+<p>A 50% drawdown requires a 100% gain to recover.
+A 75% drawdown requires 300%. This isn't a
+theoretical concern &mdash; it's the mathematical
+reason why maximum risk percentages exist. Any
+position sizing model that allows drawdowns beyond
+50% is functionally equivalent to ruin for most
+traders, because the psychological and mathematical
+barriers to recovery become insurmountable.</p>
+
+<h3>SQN as System Due Diligence</h3>
+<p>Before allocating capital to any strategy, compute
+its SQN from at least 100 trades. Below 1.7 isn't
+statistically significant. Between 2.0 and 3.0 is
+good but requires conservative sizing. Above 3.0
+opens up more aggressive sizing options. This single
+number encapsulates system quality more completely
+than win rate, profit factor, or Sharpe ratio, and
+it directly maps to position sizing decisions
+through the ruin tables.</p>
+
+<h3>Drawdown Duration Matters More Than Depth</h3>
+<p>System 3-4 has a 95% drawdown duration of 83.2
+months &mdash; nearly seven years. SQN3 has a
+duration of only 3.6 months. Most traders abandon
+systems during multi-year drawdowns regardless of
+the system's long-run edge. When choosing between
+systems with similar SQN scores, prefer the one
+with shorter drawdown durations, because you're
+more likely to actually follow it.</p>
+
+<h3>Correlated Positions Multiply Risk Silently</h3>
+<p>Ten positions at 2% risk each don't create 20%
+portfolio heat if all ten move together during a
+crisis. The ruin tables show that ten correlated
+SQN 4 positions at a 25% ruin level allow only
+0.3% per position &mdash; not the 2.4% that a
+single position would permit. Correlation is
+invisible during calm markets and lethal during
+turbulent ones.</p>
+
+<h3>Market's Money as Psychological Armor</h3>
+<p>Treating profits as "the market's money" and
+risking them more aggressively creates a
+psychological separation that helps traders stay
+in trades longer and tolerate drawdowns better.
+The mathematical result is faster compounding during
+winning periods without the emotional devastation
+of giving back original capital during drawdowns.</p>
+
+<!-- KEY TAKEAWAYS -->
+<h2 id="takeaways">Key Takeaways</h2>
+
+<h3>The How-Much Decision Dominates Everything</h3>
+<p>Random entries with proper position sizing and
+exits produced $640 million from $1 million.
+The same entries without position sizing produced
+$382,000. The entry signal is essentially
+irrelevant compared to position sizing and exit
+strategy. This is the book's central proof point,
+demonstrated empirically rather than theoretically.</p>
+
+<h3>Optimal Position Size Depends on Your Definition
+of Optimal</h3>
+<p>Six definitions of "optimal" produce wildly
+different risk percentages on the same system,
+from 0.8% to 30%. Maximum mean return requires
+30% risk and produces 99.8% ruin. Maximum
+probability of achieving objectives requires
+2.4% risk. The definition you choose reveals
+your actual risk tolerance.</p>
+
+<h3>Win Rate Is a Trap</h3>
+<p>A 90% win-rate system can have negative expectancy
+and lose money over time. A 10% win-rate system
+can have the highest expectancy of any system
+tested. Evaluating systems by win rate alone is
+the most common and most costly mistake in trading.</p>
+
+<h3>Ninety-Five Percent of PhDs Lost Money in a
+Winning Game</h3>
+<p>The Ralph Vince experiment with 40 PhDs playing a
+60% win-rate game is the most devastating
+demonstration that position sizing &mdash; not
+intelligence, not knowledge, not even edge &mdash;
+determines whether you make or lose money.</p>
+
+<h3>Nine Models Should Never Be Used</h3>
+<p>Four Martingale models (23-26) and five other
+dangerous models (27-31) including Kelly Criterion,
+Optimal f, and Intuitive Sizing are specifically
+identified as paths to ruin. The book doesn't just
+teach what works &mdash; it warns against what
+destroys.</p>
+
+<h3>Your System's SQN Determines Your Position
+Sizing Options</h3>
+<p>A poor system (SQN 1) at 25% drawdown tolerance
+with less than 1% ruin probability can risk only
+0.2% per trade. A superb system (SQN 7) at the
+same tolerance can risk 9.8%. System quality
+doesn't just affect returns &mdash; it constrains
+the entire range of position sizing strategies
+available to you.</p>
+
+<!-- CONTRARIAN IDEAS -->
+<h2 id="contrarian">Contrarian Ideas</h2>
+
+<h3>Entries Are the Least Important Part
+of Trading</h3>
+<p>The entire industry is built around entry signals,
+indicators, and stock picking. Tharp proves that
+random entries with good exits and position sizing
+outperform most actively managed funds. The massive
+infrastructure of Wall Street research,
+recommendations, and predictions is essentially
+irrelevant to trading success.</p>
+
+<h3>High Win Rates Are a Red Flag</h3>
+<p>Rather than signaling a good system, a very high
+win rate often indicates hidden tail risk. System
+3-3's 90% win rate masks a negative expectancy
+that guarantees long-term losses. Systems that
+"feel good" because they win frequently are often
+the most dangerous to trade with real money.</p>
+
+<h3>Adding Huge Winners Hurts System Quality</h3>
+<p>Counterintuitively, adding two 30R winners to a
+good system reduced its SQN by 20% because the
+standard deviation exploded. The best system
+improvements come from adding consistent small
+winners, not chasing lottery-ticket trades. The
+steadiest edge, not the flashiest, produces the
+most tradeable system.</p>
+
+<h3>Kelly Criterion and Optimal f Are Dangerous</h3>
+<p>Two of the most academically respected position
+sizing methods &mdash; both backed by rigorous
+mathematics &mdash; can lead directly to ruin when
+applied to real trading. Kelly was designed for
+binary outcomes. Optimal f assumes your worst
+loss has already occurred. Both produce ruin
+probabilities exceeding 40% in Tharp's simulations.</p>
+
+<h3>Most Traders Are Too Smart to Succeed</h3>
+<p>The PhD experiment proves that intelligence
+doesn't help. Sensory/detail-oriented traders
+(75% of the population) are specifically
+vulnerable to indicator salesmen because they
+demand data before acting &mdash; and the data
+they're shown is always cherry-picked.</p>
+
+<!-- NOTABLE QUOTES -->
+<h2 id="quotes">Notable Quotes</h2>
+
+<blockquote>"Perhaps you can now begin to understand
+why 90% of your system results are really due to
+position sizing."<cite>&mdash; Van Tharp</cite>
+</blockquote>
+
+<blockquote>"Undertrade, undertrade, undertrade is
+my second piece of advice. Whatever you think your
+position ought to be, cut it at least in half."
+<cite>&mdash; Bruce Kovner</cite></blockquote>
+
+<blockquote>"Never risk more than 1% of your total
+equity in any one trade. By risking 1%, I am
+indifferent to any individual trade."
+<cite>&mdash; Larry Hite</cite></blockquote>
+
+<blockquote>"If you picked System 3-3 as your
+favorite, then you picked a system that will lose
+money in the long run."
+<cite>&mdash; Van Tharp</cite></blockquote>
+
+<blockquote>"People don't make money by predicting
+markets. They make money by cutting losses short
+and letting profits run and by using proper
+position sizing."
+<cite>&mdash; Van Tharp (Frankfurt, 1997)</cite>
+</blockquote>
+
+<blockquote>"The people who risk a lot more than
+you and still outperform you are just the lucky
+ones. They have not yet gotten the huge loss that
+will eventually come and wipe them out."
+<cite>&mdash; Van Tharp</cite></blockquote>
+
+<blockquote>"Psychological research has shown that
+there is no correlation between the confidence
+level that people have in a future trade and the
+likelihood of it being a success."
+<cite>&mdash; Van Tharp</cite></blockquote>
+
+<blockquote>"For any given independent trial
+situation, in which you have an edge, there exists
+an optimal fixed fraction between 0 and 1 as a
+divisor of your biggest loss to bet on each and
+every event to maximize your winnings."
+<cite>&mdash; Ralph Vince</cite></blockquote>
+
+<blockquote>"Minimize your losses and try to
+preserve capital for those very few instances where
+you can make a lot in a very short period of time."
+<cite>&mdash; Richard Dennis</cite></blockquote>
+
+<blockquote>"Money managers typically have to wear
+the label of the worst peak-to-trough drawdown
+that they produce for their clients for the rest
+of their lives."
+<cite>&mdash; Van Tharp</cite></blockquote>
+
+<!-- ALLEGORIES -->
+<h2 id="allegories">Allegories &amp;
+Cultural References</h2>
+
+<table>
+<tr>
+<th>Reference</th>
+<th>Concept Illustrated</th>
+</tr>
+<tr>
+<td>Poloron Stock (1962)</td>
+<td>Five trading mistakes in one trade that
+  birthed the ten golden rules</td>
+</tr>
+<tr>
+<td>Ralph Vince PhD Experiment</td>
+<td>95% of brilliant people lose money in a
+  guaranteed-winning game due to position sizing</td>
+</tr>
+<tr>
+<td>Secrets of the Masters
+  ($1M to debt)</td>
+<td>A 23-win streak creates false confidence that
+  leads to a single catastrophic bet</td>
+</tr>
+<tr>
+<td>Random Entry Coin Flip</td>
+<td>Position sizing alone creates a 1,700x
+  difference in final equity from identical
+  random signals</td>
+</tr>
+<tr>
+<td>Marble Bag Simulation</td>
+<td>A backtest is one draw from the bag;
+  simulation reveals the full range of possible
+  outcomes</td>
+</tr>
+<tr>
+<td>Lottery Number Selection</td>
+<td>The illusion of control &mdash; choosing your
+  own numbers (or stocks) doesn't change the
+  odds</td>
+</tr>
+<tr>
+<td>Casino Martingale Doubling</td>
+<td>Twelve consecutive losses require $4,096
+  on a $5,000 bankroll &mdash; mathematical
+  certainty over time</td>
+</tr>
+<tr>
+<td>Recovery Asymmetry Ladder</td>
+<td>20% loss needs 25% gain; 50% needs 100%;
+  75% needs 300% &mdash; compounding as enemy</td>
+</tr>
+<tr>
+<td>Bankers Trust Australia</td>
+<td>Perfect position sizing system destroyed by
+  institutional incentive misalignment</td>
+</tr>
+<tr>
+<td>Kahneman &amp; Tversky
+  Prospect Theory</td>
+<td>Humans naturally cut winners and hold losers
+  &mdash; the biological inverse of profitable
+  trading</td>
+</tr>
+<tr>
+<td>George Anderla's
+  Information Doubling</td>
+<td>Information overload forces the brain into
+  shortcuts that create trading biases</td>
+</tr>
+<tr>
+<td>S&amp;P Day Trader
+  ($200K to $1M yearly)</td>
+<td>Strategy capacity ceiling &mdash; restarts
+  at $200K because system stops working at
+  larger sizes</td>
+</tr>
+<tr>
+<td>Basso-Schwager CTA Study</td>
+<td>Monthly rebalancing across uncorrelated
+  managers reduces drawdown while maintaining
+  returns</td>
+</tr>
+<tr>
+<td>Seven &plusmn; Two Chunks</td>
+<td>Cognitive limit that makes human brains
+  structurally unfit for processing market
+  information without systems</td>
+</tr>
+</table>
+
+<!-- FRAMEWORKS -->
+<h2 id="frameworks">Proposals &amp; Frameworks</h2>
+
+<h3>The SQN Rating Scale</h3>
+<p>A universal system evaluation framework:
+below 1.0 is probably untradeable, 1.7+ is
+statistically significant, 2.0-3.0 is good,
+3.0-5.0 is excellent, 5.0-7.0 is superb, and
+7.0+ is Holy Grail. Cap N at 100 for comparisons.
+Every position sizing decision in the book
+flows from where your system falls on this scale.</p>
+
+<h3>Six Market Types Model</h3>
+<p>Markets exist in six states: up-volatile,
+up-quiet, sideways-volatile, sideways-quiet,
+down-volatile, and down-quiet. Every system
+should be evaluated separately in each type,
+requiring at least 30 trades per type (180 minimum
+total). A system with SQN 1.94 overall can be
+SQN 4.32 in up-quiet conditions and &minus;1.13
+in sideways-volatile &mdash; making market-type
+classification essential for knowing when to
+trade and when to sit out.</p>
+
+<h3>The CPR Universal Sizing Formula</h3>
+<p>P = C / R. Three variables, one formula,
+applicable to any instrument in any market.
+Cash at risk, risk per unit, position size.
+The simplicity is intentional &mdash; any formula
+complex enough to confuse you is complex enough
+to be applied incorrectly under the stress
+of live trading.</p>
+
+<h3>Five-Step Ruin Avoidance Process</h3>
+<p>Define worst-case drawdown to avoid, simulate
+system to determine R-drawdown probabilities,
+choose R-drawdown at acceptable probability level,
+divide target drawdown percentage by that R value
+to get position size percentage, and adjust for
+correlated positions. This converts an abstract
+"how much should I risk" question into a
+concrete mathematical procedure.</p>
+
+<h3>31 Models &times; 3 Equity Models = 93
+Position Sizing Approaches</h3>
+<p>The comprehensive taxonomy of every position
+sizing method, from the simplest (one unit per
+fixed amount) to the most sophisticated
+(multi-tier with dampening factors), combined
+with three equity models, creates a decision
+matrix that covers virtually every possible
+approach. Nine are explicitly identified as
+dangerous, leaving 66 viable combinations for
+traders to match against their systems
+and objectives.</p>
+
+<!-- REFERENCED WORKS -->
+<h2 id="references">Referenced Works</h2>
+
+<table>
+<tr>
+<th>Work</th>
+<th>Author</th>
+<th>Why Referenced</th>
+</tr>
+<tr>
+<td><em>Trade Your Way to
+  Financial Freedom</em></td>
+<td>Van Tharp</td>
+<td>Tharp's earlier book where he coined
+  "Position Sizing" and first presented
+  the R-multiple framework</td>
+</tr>
+<tr>
+<td><em>Market Wizards</em></td>
+<td>Jack Schwager</td>
+<td>Source of Kovner, Hite, and Dennis quotes
+  on risk management; the original
+  "everyone says the same thing" about
+  position sizing</td>
+</tr>
+<tr>
+<td><em>New Market Wizards</em></td>
+<td>Jack Schwager</td>
+<td>William Eckhardt scaling-in methods;
+  Turtle system background</td>
+</tr>
+<tr>
+<td><em>Portfolio Money Management</em></td>
+<td>Ralph Vince</td>
+<td>Optimal f framework; Terminal Wealth
+  Relative concept that Tharp argues
+  against throughout</td>
+</tr>
+<tr>
+<td><em>Way of the Turtle</em></td>
+<td>Curtis Faith</td>
+<td>Most successful Turtle trader ($31M for
+  Dennis); large-account execution and
+  liquidity management</td>
+</tr>
+<tr>
+<td><em>Fooled by Randomness</em></td>
+<td>Nassim Nicholas Taleb</td>
+<td>Losing streaks and random events;
+  the danger of confusing skill with luck
+  in trading outcomes</td>
+</tr>
+<tr>
+<td><em>Safe Strategies for
+  Financial Freedom</em></td>
+<td>Van Tharp</td>
+<td>The 123 Model for identifying market type
+  direction changes</td>
+</tr>
+<tr>
+<td><em>Hit and Run Trading</em></td>
+<td>Jeff Cooper</td>
+<td>5-Day Momentum System used as example
+  in Q&amp;A on volatility vs. risk-based
+  sizing</td>
+</tr>
+<tr>
+<td><em>The Mathematics of Gambling</em></td>
+<td>Edward Thorp</td>
+<td>Kelly Criterion adaptation from
+  information theory to gambling
+  and trading</td>
+</tr>
+<tr>
+<td><em>Quantitative Trading Systems</em></td>
+<td>Howard B. Bandy</td>
+<td>Essential reference for AmiBroker
+  programming and system testing</td>
+</tr>
+<tr>
+<td>Prospect Theory (1979)</td>
+<td>Daniel Kahneman &amp;
+  Amos Tversky</td>
+<td>Foundation for understanding why humans
+  naturally cut winners and hold losers;
+  Nobel Prize 2002</td>
+</tr>
+<tr>
+<td>Bell System Technical
+  Journal (1956)</td>
+<td>J.L. Kelly</td>
+<td>Original Kelly Criterion paper designed
+  for information theory, not trading</td>
+</tr>
+</table>
+
+<!-- WHAT DIDN'T FIT -->
+<h2 id="didntfit">What Didn't Fit</h2>
+
+<h3>The Position Sizing Software Landscape
+of 2008</h3>
+<p>Tharp reviewed ten software products ranging from
+$55 to $25,000. <strong>Mechanica Pro</strong> at
+$25,000 plus $4,500 per year was used by active
+CTAs managing real money, with
+<strong>Tom Basso</strong> noting that most CTAs
+spend $250,000 or more on proprietary code rather
+than using commercial products.
+<strong>Market System Analyzer</strong> from
+<strong>Adaptrade</strong> at roughly $199 was "the
+purest form of position sizing software" with eight
+optimization objectives. <strong>MTPredictor</strong>
+claimed an 838-trade day trading record with SQN
+5.52 that dropped to 1.91 on a 100-trade basis.
+<strong>Trading Blox</strong> included pre-built
+Turtle systems. The software review is a time
+capsule of what was available before modern
+algorithmic trading platforms, and the core
+principle &mdash; that most software handles one
+trade at a time while real traders need portfolio-
+level position sizing &mdash; remains relevant.</p>
+
+<h3>The S&amp;P Day Trader's Annual Reset</h3>
+<p>One of Tharp's clients turned $200,000 into
+$1,000,000 every single year trading S&amp;P day
+trades. Each year he handed 75% of his profits
+to a hedge fund manager and restarted at $200,000.
+His system stopped working above $1 million because
+position sizes became too large for his market's
+liquidity. This example demonstrates both the
+reality of strategy capacity limits and the elegant
+solution of recognizing them rather than fighting
+them. Hedge funds under $50 million with great
+systems can make 100% per year; at $1 billion,
+the realistic ceiling drops to approximately 20%.</p>
+
+<h3>The Ten Psychological Biases Catalog</h3>
+<p>Tharp identifies ten specific biases that prevent
+traders from implementing position sizing correctly:
+locus of control, need to be right, percent gain
+distortion, repetition bias, authority bias,
+prediction bias, fact obsession, law of small
+numbers, belief perseverance, and representation
+bias. Each is a named, diagnosable pattern with
+a specific remedy. The fact obsession bias is
+particularly relevant: 75% of people have a
+sensory/detail orientation that makes them demand
+data before acting, which makes them ideal targets
+for indicator salesmen who show fifty cherry-picked
+chart examples and sell $3,000 software packages.
+The victims never see failure examples and don't
+understand that the indicator was never the
+important variable.</p>
+
+<h3>Position Sizing Rarity in Practice</h3>
+<p>Fewer than one in ten readers of Tharp's books has
+an R-multiple distribution of their last 50 trades.
+Nine in ten of those who do have the data still lack
+clear objectives. Portfolio managers must be 97%
+invested with no stops. Most bank traders don't know
+how much they're managing or how much they could
+lose. The gap between what this book teaches and
+what the industry practices is enormous, which is
+simultaneously discouraging and encouraging &mdash;
+discouraging because so few apply these principles,
+encouraging because anyone who does has a structural
+advantage over the vast majority of market
+participants.</p>
+
+<!-- ABOUT THE AUTHOR -->
+<h2 id="author">About the Author</h2>
+
+<p><strong>Van K. Tharp, Ph.D.</strong> founded the
+<strong>International Institute of Trading Mastery
+(IITM)</strong> in Cary, North Carolina, where he
+spent over thirty years coaching traders and
+investors on the psychology and mechanics of trading
+systems. His academic background is in psychology,
+which he applied to understanding why traders
+fail &mdash; concluding that roughly 60% of trading
+success comes from psychology, 30% from position
+sizing, and only 10% from the system itself.
+This breakdown, originally from
+<strong>Ed Seykota</strong>, became the organizing
+principle of Tharp's life work.</p>
+
+<p>Tharp authored several influential trading books
+including <em>Trade Your Way to Financial Freedom</em>
+(where he coined the term "Position Sizing"),
+<em>Safe Strategies for Financial Freedom</em>,
+and the <em>Peak Performance Home Study Course</em>.
+He also developed the <strong>Secrets of the Masters
+Trading Game</strong>, a simulation tool designed to
+teach position sizing experientially rather than
+theoretically. His System Quality Number became a
+standard metric in systematic trading, providing
+traders with a single number that encapsulates
+system quality and directly maps to position
+sizing decisions.</p>
+
+<p>Tharp's approach was unusual in the trading
+education world: rather than selling indicators or
+entry signals, he focused on the elements that
+actually determine success &mdash; position sizing,
+exits, and psychology. His client list included
+individual retail traders, hedge fund managers,
+and institutional traders at major banks. He was a
+regular speaker at financial conferences worldwide
+and maintained that the most important thing any
+trader could do was work on themselves before
+working on their system.</p>
+
+<!-- WHY THIS BOOK MATTERS -->
+<h2 id="matters">Why This Book Matters</h2>
+
+<p>In an industry obsessed with entries, indicators,
+and stock picks, this book makes the most
+thoroughly documented case ever assembled that
+the "how much" decision is the real driver of
+trading results. The random-entry experiment alone
+&mdash; proving that a coin flip with proper
+position sizing and exits outperforms most
+professional money managers &mdash; should be
+required reading for every market participant.
+The book doesn't just assert this; it proves it
+with Monte Carlo simulations, comparative model
+testing, and exhaustive data across multiple
+system types.</p>
+
+<p>The practical framework is immediately actionable.
+Any trader can calculate their R-multiples, compute
+their SQN, look up their maximum risk percentage in
+the ruin tables, and implement the CPR formula
+tomorrow. The book also does something rare in
+trading literature: it explicitly warns against
+popular methods. The Kelly Criterion and Optimal f
+chapters, demolishing two academically prestigious
+approaches with simulation evidence, save readers
+from expensive mistakes that sound mathematically
+rigorous but perform catastrophically in practice.</p>
+
+<p>Perhaps most importantly, the book reframes what
+position sizing is <em>for</em>. It's not about
+maximizing returns. It's about meeting your specific
+objectives &mdash; whatever those are &mdash; while
+keeping the probability of ruin below your personal
+tolerance. This reframing, from optimization to
+objective-matching, is the conceptual breakthrough
+that makes the rest of the book's technical content
+usable. A trader who understands this will never
+again ask "what's the best position sizing model?"
+and will instead ask "what position sizing model
+matches my system, my objectives, and my
+psychology?" That question, properly answered, is
+worth the entire book.</p>
+
+<footer>
+<p><em>Van Tharp's Definitive Guide to Position
+Sizing Strategies</em> by Van K. Tharp, Ph.D.
+&middot; 2008 &middot; 399 pages &middot;
+International Institute of Trading Mastery, Inc.
+&middot; A comprehensive framework for using
+position sizing to meet trading objectives,
+featuring 31 models, Monte Carlo simulation,
+the System Quality Number, and extensive
+comparative testing.</p>
+</footer>
+
+<script>var BM_KEY = 'bm_position_sizing';</script>
+<script src="../book.js?v=3"></script>
+</body>
+</html>
