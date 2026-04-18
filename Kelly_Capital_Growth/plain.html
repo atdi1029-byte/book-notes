@@ -1,0 +1,1671 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"
+  content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style"
+  content="black-translucent">
+<meta name="theme-color" content="#f4efe8">
+<title>The Kelly Capital Growth Investment Criterion
+(Plain English)</title>
+<link rel="stylesheet" href="../book.css?v=3">
+</head>
+<body>
+
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar"
+  style="display:none" onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+    onclick="event.stopPropagation();clearBookmark()">
+    Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+
+<h1>The Kelly Capital Growth Investment Criterion</h1>
+<p class="subtitle">Plain English Guide &middot;
+MacLean, Thorp &amp; Ziemba &middot; 2011
+&middot; 1,142 pages</p>
+
+<nav class="toc">
+<h2>Contents</h2>
+<ol>
+<li><a href="#what">What Is the Kelly Criterion?</a></li>
+<li><a href="#bernoulli">Where It All Started:
+Bernoulli and the St. Petersburg Paradox</a></li>
+<li><a href="#kelly-formula">The Kelly Formula:
+Edge Over Odds</a></li>
+<li><a href="#properties">Why Kelly Works:
+The Five Properties</a></li>
+<li><a href="#half-kelly">Half Kelly:
+The Practical Sweet Spot</a></li>
+<li><a href="#overbetting">The Catastrophe of
+Overbetting</a></li>
+<li><a href="#estimation">Why Your Edge Is Probably
+Smaller Than You Think</a></li>
+<li><a href="#chopra">The Chopra-Ziemba Insight:
+What Matters Most</a></li>
+<li><a href="#fractional">Fractional Kelly:
+Dialing the Risk Knob</a></li>
+<li><a href="#rebalancing">Volatility Pumping:
+Free Money from Rebalancing</a></li>
+<li><a href="#correlation">Correlation and Hedging:
+Why Pairs Trades Work</a></li>
+<li><a href="#racetrack">The Racetrack:
+Kelly's First Real-World Laboratory</a></li>
+<li><a href="#blackjack">Blackjack:
+Where Thorp Proved Kelly Works</a></li>
+<li><a href="#sports">Sports Betting:
+$50K to $173K in Four Months</a></li>
+<li><a href="#stocks">Wall Street:
+The Biggest Game</a></li>
+<li><a href="#samuelson">The Samuelson Debate:
+Is Kelly Really Optimal?</a></li>
+<li><a href="#medallion">The Medallion Fund:
+Kelly at Industrial Scale</a></li>
+<li><a href="#thorp-record">Thorp's Track Record:
+28 Years of Proof</a></li>
+<li><a href="#drawdown">Drawdown-Aware Kelly:
+Protecting Capital in Crashes</a></li>
+<li><a href="#rules">The Practical Rules:
+A Trader's Cheat Sheet</a></li>
+</ol>
+</nav>
+
+<!-- ============================================ -->
+<h2 id="what">What Is the Kelly Criterion?</h2>
+
+<p>
+Imagine you have a coin that lands heads 53% of the time.
+You can bet any amount you want on each flip,
+and you get even money when you win.
+How much should you bet?
+</p>
+
+<p>
+If you bet everything every time,
+you will eventually go broke &mdash;
+one losing flip wipes you out.
+If you bet almost nothing,
+you will grow your money painfully slowly.
+Somewhere between reckless and timid
+lies the sweet spot that makes your wealth
+grow as fast as possible
+without risking ruin.
+That sweet spot is the <strong>Kelly criterion</strong>.
+</p>
+
+<p>
+<strong>John L. Kelly Jr.</strong> was a physicist
+at Bell Labs in 1956.
+He was thinking about information theory &mdash;
+how to transmit signals over noisy phone lines &mdash;
+when he realized the same math applies
+to gambling and investing.
+The rate at which you can grow your wealth
+is mathematically identical to the rate
+at which you can transmit information
+through a noisy channel.
+<strong>Claude Shannon</strong>, the father of
+information theory and Kelly's colleague,
+immediately saw the investment implications.
+</p>
+
+<p>
+The formula is stunningly simple for
+even-money bets:
+<strong>bet a fraction of your bankroll
+equal to your edge.</strong>
+If you win 53% of the time,
+your edge is 53% minus 47% = 6%.
+So bet 6% of your current wealth on each flip.
+Not 5%. Not 7%. Exactly 6%.
+This fraction maximizes your long-run
+compound growth rate
+and minimizes the time it takes
+to reach any wealth goal.
+</p>
+
+<!-- ============================================ -->
+<h2 id="bernoulli">Where It All Started:
+Bernoulli and the St. Petersburg Paradox</h2>
+
+<p>
+In 1738, <strong>Daniel Bernoulli</strong>
+posed a puzzle that had stumped
+mathematicians for 30 years.
+His cousin Nicolas had invented a game:
+flip a fair coin repeatedly.
+If it lands heads on the first flip,
+you win $2.
+If tails then heads, you win $4.
+Tails-tails-heads, $8.
+The payoff doubles with each flip.
+The expected value of this game
+is literally infinite &mdash;
+$1 + $1 + $1 + ... forever.
+Yet no rational person would pay
+more than about $20 to play it.
+Why?
+</p>
+
+<p>
+Bernoulli's answer was revolutionary:
+people don't value money linearly.
+The jump from $1,000 to $2,000
+feels much bigger than the jump
+from $1,000,000 to $1,001,000.
+He proposed that people value
+the <em>logarithm</em> of their wealth,
+not the wealth itself.
+Under log utility,
+the St. Petersburg game has
+a finite expected value (about $2.88).
+Mystery solved &mdash;
+at least for two centuries.
+</p>
+
+<p>
+Bernoulli also introduced a second idea
+that turned out to be even more important:
+<strong>the marginal utility of wealth
+is inversely proportional to your current wealth.</strong>
+If you have $100,
+an extra dollar is worth 1/100th of a "utility unit."
+If you have $10,000,
+it is worth 1/10,000th.
+This seemingly simple observation
+leads directly to the Kelly criterion
+when you apply it to repeated bets.
+Because each dollar matters less as you get richer,
+the optimal strategy naturally scales your bets
+proportionally to your current wealth.
+</p>
+
+<!-- ============================================ -->
+<h2 id="kelly-formula">The Kelly Formula:
+Edge Over Odds</h2>
+
+<p>
+Kelly's formula takes different forms
+depending on the bet structure.
+Here are the versions you will actually use:
+</p>
+
+<h3>Even-Money Bets</h3>
+<p>
+When you win the same amount you risk
+(like a coin flip at even odds):
+<strong>f* = p &minus; q</strong>,
+where p is the probability of winning
+and q is the probability of losing.
+If you win 55% of the time,
+bet 10% of your bankroll.
+If you win 51%, bet 2%.
+The formula simply says:
+<em>your bet size equals your edge.</em>
+</p>
+
+<h3>Uneven Payoffs</h3>
+<p>
+When the payoff differs from the risk
+(like a trade where you risk $1 to make $2):
+<strong>f* = (bp &minus; q) / b</strong>,
+where b is the payoff-to-risk ratio.
+If you have a 40% chance of winning
+a 2-to-1 payoff (risk $100 to make $200),
+then f* = (2 &times; 0.40 &minus; 0.60) / 2 = 10%.
+Bet 10% of your capital.
+</p>
+
+<h3>Stock Market (Continuous Version)</h3>
+<p>
+For continuously traded securities:
+<strong>f* = (m &minus; r) / s&sup2;</strong>,
+where m is the expected return (drift),
+r is the risk-free rate,
+and s is the standard deviation (volatility).
+Using rough historical numbers for the S&P 500
+(m = 11%, s = 15%, r = 6%),
+the Kelly fraction is
+(0.11 &minus; 0.06) / 0.0225 = <strong>2.22</strong>.
+That means Kelly says to leverage 222% &mdash;
+put 222% of your wealth into stocks.
+This is why almost nobody uses full Kelly
+in practice.
+More on that shortly.
+</p>
+
+<!-- ============================================ -->
+<h2 id="properties">Why Kelly Works:
+The Five Properties</h2>
+
+<p>
+<strong>Leo Breiman</strong>, a brilliant statistician,
+proved three fundamental theorems about Kelly
+in 1961 that gave it a rigorous foundation.
+Combined with Kelly's original work
+and later additions by Thorp,
+the strategy has five remarkable properties:
+</p>
+
+<h3>1. It Maximizes Long-Run Growth Rate</h3>
+<p>
+No other strategy produces a higher
+expected compound growth rate.
+Period. This is a mathematical fact,
+not an opinion.
+The Kelly fraction f* uniquely maximizes
+E[log(W_n/W_0)],
+which is the expected logarithm of your
+wealth ratio after n trials.
+Since log is a concave function,
+there is exactly one peak,
+and Kelly sits on it.
+</p>
+
+<h3>2. It Never Goes Broke</h3>
+<p>
+Because you always bet a <em>fraction</em>
+of your current wealth,
+you can never lose everything.
+If you have $1,000 and bet 6%,
+you risk $60.
+If you lose, you have $940,
+and your next bet is 6% of $940 = $56.40.
+Your bets shrink with your losses
+and grow with your wins.
+This is fundamentally different from
+fixed-dollar betting,
+which can drive you to zero.
+</p>
+
+<h3>3. It Beats Every Other Strategy Eventually</h3>
+<p>
+Given enough time, the ratio of Kelly wealth
+to any other strategy's wealth
+approaches infinity with probability 1.
+Not "likely." Not "on average."
+<em>Almost surely.</em>
+This is Breiman's famous result.
+The Kelly bettor's wealth
+will exceed any competitor's wealth
+by an arbitrarily large multiple
+if you wait long enough.
+</p>
+
+<h3>4. It Minimizes Time to Any Goal</h3>
+<p>
+Want to double your money?
+Triple it? Grow it tenfold?
+Kelly minimizes the expected number of trials
+to reach any preassigned wealth goal.
+No other strategy gets you there faster
+on average.
+</p>
+
+<h3>5. It Adapts to Changing Probabilities</h3>
+<p>
+If the odds change from bet to bet
+(as they do in blackjack
+when the card count shifts,
+or in markets when volatility changes),
+Kelly adjusts automatically.
+You simply recalculate f*
+with the new probabilities on each trial.
+Thorp proved this works even when
+the game is non-stationary.
+</p>
+
+<p>
+These properties sound too good to be true.
+And in practice, they come with a catch &mdash;
+a very big catch that brings us
+to the most important practical insight
+in the entire book.
+</p>
+
+<!-- ============================================ -->
+<h2 id="half-kelly">Half Kelly:
+The Practical Sweet Spot</h2>
+
+<p>
+Here is the dirty secret of Kelly:
+<strong>full Kelly is terrifying to live with.</strong>
+The math guarantees long-run optimality,
+but the short run can be stomach-churning.
+With full Kelly on a 53% coin,
+there is a 50% probability
+that at some point in your career
+you will lose <em>half</em> of your peak wealth.
+Not a typo. Fifty percent chance
+of a 50% drawdown.
+Most people cannot handle that.
+</p>
+
+<p>
+<strong>Edward Thorp</strong>, the man who literally
+invented practical Kelly betting,
+has this to say about it:
+"Most cautious gamblers or investors
+who use Kelly find the frequency
+of substantial bankroll reduction
+to be uncomfortably large."
+This is the voice of experience &mdash;
+Thorp has been using Kelly since 1962.
+</p>
+
+<blockquote>
+"My gambling and investment experience,
+as well as reports from numerous
+blackjack players and loams,
+suggests that most people strongly prefer
+the increased safety and psychological comfort
+of 'half Kelly' (or some nearby value),
+in exchange for giving up 1/4
+of their growth rate."
+<cite>&mdash; Edward O. Thorp</cite>
+</blockquote>
+
+<p>
+<strong>Half Kelly</strong> means betting
+exactly half the Kelly fraction.
+If Kelly says bet 6%, you bet 3%.
+The tradeoffs are remarkable:
+</p>
+
+<p>
+<strong>Growth rate:</strong> 75% of full Kelly.
+You give up only one-quarter of your growth.
+<strong>Risk (standard deviation):</strong>
+50% of full Kelly.
+Your ride is twice as smooth.
+<strong>Chance of ever losing half your bankroll:</strong>
+drops from 50% to just 12.5%.
+<strong>Time to reach a goal:</strong>
+takes about 1.33 times as long.
+</p>
+
+<p>
+That is an extraordinary bargain.
+You trade a modest reduction in growth speed
+for a massive reduction in pain.
+In Thorp's words, you give up
+"1/4 of your growth rate"
+for "increased safety and psychological comfort."
+Almost everyone who has actually used Kelly
+in practice &mdash; as opposed to
+merely theorizing about it &mdash;
+gravitates toward half Kelly.
+</p>
+
+<!-- ============================================ -->
+<h2 id="overbetting">The Catastrophe of Overbetting</h2>
+
+<p>
+This is the single most important lesson
+in the entire 1,142-page book:
+<strong>overbetting is catastrophically worse
+than underbetting.</strong>
+The Kelly growth curve is a parabola &mdash;
+it rises to a peak at f*
+and then falls off.
+If you undershoot f* by a little,
+you lose a little growth.
+If you overshoot f* by the same amount,
+you lose the same amount of growth.
+So far, symmetric.
+</p>
+
+<p>
+But here is the killer:
+<strong>if you bet more than twice the Kelly fraction
+(f > 2f*), your expected growth rate
+goes negative.</strong>
+Your wealth will go to zero.
+Not slowly. Not eventually. Surely.
+You will be ruined.
+</p>
+
+<p>
+Think about what this means.
+If the true Kelly fraction is 5%
+and you bet 11%, you are past the danger point.
+Your wealth will oscillate wildly
+and trend toward zero.
+You might have a fantastic run first &mdash;
+Kelly overbettors can experience thrilling
+temporary gains &mdash;
+but the math is relentless.
+Over enough bets,
+you will lose almost everything.
+</p>
+
+<p>
+This is why estimation error is so dangerous.
+If you <em>think</em> the Kelly fraction is 10%
+but it is actually 5%,
+and you bet your estimated 10%,
+you are betting at 2f* &mdash;
+right at the edge of the ruin zone.
+Since estimation errors
+almost always overestimate the edge
+(due to data mining, wishful thinking,
+and survivorship bias),
+the real-world risk of overbetting
+is much greater than the risk of underbetting.
+</p>
+
+<blockquote>
+"Using too large an f*
+and overbetting is much more severely penalized
+than using too small an f*
+and underbetting."
+<cite>&mdash; Edward O. Thorp</cite>
+</blockquote>
+
+<!-- ============================================ -->
+<h2 id="estimation">Why Your Edge Is Probably
+Smaller Than You Think</h2>
+
+<p>
+Thorp identifies five reasons why
+your estimated edge (m_e)
+is almost certainly higher
+than your true edge (m_t):
+</p>
+
+<h3>1. Regression to the Mean</h3>
+<p>
+Forecast excess returns tend to be too high.
+If you backtested a system and found
+a 15% edge, the real edge going forward
+is probably lower.
+The best performers in any sample
+tend to be lucky, not just skilled,
+and their future performance
+regresses toward the average.
+</p>
+
+<h3>2. Data Mining</h3>
+<p>
+If you test enough strategies on historical data,
+some will look fantastic by pure chance.
+A system that "worked" because you searched
+through 100 variations and picked the best one
+has a built-in upward bias.
+The true edge may be a fraction
+of what the backtest showed.
+</p>
+
+<h3>3. Non-Stationarity</h3>
+<p>
+Markets change.
+What worked from 2015 to 2020
+may not work from 2020 to 2025.
+Volatility changes, correlations shift,
+regulations evolve.
+Systems that worked in the past
+may have lower true edge going forward.
+</p>
+
+<h3>4. Success Attracts Capital</h3>
+<p>
+If your edge is real
+and you make money consistently,
+other people notice.
+They copy your strategy.
+Money floods into the same trades.
+The edge gets competed away.
+The drift from m_e toward zero
+means your current Kelly fraction
+is probably too large.
+</p>
+
+<h3>5. Rule Changes</h3>
+<p>
+Changes in commissions,
+margin regulations,
+insider trading laws,
+and market structure
+can eliminate edges overnight.
+Your estimated edge from last year
+may already be gone.
+</p>
+
+<p>
+The practical conclusion:
+<strong>always assume your true edge
+is smaller than your estimated edge,
+and size your positions accordingly.</strong>
+Half Kelly provides a natural buffer.
+At half Kelly, even if your true edge
+is only half your estimate,
+you break even on growth.
+At full Kelly with the same error,
+you would be losing money.
+</p>
+
+<!-- ============================================ -->
+<h2 id="chopra">The Chopra-Ziemba Insight:
+What Matters Most</h2>
+
+<p>
+<strong>Vijay Chopra and William Ziemba</strong>
+published a landmark finding in 1993
+that every portfolio manager should know:
+<strong>errors in estimating expected returns
+are far more damaging than errors
+in estimating covariances or variances.</strong>
+</p>
+
+<p>
+How much more? It depends on your
+risk tolerance, and the numbers are striking:
+</p>
+
+<p>
+For <strong>aggressive investors</strong>
+(low risk aversion):
+mean errors are <strong>100 times</strong>
+more important than covariance errors
+and <strong>22 times</strong> more important
+than variance errors.
+</p>
+
+<p>
+For <strong>moderate investors</strong>:
+mean errors are about <strong>7 times</strong>
+more important than covariance errors.
+</p>
+
+<p>
+For <strong>conservative investors</strong>:
+the three types of errors
+are roughly equally important.
+</p>
+
+<p>
+What does this mean in practice?
+<strong>Stop spending all your time
+building perfect correlation matrices
+and start spending it
+on getting your expected return estimates right.</strong>
+If you are an aggressive trader &mdash;
+which Kelly investors tend to be &mdash;
+a 10% error in your expected return estimate
+does as much damage as a 1,000% error
+in your covariance estimate.
+The return estimate is everything.
+</p>
+
+<p>
+This also explains why fractional Kelly
+is so important.
+Since return estimates are the primary input
+to Kelly sizing, and since those estimates
+are notoriously unreliable,
+you should be deeply skeptical
+of any calculated Kelly fraction
+and dial it down accordingly.
+</p>
+
+<!-- ============================================ -->
+<h2 id="fractional">Fractional Kelly:
+Dialing the Risk Knob</h2>
+
+<p>
+<strong>Fractional Kelly</strong> means
+using some fraction c of the full Kelly bet
+(where 0 &lt; c &lt; 2).
+Think of c as a risk knob
+that goes from 0 (no bet) to 2
+(double Kelly, the suicide zone).
+Here is what happens as you turn the knob:
+</p>
+
+<p>
+<strong>c = 0.25 (quarter Kelly):</strong>
+Growth rate is 43.75% of full Kelly.
+Very smooth ride. Takes 2.29x as long
+to reach goals.
+Good for extremely uncertain edges.
+</p>
+
+<p>
+<strong>c = 0.50 (half Kelly):</strong>
+Growth rate is 75% of full Kelly.
+Chance of halving your bankroll: 12.5%.
+Takes 1.33x as long. The popular choice.
+</p>
+
+<p>
+<strong>c = 0.75 (three-quarter Kelly):</strong>
+Growth rate is 93.75% of full Kelly.
+Nearly full speed with meaningfully less risk.
+Takes 1.07x as long.
+</p>
+
+<p>
+<strong>c = 1.0 (full Kelly):</strong>
+Maximum growth rate.
+Chance of halving your bankroll: 50%.
+Minimum time to goals.
+Requires accurate edge estimates
+and strong nerves.
+</p>
+
+<p>
+<strong>c = 1.5:</strong>
+Growth rate drops to 75% of full Kelly &mdash;
+same as half Kelly!
+But with MUCH more risk.
+You are giving up growth
+and getting nothing in return.
+</p>
+
+<p>
+<strong>c = 2.0:</strong>
+Growth rate is zero.
+You are treading water while taking
+maximum risk.
+</p>
+
+<p>
+<strong>c > 2.0:</strong>
+Growth rate is negative.
+Ruin is certain.
+</p>
+
+<p>
+The key insight is the <strong>asymmetry</strong>.
+Below full Kelly, the growth curve
+is gently sloped &mdash;
+you can reduce your bet substantially
+with only modest growth penalties.
+Above full Kelly, the curve drops steeply.
+At c = 1.5, you have the same growth as c = 0.5
+but much more risk.
+The parabola punishes aggression
+far more than it punishes caution.
+</p>
+
+<!-- ============================================ -->
+<h2 id="rebalancing">Volatility Pumping:
+Free Money from Rebalancing</h2>
+
+<p>
+One of the most counterintuitive results
+in the entire book comes from
+<strong>Thomas Cover's universal portfolio</strong>
+and the work on <strong>volatility-induced growth</strong>:
+<strong>regularly rebalancing a portfolio
+to fixed target weights
+creates excess return out of thin air.</strong>
+</p>
+
+<p>
+Here is a striking example from the book.
+Take two assets that are both <em>losing</em>
+money individually &mdash;
+say, each declining by 1% per year on average.
+If they are volatile and not perfectly correlated,
+a portfolio that rebalances between them
+can actually <em>make</em> money.
+The rebalancing systematically buys low
+(the asset that dropped more)
+and sells high (the asset that rose more),
+capturing the volatility as profit.
+</p>
+
+<p>
+The formula for this excess growth is:
+<strong>(eta &minus; eta&sup2;) &times; sigma&sup2; / 2</strong>,
+where eta is the portfolio weight
+and sigma is the asset's volatility.
+This is maximized when eta = 0.5
+(equal weighting)
+and increases with volatility.
+</p>
+
+<p>
+What does this mean for a trader?
+</p>
+
+<p>
+<strong>Rebalancing is not just risk management
+&mdash; it is a source of return.</strong>
+When your DCA portfolio drifts from target weights,
+rebalancing back to targets is not merely prudent &mdash;
+it is actively profitable.
+The more volatile the assets,
+the more you gain from rebalancing.
+And equal weighting is optimal
+when you have no strong view
+on which asset will outperform.
+</p>
+
+<p>
+<strong>Mulvey et al.</strong> confirmed this
+with real-world data:
+equal-weighted rebalanced portfolios
+consistently outperformed
+cap-weighted buy-and-hold indices
+across emerging markets, developed markets,
+and S&P 500 sectors.
+</p>
+
+<!-- ============================================ -->
+<h2 id="correlation">Correlation and Hedging:
+Why Pairs Trades Work</h2>
+
+<p>
+Thorp provides the mathematical foundation
+for why hedged and pairs-trading strategies
+can be sized so aggressively.
+The key insight:
+<strong>negative correlation between two bets
+dramatically increases the optimal
+Kelly fraction for each.</strong>
+</p>
+
+<p>
+For two independent bets with equal edge m,
+the Kelly fraction for each is:
+f* = m / (1 + m&sup2;).
+This is slightly less than
+the single-bet Kelly (f* = m)
+because both bets are competing
+for the same bankroll.
+</p>
+
+<p>
+But as the correlation between the two bets
+becomes negative, something magical happens:
+the optimal fraction increases.
+At correlation = &minus;1 (perfect negative correlation),
+the pair becomes a riskless arbitrage,
+and the optimal bet is
+<em>as large as you can make it</em>.
+The growth function increases without limit
+because there is no risk.
+</p>
+
+<p>
+This is exactly the principle
+behind Thorp's investment strategy.
+In 1983, his partnership bought
+$330 million of "old" AT&T stock
+and simultaneously sold short $332.5 million
+of "new" AT&T plus the seven regional
+telephone companies.
+The long and short sides were nearly identical,
+achieving a correlation close to &minus;1.
+The position size was enormous &mdash;
+one of the largest block trades
+ever on the New York Stock Exchange &mdash;
+because the hedging virtually eliminated risk.
+</p>
+
+<p>
+<strong>For traders:</strong>
+When you find a genuine pairs trade
+or hedged position,
+Kelly tells you to size it much larger
+than an unhedged directional bet.
+The lower the residual correlation
+between your long and short legs,
+the bigger you should go.
+This is why convertible bond arbitrage,
+statistical arbitrage,
+and merger arbitrage funds
+use significant leverage &mdash;
+the hedging justifies it mathematically.
+</p>
+
+<!-- ============================================ -->
+<h2 id="racetrack">The Racetrack:
+Kelly's First Real-World Laboratory</h2>
+
+<p>
+Before Wall Street,
+Kelly-style betting was tested
+at the racetrack.
+<strong>Donald Hausch, William Ziemba,
+and Mark Rubinstein</strong>
+developed a system (called <strong>HZR</strong>
+or <strong>Dr.Z</strong>)
+in the early 1980s
+that exploited a specific inefficiency:
+the place and show pools at North American
+racetracks are systematically mispriced.
+</p>
+
+<p>
+The win pool &mdash; where most money goes &mdash;
+is roughly efficient.
+Favorites and longshots get priced
+about right.
+But the place pool (horse finishes 1st or 2nd)
+and show pool (1st, 2nd, or 3rd)
+have persistent biases.
+Favorites are underbet in place and show
+relative to their true probability
+of finishing in the money.
+</p>
+
+<p>
+The HZR system uses no handicapping
+&mdash; no opinions about which horse is best.
+It only uses the publicly displayed
+odds from the toteboard,
+applies the Kelly criterion
+to determine whether
+the expected return exceeds a threshold
+(typically 14-20% above breakeven),
+and calculates the optimal bet size.
+</p>
+
+<p>
+<strong>The results across five tracks
+and 2,192 races:</strong>
+531 system bets were made.
+59% won outright.
+Weighted by bet size, 71% won.
+Total money wagered: $162,477.
+Total profit: $18,505.
+Rate of return: 11.4%.
+This against a track take
+(the house commission) of 14-18%.
+</p>
+
+<p>
+In a <strong>live 1980 test</strong>
+at Exhibition Park in Vancouver,
+starting with $2,500,
+the system made 22 bets over 9 racing days
+and ended with $3,716 &mdash;
+a profit of $1,216 or 48.6%.
+The probability of achieving this result
+through random betting was 3 &times; 10&sup5;,
+effectively ruling out luck.
+</p>
+
+<p>
+<strong>The trading parallel is powerful:</strong>
+a market can be efficient in one dimension
+(win/directional price discovery)
+but inefficient in another
+(place/show, options pricing, spreads).
+Edge doesn't require predicting direction &mdash;
+it requires finding mispricing
+and sizing correctly.
+And transaction costs
+(the track take, commissions, slippage)
+are the #1 determinant
+of whether theoretical edge
+becomes real profit.
+A 1% increase in track take
+cut profits by 17-33%.
+</p>
+
+<!-- ============================================ -->
+<h2 id="blackjack">Blackjack:
+Where Thorp Proved Kelly Works</h2>
+
+<p>
+<strong>Edward Thorp</strong> didn't just theorize
+about Kelly &mdash;
+he was the first person to apply it
+in the real world.
+In 1962, he published <em>Beat the Dealer</em>,
+which proved that blackjack could be beaten
+by counting cards.
+Shannon introduced him to Kelly's paper
+at MIT in 1960,
+and Thorp immediately saw how to use it
+for bet sizing.
+</p>
+
+<p>
+The application is elegant.
+In blackjack, the player's edge
+changes from hand to hand
+as cards are dealt from the shoe.
+When many small cards have been played
+and the remaining shoe is rich in tens and aces,
+the player has a positive edge &mdash;
+perhaps 1-2%.
+When the shoe favors the house,
+the player has a negative edge.
+</p>
+
+<p>
+Kelly says: on each hand,
+bet a fraction of your bankroll
+equal to your current edge
+(adjusted down for the variance
+of blackjack payoffs,
+which is higher than a simple coin flip
+because of splits, doubles,
+and blackjack bonuses).
+In favorable situations, bet big.
+In unfavorable ones, bet the minimum.
+</p>
+
+<p>
+There is a complication unique to blackjack:
+you must make minimum "waiting bets"
+during unfavorable periods
+in order to stay at the table
+and catch the favorable ones.
+These waiting bets have negative expectation
+and drag down your overall growth rate.
+Thorp showed that the optimal Kelly fraction
+for favorable hands decreases
+as the ratio of favorable-to-unfavorable hands
+decreases.
+If you only see one favorable hand
+for every 10 unfavorable ones,
+your optimal bet in favorable situations
+is much smaller than if the ratio were 1-to-1.
+</p>
+
+<p>
+<strong>The deeper lesson for traders:</strong>
+if you spend most of your time
+in losing positions (waiting bets)
+to catch the occasional winner,
+the winners need to be
+proportionally smaller than
+a pure Kelly analysis would suggest.
+Your true Kelly fraction incorporates
+the cost of waiting.
+</p>
+
+<!-- ============================================ -->
+<h2 id="sports">Sports Betting:
+$50K to $173K in Four Months</h2>
+
+<p>
+In 1993, Thorp was approached
+by a computer science PhD
+who had developed a sports betting system.
+Thorp was convinced by the analysis,
+put up $50,000 as a test bankroll,
+and used Kelly sizing.
+</p>
+
+<p>
+Over 101 days of betting
+in the first four and a half months of 1994,
+the results were spectacular:
+<strong>$123,000 in profit</strong> &mdash;
+about $68,000 from Type 1 sports
+and $55,000 from Type 2.
+The expected profit based on their model
+was about $89,000,
+so they outperformed expectations
+by roughly $34,000.
+</p>
+
+<p>
+Thorp notes this overperformance
+may not be pure luck:
+"Our expectation estimates
+from the model were deliberately chosen
+to be conservative.
+The reason is that using too large an f*
+and overbetting is much more severely penalized
+than using too small an f* and underbetting."
+</p>
+
+<p>
+The typical edge was about 6%,
+so total action was about $2 million.
+They placed 5 to 15 bets per day,
+ranging from a few hundred dollars
+to several thousand each.
+The bankroll was never more than
+a few thousand dollars below breakeven
+at its worst point.
+</p>
+
+<p>
+They stopped sports betting
+despite its success for three reasons:
+(1) it required someone physically present
+in Nevada,
+(2) transporting large amounts of cash
+between casinos was risky,
+and (3) it wasn't competitive
+with their Wall Street operations,
+which offered much larger capacity.
+</p>
+
+<!-- ============================================ -->
+<h2 id="stocks">Wall Street: The Biggest Game</h2>
+
+<p>
+Applying Kelly to the stock market
+introduces new complexities.
+Unlike a coin flip or a blackjack hand,
+a stock has continuous outcomes &mdash;
+it can go up or down by any amount.
+The return distribution is not binary
+but approximately lognormal.
+And instead of individual bets,
+you are managing a portfolio
+of many simultaneous positions
+with complex correlations.
+</p>
+
+<p>
+The continuous version of Kelly
+for a single stock is:
+<strong>f* = (m &minus; r) / s&sup2;</strong>,
+where m is the expected annual return,
+r is the risk-free rate,
+and s is the annual standard deviation.
+</p>
+
+<p>
+For the S&P 500 with rough historical numbers
+(m = 11%, s = 15%, r = 6%),
+this gives f* = 0.05 / 0.0225 = 2.22.
+Full Kelly says to lever up 222%.
+But this would be insane in practice.
+In the October 1987 crash,
+the S&P dropped 23% in a single day.
+At 2x leverage, your portfolio drops 46%.
+At 2.22x leverage, you'd be down about 51%
+and facing a margin call
+that forces you to sell at the worst moment.
+</p>
+
+<p>
+This is why Thorp and everyone else
+who actually manages money
+uses fractional Kelly in markets.
+The stock market is not a coin flip &mdash;
+it has fat tails, crashes,
+and regime changes
+that the continuous model doesn't capture.
+Full Kelly in stocks is a recipe for blowup.
+</p>
+
+<p>
+For a <strong>portfolio of securities</strong>,
+the Kelly-optimal allocation
+follows a familiar form:
+<strong>F* = C&sup1; &times; (M &minus; R)</strong>,
+where C is the covariance matrix,
+M is the vector of expected returns,
+and R is the risk-free rate.
+This is the inverse-covariance-weighted
+excess return vector &mdash;
+the same formula that appears
+in mean-variance optimization
+but with a specific interpretation:
+it maximizes the log-growth rate
+of the portfolio.
+</p>
+
+<!-- ============================================ -->
+<h2 id="samuelson">The Samuelson Debate:
+Is Kelly Really Optimal?</h2>
+
+<p>
+No discussion of Kelly is complete
+without <strong>Paul Samuelson</strong>'s objections.
+Samuelson, the first American to win
+the Nobel Prize in Economics,
+was Kelly's most prominent critic.
+He wrote his famous 1979 paper
+entirely in one-syllable words
+to make his point as clearly as possible.
+</p>
+
+<p>
+Samuelson's core argument:
+Kelly maximizes E[log(W)],
+which is only optimal
+if your utility function is U(W) = log(W).
+Most people's utility is NOT logarithmic.
+A more risk-averse investor
+(whose utility curve is more concave than log)
+should bet less than Kelly.
+A less risk-averse investor
+might bet more.
+Kelly is not universally optimal &mdash;
+it is optimal for one specific
+preference function.
+</p>
+
+<p>
+He also attacked what he called
+the <strong>"False Corollary"</strong>:
+just because Kelly almost certainly
+accumulates more wealth in the long run
+does NOT mean its expected utility
+is higher for non-log investors.
+A highly risk-averse investor
+might prefer a lower-growth,
+lower-variance path
+even though it leads to less wealth.
+</p>
+
+<p>
+<strong>The resolution:</strong>
+Samuelson is technically correct.
+But the editors (MacLean, Thorp, Ziemba)
+argue his criticism is
+"largely irrelevant for practical investors."
+Here is why:
+</p>
+
+<p>
+First, <strong>fractional Kelly</strong>
+addresses the utility objection directly.
+If your utility is more concave than log,
+use less than full Kelly.
+The fractional Kelly framework
+lets you choose any point
+on the growth-vs-security tradeoff.
+You are not forced to use full Kelly
+any more than you are forced
+to drive at the car's top speed.
+</p>
+
+<p>
+Second, the dominance properties
+hold regardless of utility.
+Kelly WILL have more money eventually.
+The debate is about whether "eventually"
+matters to you, given your time horizon
+and risk preferences.
+For long-term compounders
+(endowments, family offices,
+young investors with decades ahead),
+Kelly's properties are compelling.
+For short-term investors or retirees,
+less so.
+</p>
+
+<p>
+Third, the practical dangers
+that Samuelson highlights &mdash;
+wild short-term swings,
+the possibility of losing 98% of your wealth
+on a single play with a 14% edge &mdash;
+are all addressed by using
+fractional Kelly rather than full Kelly.
+</p>
+
+<!-- ============================================ -->
+<h2 id="medallion">The Medallion Fund:
+Kelly at Industrial Scale</h2>
+
+<p>
+<strong>Jim Simons</strong> and the
+<strong>Renaissance Technologies Medallion Fund</strong>
+represent arguably the most successful
+application of Kelly-style thinking
+in investment history.
+Ziemba notes that he taught Simons
+about the Kelly criterion in 1992.
+</p>
+
+<p>
+The numbers are staggering.
+From January 1993 through April 2005:
+</p>
+
+<p>
+<strong>Annual returns (net of fees):</strong>
+39%, 71%, 38%, 31%, 21%, 42%, 25%, 99%,
+31%, 29%, 25%, 28%.
+<strong>Zero losing years.</strong>
+Only 17 losing months out of 148.
+Only 3 losing quarters out of 46.
+</p>
+
+<p>
+The fund's <strong>Sharpe ratio</strong> was 1.68
+on an annual basis.
+Its <strong>Downside Symmetric Sharpe Ratio</strong>
+(which better captures the asymmetric
+return distribution)
+was an extraordinary 26.4 on an annual basis &mdash;
+the highest Ziemba had ever seen,
+exceeding even Princeton-Newport's 13.8
+during 1969-1988.
+</p>
+
+<p>
+$100 invested in January 1993
+would have grown to approximately $5,000
+by April 2005 &mdash; a 50x multiple
+in just over 12 years.
+And this is <em>after</em> the fund's
+eye-watering fees: 5% management
+plus 44% of profits.
+Gross returns were even higher.
+</p>
+
+<p>
+The fund was closed to all outside investors
+except about six original ones,
+plus Renaissance employees.
+It managed about $5 billion
+and ran hundreds of short-term strategies
+simultaneously, many entering and exiting
+positions within seconds.
+The Kelly criterion helped determine
+not just individual position sizes
+but the overall allocation
+of capital across strategies.
+</p>
+
+<!-- ============================================ -->
+<h2 id="thorp-record">Thorp's Track Record:
+28 Years of Proof</h2>
+
+<p>
+<strong>Edward Thorp's</strong> personal investment record
+is the longest continuous track record
+of Kelly-style investing in existence.
+Starting in November 1969 with a convertible
+hedging partnership,
+through May 1998 &mdash;
+twenty-eight and a half years &mdash;
+his results speak for themselves:
+</p>
+
+<p>
+<strong>Annual compound return:</strong>
+approximately 20%.
+<strong>Annual standard deviation:</strong>
+approximately 6%.
+<strong>Correlation with the market:</strong>
+approximately zero ("market neutral").
+</p>
+
+<p>
+$10,000 invested in 1969,
+compounded tax-exempt,
+would have been worth $18 million by 1998.
+</p>
+
+<p>
+During this period, Thorp estimates
+he made about <strong>$80 billion</strong>
+in total purchases and sales &mdash;
+roughly 1.25 million individual "bets"
+averaging about $65,000 each,
+with hundreds of positions
+open at any given time.
+</p>
+
+<p>
+His strategies were primarily
+convertible bond arbitrage
+and statistical arbitrage &mdash;
+both hedged strategies
+where negative correlation
+between long and short legs
+allowed Kelly to justify larger positions.
+A notable competitor in the early days
+was <strong>Harry Markowitz</strong>,
+the Nobel laureate who created
+modern portfolio theory.
+After 20 months, Thorp's fund
+was up 39.9%
+while the Dow Jones Industrial Average
+was up only 4.2%.
+Markowitz eventually left,
+but Thorp persisted for decades.
+</p>
+
+<!-- ============================================ -->
+<h2 id="drawdown">Drawdown-Aware Kelly:
+Protecting Capital in Crashes</h2>
+
+<p>
+One of the most practical additions
+to Kelly theory comes from
+<strong>Mulvey, Pauling, and Madey's</strong>
+Dynamic Portfolio Tactics (DPT) system.
+Standard Kelly assumes you care only
+about long-run growth.
+But real investors care about drawdowns &mdash;
+they cannot tolerate losing 40% of their wealth
+even if the long-run math says they will recover.
+</p>
+
+<p>
+DPT modifies the Kelly objective function
+by adding a <strong>drawdown penalty</strong>.
+When your current wealth drops
+below your peak (high-water mark)
+by more than a threshold,
+you increase your effective risk aversion,
+automatically reducing position sizes.
+</p>
+
+<p>
+The researchers found that
+two thresholds worked well:
+<strong>D1 = 12%</strong> and <strong>D2 = 16%</strong>.
+When drawdown exceeds 12%,
+modestly reduce risk.
+When it exceeds 16%, reduce further.
+This creates a system that grows aggressively
+during good times
+but automatically shifts to capital preservation
+during bad times.
+</p>
+
+<p>
+<strong>The results (1999-2009)
+across the S&P 500, EAFE,
+and emerging markets:</strong>
+the DPT combined strategy achieved
+25.25% annual geometric return
+with only 12.99% maximum drawdown.
+Compare this to the S&P 500's
+&minus;2.26% annual return
+and 50.80% maximum drawdown
+over the same period.
+The strategy gave up some upside
+during bubble years
+but massively protected capital
+during the 2008 crash.
+</p>
+
+<p>
+The 2008 crash taught a vivid lesson:
+most of the damage was concentrated
+in just three months
+(September through November).
+Traditional annual or quarterly
+rebalancing was far too slow
+to respond.
+The DPT system,
+rebalancing every five trading days,
+detected the regime change quickly
+and de-risked before the worst of it.
+</p>
+
+<p>
+<strong>For a trader:</strong>
+consider building automatic risk reduction
+into your position sizing.
+When your equity curve drops more than 12%
+from its peak, cut your position sizes.
+When it drops more than 16%,
+cut further.
+This is not abandoning Kelly &mdash;
+it is extending Kelly to account
+for the reality that your edge estimate
+becomes less reliable during crisis periods
+when volatility spikes
+and correlations break down.
+</p>
+
+<!-- ============================================ -->
+<h2 id="rules">The Practical Rules:
+A Trader's Cheat Sheet</h2>
+
+<p>
+After 1,142 pages and 54 academic papers,
+here is what matters
+for someone who trades and invests:
+</p>
+
+<h3>Rule 1: Find the Edge First</h3>
+<p>
+Kelly tells you how much to bet.
+It does NOT tell you what to bet on.
+The fundamental problem
+is finding positive expectation opportunities.
+Without a genuine edge,
+no position sizing formula can help you.
+"The central problem for gamblers
+is to find positive expectation bets" &mdash; Thorp.
+</p>
+
+<h3>Rule 2: Use Half Kelly</h3>
+<p>
+Full Kelly is for textbooks.
+Half Kelly gives 75% of the growth rate
+with dramatically less risk
+and a massive buffer
+against estimation error.
+When in doubt, go even lower.
+Quarter Kelly (43.75% growth, 25% risk)
+is appropriate when your edge estimate
+is highly uncertain.
+</p>
+
+<h3>Rule 3: Never Go Past Full Kelly</h3>
+<p>
+This is the one rule that is absolute.
+Betting more than Kelly
+reduces your growth rate.
+Betting more than 2x Kelly
+guarantees ruin.
+There is never a reason to bet more than f*.
+</p>
+
+<h3>Rule 4: Assume Your Edge Is Smaller
+Than You Think</h3>
+<p>
+Data mining, non-stationarity,
+competition, and overconfidence
+all bias your edge estimate upward.
+Downgrade your estimated edge
+by at least 25-50% before sizing positions.
+This is equivalent to using
+quarter-to-half Kelly on your raw estimate.
+</p>
+
+<h3>Rule 5: Focus on Expected Returns,
+Not Correlations</h3>
+<p>
+Chopra-Ziemba shows that errors
+in expected returns are 100x more costly
+than errors in correlations
+for aggressive investors.
+Get your directional view right.
+The correlation matrix is secondary.
+</p>
+
+<h3>Rule 6: Rebalance Regularly</h3>
+<p>
+Rebalancing is not just housekeeping.
+It creates excess growth
+(volatility pumping)
+that increases with asset volatility.
+Equal-weight rebalanced portfolios
+consistently outperform
+cap-weighted buy-and-hold.
+</p>
+
+<h3>Rule 7: Hedge to Increase Position Size</h3>
+<p>
+Negative correlation increases
+the Kelly fraction.
+If you can find a genuine hedge
+(pairs trade, convertible arb,
+long/short positions),
+Kelly justifies larger positions
+because the risks partially cancel.
+Thorp's career was built on this principle.
+</p>
+
+<h3>Rule 8: Cut Size When Losing</h3>
+<p>
+When your equity curve drops more than 12%
+from its peak, reduce position sizes.
+At 16% drawdown, reduce further.
+This is drawdown-aware Kelly,
+and it dramatically improves
+risk-adjusted returns
+during crisis periods.
+</p>
+
+<h3>Rule 9: Transaction Costs Kill</h3>
+<p>
+A 1% increase in transaction costs
+can cut profits by 17-33%.
+Factor all costs
+(commissions, slippage, funding, market impact)
+into your edge calculation
+before applying Kelly.
+Many "edges" disappear
+once costs are properly accounted for.
+</p>
+
+<h3>Rule 10: The Long Run May Be Very Long</h3>
+<p>
+Kelly dominates other strategies eventually,
+but "eventually" can mean thousands of trials.
+With a 2% edge on even-money bets,
+it takes about 385 bets
+just to expect to double your money.
+At 10 bets per day, that is 38 trading days.
+But the variation around this expectation
+is enormous.
+You need patience and faith in the math
+to ride out the inevitable losing streaks.
+</p>
+
+<!-- ============================================ -->
+<h2 id="footer">About This Book</h2>
+
+<p>
+<strong>The Kelly Capital Growth
+Investment Criterion:
+Theory and Practice</strong><br>
+Edited by Leonard C. MacLean,
+Edward O. Thorp,
+and William T. Ziemba<br>
+World Scientific Publishing, 2011<br>
+1,142 pages &middot; 54 papers<br>
+Part of the World Scientific Handbook
+in Financial Economics Series, Vol. 3
+</p>
+
+<p>
+A comprehensive anthology of the most important
+academic papers on the Kelly criterion
+and its application to gambling,
+sports betting, and investing.
+Ranges from Daniel Bernoulli (1738)
+through Edward Thorp's
+definitive practical guide (2006),
+covering theory, criticism,
+and real-world evidence.
+</p>
+
+<h2 id="about-editors">About the Editors</h2>
+
+<p>
+<strong>Leonard C. MacLean</strong>
+is a professor at Dalhousie University
+in Halifax, Canada.
+His research focuses on
+capital growth theory,
+stochastic programming,
+and the growth-security tradeoff
+in portfolio management.
+He has co-authored numerous papers
+with Thorp and Ziemba
+on fractional Kelly strategies
+and optimal capital growth with constraints.
+</p>
+
+<p>
+<strong>Edward O. Thorp</strong>
+is the father of practical Kelly betting.
+A mathematics professor
+at MIT and UC Irvine,
+he pioneered card counting in blackjack
+(<em>Beat the Dealer</em>, 1962),
+co-invented the first wearable computer
+(with Shannon),
+created the first quantitative hedge fund
+(Princeton-Newport Partners, 1969),
+and compiled a 28.5-year track record
+of approximately 20% annual returns
+with near-zero correlation to markets.
+He made approximately $80 billion
+in total trades and was the first
+to use the Kelly criterion
+for real-world gambling and investing.
+</p>
+
+<p>
+<strong>William T. Ziemba</strong>
+is alumni professor emeritus
+at the University of British Columbia
+and visiting professor at MIT Sloan.
+The most prolific contributor
+to Kelly criterion literature,
+he co-developed the HZR racetrack
+betting system, taught Jim Simons
+about Kelly (1992),
+and has published extensively
+on stochastic optimization,
+asset-liability management,
+and the evaluation of great investors.
+He is the author of
+<em>Beat the Racetrack</em>
+and <em>Invest Japan</em>.
+</p>
+
+<h2 id="matters">Why This Book Matters</h2>
+
+<p>
+Position sizing is the most neglected topic
+in trading and investing education.
+Bookstores overflow with books about
+<em>what</em> to buy &mdash;
+which stocks, which sectors,
+which indicators, which patterns.
+Almost none address the equally important
+question of <em>how much</em> to buy.
+This anthology is the definitive collection
+on that question.
+It gathers 70 years of thinking &mdash;
+from information theory to financial economics &mdash;
+into a single volume
+and resolves the major academic debates
+with practical conclusions
+backed by extraordinary real-world evidence.
+</p>
+
+<p>
+The book matters because it contains
+the actual intellectual toolkit
+used by some of the greatest investors
+of the modern era.
+Thorp's 28-year track record,
+Simons's Medallion Fund,
+and Buffett's concentrated portfolio
+all reflect Kelly-style thinking
+about position sizing and capital growth.
+The principles are universal:
+they apply equally to a $1,000 crypto portfolio
+and a $5 billion hedge fund.
+Find your edge, size your bets proportionally,
+never overbet, and compound relentlessly.
+</p>
+
+<script>var BM_KEY = 'bm_kelly_capital_plain';</script>
+<script src="../book.js?v=3"></script>
+</body>
+</html>
