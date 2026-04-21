@@ -1,7 +1,7 @@
 // Caches books you're reading for offline access
 
-// Book Notes Service Worker v4
-var CACHE = 'books-v4';
+// Book Notes Service Worker v5
+var CACHE = 'books-v5';
 
 // Core assets always cached
 var CORE = [
@@ -9,7 +9,9 @@ var CORE = [
   './index.html',
   './book.css',
   './book.js',
-  './manifest.json'
+  './manifest.json',
+  './bg.jpg',
+  './icon.png'
 ];
 
 self.addEventListener('install', function(e) {
@@ -86,35 +88,68 @@ function shouldCache(path) {
 self.addEventListener('message', function(e) {
   if (!e.data) return;
 
-  // Cache a book for offline reading
+  // Cache a book and all its assets for offline reading
   if (e.data.type === 'cache-book') {
     var bookPath = e.data.path;
-    // Resolve to absolute URL
     var url = new URL(bookPath, self.location).href;
     caches.open(CACHE).then(function(cache) {
-      cache.match(url).then(function(existing) {
-        if (!existing) {
-          console.log('[SW] Caching for offline: ' +
-            bookPath);
-          cache.add(url).catch(function(err) {
-            console.warn('[SW] Failed to cache: ' +
-              bookPath, err);
-          });
+      // Fetch the HTML, cache it, then parse for images
+      fetch(url).then(function(resp) {
+        if (!resp.ok) return;
+        var clone = resp.clone();
+        cache.put(url, clone);
+        console.log('[SW] Cached: ' + bookPath);
+        // Parse HTML for embedded images
+        return resp.text();
+      }).then(function(html) {
+        if (!html) return;
+        // Find all src="..." in img tags
+        var imgs = [];
+        var re = /<img[^>]+src=["']([^"']+)["']/gi;
+        var m;
+        while ((m = re.exec(html)) !== null) {
+          imgs.push(m[1]);
         }
+        // Also cache cover.jpg in the book's directory
+        var dir = bookPath.replace(/index\.html$/, '')
+          .replace(/\/$/, '') + '/';
+        imgs.push(dir + 'cover.jpg');
+        // Cache each unique asset
+        var seen = {};
+        imgs.forEach(function(src) {
+          var absUrl = new URL(src, url).href;
+          if (seen[absUrl]) return;
+          seen[absUrl] = true;
+          cache.add(absUrl).then(function() {
+            console.log('[SW] Cached asset: ' + src);
+          }).catch(function() {
+            // cover.jpg or image may not exist — that's ok
+          });
+        });
+      }).catch(function(err) {
+        console.warn('[SW] Failed to cache: ' +
+          bookPath, err);
       });
     });
   }
 
-  // Remove a book from offline cache
+  // Remove a book and its assets from offline cache
   if (e.data.type === 'uncache-book') {
     var bookPath = e.data.path;
     var url = new URL(bookPath, self.location).href;
+    var dir = new URL(
+      bookPath.replace(/index\.html$/, '').replace(/\/$/, '') + '/',
+      self.location
+    ).href;
     caches.open(CACHE).then(function(cache) {
-      cache.delete(url).then(function(deleted) {
-        if (deleted) {
-          console.log('[SW] Removed from offline: ' +
-            bookPath);
-        }
+      // Delete all cached entries under this book's directory
+      cache.keys().then(function(requests) {
+        requests.forEach(function(req) {
+          if (req.url === url || req.url.startsWith(dir)) {
+            cache.delete(req);
+          }
+        });
+        console.log('[SW] Removed from offline: ' + bookPath);
       });
     });
   }
