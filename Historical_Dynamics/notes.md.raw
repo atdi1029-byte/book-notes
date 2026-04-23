@@ -1,0 +1,3117 @@
+<!-- pp. 1-20 -->
+
+## Chapter 1: Statement of the Problem
+
+### Why Mathematical Theory in History?
+
+The core question: why do empires embark on territorial expansion and collapse? Historians and sociologists have offered diverse answers ranging from specific characteristics to general social theories, but the field lacks rigorous quantitative approaches.
+
+- **Theory in social sciences** traditionally means careful thinking about concepts and definitions—it is verbal, conceptual, and discursive, not mathematical
+- **Physics and biology demonstrate** the power of mathematical formalism: mechanics, evolutionary synthesis, population ecology all matured only after developing mathematical frameworks
+- **Historical sociology faces two obstacles** that earlier attempts at mathematical history (Bagehot 1895; Rashevsky 1968) did not overcome:
+  1. Historical systems are complex with many interacting agents; physicists deal with simple systems (solar system, hydrogen atom) or identical components
+  2. Historians lack precise measured data that physicists acquire in controlled labs; historical data is fragmentary and approximate
+- **Recent advances make modeling feasible**: developments in nonlinear dynamics, agent-based models, complexity theory, and computational power now allow study of systems with short-lived feedbacks and time lags
+- **Cliometrics** (Williamson 1991)—quantitative history—has begun producing insights where previous mathematical attempts failed
+- **Key principle**: models must be judged against alternatives, not held to impossible standards of accuracy
+
+> "Mathematical modeling is a key ingredient in this research program because quantitative dynamical phenomena, often affected by complex feedbacks, cannot be fully understood at a purely verbal level."
+
+### Historical Dynamics as Research Program
+
+- **Dynamics** = scientific study of entities changing over time; the heart is mechanisms bringing about temporal change
+- **Systems approach**: treat phenomenon as system of interacting elements/subsystems; each element can be represented as lower-level system
+- **Example—empire as dynamic system**: various aspects change over time (extent of controlled territory, number of subjects); need to understand how subsystems (peasants, ruling elite, army, merchants) interact; these in turn are composed of lower-level subsystems
+- **Three classes of models** by hierarchical level:
+  1. **Individuals → Groups**: individual interaction determines group dynamics
+  2. **Groups → Polities**: group-level mechanisms explain policy-level patterns (main emphasis of this book)
+  3. **Polities → System**: how polities interact at interstate level
+- **Mathematical necessity**: nonlinear feedbacks and time lags cannot be rigorously explored through informal reasoning alone; informal verbal models often yield contradictory predictions
+- **Model scope**: simplify reality, but value comes from testing predictions against observation; all models are wrong by definition but some are useful
+
+### Delimiting the Questions
+
+Research program focused on **territorial dynamics of polities**—why some expand, others contract or collapse.
+
+- Territorial change intimately connected to military, political, economic, demographic, ethnological, and ideological processes
+- No attempt to exclusively analyze military/political history but to understand how various processes interact
+- **Geographic scope**: primarily Europe 500–1900 c.e.; theory aimed at eventual application to all agrarian polities
+- **Temporal scope**: −4000 to 1800/1900 c.e. depending on region
+- **Why agrarian polities?**: industrial and postindustrial societies change too rapidly and become too complex; agrarian societies changed slowly, provided continuous territorial records (1000–2000 c.e.) making empirical testing feasible
+
+> "In fact, more than 95% of recorded history is the history of agrarian societies. As an additional narrowing of the focus for this book, I will say little about nomadic pastoralist societies."
+
+### Hierarchical Modeling Approach
+
+**Core heuristic rule**: do not model more than two hierarchical levels simultaneously within single model.
+
+- Models violating this rule become intractable for simulation
+- **Three model classes by level**:
+  1. Individuals (or households) → group dynamics (understanding patterns at group level arising from individual mechanisms)
+  2. Groups → policy level (group dynamics explaining policy-level patterns; **main focus**)
+  3. Policy → interstate level (polity interaction at system level)
+- **Conceptual issue**: when modeling policy-level dynamics, do not simultaneously model subsystems within subsystems unless strictly necessary
+- **Practical constraint**: do not model subsystem interactions and subsystems' internal subsystems at same time; break into separate models with different levels as focus
+
+### Mathematical Framework
+
+Hard part of theory-building: choosing mechanisms to model, making assumptions about subsystem interactions, choosing functional forms, estimating parameters.
+
+- **Analytical solutions**: for simple models, may derive formula giving precise solution for all parameter values
+- **Numerical solutions**: for medium-complexity models, solve numerically on computer
+- **Agent-based simulation (ABS)**:
+  - Very powerful for investigating emergent properties of societies with heterogeneous agents
+  - Can incorporate stochastic factors and various mechanisms
+  - **Drawbacks**: language-specific (only those fluent in particular code understand), implementation details matter greatly, power is sometimes overrated; easy to keep adding components until system becomes incomprehensible
+  - Lacks common descriptive language except for those trained in specific programming language
+- **Differential/difference equations** (preferred approach):
+  - Highly standardized way to write systems of differential equations
+  - Easier to understand than computer code describing identical assumptions
+  - Analytical results available for most simple and medium-complexity models
+  - Numerical methods for solving well-standardized; allows other researchers to verify results
+  - Provides common language for theory building and comparison across researchers
+
+> "Differential (difference) equations provide an extremely useful common language for theory building in dynamical applications."
+
+**Book employs four sociological theories** as mechanisms explaining territorial dynamics: **Collins' geopolitics theory**, **collective solidarity** (Ibn Khaldun and later theorists), **ethnokinetics** (ethnic assimilation), and **demographic-structural theory** (population-state interaction).
+
+<!-- pp. 21-40 -->
+
+## Chapter 1 (cont.): Statement of the Problem
+
+### 1.3 Summary — Research Program Steps
+
+- **Define the problem**: territorial dynamics of agrarian polities — why do states expand, contract, or collapse?
+- **Primary data set**: spatiotemporal record of territorial dynamics for a specific region/period; success of each theory is measured by how well predictions match quantitative patterns
+- **Hypotheses**: identify mechanisms (or combinations) explaining territorial expansion/contraction; need not be exhaustive or mutually exclusive
+- **Translate hypotheses into mathematical models**: each hypothesis becomes a spectrum of models using alternative functional forms and parameter values
+- **Secondary data**: auxiliary tests beyond primary data (e.g., if hypothesis invokes population dynamics, test against population data separately)
+- **Model selection**: choose models that predict the most features with the fewest free parameters; penalize circularity (using same data for both parameter estimation and testing)
+- **Iterate**: involve additional hypotheses, locate more data, repeat
+
+> "Clearly this is a highly idealized course of action, which sounds almost naive in its positivistic outlook. In practice, it is unlikely that it will work just as described above. Nevertheless, there is a value in setting the goal high." — Turchin
+
+---
+
+## Chapter 2: Geopolitics
+
+**Geopolitics** (as used here): the spatial aspects of historical dynamics — specifically (1) the ability to project power at distance, and (2) the effect of spatial position on polity success.
+
+- Geopolitics is the best-theorized area in historical sociology (e.g., **Randall Collins** 1978, 1986, 1995)
+- Core argument of this chapter: **geopolitical models alone are insufficient** — they fail to explain sustained decline of large, formerly powerful polities
+- Reference for dynamical social systems: **Fararo (1989)**
+
+---
+
+### 2.1 A Primer of Dynamics
+
+Turchin introduces a classification of dynamical systems before applying them to geopolitical models.
+
+#### 2.1.1 Boundless Growth
+
+- **Linear growth**: Ẋ = c — X changes at constant rate c; solution X(t) = X₀ + ct (Newton's first law analogy)
+- **Exponential growth**: Ẋ = rX — rate of change proportional to X itself; called **autocatalytic** because more X → faster growth
+  - Provides simplest model for biological populations (**Turchin 2003**)
+- Linear and exponential are **null models** — minimal assumptions, good starting points, but not realistic for most systems (few real processes exhibit limitless growth)
+
+#### 2.1.2 Equilibrial Dynamics
+
+- **Negative feedbacks** impose upper/lower limits on growth
+- Key property: the **lag time** with which a feedback operates determines its effect
+  - Fast feedback (instantaneous): leads to equilibrial dynamics, not oscillations
+- **Asymptotic growth** model: Ẋ = c − dX
+  - Equilibrium X* = c/d; stable — deviations are corrected
+  - Trajectory: initially linear, then flattens (S-shaped approach to equilibrium)
+- **Logistic growth**: Ẋ = (r₀ − gX)X
+  - Relative growth rate declines linearly as X grows
+  - Also asymptotic; both are **first-order (one-dimensional) differential equation** models
+- **Metastable dynamics**: if f(X) is cubic (three equilibria — two stable, one unstable), the system exhibits "tipping" behaviors — trajectory depends on which basin of attraction the initial state falls in (see Chapter 6)
+- **Critical insight**: *First-order differential equations cannot produce oscillations.* Fast negative feedbacks without lag can only drive a system to equilibrium — they cannot cause boom/bust cycles.
+
+#### 2.1.3 Boom/Bust Dynamics and Sustained Oscillations
+
+- Oscillations require at least **two structural variables** with a delayed negative feedback loop
+- Classic model: **Lotka-Volterra predator-prey** equations:
+  - Ẋ = caXY − dX (consumers grow on resources, die at rate d)
+  - Ẏ = −aXY + bY (resources depleted by consumers, grow at rate b)
+- Period of oscillations ≈ 2π/√(bd) — inversely related to the geometric mean of the two feedback rates
+- **Key implication**: faster feedbacks → shorter oscillation periods; if feedbacks too fast, no oscillations at all (stabilized)
+- Second-order systems (2+ endogenous variables) can exhibit: stable equilibria, limit cycles, quasiperiodicity, chaos — Turchin calls all of these **second-order oscillations** for the book's purposes
+
+#### 2.1.4 Implications for Historical Dynamics
+
+- **Endogenous** factors: variables that participate in dynamic feedbacks within the modeled system
+- **Exogenous** factors: influence the system but are not themselves influenced by it (climate, invasions, epidemics, new religions)
+  - Whether invasion is endogenous or exogenous depends on model scope (single polity vs. world-system)
+- **Three orders of dynamics** (classification scheme used throughout the book):
+  - **Zero-order**: Ẋ = f(Z(t)) — X is driven entirely by exogenous forces; no endogenous equilibrium; random walks, stochastic trends; useful as null models
+  - **First-order**: Ẋ = f(X, Z(t)) — endogenous negative feedback + exogenous noise; X fluctuates around a stable equilibrium; no cycles unless externally imposed
+  - **Second-order**: involves multiple endogenous variables with delayed feedbacks; capable of oscillations, limit cycles, chaos
+- Detecting and characterizing **oscillation-inducing feedbacks** is a major goal of the research program
+
+---
+
+### 2.2 The Collins Theory of Geopolitics
+
+**Randall Collins** (1978, 1986, 1995) offers the most powerful verbal formulation of geopolitical theory; Collins's work is translatable into mathematical models. Also reviewed: **Hanneman et al. (1995)** simulation, **Artzrouni and Komlos (1996)** spatial simulation.
+
+#### 2.2.1 Modeling Size and Distance Effects
+
+Collins's three geopolitical principles:
+1. **Territorial resource advantage**: larger territory → more taxes and recruits → greater military power → more war success → more territory (positive feedback loop)
+2. **Marchland advantage**: states with enemies on fewer fronts expand at neighbors' expense; expansion away from the march reduces this advantage
+3. **Imperial overstretch** (cf. **Paul Kennedy 1987**): larger territory → greater logistical loads → reduced war success (negative feedback)
+
+**Simple size model** (Model 2.10): Ȧ = cA − a
+- Territory grows exponentially above threshold A₀ = a/c; shrinks to zero below it
+- Pure positive feedback — **zero-order dynamics** (the loop has all positive arrows)
+
+**Size-distance model** (Model 2.11): Ȧ = cA·exp[−√A/h] − a
+- Logistic distance multiplier L(r) = exp[−r/c₅] (following **Boulding 1962**)
+- Power maximized at A = 4h²; above this, logistical overstretch dominates
+- Two equilibria: A₁ (unstable, below which state collapses) and A₂ (stable upper bound)
+- This is **first-order dynamics** — no boom/bust possible
+- Result: imperial overstretch sets a limit on expansion but does *not* cause collapse
+
+> "No matter how nonlinear the various functional forms are, we will still end up with a one-dimensional ordinary differential equation model, which is not capable of generating boom/bust dynamics and second-order oscillations." — Turchin
+
+- Adding delays (using discrete-time equations or slow variables) could produce oscillations, but the historical record shows that empire growth is slow (decades–centuries), meaning A is a slow variable — whereas logistical costs are felt immediately (no lag). Thus delays in the logistical feedback loop are not justified empirically.
+- Conclusion: **imperial overstretch is a first-order factor** — it limits expansion, not collapse
+
+#### 2.2.2 Positional Effects
+
+- **Marchland advantage** modeled by parameter γ (γ=1: enemies on both boundaries; γ=2: enemy on one side only)
+- Having one enemy instead of two increases equilibrium size A₂ by ~30% (if A₂ = 2A₁); the marchland effect reduces the *critical collapse threshold* A₁ by ~50%
+- Primary effect: protection for marginal states, not massive amplification of large ones
+
+**The Artzrouni and Komlos (1996) Model**
+- Spatial simulation of European territorial dynamics (500–1800 C.E.)
+- Space: grid of 40km unit squares; 234 equal-sized states at start (500 C.E.)
+- Power function for state i: Pᵢ = Aᵢ / (α + exp[γCᵢ + β])
+  - Aᵢ = area (increases power); Cᵢ = perimeter (increases logistical cost, decreases power)
+  - Sea/mountain boundaries counted as fractions of land border (marchland effect)
+  - Pyrenees and Alps treated as near-impregnable barriers
+- War: random bilateral interactions; more powerful state wins with probability 1 − 0.5·exp[−K(Pᵢ/Pⱼ − 1)]; winner absorbs loser's contiguous squares
+- Each iteration = 1/3 year; 5 free parameters fit by trial-and-error to match historical European map
+- **Result**: 234 initial states reduced to ~25 by simulation end; coastal nations (France, Spain, Italy) solidify faster and achieve larger size — confirms marchland hypothesis
+- **Limitation**: model generates only first-order behavior — large countries stabilize at a size set by overstretch; no collapse of large powerful states
+
+#### 2.2.3 Conflict-Legitimacy Dynamics
+
+- Collins acknowledges geopolitics alone can't explain collapse; he discusses two nongeopolitical mechanisms:
+  1. **Demographic-structural model** (**Goldstone 1991b**)
+  2. **Ruler legitimacy** as affected by geopolitical power-prestige (**Hanneman et al. 1995**)
+
+**Hanneman et al. model**: interaction between power-prestige, state legitimacy, and international conflict
+- Rulers initiate conflict in proportion to gap between current legitimacy and maximum legitimacy
+- War success increases prestige; legitimacy follows prestige *with a lag*
+- Turchin's critique: the model imposes a lag of 3 time units (three consecutive victories needed to substantially raise legitimacy) — empirically unjustified; in reality, legitimacy likely responds *fast* (patriotic surge after victory, disillusionment after defeat)
+- Turchin shows (Appendix A.1) that translating the Hanneman core model into differential equations yields a **single-dimensional ODE** — again first-order, incapable of sustained oscillations
+- Imperial collapses in the Hanneman model appear to be entirely due to the *assumed lag*, not to any genuine second-order mechanism
+
+---
+
+### 2.3 Conclusion: Geopolitics as a First-Order Process
+
+- **Main finding**: all standard geopolitical mechanisms (resource advantage, logistical overstretch, marchland position, conflict-legitimacy) operate on fast time scales relative to territorial dynamics → they produce first-order behavior
+- First-order systems fluctuate around a stable equilibrium; they cannot generate the century-scale rise-and-fall cycles seen empirically
+- **Taagepera (1997, 1978a, 1978b)** data on imperial phases: 31 large polities show large variation in decline phase duration
+  - ~14 of 31 empires declined within ~one human generation (<0.3 centuries)
+  - 12 of 31 declined over one century or more → slow declines are common, not rare
+- Centuries-long cycles require feedbacks operating on the scale of human generations (decades or longer)
+- **Feedback speed rule**: a feedback loop operating on scale of years/weeks cannot cause oscillations with century-long periods; century-long cycles require century-scale feedbacks
+
+> "Centuries-long cycles are typically caused by feedbacks operating on the scale of human generations (decades or longer)." — Turchin
+
+- Geopolitical variables (logistic loads, marchland advantage) begin operating *without a time lag* — as soon as more territory is acquired, the state immediately incurs higher costs
+- Therefore, to explain sustained imperial decline, we must look beyond geopolitics to other variables with slow feedback dynamics (population, elite dynamics, legitimacy) — these are taken up in subsequent chapters
+
+**Table 2.1 summary** (Taagepera 1997 data — imperial phase durations in centuries):
+- Selected examples: Khmer rise 3.4 / peak 2.7 / decline 4.7; Tufan rise 1.7 / decline 4.3; Ottoman rise 0.9 / peak 3.4 / decline 0.1; Ming rise 0.9 / peak 0.6 / decline 1.8
+- Fastest collapses (decline ~0.0): Kanyakubia, Liao, Jurchen, Inca, Aztec, Spain, French, British
+- Slowest declines (>1.0 centuries): Khmer, Tufan, Sung, Kievan Rus, Fatimids, Golden Horde, Ming, Portuguese
+
+<!-- pp. 41-60 -->
+
+## Chapter 2 (cont.): Geopolitics — Summary Section
+
+### 2.4 Summary
+- Three classes of dynamical behavior:
+  - **Zero-order dynamics**: no feedbacks → exponential/linear growth or decline (unbounded)
+  - **First-order dynamics**: fast feedbacks → equilibrial; asymptotic or logistic growth;
+    can be **metastable** (multiple stable equilibria)
+  - **Second-order dynamics**: feedbacks with lag → boom/bust cycles,
+    sustained oscillations, or chaos
+- **Randall Collins's** geopolitical theory: three mechanisms driving territorial dynamics —
+  geopolitical resources, logistical loads, and marchland position
+- Positive feedback (territory → resources) alone: zero-order dynamics; states below
+  threshold shrink to extinction, above threshold grow without bound
+- Adding negative feedback (logistical loads): first-order dynamics, metastability —
+  upper equilibrium is stable; still no second-order oscillations
+- **Artzrouni and Komlos** spatial simulation: marchland advantage (higher boundary/
+  coastline ratio) → larger states; winners grow to logistical limits, losers disappear —
+  still only first-order behavior
+- **Hanneman et al.** conflict-legitimacy model: translates to first-order differential
+  equations; cannot produce second-order oscillations either
+- **Rein Taagepera's** growth/decline data: 12 of 31 empires show decline phases
+  exceeding a century — strong empirical signal of second-order dynamics
+- **Conclusion**: purely geopolitical models fail to explain prolonged imperial decline;
+  internal mechanisms (collective solidarity) must be investigated
+
+---
+
+## Chapter 3: Collective Solidarity
+
+### 3.1 Groups in Sociology
+
+#### 3.1.1 Groups as Analytical Units
+- **Methodological individualism**: sociological theories should ultimately be grounded
+  in individual properties — Turchin agrees *in principle* but with caveats
+- Caveat 1: Humans cannot exist apart from groups and remain human ("Mowgli" test);
+  human groups uniquely capable of purposeful collective action
+  (**Alexander and Borgia 1978; Melotti 1987**)
+- Caveat 2: Complex polities contain millions of individuals nested in hierarchical groups;
+  better modeling strategy = two-step: individual → group dynamics → polity dynamics
+- **Hechter (1987)**: "the key to understanding social life lies in the analysis of groups"
+- **Jack Goldstone (1994)**: introduces groups as intermediate actors between individuals
+  and revolutionary dynamics — cited as model hierarchical approach
+- Two key properties making human groups agents:
+  1. Tendency to draw **social boundaries**
+  2. Capacity for **group-oriented (solidaristic) action**, even at individual cost
+
+#### Social Boundaries
+- Humans use many cues for group demarcation: language (especially dialect/accent),
+  phenotype, religion, kinship, territory/residence, shared norms and rituals
+- Language is the single most important recognition marker (**Shaw and Wong 1989;
+  Masters 1998**)
+- Experimental evidence: people cooperate more with those sharing their dialect,
+  even when differences are slight (**Nettle 1999**)
+- **Masters (1998)**: markers include kinship (can be fictitious), religion, territory —
+  last category includes nationalism/"regnalism"
+
+#### Capacity for Solidaristic Behaviors
+- **Rational choice theory (Coleman 1990)**: individuals as utility maximizers —
+  cannot explain how societies hold together (the collective action / free-rider problem)
+- **Kraus (1993)**: Hobbesian contractarianism founders on the free-rider predicament
+  (**Olson 1965**)
+- **Collins (1992)**: only solution is **precontractual solidarity** (Durkheim's term) —
+  people must feel solidarity with *some* others beyond pure self-interest
+- "States and armies break apart when people stop thinking of themselves as members
+  of the group" (Collins 1992:23)
+- Society = mixture of self-centered (rational) and group-centered ("extrarational") behaviors
+- Collins: overall social structure = conflicting groups, some dominant — but domination
+  only possible because groups are integrated at the micro level
+
+#### 3.1.2 Evolution of Solidaristic Behaviors
+- Rational choice must be supplemented by **norms** that promote group-maintenance
+- Four proposed mechanisms for norm evolution: reciprocity, punishment, kin selection,
+  group selection (**Richerson and Boyd 1998**)
+- **Reciprocity** (**Trivers 1971; Axelrod and Hamilton 1981**): "tit for tat" works in
+  repeated prisoner's dilemma for two players — does NOT generalize to large groups
+  (rare cooperators get swamped by unconditional defectors; **Boyd and Richerson 1988**)
+- **Punishment / metanorms** (**Axelrod 1997**): norms can be stabilized by willingness
+  to punish norm-violators; requires sufficiently high density of "avengers" to start —
+  fragile; **Boyd and Richerson (1992)** show even one punisher can deter many defectors,
+  but coercive capacity is limited and coercion can be co-opted by leaders
+- Comparative evidence does NOT support coercion alone generating ultrasociality
+  (**Richerson and Boyd 1998**)
+- **Kin selection** (**W.D. Hamilton**, inclusive fitness): uncontroversial for small groups;
+  insufficient for large-scale cooperation where recipient is not a known relative
+- **Group selection** (**Sober and Wilson 1991**): controversial among sociologists
+  (seen as discredited) but gaining cautious acceptance among biologists
+- **Cultural group selection** (**Boyd and Richerson 1985, 1998, 2001**): most promising
+  theory for large-scale human cooperation
+  - Key preadaptation: **conformist transmission** of cultural traits ("when in Rome,
+    do as Romans do") — makes the group "wiser" than any individual; reduces
+    within-group variation, increases between-group variation → strengthens group selection
+  - Also developed theories of symbolic/ideological group markers and **moralistic punishment**
+- Once symbolically marked in-group cooperation stabilized in small bands (paleolithic
+  hunter-gatherers), a threshold was crossed: **symbolic demarcation** allows large
+  collectives to become designated cooperating groups
+- **Stairway effect** (Turchin 1977:102): accumulation of small quantitative changes
+  allows a qualitative leap to a larger cooperative scale, then another, etc.
+- **Richerson and Boyd (2001)**: cultural group selection theory passes tests for logical
+  coherence, proximal psychological mechanisms, microevolutionary processes,
+  and large-scale comparative evidence
+- **Fehr and Gächter (2002)**: experimental demonstration of altruistic punishment in humans
+
+#### 3.1.3 Ethnic Groups and Ethnicity
+- **Ethnic groups** are quintessential human groups — all boundary and solidarity
+  mechanisms are most vividly expressed here
+- **Barth (1969)**: the key is "the ethnic boundary that defines the group rather than
+  the cultural stuff it encloses" — form of social organization, self-ascription + ascription
+  by others; time-tested insight (**Vermeulen and Govers 1994**)
+- Ethnicity = basis of human social organization during most of evolutionary history
+  (hunter-gatherer bands: flat hierarchy, limited division of labor, ethnicity as primary
+  group identity)
+- **Brass (1991:18)**: ethnicity defined as subjective, symbolic, emblematic use of any
+  cultural aspect to create internal cohesion and differentiate from others
+- Example: Serbs, Croats, Bosnians share language but are distinct ethnies because
+  religious markers (Orthodox, Catholic, Muslim) define their boundaries
+- "Ethnic" and "religious" identity in Turchin's usage: religion is one of many cultural
+  markers used to delineate ethnic boundaries — especially important for agrarian societies
+- Ethnic conflicts evoke the most intense solidarity — sacrifice for the common good
+  is relatively common; impossible to imagine for professional organizations
+
+#### 3.1.4 The Social Scale
+- All known human societies have **hierarchically nested** group levels (**Johnson and Earle 2000**)
+- Even the simplest (Shoshone, !Kung): family/hearth group + extended family camps
+- Complex agrarian societies can have many more layers — **segmentary societies**
+  (e.g., Berbers of Morocco; **Gellner 1969**)
+- **Sahlins (1989)**: inhabitants of early modern Cerdanya had nested circles:
+  village-quarters → Cerdanya → "Two Counties" → Catalonia → Spain
+- Key dimension: **social scale** — people carry several ethnic identities nested within each other
+- Terminology adopted: **ethnos** (Russian ethnology: **Gumilev 1971; Bromley 1987**) —
+  a stable assemblage of people historically developed within a territory, sharing linguistic,
+  cultural, psychological characteristics, and self-aware as distinct
+- Hierarchical prefixes: sub-ethnos, ethnos, meta-ethnos (and sub-sub-ethnos etc.)
+- Ethnos ≈ modern nation level (Americans, French, Russians, Egyptians);
+  sub-ethnoses = Mormons, Southerners ("Rebs"), Bavarians, Saxons;
+  meta-ethnic identity arises from past/present association within a large state or empire
+- **Bartlett (1993)**: Latin Christians of Medieval Europe = inheritors of Carolingian
+  meta-ethnic identity; today = European identity based on EU membership
+- Ancient Greek hierarchical ethnicity: *xenoi* (other Hellenes) vs. *barbaroi*
+  (non-Hellenes); also Dorian/Ionian internal boundaries (**Smith 1986**)
+- **Strength of solidarity** varies with ethnic scale: can be very high at subethnic level
+  and quite low at the next level up
+- Example: late 16th-century France — Huguenots vs. Catholics engaged in brutal conflict;
+  yet a generation earlier, French nobility was solidaristic against Habsburg hegemony
+  (many later fought on opposite sides in the Wars of Religion; **Briggs 1998**)
+
+#### 3.1.5 Ethnies
+- **Ethnie** (Anthony Smith 1986, from French): named human population with myths
+  of common ancestry, shared historical memories, shared culture, homeland link,
+  and measure of solidarity at least among elites (**Smith 2000:65**)
+- Smith distinguishes two types:
+  - **Lateral (aristocratic) ethnie**: ethnic sense confined to elites; low "social penetration"
+  - **Vertical (demotic) ethnie**: much greater social penetration of shared ethnic feeling
+    through all strata — e.g., Mongols under Chinggis Khan, some ancient city-states
+  - Opposite extreme: elites ethnically distinct from subjugated commoners
+    (e.g., Old Hittite Kingdom)
+- Solidarity strength varies both by scale (3.1.4) and by **socioeconomic stratum**
+
+---
+
+### 3.2 Collective Solidarity and Historical Dynamics
+
+- Two properties make groups effective agents: boundary demarcation + solidaristic behaviors
+- "The best-organized group usually wins, and that means the group with the most
+  internal solidarity" (Collins 1992:26)
+- Mainstream historical sociology avoids collective solidarity, focuses on coercion and
+  economics (e.g., **Tilly 1990**) — solidarity seen as "soft" and unscientific
+- **Quigley (1961:129)**: calls solidarity theories "softening of the fiber" theories —
+  untestable; **Tainter (1988)** similarly dismisses as "mystical explanations"
+- Turchin's reframe: "softening of the fiber" may refer not to moral degradation of
+  individuals but to *loss of collective solidarity* — which CAN be endogenized
+- Problem: no existing sociological theory has successfully made solidarity a dynamic
+  variable connected to other historically relevant variables
+- **Hechter (1987)**: starts with groupness as a dynamic variable but pivots to rational
+  choice theory of solidarity — doomed by collective action problem (see 3.1.2)
+- **Collins (1992)**: argues for solidarity as historical variable; links to Durkheim's
+  theory of religion; but never connects solidarity dynamically to other variables
+- **Smith (1986:38)** on interstate warfare igniting ethnic sentiment: cites Aeschylus's
+  Persian Wars — communal significance of ethnic identification, *esprit de corps* in crisis
+- **McNeill (1963:809)** and **Prussian industry** anecdote: managerial elite with strong
+  internal discipline and *esprit de corps* vs. individualistic British businessmen
+- Two theories developed to the point of testable predictions: **Ibn Khaldun's asabiya**
+  and **Gumilev's passionarity**
+
+#### 3.2.1 Ibn Khaldun's Theory
+- **Ibn Khaldun** (14th-century Arab; *The Muqaddimah*) — arguably the first sociologist
+  in the modern sense (**Gellner 1981**); practicing politician, traveled extensively,
+  had a conversation with Timur Lenk; knew societies from the inside
+- Core postulate: individuals cannot survive outside a group; groups differ in capacity
+  for concerted action → introduces **asabiya** ("group feeling"; originally "making
+  common cause with one's agnates") — produces ability to defend, resist, press claims
+- Asabiya is hierarchically structured: for a higher-level group not to fall apart, its
+  asabiya must exceed the sum of lower-level group asabiyas
+- The ruling element must come from the lineage with the strongest, most natural
+  claim to control the available asabiyas
+
+**Dynamics of Asabiya**
+- Asabiya arises from "social intercourse, long familiarity, and companionship"
+  — remarkably close to Putnam's social capital (**Ibn Khaldun 1958:I:374**)
+- Ibn Khaldun distinguishes two major social types:
+  - **"Desert" (badiya)**: small-scale polities (chiefdoms); constant survival struggle →
+    necessity of cooperation → asabiya grows; produces only necessities → no corrosive luxury
+  - **"Civilization" (hadara)**: states and empires; large population, abundant labor,
+    luxury goods available → increased intraelite competition → intraelite conflict →
+    asabiya rapidly declines
+- Rate of decline: four generations from dynastic establishment to collapse
+  (may continue into 5th–6th generations; **I:281**)
+- High-asabiya "desert" groups conquer low-asabiya civilized states, establish ruling
+  dynasty → cycle repeats
+- Secondary mechanism: prosperity → population growth → scarcity → elite oppression
+  → state collapse (pursued further in Chapter 7 demographic-structural theory)
+
+**Assessment**
+- Strengths: clearly formulated, empirically testable, translatable to mathematical model;
+  explicit sociological mechanisms
+- Weaknesses: specific to Islamic arid-zone societies; emphasis on "luxury" as cause
+  of asabiya decline is only one of many "softening" theories — requires empirical
+  discrimination; Turchin to provide alternative in Chapter 4
+
+#### 3.2.2 Gumilev's Theory
+- **Lev Gumilev (1971)**: largely unknown in the West; controversial in Russia;
+  flawed but contains useful insights
+- Core connection: each polity has a **core ethnie**; properties of that ethnie drive
+  polity success or failure
+- Key concept: **passionarity** — individuals (*passionaries*) who pursue, with great
+  energy, an extrarational goal (higher than personal gain); sacrifice themselves for
+  collective good; directly translates to military/territorial capacity
+- Key concept: **ethnogenesis** — process by which ethnie members become passionaries;
+  driven (in Gumilev's theory) by cosmic energy bursts striking Earth in bandlike regions →
+  causes mutations of passionarity; ~10 such events in known Eurasian history
+- After initial impulse: passionarity increases over centuries → peak → decline;
+  group expands from sub-ethnie → ethnie → meta-ethnic empire → eventually
+  loses cohesion to internal war + external aggression
+- **Assessment by Turchin**:
+  - Strength 1: fruitful hypothesis that polity fortunes are closely linked to core ethnie
+    (factually supported by nationalism/state parallels in modern history)
+  - Strength 2: ethnogenesis concept has merit — most existing ethnies started small
+    and expanded via demographic growth + assimilation; close link between ethnogenesis
+    and enhanced collective solidarity
+  - Weakness: passionarity is treated as **exogenous** — waxes/wanes by its own
+    internal nature, not connected to other system variables; must be endogenized
+    to be scientifically useful
+
+#### 3.2.3 The Modern Context
+
+**Durkheim's Mechanical and Organic Solidarity**
+- **Durkheim (1915, 1933)**: two types of solidarity:
+  - **Mechanical**: based on similarity between individuals (simple segmentary societies)
+  - **Organic**: based on complementarity / mutual interdependence (complex, high
+    division-of-labor societies); Durkheim considered this the superior form
+- **Gellner (1981:87)**: In Ibn Khaldun's theory, "organic solidarity" is not solidarity
+  at all — civilized life with division of labor is inherently inimical to social cohesion;
+  luxury degrades asabiya of tribesmen who move to town
+- Turchin's view: division of labor may be irrelevant to asabiya waxing/waning; by
+  contrast, **cultural uniformity** appears to be an important precondition of social cohesion
+  (France used draconian methods to impose linguistic uniformity; **Weber 1976**)
+- Durkheim's insight that religion is one of the most powerful forces keeping groups
+  together remains highly relevant (**Collins 1992**)
+- Organic solidarity may be applicable only to industrial societies → largely irrelevant
+  for preindustrial agrarian polities (Turchin's focus)
+
+**Individualism and Collectivism**
+- Social psychology research on individualism/collectivism dichotomy (**Triandis 1995**)
+  appears relevant but focuses on very small social scales (families, local communities)
+- Results for small-scale groups sometimes incorrectly generalized to larger societies
+- Psychologists study effect of group on individuals, not group capacity for collective action →
+  decreases relevance for Turchin's project, though empirical variation data remains useful
+
+**Social Capital**
+- **Robert Putnam** and associates: **social capital** = "norms, networks that improve
+  efficiency of society by facilitating coordinated action" (**Putnam et al. 1993:167**)
+  — closely related to asabiya; asabiya ≈ agrarian-societies equivalent of social capital
+- **Fukuyama (1995)**: *social trust* as closely related concept; variation in trust
+  explains much of the variation in corporate economic effectiveness across countries
+- Two forms of social capital (**Putnam 2000:22**):
+  - **Bonding (exclusive)**: ethnic fraternal orgs, exclusive clubs → smaller-scale groups
+  - **Bridging (inclusive)**: civil rights movement, ecumenical orgs → larger-scale societies
+- "Dark side" of social capital: power elites exploiting social capital for antisocial ends —
+  mirrors internally solidaristic groups coercing less cohesive groups
+- **Banfield (1967)**: Mezzogiorno (southern Italy) = extreme atomization; cooperative
+  efforts limited to the nuclear family; "amoral familism"; local government ineffective
+  and corrupt — contrasts with vibrant civic culture of Midwestern American towns
+- **Putnam et al. (1993)**: Italian north/south: north has dense interpersonal networks,
+  trust, cooperation → more effective local government
+- **Gambetta (1988, 1993:77)**: Sicilian mafia = response to endemic distrust in southern
+  Italy; distrust explains why mafia emerged there and not elsewhere in the Mediterranean
+- **Triandis (1995)** classifies Mezzogiorno as *collectivist* and Americans as *individualist*
+  — opposite of Putnam's findings; resolved by attending to social scale: southern Italians
+  are collectivist at the *family* level, while Americans are collectivist at the
+  *regional/national* level; small-scale vs. large-scale solidarity distinction is crucial
+- **de Tocqueville (1984)**: classic account of richness of American civic life;
+  American "rugged individualism" is largely a myth (**Putnam 2000**)
+
+**Terminological Note**
+- Turchin settles on **asabiya** as his central term for: a group's capacity for collective action
+- Reasons: (1) minimal theoretical baggage — few know Ibn Khaldun; (2) explicit
+  acknowledgment of Ibn Khaldun's contribution; (3) if ever quantified, unit = *khaldun*
+- Social capital rejected because: sounds jarring for preindustrial societies; "capital"
+  implies divisibility (social capital is a public good); used in two conflicting senses in
+  the literature — individual-focused (**Lin 2001; Bourdieu 1980**) vs. group-focused
+  (**Putnam et al. 1993**)
+- Asabiya = group's coercive power: ability to defend itself and its resources (territory),
+  and to extend its sway over other groups and their resources
+- Quantifying asabiya: social capital research (especially Putnam) has developed methods
+  usable by analogy — density of networks, quality of interactions, mutual trust,
+  institutional effectiveness
+
+**Implications: Arabian vs. Turco-Mongolian Asabiya**
+- Empirical pattern: deserts of North Africa/Arabia + mountainous zones (Bedouin nomads,
+  Berbers, Kurds, Pashtuns) → small regional states; Iranian and Anatolian plateau zones
+  → controlled by large empires organized by Turco-Mongolian confederations
+  (**Barfield 1990:157**)
+- Raises two questions for Chapter 4: How did Turco-Mongolian polities maintain
+  asabiya at such scale? Why do Arabian and Turco-Mongolian asabiyas exhibit this
+  systematic difference across centuries?
+
+<!-- pp. 61-80 -->
+
+## Chapter 4: The Metaethnic Frontier Theory
+
+### 4.1 Frontiers as Incubators of Group Solidarity
+
+- **Core empirical puzzle**: what causes asabiya to increase or decline?
+  Chapter 3 treated it as exogenous — Chapter 4 **endogenizes** it
+- Large empires structured along two dimensions:
+  1. **Socioeconomic stratification** (elites vs. commoners)
+  2. **Ethnic dimension** (core ethnies vs. alloethnies)
+- Examples of imperial core ethnies: Castilians (Spain), English (British Empire),
+  Prussians (Prussia), Russians (*velikorossy*) in Russian Empire
+- Three types of core group integration:
+  1. Elite-only coercion of commoners and alloethnic elites
+  2. **Demotic** — commoners share solidarity with elites (Anthony Smith's term)
+  3. **Aristocratic** — lateral elite integration across ethnically diverse commoners
+- Ethnie and polity exist in dynamic interaction — neither is primary;
+  together they form an **ethnopolitical system**
+- High-asabiya ethnic group: (1) expands territory, (2) grows via colonization
+  and assimilation, (3) scales up from subethnie → ethnie → metaethnie
+  — this scaling process = **ethnogenesis** (historical process, not single event)
+
+### 4.1.1 Factors Causing Solidarity Increase
+
+**Three main factors** that increase intergroup variation / decrease intragroup variation:
+
+#### Intergroup Conflict
+- Conflict intensity is primary driver of asabiya increase
+- Spectrum: imperial center (low conflict, high peace) →
+  **stateless "tribal war zone"** (incessant warfare; Ferguson & Whitehead 1992)
+- Anthropological evidence: stateless societies characterized by
+  near-constant warfare (Keely 1997)
+
+#### Ratio of Population to Resources
+- High population density pressing subsistence limit →
+  intragroup competition → **corrodes group solidarity**
+- Mild resource shortage can stimulate solidarity
+  (collective intensification, raiding neighbors)
+- Severe/persistent shortages: ability for collective action collapses;
+  starving people are poor fighters; intragroup competition spikes
+- Population **well below carrying capacity** → surplus, communal buffering,
+  low intragroup fitness variance → promotes solidaristic behaviors
+- Population density equilibrium may be set far below carrying capacity
+  by conflict mortality (Turchin & Korotayev 2003 formal model)
+
+#### Ethnic Boundaries
+- Intergroup conflict and low population density both favor
+  asabiya increase in **small-scale groups** only
+- Large groups need sustained external threat across generations
+  to maintain cohesion — without it, internal divisions destroy asabiya
+- Solution: **metaethnic fault line** — a major ethnic boundary where
+  neighboring groups are radically *other* (language, religion, phenotype)
+- Warfare across metaethnic fault lines is more violent
+  (higher atrocity/lethality; Dower 1986) → stronger alliance formation
+  among groups on the same side
+- **"Stairway effect"**: boundary symbols from small groups are applied
+  to successively larger-scale groups → asabiya scales up
+
+### 4.1.2 Imperial Boundaries and Metaethnic Fault Lines
+
+- All three factors work **synergistically** at frontier zones of large empires,
+  especially empires with vigorous exclusionary ideologies
+- **Exclusionary religions** (Christianity, Islam) provide symbolic markers
+  for metaethnic fault lines — disallow dual membership, sharpen in/out-group
+- Imperial boundary = two-dimensional **frontier zone** (width × length),
+  not a one-dimensional line
+- Two frontier types:
+  1. Empire vs. stateless ("chiefdomless") tribal zone
+  2. Empire vs. empire
+- Tribal side: stateless → constant warfare → low population density →
+  ideal conditions for asabiya intensity and scale increase
+- Imperial side: vigorous empires prevent internecine fighting →
+  external pressure from other side sustains frontier asabiya
+- Mature empire centers lose asabiya (high pop density, no external threat)
+  → frontier zones develop their own identity →
+  new high-asabiya group emerges, eventually founds new empire
+
+#### Additional Factors (Secondary)
+- **Physical geography**: mountains isolate small groups, inhibit large-scale
+  asabiya — mountain polities rarely grow to imperial size
+- **Rivers**: enhance flow of people/goods/culture → excellent environment
+  for ethnic scaling-up; also trade routes providing prestige goods
+- **Seas**: ambiguous — can integrate (Roman Mediterranean) or divide
+  (Mediterranean as moat between Christendom and Islam under Habsburgs/Ottomans)
+- **Leveling institutions**: frontier egalitarianism may enhance asabiya
+  vs. high-inequality imperial centers (left for future development)
+- **Cultural contact**: metaethnic frontiers = mixing zones of peoples,
+  microbes, ideas, genes → increased cultural variation → faster
+  cultural group selection (Hall 2001)
+- Spread of new religions (Christianity, Islam) and nationalist ideologies
+  are exogenous variables for now — model cannot yet endogenize them
+
+### Conclusion: Metaethnic Frontier Theory
+- Areas where **imperial boundaries coincide with metaethnic fault lines**
+  act as asabiya incubators
+- Frontier pressure: weak groups (low asabiya) are absorbed;
+  survivors expand into full ethnies
+- Cultural group selection does NOT require physical extermination —
+  losing strategies replaced by imitation of winning ones
+- Theory applies to "imperial period" (~3000 BCE–1800 CE)
+- Cycle of empires:
+  1. Old empire's frontier + metaethnic fault line → ethnogenesis zone
+  2. New high-asabiya group emerges (tribal or offshoot of old core)
+  3. New subethnie grows, assimilates neighbors, forms territorial polity
+  4. New empire expands until geopolitical limits
+  5. Center loses asabiya (peace + high density) → new frontier cycle begins
+
+### 4.1.3 Scaling-Up Structures
+
+Three cultural structures that allow asabiya to scale up without splintering:
+
+#### Religion
+- Most powerful scaling mechanism: must be (1) **proselytizing** and
+  (2) **exclusionary** (Stark 1996)
+- Proselytizing → grows group by adding converts
+- Exclusionary → sharp in/out-group boundary ("who is not with us is against us")
+- **Christianity** and **Islam** as archetypal examples:
+  - *Umma* (Muslim community) demanded altruistic in-group behavior (charity);
+    *Dar al-Islam* vs. *Dar al-Harb* ("House of War") defined the boundary
+  - Enslaving fellow Muslims forbidden; enslaving infidels was not
+- Group selection features of both religions:
+  sharp boundary, leveling institutions (charity; monogamy in Christianity),
+  strong norms/metanorms, altruistic in-group behavior
+
+#### Primogeniture
+- **Rulership** (one member as symbolic focus) increases cohesion
+  but is typically limited in scale and duration
+- **Dynastic** succession extends temporal duration (Chinggisids, Sharifs)
+- Greatest danger: division of territory among multiple heirs
+- **Primogeniture** (eldest son inherits all) prevents splintering
+- Counterexample: Kievan Russia's rotation-succession system
+  (younger brother to Kiev, freeing subordinate capital) led to
+  progressive splintering into principalities each with its own dynasty —
+  only reversed when Moscow adopted primogeniture
+
+#### Society-Wide Male Socialization
+- **Otterbein (1985)**: societies dominant in external warfare use
+  military institutions that crosscut kinship units (not fraternal interest groups)
+- Crosscut units suppress internal warfare, channel aggression outward
+- Examples: age sets and police societies among prestate peoples;
+  militia drilling in Greek city-states and 17th-century Europe (McNeill 1982);
+  modern obligatory military service
+
+### 4.1.4 Metaethnic Frontier Theory in Context
+
+#### Ibn Khaldun's Theory
+- Turchin's frontier model differs from Ibn Khaldun's: Ibn Khaldun focused
+  on Arab/Berber dynamics in the Maghreb — modest ethnic distance,
+  shared Islam (unifying, not dividing) → only region-sized polities arose
+- **Turco-Mongolian contrast**: Chinese–Inner Asian frontier had enormous
+  ethnic gulf (no shared religion or language) → pressure on both sides
+  → imperial-scale asabiya on both sides (**Barfield 1989**)
+- On the Inner Asian frontier, scaling-up operated until checked by
+  geopolitical constraints → huge empires on both sides
+- In the Maghreb, ethnic distance was shallow → smaller-scale asabiya
+
+#### External Conflict–Internal Cohesion Theory
+- Classic sociology: **Simmel (1955)** and **Coser (1956)** — external conflict
+  increases internal cohesion, sets group boundaries
+- Key nuance (Coser): severe conflict can either break OR strengthen a group;
+  determining factor is **initial degree of group consensus**
+- Group with zero basic consensus → external threat → apathy → disintegration
+- Group with some initial cohesion → emerges from conflict strengthened
+- Consistent with Turchin's frontier model: most groups at the frontier
+  will perish or fail to scale; only those that chance upon the right combination
+  of norms and structures survive AND expand
+
+#### Frontiers in History
+- **McNeill (1963:60)**: "a long line of lords marcher created empires by
+  successfully exploiting a strategic position on the frontier between
+  civilization and barbarism"
+- Almost all states that unified China originated on its margins
+  (exception: the Ming)
+- Well-studied historical frontiers: Roman, medieval European, Russian steppe
+  (McNeill 1964), Egyptian (Service 1975), Akkadian Empire
+- **Two competing explanations** in the literature:
+  1. Marchland position *protects* states from predation (Collins) —
+     Turchin's theory predicts the opposite: frontier *pressure* is constructive
+  2. Technology diffusion (barbarian prowess + civilized technique) —
+     Turchin finds this dubious as the primary long-run explanation
+- These theories offer different predictions → **empirical test designed for Chapter 5**
+
+#### Semiperipheries in World-Systems Theory
+- **Wallerstein (1974, 1980, 1989)** world-systems theory: polity dynamics
+  are not endogenous but result from global core-periphery interactions
+- **Chase-Dunn and Hall**: semiperiphery = fertile ground for
+  social/organizational/technical innovation; secondary state formation
+  on marches of empires is a semiperipheral phenomenon
+- Parallel to Turchin's theory, but metaethnic frontier theory is sharper:
+  only semiperipheries where imperial frontier coincides with metaethnic
+  fault lines should produce aggressive challengers
+- World-systems theory does not explain *why* some semiperipheral
+  challengers succeed and others fail — metaethnic frontier theory does
+
+#### Ethnogenesis Literature
+- Soviet ethnology (Gumilev 1971 and others) developed extensive theory
+  of ethnogenesis — Turchin finds Gumilev's version "deeply flawed"
+- **Hall (2000, 2001)**: frontiers = zones where ethnogenesis, ethnocide,
+  culturicide, and genocide are common
+- Example: **Navajo (Diné) ethnogenesis** — shared language/customs before
+  European arrival, but consolidated Navajo ethnie formed through
+  centuries of interaction with Spaniards, then under American occupation
+  (consolidated Navajo Tribal Council as product of frontier conditions)
+- Connection between frontier conditions and ethnogenesis widely recognized
+  in *Journal of World History* case studies (Armstrong 1982; Chapell; Miller; Mulroy)
+
+---
+
+### 4.2 Mathematical Theory
+
+- Verbal theory risks misleading intuition — waxing/waning asabiya cycles
+  need mathematical validation to confirm boom-bust dynamics actually result
+- Strategy: first build simple **pseudospatial model** (analytically tractable),
+  then verify with spatially explicit simulation
+
+#### 4.2.1 Simple Analytical Model
+
+**Starting from territorial dynamics equation (2.12):**
+
+Ȧ = c₀AS(1 − A/h) − a   **(4.2)**
+
+- *A* = polity territory; *S* = average polity-wide collective solidarity (0–1);
+  *h* = spatial scale of power projection; *a* = geopolitical pressure from hinterland
+- *c₀* = proportionality constant relating asabiya × resources to geopolitical power
+- Geopolitical power = c(S) × resources = c₀S × A
+  (no asabiya → zero imperial power regardless of population size)
+
+**Asabiya dynamics — logistic growth chosen over alternatives:**
+- Asymptotic growth (linear near zero) rejected: conditional altruists
+  in minority will defect → initial growth must be autocatalytic
+- Logistic growth matches: minority altruists get exploited, but once
+  sufficient mass of altruists exists, conformism spreads the behavior
+
+Ṡ = r(A)S(1 − S)   **(4.3)**
+
+- *r(A)* = relative growth rate, assumed linear in distance from border
+- Asabiya grows near frontier, declines in center
+- **r₀** = maximum growth rate at border; **b** = width of frontier zone
+
+Average polity-wide asabiya: r(A) = r₀(1 − A/2b)   **(4.4)**
+
+**Full system (4.5):**
+
+Ȧ = c₀AS(1 − A/h) − a  
+Ṡ = r₀(1 − A/2b)S(1 − S)
+
+**Phase space analysis:**
+- Two isoclines (Ȧ = 0 and Ṡ = 0) intersect at single nontrivial equilibrium
+- Stability determined by two parameters: *h* (power projection scale) and *b*
+  (frontier width)
+- If **2b > h/2**: equilibrium is **stable** (small perturbations return to equilibrium)
+- Feedback mechanism: increasing A → larger center → average asabiya declines
+  → pushes boundary back; decreasing A → S increases → pushes frontier forward
+- **Threshold for polity survival**: if initial A(0)S(0) < a/c,
+  expansion never starts and fledgling polity is destroyed by geopolitical pressure
+
+<!-- pp. 81-100 -->
+
+## Chapter 4 (continued): The Metaethnic Frontier Theory
+
+### Unstable Equilibrium and Boom/Bust Dynamics (recap)
+
+- If `2b < h/2`, equilibrium is unstable → single boom/bust cycle
+- Both A (imperial power) and S (asabiya) rise initially; when A exceeds 2b,
+  S starts declining; logistic limits halt expansion; S collapses further
+- Positive feedback: declining A reduces resources → faster decline →
+  empire collapses (A hits 0)
+- Key qualitative insight: frontier areas must be **small** relative to empire
+  size (b < h/4) for boom/bust to occur; otherwise equilibrium is stable
+- Model does NOT produce repeated boom/bust or sustained oscillations —
+  outside pressure parameterized as constant (a), rivals modeled implicitly
+
+### 4.2.2 A Spatially Explicit Simulation
+
+- Nonspatial model extended to a **rectangular grid** of cells; each cell = a
+  small regional polity (chiefdom or province)
+- **Asabiya tracked at two levels**: cell-level and empire-level (average
+  of all member cells)
+- Cell on frontier: asabiya grows logistically toward S=1
+- Cell not on frontier: asabiya declines exponentially to 0
+- Frontier effect on growth rate is **Z-shaped**: flat and positive within
+  the frontier zone, then abruptly flat and negative in the interior
+- Power of empire at a conflict site: `P = AS̄·exp[−d/h]`
+  — discounts by distance from imperial center to conflict
+- Attacker wins if power exceeds defender's by threshold Δ_p
+
+### Dynamics Predicted by the Spatial Model
+
+- Typical run: Empire 1 expands rapidly for ~10 time steps until logistic
+  limits are reached → stationary frontier established → asabiya builds
+  in frontier zone of neighboring polities → "bundle" of challenger polities
+  suddenly arises at time ~20
+- Only 4 of the initial challengers (Empires 2, 9, 11, 16) survive; they
+  grow at expense of Empire 1 → eventually consume it
+- A second stasis period follows; then Empires 9 and 16 collapse while
+  2 and 11 expand; a stateless area appears → new Empire 17 arises
+  from it → back-and-forth dynamics between 2 survivors
+
+> "The model-generated trajectories look quite similar to the trajectories of historical polities." (p. 70)
+
+- Figure 4.4b comparison: simulated curves visually match historical
+  expansion-contraction of Tang, Tufan, W. Turk, Uigur, Sung, Liao,
+  Jurchen, Mongol, Chorezm (East/Central Asia, 600–1200 C.E.)
+- Striking parallel: 12th-century Central-East Asia had two large empires
+  (Sung, Tufan) with stationary borders; then four challengers arose
+  (W. Liao, Jurchen, Khwarizm, Mongol) — all from northern frontier zone;
+  by 13th century only Mongol survived, destroying all others
+- This matches the simulation dynamic at time steps 20–30 almost exactly
+
+### Trajectory Instability and Chaotic Dynamics
+
+- Model output is "very erratic looking" — repeated runs from same initial
+  conditions produce **wildly different outcomes**
+- Stochasticity (order of attacker selection) accounts for some variation,
+  but removing all stochasticity still yields erratic trajectories
+- Adding/subtracting a single cell from initial state causes rapidly
+  diverging trajectories → **sensitive dependence on initial conditions**
+  = **chaotic dynamics** (Ruelle 1989)
+- Sources of nonlinearity in model:
+  - **Size-threshold effect**: small polities highly extinction-prone;
+    above a size threshold much more resistant to external pressure
+  - **S_crit threshold**: critical average asabiya below which empire
+    loses cohesion
+  - Logistic growth → exponential sensitivity at low values of state variable
+- High dimensionality: each cell has two state variables (imperial index +
+  asabiya) → 2× number of cells; a 20×20 arena = dimensionality of 800
+- Implication: **long-term prediction of individual polity trajectories is
+  not feasible** even if frontier model correctly captures reality
+
+### Effect of Logistic Load Parameter h on Stability
+
+- Key stability ratio in nonspatial model: `h/b` (power projection scale /
+  frontier width)
+- In spatial model, frontier width fixed at 1 cell; vary h to test
+- Decreasing h (to 1 from reference value 2): oscillations cease;
+  medium-sized polities emerge, each occupying 7–16% of arena
+- Increasing h (to 3): one polity eventually dominates entire arena;
+  lacking frontiers, all cells decline to 0; empire collapses uniformly →
+  system persists in **stateless condition forever**
+- Confirms nonspatial model's qualitative prediction: large h destabilizes,
+  small h stabilizes
+
+### The Reflux and Breakthrough Effects
+
+- **Reflux effect**: challenger empires born on the frontier initially expand
+  *away* from the old empire — into the hinterland — rather than attacking it
+  - Reason: old empire is still large and has non-trivial asabiya; easier
+    to expand into low-asabiya hinterland
+  - As challenger's center of gravity moves away, pressure on old empire
+    decreases; further hinterland expansion hits logistic limits
+  - Result: challenger stabilizes without ever directly confronting old empire
+- **Breakthrough effect**: occurs when old empire's asabiya is already
+  declining far enough that challenger can exceed power threshold Δ_p
+  - Long stasis period (old empire slowly declining, challenger growing)
+  - Suddenly, difference in powers crosses Δ_p → challenger seizes
+    border cells → catastrophically lowers old empire's average asabiya
+    (only high-asabiya cells were on frontier) → old empire collapses rapidly
+- Both effects are **emergent** — not built into model assumptions;
+  appear spontaneously from microscale rules
+
+### Caveats
+
+- Distance effects modeled as exponential power decay — too simplistic;
+  better to model army movements, locations, supply chains explicitly
+- Simulation assumes ethnicity = polity membership; conquering a cell
+  immediately transfers loyalty — ignores **ethnokinetic processes**
+  (assimilation takes time; pursued in Chapter 6)
+- No dynamics of **social strata** (commoners vs. elites), no population
+  dynamics, no upward/downward mobility — degree of internal solidarity
+  depends on strata composition (Chapter 7)
+
+### 4.3 Summary (Chapter 4)
+
+- Goal: **endogenize** asabiya — build a theory of what causes it to
+  rise or fall
+- **Multilevel selection theory**: group-beneficial / individually-costly
+  behaviors promoted when intragroup fitness variation is minimized and
+  intergroup variation is maximized
+- Three variables affecting asabiya evolution:
+  1. **Environmental pacification** — peaceful interior of large polity
+     → intragroup competition dominates → asabiya declines;
+     stateless environment → intergroup conflict → asabiya rises
+  2. **Population density relative to carrying capacity** — subsistence-
+     level density → intragroup competition → asabiya declines;
+     low density (common in stateless zones) → asabiya rises
+  3. **Location near a metaethnic fault line** — expands symbolic
+     ethnic boundary to encompass a larger in-group opposing a very
+     alien out-group → asabiya rises
+- **Metaethnic frontiers**: where all three factors work synergistically —
+  intergroup conflict, low density, deep ethnic divides → asabiya "crucibles"
+- Frontiers of major empires carrying universal religions are especially
+  potent; exert "push or pull" on tribal zone
+- Frontiers between two large empires with mutually exclusionary religions
+  (Christianity vs. Islam) also strongly promote asabiya buildup
+- Metaethnic frontiers are zones where **ethnogenesis** occurs:
+  ethnocide, culturicide, genocide alongside ethnogenesis —
+  intense competition eventually produces one victor with high asabiya,
+  distinct identity, internal cohesion = incipient new ethnie
+- Theory treats **polity formation and ethnogenesis as two aspects
+  of the same dynamic process**
+- Analytical model (boom/bust): occurs only if frontier extent (b) is
+  small relative to logistic cap; otherwise dynamics qualitatively similar
+  to simple geopolitical model (Section 2.2.1)
+- Spatial simulation: repeated boom/bust oscillations for wide parameter
+  range, but dynamics are **chaotic** (not cyclic)
+- Key polity founding event = **ethnogenesis**: core ethnie's asabiya
+  must first exceed that of surrounding groups
+
+---
+
+## Chapter 5: An Empirical Test of the Metaethnic Frontier Theory
+
+### 5.1 Setting Up the Test
+
+- Theory predicts: large territorial empires should **originate at
+  metaethnic frontiers**
+- Test focus: **Europe, 0–1900 C.E.** — selected because spatiotemporal
+  boundaries are reasonably well-known and accessible in Western literature
+- Acknowledges "European exceptionalism" debate (Jones 1981; Landes 1998
+  vs. Blaut 1993, 2000; Frank 1998; Pomeranz 2000); takes no side —
+  assumes metaethnic frontier theory applies equally to Europe and elsewhere
+- Future publications will test on Central/East Asian, South Asian, and
+  Southwest Asian regions
+
+> "The European historical experience, for all its special features, is long enough, well-enough documented, and a large influence on the rest of the world that any systematic conclusions which hold up well in the light of that experience would almost automatically become plausible hypotheses to be tried elsewhere." — Charles Tilly (1975:13)
+
+- Geographic boundary: standard Europe/Asia divide (Urals, Caspian,
+  Caucasus, Black Sea) but **includes** Anatolia/Asia Minor
+  (Byzantine + Ottoman Empires are critical cases)
+- Temporal bounds: **500 C.E. to 1900 C.E.** (fall of western Rome to
+  agrarian-industrial transition); frontier database starts at 0 C.E.
+- Moroccan polities (Almoravids, Almohads) treated as **exogenous intrusions**
+
+### 5.1.1 Quantifying Frontiers
+
+- Frontiers are "hard to pin down" (Hall 2000) — fuzzy in time and space
+- Operational solution: divide Europe into ~50 **cultural regions** of
+  0.1–0.2 Mm² each; time divided into **one-century intervals**
+- ~1,000 area-centuries = main data units
+- **Frontier intensity score** = sum of four components (range 0–9):
+
+| Component | Score | Criterion |
+|-----------|-------|-----------|
+| Religion | 3 | Islam ↔ Christianity or Paganism |
+| Religion | 2 | Major divisions within Christianity/Islam |
+| Religion | 1 | Sects within same religion (e.g. Catholic vs. Protestant) |
+| Religion | 0 | No religious difference |
+| Language | 2 | Different linguistic groups |
+| Language | 1 | Different languages within same group (Romance, Germanic, Slavic) |
+| Language | 0 | No linguistic difference |
+| Way of life | 2 | Settled agriculturalists vs. nomadic pastoralists |
+| Way of life | 1 | Urbanized/literate agriculturalists vs. "backwoods" cultivators |
+| Way of life | 0 | Similar ways of life |
+| Warfare | 2 | Intense warfare causing detectable depopulation (up to genocide) |
+| Warfare | 1 | Persistent raiding for loot/captives, no significant depopulation |
+| Warfare | 0 | Peaceful interaction or elite-only mild warfare |
+
+- Religion given extra weight (one extra level vs. others) because of its
+  outsized role in erecting and maintaining metaethnic divisions
+- Frontier assigned to a region if a **state boundary** ran through or
+  next to it; interior empire regions and stateless polities both scored 0
+- If two or more frontiers ran through the same region: use **highest score**
+  (intensities don't add up)
+
+### 5.1.2 Polity Size
+
+- Dependent (response) variable = **territorial extent of polities**
+- Measure: **maximum area controlled at peak** (Mm²; 1 Mm = 1,000 km;
+  1 Mm² = 10⁶ km²)
+- Limitation: doesn't distinguish durable empires from brief ones;
+  Turchin notes that duration should be built into the index (future work)
+- Threshold for "large polity": **0.1 Mm²** (comparable to one cultural
+  region unit) — to exclude minor Imperial states
+- **Asabiya generator** threshold: frontier intensity ≥ 5, persisting
+  in the same cultural area for **≥ 3 centuries**
+- Testable prediction: cultural regions that are asabiya generators (score
+  ≥ 5, ≥ 3 centuries) should be **sources** of large polities
+  (>0.1 Mm²) at some later time
+- "Frontier but no empire" cells expected — neighboring empire may absorb
+  region before it develops its own
+- "No frontier but empire" cells = **anomalies** — theory predicts very
+  few; if too many, theory collapses (Lakatosian criterion)
+
+### 5.2 Results
+
+#### 5.2.1 Europe: 0–1000 C.E.
+
+- First half of millennium dominated by **Roman Empire**; frontier largely
+  stationary along Rhine–Danube line (with temporary advances into Germania,
+  Brittania, Dacia)
+- Third century: frontier overwhelmed by barbarian invasions
+- Frontier regions 0–500 C.E.: SBR, NED, NFR, EFR, WGE, SGE, BOH, AUS,
+  HUN, TRA, VLH, BUL, BYZ, MOL, ZAP
+
+**Statistical result (Table 5.1a):**
+
+| | No Frontier | Frontier |
+|-|------------|---------|
+| No Empire | 34 | 4 |
+| Empire | 1 | 11 |
+
+- G_adj = 27.1, P ≪ 0.001 — **vanishingly small probability of chance**
+- "Almost no statistical test is needed": essentially all large polities
+  (500–1000 C.E.) organized by peoples who underwent **ethnogenesis on
+  the Roman frontier**
+- Only exceptions: two exogenous polities (Avars, Omayyads) and
+  possible anomaly (Aquitaine)
+
+**Roman frontier geography:**
+- **Flat segment 1**: Rhine north of Jura/Vosges through north European
+  plain → produced Frankish Empire (~1.8 Mm² under Charlemagne),
+  Burgundian Kingdom, Alamanni, Thuringians, Saxons, Wessex/Mercia/
+  Northumbria
+- **Rugged segment**: Alps/Jura/Bavarian-Bohemian forest/Sudetes/Tatras
+  → inhibits asabiya increase (rugged terrain hypothesis, Section 4.1.2)
+- **Flat segment 2**: Danube (Hungarian plain + Wallachian plain) →
+  connected to Eurasian steppe — "western extension of the great
+  Eurasian steppe"; rapid ethnic turnover (Dacians → Huns → Gepids →
+  Langobards → Avars → Magyars)
+
+**Byzantine puzzle and frontier explanation:**
+- Why did eastern Roman Empire survive western collapse and thrive
+  another ~1,000 years? 
+- From 3rd to 10th century, area around Constantinople was the imperial
+  frontier — besieged by Goths, Huns, Slavs, Avars, Bulgars, Arabs
+- From 4th century until Bulgarian conversion (863–900 C.E.), frontier
+  = metaethnic fault line (Christianity vs. Paganism)
+- Byzantines formed as a **new ethnie** on both sides of the frontier:
+  Turkic nomads + Slavic agriculturalists → new Bulgarian ethnie north;
+  Byzantines formed south — linguistically and religiously distinct from
+  classical Romans, shaped by transformation from Hellenic naturalism/
+  rationalism toward transcendentalism/mysticism (McNeill 1963:451)
+- Byzantines survived extreme pressure and by mid-9th century launched
+  sustained territorial expansion (Whittow 1996; Treadgold 1997)
+
+**Cases not fitting predictions:**
+- "Frontier, no empire": NFR, AUS absorbed into Frankish Empire; TRA into
+  Avar Khanate; BUL into Bulgarian Khanate (center initially in VLH)
+- AUS disadvantaged by rugged Alps through its middle
+- "No frontier, empire": Duchy of Aquitaine — treated as anomaly;
+  likely a relic of Merovingian collapse, reincorporated into Carolingian
+  Empire in 8th century; may not merit inclusion
+
+#### 5.2.2 Europe: 1000–1900 C.E. (beginning)
+
+- After Roman collapse, frontier geography became **much more complex**
+- 500–1500 C.E.: slightly more than half (28/50) of cultural regions
+  classified as frontier (intensity ≥ 5, ≥ 3 centuries)
+- Three general classes of frontiers:
+  1. **Carolingian marches** (Bartlett 1993): northwestern France vs.
+     Bretons/Norse; Spanish march vs. Córdoba Emirate (later Reconquista);
+     Austrian march vs. Avar Khanate then Magyars then (16th century)
+     Ottomans; Saxon march vs. pagan Germans
+  2. (Further detail cut off at page 86)
+
+**Statistical result (Table 5.1b, 1000–1900 C.E.):**
+
+| | No Frontier | Frontier |
+|-|------------|---------|
+| No Empire | 19 | 6 |
+| Empire | 3 | 22 |
+
+- G_adj = 22.0, P ≪ 0.001 — strong confirmation in second millennium too
+
+<!-- pp. 101-120 -->
+
+## Chapter 5 (cont.): An Empirical Test of the Metaethnic Frontier Theory
+
+### 5.3 Positional Advantage?
+
+- Alternative hypothesis tested: **Collins geopolitical theory** — "marchland effect"
+  posits that polities with naturally defensible borders (coastlines, mountains)
+  gain positional advantage in territorial expansion
+- Turchin constructs a **vulnerability index** (0–4) for each cultural region:
+  - 0 = island (fully coastline-bounded, e.g., IRL)
+  - 4 = landlocked (no coastline protection)
+  - Only one region scored 0; eighteen scored 4
+- Combined into three vulnerability classes (16, 16, 18 cases) for statistical test
+- **Result (Table 5.2)**: no apparent connection between vulnerability index
+  and polity size — small, medium, and large polities distributed randomly
+  across all vulnerability classes
+- Key counterexample: the great North European Plain (France → Germany →
+  Poland → Ukraine → Russia) has no natural barriers, yet produced most
+  of Europe's largest empires (Frankish, Holy Roman, Prussia-Germany,
+  Muscovy-Russia, Lithuania-Poland, Kievan Russia)
+- **Conclusion**: positional/marchland advantage is, at best, a factor of
+  secondary importance; cannot explain the historical dynamics
+
+### 5.4 Conclusion: The Making of Europe
+
+- Motivating question (from **Charles Tilly** 1975): what features of a
+  political unit at 1500 would predict whether it would (1) survive,
+  (2) consolidate territory, (3) become a national state nucleus?
+- Turchin's claim: metaethnic frontier theory explains the **general pattern**
+  of European political development, though not every individual case
+- Key reference: **Stein Rokkan** (1975; Rokkan and Urwin 1982) mapped
+  Europe geopolitically as alternating bands:
+  - Central "trade-route belt" (North Sea to Baltic, down Rhine into Italy):
+    territorially fragmented but economically vibrant city-states
+  - West of belt: "seaward empire nations" (Denmark, England, France, Spain)
+  - Far west: "seaward peripheries" (Iceland, Scotland, Ireland, Wales, Brittany)
+  - East: "landward empire nations" (Sweden, Prussia, Bavaria, Austria)
+  - Far east: "landward peripheries" (Finland, Bohemia, Poland, Hungary)
+
+> "Paradoxically the history of Europe is one of center formation at the
+> periphery of a network of strong and independent cities." — Rokkan 1975:576
+
+- Turchin's reinterpretation: Rokkan's pattern is NOT paradoxical — it follows
+  logically from (1) state spread by "contagion" via metaethnic frontiers and
+  (2) slow asabiya decay in imperial cores
+- The **Carolingian-Ottonian core** (central belt) = old imperial core with
+  spent asabiya → fragmented; frontier marches on periphery = asabiya
+  nurseries → conquest centers
+- Key historical sequence:
+  - Post-Carolingian 9th–10th centuries: Latin Christendom assaulted by
+    Vikings, Saracens, Magyars, Polabian Slavs
+  - Carolingian marches formed defensively → became new conquest centers
+  - West/southwest marches → Breton and Spanish marches, Norman England
+  - North (Scandinavia): expansion went east (no room west/north)
+  - Saxon-Slavic frontier → Brandenburg-Prussia
+  - Bavarian-Magyar frontier → Habsburg Austria
+
+- Rokkan arbitrarily placed Denmark as "seaward" and Sweden as "landward";
+  Turchin sees both as centrifugal from the same Carolingian-Ottonian core
+- The explanation has **generality**: specific European outcome was contingent
+  on Roman Empire location, timing of invasions, and geography — but the
+  underlying mechanism (frontiers → asabiya → empire) should apply globally
+
+### 5.5 Summary
+
+- Metaethnic frontier model: large territorial polities originate in regions
+  subjected to prolonged intense metaethnic frontiers
+- Tested empirically for Europe + Asia Minor, 0–1900 C.E., 50 cultural regions
+- **Frontier index**: 0–9, based on religion/language/economy differences
+  across ethnic divide + warfare intensity; "frontier" = score ≥5, ≥3 centuries
+- Period 0–500 C.E.: strong correlation between intense prolonged frontier
+  and maximum territory 500–1000 C.E.; null rejected at P ≪ 0.001
+- Period 500–1500 C.E.: same result for 1000–1900 C.E. polities; P ≪ 0.001
+  - ALL European Great Powers originated in frontier-influenced regions
+  - Only exception: **Savoy-Sardinia-Italy** (clearest anomaly — no
+    metaethnic frontier in Savoy, yet Italy achieved Great Power status
+    1870–1914 without collapsing; frontier model clearly does not apply)
+- Six anomalous frontier regions that did NOT produce large polities:
+  AND, NED, VLH, SRU (absorbed by neighbors); SGE (Switzerland —
+  rugged terrain capped asabiya scaling); ALB (same problem)
+- **Positional advantage test**: no association between coastline vulnerability
+  index and polity size — geopolitical position is secondary
+- Model outperformed both null hypothesis and Collins rival hypothesis;
+  anomalies (especially Italy) suggest additional mechanisms exist
+
+---
+
+## Chapter 6: Ethnokinetics
+
+### 6.1 Allegiance Dynamics of Incorporated Populations
+
+- Previous chapters assumed newly incorporated populations immediately transfer
+  loyalty to the conquering empire — plausible when elites are ethnically similar
+- But successful empires inevitably annex territories with **alloethnics**
+  (ethnically very different populations) → polity becomes multiethnic
+- **Two consequences of multiethnic expansion**:
+  1. Alloethnics contribute less willingly to the empire's resources and military;
+     coercion is expensive and still yields diminished power
+     - Roman Republic recruited from core ethnie; Roman Empire could not rely
+       on the same loyalty → many empires recruit only from core (Russia too)
+  2. Alloethnics with high ethnie-level asabiya can more easily solve
+     collective-action problems → rebellions (Goldstone 1994 for review)
+     - Empire must spend heavily to buy off alloethnic elites or suppress revolt
+- **Ethnic composition is not static** — it changes via:
+  - Demographic mechanisms (differential population growth rates)
+  - **Ethnosocial mechanisms** (Bromley 1987): ethnic assimilation and
+    mobilization
+- Main purpose of Ch. 6: develop dynamic models of **ethnosocial change**
+  (**ethnokinetic** models — mathematically analogous to chemical kinetics)
+- Focus on linguistic assimilation and religious conversion as markers
+  (religion was often the primary metaethnic marker in the period studied)
+
+### 6.2 Theory
+
+#### 6.2.1 Nonspatial Models of Assimilation
+
+### The Noninteractive Model
+
+- Simplest model: two groups (core ethnie C, periphery P = 1−C)
+  - Same population growth rates
+  - Peripheral individuals switch to core at constant probability p per unit time
+- Differential equation: **Ċ = pP = p(1 − C)** (equation 6.1)
+- This is the **asymptotic growth** model (Section 2.1, eq. 2.3):
+  - Low C → approximately linear growth
+  - Approaches equilibrium C* = 1 exponentially
+- Allowing reverse switching (probability p₁): equilibrium shifts to
+  C* = p₀/(p₀ + p₁) — same asymptotic shape, different endpoint
+- **Fundamental flaw**: noninteractive model assumes individuals switch
+  identity spontaneously and independently — sociologically implausible
+  - Societies are networks; ethnic/religious identity spreads via contact
+  - Religious conversion "like contagion, travels along interpersonal links"
+
+> "The basis for successful conversionist movements is growth through social
+> networks, through a *structure of direct and intimate interpersonal
+> attachments*." — Stark 1996 (emphasis in original)
+
+### The Autocatalytic Model
+
+- Social-network reality: probability of converting is proportional to the
+  fraction already converted (more converts → more likely any individual converts)
+- Let p₀ = r₀C (switching peripheral → core), p₁ = r₁P (reverse)
+- Rate equation: **Ċ = r₀CP − r₁CP = (r₀ − r₁)C(1 − C)**
+- Define r = r₀ − r₁ → **Ċ = rC(1 − C)** (equation 6.2) — the **logistic equation**
+- Key difference from noninteractive model: when C is low, growth **accelerates**
+  (autocatalytic, like a chemical reaction that produces its own catalyst)
+- Equilibrium C* = 1 (assuming r > 0), not a fraction like in noninteractive model
+- Analogy to **autocatalytic chemical reactions**: compound's presence increases
+  its own production rate
+
+### The Threshold Model
+
+- Relaxes the linear assumption on p — uses nonlinear: p = rC(C − C₀)
+  where **C₀ is the threshold proportion** ("critical mass")
+- When C > C₀: net switching toward core (positive)
+- When C < C₀: net switching *away* from core (periphery winning)
+- Equation: **Ċ = rC(C − C₀)(1 − C)** (equation 6.3)
+- **Metastable dynamics** (Section 2.1.2): three equilibria
+  - Two stable: C = 0 and C = 1
+  - One unstable: C = C₀
+- Outcome entirely determined by initial conditions:
+  - Start above C₀ → core identity eventually wins (C → 1)
+  - Start below C₀ → peripheral identity wins (C → 0)
+- Historical fit: small groups of conquerors who adopted dominant culture
+  (Visigoths, Langobards, Bulgars, Normans — all converted to conquered
+  people's religion and language)
+- Problem: threshold model uses **global** frequency of C, but empirically
+  individuals respond to **local** social composition → need spatial models
+
+#### 6.2.2 Spatially Explicit Models
+
+### Social Space
+
+- "Space" = social space, not just physical; **Sorokin (1927)** identified
+  two principal dimensions:
+  - **Vertical**: position in social hierarchy (stratification)
+    - King's conversion has far greater effect on peasant than vice versa
+  - **Horizontal**: day-to-day interactions with peers, neighbors, co-workers
+    - Peasant interacts mostly within village, slightly with nearby villages,
+      almost never across provinces
+- Social space is **anisotropic**: downward influence > upward influence;
+  higher-ranked people belong to wider social networks
+- Key concept from epidemiology: **contact distribution** V(s) = probability
+  of social contact between two individuals separated by social distance s
+  - Reinterpreted for ethnic context: intensity of social interaction as function
+    of distance → probability of conversion spreading individual to individual
+  - Three shapes matter (Figure 6.1):
+    - **(a) Rectangular**: uniform contact within a circle, zero outside
+    - **(b) Thin-tailed**: tail declines exponentially with distance
+    - **(c) Thick-tailed**: tail declines slower than exponential
+
+### Autocatalytic Model in Space
+
+- Redefine C as spatially varying: C(x, y, z, t) where x, y = physical location,
+  z = social hierarchy, t = time
+- **Thin-tailed contact distribution**: approximated by **reaction-diffusion model**
+  - Local conversion follows logistic (S-curve); spatial spread forms a
+    **traveling wave front advancing at constant velocity**
+  - Total area of converts grows **linearly** in time after initial acceleration
+  - Classic example: spread of neolithic farmers in Europe (Ammerman and
+    Cavalli-Sforza 1973); also analogous to Fisher (1937) and Kolmogoroff (1937)
+    on spatial spread of advantageous genes
+- **Thick-tailed contact distribution**: qualitatively different dynamics
+  - As converts accumulate, increasing probability that one has a long-distance
+    acquaintance → **long-distance jumps** prevent orderly front
+  - Secondary foci form; tertiary foci from secondaries; etc.
+  - Global converts grow in **explosive, accelerating** S-shaped pattern
+  - The thicker the tail, the more closely the spatial spread approximates
+    a simple nonspatial logistic (Figure 6.2a vs. 6.2b)
+
+### Threshold Model in Space
+
+- Three key differences from autocatalytic spatial model:
+  1. Initial local proportion must exceed C₀ or the cult dies out
+  2. Initial **beachhead area** must also exceed a minimum size; otherwise
+     "diffusive losses" across boundary overwhelm conversion rate
+  3. Regardless of contact distribution shape: front advances **linearly**
+     (not explosively) — converts at the frontier are locally swamped by
+     nonbelievers, requiring high density behind to "push" the front forward
+- In autocatalytic: front is "pulled" by low-density converts interacting
+  with unconverted populations ahead of the front
+- Prediction: stable coexistence of two identities across a spatial boundary
+  is **impossible** in threshold model (front always moves one direction)
+  - Exception: if social intercourse across boundary < intercourse within each
+    side → stable coexistence possible (Levin 1976)
+
+### Summary: Three Growth Patterns (Figure 6.2)
+
+| Model | Spatial Pattern |
+|---|---|
+| Autocatalytic + thick-tailed | Explosive S-curve, no clear front |
+| Autocatalytic + thin-tailed | Latent period → linear front advance |
+| Threshold | Linear but slower front; beachhead required |
+
+### 6.3 Empirical Tests
+
+- Spatial data on conversion not available → test **nonspatial models** only
+- Key methodological insight: don't just fit C(t) trajectories (hard to
+  distinguish S-curves from noisy data); instead plot **rate of change Ċ
+  vs. C** (Figure 6.3) — the model signatures are strikingly different:
+  - Noninteractive: Ċ linear in C (decreasing line)
+  - Autocatalytic: Ċ humped curve (increases then decreases)
+  - Threshold: Ċ **negative for C < C₀**, then positive — crosses zero at C₀
+- Also test relative rate Ċ/C for additional discriminating power
+
+#### 6.3.1 Conversion to Islam
+
+- Data source: **Richard Bulliet**'s database from Iranian biographical
+  dictionaries (6,000 biographies, Bulliet 1979)
+- Key observation: biographies of religiously elite upper class show almost
+  complete **absence of Persian names** — universal custom of giving sons
+  Arabic names
+- But Persian names appear in genealogies — over two-thirds of genealogical
+  sequences begin with a Persian name then shift permanently to Arabic names
+- Persian first name = first family member to become Muslim → approximate
+  date of family's conversion
+- **469 genealogies** coded; Bulliet divided into 25-year periods and
+  calculated proportion of conversions per period
+- Same large genealogy datasets available for Iraq, Syria, Egypt, Spain
+  (analysis pending in chapter)
+
+<!-- pp. 121-140 -->
+
+## Chapter 6 (continued): Ethnokinetics
+
+### 6.3.1 Islam Conversion — Analysis Results
+
+- **Logistic curve** fitted to Iranian genealogical data (25-yr periods) explains **99.98%** of variance — extraordinary fit for social science
+- Fitting parameter *r* (relative conversion rate): **2.8 century⁻¹** for Iran, **1.5 century⁻¹** for Spain — Iran converted nearly twice as fast
+- **Noninteractive model** explains only 79.2% of variance by comparison; threshold model also substantially worse
+- **Phase plots** (Ċ − C) reveal asymmetry in the conversion curves — data skewed right, while the simple logistic predicts symmetry
+- Possible explanation: **immigration-autocatalytic model** — Ċ = (p + rC)(1 − C) — initial immigration of Muslim converts seeds the process, then autocatalytic conversion takes over
+  - Works when p ≪ r (immigration rate small relative to conversion rate)
+  - Matches historical record: Muslim Arabs and Berbers did immigrate to Spain after conquest
+- Only two data replicates (Iran, Spain) — enough to reject alternatives, not enough to definitively prove the more complex model
+
+> "The simple fact of the matter is that the basic autocatalytic model fits the data awfully well."
+
+### 6.3.2 The Rise of Christianity
+
+- Source: **Rodney Stark**, *The Rise of Christianity* (1996)
+- Historians puzzled by apparent explosive growth in 3rd century C.E. — assumed mass conversions; Turchin/Stark argue this misunderstands **autocatalytic dynamics**
+- Key insight: **relative conversion rate** stays constant throughout; the *absolute* rate (relative rate × proportion converted) increases, creating illusion of discontinuous phases
+- Stark's estimated trajectory:
+  - 40 C.E.: ~1,000 Christians = 0.0017% of Roman Empire
+  - 200 C.E.: still <1% (0.36%)
+  - 250 C.E.: 1.9%
+  - 300 C.E.: 10.5%
+  - 350 C.E.: **56.5%** — the "sudden explosion" is just autocatalytic math
+- Independent test: **Roger Bagnall** reconstructed Christian growth in Egypt from papyri (Egyptian names with Christian identity markers) — Stark was *unaware* of Bagnall's data when making predictions; R²_pred = **0.74** — strong predictive confirmation
+- Fitted r for Christianity: **0.034 yr⁻¹** → midpoint reached ~368 C.E. (starting from 1,000 converts in 40 C.E.)
+
+### Sensitivity to Initial Conditions (Logistic vs. Asymptotic)
+
+- **Critical implication**: logistic growth is *sensitive to initial conditions*; asymptotic growth is not
+- Table 6.2 — Predicted midpoint year for Christianity:
+  - Starting with 10 converts → logistic predicts 506 C.E. (vs. noninteractive: 368 C.E.)
+  - Starting with 100,000 converts → logistic predicts 230 C.E.
+  - Every **tenfold change** in initial condition shifts logistic midpoint by ~69 years
+- Asymptotic model: midpoint barely moves regardless of initial conditions (367–368 C.E.)
+- Consequence: if history is logistic, **measuring initial conditions matters enormously** for prediction — and they are hard to measure precisely
+
+### 6.3.3 The Growth of the Mormon Church
+
+- Data: LDS Church membership 1840–1980 (Stark 1984)
+- Mormon church still far from conversion midpoint → expected to grow in **essentially exponential fashion**
+- Logistic model fits: explains **98.9%** of variance
+- Fitted r = **0.023 yr⁻¹** (Table 6.1)
+- Data plotted on logarithmic scale confirms essentially exponential growth — consistent with autocatalytic dynamics at low C
+
+### 6.4 Conclusion: Data Support the Autocatalytic Model
+
+**Summary table of empirical tests (Table 6.1):**
+
+| Case Study | r̂ (yr⁻¹) | R² |
+|---|---|---|
+| Islam (Iran) | 0.028 | 0.9998 |
+| Islam (Spain) | 0.015 | 0.997 |
+| Christianity | 0.034 | 0.74 (predicted) |
+| Mormon | 0.023 | 0.989 |
+
+- Autocatalytic model wins unanimously across all four data sets
+- Consistent with **Stark's (1996)** sociological theory that conversion travels through interpersonal networks — data-driven analysis validates the theoretical postulate
+- Deviations in Islamic cases suggest an **immigration-autocatalytic hybrid** model is warranted — initial Muslim immigration followed by social conversion process
+
+### 6.5 Summary — Chapter 6
+
+- Religious identity is one source of ethnic **symbolic boundaries**; others include language, race, dress — which vary greatly in how crossable they are
+  - Race (e.g., modern Japan): nearly impossible to cross for outsiders
+  - Language: difficult post-puberty; assimilation runs through **bilingual intermediary class**
+  - Religion: surprisingly slow — half-point of conversion typically took **2–3 centuries**
+- Three models tested (noninteractive, autocatalytic, threshold):
+  - **Noninteractive**: constant probability of switching per unit time → asymptotic dynamics
+  - **Autocatalytic**: switching via direct interpersonal contact → S-shaped logistic curve
+  - **Threshold**: switching only above a critical proportion already converted → metastable dynamics
+- Spatial extensions: autocatalytic model globally logistic if social contact distribution has **thick tail** (keeps reaching new networks); thin tail → linear growth after initial acceleration; isolated segments may remain unassimilated permanently
+- Spatial threshold model: assimilation hard to start, needs critical mass; if successful, spread is **linear**
+- **Key methodological point**: translating qualitative hypotheses into explicit mathematical models, then using data to distinguish between them — this formal approach can work on realistic historical data sets
+
+---
+
+## Chapter 7: The Demographic-Structural Theory
+
+### 7.1 Population Dynamics and State Breakdown
+
+- Empire lifecycle: (1) polity formation + ethnogenesis, (2) expansion to peak size, (3) **stagnation, decline, collapse** (possibly followed by revival and another cycle)
+- **Ibn Khaldun** identified two causes of state decline: (1) ideological (loss of *asabiya*) and (2) **economic/demographic/fiscal mechanisms**
+- Ibn Khaldun's mechanism in brief:
+  - New states: light taxation, just administration → people flourish, population grows
+  - Prosperity breeds habits of **luxury** (Ibn Khaldun's term) in rulers and army
+  - Population grows → state must expand revenues → heavier taxation → economic damage → famine, pestilence, rebellion
+- **Goldstone** (1991b) formalized this as **demographic-structural theory**:
+  - *Demographic* = underlying driver is population growth
+  - *Structural* = population doesn't directly cause collapse; it works *indirectly* through social institutions
+
+**Goldstone's five mechanisms:**
+- **Price inflation** outstripping agrarian state tax revenues → fiscal crisis
+- **Elite expansion**: more aspirants for fixed elite positions → rival patronage networks → **factionalism**
+- **Rural misery**: falling real wages, food riots, wage protests, urban migration
+- **Youth bulge**: large youth cohorts with few employment opportunities → high mobilization potential
+- **Ideological conflict**: dissident elites + dissatisfied artisans recruited into heterodox religious movements
+
+- End result: state bankruptcy, loss of military control, elite-mobilized + popular uprisings → breakdown of central authority
+- **Goldstone's limitation**: treats population growth as an *exogenous* variable (driven by favorable climate, receding disease) — doesn't model the **feedback** from state breakdown back to population
+
+### Political Instability → Population Dynamics (Turchin's Extension)
+
+- Political instability affects demographic rates through multiple channels:
+  - Elevated mortality from crime, banditry, internal/external warfare
+  - Migration increases (refugees) → epidemics (vagrancy connects previously isolated areas, tips past **epidemiological threshold**)
+  - Birth rates fall (people delay marriage during uncertainty; infanticide increases)
+- Political instability also affects **carrying capacity** (k):
+  - Strong state **protects** productive population → entire cultivable area in use
+  - Strong state **invests** in agricultural productivity (irrigation, roads, flood control, land clearing)
+  - Stateless societies: population retreats to defensible hillforts (e.g., pre-conquest Peru hillfort chiefdoms — Earle 1997; Italy after Roman Empire collapse — Wickham 1981)
+- Key goal: model population dynamics as **endogenous** — feedback loop between state breakdown and population growth, not just one-way causation
+
+### 7.2 Mathematical Theory
+
+#### 7.2.1 The Basic Demographic-Fiscal Model
+
+**Two state variables:**
+- N(t) = population density (individuals per km²)
+- S(t) = accumulated state resources (kg grain or tons of grain equivalent)
+
+**Per capita surplus production** (David Ricardo's law of diminishing returns):
+- p(N) = c₁(1 − N/k)
+- As population grows: best land exhausted, marginal plots cultivated, parcels subdivided → per capita surplus falls
+- k = population size at which surplus = 0 (all food consumed, none left over)
+
+**Population dynamics** (Malthusian + surplus feedback):
+- Ṅ = r₀N(1 − N/k) — **logistic model** (equation 7.1)
+- r₀ = intrinsic growth rate; k = carrying capacity
+
+**State resource dynamics:**
+- Revenues = fixed proportion of total surplus production = c₃p(N)N
+- Expenditures = proportional to population size (army, bureaucracy, infrastructure) = βN
+- **Ṡ = ρ₀N(1 − N/k) − βN** (equation 7.2)
+- ρ₀ = per capita taxation rate at low density; β = per capita state expenditure rate
+
+**Carrying capacity as function of state resources** (feedback from S to N):
+- k(S) = k₀(1 + c·S/(s₀ + S)) (equation 7.3)
+- k₀ = carrying capacity of stateless society (baseline)
+- c = k_max − k₀ = maximum possible gain from state investment (subject to diminishing returns)
+- s₀ = half-saturation constant — reflects diminishing returns on capital investment
+
+**Scaled system (4 parameters: β′, r, c, s′):**
+- Ṅ = rN(1 − N/k(S))
+- Ṡ = N(1 − N/k(S)) − βN
+- k(S) = 1 + c·S/(s₀ + S)
+
+#### Model Dynamics
+
+**Typical trajectory (Figure 7.1a):**
+1. Start: S = 0, N = k₀/2
+2. Both N and S grow initially — as S increases, so does k(S), approaching k_max
+3. N overshoots k₀, continues growing beyond it
+4. At critical population **N_crit**: revenues = expenditures, S stops growing
+5. S collapses rapidly as expenditures exceed revenues (diminishing returns on labor)
+6. k(S) falls back to k₀; N collapses rapidly
+7. Equilibrium: N = k₀, S = 0 — **locally stable** (small perturbations don't escape)
+
+**Why collapse is inevitable:**
+- Revenue curve is a parabola (peaks at N = k/2); expenditure curve rises linearly with N
+- They must cross at N_crit = 1 − β
+- Once N exceeds N_crit, state expenditures permanently exceed revenues → **inevitable insolvency**
+- Borrowing (allowing S < 0) only postpones collapse; cutting luxuries is short-term fix only
+
+**Stochastic version (Figure 7.2):**
+- Adding annual Gaussian noise (σ = 0.1s₀) → **recurrent cycles** of state building and collapse
+- Intercycle stateless periods vary in length (system waits for strong enough perturbation to restart)
+- Cycle duration primarily determined by **r** (intrinsic population growth rate)
+- Reasonable estimate r = 0.02 yr⁻¹ (2% annual increase at low density; ~1%/yr at N = k/2) → oscillations of **2–3 centuries** in duration
+- β sets N_crit (= 1 − β); c and s₀ determine amplitude of oscillations
+
+**Model scope — important caveats:**
+- Model applies only to **pre-industrial agrarian societies** — industrial/information economies can expand productive base through innovation, escaping the saturation assumption
+- External military pressure ignored — a state under overwhelming external attack may collapse before internal dynamics play out
+- The **inescapable conclusion**: unless population is somehow prevented from crossing N_crit, state expenses will exceed revenues and collapse follows
+
+<!-- pp. 141-160 -->
+
+## Chapter 7 (continued): The Demographic-Structural Theory
+
+### 7.2.2 Adding Class Structure
+
+- Builds on **Jack Goldstone**'s demographic-structural theory (1991b)
+- Three structural variables: commoner population **P**, elite population **E**,
+  accumulated state resources **S**
+- Production per peasant is a linearly decreasing function of peasant
+  population size (diminishing returns on labor)
+- Elites extract resources from commoners; coercion capacity is
+  proportional to E but with **diminishing returns per elite capita**
+  as E grows — more nobles means each gets a smaller share
+- State revenues split between elites (rents) and state (taxes);
+  as E grows, elites divert increasing share to themselves —
+  historically via petitions for tax forgiveness, keeping taxes
+  locally, or outright corruption
+- **Selfish elite model**: elites satisfy their own subsistence first,
+  transmit only remainder to state; elites oppress commoners
+  without regard to their well-being
+- Three dynamic behaviors possible under selfish elite model:
+  1. Elites cannot get established → go extinct (stateless equilibrium)
+  2. Single state-building/collapse episode → stateless equilibrium
+  3. **Stable limit cycles** of recurrent state building and collapse
+     (Figure 7.3b)
+- Equilibrium with state present is NOT stable under selfish elite model:
+  at equilibrium, elites have no surplus to share → state gets no revenues
+  but still must spend on defense and administration
+- The "selfless elite" modification (state collects fixed proportion of
+  total extracted product) produces stable equilibrium, but Turchin
+  considers this **unrealistic** — in agrarian states elites administered
+  tax collection and prioritized clan/family over polity
+
+### 7.2.3 Models for Elite Cycles
+
+- Key theoretical result: predicted dynamics are **primarily determined
+  by assumptions about elites**, not commoners — supports Goldstone's
+  argument that elites play the key role in state breakdown
+- Two sub-models developed for elite cycle dynamics, holding commoner
+  population roughly constant to isolate elite dynamics
+
+#### The Ibn Khaldun Model
+
+- Tailored to medieval **Maghreb** — formalizes Ibn Khaldun's world-system
+  (Section 3.2.1): civilized region with sedentary commoners,
+  desert stateless tribes supplying elites (nobility)
+- Parameters:
+  - **R**: resources extracted from commoners (constant, dynasties come
+    and go but peasants keep producing)
+  - **γ**: proportion of R going to state (taxes); **(1−γ)R** = rents
+  - **μ = (1−γ)R/E**: income per noble
+  - **μ₀**: per capita income needed to maintain and replace one noble
+  - **μ_min**: "minimal acceptable income" — socially determined;
+    nobles consider it minimum standard of living appropriate to
+    their station; starts low, **increases over time** as dynasty
+    ages (former tribesmen become accustomed to luxury)
+- Elite numbers grow when μ > μ₀; when μ falls below μ_min, elites
+  divert taxes, asabiya declines, dynasty collapses
+- **r_max set at 0.08/yr** for Islamic societies — polygamy allows
+  high-ranking men to have up to four legal wives plus concubines,
+  so elite reproduction up to 4× intrinsic rate
+- Fiscal dynamics: S grows early when elite numbers are few and modest;
+  as E grows, revenues drop below expenditures → state collapses
+- When S = 0, state becomes vulnerable to conquest; desert tribes
+  (spatially adjacent) provide next dynasty immediately
+- Cycle period ~1 century for high r_max (polygamous societies);
+  reducing r_max to 0.02 extends cycle to ~1.5 centuries
+- Model can be recast in **asabiya** terms: S = asabiya of elites
+  supporting current dynasty; same mathematical dynamics
+
+> "Ibn Khaldun argued that with time former tribesmen forget the rude
+> ways of the desert, and subsequent generations grow accustomed to
+> ever-increasing luxury." — Turchin paraphrasing Ibn Khaldun
+
+- Full Ibn Khaldun model with class structure (commoner dynamics added)
+  shows essentially the same E and S dynamics; commoner growth is
+  slowed by periodic state breakdown but effect is slight
+- Longer cycles (low r_max, high extraction ε) cause more drastic
+  commoner population falloffs — longer decentralization phase
+  means longer periods of intense exploitation
+
+#### The Parasitic Nomad Model
+
+- Tailored to **Inner Asian frontier of China** —
+  based on **Thomas Barfield** (1989) and **Nikolai Kradin** (2000, 2002)
+- Key difference from Ibn Khaldun: Inner Asian nomads preferred to
+  **extort tribute** from China rather than conquer it
+- R = tribute extracted from Chinese (variable, not constant)
+- S = **asabiya of imperial confederation** (highest organizational level)
+- Autocatalytic rise of confederation:
+  - One tribe gains advantage (location, charisma, luck)
+  - Uses extracted goods to expand warrior retinue
+  - Conquers nearby tribes → larger army → more tribute
+  - Positive feedback until hitting upper extraction limit
+- When μ > μ_min: asabiya S stays constant (Ṡ = 0)
+- When μ falls below μ_min: intraelite competition intensifies,
+  S declines, confederation dissolves into warring tribes
+- Confederation collapses → tribe-level asabiya remains high →
+  preconditions for next confederation created immediately
+- Produces **recurrent cycles** (Figure 7.4b): rapid rise, plateau,
+  collapse — same mathematical structure as Ibn Khaldun model
+
+### 7.2.4 Models for the Chinese Dynastic Cycle
+
+- Dynastic cycle long recognized by historians (**Meskill 1965**):
+  early prosperity → "old and feeble" dynasty → corruption →
+  popular disorder → fall → anarchy → population decline
+- Two relevant models: **Dan Usher** (1989, economist) and
+  **Cyrus Chu & Ronald Lee** (1994, economist + demographer)
+- **Chu and Lee model** — three classes:
+  - Peasants: grow food, pay taxes
+  - Bandits: steal food, fight peasants and rulers
+  - Rulers: tax farmers, hunt bandits
+- Peasant's occupational choice modeled rationally: stay peasant
+  or turn bandit based on expected utility (food × survival probability)
+- Larger population → more peasants turning bandit
+- More bandits → less food (fewer peasants) + greater mortality risk
+  → also higher bandit survival probability (perverse feedback)
+- Eventually bandit power overwhelms the government → dynasty collapses
+
+#### Assessment of Chu-Lee and Usher Models
+
+- **Turchin's criticism**: utility function (income × survival probability)
+  is too narrowly economistic — ignores collectively held norms,
+  collective action, sociological complexity
+- **More serious criticism** (citing Goldstone): both models focus on
+  **popular rebellion as main mechanism** of state collapse — but
+  this is empirically wrong
+  - Peasants are poorly armed, disorganized, stand little chance
+    against cohesive elite-backed state
+  - **Goldstone's argument**: state collapses are brought about by
+    factional fighting among elites, which then opens the way for
+    popular rebellion (peasant uprisings often even led by elites)
+  - Popular discontent is **secondary**, not primary
+
+> "We should look to elite dynamics for the main mechanism of state
+> breakdown." — Turchin summarizing Goldstone's position
+
+- Despite criticisms, Chu-Lee/Usher models contribute by showing
+  population growth drives fall in per capita income → eventually
+  surplus insufficient for ruling class
+- The basic demographic-fiscal model (Section 7.2.1) subsumes their
+  key mechanism and adds recurrent cycle predictions of 2–3 centuries
+
+### 7.2.5 Summing Up Theoretical Insights
+
+- **Insight 1**: Population growth → diminishing returns → fall in per
+  capita income → surplus insufficient for state maintenance →
+  state bankruptcy. Prevention requires keeping population below
+  critical threshold where revenues match expenditures
+- **Insight 2**: Elites are the key dynamic variable
+  - Elites can limit commoner growth by leaving commoners below
+    subsistence — but no general mechanism limits elite growth
+  - In most agrarian societies, elite numbers will increase beyond
+    sustainable level → state breakdown
+- **Two key elite parameters**:
+  - **Reproduction rate**: high → fast Ibn Khaldun cycles (~1 century),
+    mild commoner oscillations
+  - **Extraction ability (ε)**: high → more drastic commoner falloffs,
+    longer cycles, greater commoner population amplitude
+- Elite recruitment mechanism (reproduction vs. upward social mobility)
+  does not affect qualitative dynamics — only the rate of growth matters
+- **Terminological proposal**: Turchin rejects "logistics" (Cameron 1989),
+  "secular trends" (Braudel), and "great wave" (Fischer) for these
+  dynamics; proposes **"secular cycles"** or **"secular waves"**
+  - "Secular" emphasizes centuries-long timescale
+  - "Cycles" emphasizes quasiperiodic nature; "waves" emphasizes
+    irregular up-and-down pattern
+  - Additional category: **"elite cycles"** — where commoner population
+    is relatively stable but elite dynamics drive the oscillations
+- Two phases in all models: **centralization** (political stability high)
+  and **decentralization** (political instability high); decentralization
+  can extend for variable periods without necessarily leading to
+  new centralization — so oscillations are not strongly periodic
+
+---
+
+## 7.3 Empirical Applications
+
+### 7.3.1 Periodic Breakdowns of Early Modern States — England
+
+- **Goldstone** (1991b) tested his theory on four cases: English Revolution,
+  French Revolution, Ottoman 17th-century crisis, Ming-Qing transition;
+  Turchin focuses on **English Revolution** as the most data-rich case
+
+#### Population and Food Prices
+
+- English population more than doubled between 1500 and 1640 CE
+- Land/peasant ratio declined sharply: landholdings ≥1 acre fell
+  from 57% (pre-1560) to only 36% (post-1620)
+- Proportion of **landless peasants** rose from 11% to 40% (Everitt 1967)
+- Grain price rose **600%** from 1500 to 1640 — a clear indicator
+  of land scarcity and subsistence pressure
+- Goldstone's regression: log-transformed population + harvest quality
+  + time explains **99% of variance** in log-transformed grain prices
+
+#### Fiscal Distress
+
+- Crown finances strong under **Henry VII**, deteriorated by mid-16th century
+- Real expenses increased with population: larger armies, greater
+  elite patronage demands on the Crown
+- By 1630s, Crown lands largely sold; unpaid debt interest exceeded
+  ordinary revenues; prior attempts to raise extraordinary revenues
+  had alienated elites — making them **unlikely to acquiesce** to
+  further fiscal demands (Figure 7.6a)
+
+#### Elite Overproduction
+
+- Gentry families: 6,300 in 1540 → 16,500 in 1600 → 18,500 in 1640
+  — then declined to 16,400 in 1688 after the Civil War;
+  by 1760 back to only 18,000 — never surpassed 1640 peak
+- Across all ranks 1540–1640 (Stone 1972):
+  - Peers: 60 → 160
+  - Baronets + knights: 500 → 1,400
+  - Esquires: 800 → 3,000
+  - Armigerous gentry: 5,000 → 15,000
+- **Intraelite competition proxy**: Oxford University enrollments
+  rose drastically in second half of 16th century, peaked ~1640,
+  declined to pre-1600 levels by the 1750s
+- Litigation among gentry: appearances in Courts of Common Pleas
+  as plaintiff or defendant dropped over 65% after 1640
+
+#### Mass Mobilization Potential (MMP)
+
+- Goldstone's formula combines:
+  - Real wages relative to long-term average (W_t vs. W̄)
+  - Urbanization growth (London's expansion)
+  - Youth bulge (proportion of population aged 10–29)
+- MMP peaked around 1640 — coinciding with peak fiscal distress
+  and peak elite competition (Figure 7.6)
+- **Empirical conclusion**: all three ingredients of the English
+  Revolution — state financial crisis, intraelite factional competition,
+  large disaffected commoner mass — peaked simultaneously ~1640,
+  consistent with Goldstone's theory
+
+### 7.3.2 The Great Wave
+
+- **David Hackett Fischer** (1996): western Europe 1200–2000 CE went
+  through four **"great waves"** of socioeconomic change
+- Wave pattern reflected in **price history** (Figure 7.7 — consumables
+  price index on log scale 1300–1900): periods of price equilibrium
+  (Renaissance, Enlightenment, Victorian Era) interspersed with
+  periods of rapid inflation ("price revolutions" — 13th, 16th,
+  18th, 20th centuries)
+- **Fischer's mechanism**:
+  - Late price-equilibrium stage: material conditions improve,
+    people marry earlier, have more children, population grows
+  - Aggregate demand grows faster than supply → food/fuel prices rise
+  - Creates poverty, strains social relationships, fiscal revenues
+    fall behind expenditures → states near insolvency
+  - Triggering event precipitates crisis → protracted political
+    disorder, demographic contraction, cultural despair
+  - Crisis relieves pressures: demand falls, prices deflate,
+    real wages rise (labor scarce) → new equilibrium forms
+- Fischer collected enormous cliometric dataset: prices of food,
+  oxen, manufactures; precious metals; real wages, rents, interest
+  rates; crime, bastardy, alcohol consumption
+- **Responses to Fischer were largely negative**:
+  Krugman (1997), de Vries (1998), Morgan (1999), Munro (1999) —
+  criticized caricaturization of inflation theories, lack of
+  mathematical models, failure to distinguish pre/post-industrial
+- **Turchin's assessment**: Fischer identified a real broad pattern
+  of European history; his account is broadly consistent with
+  demographic-structural theory; the models in Chapter 7 may address
+  Fischer's main shortcoming — lack of explicit mathematical theory
+- Durations of Fischer's complete waves (3, 3, 2 centuries) match
+  theoretical predictions of the demographic-fiscal model (Section 7.2.1)
+- Goldstonian crises of early modern state breakdown (17th, 19th
+  centuries) correspond to Fischer's second and third wave crises
+
+### 7.3.3 After the Black Death
+
+- Black Death (mid-14th century) removed **one-third to one-half** of
+  population in many communities — a massive "natural experiment"
+  for testing theories about population as explanatory variable
+- Different societies followed **divergent trajectories** post-plague —
+  the structural characteristics of each society explain which path
+- **Stuart Borsch** (2001 PhD thesis): compares post-plague
+  **Egypt vs. England** — both lost roughly half their populations
+
+#### England (Malthusian-Ricardian response)
+- Wages rose, rents and grain prices dropped, unemployment decreased,
+  per capita incomes rose; economy fully revived by 1500
+- Initial intense exploitation of post-plague peasants → wave of
+  peasant uprisings (late 14th, early 15th centuries)
+- Struggle won NOT on battlefield but by peasants **voting with their feet**
+  — abandoning estates unless rents/wages improved
+- Landlord collective action broke down; rents dropped, customary
+  fees and fines abolished, peasant incomes rose → conditions set
+  for sustained economic and demographic recovery
+
+#### Egypt (opposite trajectory)
+- Wages dropped, land rents and grain prices **rose**, unemployment
+  increased; no economic recovery anywhere near in sight by 1500
+- Agricultural output declined 68% between 1350 and 1500
+- Ruled by **Mamluks** (1250–1517): specialized warrior landholders,
+  "slave-soldiers" — Christian or pagan children purchased via
+  Italian intermediaries from the Caucasus
+- Mamluk landholding: **unified collective body** capable of collective
+  action (unlike England's loose individual landlords associated
+  with local village communities)
+- Post-plague Mamluks used collective power to maintain same
+  extraction levels from greatly diminished rural population →
+  much higher exploitation per individual peasant
+- This mirrors dynamics of the **selfish elite model** exactly
+
+- Borsch reinforces argument by comparison with Egypt after
+  **Antonine plagues** (late 2nd century CE) — another depopulation
+  episode with similar divergent outcomes tied to elite structure
+- **Brenner debate** (Aston and Philpin 1985) addressed related issues
+  of divergent social trajectories after plague — consistent framework
+
+<!-- pp. 161-180 -->
+
+## Chapter 7 (cont.): The Demographic-Structural Theory
+
+### Assessment: Borsch & Egypt vs. England
+
+- **Borsch's argument** (Black Death trajectories) judged "very persuasive" as comparative
+  sociology — Egypt after Black Death vs. Antonine plagues adds crucial data points
+- Demographic-structural model adds a key insight Borsch doesn't address:
+  **self-ish elite model** predicts population decline phases are characterized by
+  high elite/peasant ratios and high exploitation rates
+- In England: elite numbers eventually *declined* (sliding into peasant class via
+  economic hardship, lower reproduction, civil-war mortality) → exploitation eased
+  → per capita consumption rose → next secular cycle could begin
+- In **Mamluk Egypt**: Mamluks recruited exclusively from *exogenous* sources
+  (children of Mamluks could not themselves become Mamluks) → rural population
+  declined but Mamluk numbers did NOT → elite/peasant ratio **did not decline with time**
+- Result: Egypt stuck in a **vicious equilibrium** — low population, high elite ratio,
+  intense exploitation, stable to internal shocks, only broken by Ottoman conquest (1517)
+- England's recovery delayed ~half century vs. France because English nobility
+  temporarily offloaded difficulties onto France via Hundred Years' War
+  (Bois 1985:113); expelled from France → Wars of the Roses (1455–1485) pruned
+  the nobility → English economy resumed growth
+
+### 7.4 Summary (Chapter 7 Key Points)
+
+- Population growth → diminishing returns → shrinking surplus →
+  **fiscal insolvency** of the state; unchecked growth causes polity breakdown
+- State breakdown → negative demographic rates + reduced productive capacity →
+  population decline follows breakdown
+- **Demographic-fiscal model** predicts recurrent state-building/collapse episodes
+  at **2–3 century** intervals
+- Class-structured model (commoners + elites tracked separately): elite growth
+  appropriates increasing share of extracted product → state revenues fall,
+  expenditures rise → bankruptcy
+- **Ibn Khaldun model** (nomads conquer agrarian state) and **parasitic nomad model**
+  (nomads impose tribute without conquest) both predict faster cycles ~1 century
+- **Goldstone's structural-demographic theory**: population growth causes breakdown
+  *indirectly* — via fiscal distress, elite competition/factionalism, and increased
+  mobilization potential of the populace (not directly)
+- **Fischer's four "great waves"** of socioeconomic dynamics (12th–20th c. western
+  Europe) broadly consistent with theory
+- Dynamics can be regular or irregular; average periods 1–3 centuries;
+  commoner population changes may be drastic or mild ("elite cycles")
+- Turchin proposes calling these dynamics **secular cycles** or **waves**
+
+---
+
+## Chapter 8: Secular Cycles in Population Numbers
+
+### 8.1 Introduction
+
+- Key prediction from Ch. 7: population in agrarian societies oscillates with
+  **~2–3 century periodicity** (second-order process)
+- Theory predicts oscillations should be **second-order** — both increase and
+  decrease phases span multiple human generations
+- Secular waves documented in western European socioeconomic history by:
+  **François Simiand** (1932), **Wilhelm Abel** (1966), **Michael Postan** (1973),
+  **Emmanuel Le Roy Ladurie** (1974), **Fischer** (1996)
+- Recent data: **Nefedov** (1999, 2002a) suggests secular cycles in China,
+  Middle East, and India as well
+- Chapter goal: use formal **time-series analysis** to empirically estimate
+  periodicity and process order of long-term population fluctuations
+
+### 8.2 "Scale" and "Order" in Human Population Dynamics
+
+#### Temporal Scale: Years
+- Yearly scale: seasonal food production cycles, childhood disease mortality
+  (annual contact-rate cycles + characteristic 2–3 year oscillation from
+  infant-pathogen interaction, Schaffer & Kot 1985)
+
+#### Temporal Scale: Decades and Centuries
+- **Generation time** for humans: 20–30 years (reproductive peak ~20,
+  mean age at birth ~25; Wood 1990)
+- Three broad classes of population oscillations (**Turchin 2003**):
+  1. **Generation cycles** — period 20–30 years; appear in age pyramids
+     (e.g., U.S. baby boomer bulges); generally *not stable* in humans,
+     dissipate rapidly after perturbation (Wachter & Lee 1989)
+  2. **First-order cycles** — from fast density-dependent feedback;
+     typical period ~2 generations (40–50 years); **Easterlin** (1980)
+     hypothesized this for 20th-c. U.S. demography (large cohort → labor
+     shortage → many children → competition → few children); formal models
+     show parameters usually not in cyclic regime (Lee 1974)
+  3. **Second-order cycles** — population interacting with a *slow* variable
+     (e.g., state fiscal health in demographic-fiscal model); increase AND
+     decrease phases each span multiple generations
+- Second-order cycles in humans should have periods **120–450 years**,
+  most likely **200–300 years** (based on 6+ generation minimum period,
+  Murdoch et al. 2002; Lotka-Volterra analogy gives ~300 years using
+  r₀ ≈ 0.02 yr⁻¹)
+- This estimate converges with demographic-structural theory prediction of
+  **1–3 century** oscillation periods
+
+#### Temporal Scale: Millennia
+- Millennial scale = evolution of human societies (technological, cultural)
+- Agricultural revolution ~10,000 ya; Industrial Revolution ~200 ya
+- Pre-industrial global population doubling time ~1,000 years (McEvedy & Jones 1978)
+- Must **detrend** data before analyzing oscillatory components when
+  analyzing long time series
+
+#### Implications for Data Requirements
+- To study second-order processes: need data series ≥ **500–600 years**
+  (minimum 2 oscillations, each ~2–3 centuries)
+- Sampling interval: decades acceptable; 10-year intervals ideal;
+  data sampled at >50-year intervals (2 generations) **too sparse** for analysis
+- Minimum 4 points per cycle needed; ¼ of 200–300 year cycle = **50–75 years**
+
+### 8.3 Long-Term Empirical Patterns
+
+#### 8.3.1 Reconstructions of Historical Populations
+
+**England and Wales (1080–2000 CE)**
+- Best available data set; anchored in **Domesday Book** (1080); 1540–1800
+  reconstructed from parish records by **Wrigley, Schofield** et al.
+- Two features visible: (1) accelerating nonlinear *trend* (Industrial Revolution);
+  (2) *oscillation* around the trend
+- After detrending (power curve subtracted), **autocorrelation function (ACF)**
+  shows clear oscillatory peak at **3.1 centuries**
+- NLTSM analysis (nonlinear time-series modeling, Box-Jenkins approach):
+  - R² = 0.72–0.77 (high signal/noise)
+  - Process order d = 2–3 (second-order confirmed)
+  - Dominant period T ≈ **31 decades** regardless of lag choice (τ = 2 or 3)
+  - Lyapunov exponent Λ near 0 (unstable, weakly oscillatory but not chaotic)
+- Physical period (τ × d) = **60 years** in both lag choices — consistent
+
+**Western Europe (France, Italy, Spain, Germany, etc.)**
+- McEvedy & Jones atlas data (less detailed; authors underemphasize fluctuations)
+- General England pattern replicated: millennial upward trend + secular cycles
+  with slowdown/reversal in 14th, 17th, and late 20th centuries
+- France exception: does not clearly show 17th-century decline — artifact of
+  averaging north and south (southern France declined 1680–1750, Le Roy Ladurie 1974)
+- All European countries (2000 CE): birth deficit relative to deaths; many
+  actually declining in population (U.S. Census Bureau)
+
+**China (200 BCE–1710 CE)**
+- Central authority conducted censuses for tax purposes, but data plagued by:
+  corruption/falsification, unknown conversion coefficients (taxable households →
+  actual population), shifting territorial control
+- Agreement on *relative* changes, not absolute levels
+- Most detailed trajectory: **Chao and Hsieh (1988)** — three major periods:
+  1. Until 11th c.: population peaked near 50 million (center of gravity in north)
+  2. 12th–18th c.: population doubled to ~100 million (Sung dynasty opened south)
+  3. 18th c. onward: explosive growth → 400 million (19th c.) → 1 billion (20th c.)
+- Time-series analysis on 200 BCE–1710 CE (split into 3 equal pieces):
+  - Process order d = 2 confirmed across all segments
+  - Signal/noise and Lyapunov exponents slightly worse than England
+    (greater measurement error + genuine higher variability in period)
+  - Two superimposed oscillations visible: short (~1.3–1.5 centuries) and
+    longer (~3–4 centuries) — period evidence weaker than in England
+- Chinese population closely mirrors **dynastic cycle** (Ho 1959;
+  Reinhard et al. 1968): expansion during stability, precipitous decline during unrest
+
+#### 8.3.2 Archaeological Data
+
+- Archaeological sources: indirect (house counts, settlement area, pollen cores)
+  → must convert to population density; primary interest is *relative* changes
+- Advantage: more objective than historical demography, less guesswork
+- Sampling problem: most archaeological series sampled at >50-year intervals —
+  too sparse for formal time-series analysis
+
+**Roman Empire settlement data (Lewit 1991)**
+- Seven western areas (Britain, Belgica, northern/southern Gaul, Italy,
+  northern/southern Spain) — proportion of excavated settlements occupied
+- Two distinct episodes of settlement abandonment: **3rd century** and **5th century**
+  (plus 4th-century revival)
+- Confirms substantial population change during Roman collapse
+
+**Mesa Verde / Wetherill Mesa (Colorado)**
+- Dendrochronological data: log-cutting dates preserved in dry climate → precise
+  dating of house construction
+- Four spurts of house-building: 7th, 9th, 11th, 13th centuries →
+  periods of rapid population growth
+- Followed by near-total abandonment (~700, ~900, after 1300)
+- ACF of square-root-transformed data reveals a **two-century cycle**
+- Cannot use NLTSM (population *decline* periods censored from record)
+
+**Maya population history**
+- Early reconstructions assumed slow millennial increase then rapid collapse
+- More recent evidence (Culbert & Rice 1990): **repeated cycles** of
+  centralization and state collapse in Guatemala and Peten highlands
+- Oscillation "pace" accelerating artifact may be sampling bias — distant
+  past less documented than recent history
+
+### 8.4 Population Dynamics and Political Instability
+
+- Secular oscillations in population data consistent with demographic-structural
+  model, but *could* reflect other sociodemographic processes
+- More decisive test: examine whether **population fluctuations and political
+  instability co-vary** as theory predicts
+
+**Chu and Lee (1994) — China analysis**
+- Analyzed Chao & Hsieh population data with dummy variables for
+  **peasant rebellion** and **incidence of war**
+- Model with temperature + warfare only: R² = 0.021 (very weak)
+- Adding rebellions: R² = 0.116 (5× increase); rebellion coefficient highly significant
+- Also found statistically significant effect of **population density on rebellion incidence**
+- Limitation: only dummy (0/1) for rebellion — no scale; missed **J.S. Lee (1931)**
+  index of internal warfare intensity
+
+**Turchin's extended analysis**
+- Used **J.S. Lee's internal warfare index** (graduated scale) for China
+  200 BCE–1070 CE, smoothed to decadal intervals
+- Modeled per capita rate of population change:
+  rₜ = f(Nₜ₋τ, Wₜ₋τ) + εₜ   [Equation 8.1]
+  where W = political instability index
+- Approximated f(·) using **Response Surface Methodology** (Box & Draper 1987):
+  second-degree polynomials on Box-Cox transformed predictors
+- Analysis run on three equal periods (64 data points each), two lag choices
+  (τ = 20 and 30 years)
+
+**Results (Table 8.2)**
+- **Highly significant effect of political instability on population dynamics**
+  across all three periods and both lag choices
+- Density dependence + instability jointly explain **~60% of variance** in rₜ
+- Population density: **negative** effect on population rate of change
+  (basic density-dependence)
+- Political instability: **negative** effect on population growth
+- Effects were **synergistic**: population decline especially pronounced when
+  *both* density AND instability were high simultaneously (significant interaction term)
+- Instability R² drops in later period (1080–1710): 0.37 at τ=20, 0.11 at τ=30
+  — possibly reflects data quality deterioration
+
+> Key finding: political instability is the endogenous variable driving second-order
+> oscillations — not merely a correlate of population change but a mechanistic cause
+
+<!-- pp. 181-200 -->
+
+## Chapter 9: Case Studies
+
+### Introduction
+- All prior theories (geopolitical, ethnodynamic, demographic-structural) passed empirical tests
+  with varying success — but each examined separately
+- This chapter takes a **qualitative, generative** approach: how do mechanisms interact in
+  specific polities? What hypotheses emerge for future rigorous testing?
+- Two cases chosen: **France** and **Russia** — both long-lived European territorial empires,
+  both Great Powers in 18th–19th centuries, situated at opposite ends of the northern European
+  plain; similar enough to generalize, different enough to be interesting
+- Discussion organized around: (1) asabiya/frontier dynamics, (2) secular demographic-structural
+  cycles
+
+---
+
+## 9.1 France
+
+### 9.1.1 The Frontier Origins
+
+#### On the Roman Frontier
+- Western end of northern European plain incorporated successively into: Roman Empire,
+  Frankish Empire, Kingdom/Republic of France
+- Roman frontier ran through modern **Benelux and western Germany** (NED, WGE, SGE regions)
+- Northern and eastern France (NFR, EFR) lightly affected — until the 3rd-century crisis
+- Third century: Roman state collapse → frontier became porous; **Franci, Burgundi,
+  Alamanni** coalesced near/on the Roman border, penetrated Roman territory
+- Religious fault line intensified the frontier: Roman Gauls were Christian, Franks and
+  Alamanni were pagan (Franks converted ~500 C.E., Alamanni ~7th century)
+
+#### On the March of Frankish Empire
+- After Franks established their empire, NFR remained a frontier (now Frankish, not Roman)
+- **Brittany** peninsula colonized 5th century by Celts from British Isles → became the
+  **march of Brittany** between lower Seine and Loire
+- Frontier intensity decreased (Bretons and Franks both Christian after 496 C.E.) but religious
+  differences between branches of Christianity kept warfare intense
+- 9th–10th century: area between Rouen and Paris became intense **metaethnic fault line**
+  (religious + linguistic + military) with Viking settlement
+- Normans assimilated (religiously and linguistically) to Latin Christian metaethnie → frontier
+  intensity declined
+
+#### Ethnogenesis of Franks
+- **NED** (modern Benelux + Rhine-west Germany) became frontier earlier (1st century),
+  ceased being frontier before NFR (8th century)
+- Pre-Roman NED: small tribes lacking cultural means for scaling collective solidarity
+- Roman *limes* through middle of NED → intense military pressure → selective pressure for
+  solidarity-scaling mechanisms (**Miller 1993**)
+- Pull factor: during Dominate, Empire's weakness made large organized raids profitable;
+  need for large raiding parties drove political consolidation
+- After 300 C.E., steep religious gradient (Empire Christian, Franks practicing aggressive paganism)
+  acted as unifying force in Frankish ethnogenesis
+- Political innovation: **"long-haired kings"** (Scherman 1987) — institution of kingship
+  absent in western Germanic tribes before 300 C.E.
+- Amalgamation of Chamavi, Chattuari, Bructeri, Amsivarii, Salii and others into a single
+  Frankish ethnie (Geary 1988:78) — exactly what metaethnic frontier theory predicts
+
+#### French Ethnogenesis
+- NFR's diverse substrate: Gallic base (itself heterogeneous), Roman legionnaire settlers,
+  Franks from the north
+- Heavy colonization 3rd–5th centuries probably caused by population collapse: at nadir,
+  only **9% of dwellings occupied** after 400 C.E. (Lewit 1991) — typical of high-intensity
+  metaethnic frontier
+- Final major ethnic infusion: 9th–10th century Vikings established Duchy of Normandy
+- Assimilation to common religion and *langue d'oïl* was rapid for Normans (two centuries),
+  slower for Franks (islands of Dutch persisting to 11th century), longest for Bretons
+  (majority switched to French only in 19th century)
+- By 1868, French was native language of only **one-third** of inhabitants of France
+  (Weber 1976) — France was functionally multiethnic throughout most of its existence
+
+#### Digression on Nonelite Asabiya — Norman England vs. Norman Sicily
+- Both Norman England and Kingdom of Sicily created ~same time, similar initial trajectory
+  (precocious state-building, centralized, solid fiscal bases)
+- Sicily (SIT region): rapidly declined, passed through German Emperors → Angevins →
+  Aragonese → Castilians → Piedmontese — an object of international politics, not a subject
+- England (SBR region): after mid-15th century expulsion from continent, became a **Great Power**,
+  eventually hegemonic in 18th–19th centuries
+- SIT = imperial core after Roman frontiers moved away in 1st century B.C.E. → depressed
+  asabiya for centuries
+- SBR = locus of intense frontier 5th–11th centuries → high nonelite asabiya on eve of
+  Norman conquest; English already building a coherent, expanding state
+- **Hypothesis**: short-run polity dynamics depend on elite asabiya; long-term success or
+  failure depends very much on the **asabiya of the general populace**
+
+#### Dynamics of Frontier Intensity in NFR / Size of French Polity (Figure 9.1)
+- Capetians controlled tiny area (~Paris/Orléans) at 987 C.E.; royal domain <0.1 Mm² by 1200
+- Angevin domain encompassed 0.4 Mm² at same time
+- 13th century: rapid expansion to >0.3 Mm², stabilized at that level (partly via Albigensian
+  Crusades)
+- NFR affected by frontier for ~8 centuries; frontier rapidly declined after 10th century
+- Yet first major expansion spurt came only in the 13th century — **asabiya dynamics operate
+  on much longer timescales** than linguistic/religious assimilation or demographic cycles
+
+---
+
+### 9.1.2 Secular Waves
+
+#### The Principate Wave
+- Archaeological data (Lewit 1991): site occupation index in Roman Gaul tripled from
+  1st century B.C.E. to 2nd century C.E. — actual population increase probably even greater
+  (settlement sizes also increased)
+- Unchecked growth → state insolvency: 2nd century Roman Empire experienced a **great
+  wave of inflation** (Fischer 1996); state collapse followed
+- 3rd century: famine, disease (Antonine plagues), internecine fighting, barbarian invasions
+- Lewit shows: **depth of population decline in a province correlated with level of warfare**
+  it experienced during the calamitous 3rd century
+
+#### The Dominate-Merovingian Wave
+- North and south Gaul tracked each other until 3rd century, then diverged (Figure 9.2)
+- North: stayed lower because it became part of the Roman frontier — **frontier conditions
+  suppress population density**
+- Frankish *Regnum Francorum* peaked first half 6th century, then fragmented into 4 independent
+  polities by 600 C.E. (Neustria, Austrasia, Burgundy, Aquitaine), then smaller pieces
+- Population low-point: **543–600 C.E.** (Slicher van Bath 1964:78) — accompanied by
+  increased political instability as demographic-structural theory predicts
+- One striking feature: correlated population declines across widely separated regions belonging
+  to separate polities (e.g., Gaul and Anatolia)
+
+#### The Carolingian Wave
+- By 700 C.E. polity re-expanding; peaked under **Charlemagne** (~800 C.E.)
+- Population upswing during Carolingian era (starting 7th century), followed by downturn
+  after 900 (Reinhard et al. 1968; Duby 1974)
+- 9th-century heartland of Charlemagne's empire (NED) described by contemporaries as
+  "bursting at the seams with too many people"
+- Carolingian Empire fragmented: west Frankish kingdom of **Charles the Bald** split into
+  duchies and counties; extreme power dispersal in areas like Massif Central
+- Correlated with population decline + increased internal warfare + Viking incursions
+
+#### The Capetian Wave
+- Period of fragmentation after Carolingian collapse was "anomalously long" — 10th–12th
+  centuries were an **intercycle**: centralization could not proceed until a unified polity of
+  substantial size formed
+- Three aggressive proto-ethnies on the Frankish march competed: **Normans, Angevins,
+  Capetians** — by 11th century ethnic boundaries among their elites were blurred; whichever
+  absorbed the others would forge a new ethnie
+- Capetians ultimately prevailed; France acquired a strong monarchy ~1200 C.E.
+- By 1300: France (and most of western Europe) "crammed with people"
+- First half 14th century: population growth ceased → signs of decline **before** the 1348
+  Black Death; **Hundred Years War** (portrayed as dynastic conflict) was actually intense
+  internal warfare among great seigneurs — including the King of England as just one of the
+  counts
+
+#### The Valois Wave
+- French population declined after 1300, then precipitous drop in **Black Death** (1348),
+  further losses as epidemics recurred and Hundred Years War intensified
+- Overall population declined ~**one-half** (Dupâquier et al. 1988b:149)
+- Population then **stagnated at low level 1350–1450** — challenges standard Malthusian-
+  Ricardian theory, which predicts recovery within a generation (Brenner 1985)
+- Grain prices declined by factor of **~2 from 1300 to 1400 C.E.**, confirming land availability
+- Plague effect also declined and reached minimum (Biraben 1975:120)
+- Turchin's argument: **political instability** — not population pressure — prevented recovery
+  (demographic-structural theory prediction confirmed)
+- Normandy population began increasing after 1360s/1370s crises ended, then fell again in
+  1420s–1430s (primary Hundred Years War battlefield)
+- Territorial trajectory (Figure 9.1) hit local minima in **1370 and 1430**
+- Selfish elite model: state viability requires low noble-to-commoner ratio; massive slaughter
+  at Crécy and Agincourt lost **~40% of French nobility** at each battle (Dupâquier et al.
+  1988a:342) → noble numbers fell below viability threshold → centralization resumed
+- 1430–1510: rapid expansion; English expelled from continent by 1453; France took half
+  Burgundian inheritance by 1480; 1494 Italian campaigns (Valois-Habsburg wars)
+- Population doubled 1460–1560 (Dupâquier et al. 1988b), reaching 20 million; elite numbers
+  grew faster — noble families in *élection* of Bayeux: **211 (1463) → 559 (1598)** (Wood 1980);
+  officeholders in Montpellier: **112 (1500) → 442 (1600)** (Greengrass 1985:122)
+
+#### The Bourbon Wave (Figure 9.3 — grain prices France and England 1500–1750)
+- Political instability roughly **1560–1660 C.E.**, ~a century long
+- Two episodes of state collapse: **religious wars (~1590)** and **the Fronde (~1650)**
+- First crisis: dynastic change Valois → Bourbon; capital lost twice; warfare extremely
+  bloody especially in northern France
+- Three periods of population decline: **1580–1597, 1626–1631, 1660–1663**; first crisis
+  may have caused **≥20% population loss** (Benedict 1985:96); northern/eastern provinces
+  possibly lost **~half** their inhabitants (Dupâquier et al. 1988b:152)
+- End of troubles (mid-1660s) → another bout of territorial expansion
+- **Pattern across waves**: each successive expansion wave was **shorter and gained less
+  territory** — reflecting either declining asabiya or logistical constraints (or both)
+- Bourbon cycle ended with French Revolution; Goldstone's demographic-structural analysis
+  cited
+- Instability extended 1789–1848: Great Revolution, Bourbon Restoration, 1830 revolution,
+  1848 revolution, establishment of Second Empire
+
+### Digression on Synchrony
+- France's instability period was **phase-shifted** relative to rest of western Europe:
+  - Central Europe: Thirty Years War (1618–1648)
+  - England: 1640–1690 (Civil War, Stuart Restoration, Glorious Revolution)
+  - Spain/Catalonia/southern Italy: 1640s
+  - Russia: roughly in phase with France
+- Why do early modern state breakdowns cluster? (**Goldstone 1991b**)
+  - Crisis of 17th century + age of revolutions in 19th century → global waves
+- Three explanations for synchrony:
+  1. **Exogenous shocks** (climate fluctuations, plague pandemic as Mongol-empire reset)
+  2. **Spatial autocorrelation / contagion** (revolts inspire revolts; 1848 revolutions spread
+     via news)
+  3. **Dynamical systems theory**: two oscillatory systems driven by same mechanism and
+     period may synchronize by chance if started simultaneously; differences in phase
+     self-perpetuate (Turchin and Hall 2003)
+- Example of phase-perpetuation: France emerged from 14th-century crisis before England;
+  France on the ascendant by 1450 while England still in Wars of the Roses (1455–1485),
+  delaying English demographic-structural cycle by ~half century
+- Food prices: France peaked 1590 (and secondary peak 1620–1640); England peaked 1640 —
+  genuine phase shift, not just trigger timing differences
+
+### Fine Structure of Decentralization Phases
+- Decentralization phases not uniformly chaotic — they have **internal rhythms**
+- Hundred Years War: two acute crises ~c.1360 and 1420s, separated by ~half century
+- Bourbon period: two peaks, 1590s and c.1650, also ~half century apart
+- French Revolution: acute crisis ~1790 → relative stability under Napoleon and Bourbons →
+  renewed instability in 1830 and 1848
+- Possible mechanism: after prolonged instability, people yearn for stability and acquiesce to
+  any regime → generation that grew up in turmoil supports order at any cost, even if regime
+  lacks legitimacy; next generation (without direct experience) more easily persuaded to
+  support overturning order → **two-generation (~40–60 year) oscillation**
+- Alternative: **Easterlin (1980)** mechanism — instability depresses birth rates → smaller
+  cohort does well economically, has lower mobilization potential, but produces large number
+  of babies → alternation of small/docile vs. large/belligerent generations
+- Both mechanisms not mutually exclusive; may connect to **Kondratieff waves** and warfare
+  (Goldstein 1988; Modelski and Thompson 1996)
+
+### 9.1.3 Summary
+- Secular oscillations detected in Gaul-France: centuries III–VI–IX–XIV–XVII–XIX
+- Six oscillations in 2000 years, all ~2–3 centuries duration except X–XIV (intercycle,
+  awaiting political centralization)
+- Conforms well to demographic-structural theory predictions; qualitative dynamics in line
+  with theoretical predictions despite absence of quantitative data as rich as J. S. Lee's
+  China dataset
+
+---
+
+## 9.2 Russia
+
+### 9.2.1 The Frontier Origins
+
+#### On the Great Steppe Frontier of Europe
+- Steppe frontier's importance in Russian history: Presniakov, McNeill (1964), Kargalov,
+  Wieszynnski, Armstrong, LeDonne, Khodarkovsky; whole issue of *Russian History* (1992)
+  devoted to the topic
+- Eurasian steppe runs practically uninterrupted from **Khingan Mountains** (Mongolia-China
+  border) to the **Carpathians** and beyond into Hungary (HUN)
+- Forest-steppe transition zone runs northeast-southwest through KAZ, SRU, UKR, ZAP →
+  **metaethnic frontier throughout almost all of history**
+- Steppe nomads dominated grasslands from Cimmerians (~1st millennium B.C.E.) to 18th
+  century; woodlands inhabited by settled agriculturalists since 4th millennium B.C.E.
+- Cultural distance: Iranian nomads (Cimmerians, Scythians, Sarmatians) may not have been
+  maximally different from forest Slavs — many religious terms in modern Russian are of
+  Iranian origin; some common religious elements
+- From late 3rd century C.E., Iranian nomads replaced by waves of **Turkic and Mongolian**
+  peoples → cultural distance across frontier increased sharply
+- Greatest intensity achieved when Christianity (settled agriculturalists) and Islam (nomads)
+  extended sway over eastern Europe
+- Southern Pontic Steppe additionally squeezed between two frontiers: Greek/Byzantine
+  civilizational frontier on the Black Sea (Olbia, Chersonesus, Tanais, Phanagoria) and
+  steppe-forest frontier to the north → **metaethnic frontier theory predicts intense
+  ethnopolitogenesis** here — and that is precisely what happened
+
+#### Sequential Steppe Polities
+- **Scythians**: ruled Pontic Steppe 7th–3rd century B.C.E.
+- **Sarmatians** (also known as Alans): defeated Scythians, ruled until ~200 C.E.
+- **Goths**: 200–370 C.E.
+- **Huns**: arrived ~370 C.E. (probably Prototurkic with Mongol and Ugrian contingents) —
+  all later nomadic waves were non-Indo-European speaking peoples (Ugrians, Turks, Mongols)
+- After Ostrogoth/Visigoth defeat by Huns, Pontic Steppe ceased to be locus of strong polities;
+  successive waves passed through westward: **Avars** (558 C.E.), **Magyars**, **Bulgars**
+  (northeast Balkans → Danubian Bulgarian Empire)
+- **Khazaria**: established ~7th century east of Pontic Steppe, centered in Volga Delta;
+  dominated eastern Pontic Steppe until ~900 C.E.
+- Until ~900 C.E., Pontic Steppe contested between Avars/Magyars (west), Bulgars (south),
+  Khazars (east), eventually Principality of Kiev (north, from 9th century)
+
+#### The Kievan Prelude
+- By 9th century, **UKR region** inhabited by Slavs — partly assimilated Iranian, Baltic,
+  and Finno-Ugric peoples in the forest-steppe transition zone
+- **Khazaria** was the first large state in eastern Europe's history; defining influence on
+  ethno- and politogenesis of the region (Novoseltsev 2001)
+- Khazar ethnie formed 6th–7th centuries from Prototurkic, Ugrian, and Iranian elements;
+  core region in Daghestan (northeastern Caucasus) on northern frontier of Sassanian Empire
+- **Triggering event** for Khazar crystallization: Arab invasion after Arab conquest of
+  Sassanian Empire (mid-7th century); Arabs took Khazar capital **Samandar** in 737
+- Classic **reflux effect** (Section 4.2.2): Khazarian expansion directed northward; by mid-8th
+  century Khazars ruled Crimea, lower Don, lower/middle Volga; Polanian Slavs subjugated
+- By 9th century, Slavs inhabiting UKR found themselves on the **imperial frontier** of an
+  aggressive, ethnically alien empire — precisely the conditions the metaethnic frontier theory
+  predicts should generate ethnopolitogenesis
+
+<!-- pp. 201-220 -->
+
+## Chapter 9 (continued): Case Studies — Eastern Europe / Russia
+
+### Kievan Rus: Formation and the UKR Metaethnic Frontier
+
+- **Varangians** (Scandinavian traders/raiders) established settlement networks along
+  Volkhov, Volga, and Dnieper trade routes; trading posts evolved into territorial
+  chiefdoms and states (most notably Novgorod and Kiev)
+- **Rus Kaganate** (Principality of Kiev): federation of warrior elites living on
+  trade and tribute from Slavic, Baltic, Finnish agricultural peoples of the
+  forest-steppe land (Hosking 2001)
+- Cohesive forces were typical of frontier "barbarian" tribal confederations:
+  defense and predation
+- New steppe polity, the **Pechenegs** (Patzinaks), broke through Khazar-held
+  territory after 900 CE (Novoseltsev 2001), intensifying raiding pressure on
+  East Slavs
+- Likely not coincidence that Principality of Kiev coalesced at same time as
+  the Pecheneg Confederation — positive feedback loop: Varangians impose tribute
+  → Slavs need protection → steppe polity scales up → both sides centralize
+  until stopped by ecological/logistic constraints
+- Varangian warrior elites were also predators: raided Constantinople, campaigns
+  of Oleg and Igor against Byzantium; Prince Sviatoslav sacked Volga Bulgars,
+  destroyed Khazaria, captured Danube Bulgar capital
+- Why Kiev coalesced in UKR (not SRU or ZAP): trade routes — Dnieper and Volga
+  intersect woodlands-steppe transition in UKR (Kiev) and KAZ (Great Bulgar)
+  simultaneously; next great artery, the Danube, is precisely where Danubian
+  Bulgars settled (Kliuchevskii 1911; Earle 1997 on prestige goods in chiefdoms)
+
+### World Religions and the Metaethnic Fault Line
+
+- **Judaism** adopted as state religion of Khazaria — had very little impact
+  after Khazaria's fall in 10th century
+- **Volga Bulgars** converted to Islam; instrumental in converting Mongols to
+  Islam during 13th–14th centuries
+- Eventually all eastern nomads became Muslim; Slavs and agriculturalists
+  converted to **Orthodox Christianity**
+- Religious frontier that emerged in early second millennium coincided with
+  the economic frontier dividing agriculturalists from pastoralists → deepened
+  the metaethnic fault line running through eastern Europe
+
+### Russian Ethnogenesis (Vladimir-Suzdal Rus)
+
+- Locus of Russian ethnogenesis: **northeastern Rus** (Vladimir-Suzdal Rus),
+  including Moscow, Volga-Oka mesopotamia, northeastern Rus, formerly Kievan
+  lands, and Golden Horde to the east
+- Pre-Mongolian period → "Rus"; post-Mongolian → "Russia"
+- Population of northeastern Rus was a mixture of Baltic, Finnish, and Slavic
+  tribes; increasingly assimilated to Slavic language and Orthodox Christianity
+  over first centuries of second millennium
+- Some historians (Kliuchevskii 1911): populated by Slavic colonization;
+  others (Paszkiewicz 1983): Great Russians were slavicized **Merya**
+  (Finnish tribe of Volga-Oka mesopotamia) — details unclear but assimilation
+  was occurring under one of Europe's most intense, prolonged metaethnic frontiers
+
+### The Steppe Frontier Advances North (12th–13th c.)
+
+- In 12th–13th centuries: steppe frontier advanced north due to
+  decentralization within Kievan polity AND arrival of new nomadic hordes —
+  **Cumans** (Polovtsy) in mid-11th century, then **Mongols** two centuries later
+- Kievan state: site of internecine warfare between Ryurikid factions +
+  intensifying Cuman raiding pressure → population declined, settlements abandoned
+- 1240: Mongols decisively defeated both Cumans and East Slavic principalities
+- **Golden Horde** ruled indirectly via local rulers; periodic punitive
+  expeditions required to remind elites and population to pay tribute
+- Urban risings against Mongols during late 13th–14th centuries; no steppe
+  ruler could control all followers — raiding intensified as Golden Horde
+  central authority weakened mid-14th century
+- By some estimates, **150,000–200,000 Russians captured as slaves** in first
+  half of 17th century (Khodarkovsky 2002)
+- Turchin rates metaethnic frontier intensity in CRU (13th–16th c.) as **9**
+  (maximum): religious divide Christianity/Islam = 3, linguistic = 2,
+  warfare intensity = 2 — "essentially genocidal quality of the steppe frontier"
+- Forest-steppe transitional zone largely depopulated; most of Principality
+  of Ryazan abandoned; old capital had to be moved northwest
+
+### The Lithuanian Frontier — Weak Metaethnic Fault Line
+
+- Lithuanian state arose 13th century, rapidly conquered most of former Kievan
+  Rus by 14th century (largest in Europe by 15th century)
+- Did NOT produce intense metaethnic fault line: Lithuanian elites rapidly
+  assimilated to Kievan Rus culture; Russian became official state language
+  (Riazanovsky 2000)
+- Poland-Lithuania dynastic union (1385): conversion to Catholicism by
+  Lithuanian/west Russian nobles; still no sharp ethnic boundary — Polonization
+  affected primarily upper strata, many nobles stayed Orthodox
+- Slavic dialects between Moscow and Warsaw formed a "seamless linguistic matrix"
+- The "civilizational fault line" (*sensu* Huntington 1996) between Catholic
+  and Orthodox worlds was "rather blurred" here
+
+### The Baltic Frontier — Stronger Fault Line (Intensity ~6)
+
+- East Baltic region became crusading frontier of Latin Christendom in 13th
+  century (Shaskolsky 1978; Bartlett 1993; Murray 2001): Danes invaded Estonia,
+  German crusading knights in Livonia, Swedes conquered southern Finland
+- Ideological dimension: crusade declared against pagans AND "schismatics"
+  (Orthodox) — by 1240s, western/eastern Christianity had diverged enough to
+  be treated as separate metaethnies
+- Metaethnonym **"Nemtsy"** arose in Russian in 13th century (Lind 2001),
+  designating all non-Slavic western Europeans; old terms for Danes (*Don'*)
+  and Swedes (*Svei*) disappeared; new terms needed (~1500 CE)
+- Conflict was at times ethnocidal/genocidal (Baltic Crusades, Prussians);
+  Livonian War so intense the entire Novgorodian region was largely depopulated
+- Summary: after Kievan Rus imploded, northern borderlands became "contested
+  grounds" squeezed between two metaethnic frontiers — steppe frontier
+  (intensity ~9) and Baltic frontier (intensity ~6)
+- Subsequent Russian history = story of how these frontiers were moved away
+  from the Volga-Oka heartland; Russia remained a frontier state until at
+  least the 18th century
+
+---
+
+### 9.2.2 Secular Waves
+
+#### The Kievan Wave
+
+- Population of Kievan Rus grew rapidly (3.5M in 1000 CE → 7–8M in 12th c.;
+  McEvedy and Jones 1978; Riazanovsky 2000), but peasant/land ratio unlikely
+  to have hit Malthusian limits
+- Greater political threat came from **elite overproduction**: "ever-increasing
+  princely family with its numerous branches" (Riazanovsky 2000)
+- Kievan state reached zenith under **Iaroslav the Wise** (1019–1054)
+- His successors: 170 years of decline — 80 witnessed civil wars
+  (Pogodin, cited in Riazanovsky 2000); fathers-and-sons pattern observed
+  (two peaks of instability with relative stability between)
+- Stability interlude: Vladimir Monomakh and two sons (1113–1139)
+- Second instability peak (mid-12th century) → final collapse; Andrei
+  Bogoliubskii sacked Kiev 1169, transferred capital to Vladimir in
+  northeastern Rus; Kiev sacked again 1203; complete destruction by
+  Mongols 1240
+
+#### The Golden Horde Intercycle
+
+- By 1200 the Kievan state had undergone complete disintegration; southern
+  half became arena for three-way struggle among Ryurikid branches
+  (Fennell 1983)
+- From mid-13th to mid-15th century, northeastern Rus became **periphery of
+  the Mongolian Empire** (Golden Horde) — political dynamics determined by
+  exogenous forces; Turchin calls this an **"intercycle" period**
+- **Sergey Nefedov** (2002b): Mongolian period can be considered a complete
+  secular cycle in its own right, especially where Mongolian influence was weak
+  (Novgorod)
+- All four Chinggisid successor dynasties (Yuan in China, Jagataids in
+  Turkestan, Il-Khans in Persia, Juchids in Kipchak Steppe) went through
+  Ibn Khaldun cycles of ~1 century in period
+- China: civil war broke out 1328; Ming dynasty established 1368
+- Turkestan: nomad insurrection vs. Jagataid regime 1333–1334; Timur unified
+  Transoxania 1379, conquered Iran 1390s; Timurid dynasty lasted ~1 century
+- Persia: Il-Khans dissolved 1335; Timur's conquest; Safavids unified by 1500
+- Golden Horde: Juchid rule ended 1359 → revival under Timur Qutlugh 1391
+  (who defeated Lithuanians, consolidated dominion over Russia) → disintegrated
+  again mid-15th c.; Crimean Khanate seceded 1430; Kazan and Astrakhan followed
+  (1445, 1466)
+- Moscow polity went through its own civil war second quarter of 15th century —
+  coincided with final splintering of Golden Horde; Muscovy became de facto
+  independent, de jure only 1480
+- In China, native dynasty expelled Mongols after one cycle; in Russia and Iran,
+  steppe dynasties went through **two cycles** before giving way to native rulers
+
+#### The Muscovy Wave
+
+- After 1450: Muscovy embarked on century-long uninterrupted expansion;
+  **"gathering of Russian lands"** absorbed virtually all former Kievan Rus
+  lands not held by Lithuania
+- 1550s: Russia conquered **Kazan** → Astrakhan and Siberia quickly fell;
+  rapid eastward expansion into stateless north Asia ("breakthrough effect,"
+  Section 4.2.2)
+- 1570s: expansion ran out of steam — **Livonian War** (1558–1583) resulted
+  in loss of territory; Turchin argues the root cause was the **inversion of
+  the secular trend**
+- Evidence for demographic-structural crisis culminating in **Time of Troubles
+  (1598–1613)** (Dunning 1998):
+  - Population possibly doubled during 16th century
+  - Numbers of aristocracy (Boyar Duma) and service nobility increased faster
+    than general population
+  - Grain prices increased 4–5x; taxes rose sevenfold (inflation-adjusted)
+  - 1570s: Russian economy declined catastrophically; mass flight of peasants
+    and urban taxpayers
+- Two waves of political instability:
+  1. **Oprichnina** years 1565–1572 (Riazanovsky 2000) — a coup d'état by
+     the monarch himself (*oprichniki*) using one part of elite against the rest
+  2. **Time of Troubles** 1610–1613 — four Tsars in rapid succession, popular
+     uprisings, foreign interventions by Poland, Sweden, Crimean Tatars
+- Peaks of the two instability periods: **1570 and 1610** — forty years,
+  roughly two generations, apart
+
+#### The Romanov Wave
+
+- **Michael Romanov** crowned Tsar 1613, beginning 300-year Romanov dynasty
+- Fiscal health remained shaky through Michael's and his successor's reigns;
+  various riots and uprisings continued into early Peter the Great's reign
+- From mid-17th century onward: centralizing tendency reasserted; Poland ceded
+  left-bank Ukraine 1667; one of the longest/most successful periods of
+  territorial expansion in history followed
+- 18th century: Russia toppled 17th-century adversaries (Sweden, Turkey) or
+  conquered them (Crimean Khanate, Poland); **European/Eurasian hegemony
+  1815–1850**
+- Two explanations for Russian expansion 1650–1850:
+  1. Origin from maximally intense metaethnic frontier → very high asabiya
+  2. Acquisition of "black-earth lands" (lightly populated, highly productive)
+     → peasant population grew from ~10M in 1600 to ~100M in 1900; this
+     expansion found employment for all elites
+- Nobility constituted only **1–2%** of population (Mironov 2000) — strictly
+  monogamous society meant elite grew no faster than commoners; reduced
+  potential for intraelite competition
+
+- 19th century: population tripled (36M → 100M; McEvedy and Jones 1978);
+  peasant/land ratios declined; food shortages common; **raznochintsy**
+  (intelligentsia) emerged as new aspiring elites
+- Demographic-structural machinery "caught up" with previously runaway growth
+- Crimean War defeat was temporary setback; abandonment of Treaty of San
+  Stefano (1878) under Great Power pressure = significant check on Ottoman
+  expansion
+- Russo-Japanese War: Russia had logistical disadvantage, lost naval force at
+  Tsushima, but massed enough troops for Manchuria push; **revolution of
+  1905–1907** forced abandonment of land-based attack plan (troops needed to
+  quell uprising)
+- Romanov instability followed the **fathers-and-sons pattern**:
+  - First period: Alexander II's reign — 1860s–1870s peasant riots + terror
+    campaign by revolutionaries; assassination of tsar 1881
+  - Stability: Alexander III's reign
+  - Second period: revolutions of **1905–1907 and 1917** (geopolitical stress
+    of WWI a major contributing factor)
+
+### 9.2.3 Summary
+
+- France and Russia, very different countries, display same structural patterns
+  under metaethnic frontier + demographic-structural lenses:
+  - Both regions experienced **two ethnogenetic events**: Franks/French,
+    Rus/Russians
+  - All four ethnies arose on metaethnic frontiers
+  - All states went through secular cycles
+  - An **intercycle period** between the Frankish Empire/France and between
+    Kievan Rus/Russia
+  - Decentralization phases **invariably** show fathers-and-sons fine structure
+    with instability waves ~two generations apart
+
+---
+
+## Chapter 10: Conclusion
+
+### 10.1 Overview of Main Developments
+
+- Research program: (1) translate verbal theories into mathematical models,
+  (2) derive quantitative predictions, (3) empirically test which rival theory
+  predicts data best
+- Turchin argues this general approach can yield nontrivial advances in
+  understanding territorial dynamics of agrarian polities
+
+#### 10.1.1 Asabiya and Metaethnic Frontiers
+
+- Core novel development: **theory of asabiya** — capacity of a group for
+  collective action; increases on metaethnic frontiers, declines in core regions
+- Tested with analytical model + spatial simulation; determined conditions
+  under which repeated cycles of imperial rise and demise should appear
+- Applied to first and second millennia of European history (Chapter 5):
+  predictions borne out by data
+- Alternative theory (geopolitical marchland advantage) does no better than
+  chance at predicting where large polities originate
+- Exclusionary religions (Christianity, Islam) play key role in metaethnic
+  frontiers — but Turchin's theory treats world religions as exogenous events;
+  endogenizing their spread is left for future research
+
+#### 10.1.2 Ethnic Assimilation (Ethnokinetics)
+
+- **Ethnokinetics**: kinetics of religious and linguistic assimilation —
+  largely verbal before Turchin's formalization
+- Three case studies (conversion to Islam, rise of Christianity, Mormon church)
+  uniformly show **autocatalytic model** outperforms non-interactive and
+  threshold alternatives
+- Fitting autocatalytic model to Islamic conversion temporal trajectory:
+  R² = 0.9998 with just two free parameters — not overfitting (model simple,
+  dataset large)
+- Islamic conversion case also showed *systematic deviation* between model
+  and data → led to alternative improved model without adding parameters
+  (illustrating the iterative theory-refinement process)
+- Two open issues in ethnokinetics:
+  1. How to characterize social space within a polity (gaps in networks inhibit
+     assimilation; stable alternative identities may persist on each side of
+     a gap — example: Zoroastrians never converting in Iran)
+  2. Quantitative estimates of coefficients (e.g., why did Iranians convert
+     at ~2x the rate of Spanish?)
+
+#### 10.1.3 Demographic-Structural Theory
+
+- Builds on **Goldstone** et al. but treats population dynamics as *endogenously*
+  linked to state breakdown (not exogenous)
+- Models predict **2–3 century irregular cycles** for agrarian polities;
+  irregularity arises from variable time passing from state collapse to next cycle
+- Data survey (Chapter 8): 2–3 century oscillations are the rule, not exception
+- China data (–200 to 1710; Chu and Lee): population and instability
+  endogenously linked — strongly supported
+- Fischer (western Europe), Turchin (France, Russia): qualitative surveys
+  support the view
+- Faster cycles (~1 century) predicted for **nomadic imperial confederations**
+  due to polygamous elites; post-Chinggis Central Asia (Section 9.2.2) provides
+  supporting evidence
+
+#### 10.1.4 Geopolitics
+
+- **Collins** version: geopolitical resources, logistical loads, marchland
+  advantage → *first-order dynamics* only; cannot explain prolonged declines
+  characterizing many historical empires
+- Key insight: verbal plausibility ≠ dynamical consequence; mathematical
+  formalization reveals when verbal models predict unintended behavior
+- Empirical test: no statistical association between marchland position and
+  maximum polity size originating from it
+- Better test needed: objective analysis of all military interactions within
+  a defined area and time period (to avoid selection bias)
+
+---
+
+### 10.2 Combining Different Mechanisms into an Integrated Whole
+
+- Key organizing principle: different mechanisms operate on **different temporal
+  scales**
+  - Ecological cycles, disease outbreaks: years
+  - Human generation (population change, elite renewal, cultural transmission):
+    **20–30 years**
+  - Demographic-structural/ethnokinetic/asabiya mechanisms: much longer than
+    years or generations
+  - Secular wave: **~2–3 centuries** in agrarian empires; ~1 order of magnitude
+    larger than generation
+- Working hypothesis: generation cycles nested within secular cycles; the two
+  will **not interact strongly** at first order
+- Two-generation cycles (~40–60 years): Kondratieff waves, Easterlin cycles,
+  fathers-and-sons oscillations during decentralization phases; long price
+  time series show two dominant periods (~300 years + ~50 years)
+- Sunspot oscillation (11-year) may be superimposed on top of longer ones
+- Historical dynamics best understood as **nested cycles of different periods**
+
+- Assimilation timescale: passing from 10% to 90% conversion takes ~150–300
+  years — roughly the same temporal scale as the secular cycle; ethnokinetics
+  and demographic-structural processes may interact in complex ways
+- Asabiya dynamics occur on a **much longer scale**:
+  - Duration of metaethnic frontiers in regions of origin: 3–10 centuries
+  - One secular wave = minimum period of asabiya incubation; usually 2–3 such
+    periods before a new aggressive polity/ethnie is born
+  - Typical empire survives **2–3 secular cycles**: Rome (Republic, Principate,
+    Dominate); France (Capetian, Valois, Bourbon, now in fourth); Rus/Russia
+    (Muscovite, Imperial/Romanov); China had succession of empires each 2 cycles
+- Hypothesis: **large successful empires destroyed by combination of asabiya
+  decline AND decentralization phase of secular cycle**
+  - If asabiya still high when troubles hit → empire reconstitutes after trouble
+  - If asabiya too low → period of instability spells end of empire
+
+- During centralization phase: elites open to peripheral aspirants → strong
+  assimilation pressure
+- During decentralization phase: imperial elites close ranks against newcomers
+  → dissidents build "counternetworks" based on peripheral identities (religious,
+  linguistic, regional differences) → potential "**reverse assimilation**" where
+  core ethnie members adopt peripheral identity
+- Decentralization may also trigger **"narrowing down"** of asabiya profile:
+  in bad times elites fall back on subethnic/regional identity rather than
+  empire-wide identity
+
+---
+
+### 10.3 Broadening the Focus of Investigation
+
+- **Nomadic pastoralists** — most important gap; were crucial to Eurasian
+  empire history but not the main focus of this book
+- **Thalassocratic polities** (classical Athens, medieval Venice, early modern
+  Holland): completely left out; basic resources are sea-based, monetary
+  systems too complex for the simple economic submodel; intentional scope
+  limitation
+- Ignored literature on **hegemonic cycles** (Modelski and Thompson 1996);
+  and **world-systems theory** (Wallerstein 1974; Chase-Dunn and Hall 1997)
+  — acknowledged bias toward endogenous causes of rise/fall
+- Book's self-imposed temporal limit: 1900; but insights may apply to modernity:
+  - Elite overproduction may still drive instability (e.g., proportion of Britons
+    18–21 going to college doubled in 1990s from 15% to 33% — is British
+    society approaching a crisis?)
+  - Geopolitical arguments used to predict Soviet Union's demise (Collins 1995)
+  - Ethnic fissioning/mobilization = key element of current international
+    politics (Moynihan 1993)
+- Advocates honing theories on historical material before applying to
+  contemporary issues
+
+---
+
+### 10.4 Toward Theoretical Cliodynamics
+
+- Turchin proposes calling this combined modeling/empirical approach
+  **"cliodynamics"** (by analogy with **cliometrics**)
+- Cliometrics: quantitative data in history (originally economic history,
+  Williamson 1991); cliodynamics = source of theories and hypotheses to
+  guide cliometric empirical research
+- The two are complementary: cliodynamics needs cliometrics for raw empirical
+  inputs; cliometrics needs cliodynamics for theoretical structure
+
+---
+
+## Appendix A: Mathematical Appendix
+
+### A.1 Translating the Hanneman Model into Differential Equations
+
+- **Hanneman et al. (1995)** model for legitimacy-conflict dynamics
+- System of equations (continuous time, instantaneous war-success-to-prestige
+  effect):
+  - C = (L₀ − L)S
+  - W = δₚC
+  - Ṡ = W
+  - L̇ = W
+- C = conflict level; L = legitimacy; W = current war success; S = accumulated
+  record of past successes/failures; δₚ = power differential
+- After substitution, reduces to: **L̇ = δₚ(L₀ − L)(L − d)**
+  — essentially a **logistic model** (precisely logistic if d = 0)
+- Key conclusion: Hanneman model is described by a **single-dimensional ordinary
+  differential equation** → can have multiple equilibria; trajectory attracted
+  to stable equilibria based on initial values
+- This model is **incapable of predicting boom/bust (oscillatory) dynamics**
+
+### A.2 Spatial Simulation of the Frontier Hypothesis
+
+- Simulation arena: **21 × 21 cells**; each cell = small regional polity or
+  province within a larger territorial empire
+- Two spatial levels: single-cell regions and multicell empires
+- Each cell has two numbers: **imperial index** (which empire it belongs to)
+  and **asabiya value** (average degree of collective solidarity)
+- Asabiya dynamics: cells on imperial boundary increase according to logistic
+  growth rule: S_{x,y,t+1} = S_{x,y,t} + r₀S_{x,y,t}(1 − S_{x,y,t})
+- Cells not on a boundary: asabiya decays exponentially at rate δ:
+  S_{x,y,t+1} = S_{x,y,t} − δS_{x,y,t}
+- Neighborhood defined as four cells sharing a linear boundary (diagonal
+  cells excluded)
+
+<!-- pp. 221-240 -->
+
+## Appendix A (continued): Mathematical Appendix
+
+### A.2 Geopolitical Model — Technical Notes (pp. 207–208)
+
+- **Imperial collapse condition**: if average **asabiya** of an empire falls below
+  critical threshold S_crit, empire dissolves → all cells revert to nonimperial
+  hinterland (index 0)
+- **Attack success rule**: P_att − P_def > Δ_P (minimum power differential)
+  - Winning cell resets conquered cell's asabiya to the average of the two
+  - Unsuccessful attacks: no change
+- **Power of a cell** (eq. A.8): P_{x,y,t} = A_{i,t} · S̄_{i,t} · exp[−d_{i,x,y}/h]
+  - A = empire size (regions), S̄ = average asabiya, d = distance from
+    imperial center, h = logistical decay parameter
+  - Negative exponential models logistical constraints on power projection
+- **Randomization**: order in which cells become attackers, and order of
+  neighbor consideration, both randomized each time step — prevents
+  directional bias; only source of stochasticity in otherwise deterministic model
+- **Reference parameter set**: r₀ = 0.2, δ = 0.1, h = 2, Δ_P = 0.1,
+  S_crit = 0.003
+
+---
+
+## A.3 Demographic-Structural Models with Class Structure (pp. 208–211)
+
+### Modeling Extraction
+
+- Two-class system: **producer population** P (peasants/commoners) and
+  **exploiter population** E (elites/nobility)
+- Per capita production: ρ = ρ₀(1 − gP) — linear decline with crowding;
+  ρ₀ = max food production rate, g = density-dependence coefficient
+- Without exploiters: logistic growth with intrinsic rate r₀ = ρ₀(β₁ − δ₁)
+  and carrying capacity k = ρ₀(β₁ − δ₁)/g
+
+### Extraction Function
+
+- Proportion extracted by exploiters governed by **hyperbolic function**:
+  εaE/(1 + aE)
+  - Parameter a = max area controllable by one exploiter (territorial reach)
+  - ε = maximum proportion of product extractable
+  - As E → ∞, extraction approaches ε (cannot extract more than is produced)
+- Per capita resources remaining to producers:
+  ρ_P = ρ₀[1 + (1−ε)aE](1−gP) / (1 + aE)
+- Per capita resources to exploiters:
+  ρ_E = aρ₀ε(1−gP)P / (1 + aE)
+
+### Producer and Exploiter Equations (A.11–A.13)
+
+- **Producer dynamics** (eq. A.11):
+  Ṗ = β₁ρ₀[1 + (1−ε)aE](1−gP)P/(1+aE) − δ₁P
+- **Exploiter dynamics** (eq. A.12):
+  Ė = β₂ρ₀εaE(1−gP)P/(1+aE) − δ₂E
+- Simplification assuming ε = 1 ("ruthless elites" maximizing extraction
+  without concern for peasant welfare) yields eq. A.13
+
+### Demographic-Fiscal Model with Class Structure (pp. 210–211)
+
+- Combines class structure with state resource dynamics S
+- Key mechanism: when exploiters become impoverished, they resist state tax
+  demands → state receives declining fraction of extracted product
+- **State revenue equation** (A.14): Ṡ = γĖ − αE
+  - γ = fraction of elite surplus transmitted to state (only when Ė > 0)
+  - α = per-exploiter state expenditure (army, bureaucracy, priesthood)
+  - State expenses grow with E because state must employ elites as
+    officers, bureaucrats, priests
+- **Complete model** (A.15) adds g(S) function: carrying capacity of
+  producers increases with state resources S (investment in irrigation,
+  security, etc.)
+  - g(S) = g₀(h + S)/(h + (1+c)S)
+
+### The Selfish Elite Model (pp. 211–212)
+
+- Alternative feedback: state strength affects **elite mortality** rather than
+  productive capacity
+- **Key assumption**: strong state imposes peace on elites → suppresses
+  intraelite competition; weak state → violent intraelite competition →
+  elevated elite extinction rate
+- Modeled as δ₂ = c₁/(1 + c₂S):
+  - c₁ = maximum extinction rate (when S = 0)
+  - c₂ = how fast extinction rate declines with increasing S
+- Intuition: as S declines, the "pie" over which elites compete shrinks →
+  intensified intraelite violence and downward mobility
+- Called **"selfish elite"** model because elites oppress commoners with no
+  regard for welfare, transmitting minimal taxes to state
+- Scaled equations (P′ = gP, E′ = aE, S′ = c₂S) simplify the three
+  differential equations for analysis
+
+---
+
+## A.4 Models for Elite Cycles (pp. 212–213)
+
+### The Ibn Khaldun Model
+
+- Formalizes **Ibn Khaldun's** historical cycle: asabiya generates conquest →
+  luxury corrupts elites → decline → new group with asabiya conquers
+- R = constant resource extracted from commoners (fixed extraction)
+- Per capita elite income μ determined by three-regime algorithm:
+  - If R/E ≥ μ_min/(1−γ): elites share surplus with state → μ = (1−γ)R/E
+  - If μ_min/(1−γ) > R/E ≥ μ_min: elites keep subsistence, transmit nothing
+  - If R/E < μ_min: elites in poverty, income = R/E
+- Elite population growth rate r = χ(μ − μ₀) [linear in income above
+  subsistence μ₀], capped at r_max
+- **Collapse trigger**: when S < 0, set E = E₀, S = 0, μ_min = μ₀ → cycle
+  resets with a lean, cohesive new elite group
+
+### The Ibn Khaldun Cycle with Class Structure
+
+- Extends basic model by making R endogenous (depends on P and E):
+  - R = ε₀ · [aE/(1+aE)] · ρ₀(1−gP)P
+- Producer income ν and elite income μ both derived from extraction model
+- Producer dynamics added: Ṗ = χ₁(ν − ν₀)
+- State dynamics: Ṡ = (R − μE) − αE
+- Cycle resets same way when S < 0
+
+### The Parasitic Nomads Model (p. 213)
+
+- Models **nomadic raiders** extracting from an agrarian state (not internal
+  elite cycle but external predation cycle)
+- Nomad extraction from agrarian state:
+  R = S · E²/(h² + E²) · R_max
+  - Saturating function: small nomad force gains little; large force gains
+    proportionally more up to R_max
+  - S = agrarian state's resource stock (wealth being raided)
+- Per capita nomad income: μ = R/E
+- State dynamics: Ṡ = 0 if μ > μ₀ (state being raided); −α otherwise
+- Cycle resets when S < 0: E = E₀, S = S₀
+
+---
+
+## Appendix B: Data Summaries for the Test of the Metaethnic Frontier Theory
+
+### B.1 Cultural Region Codes (pp. 214–215)
+
+Turchin defines 50+ **cultural regions** across Europe and adjacent areas,
+each given a 3-letter code. Regions track historical territories, not modern
+borders. Key examples:
+
+- **ALB**: Albania and Kosovo
+- **AZV**: Steppe north of Azov Sea (includes Crimea)
+- **BAL**: Pomerania, Prussia, Lithuania
+- **BYZ**: Western Anatolia and European Turkey
+- **CRU**: Central Russia (Vladimir-Suzdal Rus')
+- **HUN**: Hungary, Slovakia, Vojvodina (Roman Pannonia)
+- **SBR**: England and Wales
+- **UKR**: Central Ukraine (Kiev, Chernigov, Novgorod-Seversk)
+
+### B.2 Quantification of Frontiers (pp. 215–224)
+
+- **Frontier score** = sum of four dimensions (max varies by era):
+  - **Religion**: 1 (nonexclusive pagan vs. pagan) up to 3 (exclusive world
+    religion vs. pagan)
+  - **Language**: 1 (Latin vs. Celtic/Germanic) or 2
+  - **Economy**: 1 (urban agriculturalists vs. backwoods agriculturalists)
+  - **Pressure**: 1 (raiding, no depopulation) up to 2 (severe depopulation)
+- Pre-Christian Roman frontier baseline = 5; post-Christianization = 7+
+- Score = 0 when no significant frontier exists (e.g., deep interior of stable
+  empire, or after frontier closure via conversion/conquest)
+
+### Selected Region Frontier Histories
+
+- **ANT** (Anatolia): score 0 in I–VI; Byzantine-Caliphate frontier scores 8
+  in VII–XI; after Manzikert and Turkish conquest scores 9 in XII–XIV;
+  drops to 0 under Ottoman center
+- **AUS** (Austria): Germanic incursions score 5 in III; Christianization 7 in
+  IV; Frankish-Avar frontier 6–9 in VI–IX; Magyar Christianization reduces
+  score; Ottoman frontier 8 in XVI–XVII
+- **BUL** (Bulgaria/Macedonia): Roman province to score 6–8 during Gothic
+  assaults (III–IV); Bulgar conversion to Christianity 863–900 reduces score;
+  Ottoman conquest closes frontier
+- **HUN**: Avar khanate scores 6 in VI–VIII; Magyar invasion 8 in X;
+  Magyar Christianization drops to 3 in XI; Ottoman conquest 8 in XVI–XVII
+- **SBR** (England/Wales): Hadrian's Wall frontier 5 in I–III; Christianization
+  6 in IV; Germanic immigration and Pict/Saxon raids 8 in V–VI;
+  Anglo-Saxon Christianization 670 → score drops; Viking frontier 6 in IX–X
+- **SRU** (Southern Russia): Steppe frontier with Khazars and Volga Bulgars
+  6 in VII–X; Christianization 8 in X; Mongol depopulation 9 in XIII–XVI
+
+> Key pattern: **frontier scores peak during confrontation between world
+> religions (Christianity/Islam) and paganism**, and collapse to 0 after
+> conversion or conquest closes the cultural boundary.
+
+### B.3 Quantification of Polity Sizes: First Millennium C.E. (pp. 224–225)
+
+- Source: **Periodical Historical Atlas of Europe** on CD-ROM (Nüssli 2002)
+- Minimum size threshold: 0.1 Mm² (smaller polities excluded per Section 5.1.2)
+- **Relicts** excluded: polities formed by territorial fragmentation whose area
+  never grows (e.g., Austrasia, Neustria, Burgundy as Merovingian relicts;
+  Asturia as Visigothic relict)
+- **Intruders** excluded: ethnies formed outside Europe that established polities
+  within it (Avars, Caliphate, Magyars — classified as intruders)
+- **Gothic exception**: Visigoths and Ostrogoths underwent ethnogenesis near
+  Black Sea but established polities in Iberian and Appenine peninsulas →
+  classified as second class (not intruders, but not in-situ either)
+- **In-situ polities** included: Frankish (Merovingian/Carolingian), Byzantine,
+  Bulgar Empire, Wessex-England, Burgundians, Alamans, Bavarians,
+  Saxons, Moravians
+- Polities peaking after 1000 C.E. (Holy Roman Empire, Kievan Rus',
+  Hungary, Bohemia, Poland, Denmark) analyzed in second millennium dataset
+
+### B.4 Quantification of Polity Sizes: Second Millennium C.E. (pp. 225)
+
+- Source: **CENTENNIA** electronic atlas (Reed 1996)
+- Same methodology as first millennium
+- Excluded below size threshold: medieval Scotland (0.09 Mm²), Croatia
+  (0.05 Mm²), Bavaria, Saxony, Netherlands, Switzerland, Luxemburg
+- **Two intruders**: Cumans (0.60 Mm² in 1200) and Teutonic Order
+  (0.18 Mm² in 1400, originating in EGE)
+- **One relict**: Astrakhan Khanate (0.50 Mm² in 1550, formed from Golden
+  Horde collapse, quickly conquered by Russia)
+- Polities formed after 1800 from fragmentation of Ottoman, Habsburg,
+  Russian, British, Soviet, Yugoslav empires excluded as likely relicts or
+  incipient third-millennium empires
+
+---
+
+## Bibliography (begins p. 226)
+
+Selected key references cited throughout:
+
+- **Axelrod, R.** (1997). *The Complexity of Cooperation: Agent-based models
+  of competition and collaboration*. Princeton University Press.
+- **Axelrod, R. & Hamilton, W. D.** (1981). The evolution of cooperation.
+  *Science* 211:1390–1396. [foundational game-theory basis for asabiya]
+- **Aston, T. H. & Philpin, C. H. E.** (1985). *The Brenner Debate: Agrarian
+  class structure and economic development in pre-industrial Europe*.
+  Cambridge University Press. [class structure debates informing demographic-
+  structural model]
+- **Artamonom, M. I.** (2001). *Istoriya Khazar* [History of the Khazars].
+  [key source for Khazar frontier data]
+- **Artzrouni, M. & Komlos, J.** (1996). The formation of the European state
+  system: a spatial "predatory" model. *Historical Methods* 29:126–134.
+  [related geopolitical modeling work]
+
+<!-- pp. 241-259 -->
+
+## Bibliography & Index (pp. 241–245)
+
+> These final pages contain only the Bibliography (concluding entries) and the
+> book's Index. No new arguments, models, or evidence appear here.
+
+### Bibliography — Notable Works Referenced (selected)
+
+- **Ibn Khaldun** — *The Muqaddimah* (1958 trans.) — foundational theorist of
+  asabiyyah and dynastic cycles; cited throughout the book as a precursor to
+  Turchin's own secular cycles framework
+- **Goldstone, J. A.** — *Revolution and Rebellion in the Early Modern World*
+  (1991) — key source on demographic-structural theory and state breakdown
+- **Taagepera, Rein** — two 1978 papers on empire size/duration systematics
+  and growth-decline curves (3000 BC–600 BC); empirical backbone for
+  Turchin's territorial dynamics model
+- **McNeill, W. H.** — *The Rise of the West* (1963) and *Europe's Steppe
+  Frontier* (1964) — geopolitical context for metaethnic frontier argument
+- **Collins, R.** — 1995 prediction of Soviet collapse (*American Journal of
+  Sociology*) — cited as evidence that macrosociological models can generate
+  falsifiable predictions
+- **Gumilev, Lev** — *Ethnogenesis and Biosphere* (1971, Russian) — source for
+  the ethnogenesis/asabiyyah parallel Turchin draws with his own model
+- **Kennedy, Paul** — *The Rise and Fall of the Great Powers* (1987) —
+  imperial overstretch framing
+- **Fischer, D. H.** — *The Great Wave* (1996) — price revolution cycles;
+  tested against Turchin's secular cycle model for medieval/early modern Europe
+- **Tilly, Charles** — *Coercion, Capital, and European States* (1990) —
+  state formation theory; frequently cited alongside Turchin's own frontier
+  ethnogenesis mechanism
+- **Putnam, R. D.** — *Making Democracy Work* (1993) and *Bowling Alone*
+  (2000) — social capital and trust as collective-action foundations
+- **Malthus, T. R.** — *Essay on the Principle of Population* (1798) —
+  foundational demographic pressure logic underpinning the secular cycle
+- **Le Roy Ladurie, Emmanuel** — *The Peasants of Languedoc* (1974) —
+  empirical long-run French demographic data
+- **Wrigley & Schofield** — *The Population History of England: 1541–1871*
+  (1981) — primary data source for English secular cycle analysis
+- **Goldstein, J.** — *Long Cycles* (1988) — Kondratieff-style wave dynamics
+- **Boyd & Richerson** — multiple papers (1985–2002) on cultural evolution,
+  group norms, reciprocity, and punishment — theoretical grounding for
+  Turchin's asabiyyah as an evolved cultural trait
+- **Tainter, J. A.** — *The Collapse of Complex Societies* (1988) — complexity
+  and diminishing returns framing for imperial decline
+
+### Index — Key Concept Clusters
+
+- **Asabiyyah / ethnogenesis**: 41–42, 51–63 passim; frontier ethnogenesis
+  63, 170–172; Frankish 172; French 172; Navajo 63; Russian 188
+- **Secular (demographic) cycles**: boom/bust dynamics 12, 19, 25–28, 63,
+  67–68, 76, 206; logistic model passim; carrying capacity 52, 75, 120–122,
+  129, 154, 183, 208
+- **Metasystem / metaethnic frontier**: 3, 5, 35; marchland position 17,
+  89–90; steppe frontier 61
+- **Imperial dynamics**: imperial overstretch 17–22; autocatalytic growth 10,
+  65, 96, 98; geopolitics 9, 16, 25, 88, 199
+- **Social capital / trust**: 31, 43–44, 46; social trust 43–44, 46
+- **Collective action / free rider**: 47, 48, 65; norms 31; altruism 31, 32
+- **Modeling approaches**: agent-based simulation 6; computer simulation 5–6,
+  16, 20–21, 23, 28, 64, 68–69, 71–73, 75, 76, 197, 205–207; analytical
+  solution 6, 8, 76; numerical solution 6–8, 64; null model 15
+- **Reaction-diffusion theory**: 99, 101; threshold model 98, 106; threshold
+  in space 102–103; threshold process 114
+- **Key empires/polities**: Roman Empire 20, 56, 63, 79, 83–86, 90–92, 112,
+  117, 120, 162, 170, 172, 176, 178, 201, 215–219, 221, 224; China 5, 60,
+  136, 140, 150, 156, 158, 164, 182, 184, 192, 195; Russia 40, 62, 88, 96,
+  152, 170, 182, 188, 191, 193; Caliphate 87, 216, 224
+- **Crisis of the seventeenth century**: 140, 182, 195
+- **Price revolutions**: 144; Fischer's *Great Wave* tested against model
+- **Kondratieff waves**: 201, 202
+- **World-systems theory**: 61, 184, 203 — engaged but subordinated to
+  Turchin's geopolitical/demographic framework
+- **Key thinkers indexed**: Goldstone (Jack) 9, 128, 139, 140; Collins
+  (Randall) 16, 28; Le Roy Ladurie 50, 97, 102, 107, 112, 116, 120, 122,
+  127, 128, 140, 205, 208; Taagepera 25–26, 28, 203; McNeill (William H.)
+  37, 60; Gumilev (Lev) 38, 40, 62; Ibn Khaldun 38–40, 42, 48, 118, 132;
+  Putnam (Robert D.) 43; Kennedy (Paul) 17, 27; Malthus (Thomas Robert) 118;
+  Tilly (Charles) 37, 78, 91; Stark (Rodney) 111–114; Sorokin (Pitirim A.)
+  37, 99; Goldstein (Jack) 9, 128, 139, 140; Ricardo (David) 121
+
