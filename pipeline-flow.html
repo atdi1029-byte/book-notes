@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Book Project Pipeline</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: #1a1a2e;
+  color: #e0e0e0;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  padding: 40px 20px;
+  min-height: 100vh;
+}
+h1 {
+  text-align: center;
+  font-size: 28px;
+  color: #e8c170;
+  margin-bottom: 10px;
+  letter-spacing: 1px;
+}
+.subtitle {
+  text-align: center;
+  color: #888;
+  font-size: 14px;
+  margin-bottom: 40px;
+}
+.pipeline {
+  max-width: 900px;
+  margin: 0 auto;
+  position: relative;
+}
+/* Vertical connector line */
+.pipeline::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: linear-gradient(to bottom, #e8c170, #4a90d9, #50c878, #e8c170);
+  transform: translateX(-50%);
+  z-index: 0;
+}
+.step {
+  position: relative;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: flex-start;
+  z-index: 1;
+}
+.step:nth-child(odd) { justify-content: flex-start; }
+.step:nth-child(even) { justify-content: flex-end; }
+.step-card {
+  width: 42%;
+  background: #16213e;
+  border: 2px solid #333;
+  border-radius: 12px;
+  padding: 18px 20px;
+  position: relative;
+  transition: all 0.3s;
+}
+.step-card:hover {
+  border-color: #e8c170;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(232, 193, 112, 0.15);
+}
+.step-num {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 15px;
+  z-index: 2;
+}
+.step:nth-child(odd) .step-num { right: -60px; left: auto; transform: none; }
+.step:nth-child(even) .step-num { left: -60px; right: auto; transform: none; }
+/* Center the dots on the line */
+.step .step-num {
+  position: absolute;
+  top: 20px;
+}
+.step:nth-child(odd) .step-num {
+  right: auto;
+  left: calc(100% + 28px);
+}
+.step:nth-child(even) .step-num {
+  left: auto;
+  right: calc(100% + 28px);
+}
+
+.phase-setup .step-num { background: #e8c170; color: #1a1a2e; }
+.phase-process .step-num { background: #4a90d9; color: #fff; }
+.phase-write .step-num { background: #50c878; color: #1a1a2e; }
+.phase-ship .step-num { background: #e8c170; color: #1a1a2e; }
+
+.phase-setup .step-card { border-color: #e8c17044; }
+.phase-process .step-card { border-color: #4a90d944; }
+.phase-write .step-card { border-color: #50c87844; }
+.phase-ship .step-card { border-color: #e8c17044; }
+
+.step-title {
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+.phase-setup .step-title { color: #e8c170; }
+.phase-process .step-title { color: #4a90d9; }
+.phase-write .step-title { color: #50c878; }
+.phase-ship .step-title { color: #e8c170; }
+
+.step-desc {
+  font-size: 13px;
+  color: #aaa;
+  line-height: 1.5;
+}
+.step-tool {
+  display: inline-block;
+  background: #0d1b2a;
+  color: #7eb8da;
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  margin-top: 6px;
+}
+.decision {
+  background: #1a1a2e;
+  border: 2px dashed #e8c170;
+  border-radius: 12px;
+  padding: 14px 20px;
+  text-align: center;
+  width: 42%;
+  margin: 0 auto 20px;
+  position: relative;
+  z-index: 1;
+}
+.decision-text {
+  color: #e8c170;
+  font-weight: 600;
+  font-size: 14px;
+}
+.decision-paths {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: #888;
+  margin-top: 6px;
+}
+.yes { color: #50c878; }
+.no { color: #e87070; }
+
+.phase-label {
+  text-align: center;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  margin: 30px 0 15px;
+  position: relative;
+  z-index: 1;
+}
+.phase-label span {
+  padding: 4px 16px;
+  border-radius: 20px;
+}
+.phase-label.setup span { background: #e8c17022; color: #e8c170; }
+.phase-label.process span { background: #4a90d922; color: #4a90d9; }
+.phase-label.write span { background: #50c87822; color: #50c878; }
+.phase-label.ship span { background: #e8c17022; color: #e8c170; }
+
+/* Sub-items list */
+.sub-items {
+  list-style: none;
+  margin-top: 8px;
+  padding-left: 0;
+}
+.sub-items li {
+  font-size: 12px;
+  color: #888;
+  padding: 2px 0;
+  padding-left: 16px;
+  position: relative;
+}
+.sub-items li::before {
+  content: '→';
+  position: absolute;
+  left: 0;
+  color: #555;
+}
+
+/* Legend */
+.legend {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  margin-bottom: 30px;
+  flex-wrap: wrap;
+}
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #888;
+}
+.legend-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+</style>
+</head>
+<body>
+
+<h1>Book Project Pipeline</h1>
+<p class="subtitle">How Claude processes a book from PDF to published HTML</p>
+
+<div class="legend">
+  <div class="legend-item">
+    <div class="legend-dot" style="background:#e8c170"></div> Setup & Ship
+  </div>
+  <div class="legend-item">
+    <div class="legend-dot" style="background:#4a90d9"></div> Processing
+  </div>
+  <div class="legend-item">
+    <div class="legend-dot" style="background:#50c878"></div> Writing
+  </div>
+  <div class="legend-item">
+    <div class="legend-dot" style="background:#0000;border:2px dashed #e8c170"></div> Decision
+  </div>
+</div>
+
+<div class="pipeline">
+
+  <!-- PHASE: SETUP -->
+  <div class="phase-label setup"><span>Setup</span></div>
+
+  <div class="step phase-setup">
+    <div class="step-card">
+      <div class="step-title">Scaffold Book</div>
+      <div class="step-desc">
+        Create folder, extract cover from PDF,
+        generate template files (summary.md, notes.md, index.html)
+      </div>
+      <div class="step-tool">./build.sh scaffold "Title" "Author" ...</div>
+    </div>
+    <div class="step-num">1</div>
+  </div>
+
+  <!-- PHASE: PROCESSING -->
+  <div class="phase-label process"><span>Processing</span></div>
+
+  <div class="step phase-process">
+    <div class="step-card">
+      <div class="step-title">Run bookai (20-page batches)</div>
+      <div class="step-desc">
+        Split PDF into batches. Launch parallel Claude
+        invocations. Try Sonnet first, fall back to Haiku
+        on content filter errors. Write to disk after
+        EACH batch.
+      </div>
+      <div class="step-tool">./bookai "book.pdf" "Folder" 1 END 20 5 3</div>
+      <ul class="sub-items">
+        <li>3 parallel waves at a time</li>
+        <li>Auto-retry with 30s delay (max 2)</li>
+        <li>Track pages in .pages_done</li>
+      </ul>
+    </div>
+    <div class="step-num">2</div>
+  </div>
+
+  <div class="step phase-process">
+    <div class="step-card">
+      <div class="step-title">Gap-Fill Pass</div>
+      <div class="step-desc">
+        Check .pages_done against expected range.
+        Re-run any failed/missing pages individually.
+        A book is NOT complete until every page is processed.
+      </div>
+      <div class="step-tool">automatic (built into bookai)</div>
+    </div>
+    <div class="step-num">3</div>
+  </div>
+
+  <div class="step phase-process">
+    <div class="step-card">
+      <div class="step-title">Dedup + Verify</div>
+      <div class="step-desc">
+        Remove duplicate chapter sections (keep longest).
+        Report chapter coverage, page gaps, final line count.
+      </div>
+      <div class="step-tool">Python scripts inside bookai</div>
+    </div>
+    <div class="step-num">4</div>
+  </div>
+
+  <!-- DECISION -->
+  <div class="decision">
+    <div class="decision-text">Raw notes &gt; 3000 lines?</div>
+    <div class="decision-paths">
+      <span class="yes">YES → Compact to ~1500-2000 lines</span>
+      <span class="no">NO → Keep as-is</span>
+    </div>
+  </div>
+
+  <div class="step phase-process">
+    <div class="step-card">
+      <div class="step-title">Compact Notes</div>
+      <div class="step-desc">
+        Back up raw notes as notes.md.raw.
+        Use 2 parallel agents (first half + second half),
+        merge results. Remove redundant examples,
+        keep core arguments + best evidence.
+      </div>
+      <div class="step-tool">notes.md.raw → notes.md (~1500-2000 lines)</div>
+    </div>
+    <div class="step-num">5</div>
+  </div>
+
+  <!-- PHASE: WRITING -->
+  <div class="phase-label write"><span>Writing</span></div>
+
+  <div class="step phase-write">
+    <div class="step-card">
+      <div class="step-title">Write summary.md</div>
+      <div class="step-desc">
+        One-line thesis, 8-12 key takeaways,
+        thematic breakdowns, contrarian ideas,
+        and author proposals.
+      </div>
+      <div class="step-tool">~200-500 lines</div>
+    </div>
+    <div class="step-num">6</div>
+  </div>
+
+  <div class="step phase-write">
+    <div class="step-card">
+      <div class="step-title">Write index.html (DIRECTLY)</div>
+      <div class="step-desc">
+        Read notes deeply, then CLOSE them.
+        Write from understanding — not paragraph by paragraph.
+        Original prose, not reformatted notes.
+        Never use subagents for this step.
+      </div>
+      <div class="step-tool">1200-1500 lines, ~70 char wrap</div>
+      <ul class="sub-items">
+        <li>Chapters first (5-8 paragraphs each)</li>
+        <li>Key Takeaways, Contrarian Ideas</li>
+        <li>Notable Quotes (8-15 blockquotes)</li>
+        <li>Allegories &amp; Cultural References</li>
+        <li>Proposals/Frameworks</li>
+        <li>Referenced Works</li>
+        <li>About the Author + Why It Matters</li>
+        <li>Bold 40-70 key terms</li>
+      </ul>
+    </div>
+    <div class="step-num">7</div>
+  </div>
+
+  <!-- DECISION -->
+  <div class="decision">
+    <div class="decision-text">HTML Checklist passes?</div>
+    <div class="decision-paths">
+      <span class="yes">YES → Ship it</span>
+      <span class="no">NO → Fix (lines, bolds, quotes...)</span>
+    </div>
+  </div>
+
+  <!-- PHASE: SHIP -->
+  <div class="phase-label ship"><span>Ship</span></div>
+
+  <div class="step phase-ship">
+    <div class="step-card">
+      <div class="step-title">Add to Shelf</div>
+      <div class="step-desc">
+        Add book card HTML to main index.html
+        under the appropriate category shelf.
+      </div>
+      <div class="step-tool">./build.sh add-shelf "Title" ...</div>
+    </div>
+    <div class="step-num">8</div>
+  </div>
+
+  <div class="step phase-ship">
+    <div class="step-card">
+      <div class="step-title">Git Push</div>
+      <div class="step-desc">
+        Commit all files and push to GitHub Pages.
+        Book is now live and syncs bookmarks
+        via Apps Script backend.
+      </div>
+      <div class="step-tool">git push (SSH port 443)</div>
+      <ul class="sub-items">
+        <li>book.js handles bookmark sync</li>
+        <li>Progress bar tracks reading</li>
+        <li>JSONP to Google Sheets backend</li>
+      </ul>
+    </div>
+    <div class="step-num">9</div>
+  </div>
+
+</div>
+
+<div style="text-align:center;margin-top:50px;color:#555;font-size:12px;">
+  50 books completed with this pipeline &middot; March 2026
+</div>
+
+</body>
+</html>

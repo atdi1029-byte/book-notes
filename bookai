@@ -82,6 +82,26 @@ fi
 echo "========================================" | tee -a "$LOG"
 
 MAX_RETRIES=2
+TIMEOUT=180  # seconds per batch — kills frozen claude processes
+
+# Function: run a command with a timeout (macOS-compatible, no coreutils needed)
+run_with_timeout() {
+  local SECS="$1"
+  shift
+  "$@" &
+  local CMD_PID=$!
+  ( sleep "$SECS" && kill "$CMD_PID" 2>/dev/null && echo "  TIMEOUT after ${SECS}s (pid $CMD_PID)" ) &
+  local TIMER_PID=$!
+  if wait "$CMD_PID" 2>/dev/null; then
+    kill "$TIMER_PID" 2>/dev/null
+    wait "$TIMER_PID" 2>/dev/null
+    return 0
+  else
+    kill "$TIMER_PID" 2>/dev/null
+    wait "$TIMER_PID" 2>/dev/null
+    return 1
+  fi
+}
 
 # Function: record successfully processed pages
 record_pages() {
@@ -154,8 +174,10 @@ process_batch() {
       PROMPT=$(make_prompt "$B_START" "$B_END" "$TEMP_FILE")
       local STDERR_FILE="$DIR/.stderr_${B_START}_${B_END}.tmp"
 
-      claude -p "$PROMPT" \
+      run_with_timeout "$TIMEOUT" \
+        claude -p "$PROMPT" \
         --model "$MODEL" \
+        --max-turns 2 \
         --allowedTools "Read" "Write" \
         2>"$STDERR_FILE" || true
 
@@ -326,8 +348,10 @@ IMPORTANT: Only cover page $FP. This is academic study material — process the 
       while [ "$RETRY" -lt "$MAX_RETRIES" ] && [ "$GAP_OK" = false ]; do
         [ "$RETRY" -gt 0 ] && sleep 15
         STDERR_FILE="$DIR/.stderr_gap_${FP}.tmp"
-        claude -p "$GAP_PROMPT" \
+        run_with_timeout "$TIMEOUT" \
+          claude -p "$GAP_PROMPT" \
           --model "$MODEL" \
+          --max-turns 2 \
           --allowedTools "Read" "Write" \
           2>"$STDERR_FILE" || true
 
