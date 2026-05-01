@@ -208,6 +208,29 @@
 
   .mark-read.hide { display: none; }
 
+  .move-to-shelf {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(25, 100, 200, 0.88);
+    color: #fff;
+    border: none;
+    font-size: 0.58rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    padding: 5px 0;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.18s;
+    text-transform: uppercase;
+    z-index: 4;
+    text-align: center;
+  }
+  #toReadView .book:hover .move-to-shelf {
+    opacity: 1;
+  }
+
   .book-title {
     font-size: 0.95rem;
     color: #fff;
@@ -394,6 +417,10 @@
   <div id="shelfView">
   <h2 class="section-title" id="readingTitle" style="display:none">Currently Reading</h2>
   <div class="shelf" id="readingShelf" style="display:none"></div>
+
+  <h2 class="section-title" id="recentlyAddedTitle"
+    style="display:none">Recently Added from To Read</h2>
+  <div class="shelf" id="recentlyAddedShelf" style="display:none"></div>
 
   <h2 class="section-title">Personal Finance Basics</h2>
   <div class="shelf">
@@ -2677,6 +2704,69 @@
   document.addEventListener('visibilitychange', function() {
     if (document.visibilityState === 'visible') syncFromBackend();
   });
+
+  // ── Move to Shelf ─────────────────────────────────────────────
+  var SHELF_MOVED_KEY = 'books_moved_to_shelf';
+
+  function getMovedToShelf() {
+    try {
+      return JSON.parse(localStorage.getItem(SHELF_MOVED_KEY)) || {};
+    } catch(e) { return {}; }
+  }
+
+  function moveToShelf(e, id) {
+    e.preventDefault();
+    e.stopPropagation();
+    var moved = getMovedToShelf();
+    moved[id] = Date.now();
+    localStorage.setItem(SHELF_MOVED_KEY, JSON.stringify(moved));
+    renderMovedToShelf();
+  }
+
+  function renderMovedToShelf() {
+    var moved = getMovedToShelf();
+    var title = document.getElementById('recentlyAddedTitle');
+    var shelf = document.getElementById('recentlyAddedShelf');
+    shelf.innerHTML = '';
+    var list = [];
+
+    document.querySelectorAll('#toReadView .book').forEach(function(el) {
+      var id = el.dataset.book;
+      if (moved[id]) {
+        el.style.display = 'none';
+        list.push({ el: el, ts: moved[id] });
+      } else {
+        el.style.display = '';
+      }
+    });
+
+    list.sort(function(a, b) { return b.ts - a.ts; });
+    list.forEach(function(item) {
+      var clone = item.el.cloneNode(true);
+      var btn = clone.querySelector('.move-to-shelf');
+      if (btn) btn.remove();
+      var tier = clone.querySelector('.tier-badge');
+      if (tier) tier.remove();
+      shelf.appendChild(clone);
+    });
+
+    var has = list.length > 0;
+    title.style.display = has ? '' : 'none';
+    shelf.style.display = has ? '' : 'none';
+  }
+
+  // Inject "→ Shelf" button into every To Read card
+  document.querySelectorAll('#toReadView .book').forEach(function(el) {
+    var id = el.dataset.book;
+    var btn = document.createElement('button');
+    btn.className = 'move-to-shelf';
+    btn.title = 'Move to shelf';
+    btn.textContent = '→ Shelf';
+    btn.onclick = function(e) { moveToShelf(e, id); };
+    el.querySelector('.cover-wrap').appendChild(btn);
+  });
+
+  renderMovedToShelf();
 </script>
 
 <script>
