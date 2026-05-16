@@ -406,7 +406,6 @@
   </div>
   <p class="subtitle">Personal library of summaries &amp; detailed notes
     <button class="filter-btn active" id="filterUnread" onclick="toggleFilter()">Unread</button>
-    <button class="filter-btn" id="filterReading" onclick="toggleReading()">Reading</button>
   </p>
 
   <div class="tab-row">
@@ -415,9 +414,6 @@
   </div>
 
   <div id="shelfView">
-  <h2 class="section-title" id="readingTitle" style="display:none">Currently Reading</h2>
-  <div class="shelf" id="readingShelf" style="display:none"></div>
-
   <h2 class="section-title" id="recentlyAddedTitle"
     style="display:none">Recently Added from To Read</h2>
   <div class="shelf" id="recentlyAddedShelf" style="display:none"></div>
@@ -2764,7 +2760,6 @@
 <script>
   var KEY = 'books_read';
   var filtering = true;
-  var readingFilter = false;
   var activeBookmarks = (function() {
     try { return JSON.parse(localStorage.getItem('books_bookmarks')) || {}; }
     catch(e) { return {}; }
@@ -2826,32 +2821,17 @@
 
   function toggleFilter() {
     filtering = !filtering;
-    if (filtering) { readingFilter = false; document.getElementById('filterReading').classList.remove('active'); }
     document.getElementById('filterUnread').classList.toggle('active', filtering);
-    render();
-  }
-
-  function toggleReading() {
-    readingFilter = !readingFilter;
-    if (readingFilter) { filtering = false; document.getElementById('filterUnread').classList.remove('active'); }
-    document.getElementById('filterReading').classList.toggle('active', readingFilter);
     render();
   }
 
   function render() {
     var read = getRead();
-    var readingShelf = document.getElementById('readingShelf');
-    var readingTitle = document.getElementById('readingTitle');
 
-    // Clear reading shelf
-    readingShelf.innerHTML = '';
-
-    document.querySelectorAll('.content .shelf:not(#readingShelf) .book').forEach(function(el) {
+    document.querySelectorAll('.content .shelf .book').forEach(function(el) {
       var id = el.dataset.book;
-      var bmkey = el.dataset.bmkey;
       var badge = el.querySelector('.read-badge');
       var btn = el.querySelector('.mark-read');
-      // Read badge
       if (read[id]) {
         badge.classList.add('show');
         btn.classList.add('hide');
@@ -2863,38 +2843,10 @@
       }
     });
 
-    if (readingFilter) {
-      // Collect bookmarked books (skip read ones), sort by timestamp (most recent first)
-      var bookmarked = [];
-      document.querySelectorAll('.book[data-bmkey]').forEach(function(el) {
-        var bmkey = el.dataset.bmkey;
-        if (bmkey && activeBookmarks[bmkey] && !read[el.dataset.book]) {
-          bookmarked.push({ el: el, ts: activeBookmarks[bmkey].ts || 0 });
-        }
-      });
-      bookmarked.sort(function(a, b) { return b.ts - a.ts; });
-      // Clone into reading shelf
-      bookmarked.forEach(function(item) {
-        var clone = item.el.cloneNode(true);
-        clone.classList.remove('hidden-read', 'hidden-reading');
-        readingShelf.appendChild(clone);
-      });
-      readingTitle.style.display = bookmarked.length ? '' : 'none';
-      readingShelf.style.display = bookmarked.length ? '' : 'none';
-    } else {
-      readingTitle.style.display = 'none';
-      readingShelf.style.display = 'none';
-    }
-
     // Hide/show category sections
-    document.querySelectorAll('.section-title:not(#readingTitle):not(#recentlyAddedTitle)').forEach(function(title) {
+    document.querySelectorAll('.section-title:not(#recentlyAddedTitle)').forEach(function(title) {
       var shelf = title.nextElementSibling;
       if (!shelf || !shelf.classList.contains('shelf')) return;
-      if (readingFilter) {
-        title.style.display = 'none';
-        shelf.style.display = 'none';
-        return;
-      }
       var hasVisible = false;
       shelf.querySelectorAll('.book').forEach(function(b) {
         if (b.style.display !== 'none' && !b.classList.contains('hidden-read')) hasVisible = true;
