@@ -2904,58 +2904,119 @@
     } catch(e) { return {}; }
   }
 
-  function moveToShelf(e, id) {
+  function getSectionName(bookEl) {
+    // Walk up to the parent .shelf div, then get the
+    // preceding .section-title sibling
+    var shelfDiv = bookEl.parentElement;
+    if (!shelfDiv) return '';
+    var prev = shelfDiv.previousElementSibling;
+    while (prev) {
+      if (prev.classList.contains('section-title')) {
+        return prev.textContent.trim();
+      }
+      prev = prev.previousElementSibling;
+    }
+    return '';
+  }
+
+  function findShelfSection(sectionName) {
+    // Find the matching section title in #shelfView
+    var found = null;
+    document.querySelectorAll(
+      '#shelfView .section-title'
+    ).forEach(function(h2) {
+      if (h2.textContent.trim() === sectionName) found = h2;
+    });
+    if (!found) return null;
+    // Return the .shelf div that follows it
+    var next = found.nextElementSibling;
+    while (next) {
+      if (next.classList.contains('shelf')) return next;
+      next = next.nextElementSibling;
+    }
+    return null;
+  }
+
+  function moveToShelf(e, id, sectionName) {
     e.preventDefault();
     e.stopPropagation();
     var moved = getMovedToShelf();
-    moved[id] = Date.now();
+    moved[id] = { ts: Date.now(), section: sectionName };
     localStorage.setItem(SHELF_MOVED_KEY, JSON.stringify(moved));
     renderMovedToShelf();
   }
 
   function renderMovedToShelf() {
     var moved = getMovedToShelf();
-    var title = document.getElementById('recentlyAddedTitle');
-    var shelf = document.getElementById('recentlyAddedShelf');
-    shelf.innerHTML = '';
-    var list = [];
 
-    document.querySelectorAll('#toReadView .book').forEach(function(el) {
-      var id = el.dataset.book;
-      if (moved[id]) {
+    // Hide the old "Recently Added" fallback section
+    var fallbackTitle =
+      document.getElementById('recentlyAddedTitle');
+    var fallbackShelf =
+      document.getElementById('recentlyAddedShelf');
+    if (fallbackTitle) fallbackTitle.style.display = 'none';
+    if (fallbackShelf) fallbackShelf.style.display = 'none';
+
+    // Remove any previously injected moved cards
+    document.querySelectorAll(
+      '#shelfView .book[data-moved="1"]'
+    ).forEach(function(el) { el.remove(); });
+
+    document.querySelectorAll('#toReadView .book').forEach(
+      function(el) {
+        var id = el.dataset.book;
+        var entry = moved[id];
+        if (!entry) { el.style.display = ''; return; }
         el.style.display = 'none';
-        list.push({ el: el, ts: moved[id] });
-      } else {
-        el.style.display = '';
+        var sectionName = entry.section ||
+          (typeof entry === 'number' ? '' : '');
+        var targetShelf = sectionName
+          ? findShelfSection(sectionName) : null;
+        if (!targetShelf) {
+          // Fallback: use Recently Added
+          if (fallbackShelf) {
+            var clone = el.cloneNode(true);
+            clone.style.display = '';
+            clone.dataset.moved = '1';
+            var btn = clone.querySelector('.move-to-shelf');
+            if (btn) btn.remove();
+            var tier = clone.querySelector('.tier-badge');
+            if (tier) tier.remove();
+            fallbackShelf.appendChild(clone);
+            if (fallbackTitle)
+              fallbackTitle.style.display = '';
+            if (fallbackShelf)
+              fallbackShelf.style.display = '';
+          }
+          return;
+        }
+        var clone = el.cloneNode(true);
+        clone.style.display = '';
+        clone.dataset.moved = '1';
+        var btn = clone.querySelector('.move-to-shelf');
+        if (btn) btn.remove();
+        var tier = clone.querySelector('.tier-badge');
+        if (tier) tier.remove();
+        targetShelf.appendChild(clone);
       }
-    });
-
-    list.sort(function(a, b) { return b.ts - a.ts; });
-    list.forEach(function(item) {
-      var clone = item.el.cloneNode(true);
-      clone.style.display = '';
-      var btn = clone.querySelector('.move-to-shelf');
-      if (btn) btn.remove();
-      var tier = clone.querySelector('.tier-badge');
-      if (tier) tier.remove();
-      shelf.appendChild(clone);
-    });
-
-    var has = list.length > 0;
-    title.style.display = has ? '' : 'none';
-    shelf.style.display = has ? '' : 'none';
+    );
   }
 
   // Inject "→ Shelf" button into every To Read card
-  document.querySelectorAll('#toReadView .book').forEach(function(el) {
-    var id = el.dataset.book;
-    var btn = document.createElement('button');
-    btn.className = 'move-to-shelf';
-    btn.title = 'Move to shelf';
-    btn.textContent = '→ Shelf';
-    btn.onclick = function(e) { moveToShelf(e, id); };
-    el.querySelector('.cover-wrap').appendChild(btn);
-  });
+  document.querySelectorAll('#toReadView .book').forEach(
+    function(el) {
+      var id = el.dataset.book;
+      var section = getSectionName(el);
+      var btn = document.createElement('button');
+      btn.className = 'move-to-shelf';
+      btn.title = 'Move to shelf';
+      btn.textContent = '→ Shelf';
+      btn.onclick = function(e) {
+        moveToShelf(e, id, section);
+      };
+      el.querySelector('.cover-wrap').appendChild(btn);
+    }
+  );
 
   renderMovedToShelf();
 </script>
