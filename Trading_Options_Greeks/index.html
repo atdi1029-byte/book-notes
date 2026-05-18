@@ -1,0 +1,3002 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trading Option Greeks — Dan Passarelli</title>
+<link rel="stylesheet" href="../book.css">
+<script>
+const BM_KEY = "trading_option_greeks";
+</script>
+<script src="../book.js" defer></script>
+<style>
+.fig-list {
+  margin: 1.2em 0;
+  font-size: 0.88em;
+}
+.fig-item {
+  display: block;
+  padding: 0.25em 0.9em;
+  background: rgba(90,62,26,0.06);
+  border-left: 3px solid #c5a55a;
+  border-radius: 0 4px 4px 0;
+  margin-bottom: 0.3em;
+  line-height: 2;
+}
+.fig-label {
+  color: #4a3a28;
+  margin-right: 0.5em;
+}
+.fig-view-link {
+  color: #c5a55a;
+  text-decoration: none;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.fig-view-link:hover { text-decoration: underline; }
+#fig-lb {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.92);
+  z-index: 9999;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  cursor: zoom-out;
+}
+#fig-lb.open { display: flex; }
+#fig-lb-img {
+  max-width: 92vw;
+  max-height: 82vh;
+  border-radius: 4px;
+  box-shadow: 0 0 40px rgba(0,0,0,0.8);
+  cursor: default;
+}
+#fig-lb-caption {
+  color: #ddd;
+  font-size: 0.9em;
+  margin-top: 0.8em;
+  max-width: 700px;
+  text-align: center;
+  font-style: italic;
+}
+#fig-lb-close {
+  position: fixed;
+  top: 16px; right: 20px;
+  color: #fff;
+  font-size: 2em;
+  cursor: pointer;
+  opacity: 0.7;
+  line-height: 1;
+}
+#fig-lb-close:hover { opacity: 1; }
+.part-divider {
+  text-align: center;
+  margin: 2.5em 0 1.5em;
+  padding: 0.8em 1.5em;
+  background: rgba(197,165,90,0.08);
+  border-top: 2px solid #c5a55a;
+  border-bottom: 2px solid #c5a55a;
+  font-size: 1.1em;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #c5a55a;
+  text-transform: uppercase;
+}
+</style>
+<div id="fig-lb">
+  <span id="fig-lb-close" title="Close">&#x2715;</span>
+  <img id="fig-lb-img" src="" alt="">
+  <div id="fig-lb-caption"></div>
+</div>
+<script>
+(function(){
+  var lb = document.getElementById('fig-lb');
+  var lbImg = document.getElementById('fig-lb-img');
+  var lbCap = document.getElementById('fig-lb-caption');
+  function open(src, cap) {
+    lbImg.src = src;
+    lbCap.textContent = cap || '';
+    lb.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  function close() {
+    lb.classList.remove('open');
+    document.body.style.overflow = '';
+    lbImg.src = '';
+  }
+  lb.addEventListener('click', function(e){
+    if (e.target === lb || e.target.id === 'fig-lb-close') close();
+  });
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'Escape') close();
+  });
+  document.addEventListener('click', function(e){
+    var a = e.target.closest('.fig-view-link');
+    if (a) {
+      e.preventDefault();
+      open(a.dataset.fig, a.dataset.caption);
+    }
+  });
+})();
+</script>
+</head>
+<body>
+<div class="book-header">
+<h1>Trading Option Greeks</h1>
+<p class="subtitle">Dan Passarelli &mdash; 2nd Edition, Bloomberg Press, 2012</p>
+</div>
+
+<nav class="toc">
+<h2>Contents</h2>
+<ul style="columns:2;column-gap:2em;list-style:none;padding:0">
+<li><a href="#glossary">Glossary</a></li>
+<li><a href="#ch1">Ch 1: The Basics</a></li>
+<li><a href="#ch2">Ch 2: Greek Philosophy</a></li>
+<li><a href="#ch3">Ch 3: Understanding Volatility</a></li>
+<li><a href="#ch4">Ch 4: Option-Specific Risk</a></li>
+<li><a href="#ch5">Ch 5: Volatility-Selling Strategies</a></li>
+<li><a href="#ch6">Ch 6: Put-Call Parity &amp; Synthetics</a></li>
+<li><a href="#ch7">Ch 7: Rho</a></li>
+<li><a href="#ch8">Ch 8: Dividends and Option Pricing</a></li>
+<li><a href="#ch9">Ch 9: Vertical Spreads</a></li>
+<li><a href="#ch10">Ch 10: Wing Spreads</a></li>
+<li><a href="#ch11">Ch 11: Calendar and Diagonal Spreads</a></li>
+<li><a href="#ch12">Ch 12: Delta-Neutral: Implied Vol</a></li>
+<li><a href="#ch13">Ch 13: Delta-Neutral: Realized Vol</a></li>
+<li><a href="#ch14">Ch 14: Studying Volatility Charts</a></li>
+<li><a href="#ch15">Ch 15: Straddles and Strangles</a></li>
+<li><a href="#ch16">Ch 16: Ratio and Complex Spreads</a></li>
+<li><a href="#ch17">Ch 17: Putting the Greeks into Action</a></li>
+<li><a href="#lessons">Trading &amp; Investing Lessons</a></li>
+<li><a href="#takeaways">Key Takeaways</a></li>
+<li><a href="#contrarian">Contrarian Ideas</a></li>
+<li><a href="#quotes">Notable Quotes</a></li>
+<li><a href="#allegories">Allegories &amp; Cultural References</a></li>
+<li><a href="#frameworks">Frameworks</a></li>
+<li><a href="#referenced">Referenced Works</a></li>
+<li><a href="#didntfit">What Didn't Fit</a></li>
+</ul>
+</nav>
+
+<h2 id="glossary">Glossary</h2>
+
+<h4>Foundational Concepts</h4>
+<p>
+<strong>Option:</strong> A contract giving the owner the right
+(not obligation) to buy or sell a fixed quantity of an underlying
+security at a specific price within a set time.
+<br><strong>Call:</strong> The right to BUY the underlying at the
+strike price. Valuable when the stock rises above the strike.
+<br><strong>Put:</strong> The right to SELL the underlying at the
+strike price. Valuable when the stock falls below the strike.
+<br><strong>Strike price:</strong> The fixed price at which the
+holder may buy (call) or sell (put) the underlying upon exercise.
+<br><strong>Expiration:</strong> The date after which the option
+ceases to exist. For equity options, the Saturday after the third
+Friday of the stated month; last trading day is that Friday.
+<br><strong>Premium:</strong> The price paid for an option contract.
+Equals intrinsic value plus time value.
+<br><strong>Intrinsic value:</strong> How far an option is
+in-the-money. A call with stock at $55 and strike at $50 has $5
+intrinsic value. OTM options have zero intrinsic value.
+<br><strong>Time value (extrinsic value):</strong> Premium minus
+intrinsic value. Represents the possibility of further favorable
+movement before expiration. Decays to zero at expiration.
+<br><strong>In-the-money (ITM):</strong> A call whose strike is
+below the stock price; a put whose strike is above it.
+<br><strong>At-the-money (ATM):</strong> Strike price approximately
+equal to the current stock price.
+<br><strong>Out-of-the-money (OTM):</strong> A call whose strike
+is above the stock price; a put whose strike is below it.
+<br><strong>Parity:</strong> An option trading with only intrinsic
+value and no time value left. Deep ITM options often trade at parity.
+<br><strong>American-style:</strong> Can be exercised any time
+before expiration. All equity options listed on US exchanges.
+<br><strong>European-style:</strong> Can only be exercised at
+expiration. Common for index options like SPX.
+</p>
+
+<h4>The Five Greeks</h4>
+<p>
+<strong>Delta (Δ):</strong> Rate of change in option price per $1
+move in the underlying. Calls have positive delta (0 to 1.00);
+puts have negative delta (0 to −1.00). ATM options have delta
+near ±0.50.
+<br><strong>Gamma (Γ):</strong> Rate of change in delta per $1 move
+in the underlying. The "delta of delta." ATM options have the
+highest gamma; ITM/OTM have low gamma. Long options = positive
+gamma; short options = negative gamma.
+<br><strong>Theta (Θ):</strong> Daily rate of time decay. How much
+the option loses in value each day assuming all else equal. Long
+options have negative theta (you pay decay). Short options have
+positive theta (you collect decay). Theta accelerates in the
+final 30 days, especially for ATM options.
+<br><strong>Vega (V):</strong> Change in option price per 1%
+change in implied volatility. ATM options have the highest vega.
+Long options have positive vega (rising IV helps); short options
+have negative vega (rising IV hurts).
+<br><strong>Rho (ρ):</strong> Change in option price per 1%
+change in the risk-free interest rate. Calls have positive rho
+(higher rates favor calls); puts have negative rho. Most
+significant for LEAPS and deep ITM options.
+</p>
+
+<h4>Volatility Terms</h4>
+<p>
+<strong>Historical volatility (HV):</strong> Annualized standard
+deviation of daily returns over a past period. Also called
+realized volatility or statistical volatility. Measures how much
+the stock actually moved.
+<br><strong>Implied volatility (IV):</strong> The volatility figure
+implied by the current market price of an option, backed out from
+a pricing model. Reflects the market's expectation of future
+volatility, not historical behavior.
+<br><strong>VIX:</strong> CBOE Volatility Index; measures 30-day
+implied volatility of S&amp;P 500 options. Often called the "fear
+gauge." Typically inversely correlated with the S&amp;P 500.
+<br><strong>Volatility skew:</strong> The difference in IV across
+strikes (vertical skew) or expirations (term structure skew).
+OTM puts typically have higher IV than OTM calls — the "smirk."
+<br><strong>IV rush:</strong> A rapid rise in implied volatility
+before a known event (earnings, FDA decision). Option prices
+inflate even if the underlying doesn't move.
+<br><strong>IV crush:</strong> Sharp collapse in implied volatility
+after the event resolves. Option prices drop regardless of the
+direction of the underlying's move.
+<br><strong>Realized volatility:</strong> How much the stock
+actually moved during a period. Compared against implied volatility
+to evaluate whether options were fairly priced.
+</p>
+
+<h4>Strategies and Structures</h4>
+<p>
+<strong>Covered call:</strong> Long stock plus short call on the
+same underlying. Caps upside in exchange for premium income.
+<br><strong>Protective put:</strong> Long stock plus long put.
+Insurance that limits downside while preserving upside.
+<br><strong>Vertical spread:</strong> Buy one option, sell another
+at a different strike, same expiration, same underlying. Bull call
+spread (buy lower, sell higher) or bear put spread (buy higher put,
+sell lower put).
+<br><strong>Iron condor:</strong> Short OTM call spread plus short
+OTM put spread. Four legs. Profits when the underlying stays in
+a range.
+<br><strong>Butterfly:</strong> Buy one option, sell two at a
+middle strike, buy one more at an outer strike. Maximum profit
+when underlying pins at middle strike at expiration.
+<br><strong>Calendar spread:</strong> Buy a longer-dated option
+and sell a shorter-dated option at the same strike. Also called
+a time spread. Trades volatility term structure.
+<br><strong>Straddle:</strong> Buy (or sell) a call and a put at
+the same strike and expiration. Profits from large moves in either
+direction (long) or from range-bound action (short).
+<br><strong>Strangle:</strong> Like a straddle but with different
+strikes — OTM call and OTM put. Cheaper premium, wider
+break-even points.
+<br><strong>Ratio spread:</strong> Buy fewer options than you sell
+(e.g., buy 1, sell 2). Creates a position with extra short gamma
+beyond the hedge.
+<br><strong>Backspread:</strong> Sell fewer options than you buy.
+Opposite of ratio spread. Net long gamma, benefits from very
+large moves.
+<br><strong>Delta-neutral:</strong> A position with total delta
+close to zero. Not direction-indifferent — gamma will make it
+directional as the stock moves. Isolates the vega/gamma trade.
+<br><strong>Gamma scalping:</strong> Dynamically delta-hedging a
+long-gamma position by buying stock when the price falls and
+selling when it rises. Monetizes realized volatility.
+<br><strong>Conversion/reversal:</strong> Synthetic arbitrage
+position combining stock, call, and put to lock in risk-free profit
+when put-call parity is violated.
+<br><strong>Pin risk:</strong> The risk that an underlying settles
+exactly at the strike at expiration, leaving the short option
+writer uncertain whether they will be assigned.
+</p>
+
+<div class="part-divider">Part I — The Basics of Option Greeks</div>
+
+<h2 id="ch1">Chapter 1: The Basics</h2>
+
+<p>
+An <strong>option</strong> is a contract giving its owner the right
+to buy or sell a fixed quantity of an underlying security at a
+specific price within a certain time.
+There are two types: <strong>calls</strong> give the right to buy;
+<strong>puts</strong> give the right to sell.
+The buyer — called the <strong>holder</strong> or long — owns the
+right and pays a premium for it.
+The seller — called the <strong>writer</strong> or short — receives
+that premium and incurs an obligation.
+Unlike stock ownership, option holders receive no dividends and
+have no voting rights.
+The corporation has no knowledge of option contract parties.
+</p>
+
+<p>
+When a trader who is long an option exercises, a trader with a short
+position gets <strong>assigned</strong> — required to fulfill the
+obligation to buy or sell at the strike.
+Shorting an option requires no borrowing, unlike shorting stock;
+the contract is simply created between two parties.
+For every open long contract there is an equal and offsetting short
+contract — they are exactly as common as each other.
+</p>
+
+<p>
+All orders are either <strong>opening</strong> or <strong>closing</strong>
+transactions.
+A new long position is established with a buy-to-open order;
+an existing long is exited with a sell-to-close.
+A new short is established with a sell-to-open order;
+it is covered with a buy-to-close.
+<strong>Volume</strong> measures contracts traded in a session and
+resets to zero each day; <strong>open interest</strong> is a running
+total of all outstanding contracts.
+When Trader A opens long from Trader B who opens short: volume = 1,
+OI = 1.
+When Trader B buys back from Trader C (both transacting but neither
+pair is net new): volume = 2, OI stays at 1.
+</p>
+
+<p>
+The <strong>Options Clearing Corporation (OCC)</strong> is the
+ultimate guarantor of every options trade — in 2010, nearly 3.9
+billion contracts.
+It works through clearing members: both sides of a trade submit
+to their respective clearing firms, which both report to the OCC,
+which matches the trade.
+If the original seller covers his position, the OCC reassigns an
+obligation to a different short holder — the OCC is the ultimate
+counterparty to both exercise and assignment.
+Exchange-listed options are standardized: fixed contract size
+(typically 100 shares), listed strike increments, and standard
+expiration schedules.
+</p>
+
+<p>
+An option's <strong>premium</strong> has two components.
+<strong>Intrinsic value</strong> is the amount by which an option
+is in-the-money: an IBM 170 call with IBM at $171.30 has $1.30
+intrinsic value.
+<strong>Time value</strong> is what remains — the possibility of
+further favorable movement.
+OTM options are entirely time value; deep ITM options trading with
+virtually no time value are said to be trading at <strong>parity</strong>.
+</p>
+
+<p>
+The four basic positions map to distinct risk profiles.
+<strong>Buying a call</strong>: Intel June 22.50 call at $0.85
+with INTC at $22.25 — limited risk ($85 per contract), unlimited
+upside, break-even of $23.35.
+At $27 expiration the return is 429%; leverage cuts both ways.
+<strong>Selling a naked call</strong>: TGT October 50 call at $1.45
+with TGT at $49.42 — the $1.45 is the maximum profit;
+risk is unlimited above the $51.45 break-even.
+This position requires margin and is "not bullish" — it merely
+requires TGT not to rise above $50.
+</p>
+
+<p>
+<strong>Selling a covered call</strong> — owning the stock and
+writing a call against it — caps upside in exchange for income.
+Isabel buys TGT at $49.42 and sells the October 50 call at $1.45:
+maximum profit is $2.03 (the $0.58 stock gain to $50 plus the $1.45
+premium) and the break-even drops to $47.97.
+<strong>Selling a put</strong> is the bullish-neutral income trade:
+Sam sells a BA January 65 put at $1.20 with BA at $69.77, willing
+to own the stock at an effective cost of $63.80.
+If the put is never assigned, Sam keeps the $1.20 regardless.
+The <strong>long put</strong> mirrors the short call: buying the
+SPY May 139 put at $2.30 delivers a break-even of $136.70 and
+limited risk equal to the premium.
+A <strong>protective put</strong> — stock plus long put — is pure
+insurance: Kathleen's maximum loss on the SPY position is $3.65
+per share regardless of how far the market falls.
+</p>
+
+<div class="fig-list">
+<span class="fig-item"><span class="fig-label">Exhibit 1.1</span><a class="fig-view-link" href="#" data-fig="charts/fig_p0028.jpg" data-caption="Exhibit 1.1: Long INTC call at expiration — hockey-stick P&amp;L diagram">[view]</a></span>
+<span class="fig-item"><span class="fig-label">Exhibit 1.2</span><a class="fig-view-link" href="#" data-fig="charts/fig_p0029.jpg" data-caption="Exhibit 1.2: Long call vs. long stock comparison">[view]</a></span>
+<span class="fig-item"><span class="fig-label">Exhibit 1.3</span><a class="fig-view-link" href="#" data-fig="charts/fig_p0030.jpg" data-caption="Exhibit 1.3: Naked TGT call — unlimited risk above break-even">[view]</a></span>
+<span class="fig-item"><span class="fig-label">Exhibit 1.4</span><a class="fig-view-link" href="#" data-fig="charts/fig_p0032.jpg" data-caption="Exhibit 1.4: Covered call P&amp;L — buy-write on TGT">[view]</a></span>
+<span class="fig-item"><span class="fig-label">Exhibit 1.5</span><a class="fig-view-link" href="#" data-fig="charts/fig_p0034.jpg" data-caption="Exhibit 1.5: Short BA put at expiration">[view]</a></span>
+<span class="fig-item"><span class="fig-label">Exhibit 1.6</span><a class="fig-view-link" href="#" data-fig="charts/fig_p0036.jpg" data-caption="Exhibit 1.6: Long SPY put at expiration">[view]</a></span>
+<span class="fig-item"><span class="fig-label">Exhibit 1.7</span><a class="fig-view-link" href="#" data-fig="charts/fig_p0037.jpg" data-caption="Exhibit 1.7: Protective put — stock plus long put">[view]</a></span>
+</div>
+
+<p>
+<strong>American-exercise</strong> options — all exchange-listed
+equity options — can be exercised any time before expiration.
+<strong>European-exercise</strong> options, common for indexes like
+the S&amp;P 500 (SPX), can only be exercised at expiration.
+ETFs like SPY track an index (SPY ≈ 1/10th of the S&amp;P 500 level)
+and settle via physical share delivery, while SPX settles in cash.
+Many index options are also <strong>a.m.-settled</strong>: the last
+trading day is Thursday before expiration Friday, with the
+settlement price set by Friday morning opening prices of all
+components — a common source of surprises.
+</p>
+
+<h2 id="ch2">Chapter 2: Greek Philosophy</h2>
+
+<p>
+Options have a <strong>price</strong> in the market and a
+<strong>value</strong> determined by an options-pricing model.
+The model (typically Black-Scholes) takes inputs — current stock
+price, strike, time to expiration, risk-free rate, and volatility
+— and outputs a theoretical value.
+When market price diverges from theoretical value, a tradeable
+opportunity may exist.
+The <strong>greeks</strong> are the derivatives of the pricing
+model: they measure how sensitive the option's value is to each
+input changing by a small amount.
+They do not predict the future — they describe the current
+risk landscape.
+</p>
+
+<p>
+<strong>Delta</strong> is the rate of change in option value per
+$1 move in the underlying stock.
+A call with delta 0.57 gains approximately $0.57 in value for
+every $1 rise in the stock.
+Delta ranges from 0 (deep OTM call) to 1.00 (deep ITM call).
+ATM options typically have delta near 0.50.
+Passarelli offers four definitions: (1) the option's rate of price
+change per dollar move in the stock; (2) the hedge ratio — the
+number of options needed to hedge 100 shares of stock;
+(3) the percentage probability of expiring ITM; and
+(4) the equivalent stock position — a 0.50 delta call behaves like
+owning 50 shares.
+</p>
+
+<p>
+<blockquote>
+"Option greeks are metrics used to measure an option's sensitivity
+to influences on its price. Comprehensive knowledge of the greeks
+can help traders to avoid common pitfalls and increase profit
+potential."
+<cite>— Dan Passarelli</cite>
+</blockquote>
+
+Delta is not fixed — it changes as the stock moves, as time passes,
+and as volatility shifts.
+This rate of change is <strong>gamma</strong>.
+An option with delta 0.50 and gamma 0.05 will have delta 0.55 if
+the stock rises $1, and 0.45 if it falls $1.
+ATM options have the highest gamma; far ITM and far OTM options
+have near-zero gamma.
+Long options have positive gamma — the delta is always working
+"with" you, increasing when the stock moves in your favor and
+decreasing when it moves against you.
+Short options have negative gamma — the delta always works against
+you, creating the constant risk of an accelerating loss.
+</p>
+
+<p>
+<strong>Theta</strong> is the daily cost of owning time value.
+A long ATM option losing $0.013 per day (theta = −0.013) is slowly
+being consumed by the passage of time.
+Theta is not linear: it accelerates sharply in the final 30 days
+before expiration, especially for ATM options.
+The exhibit of ATM theta over the final 10 days shows the decay
+curve becoming increasingly steep.
+Short options earn positive theta — the option seller's edge is
+this steady collection of time value.
+The theta-gamma trade-off is the central tension of all options
+strategies: long gamma means negative theta, short gamma means
+positive theta, and neither side gets both.
+</p>
+
+<div class="fig-list">
+<span class="fig-item"><span class="fig-label">Exhibit 2.1</span><a class="fig-view-link" href="#" data-fig="charts/fig_p0043.jpg" data-caption="Exhibit 2.1: RMBS option chain showing delta across strikes">[view]</a></span>
+<span class="fig-item"><span class="fig-label">Exhibit 2.2</span><a class="fig-view-link" href="#" data-fig="charts/fig_p0044.jpg" data-caption="Exhibit 2.2: Gamma example — how delta changes per $1 stock move">[view]</a></span>
+<span class="fig-item"><span class="fig-label">Exhibit 2.3</span><a class="fig-view-link" href="#" data-fig="charts/fig_p0047.jpg" data-caption="Exhibit 2.3: Theta decay table — daily cost per ATM option">[view]</a></span>
+<span class="fig-item"><span class="fig-label">Exhibit 2.4</span><a class="fig-view-link" href="#" data-fig="charts/fig_p0048.jpg" data-caption="Exhibit 2.4: Theta acceleration in final 10 days to expiration">[view]</a></span>
+<span class="fig-item"><span class="fig-label">Exhibit 2.5</span><a class="fig-view-link" href="#" data-fig="charts/fig_p0051.jpg" data-caption="Exhibit 2.5: Call delta relative to stock price — the S-curve">[view]</a></span>
+<span class="fig-item"><span class="fig-label">Exhibit 2.6</span><a class="fig-view-link" href="#" data-fig="charts/fig_p0052.jpg" data-caption="Exhibit 2.6: Gamma by moneyness for QQQ calls">[view]</a></span>
+<span class="fig-item"><span class="fig-label">Exhibit 2.7</span><a class="fig-view-link" href="#" data-fig="charts/fig_p0052.jpg" data-caption="Exhibit 2.7: Gamma by strike — ATM peak">[view]</a></span>
+<span class="fig-item"><span class="fig-label">Exhibit 2.8</span><a class="fig-view-link" href="#" data-fig="charts/fig_p0053.jpg" data-caption="Exhibit 2.8: Gamma with time — ATM gamma increases as expiration approaches">[view]</a></span>
+</div>
+
+<p>
+<div class="diagram">
+<svg viewBox="0 0 520 200" width="100%" style="max-width:520px;display:block;margin:1em auto">
+  <rect width="520" height="200" fill="#1a1a2e" rx="8"/>
+  <text x="200" y="20" fill="#c5a55a" font-size="13" font-family="monospace" font-weight="bold">Theta Decay — ATM Option</text>
+  <!-- axes -->
+  <line x1="50" y1="170" x2="490" y2="170" stroke="#555" stroke-width="1.5"/>
+  <line x1="50" y1="170" x2="50" y2="25" stroke="#555" stroke-width="1.5"/>
+  <!-- decay curve - starts gentle, accelerates near expiration -->
+  <path d="M70,40 C150,42 240,55 310,85 C360,105 400,135 450,168" stroke="#f97583" stroke-width="2.5" fill="none"/>
+  <!-- annotations -->
+  <text x="60" y="37" fill="#888" font-size="10" font-family="monospace">Time value</text>
+  <text x="455" y="165" fill="#888" font-size="10" font-family="monospace">Expiry</text>
+  <text x="55" y="185" fill="#888" font-size="10" font-family="monospace">90 days</text>
+  <text x="270" y="185" fill="#888" font-size="10" font-family="monospace">30 days</text>
+  <text x="440" y="185" fill="#888" font-size="10" font-family="monospace">0</text>
+  <!-- acceleration zone -->
+  <line x1="380" y1="50" x2="400" y2="120" stroke="#c5a55a" stroke-width="1" stroke-dasharray="3,3"/>
+  <text x="405" y="80" fill="#c5a55a" font-size="10" font-family="monospace">Acceleration</text>
+  <text x="405" y="93" fill="#c5a55a" font-size="10" font-family="monospace">zone (&lt;30 days)</text>
+</svg>
+<p class="diagram-caption">ATM option theta decay accelerates sharply in the final 30 days.
+The curve is gentle early in the option's life and becomes steep
+near expiration — the time-value "cliff."</p>
+</div>
+
+<strong>Vega</strong> measures sensitivity to implied volatility.
+An AT&amp;T call with vega of 0.10 gains $0.10 for every one-point
+rise in IV.
+The relationship is symmetrical: the same option loses $0.10 for
+every one-point fall.
+Vega is highest for ATM options with the most time remaining —
+longer-dated options have more of their premium composed of
+uncertainty, which responds more to volatility changes.
+Short-dated options and deep ITM/OTM options have low vega.
+This is why the rule holds:
+
+<blockquote>
+"Buy options when expecting volatility to increase;
+sell options when expecting volatility to decrease."
+<cite>— Dan Passarelli, recurring principle throughout Trading Option Greeks</cite>
+</blockquote>
+</p>
+
+<p>
+<table>
+<caption>Greek Behavior by Moneyness — ATM Options Have the Most of Everything</caption>
+<thead>
+<tr><th>Moneyness</th><th>Delta (call)</th><th>Gamma</th><th>Theta (magnitude)</th><th>Vega</th></tr>
+</thead>
+<tbody>
+<tr><td>Deep ITM</td><td>Near 1.00</td><td>Low</td><td>Low</td><td>Low</td></tr>
+<tr><td>Slightly ITM</td><td>0.60–0.80</td><td>Moderate</td><td>Moderate</td><td>Moderate</td></tr>
+<tr><td>At-the-money</td><td>≈0.50</td><td><strong>Highest</strong></td><td><strong>Highest</strong></td><td><strong>Highest</strong></td></tr>
+<tr><td>Slightly OTM</td><td>0.20–0.40</td><td>Moderate</td><td>Moderate</td><td>Moderate</td></tr>
+<tr><td>Deep OTM</td><td>Near 0</td><td>Low</td><td>Low</td><td>Low</td></tr>
+</tbody>
+</table>
+
+<strong>Rho</strong> measures the sensitivity to interest rates.
+It enters the pricing model through put-call parity: calls benefit
+from rising rates (the cost of carrying stock) while puts are hurt.
+For most retail traders, rho is the least important greek in the
+short run.
+Its influence grows substantially with time — a LEAPS option can
+have rho ten times that of a near-term option at the same strike.
+Passarelli notes that online brokers sometimes quote greeks using
+slightly different model assumptions, and traders should understand
+what they are seeing.
+</p>
+
+<h2 id="ch3">Chapter 3: Understanding Volatility</h2>
+
+<p>
+<strong>Historical volatility (HV)</strong> — also called realized
+volatility or statistical volatility — is the annualized standard
+deviation of daily returns over a past period.
+It tells you how much the stock actually moved.
+Standard deviation, represented by the Greek letter sigma (σ),
+measures dispersion from a mean.
+In a normal distribution, roughly 68% of observations fall within
+one standard deviation of the mean, 95% within two, and 99.7%
+within three — the "68-95-99.7 rule."
+Applied to stocks: if a stock has 20% HV and is trading at $50,
+there is a 68% probability it will be between $40 and $60 in one
+year.
+</p>
+
+<p>
+<strong>Implied volatility (IV)</strong> is the volatility figure
+implied by the option's current market price.
+Where HV asks "how much did the stock move?" IV asks "how much
+does the market expect it to move?"
+IV is derived by plugging the current option price back into the
+pricing model and solving for the volatility input.
+When fear rises — before earnings, during crises — option buyers
+pay up and IV inflates.
+When calm returns, IV collapses.
+The <strong>VIX</strong> index measures 30-day IV on S&amp;P 500
+options and has a persistent inverse relationship with the index
+itself: market drops drive VIX up, rallies bring it down.
+</p>
+
+<p>
+To convert annual IV into a single-day expected move, divide by
+the square root of 252 (trading days in a year).
+A stock with 25% IV has a daily expected move of
+25% ÷ √252 ≈ 1.57%.
+For a $40 stock: the one-standard-deviation daily move is
+$40 × 1.57% ≈ $0.63.
+This calculation lets traders compare the magnitude of implied
+moves against their directional forecasts or strategy requirements.
+</p>
+
+<p>
+Extending to a multi-day expected move uses the same formula
+scaled by the square root of time.
+For a 30-day move at 25% IV: 25% × √(30/252) ≈ 8.63%.
+For the same $40 stock, this translates to a one-standard-deviation
+expected move of $3.45 over 30 days.
+Straddle traders use this calculation to evaluate whether
+the premium they are paying for a straddle is justified
+by the expected move:
+if a 30-day straddle costs $3.00 and the standard deviation
+expected move is $3.45, the options are priced fairly.
+If the straddle costs $5.00, options are expensive relative to
+historical movement patterns — a sell signal.
+This is how professional traders convert abstract "implied
+volatility" numbers into concrete dollar move expectations.
+</p>
+
+<table>
+<caption>Deannualizing IV — One Standard Deviation Expected Moves</caption>
+<thead>
+<tr><th>Annual IV</th><th>1-Day Expected Move (%)</th><th>7-Day Move (%)</th><th>30-Day Move (%)</th><th>$40 Stock: 30-Day $Move</th></tr>
+</thead>
+<tbody>
+<tr><td>15%</td><td>0.94%</td><td>2.50%</td><td>5.19%</td><td>$2.07</td></tr>
+<tr><td>25%</td><td>1.57%</td><td>4.16%</td><td>8.63%</td><td>$3.45</td></tr>
+<tr><td>40%</td><td>2.52%</td><td>6.65%</td><td>13.80%</td><td>$5.52</td></tr>
+<tr><td>60%</td><td>3.78%</td><td>9.98%</td><td>20.70%</td><td>$8.28</td></tr>
+<tr><td>80%</td><td>5.04%</td><td>13.30%</td><td>27.59%</td><td>$11.04</td></tr>
+</tbody>
+</table>
+
+<div class="fig-list">
+<span class="fig-item"><span class="fig-label">Exhibit 3.1</span><a class="fig-view-link" href="#" data-fig="charts/fig_p0060.jpg" data-caption="Exhibit 3.1: Bell curve — standard deviation and probability distribution">[view]</a></span>
+<span class="fig-item"><span class="fig-label">Exhibit 3.2</span><a class="fig-view-link" href="#" data-fig="charts/fig_p0062.jpg" data-caption="Exhibit 3.2: HV vs IV comparison — divergence before earnings">[view]</a></span>
+<span class="fig-item"><span class="fig-label">Exhibit 3.3</span><a class="fig-view-link" href="#" data-fig="charts/fig_p0066.jpg" data-caption="Exhibit 3.3: VIX and S&amp;P 500 inverse relationship">[view]</a></span>
+<span class="fig-item"><span class="fig-label">Exhibit 3.4</span><a class="fig-view-link" href="#" data-fig="charts/fig_p0069.jpg" data-caption="Exhibit 3.4: Volatility term structure — GM near vs. far month IV">[view]</a></span>
+<span class="fig-item"><span class="fig-label">Exhibit 3.5</span><a class="fig-view-link" href="#" data-fig="charts/fig_p0070.jpg" data-caption="Exhibit 3.5: Vertical volatility skew — Citigroup put/call IV by strike">[view]</a></span>
+</div>
+
+<p>
+<div class="diagram">
+<svg viewBox="0 0 520 200" width="100%" style="max-width:520px;display:block;margin:1em auto">
+  <rect width="520" height="200" fill="#1a1a2e" rx="8"/>
+  <text x="150" y="20" fill="#c5a55a" font-size="13" font-family="monospace" font-weight="bold">Volatility Skew (Vertical) — Typical Equity</text>
+  <!-- axes -->
+  <line x1="60" y1="165" x2="480" y2="165" stroke="#555" stroke-width="1.5"/>
+  <line x1="60" y1="30" x2="60" y2="170" stroke="#555" stroke-width="1.5"/>
+  <!-- axis labels -->
+  <text x="195" y="185" fill="#888" font-size="10" font-family="monospace">Strike (OTM put → ATM → OTM call)</text>
+  <text x="15" y="105" fill="#888" font-size="10" font-family="monospace" transform="rotate(-90,15,105)">IV %</text>
+  <!-- skew curve — higher on left (puts), lower on right (calls) -->
+  <path d="M80,45 C130,55 200,95 280,130 C340,150 400,158 460,162" stroke="#4ec9b0" stroke-width="2.5" fill="none"/>
+  <!-- level line for flat vol -->
+  <line x1="80" y1="130" x2="460" y2="130" stroke="#555" stroke-width="1" stroke-dasharray="4,4"/>
+  <text x="462" y="134" fill="#555" font-size="9" font-family="monospace">Flat IV</text>
+  <!-- annotations -->
+  <text x="70" y="40" fill="#f97583" font-size="10" font-family="monospace">OTM puts</text>
+  <text x="70" y="52" fill="#f97583" font-size="10" font-family="monospace">high IV</text>
+  <text x="400" y="152" fill="#4ec9b0" font-size="10" font-family="monospace">OTM calls</text>
+  <text x="400" y="164" fill="#4ec9b0" font-size="10" font-family="monospace">lower IV</text>
+  <text x="255" y="120" fill="#c5a55a" font-size="10" font-family="monospace">ATM</text>
+</svg>
+<p class="diagram-caption">Vertical volatility skew: OTM puts carry higher IV than OTM calls
+on the same expiration. The "smirk" reflects persistent demand for
+downside protection and the market's memory of crash risk.</p>
+</div>
+
+<blockquote>
+"Implied volatility measures what the market believes future
+volatility will be — not what it has been. When IV and
+historical volatility diverge significantly, the market
+is telling you something important."
+<cite>— Dan Passarelli, Chapter 3</cite>
+</blockquote>
+
+Volatility exhibits <strong>mean reversion</strong>: extremely high
+and extremely low IV levels tend to revert toward their historical
+averages.
+The SPX has had HV ranging from roughly 7% to 80% over the decades.
+When IV is unusually elevated relative to HV, it often signals an
+opportunity to sell volatility; when IV is depressed relative to
+its historical norms, buying volatility becomes more attractive.
+But mean reversion is probabilistic — IV can stay elevated longer
+than a trader can stay solvent on short volatility positions.
+</p>
+
+<p>
+Two types of skew matter to options traders.
+<strong>Term structure skew</strong>: near-term IV often differs
+from longer-term IV.
+Before an expected event (earnings, Fed meeting), front-month IV
+spikes while back-month IV may remain stable, flattening or
+inverting the term structure curve.
+<strong>Vertical skew</strong>: OTM puts typically have higher IV
+than OTM calls on the same expiration.
+This "volatility smirk" reflects persistent demand for downside
+protection — put buyers willing to overpay for insurance, market
+makers pricing in tail risk.
+The Citigroup exhibit shows a clear downward slope: the 30-strike
+put carries meaningfully higher IV than the 35-strike call.
+</p>
+
+<h2 id="ch4">Chapter 4: Option-Specific Risk and Opportunity</h2>
+
+<p>
+Each position in an option has a unique greek profile that changes
+as the underlying moves, as time passes, and as volatility shifts.
+Understanding these dynamics is not academic — it determines
+whether a trade is appropriate for a given forecast.
+Passarelli structures this chapter around two traders, Kim and Mick,
+who each analyze Disney (DIS) options using the full suite of greeks
+before and after opening positions.
+</p>
+
+<p>
+Kim examines long ATM calls on Disney at $35.
+The <strong>37.50 strike call</strong> (OTM) costs $0.55 and has
+a delta of 0.35, gamma of 0.166, theta of −0.013, and vega of
+0.048.
+The <strong>35 strike call</strong> (ATM) costs $1.30 and has
+delta 0.57, gamma 0.166, theta −0.013, and vega 0.048.
+The ATM call has higher delta but the same gamma and vega as the
+OTM call — yet costs more than twice as much.
+This highlights a key insight: gamma and vega are similar across
+nearby strikes at the same expiration, but delta and premium
+differ substantially.
+</p>
+
+<p>
+A long ATM call on Disney with stock at exactly $35 — break-even
+is $36.30 ($35 strike + $1.30 premium).
+The time-price matrix (Exhibit 4.2) shows how the value of this
+call changes across a range of stock prices and days remaining.
+At $37 with 44 days left the call is worth $3.30; at $37 with 20
+days left it is worth $2.90; the decay cost of time is immediately
+visible.
+<strong>OTM calls</strong> are really about gamma, time horizon,
+and magnitude: an OTM call only profits with a large, fast move.
+The theta and time demands on an OTM call make it a bet on both
+direction and speed — a higher hurdle than most traders realize.
+</p>
+
+<div class="fig-list">
+<span class="fig-item"><span class="fig-label">Exhibit 4.1</span><a class="fig-view-link" href="#" data-fig="charts/fig_p0075.jpg" data-caption="Exhibit 4.1: Disney 35 call — full greek table">[view]</a></span>
+<span class="fig-item"><span class="fig-label">Exhibit 4.2</span><a class="fig-view-link" href="#" data-fig="charts/fig_p0076.jpg" data-caption="Exhibit 4.2: Disney 35 call — time-price matrix">[view]</a></span>
+<span class="fig-item"><span class="fig-label">Exhibit 4.3</span><a class="fig-view-link" href="#" data-fig="charts/fig_p0079.jpg" data-caption="Exhibit 4.3: Disney 37.50 call — delta matrix across time and price">[view]</a></span>
+<span class="fig-item"><span class="fig-label">Exhibit 4.4</span><a class="fig-view-link" href="#" data-fig="charts/fig_p0080.jpg" data-caption="Exhibit 4.4: Disney 37.50 call — vega matrix">[view]</a></span>
+<span class="fig-item"><span class="fig-label">Exhibit 4.13</span><a class="fig-view-link" href="#" data-fig="charts/fig_p0101.jpg" data-caption="Exhibit 4.13: Greeks for Disney 35 call and put side by side">[view]</a></span>
+<span class="fig-item"><span class="fig-label">Exhibit 4.14</span><a class="fig-view-link" href="#" data-fig="charts/fig_p0101.jpg" data-caption="Exhibit 4.14: Disney 35 put — price-time-delta matrix">[view]</a></span>
+</div>
+
+<p>
+The <strong>long ITM call</strong> has the least amount of remaining
+time value and behaves most like long stock — the delta approaches
+1.00, gamma is low, and theta is minimal.
+ITM calls are used when a trader wants stock-like exposure with
+limited downside, or when very high probability of expiring ITM
+is desired.
+The tradeoff: the premium paid is large because of the intrinsic
+value component.
+</p>
+
+<p>
+<table>
+<caption>Kim's Disney Option Comparison — ATM vs OTM Call</caption>
+<thead>
+<tr><th>Greek</th><th>35 Call (ATM, $1.30)</th><th>37.50 Call (OTM, $0.55)</th></tr>
+</thead>
+<tbody>
+<tr><td>Delta</td><td>0.57</td><td>0.35</td></tr>
+<tr><td>Gamma</td><td>0.166</td><td>0.166</td></tr>
+<tr><td>Theta</td><td>−0.013</td><td>−0.013</td></tr>
+<tr><td>Vega</td><td>0.048</td><td>0.048</td></tr>
+<tr><td>Cost</td><td>$130 per contract</td><td>$55 per contract</td></tr>
+<tr><td>Break-even at expiration</td><td>$36.30</td><td>$38.05</td></tr>
+</tbody>
+</table>
+
+<p>
+The table reveals a striking insight: the OTM call has <em>identical</em>
+gamma, theta, and vega to the ATM call — yet costs less than half
+as much and has meaningfully lower delta.
+The difference is entirely delta: the ATM call has 0.57 delta
+while the OTM call has 0.35.
+An aggressive investor buys OTM calls expecting large moves;
+a moderate investor buys ATM for better probability of profit.
+But in terms of time decay and volatility sensitivity, both are
+equally exposed per contract — the OTM call is not "safer" on
+a theta or vega basis.
+This is one of the most important practical insights in the book:
+moneyness primarily affects delta, not the other greeks at similar
+strikes within a few dollars of ATM.
+</p>
+
+<p>
+The <strong>time-price matrix</strong> for the Disney 35 call shows
+how option value changes across both stock price and time.
+With 44 days to go: at $37 the call is worth $3.30;
+at $38 the call is worth $4.20.
+With 20 days to go: at $37 the call is worth $2.90;
+at $38 the call is worth $3.80.
+The difference — $0.40 lost per $1 of favorable stock movement
+over 24 days — is the cost of time.
+Traders who watch only delta and forget theta are surprised
+by this: the stock can move in your favor and the option can
+still lose value if time passes faster than delta gains.
+</p>
+
+Passarelli's core observation: <em>all options trades are, at their
+heart, volatility trades.</em>
+Buying options is a bullish volatility position: you want IV to
+rise (making your option worth more) or realized vol to exceed
+what you paid for.
+Selling options is a bearish volatility position: you want IV to
+fall and the stock to move less than the option premium implied.
+This framework cuts across direction: even a directional long call
+is also a bet that realized vol will justify the premium paid.
+The taxonomy of buying strategies (long calls, long puts, long
+straddles) vs. selling strategies (covered calls, short puts,
+iron condors) maps directly onto long-vol vs. short-vol exposures.
+</p>
+
+<p>
+<blockquote>
+"There should be no statistical advantage to systematically buying
+or selling options. The options market will always equalize
+imbalances."
+<cite>— Dan Passarelli, Chapter 4</cite>
+</blockquote>
+
+The <strong>teenie sellers</strong> of the CBOE floor — traders who
+habitually sold deep OTM options for "teinies" ($0.0625, the
+minimum tick in pre-decimal days) — appeared to have a reliable
+edge collecting small premiums month after month.
+Eventually, a single catastrophic event wiped out years of gains
+in a day.
+The <strong>Babe Ruth analogy</strong> captures the other side:
+Ruth had a low batting average but a very high expected value per
+at-bat because his home runs far exceeded his strikeouts in
+dollar terms.
+Long-option traders accept many small losses for occasional large
+winners.
+The <strong>Fair Game argument</strong>: in an efficient market,
+there should be no systematic statistical edge to buying or selling
+options — the market prices IV at its fair expected value,
+just as a fair die game offers no edge at the correct entrance fee.
+Individual mispricings exist at moments; a systematic advantage
+for one side does not.
+</p>
+
+<h2 id="ch5">Chapter 5: Introduction to Volatility-Selling Strategies</h2>
+
+<p>
+Along with death and taxes, Passarelli writes, one fact of options
+life is certain: the time value of all options ultimately goes to
+zero.
+<strong>Volatility-selling strategies</strong> exploit this: they
+are income-generating positions that are short gamma, short vega,
+and long theta.
+The seller is "effectively paid to assume the risk of movement" —
+collecting premium in exchange for bearing the risk that the
+underlying moves farther than the market priced in.
+</p>
+
+<p>
+<blockquote>
+"Along with death and taxes, there is one other fact of life
+we can all count on: the time value of all options ultimately
+going to zero."
+<cite>— Dan Passarelli, Chapter 5</cite>
+</blockquote>
+
+The <strong>gamma-theta trade-off</strong> is the engine of all
+volatility-selling positions.
+Short options have negative gamma (delta always working against you
+as the stock moves) but positive theta (daily income from time
+decay).
+The seller is a slow, steady earner — collecting a small amount
+each day — who faces the occasional outsized loss if the underlying
+moves sharply.
+The buyer has the mirror profile: daily bleed from negative theta,
+but gains sharply when a big move arrives.
+Passarelli argues that the greeks matter for volatility sellers
+even if the seller intends to hold to expiration: they determine
+when to exit early, how to size stop-losses, and how to manage
+the position if the environment changes.
+</p>
+
+<p>
+<strong>Brendan's naked JNJ call</strong>: Johnson &amp; Johnson
+has been trading in a $60–$65 channel for months; the stock
+approaches the $65 resistance level.
+Brendan sells 10 JNJ November 65 calls at $0.66 with the stock
+near $64 — maximum profit $660, 28 days to expiration.
+He checks: no earnings, no takeover news, ADX/DMI confirms no
+trend.
+The greeks on entry: delta −0.34, gamma −0.15, theta +0.02,
+vega −0.07.
+To plan his stop-loss, Brendan uses delta and gamma: to trigger
+a stop at the $1.10 repurchase price, the stock needs to rise
+only $1.01 — not the $1.24 suggested by delta alone — because
+gamma accelerates the option's price sensitivity as the stock
+rises.
+</p>
+
+<div class="fig-list">
+<span class="fig-item"><span class="fig-label">Exhibit 5.1</span><a class="fig-view-link" href="#" data-fig="charts/fig_p0112.jpg" data-caption="Exhibit 5.1: Naked JNJ call at expiration — profit capped, risk unlimited">[view]</a></span>
+<span class="fig-item"><span class="fig-label">Exhibit 5.2</span><a class="fig-view-link" href="#" data-fig="charts/fig_p0112.jpg" data-caption="Exhibit 5.2: Greeks for short JNJ 65 call — delta, gamma, theta, vega">[view]</a></span>
+<span class="fig-item"><span class="fig-label">Exhibit 5.3</span><a class="fig-view-link" href="#" data-fig="charts/fig_p0114.jpg" data-caption="Exhibit 5.3: JNJ theta table — daily decay over 28-day life">[view]</a></span>
+<span class="fig-item"><span class="fig-label">Exhibit 5.5</span><a class="fig-view-link" href="#" data-fig="charts/fig_p0117.jpg" data-caption="Exhibit 5.5: Naked JNJ put — vega matrix showing IV sensitivity">[view]</a></span>
+<span class="fig-item"><span class="fig-label">Exhibit 5.7</span><a class="fig-view-link" href="#" data-fig="charts/fig_p0120.jpg" data-caption="Exhibit 5.7: Covered call — Bill's HOG March 70 with theta comparison">[view]</a></span>
+</div>
+
+<p>
+The <strong>naked put</strong> — Stacie's JNJ 65 put — appears
+safer than the naked call because stocks don't typically fall as
+fast as they rise, but it carries a subtle extra risk: when a
+stock falls sharply, IV almost always spikes simultaneously.
+A naked put holder faces a "<strong>double whammy</strong>": the
+delta loss from the stock falling plus the vega loss from rising
+IV, both hitting simultaneously.
+</p>
+
+<p>
+The <strong>covered call</strong> — Bill's Harley-Davidson HOG
+March 70 call — replaces the unlimited risk of a naked call with
+the stock as collateral.
+But this is not "free money": the stock can still fall sharply,
+and the $1.45 premium provides only $1.45 of downside cushion.
+Passarelli notes the IV term structure opportunity: if near-month
+IV is elevated relative to back-months, the covered call seller
+is collecting inflated premium that is likely to revert.
+The <strong>covered put</strong> — Libby's HOG short put paired
+with short stock — is the mirror strategy, appropriate when the
+trader is bearish on the stock with a neutral short-term IV view.
+</p>
+
+<p>
+The <strong>"Would I Do It Now?" rule</strong> appears here for the
+first time: periodically examine every open short position and ask
+whether, starting fresh with no position, you would establish this
+short right now at the current price.
+If the answer is no — if market conditions have changed enough that
+you'd pass on this trade — then close it.
+This rule combats the inertia that keeps traders holding losers
+through cognitive dissonance rather than clear-eyed decision-making.
+</p>
+
+<table>
+<caption>Volatility-Selling Strategies — Greek Fingerprints and Key Risks</caption>
+<thead>
+<tr><th>Strategy</th><th>Delta</th><th>Gamma</th><th>Theta</th><th>Vega</th><th>Key Risk</th></tr>
+</thead>
+<tbody>
+<tr><td>Naked call (Brendan JNJ)</td><td>−</td><td>−</td><td>+</td><td>−</td><td>Unlimited upside risk; rising stock</td></tr>
+<tr><td>Naked put (Stacie JNJ)</td><td>+</td><td>−</td><td>+</td><td>−</td><td>Double whammy: falling stock + rising IV simultaneously</td></tr>
+<tr><td>Covered call (Bill HOG)</td><td>+ (stock − call)</td><td>−</td><td>+</td><td>−</td><td>Stock decline; premium provides only limited cushion</td></tr>
+<tr><td>Covered put (Libby HOG)</td><td>− (short stock − put)</td><td>−</td><td>+</td><td>−</td><td>Stock rally; opposite of covered call risk</td></tr>
+<tr><td>Cash-secured put</td><td>+</td><td>−</td><td>+</td><td>−</td><td>Assignment at strike; effective stock ownership below market</td></tr>
+</tbody>
+</table>
+
+<p>
+The <strong>covered call vs. naked put equivalence</strong> is one
+of the most important insights from put-call parity:
+a covered call (long stock + short call) and a cash-secured short
+put at the same strike and expiration produce <em>identical
+P&amp;L profiles at expiration.</em>
+Bill's covered call on HOG at the 70 strike has the same
+at-expiration diagram as Libby's naked put at the 70 strike.
+The difference is in capital requirements, assignment mechanics,
+and dividend handling — not in the underlying risk profile.
+Market makers arbitrage any pricing divergence between the two
+instantly through conversions and reversals.
+This equivalence helps traders choose the most capital-efficient
+version of the same trade.
+</p>
+
+<h2 id="ch6">Chapter 6: Put-Call Parity and Synthetics</h2>
+
+<p>
+<strong>Put-call parity</strong> is the most fundamental
+no-arbitrage relationship in options.
+For European options: call price − put price = stock price −
+present value of strike.
+Without dividends: C − P = S − Xe^(−rT).
+With dividends: C − P = S − PV(dividends) − Xe^(−rT).
+This means that a call and a put on the same underlying, same
+strike, same expiration, combined with the appropriate stock or
+bond position, must produce an equivalent payoff — or arbitrage
+exists.
+</p>
+
+<p>
+Passarelli walks through the arithmetic concretely.
+If a stock is at $50, the 50 call is $3.00, and the 50 put is
+$2.50, and the risk-free rate is 5% with 60 days to expiration:
+the call-put parity formula predicts the difference should be
+$50 − $50 × e^(−0.05 × 60/365) ≈ $0.41.
+The actual difference is $3.00 − $2.50 = $0.50.
+The call is overpriced by $0.09 — or the put is underpriced —
+and a conversion or reversal could capture this.
+In practice, the bid-ask spread, commissions, and borrowing costs
+for the stock position consume most of any small arbitrage profit,
+which is why only institutions with near-zero transaction costs
+run conversion/reversal books profitably.
+</p>
+
+<p>
+The interest advantage embedded in calls explains why they always
+trade at a premium to puts of the same strike: the call buyer
+avoids tying up capital in the stock, earning interest on the
+difference.
+A <strong>married put</strong> (long stock + long put) and a
+<strong>long call</strong> are synthetic equivalents — same payoff
+profile at expiration — but the call is cheaper because the
+investor doesn't pay for the stock upfront.
+</p>
+
+<p>
+The four basic <strong>synthetic relationships</strong>:
+long stock = long call + short put (same strike, same expiration);
+short stock = short call + long put;
+long call = long stock + long put;
+long put = short stock + long call.
+These are not just theoretical curiosities — they are actively
+used by market makers to hedge exposures and by traders to
+construct positions more capital-efficiently.
+</p>
+
+<div class="fig-list">
+<span class="fig-item"><span class="fig-label">Exhibit 6.1</span><a class="fig-view-link" href="#" data-fig="charts/fig_p0128.jpg" data-caption="Exhibit 6.1: Put-call parity formula with worked example">[view]</a></span>
+<span class="fig-item"><span class="fig-label">Exhibit 6.2</span><a class="fig-view-link" href="#" data-fig="charts/fig_p0130.jpg" data-caption="Exhibit 6.2: Synthetic stock — delta comparison with actual stock">[view]</a></span>
+<span class="fig-item"><span class="fig-label">Exhibit 6.3</span><a class="fig-view-link" href="#" data-fig="charts/fig_p0132.jpg" data-caption="Exhibit 6.3: Conversion — long stock + short call + long put greek exhibit">[view]</a></span>
+<span class="fig-item"><span class="fig-label">Exhibit 6.4</span><a class="fig-view-link" href="#" data-fig="charts/fig_p0133.jpg" data-caption="Exhibit 6.4: Reversal — short stock + long call + short put">[view]</a></span>
+</div>
+
+<p>
+A <strong>conversion</strong> is long stock + long put + short call
+(all same strike and expiration) — a synthetic short bond position.
+A <strong>reversal</strong> is the mirror: short stock + short put
++ long call.
+Both produce a fixed, known payoff at expiration with the primary
+greek exposure being <strong>rho</strong> — the interest rate risk
+of locking up capital.
+Conversions and reversals are how professional market makers
+arbitrage put-call parity violations.
+</p>
+
+<table>
+<caption>Synthetic Equivalents — Put-Call Parity Relationships</caption>
+<thead>
+<tr><th>Position</th><th>Synthetic Equivalent</th><th>Components</th><th>Primary Risk</th></tr>
+</thead>
+<tbody>
+<tr><td>Long stock</td><td>Synthetic long stock</td><td>Long call + short put (same strike)</td><td>Delta; rho for long-dated</td></tr>
+<tr><td>Short stock</td><td>Synthetic short stock</td><td>Short call + long put (same strike)</td><td>Delta; dividend risk</td></tr>
+<tr><td>Long call</td><td>Synthetic long call</td><td>Long stock + long put</td><td>Delta + theta (put decay)</td></tr>
+<tr><td>Long put</td><td>Synthetic long put</td><td>Short stock + long call</td><td>Short-stock margin; borrowing cost</td></tr>
+<tr><td>Short call</td><td>Synthetic short call</td><td>Short stock + short put</td><td>Unlimited upside risk via put assignment</td></tr>
+<tr><td>Conversion</td><td>Short bond equivalent</td><td>Long stock + long put + short call</td><td>Rho (interest rate sensitivity)</td></tr>
+<tr><td>Reversal</td><td>Long bond equivalent</td><td>Short stock + short put + long call</td><td>Rho; dividend assignment risk</td></tr>
+</tbody>
+</table>
+
+<p>
+The practical value of synthetic relationships extends beyond
+arbitrage.
+A trader who wants to reduce a long call position without
+triggering short-term capital gains might instead sell synthetic
+equivalents rather than closing the call directly.
+An institution that needs to quickly establish a short position
+in a stock with limited borrow availability can replicate it
+with options.
+Market makers use these equivalences constantly to manage delta
+exposures across their books: when a large customer order creates
+an unbalanced delta position, the fastest hedge may be a
+synthetic rather than the physical stock.
+</p>
+
+<p>
+<strong>Pin risk</strong> is the silent danger for short-option
+holders near expiration: if the stock settles exactly at the strike,
+the trader doesn't know whether they'll be assigned.
+A market maker short 100 calls at the 50 strike with stock at
+exactly $50.00 at expiration may be assigned on some, all, or none
+of those contracts — and won't find out until after the weekend.
+<strong>Boxes</strong> — a conversion combined with a reversal at
+different strikes — are pure interest-rate instruments: the locked-in
+payoff discounted to present value represents a form of borrowing
+or lending, used by institutions to manage short-term cash.
+</p>
+
+<h2 id="ch7">Chapter 7: Rho</h2>
+
+<p>
+<strong>Rho</strong> measures the change in option price per 1%
+change in the risk-free interest rate.
+Calls have positive rho (rising rates benefit call holders by
+making the "borrow and buy" alternative less attractive relative
+to the leveraged call position);
+puts have negative rho (rising rates reduce the present value of
+the fixed-rate put payoff).
+</p>
+
+<p>
+The magnitude of rho scales with three factors: the depth of the
+option in-the-money, the level of the interest rate, and most
+importantly, <strong>time to expiration</strong>.
+A near-term option's rho is negligible — a 30-day ATM option might
+have rho of 0.02, barely visible.
+A LEAPS option with 639 days remaining can have rho of 0.638 —
+making a 1% rate move equivalent to a $0.64 change in the option's
+price per contract (or $64 for a standard contract).
+</p>
+
+<div class="fig-list">
+<span class="fig-item"><span class="fig-label">Exhibit 7.1</span><a class="fig-view-link" href="#" data-fig="charts/fig_p0137.jpg" data-caption="Exhibit 7.1: Rho by expiration — calls and puts across time">[view]</a></span>
+<span class="fig-item"><span class="fig-label">Exhibit 7.2</span><a class="fig-view-link" href="#" data-fig="charts/fig_p0139.jpg" data-caption="Exhibit 7.2: PG rho table — call and put rho at multiple expirations">[view]</a></span>
+</div>
+
+<p>
+Passarelli shows how traders can back interest rates out of option
+prices to determine what rate the market is currently pricing in —
+useful for spotting mispricings in LEAPS when actual rates diverge
+from priced-in rates.
+The practical conclusion: for most short-term equity option traders,
+rho is the least important greek in normal rate environments.
+But it becomes essential when trading LEAPS, when interest rates
+are volatile, or when managing large portfolios of long-dated
+positions.
+Ignoring rho on LEAPS positions is the most common rho-related
+error.
+</p>
+
+<p>
+The <strong>Procter &amp; Gamble rho table</strong> (Exhibit 7.2) shows
+how rho scales across expirations for both calls and puts.
+A near-month PG call with 30 days to expiration might carry rho
+of only 0.018; the same strike's LEAPS with 639 days carries
+rho of 0.638.
+The puts have negative rho of roughly equal magnitude.
+A trader long 10 LEAPS calls on PG would face a $638 change
+in position value per 1% shift in the risk-free rate — a number
+worth monitoring in an active rate-change environment.
+During the 2022–2023 Federal Reserve rate hiking cycle, traders
+holding large LEAPS books discovered rho firsthand as the
+cumulative effect of rate increases moved option values
+in ways that purely directional analysis did not predict.
+</p>
+
+<table>
+<caption>Rho Magnitude by Days to Expiration (ATM Call, 25% IV)</caption>
+<thead>
+<tr><th>Days to Expiration</th><th>Approx. Call Rho</th><th>Approx. Put Rho</th><th>Practical Relevance</th></tr>
+</thead>
+<tbody>
+<tr><td>30</td><td>+0.018</td><td>−0.015</td><td>Negligible for most trades</td></tr>
+<tr><td>60</td><td>+0.038</td><td>−0.032</td><td>Minor; monitor for large books</td></tr>
+<tr><td>90</td><td>+0.058</td><td>−0.049</td><td>Worth tracking in rising rate env.</td></tr>
+<tr><td>180</td><td>+0.120</td><td>−0.100</td><td>Meaningful for LEAPS strategies</td></tr>
+<tr><td>365</td><td>+0.240</td><td>−0.200</td><td>Primary greek concern for LEAPS</td></tr>
+<tr><td>639</td><td>+0.638</td><td>−0.520</td><td>Dominates P&amp;L in rate-volatile environments</td></tr>
+</tbody>
+</table>
+
+<h2 id="ch8">Chapter 8: Dividends and Option Pricing</h2>
+
+<p>
+Dividends affect option pricing in ways that surprise traders
+who haven't studied them carefully.
+Every dividend has four key dates: <strong>declaration date</strong>
+(board announces the dividend), <strong>ex-dividend date</strong>
+(first day trading without right to dividend), <strong>record date</strong>
+(shareholders of record who receive payment), and
+<strong>payment date</strong> (cash arrives).
+Traders who buy stock on or after the ex-date don't receive the
+current dividend; options pricing reflects this adjustment.
+</p>
+
+<p>
+When a stock goes ex-dividend, the stock price drops by
+approximately the dividend amount on the opening.
+This automatic price adjustment shifts option values: calls become
+worth less (the stock will fall), puts become worth more.
+A call priced without accounting for a $1 dividend will be
+overpriced by roughly $1 × delta; a put will be underpriced by
+the same amount.
+Input the correct dividend data into pricing models or the greeks
+will be wrong — the most common dividend error is using the wrong
+ex-date, which can create a 2-point IV misread.
+</p>
+
+<div class="fig-list">
+<span class="fig-item"><span class="fig-label">Exhibit 8.1</span><a class="fig-view-link" href="#" data-fig="charts/fig_p0149.jpg" data-caption="Exhibit 8.1: Dividend effect on call and put prices — before and after">[view]</a></span>
+<span class="fig-item"><span class="fig-label">Exhibit 8.2</span><a class="fig-view-link" href="#" data-fig="charts/fig_p0151.jpg" data-caption="Exhibit 8.2: Early exercise decision — dividend vs. put bid comparison">[view]</a></span>
+</div>
+
+<p>
+<strong>Early exercise of American calls</strong> is normally
+irrational — you give up time value by exercising early.
+The exception is dividends: if the dividend you would receive from
+exercising exceeds the time value you would sacrifice, early
+exercise is rational.
+The decision rule: early exercise makes sense when
+Dividend &gt; Interest + Put Bid, where the put bid is the
+time value of the equivalent put and interest is the cost of
+carrying the stock.
+Deep ITM calls with little time value and large dividends are the
+primary candidates for early assignment before the ex-date.
+</p>
+
+<p>
+A <strong>"dividend play"</strong> involves buying stock just
+before the ex-date specifically to capture the dividend, while
+short calls on that stock face assignment risk.
+Before the ex-date, volume in deep ITM calls spikes dramatically
+as dividend-play traders buy calls, exercise them to get long
+stock, and collect the dividend.
+<strong>GE's dividend</strong> — a 30-year streak of quarterly
+payments — was cut during the 2008–2009 financial crisis,
+surprising traders who had priced in dividend continuity and
+suddenly found their pricing models producing strange results.
+Near the ex-date, the sum of call delta and put delta can exceed
+1.00 in absolute terms — an anomaly caused by the discontinuous
+dividend adjustment, not a model error.
+</p>
+
+<p>
+The <strong>MSFT special dividend of 2004</strong> — $3 per share —
+created enormous disruption in Microsoft options.
+Traders who had not explicitly modeled the one-time $3 payment
+found their options pricing models suddenly wrong by a significant
+amount.
+Short call holders faced unexpected early assignment as smart
+money exercised to capture the dividend; short put holders
+benefited as the stock dropped predictably by $3 on the ex-date.
+Passarelli notes the more typical version: a company like XYZ
+that normally pays $0.10/quarter raises its dividend to $0.50.
+A model using $0.10 will misprice options significantly —
+an error that compounds if the position is held through
+multiple ex-dates.
+</p>
+
+<table>
+<caption>Early Exercise Decision for Dividends — Call Holder Framework</caption>
+<thead>
+<tr><th>Scenario</th><th>Dividend</th><th>Put Bid (time value)</th><th>Interest Cost</th><th>Early Exercise?</th></tr>
+</thead>
+<tbody>
+<tr><td>Deep ITM call, large dividend</td><td>$1.50</td><td>$0.05</td><td>$0.20</td><td>Yes — dividend exceeds cost</td></tr>
+<tr><td>Near ITM call, moderate dividend</td><td>$0.50</td><td>$0.40</td><td>$0.15</td><td>No — time value too high to sacrifice</td></tr>
+<tr><td>ATM call, standard dividend</td><td>$0.25</td><td>$0.80</td><td>$0.12</td><td>No — substantial time value remains</td></tr>
+<tr><td>Deep ITM LEAPS call</td><td>$0.80 (annual)</td><td>$0.15</td><td>$0.30</td><td>Maybe — evaluate each quarter</td></tr>
+</tbody>
+</table>
+
+<div class="part-divider">Part II — Spreads</div>
+
+<h2 id="ch9">Chapter 9: Vertical Spreads</h2>
+
+<p>
+A <strong>vertical spread</strong> is an options position combining
+a long option and a short option at different strikes, same
+expiration, same underlying.
+Buying a lower-strike call and selling a higher-strike call is a
+<strong>bull call spread</strong> — it costs less than the outright
+call but caps the upside at the short strike.
+The premium paid ($4.40 for an AAPL 395–405 bull call spread
+when AAPL is at $391) is the maximum loss; the difference between
+strikes minus the premium paid ($10 − $4.40 = $5.60) is the
+maximum gain.
+</p>
+
+<p>
+The greek profile of a vertical spread shifts as the stock moves
+through the strikes.
+When AAPL is at $395 (near the long strike): the long call's greeks
+dominate — negative theta, positive gamma, positive vega.
+The trader needs upward movement to overcome time decay.
+When AAPL is at $400 (the midpoint): both calls influence greeks
+roughly equally, and the position becomes nearly a pure delta play
+with minimal theta or vega.
+When AAPL reaches $405 (near the short strike): the short call
+dominates — gamma turns negative, theta turns positive.
+Time decay now works for the trader who bought the spread, helping
+consolidate the gain.
+</p>
+
+<div class="fig-list">
+<span class="fig-item"><span class="fig-label">Exhibit 9.1</span><a class="fig-view-link" href="#" data-fig="charts/fig_p0166.jpg" data-caption="Exhibit 9.1: Bull call spread at expiration — AAPL 395-405">[view]</a></span>
+<span class="fig-item"><span class="fig-label">Exhibit 9.2</span><a class="fig-view-link" href="#" data-fig="charts/fig_p0168.jpg" data-caption="Exhibit 9.2: Bull call spread P&amp;L at various dates before expiration">[view]</a></span>
+<span class="fig-item"><span class="fig-label">Exhibit 9.3</span><a class="fig-view-link" href="#" data-fig="charts/fig_p0170.jpg" data-caption="Exhibit 9.3: Bull call spread greeks at three stock prices">[view]</a></span>
+<span class="fig-item"><span class="fig-label">Exhibit 9.4</span><a class="fig-view-link" href="#" data-fig="charts/fig_p0180.jpg" data-caption="Exhibit 9.4: Bear call spread at expiration">[view]</a></span>
+<span class="fig-item"><span class="fig-label">Exhibit 9.7</span><a class="fig-view-link" href="#" data-fig="charts/fig_p0184.jpg" data-caption="Exhibit 9.7: Bear put spread — XOM example">[view]</a></span>
+<span class="fig-item"><span class="fig-label">Exhibit 9.10</span><a class="fig-view-link" href="#" data-fig="charts/fig_p0188.jpg" data-caption="Exhibit 9.10: Bull put spread — credit received, defined risk">[view]</a></span>
+</div>
+
+<p>
+<table>
+<caption>Bull Call Spread vs. Outright Call — AAPL 395-405 Example</caption>
+<thead>
+<tr><th>Scenario</th><th>Outright 395 Call ($14.60 debit)</th><th>395–405 Bull Spread ($4.40 debit)</th><th>Winner</th></tr>
+</thead>
+<tbody>
+<tr><td>AAPL at $405 at expiration</td><td>+$5.40 (37% gain)</td><td>+$5.60 (127% gain)</td><td>Spread</td></tr>
+<tr><td>AAPL at $405 with 4 weeks left</td><td>+36%</td><td>+30%</td><td>Outright call</td></tr>
+<tr><td>AAPL at $420 at expiration</td><td>+$10.40 (71% gain)</td><td>+$5.60 (127% gain)</td><td>Spread (return); call ($ profit)</td></tr>
+<tr><td>AAPL at $395 at expiration</td><td>−$14.60 (100% loss)</td><td>−$4.40 (100% loss)</td><td>Spread (lower $ loss)</td></tr>
+<tr><td>AAPL falls to $380</td><td>−$14.60</td><td>−$4.40</td><td>Spread (lower capital at risk)</td></tr>
+</tbody>
+</table>
+
+The comparison between a spread and an outright call depends on
+timing: at expiration, the bull call spread wins decisively if the
+stock reaches but doesn't exceed the short strike.
+An AAPL move from $391 to $405 by expiration gives the outright
+call a loss of 32% ($4.60 lost on a $14.60 debit) while the spread
+gains 127% on a $4.40 debit.
+But if AAPL reaches $405 quickly with four weeks left, the outright
+call is ahead (+36% vs +30% for the spread).
+The key rule: <em>hold the spread to expiration to capture the full
+benefit — the remaining profit is earned through the short option's
+time decay.</em>
+</p>
+
+<p>
+Vertical spreads interact with volatility.
+A <strong>bull call spread</strong> on a takeover candidate is
+interesting: if no deal happens, the stock stays range-bound and
+the spread's limited premium decays; if a deal happens, the spread
+pays its maximum regardless of the acquisition premium.
+The trader is wrong on the spread being OTM but still wins — a
+"win-win-win" scenario.
+Put-call parity means that every credit spread has an equivalent
+debit spread: a bear call spread (sell lower, buy higher) produces
+the same economic result as a bull put spread (buy lower put, sell
+higher put) at the same strikes.
+A <strong>box</strong> — combining both a bull call spread and a
+bull put spread at the same strikes — locks in a known profit
+(or loss) regardless of underlying movement, reducing to a
+pure present-value calculation.
+</p>
+
+<p>
+The <strong>Sam and Isabel box</strong> — using JNJ options —
+illustrates this concretely.
+Sam establishes a bull call spread (buy 65 call, sell 70 call).
+Isabel simultaneously establishes a bull put spread on the same
+expiration (buy 65 put, sell 70 put).
+Together, the box's value at any stock price at expiration is
+exactly $5.00 — the width of the strikes.
+The current combined price of the box in the market is the
+present value of $5.00 discounted at the risk-free rate.
+If the market misprices this, arbitrageurs buy the box at the
+discount and hold to expiration, collecting the difference.
+In practice, boxes trade at very tight margins because
+institutional desks monitor these relationships continuously.
+For retail traders, the box is most useful as a lens:
+if you own a bull call spread and the underlying falls, selling
+the corresponding bear put spread (converting to a box) can
+lock in any remaining profit without closing the position.
+</p>
+
+<h2 id="ch10">Chapter 10: Wing Spreads</h2>
+
+<p>
+<strong>Wing spreads</strong> — condors and butterflies — are
+multi-leg strategies that profit from the underlying staying within
+a range or pinning at a specific price.
+A <strong>butterfly</strong> buys one option at a lower strike,
+sells two at a middle strike, and buys one at an upper strike —
+all same expiration.
+Maximum profit occurs when the stock pins exactly at the middle
+strike at expiration; the position loses money outside the wings.
+</p>
+
+<p>
+<strong>UPS butterfly example</strong>: UPS at $70; buy 1 UPS
+67.50 call, sell 2 UPS 70 calls, buy 1 UPS 72.50 call.
+The at-expiration break-evens are $67 and $73 — stock must stay
+within that range.
+Maximum profit is the width of one wing minus the debit paid.
+An <strong>iron butterfly</strong> uses puts on one side and calls
+on the other, typically for a net credit: sell ATM call and put,
+buy OTM call and OTM put as wings.
+The iron butterfly is equivalent to the standard butterfly but
+creates a credit rather than a debit; the same break-even
+mechanics apply.
+</p>
+
+<div class="fig-list">
+<span class="fig-item"><span class="fig-label">Exhibit 10.1</span><a class="fig-view-link" href="#" data-fig="charts/fig_p0188.jpg" data-caption="Exhibit 10.1: UPS butterfly at expiration">[view]</a></span>
+<span class="fig-item"><span class="fig-label">Exhibit 10.2</span><a class="fig-view-link" href="#" data-fig="charts/fig_p0189.jpg" data-caption="Exhibit 10.2: Butterfly P&amp;L across price range">[view]</a></span>
+<span class="fig-item"><span class="fig-label">Exhibit 10.5</span><a class="fig-view-link" href="#" data-fig="charts/fig_p0196.jpg" data-caption="Exhibit 10.5: Directional butterfly — Walgreen Co. example">[view]</a></span>
+<span class="fig-item"><span class="fig-label">Exhibit 10.8</span><a class="fig-view-link" href="#" data-fig="charts/fig_p0201.jpg" data-caption="Exhibit 10.8: Iron condor management — adjustment when stock reaches $93">[view]</a></span>
+</div>
+
+<p>
+A <strong>condor</strong> is a butterfly with a wider body — the
+two short options are at different (but adjacent) strikes rather
+than the same strike.
+An <strong>iron condor</strong> sells an OTM call spread and an
+OTM put spread on the same underlying and expiration.
+The maximum profit is the net credit received; maximum loss is the
+width of either spread minus the credit.
+The position profits if the stock stays between the two short
+strikes through expiration.
+Iron condors are the most popular retail income strategy because
+they define risk completely and benefit from time decay.
+</p>
+
+<p>
+<table>
+<caption>Iron Condor vs. Butterfly — Structure Comparison</caption>
+<thead>
+<tr><th>Feature</th><th>Iron Condor</th><th>Butterfly</th></tr>
+</thead>
+<tbody>
+<tr><td>Legs</td><td>4 (short call spread + short put spread)</td><td>3 (or 4 for iron butterfly)</td></tr>
+<tr><td>Credit / Debit</td><td>Net credit</td><td>Net debit (standard); credit for iron butterfly</td></tr>
+<tr><td>Profit zone</td><td>Wide band between two short strikes</td><td>Narrow — peaks at middle strike</td></tr>
+<tr><td>Max profit</td><td>Net credit received</td><td>Difference of wings minus debit</td></tr>
+<tr><td>Max loss</td><td>Wing width minus credit</td><td>Debit paid (standard butterfly)</td></tr>
+<tr><td>Ideal scenario</td><td>Stock stays in range</td><td>Stock pins exactly at middle strike</td></tr>
+<tr><td>Best for</td><td>Range-bound, IV selling</td><td>Precise directional pin target</td></tr>
+</tbody>
+</table>
+
+Strike selection for iron condors is critical.
+Too narrow and the maximum profit zone is small and easily violated;
+too wide and the premium collected is negligible relative to the
+risk.
+Passarelli describes the 2007 DJX (Dow Jones Index) condor that
+had break-even points so far from the market they seemed absurd —
+then the Dow fell 50% in 2008, blowing through the put spread.
+The practical rule: measure expected ranges using the options
+market's own implied volatility to set break-even levels —
+typically one to two standard deviations out.
+</p>
+
+<p>
+A <strong>directional butterfly</strong> skews the wings: instead
+of centering on the ATM strike, center the body on where you
+think the stock will be at expiration.
+Walgreen's directional butterfly, bought for just $0.10 debit,
+illustrates how a low-cost asymmetric bet can be constructed —
+the implied delta of the position is far greater than the tiny
+premium suggests.
+For management: if the underlying approaches a wing strike, the
+iron condor can be converted to a long strangle by buying back
+the short side — paying to defend rather than taking maximum loss.
+</p>
+
+<h2 id="ch11">Chapter 11: Calendar and Diagonal Spreads</h2>
+
+<p>
+A <strong>calendar spread</strong> — also called a time spread or
+horizontal spread — buys a longer-dated option and sells a
+shorter-dated option at the same strike.
+The position profits when the front-month option decays faster
+than the back-month option, and when implied volatility rises.
+It is fundamentally a <strong>short-gamma, long-vega</strong>
+position — the opposite of a covered call.
+</p>
+
+<p>
+<strong>BBBY calendar spread</strong>: Bed Bath &amp; Beyond trading
+at $35; sell the near-month 35 call, buy the two-month 35 call.
+The net debit is $0.80.
+At expiration of the front month, if BBBY is still at $35, the
+front-month call expires worthless and the back-month call retains
+significant value — the position profits from the differential
+decay rates.
+If BBBY moves sharply in either direction, both options move ITM
+or OTM, the differential narrows, and the spread loses money.
+This illustrates the paradox: a long calendar has negative gamma
+(dislikes the stock moving) yet positive vega (benefits from
+rising IV) — two characteristics that usually travel together are
+here separated.
+</p>
+
+<div class="fig-list">
+<span class="fig-item"><span class="fig-label">Exhibit 11.1</span><a class="fig-view-link" href="#" data-fig="charts/fig_p0213.jpg" data-caption="Exhibit 11.1: BBBY calendar spread — front month vs back month decay">[view]</a></span>
+<span class="fig-item"><span class="fig-label">Exhibit 11.2</span><a class="fig-view-link" href="#" data-fig="charts/fig_p0214.jpg" data-caption="Exhibit 11.2: Calendar spread P&amp;L at front-month expiration">[view]</a></span>
+<span class="fig-item"><span class="fig-label">Exhibit 11.6</span><a class="fig-view-link" href="#" data-fig="charts/fig_p0220.jpg" data-caption="Exhibit 11.6: Rolling strategy — aggregate premium collected over time">[view]</a></span>
+<span class="fig-item"><span class="fig-label">Exhibit 11.8</span><a class="fig-view-link" href="#" data-fig="charts/fig_p0226.jpg" data-caption="Exhibit 11.8: Directional WMT calendar — theta turns negative below $47">[view]</a></span>
+<span class="fig-item"><span class="fig-label">Exhibit 11.9</span><a class="fig-view-link" href="#" data-fig="charts/fig_p0227.jpg" data-caption="Exhibit 11.9: Calendar spread P&amp;L at various stock price levels">[view]</a></span>
+</div>
+
+<p>
+The <strong>volatility term structure play</strong> using calendar
+spreads requires analyzing each leg's vega separately, not just the
+net vega of the position.
+When front-month IV is elevated relative to back-month IV — often
+before earnings — selling the front-month option and buying the
+back-month captures the higher IV in the short leg.
+If the term structure reverts (front-month IV falls after the
+event), the calendar spread profits from both the premium decay
+and the IV compression in the front month.
+</p>
+
+<p>
+<strong>Rolling</strong> a covered call uses the calendar spread
+logic: each month, the short call is repurchased and a new
+short call in the following month is sold, effectively
+"earning a free call" in the back month.
+Over time, rolling generates a long-dated option at near-zero
+net cost.
+<table>
+<caption>Calendar Spread Greek Profile — BBBY ATM Calendar ($35 Strike)</caption>
+<thead>
+<tr><th>Greek</th><th>At Initiation</th><th>Stock Up $3</th><th>Stock Down $3</th><th>IV Rises 5%</th></tr>
+</thead>
+<tbody>
+<tr><td>Delta</td><td>≈ 0</td><td>Slightly negative</td><td>Slightly positive</td><td>Minimal change</td></tr>
+<tr><td>Gamma</td><td>Negative (net)</td><td>More negative</td><td>More negative</td><td>Less negative</td></tr>
+<tr><td>Theta</td><td>Positive</td><td>Less positive</td><td>Less positive</td><td>More positive</td></tr>
+<tr><td>Vega</td><td>Positive (net)</td><td>Slightly less positive</td><td>Slightly less positive</td><td>Gains from vega</td></tr>
+</tbody>
+</table>
+
+<p>
+The calendar spread's paradox: it is short gamma (dislikes stock
+movement) but long vega (benefits from rising IV).
+These two characteristics normally travel together in a single
+long option — but the calendar spread decouples them by combining
+two options with different expiration dates.
+The front-month option has higher gamma and lower vega per day;
+the back-month option has lower gamma but higher vega per day.
+Selling the front-month and buying the back-month creates a net
+position that is simultaneously short the "fast-decaying,
+high-gamma" component and long the "slow-decaying, high-vega" leg.
+This decoupling is what makes calendar spreads useful for traders
+who want IV exposure without the full directional gamma risk
+of an outright long option.
+</p>
+
+<p>
+The <strong>short calendar spread</strong> — selling the back month
+and buying the front month — is the opposite: negative vega,
+positive gamma.
+It profits when IV falls (term structure flattens) or when the
+stock makes a large move that causes the short back-month option
+to decline more in value than the long front-month.
+Passarelli warns: short calendars are less intuitive and require
+very specific volatility views to justify the position.
+Most retail traders should master the long calendar before
+attempting its short counterpart.
+</p>
+
+<a name="double-calendar"></a>
+<p>
+A <strong>double calendar</strong> sells both a call calendar and
+a put calendar simultaneously, earning income from two strikes;
+the MMM double calendar example shows this creates a wider
+profitability zone than a single calendar.
+</p>
+
+<p>
+A <strong>diagonal spread</strong> is a calendar spread with
+different strikes — buy a further-dated option at one strike,
+sell a shorter-dated option at a different strike.
+The Apple diagonal (buy back-month call at one strike, sell
+front-month call at a higher strike) adds a directional bias
+to the time trade.
+A <strong>double diagonal</strong> — JPMorgan example — combines
+a call diagonal with a put diagonal to create a wide income zone
+that profits from both moderate directional movement and
+time decay.
+</p>
+
+<div class="part-divider">Part III — Volatility</div>
+
+<h2 id="ch12">Chapter 12: Delta-Neutral Trading — Implied Volatility</h2>
+
+<p>
+<strong>Direction-neutral</strong> means having no directional view;
+<strong>direction-indifferent</strong> means having a view on
+volatility regardless of direction.
+A delta-neutral position — achieved by combining long options with
+short stock (or long stock) in the exact ratio of the option's
+delta — is direction-indifferent at the moment of entry.
+But gamma will make the position directional as the stock moves:
+a long-call, short-stock delta-neutral position becomes net long
+delta as the stock rises (gamma helps the call) and net short
+delta as the stock falls.
+</p>
+
+<p>
+<strong>Portfolio margining</strong> — available to qualifying
+traders — calculates margin on the net risk of a portfolio rather
+than on each position individually.
+It dramatically reduced the capital required to run delta-neutral
+books, opening professional-style volatility trading to larger
+retail accounts.
+The core trade in this chapter: buying options when IV is low
+(or expected to rise) and selling stock against them to remain
+delta-neutral, profiting from the IV expansion without taking
+directional risk.
+</p>
+
+<p>
+The <strong>IV rush and crush cycle</strong> follows a predictable
+arc around scheduled events.
+Four to six weeks before earnings, IV begins rising as traders
+buy options to position for the expected move.
+The week before earnings, IV accelerates sharply — sometimes
+doubling from the prior-month baseline.
+On the announcement date, with the event resolved, IV collapses
+to its normal range regardless of what the stock does.
+A stock that beats earnings and gaps up 8% can still produce
+a loss for a long straddle holder if the IV collapse is large
+enough to more than offset the favorable move.
+</p>
+
+<p>
+Passarelli quantifies this for Susie Seller's earnings straddle:
+she sold the straddle at 38% IV collecting $1,150 in theoretical
+value.
+After the stock moved modestly and IV collapsed to 22%,
+the straddle was worth $350 — a $800 gain.
+Had the stock moved more aggressively, the gamma loss would have
+offset more of the vega gain; had it moved less, the full
+$1,150 would have been captured.
+Bobby Buyer on the other side — long the straddle — profited $400
+from the IV rush in the days before the announcement, before the
+stock even moved.
+The patience lesson: Bobby bought his options four weeks early
+when IV was 2 points cheaper, saving $200 in premium;
+traders who rush in two months early pay a much steeper cost
+for weeks of IV buildup with minimal reward.
+</p>
+
+<table>
+<caption>IV Rush &amp; Crush — Earnings Event P&amp;L Scenarios</caption>
+<thead>
+<tr><th>Trader</th><th>Position</th><th>IV at Entry</th><th>IV at Close</th><th>Stock Move</th><th>P&amp;L</th></tr>
+</thead>
+<tbody>
+<tr><td>Susie Seller</td><td>Short straddle (10-lot)</td><td>38%</td><td>22%</td><td>Moderate (favorable)</td><td>+$800</td></tr>
+<tr><td>Bobby Buyer</td><td>Long straddle (10-lot)</td><td>36% (bought 4 wks early)</td><td>38% (pre-earnings peak)</td><td>None yet</td><td>+$400 (pre-announcement IV rush)</td></tr>
+<tr><td>Early buyer (poor timing)</td><td>Long straddle</td><td>28% (2 months early)</td><td>38%</td><td>None</td><td>Minimal; extra theta drag overwhelms IV gain</td></tr>
+</tbody>
+</table>
+
+<div class="fig-list">
+<span class="fig-item"><span class="fig-label">Exhibit 12.1</span><a class="fig-view-link" href="#" data-fig="charts/fig_p0241.jpg" data-caption="Exhibit 12.1: Delta-neutral setup — long call plus short stock hedge">[view]</a></span>
+<span class="fig-item"><span class="fig-label">Exhibit 12.5</span><a class="fig-view-link" href="#" data-fig="charts/fig_p0245.jpg" data-caption="Exhibit 12.5: Susie Seller — earnings IV crush, greek P&amp;L breakdown">[view]</a></span>
+<span class="fig-item"><span class="fig-label">Exhibit 12.9</span><a class="fig-view-link" href="#" data-fig="charts/fig_p0248.jpg" data-caption="Exhibit 12.9: Bobby Buyer — IV rush before earnings, patience math">[view]</a></span>
+</div>
+
+<p>
+The <strong>IV rush and crush</strong> around earnings is the
+central case study.
+<strong>Susie Seller</strong> sells a straddle before earnings,
+collecting $1,150 in theoretical premium based on 38% IV.
+When earnings arrive and the stock moves modestly, IV collapses
+to 22% — the position closes for an $800 profit, though less than
+the theoretical maximum due to the stock's actual move.
+<strong>Bobby Buyer</strong> buys options before earnings
+expecting a large move.
+Passarelli's patience math: waiting to buy options four weeks
+before earnings when IV is 2 points cheaper versus rushing in
+two months early saves premium but requires patient timing.
+Bobby profits $400 — the IV expansion before the event provided
+his gain even before the stock moved.
+</p>
+
+<h2 id="ch13">Chapter 13: Delta-Neutral Trading — Realized Volatility</h2>
+
+<p>
+Where Chapter 12 traded implied volatility, this chapter trades
+<strong>realized volatility</strong> — how much the stock actually
+moves, regardless of IV.
+<strong>Gamma scalping</strong> is the mechanism: maintain a
+delta-neutral position in a long-gamma option, and every time the
+stock moves a meaningful amount, re-hedge.
+When the stock rises, the long call's delta has increased (gamma);
+sell stock to reduce back to delta-neutral, locking in a stock
+profit.
+When the stock falls, the call's delta has decreased; buy stock
+to re-hedge, again locking in a stock profit.
+</p>
+
+<p>
+<strong>Harry's 7-day gamma scalping journal</strong>: Harry buys
+one ATM call with delta 0.50 and shorts 50 shares against it —
+delta-neutral on Day 1.
+Day 2: stock rises $2; call delta is now 0.55 — Harry sells
+5 shares at the higher price to re-hedge.
+Day 3: stock falls $3; delta falls back — Harry buys shares at a
+lower price.
+By Day 7, even if the stock ends near where it started, Harry has
+locked in a series of small stock-to-option cross-hedge profits.
+The cumulative gain exceeds the theta cost of the long call —
+Harry profits because realized vol exceeded implied vol.
+<strong>Mary's mirror journal</strong> shows the short-gamma
+perspective: identical moves produce identical losses on the
+short side, since every re-hedge forces buying high and selling
+low.
+</p>
+
+<p>
+The fundamental equation of gamma scalping:
+if realized volatility exceeds implied volatility over the life
+of the position, the long-gamma trader profits.
+If implied exceeds realized, the short-gamma seller wins.
+The 25% IV used to price Harry's options encodes a specific gamma/theta
+ratio: 2.80 gamma units per 0.50 theta per day — a 5.6× ratio.
+At 50% IV, the ratio inverts: 1.40 gamma per 0.90 theta.
+Higher IV makes gamma more expensive in theta terms.
+This benchmark lets traders compare IV levels to assess whether
+long-gamma or short-gamma has the better risk-adjusted edge.
+</p>
+
+<table>
+<caption>Harry's 7-Day Gamma Scalping Journal (20-lot ATM call, $40 stock)</caption>
+<thead>
+<tr><th>Day</th><th>Stock Move</th><th>Scalp Action</th><th>Scalp P&amp;L</th><th>Theta Cost</th><th>Net Day</th></tr>
+</thead>
+<tbody>
+<tr><td>1 (volatile)</td><td>Up $2, back to $40</td><td>Sell 560 shares @ $42, buy back @ $40</td><td>+$1,120</td><td>−$50</td><td><strong>+$1,070</strong></td></tr>
+<tr><td>2 (quiet)</td><td>Dip $0.40, recover</td><td>Buy 112 shares @ $39.60, sell @ $40</td><td>+$45</td><td>−$50</td><td>−$5</td></tr>
+<tr><td>3 (trending)</td><td>Grind $40→$42 ($0.50 steps)</td><td>Sell 140 shares at each $0.50 increment</td><td>+$140</td><td>−$50</td><td>+$90</td></tr>
+<tr><td>4 (gap down)</td><td>Gap opens $4 lower to $38</td><td>Buy 1,120 shares @ $38 to re-hedge</td><td>+$2,240</td><td>−$50</td><td><strong>+$2,190</strong></td></tr>
+<tr><td>5–6 (weekend)</td><td>Market closed</td><td>No action</td><td>$0</td><td>−$100</td><td>−$100</td></tr>
+<tr><td>7 (quiet drift)</td><td>Up $0.25</td><td>Sell 70 shares @ $38.25</td><td>+$9</td><td>−$50</td><td>−$41</td></tr>
+<tr><td colspan="5"><strong>Weekly total</strong></td><td><strong>+$3,204</strong></td></tr>
+</tbody>
+</table>
+
+<p>
+Mary's mirror position — short the same 20 calls with 1,000 shares
+long — produces the opposite outcome on every day with one
+important caveat: the decisions are not symmetric.
+On Day 4 when the stock gaps $4 lower, Mary chooses to cover
+only 560 shares (half her delta) rather than fully re-hedging,
+"leaning the stock" with a directional view that it would recover.
+Her partial hedge locks in only half the gap-down profit while
+she retains long-delta exposure.
+The week's total for Mary: a net loss, driven entirely by the
+Day 4 gap that overwhelmed her five days of theta collection.
+<blockquote>
+"Long-gamma traders strive each day to scalp enough to cover
+the day's theta, while short-gamma traders hope to keep the
+loss due to adverse movement lower than the daily profit
+from theta."
+<cite>— Dan Passarelli, Chapter 13</cite>
+</blockquote>
+
+Passarelli's key observation: <em>options trading is not a
+zero-sum game.</em>
+Harry and Mary started with perfectly opposite positions, but
+because their hedging decisions differed, Harry's gain did not
+equal Mary's loss.
+</p>
+
+<div class="fig-list">
+<span class="fig-item"><span class="fig-label">Exhibit 13.1</span><a class="fig-view-link" href="#" data-fig="charts/fig_p0255.jpg" data-caption="Exhibit 13.1: Harry's gamma scalping journal — 7-day P&amp;L walkthrough">[view]</a></span>
+<span class="fig-item"><span class="fig-label">Exhibit 13.2</span><a class="fig-view-link" href="#" data-fig="charts/fig_p0257.jpg" data-caption="Exhibit 13.2: Mary's short-gamma mirror — same moves, opposite outcome">[view]</a></span>
+<span class="fig-item"><span class="fig-label">Exhibit 13.3</span><a class="fig-view-link" href="#" data-fig="charts/fig_p0260.jpg" data-caption="Exhibit 13.3: Smileys and frowns — long vs short gamma P&amp;L curves">[view]</a></span>
+</div>
+
+<p>
+<div class="diagram">
+<svg viewBox="0 0 560 220" width="100%" style="max-width:560px;display:block;margin:1em auto">
+  <rect width="560" height="220" fill="#1a1a2e" rx="8"/>
+  <!-- axes -->
+  <line x1="40" y1="180" x2="520" y2="180" stroke="#555" stroke-width="1.5"/>
+  <line x1="280" y1="20" x2="280" y2="195" stroke="#555" stroke-width="1.5" stroke-dasharray="4,3"/>
+  <!-- smiley curve (long gamma) -->
+  <path d="M60,160 Q170,175 280,140 Q390,175 500,160" stroke="#4ec9b0" stroke-width="2.5" fill="none"/>
+  <text x="80" y="145" fill="#4ec9b0" font-size="12" font-family="monospace">SMILEY (long γ)</text>
+  <!-- frown curve (short gamma) -->
+  <path d="M60,110 Q170,95 280,120 Q390,95 500,110" stroke="#f97583" stroke-width="2.5" fill="none"/>
+  <text x="380" y="100" fill="#f97583" font-size="12" font-family="monospace">FROWN (short γ)</text>
+  <!-- labels -->
+  <text x="265" y="215" fill="#888" font-size="11" font-family="monospace">Stock Price</text>
+  <text x="43" y="185" fill="#888" font-size="10" font-family="monospace">↑ P&amp;L</text>
+  <text x="256" y="175" fill="#c5a55a" font-size="10" font-family="monospace">ATM</text>
+  <text x="38" y="115" fill="#888" font-size="9">profit</text>
+  <text x="38" y="165" fill="#888" font-size="9">loss</text>
+  <line x1="40" y1="140" x2="520" y2="140" stroke="#333" stroke-width="1" stroke-dasharray="2,4"/>
+</svg>
+<p class="diagram-caption">Long-gamma (smiley) vs. short-gamma (frown) P&amp;L curves.
+Both large up and down moves profit the long-gamma trader;
+the short-gamma seller profits only in the middle zone.</p>
+</div>
+
+<p>
+The <strong>smileys and frowns</strong> visual: plot the cumulative
+P&L of a gamma-scalped position as the stock moves.
+A long-gamma position produces a "smiley" — a U-shaped P&amp;L curve
+where both large upward and large downward moves produce profit.
+A short-gamma position produces a "frown" — an inverted U where
+moderate moves are profitable but large moves produce losses.
+The smiley corresponds to positive convexity; the frown to
+negative convexity.
+</p>
+
+<p>
+The fundamental equation: gamma scalping profit = (realized vol)²
+÷ (implied vol)² × theta.
+If realized vol equals implied vol, gamma scalping breaks even.
+If realized vol exceeds implied vol, the long-gamma trader profits
+over time.
+Passarelli uses the ratio of gamma to theta as a benchmark:
+25% IV produces roughly 2.80 gamma per 0.50 theta per day —
+a 5.6× ratio.
+Monitoring this ratio as IV changes helps traders decide whether
+long or short gamma offers better risk-adjusted value.
+</p>
+
+<h2 id="ch14">Chapter 14: Studying Volatility Charts</h2>
+
+<p>
+Passarelli identifies nine recurring volatility chart patterns
+that signal tradeable conditions.
+Diagnosing these patterns before entering a position determines
+whether the trade setup has edge or is merely a coin flip.
+</p>
+
+<div class="fig-list">
+<span class="fig-item"><span class="fig-label">Exhibit 14.1-14.9</span><a class="fig-view-link" href="#" data-fig="charts/fig_p0271.jpg" data-caption="Exhibit 14.1: Volatility chart pattern — IV above HV, sell signal">[view]</a></span>
+<span class="fig-item"><span class="fig-label">Exhibit 14.5</span><a class="fig-view-link" href="#" data-fig="charts/fig_p0276.jpg" data-caption="Exhibit 14.5: Volatility mesa — prolonged elevated IV">[view]</a></span>
+<span class="fig-item"><span class="fig-label">Exhibit 14.8</span><a class="fig-view-link" href="#" data-fig="charts/fig_p0280.jpg" data-caption="Exhibit 14.8: IV spike followed by crush">[view]</a></span>
+</div>
+
+<p>
+The nine chart patterns span the full range of IV/HV relationships:
+each one suggests a different options strategy and a different
+expected outcome.
+Passarelli uses 30-day realized vol and current IV as the two
+lines on the chart — when they converge, diverge, spike, or
+plateau, each configuration tells a different story.
+</p>
+
+<p>
+The nine patterns are: (1) <strong>IV above HV</strong> — options
+are expensive relative to how the stock has actually moved;
+sell volatility. (2) <strong>IV below HV</strong> — options are
+cheap; buy volatility. (3) <strong>IV at HV</strong> — fairly
+priced; neither side has an obvious vol edge.
+(4) <strong>Rising IV with rising stock</strong> — bullish and
+fearful simultaneously, unusual; IV usually falls as stocks rise.
+(5) <strong>IV mesa</strong> — prolonged elevated IV plateau;
+implies a sustained period of option overpricing if mean reversion
+holds. (6) <strong>IV spike followed by crush</strong> — the
+earnings pattern; sell the straddle before the spike peaks.
+(7) <strong>HV spike above IV</strong> — the stock is moving more
+than the options predicted; long gamma has edge.
+(8) <strong>Convergence</strong> — IV and HV coming together;
+directional trades become cleaner as vol premium compresses.
+(9) <strong>Divergence</strong> — IV and HV separating; a widening
+gap suggests an impending vol mean reversion.
+</p>
+
+<p>
+The most actionable pattern in the book is the
+<strong>IV spike followed by crush</strong> — the earnings pattern.
+A stock with normally 20% IV will see IV spike to 40–50% in the
+weeks before an earnings report, then collapse back to 20% the
+day after.
+Selling a straddle or iron condor at the IV peak — a few days
+before the announcement — captures that collapse.
+The catch: the stock may also make a large move, and the
+direction-indifferent premium seller must size the position
+such that the IV crush profit exceeds the directional loss
+on any reasonable stock move.
+This is why Passarelli's Susie Seller collects $1,150 of
+theoretical premium but only books $800 — the stock moved
+moderately, limiting the crushing effect on the straddle's
+value even as IV fell from 38% to 22%.
+</p>
+
+<p>
+The <strong>IV mesa</strong> — a prolonged plateau of elevated IV —
+is the rarest pattern and the most valuable to identify.
+When a stock maintains abnormally high IV for weeks without a
+corresponding level of realized movement, it signals persistent
+option overpricing: the market is pricing in a risk that isn't
+materializing.
+Short volatility traders who identify a mesa and sell options
+repeatedly into it — collecting elevated theta with controlled
+gamma exposure — can generate outsized returns if the mesa
+eventually resolves back to normal IV.
+The risk: the mesa exists because something specific is holding
+IV elevated (merger uncertainty, regulatory decision, patent
+litigation), and if that event triggers, the gap between IV and
+HV closes violently in the wrong direction.
+</p>
+
+<div class="part-divider">Part IV — Advanced Option Trading</div>
+
+<h2 id="ch15">Chapter 15: Straddles and Strangles</h2>
+
+<p>
+A <strong>long straddle</strong> buys both a call and a put at the
+same strike and expiration.
+The position is delta-neutral at entry and profits from a large
+move in either direction — the underlying must move beyond
+the combined premium to produce a profit.
+The position is long gamma, short theta, and long vega: it wants
+the stock to move, time to pass slowly, and IV to rise.
+</p>
+
+<table>
+<caption>Straddle vs. Strangle — Break-Even and Risk Comparison</caption>
+<thead>
+<tr><th>Feature</th><th>Straddle (ATM)</th><th>Strangle (OTM)</th></tr>
+</thead>
+<tbody>
+<tr><td>Structure</td><td>Same strike call + put (ATM)</td><td>OTM call + OTM put (different strikes)</td></tr>
+<tr><td>Premium paid</td><td>Higher (both options have time value at ATM)</td><td>Lower (OTM options cheaper)</td></tr>
+<tr><td>Break-even range</td><td>Narrower (must exceed combined ATM premium)</td><td>Wider (lower premium, wider strikes)</td></tr>
+<tr><td>Delta at entry</td><td>≈ 0 (ATM call delta ≈ −put delta)</td><td>≈ 0 (OTM deltas also roughly balance)</td></tr>
+<tr><td>Gamma</td><td>Higher (ATM options have maximum gamma)</td><td>Lower per dollar invested</td></tr>
+<tr><td>Theta</td><td>Highest decay (ATM options decay fastest)</td><td>Slower decay but smaller position size</td></tr>
+<tr><td>Vega</td><td>Highest IV sensitivity</td><td>Moderate — less sensitive to IV changes</td></tr>
+<tr><td>Best for</td><td>Large expected move + IV rise</td><td>Very large expected move + lower cost preference</td></tr>
+</tbody>
+</table>
+
+<p>
+<strong>Susan's FOMC straddle</strong>: Susan buys a two-week
+straddle on Acme Corp ahead of a Federal Reserve meeting, paying
+a combined $3.50 in premium.
+The break-evens are $3.50 above and below the current stock price.
+Week 1: IV rises as the Fed meeting approaches — the straddle
+appreciates even though the stock barely moves (pure vega gain).
+Week 2: the Fed surprises with a rate cut; the stock rallies $5.
+By the time Susan closes, she has captured both the IV rush before
+the event and the directional move after it.
+</p>
+
+<p>
+Susan's trade illustrates why straddles are often better bought
+early rather than at the last moment.
+With two weeks to expiration, her straddle had enough theta life
+remaining that the IV rush before the Fed meeting could build
+substantial value.
+A trader who bought the same straddle with only two days until
+the Fed meeting would have paid even more for the inflated IV
+— having missed the IV buildup — and would then face IV crush
+the moment the meeting concluded.
+The timing of entry relative to the IV cycle is as important
+as the size of the eventual move.
+Passarelli emphasizes this specifically: the straddle buyer's
+edge is not just being right about a large move occurring —
+it is buying when IV is low relative to its potential, before
+the rush.
+</p>
+
+<div class="fig-list">
+<span class="fig-item"><span class="fig-label">Exhibit 15.1</span><a class="fig-view-link" href="#" data-fig="charts/fig_p0288.jpg" data-caption="Exhibit 15.1: Long straddle at expiration — V-shape P&amp;L">[view]</a></span>
+<span class="fig-item"><span class="fig-label">Exhibit 15.4</span><a class="fig-view-link" href="#" data-fig="charts/fig_p0294.jpg" data-caption="Exhibit 15.4: Short straddle — John's XYZ example, pin risk discussion">[view]</a></span>
+<span class="fig-item"><span class="fig-label">Exhibit 15.6</span><a class="fig-view-link" href="#" data-fig="charts/fig_p0299.jpg" data-caption="Exhibit 15.6: Synthetic straddle comparison — stock plus options">[view]</a></span>
+<span class="fig-item"><span class="fig-label">Exhibit 15.8</span><a class="fig-view-link" href="#" data-fig="charts/fig_p0302.jpg" data-caption="Exhibit 15.8: Long strangle vs. long straddle break-even comparison">[view]</a></span>
+</div>
+
+<p>
+The <strong>short straddle</strong> — John's XYZ position —
+collects a large premium in exchange for unlimited risk in both
+directions and the ever-present threat of pin risk.
+If XYZ closes within the premium range at expiration, the straddle
+seller keeps the full premium.
+<strong>Pin risk</strong> is the most anxiety-inducing aspect of
+short straddle management: if XYZ settles exactly at the strike,
+John doesn't know until after the weekend market close whether he
+is long or short 100 shares of stock.
+Managing the short straddle through the final week requires active
+monitoring and willingness to flatten delta by trading the
+underlying or rolling the position.
+</p>
+
+<p>
+A <strong>synthetic straddle</strong> replaces one leg with a
+stock position.
+A long call plus short stock at the correct delta ratio recreates
+the P&amp;L of a long straddle at lower initial premium — but it
+requires more active management as the delta shifts.
+A <strong>strangle</strong> purchases (or sells) OTM options on
+both sides: buy an OTM call and an OTM put.
+The strangle is cheaper than a straddle — OTM options carry less
+premium — but requires a larger move to profit.
+The break-even points are further from the current price, making
+the short strangle more forgiving of small moves but still exposed
+to large ones.
+</p>
+
+<h2 id="ch16">Chapter 16: Ratio Spreads and Complex Spreads</h2>
+
+<p>
+A <strong>ratio spread</strong> sells more options than it buys:
+buy 1, sell 2 (or buy 10, sell 20) — a 1×2 ratio.
+The net delta and vega profile is intermediate: the position
+benefits from moderate moves toward the short strikes but carries
+extra short gamma beyond the hedge.
+A <strong>backspread</strong> is the opposite: sell fewer options
+than you buy (e.g., sell 1, buy 2).
+Backspreads have long gamma and benefit from large moves in either
+direction; they lose in the middle zone.
+</p>
+
+<p>
+<strong>Passarelli's Ford Motor Company floor position</strong>:
+As a CBOE market maker, Passarelli was once positioned in a large
+Ford options book that included multiple expirations, strikes,
+and put and call positions simultaneously.
+Managing this book required monitoring the net delta, gamma, vega,
+and theta of the entire portfolio — not each position in isolation.
+The exhibit showing his full greek summary by expiration
+illustrates why professionals think in terms of total exposure,
+not individual trades.
+A position that appears delta-neutral may have positive gamma in
+the front month and negative gamma in a back month — leaving the
+portfolio vulnerable to term structure shifts.
+</p>
+
+<div class="fig-list">
+<span class="fig-item"><span class="fig-label">Exhibit 16.1</span><a class="fig-view-link" href="#" data-fig="charts/fig_p0309.jpg" data-caption="Exhibit 16.1: Ratio spread — 1x2 call ratio, greek table at 8 price points">[view]</a></span>
+<span class="fig-item"><span class="fig-label">Exhibit 16.2</span><a class="fig-view-link" href="#" data-fig="charts/fig_p0311.jpg" data-caption="Exhibit 16.2: Backspread at expiration — long gamma, profits from large moves">[view]</a></span>
+<span class="fig-item"><span class="fig-label">Exhibit 16.5</span><a class="fig-view-link" href="#" data-fig="charts/fig_p0316.jpg" data-caption="Exhibit 16.5: Passarelli's Ford Motor market-maker book — full greek summary">[view]</a></span>
+<span class="fig-item"><span class="fig-label">Exhibit 16.8</span><a class="fig-view-link" href="#" data-fig="charts/fig_p0322.jpg" data-caption="Exhibit 16.8: Risk reversal — skew trade using OTM put vs OTM call">[view]</a></span>
+</div>
+
+<p>
+<table>
+<caption>Backspread (Call 1×2) — Dynamic Greek Table at 8 Price Points</caption>
+<thead>
+<tr><th>Stock Price</th><th>Delta</th><th>Gamma</th><th>Theta</th><th>Vega</th><th>P&amp;L Trend</th></tr>
+</thead>
+<tbody>
+<tr><td>$30 (far below)</td><td>Near 0</td><td>Low +</td><td>Low −</td><td>Low +</td><td>Near max loss (middle zone)</td></tr>
+<tr><td>$35 (below body)</td><td>Slightly +</td><td>Moderate +</td><td>−</td><td>+</td><td>Losing ground</td></tr>
+<tr><td>$40 (short strike)</td><td>Low or flat</td><td>Negative peak</td><td>Highest +</td><td>Lowest</td><td>Maximum loss zone</td></tr>
+<tr><td>$42 (just above short)</td><td>Slightly −</td><td>−</td><td>+</td><td>−</td><td>Still losing</td></tr>
+<tr><td>$45 (between strikes)</td><td>Neutral</td><td>Near 0</td><td>Near 0</td><td>Near 0</td><td>Break-even transition</td></tr>
+<tr><td>$50 (long strike area)</td><td>Increasing +</td><td>+</td><td>−</td><td>+</td><td>Starting to profit</td></tr>
+<tr><td>$55 (above long strikes)</td><td>Strong +</td><td>High +</td><td>High −</td><td>High +</td><td>Profitable — long gamma kicks in</td></tr>
+<tr><td>$60 (deep ITM both)</td><td>Near 2.00 equivalent</td><td>Declining +</td><td>Low −</td><td>Low +</td><td>Profit plateauing near max</td></tr>
+</tbody>
+</table>
+
+<p>
+The backspread's dynamic greek table reveals why it is both
+exciting and dangerous to hold.
+In the middle zone — between the short and long strikes — the
+position is simultaneously negative gamma and negative theta,
+paying for the privilege of sitting in no-man's-land with the
+stock not moving enough.
+Once the stock breaks clearly above the long strikes, long gamma
+takes over: every dollar the stock moves up now generates
+accelerating delta profits.
+The "lean short" technique — entering the backspread for a small
+credit rather than a debit — changes the risk/reward by giving
+the trader a small profit even if the middle-zone loss is never
+recovered.
+</p>
+
+<strong>Trading volatility skew</strong> with risk reversals:
+sell the overpriced OTM put (high IV) and buy the underpriced
+OTM call (low IV), or vice versa.
+If the skew reverts — OTM put IV falls toward OTM call IV — both
+legs benefit simultaneously.
+The position carries directional risk (a risk reversal has net
+delta), so managing the delta exposure is part of the trade.
+</p>
+
+<p>
+When a delta-neutral position in one class of options (e.g., SPY)
+is combined with a position in a correlated class (e.g., an
+individual stock), the correlation becomes the primary risk.
+<strong>Multiple-class risk</strong>: a trader long delta-neutral
+straddles on GS and short delta-neutral straddles on SPY may think
+both exposures cancel, but if GS starts moving twice as much as
+SPY (or less), the P&amp;L diverges.
+Passarelli warns: delta-neutral does not mean market-risk-free
+when positions span correlated but non-identical underlyings.
+</p>
+
+<h2 id="ch17">Chapter 17: Putting the Greeks into Action</h2>
+
+<p>
+Passarelli's three-step learning process for options mastery:
+<strong>Study</strong> the strategies and their greek profiles
+in depth; <strong>paper trade</strong> with real market data
+but no real money, learning how positions actually behave in
+live conditions; then move to <strong>real money</strong>
+("Showtime") only after developing genuine conviction in how
+the position will behave across a range of outcomes.
+Most traders skip step two and pay for the education in losses.
+</p>
+
+<p>
+<strong>Strategy selection</strong> starts with the forecast.
+<strong>Arlo on Agilent</strong>: bullish on ADT, wants to
+participate in a 10% rise over two months.
+Comparing an outright long call versus a bull call spread,
+Arlo must ask: Is the expected move modest and time-dependent
+(spread) or large and fast (outright call)?
+Given a moderate bullish view, the spread offers better expected
+value per dollar of risk.
+<strong>Luke on US Steel</strong>: strongly bullish, expects a
+large move; the outright call is preferred because the spread's
+cap at the short strike sacrifices too much upside.
+The greek profiles before and after the expected move are both
+part of the analysis.
+</p>
+
+<table>
+<caption>Strategy Selection Framework — Matching Forecast to Position</caption>
+<thead>
+<tr><th>Market Forecast</th><th>IV Forecast</th><th>Best Strategy</th><th>Avoid</th></tr>
+</thead>
+<tbody>
+<tr><td>Strongly bullish, large fast move</td><td>Rising</td><td>Long ATM call</td><td>Bull call spread (caps upside)</td></tr>
+<tr><td>Moderately bullish, slow grind up</td><td>Stable or falling</td><td>Bull call spread</td><td>Outright call (theta cost too high)</td></tr>
+<tr><td>Neutral, range-bound</td><td>Elevated, falling</td><td>Short iron condor or covered call</td><td>Long straddle (both sides decay)</td></tr>
+<tr><td>Neutral, expecting large move</td><td>Low, rising</td><td>Long straddle or strangle</td><td>Short iron condor (gets crushed by move)</td></tr>
+<tr><td>Bearish, large fast decline</td><td>Rising (fear)</td><td>Long put</td><td>Bear put spread (caps downside profit)</td></tr>
+<tr><td>Bearish, moderate decline</td><td>Stable</td><td>Bear put spread or bear call spread</td><td>Naked short call (unlimited risk)</td></tr>
+<tr><td>Mildly bullish, income-focused</td><td>Elevated, falling</td><td>Cash-secured put or covered call</td><td>Long OTM call (too much theta decay)</td></tr>
+<tr><td>Term structure flat, event approaching</td><td>Near-term low, back-month elevated</td><td>Short calendar (sell back, buy front)</td><td>Long calendar (structural disadvantage)</td></tr>
+</tbody>
+</table>
+
+<p>
+The critical variable in strategy selection is often the IV
+environment rather than the directional view alone.
+A strongly bullish trader in a high-IV environment faces a
+different decision than the same bullish trader in a
+low-IV environment.
+When IV is elevated, outright calls are expensive — the spread
+offers better risk-adjusted value even for aggressive bulls.
+When IV is depressed, outright calls are cheap and the full
+upside exposure may be worth paying for.
+Passarelli's framework requires the trader to simultaneously
+hold a view on direction, a view on volatility, and a time
+horizon — three inputs that together determine the optimal
+structure.
+</p>
+
+<div class="fig-list">
+<span class="fig-item"><span class="fig-label">Exhibit 17.1</span><a class="fig-view-link" href="#" data-fig="charts/fig_p0327.jpg" data-caption="Exhibit 17.1: Arlo/Agilent strategy comparison — long call vs. bull spread">[view]</a></span>
+<span class="fig-item"><span class="fig-label">Exhibit 17.2</span><a class="fig-view-link" href="#" data-fig="charts/fig_p0328.jpg" data-caption="Exhibit 17.2: Halliburton iron condor — adjustment sequence">[view]</a></span>
+</div>
+
+<p>
+The <strong>HAPI (Hope and Pray Index)</strong> is Passarelli's
+tongue-in-cheek name for the strategy of holding a losing position
+while hoping it recovers, without any plan-based reason to do so.
+<blockquote>
+"Ask yourself: If I had no position right now, would I put this
+trade on at the current price? If the answer is no, close it."
+<cite>— Dan Passarelli, Chapter 17</cite>
+</blockquote>
+
+HAPI rises as rational trade management falls.
+The antidote is the "Would I Do It Now?" rule applied rigorously:
+every open position must be justified by current conditions, not
+just by the entry rationale.
+</p>
+
+<p>
+<strong>Adjustments</strong> are the most demanding skill in
+options trading.
+The Halliburton iron condor adjustment: as the underlying moves
+toward the call spread, the trader can (a) close the threatened
+leg, (b) roll the short strike higher, (c) add long delta via
+stock or long calls to neutralize, or (d) close the entire
+position.
+Each choice has different greek and P&amp;L implications.
+Passarelli emphasizes that the right adjustment depends on the
+trader's updated forecast — adjusting a position requires
+re-underwriting the trade from scratch.
+The worst adjustment is the one made from fear or inertia rather
+than analysis.
+</p>
+
+<p>
+The <strong>Halliburton iron condor adjustment</strong> walks
+through this process in detail.
+Halliburton is at $45; the iron condor was sold with short strikes
+at $40 put and $50 call.
+As the stock rallies toward $50, the call spread portion is
+threatened.
+Option A: close the call spread and leave the put spread running —
+partial exit, accept the loss on the threatened side.
+Option B: roll the short call from $50 to $55 — extend the
+range but accept more time and more risk.
+Option C: buy an additional call above $50 to cap the loss on
+the upside — converts the call spread into a butterfly.
+Option D: buy stock or a single call to delta-hedge — makes
+the overall position directionally positive to offset the
+call spread's negative delta.
+Each adjustment reflects a different updated forecast for
+Halliburton's movement and a different tolerance for the
+resulting risk.
+</p>
+
+<table>
+<caption>Nine Volatility Chart Patterns — Diagnosis and Trade Implication</caption>
+<thead>
+<tr><th>#</th><th>Pattern</th><th>IV vs HV</th><th>Diagnosis</th><th>Trade Implication</th></tr>
+</thead>
+<tbody>
+<tr><td>1</td><td>Both rising; IV leads</td><td>IV &gt; HV, widening</td><td>Options getting expensive relative to moves</td><td>Vol selling when divergence extreme</td></tr>
+<tr><td>2</td><td>Both rising; HV leads</td><td>HV &gt; IV, widening</td><td>Stock moving more than options priced in</td><td>Buy volatility — options cheap</td></tr>
+<tr><td>3</td><td>IV and HV rising together</td><td>IV ≈ HV</td><td>Options fairly priced; momentum in both</td><td>Neither side has clear vol edge</td></tr>
+<tr><td>4</td><td>IV rising, HV falling</td><td>IV &gt; HV, sharply</td><td>Fear premium building; stock actually calming</td><td>Strong sell signal — IV likely to revert</td></tr>
+<tr><td>5</td><td>IV mesa (prolonged plateau)</td><td>IV persistently elevated</td><td>Sustained option overpricing; no realized catalyst</td><td>Short vol with defined risk; roll monthly</td></tr>
+<tr><td>6</td><td>IV spike then crush</td><td>IV spikes → collapses</td><td>Classic earnings or event pattern</td><td>Sell straddle / iron condor into the spike</td></tr>
+<tr><td>7</td><td>HV spikes above IV</td><td>HV &gt; IV</td><td>Realized vol caught market makers off guard</td><td>Long gamma had edge; buy vol on dip if expected to continue</td></tr>
+<tr><td>8</td><td>Convergence</td><td>IV and HV coming together</td><td>Vol premium compressing; fair value approaching</td><td>Directional trades become cleaner; exit pure vol positions</td></tr>
+<tr><td>9</td><td>Divergence</td><td>IV and HV separating</td><td>Growing mispricing — one side will eventually correct</td><td>Wait for direction of resolution; then fade the extreme</td></tr>
+</tbody>
+</table>
+
+<h3>The Open Interest Signal</h3>
+<p>
+Open interest spikes in deep ITM calls before an ex-dividend date
+are one of the most reliable signals in listed options: a sudden
+surge in volume for calls that are trading at parity signals
+dividend-play traders are exercising to capture tomorrow's
+dividend.
+The mirror signal: if you are short those same calls, you will
+almost certainly be assigned.
+Understanding this — and building it into a checklist before
+selling ITM calls in dividend-paying stocks — prevents the
+surprise of a Monday morning assignment notice for a trade
+that appeared safe on Friday.
+</p>
+
+<h2 id="lessons">Trading &amp; Investing Lessons</h2>
+
+<div class="diagram">
+<svg viewBox="0 0 560 220" width="100%" style="max-width:560px;display:block;margin:1em auto">
+  <rect width="560" height="220" fill="#1a1a2e" rx="8"/>
+  <text x="140" y="22" fill="#c5a55a" font-size="13" font-family="monospace" font-weight="bold">The Vol-Selling Decision Framework</text>
+  <!-- boxes -->
+  <rect x="40" y="40" width="120" height="40" rx="4" fill="rgba(78,201,176,0.15)" stroke="#4ec9b0" stroke-width="1.5"/>
+  <text x="100" y="56" fill="#4ec9b0" font-size="10" text-anchor="middle" font-family="monospace">Compare IV to HV</text>
+  <text x="100" y="70" fill="#4ec9b0" font-size="10" text-anchor="middle" font-family="monospace">Is IV elevated?</text>
+
+  <rect x="220" y="40" width="120" height="40" rx="4" fill="rgba(78,201,176,0.15)" stroke="#4ec9b0" stroke-width="1.5"/>
+  <text x="280" y="56" fill="#4ec9b0" font-size="10" text-anchor="middle" font-family="monospace">IV percentile</text>
+  <text x="280" y="70" fill="#4ec9b0" font-size="10" text-anchor="middle" font-family="monospace">52-week range?</text>
+
+  <rect x="400" y="40" width="120" height="40" rx="4" fill="rgba(78,201,176,0.15)" stroke="#4ec9b0" stroke-width="1.5"/>
+  <text x="460" y="56" fill="#4ec9b0" font-size="10" text-anchor="middle" font-family="monospace">Catalyst calendar</text>
+  <text x="460" y="70" fill="#4ec9b0" font-size="10" text-anchor="middle" font-family="monospace">Event before expiry?</text>
+
+  <!-- arrows -->
+  <line x1="160" y1="60" x2="220" y2="60" stroke="#555" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="340" y1="60" x2="400" y2="60" stroke="#555" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- second row -->
+  <rect x="130" y="120" width="140" height="40" rx="4" fill="rgba(249,117,131,0.12)" stroke="#f97583" stroke-width="1.5"/>
+  <text x="200" y="136" fill="#f97583" font-size="10" text-anchor="middle" font-family="monospace">Map break-evens to</text>
+  <text x="200" y="150" fill="#f97583" font-size="10" text-anchor="middle" font-family="monospace">standard deviation range</text>
+
+  <rect x="310" y="120" width="140" height="40" rx="4" fill="rgba(197,165,90,0.15)" stroke="#c5a55a" stroke-width="1.5"/>
+  <text x="380" y="136" fill="#c5a55a" font-size="10" text-anchor="middle" font-family="monospace">"Would I Do It Now?"</text>
+  <text x="380" y="150" fill="#c5a55a" font-size="10" text-anchor="middle" font-family="monospace">rule at each review</text>
+
+  <!-- down arrows from top row -->
+  <line x1="460" y1="80" x2="460" y2="100" stroke="#555" stroke-width="1.5"/>
+  <line x1="460" y1="100" x2="200" y2="100" stroke="#555" stroke-width="1.5"/>
+  <line x1="200" y1="100" x2="200" y2="120" stroke="#555" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="380" y1="100" x2="380" y2="120" stroke="#555" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <defs>
+    <marker id="arrow" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
+      <path d="M0,0 L6,3 L0,6 Z" fill="#555"/>
+    </marker>
+  </defs>
+  <text x="280" y="200" fill="#888" font-size="9" text-anchor="middle" font-family="monospace">Check all five steps before selling volatility</text>
+</svg>
+<p class="diagram-caption">The vol-selling decision framework: five checkpoints before
+entering any short-volatility position. Each step filters for
+trades with genuine statistical edge.</p>
+</div>
+
+<h3>Delta as Portfolio Exposure</h3>
+<p>
+Every position — stocks, options, spreads — can be expressed in
+delta terms.
+A portfolio with net delta of +3,000 is equivalent to being long
+3,000 shares of the underlying.
+Institutional traders manage total portfolio delta daily; retail
+traders who track only individual positions miss the aggregate
+directional risk they've accumulated.
+Greeks unify the language of portfolio risk across all strategies.
+</p>
+
+<h3>Volatility Has a Price — Know If You're Overpaying</h3>
+<p>
+Comparing IV to HV before every options trade tells you whether
+the market is pricing fear or complacency.
+Buying options when IV is at 52-week lows and selling when IV is
+at 52-week highs is not market timing — it is simply purchasing
+insurance when it is cheap and selling it when it is expensive.
+The VIX chart is the simplest version of this for S&amp;P 500 traders.
+</p>
+
+<h3>Gamma-Theta is the Risk-Reward Unit</h3>
+<p>
+Every long options position is a bet that the stock will move
+more than the theta cost.
+Every short options position bets the stock will move less.
+Before entering a long straddle on earnings, calculate the breakeven
+daily move needed to offset theta; if the stock rarely moves that
+much, selling the straddle has edge.
+This gamma-theta framing turns vague intuition about volatility
+into a quantitative decision process.
+</p>
+
+<h3>The Vol Surface as a Market Map</h3>
+<p>
+Every stock has a volatility surface: IV plotted across all
+available strikes and expirations simultaneously.
+Reading the surface reveals where the market expects risk to be
+concentrated — high IV OTM puts signal crash fear; elevated
+near-term IV versus flat back-month IV signals a near-term event.
+Professional traders monitor the shape of the surface as closely
+as they monitor the stock's price.
+When the surface changes shape — near-term IV spikes while
+back-month stays flat, or OTM calls suddenly carry higher IV
+than OTM puts — it signals a shift in the market's collective
+fear or greed that may not yet be reflected in the stock price
+itself.
+</p>
+
+<h3>Spreads as Position Management</h3>
+<p>
+Selling a spread against an existing long option is not just a
+new trade — it is a position management decision.
+Converting a long call into a bull call spread by selling a higher
+strike eliminates vega exposure, reduces theta cost, and
+partially monetizes a gain before expiration.
+Every spread decision is implicitly a decision about which greeks
+to keep and which to hedge away.
+</p>
+
+<h3>IV Crush is a Tax on Directional Options Buyers</h3>
+<p>
+Buying calls before earnings expecting a stock to gap up, only
+to watch the option lose value despite the rise, is one of the
+most common beginner losses.
+The reason is IV crush: the surge in IV before the event inflated
+the option's premium; once the event passes, IV collapses and
+erases the time value.
+The lesson: account for the post-event IV level, not just the
+directional move, when estimating option P&amp;L after earnings.
+</p>
+
+<h3>Calendar Spreads as a Volatility Lens on Time</h3>
+<p>
+Every calendar spread is a bet that the current volatility term
+structure will change in your favor.
+When front-month IV is unusually high relative to back-month IV,
+short-calendar positions (sell back, buy front) benefit from
+term structure normalization.
+Term structure analysis applies to all assets: futures curves,
+bond yield curves, and options term structures all reveal the
+market's current assumptions about uncertainty over time.
+</p>
+
+<h2 id="takeaways">Key Takeaways</h2>
+
+<h3>Greeks are the Language of Options Risk</h3>
+<p>
+Delta, gamma, theta, vega, and rho are not optional theory —
+they are the only way to precisely describe how an options
+position will behave across a range of outcomes.
+A trader who cannot explain every position in greek terms does
+not fully understand the risk they are carrying.
+</p>
+
+<h3>Gamma and Theta Always Trade Off</h3>
+<p>
+There is no position that is simultaneously long gamma and long
+theta — these are opposite sides of the same trade.
+Income-seeking strategies (short gamma) pay for premium collection
+with exposure to large moves; protection-seeking strategies
+(long gamma) pay a daily theta cost for the right to benefit
+from those large moves.
+The ratio between gamma and theta is set by implied volatility:
+higher IV means you pay more theta per unit of gamma because
+the market is pricing in greater expected movement.
+This is why high-IV environments favor selling options and
+low-IV environments favor buying options — not as a market-timing
+rule, but as a statement about which side is paying a fair price
+for the risk they are accepting.
+</p>
+
+<h3>Moneyness Determines the Greek Profile — Choose Deliberately</h3>
+<p>
+Choosing between an ITM, ATM, or OTM option for the same
+directional view is not a minor detail — it is a fundamentally
+different trade.
+The ATM option has the highest gamma, highest theta, highest vega,
+and a delta near 0.50.
+The deep ITM option has a delta near 1.00 but minimal gamma,
+theta, and vega — it behaves like stock ownership with a capped
+downside.
+The OTM option has the lowest premium and delta but the same
+relative gamma and vega per dollar as ATM — it is the highest-
+leverage, highest-risk choice.
+Passarelli's greek matrices showing Disney and QQQ options across
+strikes make this comparison concrete: side-by-side numbers replace
+vague intuitions about "aggressive" versus "conservative" with
+precise risk measurement.
+</p>
+
+<h3>All Options Trades Are Volatility Trades</h3>
+<p>
+Even a simple directional call purchase is a bet on volatility:
+the realized vol of the stock must justify the IV embedded in
+the premium.
+A directional trader who ignores IV is systematically
+overpaying when fear is elevated and underpaying when complacency
+rules.
+</p>
+
+<h3>ATM Options Have the Most Time Value Per Dollar</h3>
+<p>
+ATM options have the highest theta, highest gamma, and highest
+vega in absolute terms.
+They are the most sensitive to the passage of time and to
+volatility changes.
+Moving OTM reduces the premium paid but also reduces all the
+greeks — the leverage profile changes dramatically.
+</p>
+
+<h3>The "Would I Do It Now?" Rule Prevents Cognitive Traps</h3>
+<p>
+Holding a losing short option position because "I already have
+the premium collected" is a sunk-cost trap.
+Re-underwrite every open position as if you had no position;
+if you would not enter today, close the trade.
+</p>
+
+<h3>Volatility Mean-Reverts — But Not on a Schedule</h3>
+<p>
+IV at extremes tends to revert toward its historical average,
+but can stay elevated or depressed longer than most traders
+expect.
+Mean-reversion trades require defined risk; open-ended positions
+on volatility can survive being right on direction but wrong
+on timing.
+The most dangerous IV trade is a naked short position entered
+when IV is elevated: if IV continues rising before it eventually
+falls, the short option holder faces both mark-to-market losses
+and an accelerating delta risk that can become unmanageable.
+The professional solution is always defined-risk structures —
+iron condors, credit spreads, butterflies — that cap the
+worst-case loss regardless of how long the mean-reversion takes.
+</p>
+
+<h3>Spreads Define Risk and Change Greek Exposure</h3>
+<p>
+Every spread decision is a decision about which greeks to keep
+and which to hedge away.
+Buying a vertical spread versus buying an outright call is not
+just a premium decision — it changes gamma, theta, and vega
+dramatically and alters the range of profitable outcomes.
+</p>
+
+<h3>Paper Trading is Mandatory Before Real Money</h3>
+<p>
+Options positions behave in unexpected ways until you've lived
+through earnings IV crush, early assignment on covered calls,
+and the acceleration of theta in the final week.
+Paper trading with real market data builds intuition before
+real capital is at risk.
+The goal of paper trading is not to prove that a strategy "works"
+— it is to internalize the greek dynamics so that when you see
+your first real position in IV crush, or your first short iron
+condor being tested at the wing, you have a reference point for
+how it should behave and what the correct response is.
+Passarelli's three-step framework — Study, Paper Trade, Showtime —
+is the minimum viable path to informed options trading.
+Skipping the paper-trade step is the single most common cause
+of avoidable losses for new options participants.
+</p>
+
+<h2 id="contrarian">Contrarian Ideas</h2>
+
+<h3>Delta-Neutral Hides Gamma Risk</h3>
+<p>
+A position with zero net delta at the moment of entry can become
+violently directional within hours.
+Gamma is the force that converts a "neutral" position into a
+directional one.
+A short straddle with zero delta at entry will be long 50 deltas
+if the stock rallies $1 (negative gamma makes calls more valuable,
+increasing the net delta exposure).
+Retail traders who see "delta neutral" on their option chain
+display and conclude they have no directional risk are reading
+one snapshot of a dynamic system.
+Managing a delta-neutral position means continuously monitoring
+and re-hedging as gamma moves the delta — not a one-time setup.
+</p>
+
+<h3>Neither Buying Nor Selling Options Has Systematic Edge</h3>
+<p>
+The conventional retail narrative is that "selling options is
+better" because premium sellers consistently win.
+Passarelli's Fair Game argument challenges this: in an efficient
+market, option prices reflect the correct expected value of
+future volatility.
+Neither side has a statistical edge over time; the edge belongs
+to whoever manages positions more skillfully.
+</p>
+
+<h3>A Directional View Is Not Enough to Trade Options Profitably</h3>
+<p>
+Being right about the direction of a stock's move does not
+guarantee profit from a long option position.
+IV crush, excessive premium relative to the actual move, and
+poor timing can all turn a correct directional call into a
+losing trade.
+Options require a view on both direction and volatility.
+</p>
+
+<h3>The Calendar Spread's Hidden Paradox</h3>
+<p>
+Long calendar spreads are short gamma but long vega — two greek
+signs that normally travel together in an outright long option but
+are here decoupled.
+A trader who uses a calendar spread as a cheap substitute for an
+outright long option will be surprised when a large stock move
+(which would profit the outright option holder) damages the
+calendar spread.
+Understanding this paradox prevents misapplication of the strategy:
+calendar spreads are for traders with a specific view on volatility
+term structure, not for traders who simply want a cheaper version
+of a directional bet.
+</p>
+
+<h3>Deep ITM Calls Sometimes Make More Sense Than Shares</h3>
+<p>
+Traders assume that buying stock is the "conservative" alternative
+to buying calls.
+Deep ITM calls with delta near 0.90 offer nearly identical
+directional exposure to stock while capping the maximum loss
+at the premium paid — effectively buying stock with a guaranteed
+stop-loss built in.
+For the same capital, you can own more "stock equivalent" exposure
+with defined risk.
+</p>
+
+<h3>Calendar Spreads Are Primarily Volatility Trades</h3>
+<p>
+Most retail traders use calendar spreads as "cheap income" plays.
+Passarelli reframes them as volatility term structure bets:
+the key decision is whether front-month IV is overpriced relative
+to back-month IV, not whether the stock will stay flat.
+This reframe changes how to select strikes, expirations, and
+entry timing.
+</p>
+
+<h3>Delta-Neutral Is Not Market-Risk-Free</h3>
+<p>
+Achieving delta-neutrality does not eliminate directional risk
+— it only eliminates it at the current moment.
+Gamma will re-introduce directional risk as the stock moves,
+and a "delta-neutral" multi-stock book carries correlation risk
+that is invisible in the individual position's greek readout.
+</p>
+
+<h2 id="quotes">Notable Quotes</h2>
+
+<blockquote>
+"The only barrier left between the Average Joe and the options
+pro is that of knowledge. Those who have it will succeed;
+those who do not will fail."
+<cite>— Dan Passarelli, Preface</cite>
+</blockquote>
+
+<blockquote>
+"Along with death and taxes, there is one other fact of life we
+can all count on: the time value of all options ultimately
+going to zero."
+<cite>— Dan Passarelli, Chapter 5</cite>
+</blockquote>
+
+<blockquote>
+"The options market will always equalize imbalances."
+<cite>— Dan Passarelli, Chapter 4</cite>
+</blockquote>
+
+<blockquote>
+"Option greeks are metrics used to measure an option's sensitivity
+to influences on its price."
+<cite>— Dan Passarelli, Preface</cite>
+</blockquote>
+
+<blockquote>
+"Buy options when expecting volatility to increase; sell options
+when expecting volatility to decrease."
+<cite>— Dan Passarelli (recurring rule throughout)</cite>
+</blockquote>
+
+<blockquote>
+"A trader's objectives will dictate the right strategy for the
+right situation."
+<cite>— Dan Passarelli, Preface</cite>
+</blockquote>
+
+<blockquote>
+"If there are any 'secrets' of professional traders, this book
+will expose them."
+<cite>— Dan Passarelli, Preface</cite>
+</blockquote>
+
+<h2 id="allegories">Allegories &amp; Cultural References</h2>
+<table>
+<thead><tr><th>Reference</th><th>Concept Illustrated</th></tr></thead>
+<tbody>
+<tr><td>Wimpy telling Popeye "I'll gladly pay you Tuesday for a hamburger today"</td><td>Counterparty credit risk — why the OCC exists to guarantee every trade</td></tr>
+<tr><td>Babe Ruth's low batting average / high home run rate</td><td>Long-option buyers accept many small losses for occasional large winners — expected value over batting average</td></tr>
+<tr><td>The fair die game ($0.50 entrance fee for a 50/50 win)</td><td>The Fair Game argument — option prices reflect their statistically fair expected value; no systematic edge to buying or selling</td></tr>
+<tr><td>The loaded die (only a "1" wins; fair fee = $0.1667)</td><td>OTM options with low probability — fair pricing removes the apparent edge of teenie selling</td></tr>
+<tr><td>Death, taxes, and time decay going to zero</td><td>Theta is the only certainty in options — the universal edge of the option seller</td></tr>
+<tr><td>Insurance policy (protective put)</td><td>Paying premium for downside protection — the correct mental model for put buying</td></tr>
+<tr><td>Teenie sellers on the CBOE floor</td><td>Short-volatility strategies can generate steady income until one catastrophic event wipes out years of gains</td></tr>
+<tr><td>Harry's 7-day gamma scalping journal</td><td>Realized volatility monetized through dynamic delta-hedging — how long gamma earns its keep</td></tr>
+<tr><td>Mary's mirror-image short-gamma journal</td><td>The exact same stock moves that generate profit for the long-gamma trader produce equivalent losses for the short-gamma trader</td></tr>
+<tr><td>Smileys and frowns (P&amp;L curves)</td><td>Long gamma = convex U-shape (smiley); short gamma = concave inverted U (frown) — visual encoding of gamma's directionality</td></tr>
+<tr><td>GE's 30-year dividend streak being broken in 2009</td><td>Historical patterns in dividends (and by extension, any input to option pricing models) can change suddenly, invalidating model assumptions</td></tr>
+<tr><td>The HAPI — Hope and Pray Index</td><td>Holding losing positions without analysis is not a strategy; it is a behavior driven by emotion rather than edge</td></tr>
+<tr><td>Earning a "free call" by rolling covered calls</td><td>Calendar spread logic applied to income strategies — rolling short calls builds a long-dated option at near-zero net cost over time</td></tr>
+<tr><td>The DJX condor with "impossible" strike range (2007)</td><td>Option traders who set break-evens based on historical volatility were devastated by the 2008 crash — fat tails exist outside the model</td></tr>
+<tr><td>Visteon spinoff creating three classes of Ford options</td><td>Corporate actions can create complex, non-standard contracts — real-world options are not always the textbook 100-share version</td></tr>
+</tbody>
+</table>
+
+<h2 id="frameworks">Proposals &amp; Frameworks</h2>
+
+<h3>The Greek Hierarchy for Trade Decisions</h3>
+<p>
+Passarelli presents a practical decision sequence for every
+options trade:
+(1) Start with delta — what is the directional exposure?
+(2) Check gamma — how will delta change if the stock moves?
+(3) Evaluate theta — what is the daily cost (or benefit)?
+(4) Assess vega — is IV rising or falling, and which side does that favor?
+(5) Consider rho — only for LEAPS or in rising-rate environments.
+This hierarchy reflects the typical magnitude of each greek's
+contribution to P&amp;L for most short- to medium-term equity options.
+</p>
+
+<h3>Greek Profile by Strategy — The Complete Map</h3>
+<p>
+Every options strategy has a characteristic greek fingerprint.
+Understanding the sign and magnitude of each greek determines
+whether a strategy is appropriate for a given forecast about
+direction, time, and volatility.
+</p>
+
+<table>
+<caption>Options Strategy Greek Profiles</caption>
+<thead>
+<tr><th>Strategy</th><th>Delta</th><th>Gamma</th><th>Theta</th><th>Vega</th><th>Ideal For</th></tr>
+</thead>
+<tbody>
+<tr><td>Long call</td><td>+ (0–1)</td><td>+</td><td>−</td><td>+</td><td>Bullish + rising IV</td></tr>
+<tr><td>Short naked call</td><td>−</td><td>−</td><td>+</td><td>−</td><td>Neutral to bearish + falling IV</td></tr>
+<tr><td>Covered call</td><td>+ (stock−delta)</td><td>−</td><td>+</td><td>−</td><td>Neutral/slight bull + falling IV</td></tr>
+<tr><td>Long put</td><td>− (0 to −1)</td><td>+</td><td>−</td><td>+</td><td>Bearish + rising IV</td></tr>
+<tr><td>Short naked put</td><td>+</td><td>−</td><td>+</td><td>−</td><td>Neutral to bullish + falling IV</td></tr>
+<tr><td>Bull call spread</td><td>+ (smaller)</td><td>+/− (shifts)</td><td>−/+ (shifts)</td><td>+ (smaller)</td><td>Moderate bull; IV not critical</td></tr>
+<tr><td>Bear put spread</td><td>− (smaller)</td><td>+/−</td><td>−/+</td><td>+ (smaller)</td><td>Moderate bear; IV not critical</td></tr>
+<tr><td>Long straddle</td><td>≈0</td><td>+</td><td>−</td><td>+</td><td>Expects large move + IV rise</td></tr>
+<tr><td>Short straddle</td><td>≈0</td><td>−</td><td>+</td><td>−</td><td>Range-bound + IV fall</td></tr>
+<tr><td>Iron condor</td><td>≈0</td><td>−</td><td>+</td><td>−</td><td>Range-bound; defined risk version of short straddle</td></tr>
+<tr><td>Long calendar spread</td><td>≈0</td><td>−</td><td>+</td><td>+</td><td>Flat stock + rising IV (term structure play)</td></tr>
+<tr><td>Long butterfly</td><td>≈0</td><td>−</td><td>+</td><td>−</td><td>Expects pin at middle strike at expiration</td></tr>
+<tr><td>Backspread (calls)</td><td>+</td><td>+</td><td>−</td><td>+</td><td>Expects very large move up</td></tr>
+<tr><td>Ratio spread (calls)</td><td>+/−</td><td>−</td><td>+</td><td>−</td><td>Moderate rise + falling IV</td></tr>
+</tbody>
+</table>
+
+<h3>The Three-Step Mastery Process</h3>
+<p>
+Study → Paper Trade → Real Money ("Showtime").
+Study means understanding the greek behavior of every strategy
+before market hours.
+Paper trading means running real trades with real market prices
+but no real money — the only way to experience IV crush, pin risk,
+and assignment before they cost you real capital.
+Showtime comes only when consistent paper-trading results justify
+committing real money.
+</p>
+
+<h3>The Vol-Selling Decision Framework</h3>
+<p>
+Before selling volatility: (1) Compare current IV to HV —
+is IV elevated? (2) Check IV percentile relative to its own
+52-week range. (3) Assess the catalyst calendar — is there a
+known event that will drive IV higher before expiration?
+(4) Map the break-evens to standard deviation ranges.
+(5) Apply the "Would I Do It Now?" rule at each management point.
+</p>
+
+<h3>Calendar Spread Entry Filter</h3>
+<p>
+Before entering a calendar spread, analyze the term structure:
+(1) Is front-month IV higher than back-month IV?
+(The spread profits from this differential compressing.)
+(2) Is there an event in the front month that is inflating its IV?
+(3) What is the expected magnitude of the stock's move relative
+to the calendar's profit range?
+A calendar spread entered when the term structure is flat or
+inverted (back month IV higher than front month) starts at a
+structural disadvantage.
+</p>
+
+<h2 id="referenced">Referenced Works</h2>
+<table>
+<thead>
+<tr><th>Name</th><th>Work / Role</th><th>Connection to Book</th></tr>
+</thead>
+<tbody>
+<tr><td>Fischer Black &amp; Myron Scholes</td><td>Black-Scholes Option Pricing Model (1973)</td><td>The foundational pricing model used throughout; source of the greeks as partial derivatives</td></tr>
+<tr><td>Robert Merton</td><td>Extended Black-Scholes for dividends and continuous time</td><td>Merton's extensions make the model applicable to real equity options with dividends</td></tr>
+<tr><td>Jim Bittman</td><td>CBOE Options Institute instructor; mentor to Passarelli</td><td>Credited in acknowledgments as the reason this book was written; foundational influence on Passarelli's greek-centric approach</td></tr>
+<tr><td>William J. Brodsky</td><td>Chairman and CEO, Chicago Board Options Exchange</td><td>Wrote the foreword; contextualizes the book within the explosive growth of listed options markets</td></tr>
+<tr><td>Options Clearing Corporation (OCC)</td><td>Guarantor of all listed options trades</td><td>Chapter 1 explains its role as universal counterparty; ensures market integrity</td></tr>
+<tr><td>CBOE VIX</td><td>Volatility Index measuring 30-day S&amp;P 500 IV</td><td>Used throughout Chapter 3 as the benchmark for market-wide implied volatility</td></tr>
+<tr><td>John Kmiecik</td><td>Content editor; colleague at Market Taker Mentoring</td><td>Credited for diligent content editing of the manuscript</td></tr>
+</tbody>
+</table>
+
+<h2 id="didntfit">What Didn't Fit</h2>
+
+<h3>The Visteon Spinoff and Three Classes of Ford Options</h3>
+<p>
+In the summer of 2000, Ford spun off its Visteon auto-parts
+subsidiary in a complex transaction that created three distinct
+classes of Ford options simultaneously.
+The standard "F" class represented 100 shares of new Ford stock.
+The "XFO" class represented 100 shares of Ford plus $2,000 cash
+plus additional consideration.
+The "FOD" class represented 100 shares of new Ford plus 13 shares
+of Visteon plus $2,001.24.
+This real-world example illustrates that exchange-listed options
+are not always the clean 100-share instruments assumed in
+textbooks — corporate actions create non-standard contracts
+that persist until expiration.
+Traders must always verify contract specifications before assuming
+standard terms.
+</p>
+
+<h3>The GM Volatility Term Structure Exhibit</h3>
+<p>
+General Motors options provided Passarelli with a striking
+term-structure exhibit showing near-month IV significantly
+elevated above longer-dated IV — a common pattern before earnings
+or restructuring announcements.
+The exhibit makes visible what the numbers alone cannot convey:
+the front-month IV spike is so sharp relative to the back month
+that the term structure resembles a cliff rather than a slope.
+Calendar spread traders who identified this pattern before GM's
+earnings had a structural advantage: the front-month short was
+collecting 8–10 points of IV above the back-month long, creating
+an immediate edge even if the underlying moved modestly.
+This pattern recurs across earnings season every quarter.
+</p>
+
+<h3>The Theta Acceleration Final-Week Math</h3>
+<p>
+Passarelli presents a specific exhibit showing ATM option theta
+in the final 10 trading days: the decay is not linear but
+exponential.
+With 10 days remaining, an ATM option might lose $0.015 per day
+in time value.
+With 5 days remaining, the same option loses $0.022 per day.
+With 2 days remaining, it loses $0.030 per day.
+By the final day, theta can be three to four times the rate
+of day 10.
+This acceleration is the reason short-option sellers prefer
+near-expiration options: the theta income is most efficient
+in the final 7–10 days.
+It is also why long-option holders who are slightly OTM with
+a week left face a brutal uphill battle — the theta clock
+is running fastest precisely when the option needs the stock
+to move most urgently.
+The practical rule: avoid holding long options into the final
+week unless you have a specific event catalyst that justifies
+the accelerating decay cost.
+</p>
+
+<h3>The Citigroup Vertical Skew Exhibit</h3>
+<p>
+The Citigroup volatility skew exhibit — OTM puts with IV of 35%
+versus OTM calls at 22% — captures the asymmetric fear premium
+baked into financial stock options after the 2008 crisis.
+Put buyers had learned an expensive lesson: tail risk in large
+banks was not theoretical, and they were willing to pay
+significantly elevated premiums for downside protection.
+The slope of this skew tells a story about the market's collective
+memory of the financial crisis and its ongoing expectation of
+non-normal distribution in financial stocks.
+For traders, the key implication: selling OTM puts in financial
+stocks carries more tail risk than the standard delta alone
+suggests, because the high skew reflects genuine fear of
+discontinuous downside moves.
+</p>
+
+<h3>Passarelli's Ford Motor Floor Position</h3>
+<p>
+The most vivid illustration of multi-greek portfolio management
+in the book is Passarelli's own Ford Motor options book from his
+market-maker days.
+The position spanned multiple expirations (near-month, next-month,
+and LEAPS), with both calls and puts, long and short.
+The exhibit of the full greek summary by expiration showed that
+the book was net delta-neutral overall — but the breakdown by
+expiration revealed something important: positive gamma and
+negative theta in the near month (long-gamma bias), but negative
+gamma and positive theta in the back months (short-gamma bias).
+This meant the book behaved like a long straddle on a day-by-day
+basis for the near expiration but like a short straddle for the
+longer-dated positions.
+A large one-day move in Ford stock would simultaneously help the
+near-month Greeks and hurt the back-month Greeks — partially
+self-hedging, but only partially.
+Managing this kind of book required calculating the net effect
+of each scenario on the entire portfolio, not just looking at
+any single position in isolation.
+This is why institutions run "scenario analysis" rather than
+individual trade review — the interaction between positions is
+where the real risk lives.
+</p>
+
+<h3>The Standard Deviation Formula for Iron Condor Strikes</h3>
+<p>
+Passarelli provides a practical formula for setting iron condor
+break-even targets using the options market's own implied
+volatility: multiply the stock price by IV, divide by the square
+root of 252 (for a one-day move) or scale by the square root of
+days to expiration for multi-day targets.
+This gives a one-standard-deviation range — roughly 68% probability
+the stock stays within it.
+Setting condor wings at one standard deviation produces a high
+probability of profit (about 68%) but a narrow maximum gain zone;
+two standard deviations produces lower probability but more
+room to be wrong.
+The SPX iron condor example shows how this math translates to
+specific strike selection.
+</p>
+
+<h3>Conversions, Reversals, and the Jelly Roll</h3>
+<p>
+The jelly roll — combining a conversion in one expiration with
+a reversal in another — is a pure interest-rate instrument
+used by institutions to roll positions forward in time while
+locking in financing rates.
+Retail traders rarely execute jelly rolls, but understanding
+them illuminates why put-call parity violations persist across
+expirations: the jelly roll arbitrage keeps term structure
+relationships aligned.
+Passarelli's conversion/reversal exhibits show rho as the
+dominant greek in these positions — the entire profit (or loss)
+of a conversion is driven by interest rates, not by any movement
+in the underlying stock or its volatility.
+This reveals rho's importance in institutional options books,
+where LEAPS and long-dated positions make interest rate sensitivity
+a first-order risk.
+</p>
+
+<footer>
+<p><strong>Title:</strong> Trading Option Greeks</p>
+<p><strong>Author:</strong> Dan Passarelli</p>
+<p><strong>Edition:</strong> Second Edition</p>
+<p><strong>Publisher:</strong> Bloomberg Press / John Wiley &amp; Sons</p>
+<p><strong>Year:</strong> 2012</p>
+<p><strong>Pages:</strong> 345</p>
+<p>
+A comprehensive guide to understanding and applying the five
+option greeks — delta, gamma, theta, vega, and rho — across
+all major options strategies.
+Written by a former CBOE market maker, the book bridges
+professional floor-trader intuition with systematic,
+greek-based risk management for retail and institutional traders.
+</p>
+</footer>
+
+<h2 id="about">About the Author</h2>
+<p>
+<strong>Dan Passarelli</strong> is a former options market maker
+on the Chicago Board Options Exchange (CBOE) and founder of
+Market Taker Mentoring, an options education firm based in Chicago.
+He spent years as an instructor at the CBOE's Options Institute,
+where he taught options theory and practical trading to both retail
+investors and professional traders at financial institutions.
+His background combines the real-time intuition of the trading
+floor — where position management under pressure is the curriculum
+— with the systematic, quantitative framework that the greeks provide.
+</p>
+<p>
+Before founding Market Taker Mentoring, Passarelli developed his
+trading style as a market maker, simultaneously quoting bids and
+asks across dozens of option series and managing a multi-greek
+book in real time.
+This experience is what gives the book its most distinctive quality:
+the examples are not hypothetical — they are drawn from the kinds
+of real decisions that professionals face on every trading day.
+Jim Bittman, a senior instructor at the CBOE Options Institute,
+served as Passarelli's mentor and is credited as the primary reason
+this book was written.
+</p>
+<p>
+Passarelli is also the author of <em>The Market Taker's Edge</em>
+(McGraw-Hill, 2011), which focuses on the practical application
+of options strategies from an execution standpoint.
+He contributes to market education through his website,
+markettaker.com, and has taught thousands of traders through
+his firm's mentoring programs.
+<em>Trading Option Greeks</em> is his most technically rigorous
+work — a textbook for serious traders who want to move beyond
+strategy names into the underlying mechanics of options risk.
+</p>
+
+<h2 id="matters">Why This Book Matters</h2>
+<p>
+Options markets grew from a specialized institutional tool into
+a mass-market instrument in the two decades following the
+introduction of listed equity options in 1973.
+By 2010, nearly 3.9 billion contracts changed hands annually —
+far more than the total shares traded on many stock exchanges.
+Yet most retail traders approached options with only a surface
+understanding: they knew that calls were bullish and puts were
+bearish, but had little insight into what drove option prices
+between entry and expiration.
+<em>Trading Option Greeks</em> fills that gap more directly than
+almost any book before or since.
+</p>
+<p>
+The book's enduring value is its refusal to oversimplify.
+Passarelli doesn't reassure the reader that options are easy —
+he shows exactly how they can surprise, erode, and destroy
+capital when misunderstood.
+The gamma-theta trade-off, the IV crush phenomenon, the dynamics
+of delta-neutral positions — these are the mechanisms that
+separate profitable options traders from the majority who lose.
+By naming and quantifying them, Passarelli gives traders
+a complete vocabulary for their own risk.
+</p>
+
+<p>
+Perhaps the book's most lasting contribution is structural:
+by organizing options risk into five clean dimensions rather
+than a confusing catalog of strategies, Passarelli enables
+traders to reason from first principles rather than memorize
+isolated recipes.
+A trader who understands the five greeks can deconstruct any
+new strategy they encounter and immediately identify its risk
+profile, profit zone, and sensitivities.
+The strategy names and ticker examples become secondary —
+the framework is what stays.
+This is the professional edge that Passarelli says was never
+a secret, only unavailable to those who didn't know where to look.
+</p>
+<p>
+In an era when zero-commission trading and weekly expiration
+options have dramatically increased retail participation in
+options markets, the greek framework has never been more
+relevant.
+A trader entering a 0DTE iron condor without understanding gamma
+acceleration is flying blind.
+A trader buying earnings straddles without accounting for IV crush
+is systematically overpaying.
+<em>Trading Option Greeks</em> provides the foundation that makes
+the difference — not secrets, but structured understanding of
+the mechanics that drive every options price every day.
+</p>
+
+</body>
+</html>
