@@ -3001,6 +3001,7 @@
       '#shelfView .book[data-moved="1"]'
     ).forEach(function(el) { el.remove(); });
 
+    var touchedShelves = [];
     document.querySelectorAll('#toReadView .book').forEach(
       function(el) {
         var id = el.dataset.book;
@@ -3037,8 +3038,23 @@
         var tier = clone.querySelector('.tier-badge');
         if (tier) tier.remove();
         targetShelf.appendChild(clone);
+        if (touchedShelves.indexOf(targetShelf) === -1)
+          touchedShelves.push(targetShelf);
       }
     );
+
+    // Re-show sections that gained moved cards
+    // (render() may have hidden them before clones
+    // were injected)
+    touchedShelves.forEach(function(shelf) {
+      var title = shelf.previousElementSibling;
+      while (title && !title.classList.contains(
+        'section-title')) {
+        title = title.previousElementSibling;
+      }
+      if (title) title.style.display = '';
+      shelf.style.display = '';
+    });
   }
 
   // Inject "→ Shelf" button into every To Read card
