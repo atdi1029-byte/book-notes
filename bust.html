@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html><head><title>Cache Bust</title></head>
+<body style="background:#111;color:#0f0;font-family:monospace;
+  padding:2em;font-size:1.2em">
+<h2>Busting cache...</h2>
+<pre id="log"></pre>
+<script>
+var log = document.getElementById('log');
+function L(m){ log.textContent += m + '\n'; }
+
+(async function(){
+  // 1. Unregister all service workers
+  if ('serviceWorker' in navigator) {
+    var regs = await navigator.serviceWorker.getRegistrations();
+    for (var r of regs) {
+      await r.unregister();
+      L('Unregistered SW: ' + r.scope);
+    }
+  } else { L('No SW support'); }
+
+  // 2. Delete all caches
+  var names = await caches.keys();
+  for (var n of names) {
+    await caches.delete(n);
+    L('Deleted cache: ' + n);
+  }
+
+  L('\nDone! Redirecting in 2s...');
+  setTimeout(function(){
+    window.location.href = './index.html';
+  }, 2000);
+})();
+</script>
+</body></html>
