@@ -2,286 +2,3525 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Project Hub</title>
+<meta name="viewport"
+  content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style"
+  content="black-translucent">
+<meta name="theme-color" content="#f4efe8">
+<title>Bressert: Cycle Trading</title>
+<link rel="stylesheet" href="../book.css?v=4">
 <style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-
-  body {
-    background: #0e0804;
-    color: #e8dcc8;
-    font-family: Georgia, 'Times New Roman', serif;
-    line-height: 1.7;
-    min-height: 100vh;
-  }
-
-  .bg {
-    position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: radial-gradient(ellipse at 30% 20%, rgba(60,40,20,0.4), transparent 60%),
-                radial-gradient(ellipse at 70% 80%, rgba(40,25,50,0.3), transparent 60%),
-                #0e0804;
-    z-index: 0;
-  }
-
-  .content {
-    position: relative;
-    z-index: 1;
-    padding: 2.5rem 1.5rem;
-    max-width: 960px;
-    margin: 0 auto;
-  }
-
-  h1 {
-    font-size: 2.2rem;
-    color: #fff;
-    margin-bottom: 0.3rem;
-    text-shadow: 0 2px 16px rgba(0,0,0,0.5);
-  }
-
-  .subtitle {
-    color: rgba(255,255,255,0.7);
-    font-size: 1rem;
-    font-style: italic;
-    margin-bottom: 2.5rem;
-    padding-bottom: 1.5rem;
-    border-bottom: 1px solid rgba(255,255,255,0.15);
-  }
-
-  .section-title {
-    font-size: 1.1rem;
-    color: rgba(255,255,255,0.85);
-    text-shadow: 0 1px 8px rgba(0,0,0,0.4);
-    margin-top: 2.2rem;
-    margin-bottom: 0.8rem;
-    padding-bottom: 0.4rem;
-    border-bottom: 1px solid rgba(255,255,255,0.15);
-    font-style: italic;
-  }
-
-  .section-title:first-of-type { margin-top: 0; }
-
-  .shelf {
-    display: flex;
-    gap: 1.2rem;
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    padding-bottom: 0.5rem;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-  }
-
-  .shelf::-webkit-scrollbar { display: none; }
-
-  .card {
-    display: block;
-    text-decoration: none;
-    color: #e8dcc8;
-    transition: transform 0.25s ease;
-    min-width: 180px;
-    width: calc(33.333% - 0.8rem);
-    flex-shrink: 0;
-  }
-
-  .card:hover { transform: translateY(-6px); }
-
-  .card-face {
-    position: relative;
-    border-radius: 12px;
-    overflow: hidden;
-    aspect-ratio: 3 / 2;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 2px 4px 12px rgba(0,0,0,0.6), 6px 8px 24px rgba(0,0,0,0.3);
-    transition: box-shadow 0.25s ease;
-  }
-
-  .card:hover .card-face {
-    box-shadow: 2px 4px 16px rgba(0,0,0,0.7), 8px 12px 32px rgba(0,0,0,0.4), 0 0 40px rgba(180,120,40,0.1);
-  }
-
-  .card-face .icon { font-size: 2.5rem; z-index: 1; }
-
-  .card-face .overlay {
-    position: absolute;
-    inset: 0;
-    background: rgba(0,0,0,0.25);
-    border-radius: 12px;
-  }
-
-  .card-title {
-    font-size: 0.95rem;
-    color: #fff;
-    font-weight: 700;
-    margin-top: 0.6rem;
-    line-height: 1.3;
-    text-shadow: 0 1px 6px rgba(0,0,0,0.4);
-  }
-
-  .card-desc {
-    font-size: 0.78rem;
-    color: rgba(255,255,255,0.55);
-    margin-top: 0.15rem;
-    text-shadow: 0 1px 4px rgba(0,0,0,0.3);
-  }
-
-  .tag {
-    display: inline-block;
-    font-size: 0.6rem;
-    font-weight: 700;
-    padding: 2px 8px;
-    border-radius: 10px;
-    margin-top: 6px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    font-family: -apple-system, sans-serif;
-  }
-
-  .tag.pwa { background: rgba(58,158,74,0.35); color: #6ee87a; }
-  .tag.web { background: rgba(96,165,250,0.25); color: #93bbfd; }
-  .tag.local { background: rgba(251,191,36,0.25); color: #fbbf24; }
-
-  /* Card gradients */
-  .bg-crypto { background: linear-gradient(135deg, #1a1040, #2d1b69, #1a1040); }
-  .bg-spx { background: linear-gradient(135deg, #0a2a2a, #0e3d3d, #0a2a2a); }
-  .bg-bloom { background: linear-gradient(135deg, #2d1a24, #3d2030, #2d1a24); }
-  .bg-sora { background: linear-gradient(135deg, #1a0a2a, #2d1040, #1a0a2a); }
-  .bg-trade { background: linear-gradient(135deg, #1a2010, #2a3518, #1a2010); }
-  .bg-roman { background: linear-gradient(135deg, #1a2035, #253050, #1a2035); }
-  .bg-cadence { background: linear-gradient(135deg, #2a1a08, #3d2810, #2a1a08); }
-  .bg-zercher { background: linear-gradient(135deg, #2a0a0a, #3d1515, #2a0a0a); }
-  .bg-books { background: linear-gradient(135deg, #1a1020, #281838, #1a1020); }
-  .bg-reading { background: linear-gradient(135deg, #201a10, #352a18, #201a10); }
-  .bg-email { background: linear-gradient(135deg, #0a2015, #103525, #0a2015); }
-  .bg-emailhelp { background: linear-gradient(135deg, #102020, #183530, #102020); }
-  .bg-counter { background: linear-gradient(135deg, #1a1520, #281f30, #1a1520); }
-  .bg-bible { background: linear-gradient(135deg, #201510, #352518, #201510); }
-
-  @media (max-width: 600px) {
-    .content { padding: 1.2rem; }
-    h1 { font-size: 1.6rem; }
-    .card { width: 42vw; min-width: 150px; }
-  }
+.chart-figure {
+  margin: 1.8rem 0;
+  text-align: center;
+}
+.chart-view-link {
+  color: #c5a55a;
+  text-decoration: none;
+  font-weight: 700;
+  font-style: normal;
+  margin-left: 0.4em;
+  white-space: nowrap;
+}
+.chart-view-link:hover { text-decoration: underline; }
+.chart-caption {
+  font-size: 0.92rem;
+  color: #2a2015;
+  font-style: italic;
+  margin-top: 0.5rem;
+  line-height: 1.5;
+  max-width: 720px;
+  margin-left: auto;
+  margin-right: auto;
+}
+#fig-lb{display:none;position:fixed;inset:0;
+  background:rgba(0,0,0,0.92);z-index:9999;
+  justify-content:center;align-items:center;
+  flex-direction:column;cursor:zoom-out;}
+#fig-lb.open{display:flex;}
+#fig-lb-img{max-width:92vw;max-height:82vh;
+  border-radius:4px;
+  box-shadow:0 0 40px rgba(0,0,0,0.8);
+  cursor:default;}
+#fig-lb-caption{color:#ddd;font-size:0.9em;
+  margin-top:0.8em;max-width:700px;
+  text-align:center;font-style:italic;}
+#fig-lb-close{position:fixed;top:16px;right:20px;
+  color:#fff;font-size:2em;cursor:pointer;
+  opacity:0.7;line-height:1;}
+#fig-lb-close:hover{opacity:1;}
 </style>
 </head>
 <body>
+<script>var BM_KEY = 'bm_bressert_cycle';</script>
 
-<div class="bg"></div>
-
-<div class="content">
-  <h1>Project Hub</h1>
-  <p class="subtitle">Everything we built together</p>
-
-  <!-- TRADING -->
-  <h2 class="section-title">Trading</h2>
-  <div class="shelf">
-    <a class="card" href="https://atdi1029-byte.github.io/crypto-trade/" target="_blank">
-      <div class="card-face bg-crypto"><div class="overlay"></div><span class="icon">📊</span></div>
-      <div class="card-title">Crypto Dashboard</div>
-      <div class="card-desc">Signals, Pokemon scaling, DCA levels</div>
-      <span class="tag pwa">PWA</span>
-    </a>
-    <a class="card" href="https://atdi1029-byte.github.io/spx-trade/" target="_blank">
-      <div class="card-face bg-spx"><div class="overlay"></div><span class="icon">📈</span></div>
-      <div class="card-title">SPX Dashboard</div>
-      <div class="card-desc">Stocks, badges, treasury liquidity</div>
-      <span class="tag pwa">PWA</span>
-    </a>
-    <a class="card" href="https://atdi1029-byte.github.io/sora-signal/" target="_blank">
-      <div class="card-face bg-sora"><div class="overlay"></div><span class="icon">🔮</span></div>
-      <div class="card-title">Sora Signal</div>
-      <div class="card-desc">Signal tracking dashboard</div>
-      <span class="tag pwa">PWA</span>
-    </a>
-    <a class="card" href="Trade/index.html">
-      <div class="card-face bg-trade"><div class="overlay"></div><span class="icon">💹</span></div>
-      <div class="card-title">Trade Analytics</div>
-      <div class="card-desc">Upload &amp; analyze trade data</div>
-      <span class="tag local">Local</span>
-    </a>
-  </div>
-
-  <!-- FINANCE -->
-  <h2 class="section-title">Finance</h2>
-  <div class="shelf">
-    <a class="card" href="https://atdi1029-byte.github.io/bloom-portfolios/" target="_blank">
-      <div class="card-face bg-bloom"><div class="overlay"></div><span class="icon">🌸</span></div>
-      <div class="card-title">Bloom Portfolio</div>
-      <div class="card-desc">Valuations, buy/sell opps, growth charts</div>
-      <span class="tag pwa">PWA</span>
-    </a>
-    <a class="card" href="https://atdi1029-byte.github.io/roman-chariots/" target="_blank">
-      <div class="card-face bg-roman"><div class="overlay"></div><span class="icon">🏛️</span></div>
-      <div class="card-title">Roman Chariots</div>
-      <div class="card-desc">Budgeting, receipts, insights</div>
-      <span class="tag pwa">PWA</span>
-    </a>
-  </div>
-
-  <!-- PRODUCTIVITY -->
-  <h2 class="section-title">Productivity</h2>
-  <div class="shelf">
-    <a class="card" href="https://atdi1029-byte.github.io/cadence/" target="_blank">
-      <div class="card-face bg-cadence"><div class="overlay"></div><span class="icon">⚡</span></div>
-      <div class="card-title">Cadence</div>
-      <div class="card-desc">Task manager with cloud sync</div>
-      <span class="tag pwa">PWA</span>
-    </a>
-    <a class="card" href="https://atdi1029-byte.github.io/workout-tracker/" target="_blank">
-      <div class="card-face bg-zercher"><div class="overlay"></div><span class="icon">🏋️</span></div>
-      <div class="card-title">Zercher</div>
-      <div class="card-desc">Workouts, running, interval timer</div>
-      <span class="tag pwa">PWA</span>
-    </a>
-  </div>
-
-  <!-- LEARNING -->
-  <h2 class="section-title">Learning</h2>
-  <div class="shelf">
-    <a class="card" href="https://atdi1029-byte.github.io/book-notes/" target="_blank">
-      <div class="card-face bg-books"><div class="overlay"></div><span class="icon">📚</span></div>
-      <div class="card-title">Book Notes</div>
-      <div class="card-desc">Chapter-by-chapter deep dives</div>
-      <span class="tag pwa">PWA</span>
-    </a>
-    <a class="card" href="https://atdi1029-byte.github.io/reading-list/" target="_blank">
-      <div class="card-face bg-reading"><div class="overlay"></div><span class="icon">📖</span></div>
-      <div class="card-title">Reading List</div>
-      <div class="card-desc">Master investment reading list</div>
-      <span class="tag web">Web</span>
-    </a>
-    <a class="card" href="Bible/index.html">
-      <div class="card-face bg-bible"><div class="overlay"></div><span class="icon">✝️</span></div>
-      <div class="card-title">Bible Study</div>
-      <div class="card-desc">Verse-by-verse commentary</div>
-      <span class="tag local">Local</span>
-    </a>
-  </div>
-
-  <!-- OUTREACH -->
-  <h2 class="section-title">Outreach</h2>
-  <div class="shelf">
-    <a class="card" href="https://atdi1029-byte.github.io/gig-outreach/" target="_blank">
-      <div class="card-face bg-email"><div class="overlay"></div><span class="icon">📧</span></div>
-      <div class="card-title">Gig Outreach</div>
-      <div class="card-desc">Email templates &amp; contacts</div>
-      <span class="tag pwa">PWA</span>
-    </a>
-  </div>
-
-  <!-- OTHER -->
-  <h2 class="section-title">Other</h2>
-  <div class="shelf">
-    <a class="card" href="Counterpoint/index.html">
-      <div class="card-face bg-counter"><div class="overlay"></div><span class="icon">🎵</span></div>
-      <div class="card-title">Counterpoint</div>
-      <div class="card-desc">Music composition workbench</div>
-      <span class="tag local">Local</span>
-    </a>
-  </div>
-
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar"
+  style="display:none">
+  <span id="bookmarkText"></span>
+  <button onclick="jumpToBookmark()">Jump</button>
+  <button onclick="clearBookmark()">Clear</button>
 </div>
 
+<h1>Bressert: Cycle Trading</h1>
+<p class="author">Walter Bressert</p>
+<p class="subtitle">
+The Power of Oscillator/Cycle Combinations
+&bull; Cycles, Patterns and Oscillators
+in the Stock Market
+&bull; The Cycle Trading Pattern Manual
+</p>
+
+<nav>
+<h2 id="toc">Table of Contents</h2>
+<ul>
+<li><a href="#glossary">Glossary</a></li>
+<li><a href="#ch1">Ch 1: Focus on Cycles</a></li>
+<li><a href="#ch2">Ch 2: Technical Tools
+with Cycles</a></li>
+<li><a href="#ch3">Ch 3: Focus
+on Oscillators</a></li>
+<li><a href="#ch4">Ch 4: Centered
+Detrending</a></li>
+<li><a href="#ch5">Ch 5: The Detrend
+as an Oscillator</a></li>
+<li><a href="#ch6">Ch 6: Detrending
+Oscillators</a></li>
+<li><a href="#ch7">Ch 7: 3-Dimensional
+Analysis</a></li>
+<li><a href="#ch8">Ch 8: Primary Cycle
+in Gold</a></li>
+<li><a href="#ch9">Ch 9: MACD</a></li>
+<li><a href="#ch10">Ch 10: RSI</a></li>
+<li><a href="#ch11">Ch 11: CCI</a></li>
+<li><a href="#ch12">Ch 12: Stochastic</a></li>
+<li><a href="#ch13">Ch 13: 3-10
+Oscillator</a></li>
+<li><a href="#ch14">Ch 14: Trading &amp;
+Money Management</a></li>
+<li><a href="#part2">Part II: Stock Market
+Cycles (Workshop)</a></li>
+<li><a href="#part3">Part III: Cycle Trading
+Pattern Manual</a></li>
+<li><a href="#trading-lessons">Trading &amp;
+Investing Lessons</a></li>
+<li><a href="#takeaways">Key Takeaways</a></li>
+<li><a href="#contrarian">Contrarian Ideas</a></li>
+<li><a href="#quotes">Notable Quotes</a></li>
+<li><a href="#allegories">Allegories &amp;
+Cultural References</a></li>
+<li><a href="#frameworks">Proposals &amp;
+Frameworks</a></li>
+<li><a href="#references">Referenced
+Works</a></li>
+<li><a href="#didnt-fit">What Didn&rsquo;t
+Fit</a></li>
+<li><a href="#about">About the Author</a></li>
+<li><a href="#why-matters">Why This
+Book Matters</a></li>
+</ul>
+</nav>
+
+<!-- ════════════════════════════════════════ -->
+<h2 id="glossary">Glossary</h2>
+<hr>
+
+<h4>Cycle Hierarchy</h4>
+<p>
+<strong>Long-Term Dominant Cycle:</strong>
+Cycles longer than 1 year, ranging from 2 to
+11 years by market. The 4-Year Cycle in
+stocks, 5.5-year in gold, 3-year in corn.
+Sets the longest-term trend direction.
+</p>
+<p>
+<strong>Seasonal Cycle:</strong> Yearly cycle
+with highs and lows at approximately the same
+time each year. Soybeans low Jun-Oct, high
+Apr-Jul. Gold (bull) tops Q1, bottoms Q2.
+Currencies low May-Sep, high Nov-Apr.
+</p>
+<p>
+<strong>Primary Cycle (PC):</strong> The
+dominant weekly cycle. S&amp;P averages 22
+weeks, T-Bonds 21 weeks, gold 18 weeks.
+Sets the trend for the daily Trading Cycle.
+</p>
+<p>
+<strong>Trading Cycle (TC):</strong> The daily
+cycle you trade. Measured bottom to bottom,
+averaging 14&ndash;25 bars. Most cluster in
+the 18&ndash;22 bar range.
+</p>
+<p>
+<strong>Alpha Cycle:</strong> First half of
+the Trading Cycle. Always begins when the
+Trading Cycle begins.
+</p>
+<p>
+<strong>Beta Cycle:</strong> Second half of
+the Trading Cycle. Begins when Alpha bottoms,
+ends when the Trading Cycle bottoms.
+</p>
+
+<h4>Cycle Concepts</h4>
+<p>
+<strong>Right Translation:</strong> In a bull
+market, cycle crests shift to the right &mdash;
+the upswing is longer than the downswing.
+Higher crests and higher troughs. Average move
+from bottom to top = 3 weeks, top to bottom
+= 1 week.
+</p>
+<p>
+<strong>Left Translation:</strong> In a bear
+market, cycle crests shift to the left &mdash;
+the downswing is longer. Lower crests and
+troughs. Average move from bottom to top =
+1 week, top to bottom = 3 weeks.
+</p>
+<p>
+<strong>70% Timing Band:</strong> The middle
+70% of historical cycle lengths. 7 out of 10
+turns occur within this range. By the last
+day of the band, 90%+ of cycles have turned.
+~20% occur before the band, ~10% after.
+</p>
+<p>
+<strong>Centered Detrend:</strong> Moving
+average of the same length as the suspected
+cycle, plotted at the midpoint (centered back
+half the cycle). Eliminates effects of longer
+cycles. Cannot be used in real time (lags by
+half the cycle).
+</p>
+<p>
+<strong>Half-Span Detrend:</strong> Moving
+average of half the cycle length, plotted at
+current time. Approximates centered detrend
+behavior in real time.
+</p>
+
+<h4>Oscillators &amp; Patterns</h4>
+<p>
+<strong>RSI3M3:</strong> RSI(3) smoothed with
+a 3-bar moving average. Buy line = 30, sell
+line = 70&ndash;75. Primary daily oscillator
+for Trading Cycle identification.
+</p>
+<p>
+<strong>RSI3M3 Detrend:</strong> RSI3M3 minus
+its 5-bar moving average crossover. Catches
+signals in strong trends where RSI3M3 stays
+above its buy line.
+</p>
+<p>
+<strong>CCI (Commodity Channel Index):</strong>
+Standard buy/sell at &plusmn;100. Bressert
+uses smoothed versions: 5-day CCI smoothed
+with 8-term MA for T-Bond Trading Cycles
+(buy -35, sell 60); 30-month CCI for
+S&amp;P 4-Year Cycles.
+</p>
+<p>
+<strong>MACD Detrend:</strong> The spread
+between the MACD line and its signal/crossover.
+Turns before the MACD itself. Generates entries
+well before the traditional MACD crossover.
+</p>
+<p>
+<strong>3-10 Oscillator:</strong> 3-day MA
+minus 10-day MA, with 16-term crossover.
+Sensitive daily oscillator. Two key patterns:
+TSS and SBS.
+</p>
+<p>
+<strong>TSS (Two Step Sell):</strong> Oscillator
+high A above crossover, low B below crossover,
+then higher &ldquo;second step&rdquo; high C
+above A. Two-day downturn = setup. Trigger =
+drop below previous week&rsquo;s low.
+</p>
+<p>
+<strong>SBS (Small Bump Sell):</strong>
+Following a low below crossover, high B above
+crossover and zero, deeper low C below
+crossover, then &ldquo;small bump&rdquo; high
+D above crossover but below B. Two-day
+downturn = setup.
+</p>
+<p>
+<strong>Kiss Pattern:</strong> MACD bouncing
+off (or &ldquo;kissing&rdquo;) its crossover
+line. Bull Kiss = detrend rises above zero,
+dips back to test crossover, bounces. Bear
+Kiss = mirror image. More reliable when the
+price extreme before the Kiss is above (buy)
+or below (sell) the previous extreme.
+</p>
+<p>
+<strong>Hook Pattern:</strong> Oscillator drops
+below -1, rises (usually staying below 0),
+drops below crossover, then recovers above it.
+Shaped like a fishing hook. Primarily in bear
+markets but still produces 10%+ moves.
+</p>
+
+<h4>Trading Mechanics</h4>
+<p>
+<strong>Setup:</strong> An oscillator formation
+that signals a potential turn &mdash; drop
+below buy line, divergence, crossover
+penetration, or specific pattern completion.
+</p>
+<p>
+<strong>Trigger Entry:</strong> Price-based
+mechanical entry that removes emotion. Buy =
+price exceeds high of setup bar. Sell = price
+drops below low of setup bar. Stop placed at
+the cycle extreme.
+</p>
+<p>
+<strong>Mid-Cycle Pause (MCP):</strong> Price
+projection technique. Measure diagonal from
+cycle peak to trough, find midpoint, measure
+vertical distance to previous extreme, mirror
+it. &plusmn;10% range = target zone.
+</p>
+<p>
+<strong>Speed Resistance Lines:</strong> From
+cycle low to high, divide by 3 (.33 and .66).
+Draw lines from the low through those points.
+Upper speedline break = prices drop to lower.
+Lower speedline break = test cycle low.
+</p>
+<p>
+<strong>Money Contract:</strong> First of three
+contracts. Take profit equal to dollar risk,
+usually within 5 days. Reduces total exposure
+by two-thirds.
+</p>
+
+<!-- ════════════════════════════════════════ -->
+<h2 id="ch1">Chapter 1: Focus on Cycles</h2>
+<hr>
+
+<p>
+Everything in nature moves in cycles &mdash;
+planets orbit the sun, tides rise and fall,
+salmon spawn on schedule, even your heartbeat
+follows a rhythm.
+<strong>Walter Bressert</strong> spent decades
+documenting this principle in financial
+markets, building on the
+<strong>Foundation for the Study of
+Cycles</strong>, a non-profit that has
+cataloged over 3,000 cycles in weather, war,
+sunspots, drought, marriage rates, inflation,
+bank failures, real estate, manufacturing,
+and stock prices since the 1930s. His core
+premise: fundamentals move markets, but the
+fundamental picture is always most bullish at
+tops and most bearish at bottoms. Cycle
+analysis assumes fundamental events will
+occur to move prices in the direction of
+the cycle &mdash; the news follows the cycle,
+not the other way around.
+</p>
+
+<div class="chart-figure">
+<div class="chart-caption">
+Example 1-1 &mdash; Composite of three
+dominant cycles forming market price pattern
+<a class="chart-view-link"
+  href="javascript:void(0)"
+  onclick="bLB('charts/book_p008_003.jpeg',
+  'Example 1-1 — Composite Cycle')">[view]</a>
+</div></div>
+
+<p>
+Each market has its own
+<strong>cycle profile</strong> of several
+dominant cycles. The basic principle: identify
+the longest dominant cycle affecting price,
+then work down cycle by cycle to the smallest
+dominant cycle you wish to trade. Bressert
+identifies <strong>four dominant cycles</strong>
+in every market: (1) <strong>Long-term
+dominant cycles</strong> longer than one year,
+ranging from 2 to 11 years &mdash; the 4-year
+cycle in stocks, 5.5-year cycle in gold,
+3-year in corn, 6-year in crude oil.
+(2) The <strong>Seasonal Cycle</strong>, a
+yearly rhythm especially powerful in
+agricultural markets but also present in
+metals, financials, and currencies. Soybeans
+low June&ndash;October, high April&ndash;July.
+Gold (bull) tops Q1, bottoms Q2. Currencies
+low May&ndash;September, high
+November&ndash;April.
+(3) The <strong>Primary Cycle</strong>, the
+dominant weekly cycle averaging 9 to 22 weeks
+by market. (4) The <strong>Trading Cycle</strong>,
+measured in days, typically 14 to 25 bars
+from bottom to bottom, containing two
+sub-cycles: the Alpha Cycle (first half) and
+Beta Cycle (second half).
+</p>
+
+<div class="chart-figure">
+<div class="chart-caption">
+Example 1-2 &mdash; Full cycle hierarchy:
+Seasonal &rarr; Primary &rarr; 1/2 Primary
+&rarr; Trading &rarr; Alpha/Beta
+<a class="chart-view-link"
+  href="javascript:void(0)"
+  onclick="bLB('charts/book_p010_004.jpeg',
+  'Example 1-2 — Cycle Hierarchy')">[view]</a>
+</div></div>
+
+<p>
+The nesting is the key to the entire system.
+Each longer cycle determines the trend for
+the next shorter cycle. If the Primary Cycle
+is moving up, the Trading Cycle shows
+<strong>right translation</strong> &mdash;
+higher crests, higher troughs, tops occurring
+late in the cycle (bullish). On average the
+move from bottom to top takes three weeks,
+top to bottom one week. If the Primary Cycle
+is moving down, <strong>left translation</strong>
+appears &mdash; lower crests, lower troughs,
+tops occurring early. Average bottom to top
+is one week, top to bottom is three weeks.
+This single observation tells you whether to
+hold through a pullback or take profits
+quickly. Every PC low was above the previous
+PC low in a bull phase &mdash; every one. When
+about two-thirds of PC lows started falling
+below the previous low, the market had
+shifted to bear.
+</p>
+
+<div class="chart-figure">
+<div class="chart-caption">
+Example 1-3 &mdash; Right translation (bull)
+vs. left translation (bear) showing how
+crests shift
+<a class="chart-view-link"
+  href="javascript:void(0)"
+  onclick="bLB('charts/book_p011_005.jpeg',
+  'Example 1-3 — Right/Left Translation')">[view]</a>
+</div></div>
+
+<p>
+From this nesting, Bressert distills the
+fundamental <strong>cyclic trading rule</strong>:
+if the longer-term cycle is moving up, buy
+the troughs of the shorter cycle. If the
+longer-term cycle is moving down, sell the
+crests. The challenge is knowing <em>when</em>
+the cycle is about to turn &mdash; which is
+where oscillators and timing bands enter.
+</p>
+
+<p>
+The <strong>70% Timing Band</strong> is
+Bressert&rsquo;s central timing tool. By
+eliminating the most extreme 15% on each
+side of historical cycle lengths, he narrows
+the window where 7 out of 10 cycles will
+turn. The critical probability insight: by
+the last day of the 70% band, 90% or more
+of cycles have already turned. About 20%
+turn before the band, 10% after. The
+probability of a successful trade is
+<strong>much greater later in the timing band
+than earlier</strong>. Patience is
+mathematically rewarded.
+</p>
+
+<p>
+Bressert publishes comprehensive timing band
+tables for over 20 markets. Key values:
+<strong>S&amp;P Index</strong> Primary Cycle
+averages 22 weeks, band 16&ndash;25.
+<strong>T-Bonds</strong> have two interactive
+Primary Cycles &mdash; 21-week and 14-week
+&mdash; with Trading Cycle averaging 21
+market days, band 15&ndash;30.
+<strong>Gold</strong> Primary Cycle averages
+18 weeks, band 11&ndash;23, with Trading
+Cycle averaging 15 market days, band
+13&ndash;20. <strong>Japanese Yen</strong>
+Primary Cycle averages 31 weeks, band
+26&ndash;44. <strong>Soybeans</strong>
+Primary Cycle averages 14 weeks, band
+11&ndash;22. All Trading Cycles are provided
+in both calendar days (include weekends,
+because the world doesn&rsquo;t stop on
+weekends) and market days (for oscillator
+calculations).
+</p>
+
+<div class="chart-figure">
+<div class="chart-caption">
+Primary Cycle timing bands table &mdash;
+weeks trough-to-trough for all major
+futures markets
+<a class="chart-view-link"
+  href="javascript:void(0)"
+  onclick="bLB('charts/book_p016_007.jpeg',
+  'Primary Cycle Timing Bands')">[view]</a>
+</div></div>
+
+<div class="chart-figure">
+<div class="chart-caption">
+Trading Cycle timing bands &mdash;
+calendar days, tables 1-3
+<a class="chart-view-link"
+  href="javascript:void(0)"
+  onclick="bLB('charts/book_p020_009.jpeg',
+  'TC Timing Bands Calendar Days')">[view]</a>
+</div></div>
+
+<div class="chart-figure">
+<div class="chart-caption">
+Trading Cycle timing bands &mdash;
+market days, tables 1-3
+<a class="chart-view-link"
+  href="javascript:void(0)"
+  onclick="bLB('charts/book_p022_011.jpeg',
+  'TC Timing Bands Market Days')">[view]</a>
+</div></div>
+
+<p>
+An important adjustment: timing bands should
+be shifted for bull versus bear markets.
+In a bull market, the trough-to-crest phase
+stretches from the average to the end of
+the band (longer upswings), while the
+crest-to-trough phase compresses from the
+beginning to the average (shorter pullbacks).
+In bear markets, the reverse. For the S&amp;P
+1/2 Primary Cycle: trough-to-crest averages
+5 weeks with a 2&ndash;10 week band. In a
+bull market, expect 5&ndash;10 weeks up. In
+a bear, 2&ndash;5 weeks. Crest-to-trough
+averages 5 weeks, band 1&ndash;9. Bull = 1
+&ndash;5 weeks down. Bear = 5&ndash;9 weeks.
+This single adjustment can dramatically
+narrow your trading window.
+</p>
+
+<p>
+Bressert details a <strong>7-step process
+for plotting timing bands</strong> on a chart,
+using a color code: Red for Trading Cycle
+trough-to-trough, Brown for Alpha/Beta
+trough-to-trough, Green for trough-to-crest,
+Orange for crest-to-trough. At Step 7, three
+overlapping bands converge to give the most
+probable time for the Trading Cycle trough:
+(1) the red T-T of the Trading Cycle,
+(2) the brown T-T of the Beta Cycle, and
+(3) the orange C-T of the Beta Cycle. The
+Trading Cycle will frequently bottom within
+the overlap area of all three. Once the
+trough is confirmed, it becomes the new
+Day Zero for the next cycle.
+</p>
+
+<div class="chart-figure">
+<div class="chart-caption">
+7-step timing band plotting process with
+color-coded overlapping bands
+<a class="chart-view-link"
+  href="javascript:void(0)"
+  onclick="bLB('charts/book_p025_013.jpeg',
+  'Timing Band 7-Step Process')">[view]</a>
+</div></div>
+
+<div class="chart-figure">
+<div class="chart-caption">
+Chart CY-1 &mdash; Dec 1988 Gold with
+Primary and Trading Cycle timing bands
+showing convergence at cycle lows
+<a class="chart-view-link"
+  href="javascript:void(0)"
+  onclick="bLB('charts/book_p030_017.jpeg',
+  'Chart CY-1 — Gold Timing Bands')">[view]</a>
+</div></div>
+
+<!-- ════════════════════════════════════════ -->
+<h2 id="ch2">Chapter 2: Technical Tools
+with Cycles</h2>
+<hr>
+
+<p>
+Cycles tell you <em>when</em> a turn is likely.
+Technical tools tell you <em>where</em>.
+Bressert combines the two through three
+specific techniques, each anchored to
+individual cycles. The
+<strong>Mid-Cycle Pause Price Objective
+(MCP)</strong> projects how far prices will
+travel to the next cycle top or bottom. The
+construction: measure the diagonal distance
+from a cycle peak B to the following trough C,
+find the midpoint X, measure the vertical
+distance from X down to the price low of the
+preceding cycle A (call it X&ndash;X1), then
+mirror that same distance above X to get X2.
+A 10% range around X2 gives you the zone
+where the next cycle of the same length
+should top. The MCP works identically in
+bear markets (mirror image).
+</p>
+
+<div class="chart-figure">
+<div class="chart-caption">
+MCP construction &mdash; bull market
+5-step process
+<a class="chart-view-link"
+  href="javascript:void(0)"
+  onclick="bLB('charts/book_p033_019.jpeg',
+  'MCP Bull Market')">[view]</a>
+</div></div>
+
+<div class="chart-figure">
+<div class="chart-caption">
+MCP construction &mdash; bear market
+<a class="chart-view-link"
+  href="javascript:void(0)"
+  onclick="bLB('charts/book_p034_020.jpeg',
+  'MCP Bear Market')">[view]</a>
+</div></div>
+
+<p>
+The critical MCP rule: it will only be met
+if the next longer cycle continues in the
+same direction. An MCP for a Trading Cycle
+requires the Primary Cycle to keep trending.
+An MCP for a Primary Cycle requires the
+Seasonal Cycle to cooperate. If the longer
+cycle has turned, the MCP is invalidated.
+There are four basic MCP/retracement
+situations: bull market before a top (MCP
+ahead, 60-40% range as resistance), bear
+market before a top (MCP met, retracement
+expected), bull market before a bottom (MCP
+met, retracement expected), and bear market
+before a bottom (MCP ahead, 60-40% as
+support).
+</p>
+
+<p>
+<strong>60-40% retracements</strong> derive
+from Fibonacci .618 and .382. Most Primary
+Cycles, Trading Cycles, and Alpha Cycles
+retrace at least 40%. In practice, waiting
+for prices to enter the 38&ndash;62%
+retracement zone before taking a buy signal
+is &ldquo;like stretching a rubber band
+&mdash; the further it is stretched, the more
+powerful the snap back.&rdquo; In T-Bonds,
+five of six Trading Cycle bottoms retraced
+at least 38%, and only one exceeded 62%.
+After an extended uptrend, a close below a
+62% retracement will frequently signify a
+trend reversal &mdash; a dual-use indicator.
+</p>
+
+<div class="chart-figure">
+<div class="chart-caption">
+60-40% retracement construction and four
+MCP/retracement situations
+<a class="chart-view-link"
+  href="javascript:void(0)"
+  onclick="bLB('charts/book_p036_022.jpeg',
+  'Retracement Situations')">[view]</a>
+</div></div>
+
+<p>
+<strong>Speed Resistance Lines</strong>,
+developed by <strong>Edson Gould</strong>
+and popularized by <strong>Gerald Appel</strong>,
+divide the vertical distance from a cycle low
+to high by three (.33 and .66). Lines drawn
+from the low through those points create
+two speedlines. When the upper speedline is
+decisively penetrated (entire day&rsquo;s
+range below the line, or penetration exceeding
+1.5% of price), prices often drop to the
+lower speedline. When the lower breaks,
+expect a test of the cycle low. These are
+most powerful when prices retrace 60&ndash;40%
+to meet a speedline within the overlap area
+of timing bands as oscillators overextend.
+</p>
+
+<div class="chart-figure">
+<div class="chart-caption">
+Speed Resistance Lines &mdash; bull and
+bear construction
+<a class="chart-view-link"
+  href="javascript:void(0)"
+  onclick="bLB('charts/book_p038_023.jpeg',
+  'Speed Resistance Lines')">[view]</a>
+</div></div>
+
+<p>
+<strong>Cyclic Support/Resistance Lines</strong>
+are drawn horizontally from the midpoint of
+the MCP diagonal. These levels can offer
+support in declining markets AND resistance
+in rising ones, sometimes months or years
+after being established. The longer the cycle
+that created the level, the greater its power.
+On weekly and monthly range charts, old highs
+and lows that have stopped prices more than
+twice become the most reliable S/R levels.
+</p>
+
+<p>
+The key insight of this chapter: no single
+technical tool works in all markets &mdash;
+each must be isolated through historical
+research. But cycles provide the
+&ldquo;rule&rdquo; that brings the technical
+picture into focus through the use of time.
+A Mid-Cycle Pause price objective is only
+valid for the cycle in which it occurs. A
+60&ndash;40% retracement is only valid if the
+next longer cycle continues in the same
+direction. Support and resistance lines are
+always valid, but cycles tend to top and
+bottom at or near these levels. Technical
+tools plus cycles plus oscillators equals
+the ability to anticipate trends and trend
+reversals.
+</p>
+
+<p>
+Combined with timing bands, these tools
+provide a complete framework: the timing
+band says <em>when</em> to expect a turn,
+the 60&ndash;40% zone and S/R levels say
+<em>where</em>, the MCP says <em>how far</em>,
+and oscillators will say <em>now</em>.
+Each tool alone is useful but incomplete.
+Together they produce what Bressert calls
+high probability Oscillator/Cycle
+Combinations.
+</p>
+
+<!-- ════════════════════════════════════════ -->
+<h2 id="ch3">Chapter 3: Focus
+on Oscillators</h2>
+<hr>
+
+<p>
+An oscillator is any mathematically calculated
+indicator that moves up and down with price
+to show overbought and oversold conditions.
+The problem: not every overbought reading is
+a significant top, not every oversold reading
+is a meaningful bottom. That is where the
+combination with cycles becomes essential.
+Bressert&rsquo;s core insight:
+<strong>cycle analysis provides the TIME
+dimension, oscillators provide the PRICE
+dimension</strong>. Together they confirm
+tops and bottoms as they form and project
+the next turning point into the future.
+Without the cycle&rsquo;s timing context,
+oscillator signals are mostly noise.
+</p>
+
+<p>
+The mechanical system has two components.
+The <strong>Setup</strong> is an oscillator
+formation: the oscillator drops below a buy
+line, shows divergence, penetrates a
+crossover, or completes a specific pattern.
+The <strong>Trigger</strong> is a price-based
+entry: usually exceeding the high of the
+setup bar for buys, or dropping below the
+low for sells. Once the trigger fires, you
+enter with a predetermined stop at the cycle
+extreme. This removes emotion completely
+&mdash; Bressert calls these
+&ldquo;no thinkums.&rdquo;
+</p>
+
+<p>
+<strong>Seven techniques</strong> enhance
+oscillator performance:
+(1) <strong>Price/oscillator turns</strong>
+&mdash; simplest approach, prices and
+oscillator turn at approximately the same
+time. Problem: most oscillators have
+&ldquo;wiggles&rdquo; that aren&rsquo;t
+real turns.
+(2) <strong>Smoothing</strong> &mdash;
+eliminates false wiggles, normally with a
+simple moving average.
+(3) <strong>Levels (buy/sell lines)</strong>
+&mdash; eliminate false turns and indicate
+where tops/bottoms can be expected (70/30
+for Stochastic, &plusmn;100 for CCI).
+Review buy/sell lines every 6&ndash;12
+months.
+(4) <strong>Crossover lines</strong> &mdash;
+excellent filters; entries not as close to
+the turn but probability greatly increased.
+(5) <strong>The zero line</strong> &mdash;
+often acts as support/resistance for
+oscillators; frequently an important
+component in patterns.
+(6) <strong>Price/oscillator patterns</strong>
+&mdash; combine multiple techniques to
+identify recurring formations.
+(7) <strong>Setup/trigger entries</strong>
+&mdash; turn patterns into mechanical trades.
+</p>
+
+<p>
+The three-step development process for any
+Oscillator/Cycle Combination: (1) the TIME
+is right for a cycle turn, as determined by
+timing bands, (2) the Price/Oscillator
+Pattern sets up, (3) price activity triggers
+entry by exceeding the buy/sell stop. The
+result is a pre-determined probability of
+success based on historical research. No
+single oscillator picks every top and bottom
+&mdash; use several. Learn one well first,
+then expand your toolkit.
+</p>
+
+<p>
+The trigger entry normally puts you in on
+strength when buying and weakness when
+selling. For buys: a buy stop above the
+high of the day that turned the oscillator
+up, or the day of the crossover, or the
+day before/after either of those. For any
+of these, the stop could also be placed
+above the next larger time period (daily
+oscillator upturn &rarr; buy stop above
+high of that week). In some situations a
+close exceeding the high, or a pivot point,
+may be preferable. The trigger entry
+eliminates emotional attachment &mdash; the
+entry is pre-determined by historical
+performance.
+</p>
+
+<p>
+Research requirements are non-negotiable:
+minimum 5 years on any oscillator pattern,
+preferably 10 or 20. You need a large number
+of samples to establish the confidence to
+take positions against prevailing sentiment.
+Without enough research, you will encounter
+unanticipated patterns that almost always
+cost money. Keep a notebook &mdash; over
+time, reviewing notes reveals recurring
+gems &ldquo;like money in the bank.&rdquo;
+Do not add notes to original research or
+you will lose direction.
+</p>
+
+<p>
+Bressert acknowledges the limits honestly:
+cycles contract, extend, and skip beats.
+Oscillators do NOT always overextend at
+cycle highs/lows. Even when they do, they
+often reach their most extreme before or
+after the exact price turn. Awareness of
+these limitations demands development of
+high probability parameters through three
+pillars: (1) don&rsquo;t expect one
+oscillator to catch everything &mdash; use
+several, (2) develop historically researched
+patterns with mechanical setups and triggers,
+(3) use market-proven money management to
+control risk and optimize profits.
+</p>
+
+<p>
+An important caveat on buy/sell lines:
+Bressert uses two approaches to determine
+them. The first looks for the level of
+greatest overextension reached by most cycle
+turns. The second looks for a less extreme
+level that still identifies cycle turns when
+followed by an oscillator turn and trigger
+entry. For example, the S&amp;P MACD Detrend
+has a buy line at -90 (greatest
+overextension) but a -70 level also includes
+all 4-year cycle lows and was met or exceeded
+by a rise above the crossover. Both approaches
+should be researched and followed.
+</p>
+
+<!-- ════════════════════════════════════════ -->
+<h2 id="ch4">Chapter 4: Centered
+Detrending</h2>
+<hr>
+
+<p>
+<strong>Centered detrending</strong> is the
+foundation for identifying cycles visually.
+Step 1: have an idea of the approximate
+cycle length. Step 2: calculate a moving
+average of that length on the close. Step 3:
+<em>center</em> it &mdash; plot it at the
+midpoint, not the current bar. A 20-week
+moving average gets plotted back 10.5 weeks
+(conveniently rounded to 11 weeks back). The
+centered moving average becomes the zero
+line, and the bars plotted relative to it
+form the centered detrend. This eliminates
+the effects of all cycles longer than the
+one you&rsquo;re searching for, letting
+individual cycles stand out clearly.
+</p>
+
+<div class="chart-figure">
+<div class="chart-caption">
+Chart D-2 &mdash; Weekly S&amp;P 1983-1990
+with 20-week centered detrend, 16 cycles
+identified, median length 21.5 weeks
+<a class="chart-view-link"
+  href="javascript:void(0)"
+  onclick="bLB('charts/book_p050_026.jpeg',
+  'Chart D-2 — S&P Centered Detrend')">[view]</a>
+</div></div>
+
+<p>
+The basic premise: cycle lows occur
+<strong>below</strong> the centered moving
+average, highs occur <strong>above</strong> it.
+Only in extremely rare situations does the
+reverse happen. In the S&amp;P from 1983 to
+1990, the median Primary Cycle was 21.5 weeks.
+75% of lows occurred 15&ndash;26 weeks from
+the previous low. Since 1950, the median has
+been 22 weeks.
+</p>
+
+<p>
+One of Bressert&rsquo;s most important
+insights: <strong>cycle highs and lows are
+not always price highs and lows</strong>.
+In the S&amp;P (Chart D-3), a detrended
+cycle low at point B was at a higher price
+than the actual price low four weeks earlier
+at point C. The uptrend from rising 4-year
+and 8-year cycles prevented the weaker
+20-week cycle from making a substantial
+price decline. The detrend reveals where the
+actual cycle low occurred even when the price
+chart obscures it. This phenomenon appears
+across gold, Swiss Franc, T-Bonds, and
+soybeans.
+</p>
+
+<div class="chart-figure">
+<div class="chart-caption">
+Chart D-3 &mdash; S&amp;P showing detrended
+cycle low at higher price than actual price
+low (strong uptrend effect)
+<a class="chart-view-link"
+  href="javascript:void(0)"
+  onclick="bLB('charts/book_p051_027.jpeg',
+  'Chart D-3 — Divergent Low')">[view]</a>
+</div></div>
+
+<p>
+In gold, the dominant weekly cycle is 18
+weeks. Chart D-5 shows weekly gold from 1981
+to 1987 detrended with an 18-week centered
+moving average, with cycle lows clearly
+visible in the detrend panel. Chart D-6
+zooms in on a prolonged trading range where
+the price chart suggested a cycle bottom at
+point D, but the detrend reveals the actual
+cycle low occurred weeks earlier at point C
+&mdash; a tug-of-war between longer-term
+cycles moving up and shorter-term cycles
+moving down. Once the Primary Cycle
+bottomed, gold was free to move rapidly
+higher. The centered detrend makes you
+<em>aware</em> this can happen, helping
+determine direction when markets break
+out of wedge or triangle patterns.
+</p>
+
+<div class="chart-figure">
+<div class="chart-caption">
+Chart D-5 &mdash; Weekly gold 1981-1987
+with 18-week centered detrend
+<a class="chart-view-link"
+  href="javascript:void(0)"
+  onclick="bLB('charts/book_p053_029.jpeg',
+  'Chart D-5 — Gold Detrend')">[view]</a>
+</div></div>
+
+<div class="chart-figure">
+<div class="chart-caption">
+Chart D-8 &mdash; Daily gold 1988-1989,
+15-day centered detrend with Trading Cycle
+lengths labeled
+<a class="chart-view-link"
+  href="javascript:void(0)"
+  onclick="bLB('charts/book_p056_032.jpeg',
+  'Chart D-8 — Daily Gold Detrend')">[view]</a>
+</div></div>
+
+<p>
+The Swiss Franc has a monthly 4-year cycle
+and a weekly 22-week Primary Cycle. Chart
+D-10 shows the Swiss Franc with both 50-week
+and 22-week centered detrends. The 50-week
+detrend illustrates the seasonal tendency:
+lows May&ndash;September, highs
+November&ndash;April. The 22-week detrend
+reveals Primary Cycle fluctuations fitting
+the 80% timing band of 16&ndash;28 weeks.
+The Swiss Franc also has an 8-week Trading
+Cycle (timing band 6&ndash;11 weeks) that
+provides some of the lowest-risk trading
+opportunities in currencies.
+</p>
+
+<div class="chart-figure">
+<div class="chart-caption">
+Chart D-10 &mdash; Weekly Swiss Franc with
+50-week and 22-week centered detrends
+<a class="chart-view-link"
+  href="javascript:void(0)"
+  onclick="bLB('charts/book_p057_033.jpeg',
+  'Chart D-10 — Swiss Franc')">[view]</a>
+</div></div>
+
+<p>
+T-Bonds present a special case: two
+interactive Primary Cycles of 21 weeks and
+14 weeks. Most 21-week cycles are composed
+of two smaller 14-week cycles. Chart D-12
+shows both detrends on the same chart from
+1983 to 1990. For all cycles, the move from
+low to high ranged 7 to 16 weeks (with one
+stretching to 20). Only four cycles rose to
+a top in 3&ndash;5 weeks &mdash; all in bear
+moves. The <strong>Federal Reserve effect</strong>
+can extend cycle lengths and keep oscillators
+at extremes for extended periods, making
+T-Bonds particularly tricky but rich with
+opportunities for those who understand the
+interplay.
+</p>
+
+<div class="chart-figure">
+<div class="chart-caption">
+Chart D-12 &mdash; Weekly T-Bonds 1983-1990
+with 21-week and 14-week centered detrends
+<a class="chart-view-link"
+  href="javascript:void(0)"
+  onclick="bLB('charts/book_p059_035.jpeg',
+  'Chart D-12 — T-Bond Detrends')">[view]</a>
+</div></div>
+
+<div class="chart-figure">
+<div class="chart-caption">
+Chart D-13 &mdash; Daily T-Bonds 1988-1990
+with 21-day centered detrend showing
+Trading Cycle lengths
+<a class="chart-view-link"
+  href="javascript:void(0)"
+  onclick="bLB('charts/book_p062_037.jpeg',
+  'Chart D-13 — Daily T-Bond Detrend')">[view]</a>
+</div></div>
+
+<p>
+For T-Bond daily Trading Cycles: 65% bottom
+17&ndash;23 market days from the previous low.
+35% bottom 28&ndash;30 days from the low.
+Guideline: expect the low at 17&ndash;23 days;
+if prices keep declining after day 23, no
+bottom is likely until day 28&ndash;30. All
+cycles with a 14&ndash;22 day count to the
+high then made the Trading Cycle low at
+28&ndash;30 days &mdash; &ldquo;money in the
+bank&rdquo; information.
+</p>
+
+<p>
+The critical limitation: centered detrending
+cannot be used for real-time trading because
+the centered moving average lags by half the
+cycle period. It should be used to confirm
+tops and bottoms after they occur. For real-
+time decisions, you need oscillators and
+real-time detrends &mdash; the subject of
+the next two chapters. But always remember:
+almost all cycle highs occur above the
+centered moving average, and almost all cycle
+lows occur below it. This basic principle
+validates (or invalidates) your real-time
+analysis.
+</p>
+
+<!-- ════════════════════════════════════════ -->
+<h2 id="ch5">Chapter 5: The Detrend
+as an Oscillator</h2>
+<hr>
+
+<p>
+A <strong>current-time detrend</strong> uses
+a non-centered moving average, plotted at the
+current bar. Unlike the centered version, it
+can be used in real time, but it looks very
+different. With a 20-week real-time detrend
+in the S&amp;P, Primary Cycle highs and lows
+don&rsquo;t match the centered version, and
+many lows appear <em>above</em> the moving
+average. What stands out instead are the
+Seasonal lows. The 20-week moving average is
+close to half the Seasonal Cycle length, so
+it is Seasonal turns that dominate this
+detrend.
+</p>
+
+<div class="chart-figure">
+<div class="chart-caption">
+Chart D-17 &mdash; S&amp;P 20-week real-time
+detrend showing Seasonal lows instead of
+Primary Cycle turns
+<a class="chart-view-link"
+  href="javascript:void(0)"
+  onclick="bLB('charts/book_p068_041.jpeg',
+  'Chart D-17 — Real-Time Detrend')">[view]</a>
+</div></div>
+
+<p>
+The <strong>half-span detrend</strong> offers
+a better compromise: a moving average of
+half the cycle length highlights that
+cycle&rsquo;s turns somewhat like a centered
+detrend. A 10-week moving average (half of
+the 20-week Primary Cycle) shows Primary
+Cycle turns in the S&amp;P reasonably well,
+though in half the cycles the detrend tops
+before prices top. The crucial feature: both
+real-time and half-span detrends establish
+<strong>levels</strong> &mdash; consistent
+overbought/oversold thresholds where cycles
+tend to turn.
+</p>
+
+<div class="chart-figure">
+<div class="chart-caption">
+Chart D-19 &mdash; S&amp;P 10-week detrend
+with four levels (A, B, C, D)
+<a class="chart-view-link"
+  href="javascript:void(0)"
+  onclick="bLB('charts/book_p070_043.jpeg',
+  'Chart D-19 — Detrend Levels')">[view]</a>
+</div></div>
+
+<p>
+<strong>Level A</strong>: met or exceeded
+following every Primary Cycle low but one.
+Expectation: no cycle high will be made
+until Level A is reached.
+<strong>Level B</strong>: met or exceeded at
+5 of 8 Primary Cycle highs. When this
+overbought level is reached late in the
+timing for a high, start looking for a top.
+<strong>Level C</strong>: met or exceeded on
+the downside following every PC top &mdash;
+approximate level for 6 of 9 PC lows in a
+bull market. No bottom until the detrend
+drops to C. <strong>Level D</strong>: a drop
+below this means a bottom is imminent.
+These levels persist for years and appear
+in most markets.
+</p>
+
+<p>
+Monthly detrends reveal the biggest moves.
+Running 40, 20, and 10-month detrends on the
+S&amp;P from 1960 to 1990 shows: Level A in
+the 40-month detrend at -7 was exceeded by
+every 4-year and 8-year cycle bottom. Level C
+in the 20-month detrend at -20 captured
+four of five 4-year lows. Level E in the
+10-month detrend, combined with Level C in
+the 20-month and Level A in the 40-month,
+signals a 4-year or 8-year cycle bottom.
+When all three converge, you are looking at
+a generational buying opportunity. The 1982
+S&amp;P bottom showed shorter-term detrends
+bottoming before longer-term ones &mdash;
+a pattern to watch for at all major cycle
+lows.
+</p>
+
+<div class="chart-figure">
+<div class="chart-caption">
+Chart D-24 &mdash; Monthly S&amp;P 1960-1990
+with 40, 20, and 10-month detrends
+<a class="chart-view-link"
+  href="javascript:void(0)"
+  onclick="bLB('charts/book_p074_047.jpeg',
+  'Chart D-24 — Monthly Detrends')">[view]</a>
+</div></div>
+
+<p>
+To discover levels and patterns, run 40, 20,
+and 10-term detrends for monthly, weekly, and
+daily charts in a condensed scale with as
+much history as possible. The levels from
+major turning points near major cycle lows
+often become the parameters governing the
+market for years to come.
+</p>
+
+<p>
+The combination of multiple detrend
+timeframes provides a powerful framework.
+In Chart D-22, the S&amp;P 40-week detrend
+showed every Seasonal low below the moving
+average (7 of 8), and every Seasonal high
+above it. At point 1, the 40-week was
+slightly below the moving average, the
+10-week was at Level B, and the timing for
+a Primary Cycle low was right &mdash; making
+this bottom relatively low risk. At the same
+time, the detrend high at 3 was much lower
+than at 4, and barely reached Level A,
+indicating potential for a short at the
+22-week Primary Cycle top. Three detrend
+timeframes, three confirming signals, one
+high-probability trade.
+</p>
+
+<p>
+Weekly charts and oscillators are the most
+important and accurate for indicating
+Seasonal and Primary Cycle tops and bottoms.
+But monthly charts show the longer-term
+cycles and the potential for major tops and
+bottoms followed by the really big moves.
+The professional trader watches all three
+timeframes simultaneously and acts when
+they converge.
+</p>
+
+<!-- ════════════════════════════════════════ -->
+<h2 id="ch6">Chapter 6: Detrending
+Oscillators</h2>
+<hr>
+
+<p>
+The detrend is both an oscillator and a tool
+to improve other oscillators. An
+<strong>oscillator detrend</strong> is the
+spread between two components &mdash; most
+commonly the MACD minus its signal line.
+This spread turns <em>before</em> the MACD
+itself, often exactly at tops and bottoms.
+It has buy/sell lines that help identify
+major turns, and combined with a crossover
+generates trigger entries well before the
+traditional MACD crossover, with much
+smaller dollar risk.
+</p>
+
+<div class="chart-figure">
+<div class="chart-caption">
+Chart DO-1 &mdash; Weekly Yen 1981-1990
+with MACD (middle) and MACD Detrend (bottom)
+showing six persistent levels
+<a class="chart-view-link"
+  href="javascript:void(0)"
+  onclick="bLB('charts/book_p080_050.jpeg',
+  'Chart DO-1 — Yen MACD Detrend')">[view]</a>
+</div></div>
+
+<p>
+In the Japanese Yen, the MACD detrend
+establishes levels that persist across years.
+Level LA (.18) started as a valid sell line,
+then lost effectiveness in the powerful bull
+until February 1987 when it slowed prices to
+form a Kiss Pattern. Level LB (.42) was set
+by the major high preceding the 1982 low and
+was exceeded at four of five Primary Cycle
+tops, all producing sizable declines. Level
+LC (.78) was reached only twice (both only by
+.01), both times the same week as the price
+high. Level LD (-.23) confirmed five of seven
+significant bottoms. Level LE (-.40) and LF
+(-.79) mark progressively deeper levels
+&mdash; the first reaction following a big
+decline often dwarfs subsequent turning
+points but eventually acts as a resistance
+level.
+</p>
+
+<p>
+Bressert&rsquo;s detailed comparison of the
+MACD versus its detrend at specific turns is
+revelatory. At Yen highs 3, 4, and 5: the
+detrend high was the same week as the price
+high in all three cases. The MACD high
+lagged by 2 weeks at highs 3 and 5. The
+downside MACD crossover occurred well after
+the price turn &mdash; too late for a useful
+entry. At four lows (B, C, D, E): three had
+the detrend bottom the same week as the
+price low, while the MACD bottomed weeks
+later. Using the MACD crossover for entry
+at these lows would have actually bought
+tops following three of the four lows.
+The detrend clearly outperforms.
+</p>
+
+<p>
+Three possible entry patterns emerge: (1)
+sell the low of the week the detrend turns
+down, or buy the high of the upturn week;
+(2) use the 5-term crossover of the detrend
+as the setup, with the price extreme of
+the crossover week as trigger; (3) following
+an overextended detrend, use the MACD turn
+itself as the setup. Each has different
+timing and risk characteristics.
+</p>
+
+<p>
+The <strong>Kiss Pattern</strong> is one of
+Bressert&rsquo;s signature formations. A
+<strong>Bull Kiss</strong>: following a price
+low, the detrend rises above zero, dips
+back to test the crossover (dropping to .50
+to -.99), then bounces. The upside crossover
+triggers a buy. A <strong>Bear Kiss</strong>
+is the mirror image. The pattern is more
+reliable when the price extreme before the
+Kiss is above (for buys) or below (for sells)
+the previous extreme. In the Yen, Kiss
+Pattern 1 was confirmed by the detrend
+turning up at the crossover week (870313)
+with a high of 65.73 triggering entry the
+following week. Protective stop below the
+earlier low at 64.60. Kiss Pattern 2 was
+even tighter: the upturn and crossover
+occurred the same week, with high at 71.10
+triggering the following week.
+</p>
+
+<div class="chart-figure">
+<div class="chart-caption">
+Chart DO-6 &mdash; Bull Kiss Pattern 1
+in the Japanese Yen with entry/exit details
+<a class="chart-view-link"
+  href="javascript:void(0)"
+  onclick="bLB('charts/book_p087_054.jpeg',
+  'Chart DO-6 — Bull Kiss')">[view]</a>
+</div></div>
+
+<div class="chart-figure">
+<div class="chart-caption">
+Chart DO-8 &mdash; Bear Kiss Pattern 3
+<a class="chart-view-link"
+  href="javascript:void(0)"
+  onclick="bLB('charts/book_p091_057.jpeg',
+  'Chart DO-8 — Bear Kiss')">[view]</a>
+</div></div>
+
+<p>
+The <strong>3-10 Moving Average Detrend</strong>
+(3-day minus 10-day, with 16-term crossover)
+provides a more sensitive view. In the Yen,
+sell lines S4 (1.29) and S5 (2.44) were
+derived from the 1982 low. Every drop below
+Buy Line B2 (-1.50) indicated a bottom when
+the detrend turned up. Every downturn above
+Sell Line S4 indicated a top. The first
+failure to reach S4 at point X was a
+potential indicator the bull market was over.
+</p>
+
+<p>
+A crucial rule: the detrend low must drop
+below its zero line (the 16-term average) to
+have a bottom worth buying. In a strong
+uptrend, the 3-10 oscillator often stays
+above zero, making traders think the decline
+will continue. But the detrend dropping to
+its buy line while the oscillator stays
+above zero is actually a strong buy signal
+&mdash; it occurred at 5 of 6 such instances
+in the Yen. Following this rule, you miss
+few moves of consequence and reduce losing
+trades inherent in bottom picking.
+</p>
+
+<p>
+Combining the 3-10 detrend, MACD detrend,
+and 10-week price detrend on a single chart
+(Chart DO-11) gives the fullest picture. The
+MACD detrend identifies the major turns, the
+3-10 detrend highlights shorter moves and
+gives earlier signals, and the 10-week price
+detrend provides natural support/resistance
+at its zero line (the 10-week moving average).
+When all three confirm, the probability of
+a significant turn is very high.
+</p>
+
+<!-- ════════════════════════════════════════ -->
+<h2 id="ch7">Chapter 7: 3-Dimensional
+Analysis</h2>
+<hr>
+
+<p>
+<strong>3-D analysis</strong> evaluates
+markets on three levels simultaneously:
+long-term (monthly), intermediate (weekly),
+and short-term (daily). The same oscillator
+on three timeframes gives three different
+pictures. Monthly oscillators indicate
+potential tops/bottoms before weekly patterns
+complete. Weekly oscillators identify Seasonal
+and Primary Cycle turns. Daily oscillators
+confirm the exact entry with lowest dollar
+risk. The confluence of signals across all
+three produces the highest-probability trades.
+</p>
+
+<div class="chart-figure">
+<div class="chart-caption">
+Chart 3D-1 &mdash; Monthly soybeans
+1961-1990 with MACD detrend identifying
+24/39-month cycle turns
+<a class="chart-view-link"
+  href="javascript:void(0)"
+  onclick="bLB('charts/book_p099_061.jpeg',
+  'Chart 3D-1 — Monthly Soybeans')">[view]</a>
+</div></div>
+
+<p>
+In soybeans, the monthly MACD detrend sell
+line (.26) was derived by multiplying the
+1973 oscillator high (.6797) by .618 and
+subtracting. Four major cycle highs were made
+with the oscillator above this level, each
+confirmed by a downturn and trigger entry
+(drop below the downturn month&rsquo;s low).
+The buy line (-.113) was derived similarly
+from the first low following the 1973 high
+(-.2954). Of 11 major lows: 4 were identified
+by upturn below the buy line followed by
+exceeding the upturn month&rsquo;s high. Three
+more were divergent patterns (lower price,
+higher oscillator low &mdash; also Kiss
+Patterns). Of seven major 24/39-month cycle
+bottoms, six were identified by either the
+buy line pattern or divergence.
+</p>
+
+<p>
+Weekly soybeans added a second layer. The
+MACD detrend sell line (.111) was exceeded at
+both major highs C and D and at Seasonal high
+H. The weekly gave earlier entry than the
+monthly at both C and D. For bottom
+identification, an 8-term crossover of the
+detrend as setup with trigger above the
+crossover week&rsquo;s high confirmed the
+bottom at low 7 and correctly avoided
+entering at lows 8 and 11 (which had small
+moves).
+</p>
+
+<p>
+The daily layer (Chart 3D-3) used a 40-day
+CCI with sell line at 150 and buy line at
+-150 (not the standard &plusmn;100). A 4-term
+crossover was added because CCI lows tend
+to occur early and wiggle. For Primary Cycle
+lows: prices must be within the 11&ndash;20
+week timing band, CCI must drop below -150,
+rise above crossover, and trigger above the
+crossover week&rsquo;s high. All five Primary
+Cycle lows were confirmed within days of the
+bottom. An 8-day RSI with sell line 70 and
+buy line 30 exceeded its sell line at every
+Primary Cycle high and dropped below its buy
+line at every Primary Cycle low, adding
+another confirmation layer.
+</p>
+
+<p>
+Another dimension: run time-dependent
+oscillators in three different time lengths
+&mdash; 5, 8, and 13 periods (or 10, 20, and
+40). Use longer periods to identify major
+overbought/oversold levels, shorter periods
+for entry with lower dollar risk.
+</p>
+
+<div class="chart-figure">
+<div class="chart-caption">
+Chart 3D-3 &mdash; Daily soybeans with
+40-day CCI (Panel B) and 8-day RSI (Panel C)
+confirming all five Primary Cycle lows
+<a class="chart-view-link"
+  href="javascript:void(0)"
+  onclick="bLB('charts/book_p104_063.jpeg',
+  'Chart 3D-3 — Daily Soybeans')">[view]</a>
+</div></div>
+
+<p>
+Monthly oscillators showing a setup can give
+early positioning before the weekly pattern
+completes. Once the monthly oscillator
+crosses a threshold, weekly patterns provide
+additional high probability trigger entries.
+And once the weekly confirms, daily patterns
+offer the lowest-risk entry point. Each
+timeframe adds information; each confirmation
+increases probability. The professional
+watches all three.
+</p>
+
+<p>
+The practical hierarchy: monthly data for
+cycles longer than 1 year and Seasonal
+identification. Weekly data for Seasonal and
+Primary Cycle turns. Daily data for Primary
+Cycle and Trading Cycle turns. Intraday data
+for Trading Cycle and shorter-term daily
+cycles using the same concepts. Start with
+55-minute and 110-minute periods for intraday.
+</p>
+
+<p>
+The key psychological benefit of 3-D analysis:
+when monthly, weekly, and daily oscillators
+all confirm a bottom, you have the confidence
+to take a significant position and hold it
+through the inevitable countertrend
+fluctuations. Without that multi-timeframe
+confluence, doubt creeps in at the first
+adverse tick. Bressert&rsquo;s system is as
+much about building conviction as it is about
+finding entries.
+</p>
+
+<!-- ════════════════════════════════════════ -->
+<h2 id="ch8">Chapter 8: Primary Cycle
+in Gold</h2>
+<hr>
+
+<p>
+Gold&rsquo;s dominant weekly cycle &mdash; the
+<strong>18-week Primary Cycle</strong> &mdash;
+has a 90% timing band of 11&ndash;23 weeks.
+Bressert analyzes 28 Primary Cycles from
+March 1981 to September 1989, separating
+bull and bear phases. The MACD crossing above
+zero begins the bull phase; below zero begins
+the bear. The full data is in Table GT-1
+covering dates, prices, percentage moves,
+weeks to high, and weeks to low for all
+28 cycles.
+</p>
+
+<div class="chart-figure">
+<div class="chart-caption">
+Charts G-1/G-2 &mdash; Weekly gold 1981-1990
+showing right and left translation across
+28 Primary Cycles
+<a class="chart-view-link"
+  href="javascript:void(0)"
+  onclick="bLB('charts/book_p108_065.jpeg',
+  'Charts G-1/G-2 — Gold Cycles')">[view]</a>
+</div></div>
+
+<div class="chart-figure">
+<div class="chart-caption">
+Table GT-1 &mdash; Gold Primary Cycle
+time counts and price movements for all
+28 cycles
+<a class="chart-view-link"
+  href="javascript:void(0)"
+  onclick="bLB('charts/book_p110_067.jpeg',
+  'Table GT-1')">[view]</a>
+</div></div>
+
+<p>
+The bull/bear divide is stark.
+<strong>Bull markets:</strong> average rise
+from low to high takes 9.5 weeks with an
+average gain of 21.5%. 90% of highs made
+5&ndash;14 weeks from the low. Average
+decline high-to-low: 6.4 weeks, 11.6%.
+<strong>Bear markets:</strong> average rise
+takes only 4.4 weeks with 11.3% gain. 80%
+of highs occur 1&ndash;6 weeks from the low.
+Average decline: 11.6 weeks, 14.4%.
+Bull market longs should have wide stops
+until week 9, then tightened. Bear market
+longs are high risk; close stops starting
+week 4. Bear market effort should focus on
+selling short at Primary Cycle tops.
+</p>
+
+<p>
+Using the MACD detrend with a 3-term
+crossover, three patterns identify cycle
+bottoms:
+<strong>(1) Oversold:</strong> oscillator
+drops below -1 (all lows occurred -1 to -11),
+turns up, exceeds crossover, trigger above
+crossover week&rsquo;s high.
+<strong>(2) Kiss:</strong> oscillator rises
+above zero, drops back to .50 to -.99, turns
+up, exceeds crossover, trigger above
+crossover week&rsquo;s high.
+<strong>(3) Hook:</strong> oscillator drops
+below -1, rises (usually staying below 0),
+drops below crossover, recovers above it,
+trigger above crossover week&rsquo;s high.
+Together these three patterns identified
+<strong>80% of all Primary Cycle lows</strong>.
+</p>
+
+<div class="chart-figure">
+<div class="chart-caption">
+Charts G-4/G-5/G-6 &mdash; Gold MACD
+detrend with Oversold, Kiss, and Hook
+patterns labeled at each cycle low
+<a class="chart-view-link"
+  href="javascript:void(0)"
+  onclick="bLB('charts/book_p116_071.jpeg',
+  'Gold MACD Patterns')">[view]</a>
+</div></div>
+
+<p>
+The Kiss pattern is the most powerful: 5 of
+6 Kiss cycles rose 17% or more, including
+the three largest moves of all 28 cycles.
+<strong>This is a pattern to trade
+aggressively.</strong> The Oversold pattern
+tends to occur in bear markets: 9 of 12
+Oversold cycles rose 13% or less, averaging
+5.8 weeks to the high (closer to the bear
+average). The Hook occurs mainly in bear
+markets but all four produced 10%+ moves.
+</p>
+
+<p>
+Research table GT-2 provides column-by-column
+analysis. Column 5 (weeks oscillator turned
+before/after price low): 80% of oscillator
+turns occurred within &plusmn;1 week of the
+price low, 90% within &plusmn;2 weeks.
+Column 6 (weeks to crossover): 85% exceeded
+the crossover within 0&ndash;2 weeks of the
+price low. Column 7 (weeks from crossover to
+trigger): 85% triggered by week 2 after
+crossover, most in week 1. These are
+actionable guidelines: expect the oscillator
+to bottom within 2 weeks of the price low,
+the crossover within 2 weeks, and the
+trigger the first week after crossover.
+</p>
+
+<div class="chart-figure">
+<div class="chart-caption">
+Table GT-2 &mdash; Research table for all
+gold Primary Cycle bottoms with MACD
+detrend patterns
+<a class="chart-view-link"
+  href="javascript:void(0)"
+  onclick="bLB('charts/book_p120_074.jpeg',
+  'Table GT-2')">[view]</a>
+</div></div>
+
+<p>
+For Primary Cycle tops, the oscillator is
+less consistent. The best observation: an
+Overbought pattern above +4.00 in the
+detrend usually produces a decline of 5+
+weeks in bull markets and extended declines
+in bear. These don&rsquo;t occur often, but
+when they do, they&rsquo;re reliable. For
+more consistent top identification, daily
+oscillators (RSI, 3-10) are superior.
+</p>
+
+<p>
+The practical gold trading strategy: use the
+MACD to determine bull/bear phase (above/below
+zero). In bull phases, buy aggressively at
+Oversold and especially Kiss patterns at
+Primary Cycle lows. Wide stops until week 9,
+tightened progressively. Expect 21.5% average
+moves lasting 9.5 weeks. In bear phases,
+focus on selling short at cycle highs using
+daily oscillators, with tight stops starting
+week 4.
+</p>
+
+<!-- ════════════════════════════════════════ -->
+<h2 id="ch9">Chapter 9: MACD</h2>
+<hr>
+
+<p>
+The <strong>MACD</strong>, invented by
+<strong>Gerald Appel</strong>, is constructed
+from three exponential moving averages: a
+12-day (fast) minus a 26-day (slow) produces
+the MACD line, and a 9-day EMA of the MACD
+is the signal/crossover. The MACD crossing
+its signal confirms tops/bottoms, but
+usually <em>after</em> the market has turned.
+The detrend between the MACD and signal
+turns earlier and more accurately. Bressert
+applies this to the Japanese Yen Primary
+Cycle, which has an 80% timing band of
+26&ndash;44 weeks, average 31.
+</p>
+
+<div class="chart-figure">
+<div class="chart-caption">
+Chart MACD-1 &mdash; Weekly Yen with MACD
+and detrend, Primary Cycle highs/lows marked
+<a class="chart-view-link"
+  href="javascript:void(0)"
+  onclick="bLB('charts/book_p125_075.jpeg',
+  'Chart MACD-1 — Yen MACD')">[view]</a>
+</div></div>
+
+<p>
+Every Primary Cycle low occurred at an upturn
+of the detrend. 13 of 14 lows had the detrend
+below zero; the one exception &ldquo;kissed&rdquo;
+zero and exploded upward. Eight lows (indicated
+by circles) occurred following sizable MACD
+declines &mdash; all followed by sizable price
+rises. In bull markets, expect Primary Cycle
+bottoms at MACD lows following sizable declines,
+to be followed by sizable rises.
+</p>
+
+<p>
+The setup for bottoms: price must be 26+ weeks
+from the previous low AND the detrend must be
+below zero. Using the crossover as setup with
+trigger at the crossover week&rsquo;s high gave
+10 confirmations &mdash; 8 highly profitable,
+1 serious loss, 3 did not enter. Confirmed
+bottoms: cycles 1, 2, 3, 4, 7, 9, 10, 11,
+12, and 13.
+</p>
+
+<p>
+For Primary Cycle highs: detrend must be above
+zero and drop below the crossover. Trigger
+when prices drop below the crossover week&rsquo;s
+low. Critical guideline: if the crossover
+doesn&rsquo;t happen by weeks 3&ndash;4, the
+uptrend should continue. 75% of entries
+occurred the week following crossover. If the
+Primary Cycle high fails to exceed the
+previous one, expect a sizable decline in both
+price and time (4 of 5 such cases produced
+big downmoves). About 25% of cycles will have
+a setup and trigger before the actual cycle
+high &mdash; these are likely to lose money,
+indicating the uptrend will continue.
+</p>
+
+<p>
+Cycle highs made 17 weeks or less from the
+Primary Cycle low have potential for big
+downmoves. Highs made 20+ weeks tend to have
+small downmoves followed by continuation.
+Lower prices more than 4 weeks after trigger
+entry are likely to be followed by a downtrend
+into at least week 12 from entry.
+</p>
+
+<div class="chart-figure">
+<div class="chart-caption">
+Charts MACD-2/3/4 &mdash; Expanded weekly
+Yen showing MACD detrend entries at each
+Primary Cycle turn
+<a class="chart-view-link"
+  href="javascript:void(0)"
+  onclick="bLB('charts/book_p127_076.jpeg',
+  'Charts MACD-2/3/4 — Yen Detail')">[view]</a>
+</div></div>
+
+<p>
+The practical MACD guidelines for the Yen
+Primary Cycle: (1) expect cycle lows 26-44
+weeks from the previous low, with the
+detrend turning up below zero; (2) expect
+sizable rallies from MACD lows following
+big declines; (3) don&rsquo;t fight the
+crossover &mdash; if it hasn&rsquo;t happened
+by week 4, the trend continues; (4) lower
+highs are bearish &mdash; if the PC high
+fails to exceed the previous one, expect a
+major decline; (5) use multiple oscillators
+to confirm the MACD detrend at both tops
+and bottoms.
+</p>
+
+<p>
+The MACD detrend can be applied to any market
+with different input factors. Bressert
+recommends researching the MACD with daily,
+weekly, and monthly data for each market you
+trade. The levels established near major
+turning points (like the 1982 lows) often
+govern the market for years to come. This
+is why historical research matters &mdash;
+the 1982 Yen levels were still active in 1990.
+</p>
+
+<p>
+Kiss Patterns in the MACD Detrend deserve
+special attention. The Bull Kiss at point K1
+was confirmed by the detrend reaching LA (.18)
+at the test low &mdash; the price low was
+above the previous bottom, and the 3-10
+detrend also confirmed with an upturn below
+zero. The Bear Kiss at K3 was confirmed by
+the downturn being above the Sell Line. Each
+Kiss Pattern must be evaluated as both a
+potential continuation AND reversal as it
+forms. The confirming signals from other
+oscillators tip the balance.
+</p>
+
+<!-- ════════════════════════════════════════ -->
+<h2 id="ch10">Chapter 10: RSI</h2>
+<hr>
+
+<p>
+The RSI is excellent at identifying cycle
+extremes when properly tuned. Bressert&rsquo;s
+key adaptation: <strong>RSI(3) smoothed with
+a 3-bar moving average</strong> &mdash; the
+<strong>RSI3M3</strong>. The raw 3-period RSI
+has too many wiggles; smoothing eliminates
+the noise and produces a clean oscillator
+whose turns closely match Trading Cycle tops
+and bottoms. Buy line at 30, sell line at
+75. The disadvantage of unsmoothed RSI:
+sizable wiggles at cycle turns eliminate
+useful trigger entries. Fibonacci time
+periods (3, 5, 8, 13, 21) show potential
+for identifying specific cycles &mdash;
+shorter periods (3, 5) for Trading Cycles,
+longer (13, 21) for Primary Cycles.
+</p>
+
+<div class="chart-figure">
+<div class="chart-caption">
+Chart RSI-1 &mdash; Daily T-Bonds with raw
+RSI(3) vs. RSI3M3 (smoothed) showing
+dramatic noise reduction
+<a class="chart-view-link"
+  href="javascript:void(0)"
+  onclick="bLB('charts/book_p135_080.jpeg',
+  'Chart RSI-1 — RSI3M3')">[view]</a>
+</div></div>
+
+<p>
+<strong>Trading Cycle Bottom Setup</strong>
+(smoothed 3-day RSI, buy line 30): Time
+from previous low must be within 15&ndash;30
+market day timing band. In bull markets,
+expect decline from Trading Cycle high to
+be 3&ndash;11 days; in bear markets,
+11&ndash;17 days. If no low identified by day
+17, extreme left translation may be
+occurring. The oscillator must drop below the
+buy line at 30, turn up, and the trigger is
+a rise above the high of the upturn day.
+The oscillator low should follow a Trading
+Cycle high that was ideally made with a rise
+above the sell line at 75.
+</p>
+
+<p>
+<strong>Trading Cycle Bottom results</strong>
+(Table RSI-2): All 3 lows where oscillator
+didn&rsquo;t reach the buy line had no setup.
+Remaining lows in the up-phase of the
+Primary Cycle were all profitable. Two lows
+in the down-phase both lost money. At Primary
+Cycle bottoms, only 2 of 4 were profitable.
+Total: 8 of 15 profitable (53%). BUT &mdash;
+holding into the bull part of the
+trough-to-crest timing band (5&ndash;16 days,
+average 11) increased profits to 7 of 8
+having intermediate to big gains.
+</p>
+
+<div class="chart-figure">
+<div class="chart-caption">
+Chart RSI-2 &mdash; Daily T-Bonds with
+RSI3M3 (Panel B), 11-day RSI (Panel C),
+and 21-day RSI (Panel D) at Trading Cycle
+bottoms
+<a class="chart-view-link"
+  href="javascript:void(0)"
+  onclick="bLB('charts/book_p136_081.jpeg',
+  'Chart RSI-2 — TC Bottoms')">[view]</a>
+</div></div>
+
+<p>
+<strong>Trading Cycle Top Setup</strong>
+(sell line 70-75): Time from low to high
+should be 5&ndash;16 market days (average 11).
+In bull markets, 11&ndash;16+ days. In bear,
+5&ndash;11 days. Critical: do NOT sell an
+oscillator downturn if the price high is less
+than 5 days from the Trading Cycle low &mdash;
+for one early top that makes money you will
+have several losses. The oscillator must rise
+above the sell line, turn down, and the
+trigger is a drop below the downturn
+day&rsquo;s low. If a second oscillator high
+occurs above the sell line, use that as a
+second entry.
+</p>
+
+<p>
+<strong>Trading Cycle Top results</strong>
+(Table RSI-3): 7 of 11 first entries
+profitable (60%). Second entries: 5 of 6
+profitable (80%), indicating the second
+setup should generally be taken. Big profits
+all came from selling the top of the Primary
+Cycle &mdash; more contracts should be
+committed to PC high identification.
+Overall: 11 of 13 profitable (85%) with 7
+having medium to big profits.
+</p>
+
+<p>
+For Primary Cycle identification, the
+<strong>11-day RSI</strong> (sell 70, buy 30)
+reached the sell line at every Primary Cycle
+high and dropped below the buy line at every
+Primary Cycle low. The <strong>21-day RSI</strong>
+(buy line raised to 40) confirmed every
+Primary Cycle bottom near or below its buy
+line. When both the 10-week Stochastic and
+11-day RSI are at extremes simultaneously,
+the Primary Cycle turn is imminent.
+</p>
+
+<p>
+<strong>Primary Cycle Bottom confirmation</strong>
+requires: prices within 12&ndash;28 week
+timing band, 11-day RSI below 30, 21-day RSI
+below or very near 40, RSI3M3 drops below 30
+then turns up with trigger above upturn
+day&rsquo;s high, and the upturn week&rsquo;s
+high must be exceeded. Other oscillators
+should also confirm.
+</p>
+
+<p>
+The RSI&rsquo;s three adaptation methods:
+(1) use different time periods, (2) adjust
+buy/sell lines, (3) smooth the oscillator.
+Each market needs individual tuning through
+research. Conditions will change &mdash;
+researching 10+ years and cataloging bull
+and bear behaviors separately prepares you
+for questionable situations in real-time
+trading.
+</p>
+
+<!-- ════════════════════════════════════════ -->
+<h2 id="ch11">Chapter 11: CCI</h2>
+<hr>
+
+<p>
+The <strong>Commodity Channel Index</strong>,
+published by <strong>Donald Lambert</strong>
+in <em>Futures</em> magazine in 1980, moves
+between sell (+100) and buy (-100) lines.
+It is calculated from the typical price
+(H+L+C)/3, a moving average of typical
+prices, and the mean deviation, scaled by
+the constant .015 so 70&ndash;80% of random
+fluctuations fall within &plusmn;100%.
+Bressert applies it to two very different
+cycles with spectacular results.
+</p>
+
+<div class="chart-figure">
+<div class="chart-caption">
+Chart CCI-1 &mdash; Monthly S&amp;P
+1950-1990 with 30-month CCI and detrend
+identifying every 4-year cycle bottom
+<a class="chart-view-link"
+  href="javascript:void(0)"
+  onclick="bLB('charts/book_p149_084.jpeg',
+  'Chart CCI-1 — S&P 4-Year')">[view]</a>
+</div></div>
+
+<p>
+<strong>The 4-Year Cycle in the S&amp;P</strong>
+uses a 30-month CCI with 8-month crossover
+on monthly data. From 1950 to 1990 (40 years):
+every 4-year high exceeded the sell line at
++100. Every 4-year bottom dropped below zero.
+6 of 9 bottoms dropped below the buy line at
+-100. Every 4-year high was followed by a
+decline in the detrend below the buy line at
+-90. The complete confirmation requires five
+conditions: (1) price low 32+ months from
+previous bottom, (2) detrend below -90 and
+turning up, (3) CCI below zero (preferably
+below -100), (4) CCI rising above crossover,
+(5) prices exceeding the crossover month&rsquo;s
+high. This confirmed <strong>every single
+4-year cycle bottom from 1953 to 1987</strong>
+&mdash; a &ldquo;stellar indicator.&rdquo;
+</p>
+
+<p>
+Bressert walks through each historical
+confirmation in detail: the 9/53 low (51
+months), 10/57 (49 months), 6/62 (56 months),
+10/66 (52 months), 5/70 (43 months), 10/74
+(53 months), 3/78 (41 months &mdash; shortest
+ever but still above the 32-month minimum
+since 1917), 8/82 (53 months), and 10/87
+(50 months &mdash; the hardest one, with
+confirmation taking 12 months because the
+CCI crossover high was not exceeded for a
+full year). Each case shows how the five
+conditions interacted and when the trigger
+entry fired.
+</p>
+
+<p>
+Following a 4-year bottom, there is a period
+of &ldquo;free time&rdquo; until the CCI
+exceeds the sell line &mdash; during this
+time, market declines and Primary Cycle lows
+can be aggressively bought with high
+probability that prices will continue rising
+over the longer term. Following the high,
+there is free time until the CCI drops below
+zero. These free-time windows are among the
+most valuable insights in the book.
+</p>
+
+<p>
+<strong>The 4-Week Trading Cycle in T-Bonds</strong>
+uses a smoothed 5-day CCI with 8-term MA
+crossover on daily data. Sell line at 60,
+buy line at -35 (not the standard &plusmn;100).
+The buy pattern: (1) prices 15&ndash;30 days
+from previous Trading Cycle low, (2) 10-day
+detrend below -.80, (3) CCI drops below -35
+and turns up (ideally following a high above
+60), (4) trigger above the upturn day&rsquo;s
+high, (5) protective stop below the cycle&rsquo;s
+lowest price. If the oscillator rises above
+the crossover then drops back below before
+rising above the sell line, raise the stop
+to below the crossover day&rsquo;s low.
+</p>
+
+<div class="chart-figure">
+<div class="chart-caption">
+Chart CCI-8 &mdash; Daily T-Bonds with CCI
+and half-span detrend showing all Trading
+Cycle buy entries
+<a class="chart-view-link"
+  href="javascript:void(0)"
+  onclick="bLB('charts/book_p166_091.jpeg',
+  'Chart CCI-8 — T-Bond Buys')">[view]</a>
+</div></div>
+
+<p>
+Using a <strong>3-contract system</strong>:
+Contract #1 (Money) takes $1,000 profit
+(1 full point). Contract #2 (Short-Term)
+takes profits after CCI rises above sell
+line then turns down and triggers exit.
+Contract #3 (Long-Term) held until the
+Primary Cycle high &mdash; exit when
+oscillator drops below crossover and price
+drops below crossover day&rsquo;s low.
+Results: <strong>$58,880 total profit</strong>
+on 12 Trading Cycle trades. 10 of 11 entries
+profitable. Dollar risk under $1,500 per
+contract in 10 of 11 trades. Contract #1
+reached its objective within 0&ndash;5 days,
+7 of 10 by day 2. Contract #3&rsquo;s big
+profits came from positions put on early in
+the Primary Cycle &mdash; a single big move
+every two years more than compensates for
+extra losses.
+</p>
+
+<p>
+For Trading Cycle tops, the sell pattern
+mirrors the buy: (1) prices 5&ndash;16 days
+from the low (average 11), (2) 10-day detrend
+above +.90, (3) CCI above 60 and dropped
+below crossover, (4) trigger below the
+crossover day&rsquo;s low. Using simple
+oscillator downturns as triggers gave only
+36% profitability. Using the full
+CCI/crossover/trigger combination jumped
+to <strong>82%</strong> &mdash; exceptional
+in a bull market. Total short-side profits:
+$13,210 on 11 trades, averaging $1,200 per
+3-contract trade. Without the Money Contract,
+80% would not have been profitable &mdash;
+proving the value of the short-term profit
+objective and trading with the Primary
+Cycle&rsquo;s trend.
+</p>
+
+<p>
+Bressert also applies the CCI to Seasonal
+Cycle analysis in soybean oil. The 30-week
+CCI with 8-term crossover identified 8 of 9
+Seasonal lows and 7 of 8 Seasonal highs
+through mechanical patterns. Every confirmed
+Seasonal low was followed by a trendline
+breakout. Five of seven produced moves
+exceeding 20% from the entry point.
+Guideline: establish as many long-term
+positions as possible before and shortly
+after the trendline is penetrated.
+</p>
+
+<!-- ════════════════════════════════════════ -->
+<h2 id="ch12">Chapter 12: Stochastic</h2>
+<hr>
+
+<p>
+The Stochastic usually tops and bottoms near
+price turns, but conventional wisdom about
+overbought above 70 / oversold below 30 is
+misleading. In bull markets the Stochastic
+camps above 70 for extended periods; in bear
+markets it stays below 30. Bressert changes
+the buy/sell lines to <strong>20 and 80</strong>
+and uses multiple timeframes simultaneously.
+The slow Stochastic is preferred over the
+fast version. The crossover (%D) is kept only
+for questionable situations.
+</p>
+
+<div class="chart-figure">
+<div class="chart-caption">
+Chart STOCH-1 &mdash; Weekly T-Bonds with
+10, 20, and 40-week Stochastics
+<a class="chart-view-link"
+  href="javascript:void(0)"
+  onclick="bLB('charts/book_p177_094.jpeg',
+  'Chart STOCH-1 — T-Bond Stochastic')">[view]</a>
+</div></div>
+
+<p>
+The <strong>10-week Stochastic</strong> (buy
+20, sell 80): 15 of 18 Primary Cycle lows
+occurred with oscillator below 20. In 80% of
+cases, once the oscillator dropped below the
+sell line, it continued straight down without
+a wiggle until below the buy line &mdash; a
+clean tradable move. Setup: oscillator drops
+below 20, turns up. Trigger: rise above the
+upturn week&rsquo;s high. Result: 11 of 18
+Primary Cycle lows confirmed by trigger entry.
+10 of 11 followed by intermediate to large
+profits. Most confirmations within 1&ndash;3
+weeks of the bottom.
+</p>
+
+<p>
+The <strong>20-week Stochastic</strong>
+produces rarer but bigger signals. When it
+drops from above 70 to below 30 without a
+wiggle, and the cycle bottom is above the
+previous one, expect a sizable move above
+the previous cycle high. This pattern is
+rare but produces big profits &mdash; 3 of
+6 cycles bottoming in uptrend/trading range
+produced large gains. 5 of 6 cycles saw the
+Stochastic bottom below 15.
+</p>
+
+<p>
+The <strong>40-week Stochastic</strong>
+reveals a pattern at major bottoms: drop
+from above sell to below buy, rise to form
+peaks at 1 and 2 below 50, drop well below
+buy again, then rise above peaks 1 and 2.
+This confirmed the two major bull market
+bottoms in the study period. The same
+pattern appears at major bottoms in the
+40-day Stochastic for Primary Cycle lows.
+This may be a universal pattern for all
+longer-term cycle bottoms.
+</p>
+
+<p>
+For Primary Cycle tops: most occurred with
+10-week Stochastic above the sell line at
+80. But the Stochastic alone doesn&rsquo;t
+generate high-probability confirmations of
+highs. Best approach: have the 10-week
+Stochastic above 80, then use daily
+oscillators (CCI, RSI, 3-10) for the actual
+setup and trigger entry. Many Primary Cycle
+highs can be sold within days of the top when
+both the 10-week and 10-day Stochastics are
+above their sell lines and another oscillator
+generates the trigger.
+</p>
+
+<p>
+Multi-timeframe confluence for Primary Cycle
+bottoms: when the 10-week Stochastic is
+below 20, and the 10-day is at least below
+30 (ideally below 15), a trigger entry from
+the RSI or CCI will often buy a Primary
+Cycle low within days of the bottom. The
+daily 10, 20, and 40-day Stochastics mirror
+the weekly versions, with the 40-day showing
+Primary Cycle turns and the 10-day showing
+Trading Cycle turns.
+</p>
+
+<p>
+For Seasonal Cycle identification in soybeans,
+the 40-week Stochastic (buy 10, sell 90)
+reveals a crucial guideline: Seasonal highs
+below the sell line are followed by Seasonal
+lows below the previous low. Seasonal highs
+above the sell line are followed by Seasonal
+lows above the previous low. The 20-week
+Stochastic (buy 15, sell 80): 6 of 8
+Seasonal highs above 80, every Seasonal low
+below 15. A Seasonal high is not likely in
+place unless the 20-week Stochastic has
+exceeded 80, especially in a bull market.
+</p>
+
+<p>
+The Stochastic should be part of any
+oscillator combination for Primary and
+Trading Cycle identification. It helps
+identify the Seasonal Cycle. Use the longer
+periods (20, 40-week) to identify the big
+picture; use the shorter periods (10-week,
+10-day) for timing. It works in all markets
+and all time frames, and its buy/sell lines
+need much less adjustment than most other
+oscillators.
+</p>
+
+<p>
+Daily Stochastics mirror weekly versions:
+10-day for Trading Cycle turns (sell 80, buy
+30), with many lows below 15. Combine daily
+Stochastic with CCI or RSI for high
+probability trigger entries. When the 10-week
+is below 20 and the 10-day is below 15
+simultaneously, you have very high confidence
+that a Primary Cycle low is forming.
+</p>
+
+<!-- ════════════════════════════════════════ -->
+<h2 id="ch13">Chapter 13: 3-10
+Oscillator</h2>
+<hr>
+
+<p>
+The <strong>3-10 Oscillator</strong> is the
+3-day moving average minus the 10-day moving
+average, with a 16-term moving average as
+crossover. It is more sensitive than the MACD,
+turning at overextensions to indicate highs
+and lows, but its real power comes from two
+specific patterns: the <strong>Two Step Sell
+(TSS)</strong> and the <strong>Small Bump Sell
+(SBS)</strong>. These patterns identify
+Primary Cycle highs with remarkable
+consistency.
+</p>
+
+<p>
+<strong>Validity rules are strict:</strong>
+A high is valid only when above the zero line
+AND the crossover, following a low below the
+crossover. A low is valid only when below the
+crossover, following a high above the
+crossover. This filtering eliminates most
+false signals. In Example 1, of 15 oscillator
+turns, only 6 qualify as valid setups.
+</p>
+
+<p>
+<strong>TSS (Two Step Sell):</strong>
+(1) oscillator high A above the crossover;
+(2) oscillator low B below the crossover;
+(3) higher &ldquo;second step&rdquo; high C
+above both the crossover and the previous
+high A; (4) two-day downturn completes setup;
+(5) trigger = drop below previous week&rsquo;s
+low. The higher second step signals
+exhaustion &mdash; the market climbed the
+stairs but couldn&rsquo;t reach the next
+floor.
+</p>
+
+<p>
+<strong>SBS (Small Bump Sell):</strong>
+(1) following a low below crossover at A,
+high B above crossover and zero line;
+(2) deeper low C below crossover and
+below A; (3) &ldquo;small bump&rdquo; high D
+above crossover and zero but below B;
+(4) two-day downturn completes setup.
+The small bump after a deeper low signals
+a failed rally attempt &mdash; the market
+couldn&rsquo;t get back to where it was.
+</p>
+
+<div class="chart-figure">
+<div class="chart-caption">
+Charts 310-1/310-2 &mdash; Daily gold with
+3-10 oscillator showing TSS and SBS patterns
+at each Primary Cycle high
+<a class="chart-view-link"
+  href="javascript:void(0)"
+  onclick="bLB('charts/book_p189_101.jpeg',
+  'Charts 310-1/310-2 — Gold TSS/SBS')">[view]</a>
+</div></div>
+
+<p>
+In gold from February 1988 to December 1989,
+<strong>every Primary Cycle high was followed
+by a completed sell pattern</strong>. 4 of 5
+entered the market within 7 days of the top.
+4 of 5 PC highs were identified by the TSS
+specifically. Of 9 SBS setups, only 5
+triggered entry &mdash; all 5 occurred 9+
+weeks from the PC low. Of 8 TSS entries, 4
+occurred at PC highs, 3 in bear markets
+(4&ndash;6 weeks from the low).
+</p>
+
+<p>
+Three rules eliminate most losing trades:
+<strong>(1) 8-Week Rule:</strong> don&rsquo;t
+enter in an outside down week where the high
+is the highest of the past 8 weeks &mdash;
+in gold, prices often continue higher.
+<strong>(2) 6-Week Rule:</strong> if the
+downturn occurs less than 6 weeks from the
+PC low and the high is exceeded, use a
+modified trigger; cancel if not filled in
+3 weeks. <strong>(3) 14-Week Rule:</strong>
+after the 14th week from the PC low,
+don&rsquo;t enter short &mdash; you should
+be preparing to go long.
+</p>
+
+<p>
+Key research findings from Table 3 (sorted
+by PC high): of 9 entries occurring 9&ndash;17
+weeks from the PC low, <strong>8 made the next
+PC low 3&ndash;6 weeks from entry</strong>.
+This is a &ldquo;real jewel&rdquo; &mdash; it
+keeps you from taking profits too soon and
+from trying to buy until at least week 3
+after entry. From Table 4: entries less than
+9 weeks from the PC low tend to be PC highs,
+indicating a bear market where the previous
+PC low will likely be broken. Table 5: median
+decline from entry to PC low is about 6%, no
+decline exceeded 10.1%.
+</p>
+
+<p>
+The same TSS/SBS process can be applied to
+intraday data for earlier entries in
+anticipation of the daily trigger. Different
+markets may have different characteristics
+&mdash; some may favor TSS, others SBS. The
+only way to know is thorough research over
+10+ years, cataloging bull and bear behaviors
+separately.
+</p>
+
+<!-- ════════════════════════════════════════ -->
+<h2 id="ch14">Chapter 14: Trading &amp;
+Money Management</h2>
+<hr>
+
+<p>
+Bressert&rsquo;s <strong>12 Cardinal
+Mistakes</strong> of futures trading are
+drawn from decades of personal experience.
+(1) <strong>Lack of a game plan</strong>
+&mdash; 90%+ of traders he encountered had
+none. Must include: where to enter, how much
+to risk, where to exit if wrong, where to
+take profits if right, how much to make if
+right, a safety stop, and an approximate
+timeline. (2) <strong>Lack of money
+management</strong> &mdash; controlling risk
+through stops while balancing loss potential
+against profit potential. Key: a trade with
+$1,000 risk and $1,000 reward that works
+8/10 times beats $500 risk/$1,500 reward
+that works 1/3 of the time.
+(3) <strong>Failure to use protective
+stops</strong> &mdash; not mental stops,
+real stops. &ldquo;The first loss is the
+smallest. It is also the easiest to take.&rdquo;
+</p>
+
+<blockquote>
+&ldquo;You are most likely to make these
+mistakes when you are <em>making money</em>,
+not losing it. Following a string of
+profitable trades, you are most likely to
+lose <em>large</em> amounts of money.&rdquo;
+<cite>&mdash; Walter Bressert</cite>
+</blockquote>
+
+<p>
+(4) <strong>Taking small profits, letting
+losses run</strong> &mdash; result of no game
+plan. After one or two losses, you take the
+next small profit even though it could have
+been big. (5) <strong>Overstaying your
+position</strong>. (6) <strong>Averaging a
+loss</strong> &mdash; disaster in leveraged
+markets. Never average unless your
+pre-determined plan called for it with an
+unmovable stop. (7) <strong>Meeting margin
+calls</strong> &mdash; a margin call means
+you&rsquo;re wrong; meeting it increases
+your loss. (8) <strong>Increasing commitment
+with success</strong> &mdash; ruins more
+traders than small losses. Reduce percentage
+risk as equity grows. (9) <strong>Overtrading
+your account</strong> &mdash; maximum 5-10%
+equity per trade, no exceptions.
+(10) <strong>Failure to remove profits</strong>
+&mdash; pre-determine an equity level and
+take money out. Your equity curve has cycles
+too. (11) <strong>Changing strategy during
+market hours</strong> &mdash; develop your
+plan when markets are closed. (12)
+<strong>Lack of patience</strong> &mdash;
+average futures trader lifespan: between five
+minutes and nine months. Must you have a
+trade a day, or can you wait for the high
+probability setups?
+</p>
+
+<blockquote>
+&ldquo;Hope is the most devastating of all
+emotions. You <em>know</em> when you find
+yourself hoping that you are wrong, and
+should immediately get out.&rdquo;
+<cite>&mdash; Walter Bressert</cite>
+</blockquote>
+
+<p>
+The <strong>Controlled Risk Money
+Management</strong> system trades in
+multiples of three contracts, each with a
+different profit objective.
+<strong>Contract #1 (Money Contract):</strong>
+profit objective equals dollar risk, usually
+$1,000. Take it as quickly as possible,
+normally within 5 days. If not met by day
+4&ndash;5, lower the objective or consider
+closing. Once taken, total risk drops by
+two-thirds and you have closed profits.
+<strong>Contract #2 (Short-Term):</strong>
+take profits at the Trading Cycle top (bull)
+or trough (bear), normally 1&ndash;2 weeks
+after entry.
+<strong>Contract #3 (Long-Term):</strong>
+ride to the Primary or Seasonal Cycle
+objective. Wide stop needed, often risking
+20&ndash;30% of open profits. But a single
+big move every two years more than
+compensates for extra losses.
+</p>
+
+<p>
+Risk rules: never more than 10% equity per
+trade, never more than 20% total exposure.
+As equity grows, <em>reduce</em> the
+percentage &mdash; don&rsquo;t increase.
+The $30,000 account example: $3,000 risk
+(10%), three contracts at $1,000 risk each
+(3.3% per contract). Once the Money Contract
+is liquidated with $1,000 profit, total
+exposure drops to about 3.3% for the two
+remaining positions.
+</p>
+
+<p>
+The pyramid builds at subsequent Trading
+Cycle lows: three more contracts added
+(total four &mdash; two Long-Term, one
+Money, one Short-Term). As the market moves
+up, Money Contract taken, Short-Term taken
+at the next Trading Cycle top. Both Long-Term
+contracts held for the Primary Cycle high.
+If the market doesn&rsquo;t retrace as
+expected at the next Trading Cycle low, new
+contracts are not added &mdash; but the two
+Long-Term contracts ride the trend.
+</p>
+
+<p>
+<strong>Pivot Points</strong> for
+professional entry: seven key price levels
+(yesterday&rsquo;s high/low/close, today&rsquo;s
+open/high/low/close) combined with four time
+windows (the open, 30 minutes after open,
+mid-day 11:20-11:45 Chicago time, 35 minutes
+before close). A breakout at the open is
+far less significant than one in the last
+35 minutes. The later in the day a pivot
+point is taken out, the greater the
+probability of continuation the following
+day. Market entry and exit rules work best
+at cycle tops/bottoms and oscillator
+overextensions.
+</p>
+
+<p>
+Bressert is transparent about his own
+failures: every experienced trader has a
+profit/loss cycle. After making large
+amounts, he invariably became overconfident,
+sloppy, and &ldquo;dangerous.&rdquo; He
+made and lost many millions. Reviewing his
+records, his largest losses came from his
+<em>smallest</em> positions &mdash;
+counterintuitive but consistent. The 12
+Cardinal Mistakes can be overcome through
+strict, unbending self-discipline and
+mechanical rules that cannot be broken.
+</p>
+
+<blockquote>
+&ldquo;The real key to trading futures is
+not making money; it is keeping it.&rdquo;
+<cite>&mdash; Walter Bressert</cite>
+</blockquote>
+
+<!-- ════════════════════════════════════════ -->
+<h2 id="part2">Part II: Cycles, Patterns
+and Oscillators in the Stock Market
+(Workshop 1992)</h2>
+<hr>
+
+<p>
+This TAG XIV workshop paper applies
+Bressert&rsquo;s methodology specifically to
+equities, anchored by the
+<strong>4-Year Cycle</strong> &mdash; the
+dominant longer-term cycle affecting the
+stock market since 1789. Using DJIA data
+from 1917 through 1990: the 4-Year Cycle
+averaged <strong>49 months</strong> from low
+to low, <strong>36 months</strong> from low
+to high, and <strong>13 months</strong> from
+high to low. Average advance:
+<strong>107%</strong> &mdash; more than a
+doubling. In 15 of 17 cycles (nearly 90%),
+the bottom came 43 months or more from the
+previous bottom.
+</p>
+
+<div class="chart-figure">
+<div class="chart-caption">
+Table 1 &mdash; 4-Year Cycle DJIA data
+1917-1990 with dates, prices, and advances
+<a class="chart-view-link"
+  href="javascript:void(0)"
+  onclick="bLB('charts/workshop_p002_002.jpeg',
+  'Table 1 — 4-Year Cycle')">[view]</a>
+</div></div>
+
+<p>
+Bressert analyzes 19 Presidential elections
+(1912&ndash;1988): in 17 of 19 cases, the
+market advanced from the election year low
+to the following year&rsquo;s high. The
+S&amp;P has a 22-week Primary Cycle and a
+39-day Trading Cycle clustering in the
+18&ndash;22 bar range with 7 cyclic
+components. S&amp;P timing bands show
+<strong>80% accuracy</strong> &mdash;
+better than the standard 70%.
+</p>
+
+<p>
+The workshop presents four specific
+<strong>Oscillator/Cycle Combination
+recipes</strong>: (1) CCI(30) for the
+4-Year Cycle, (2) CCI(58) for T-Bond
+Trading Cycles, (3) RSI3M3 for T-Bond
+Trading Cycles, (4) RSI3M3 for DJIA
+Primary Cycles. Trade tracking for 15
+Trading Cycles produced
+<strong>$58,880 profit with 91.7% win
+rate</strong>. The paper details centered
+vs. real-time detrend analysis, half-span
+detrend concepts, and seven techniques to
+enhance oscillator performance with
+specific examples.
+</p>
+
+<div class="chart-figure">
+<div class="chart-caption">
+S&amp;P cycle hierarchy with centered
+detrend and timing bands
+<a class="chart-view-link"
+  href="javascript:void(0)"
+  onclick="bLB('charts/workshop_p015_015.jpeg',
+  'S&P Cycle Hierarchy')">[view]</a>
+</div></div>
+
+<p>
+The <strong>Bear Kiss OSCAR pattern</strong>
+for currencies is introduced here: a
+crossover detrend pattern identifying 8
+signals in the Yen, Pound, and Swiss Franc.
+Each produced declines of 0.9% to 6.2%
+lasting 2 to 8 days. Short, sharp, and
+consistently profitable. The pattern is
+specific to the crossover detrend on
+currency Trading Cycles &mdash; a niche
+application but valuable for FX traders.
+</p>
+
+<div class="chart-figure">
+<div class="chart-caption">
+Bear Kiss OSCAR pattern on Japanese Yen
+<a class="chart-view-link"
+  href="javascript:void(0)"
+  onclick="bLB('charts/workshop_p041_040.jpeg',
+  'Bear Kiss OSCAR')">[view]</a>
+</div></div>
+
+<p>
+The full oscillator settings summary covers
+16 different oscillator configurations,
+complete cycle lengths for all major markets,
+a chart index of 50 charts, and the four
+mechanical Oscillator/Cycle Combination
+recipes. The paper also includes
+Fibonacci/Gann nested squares diagrams and
+CycleWatch Monthly Report examples showing
+how Bressert applies the system in real time.
+</p>
+
+<p>
+The workshop&rsquo;s key contribution beyond
+the main book: it applies the cycle framework
+specifically to stocks (not just futures),
+provides the 4-Year Cycle historical data
+back to 1917, introduces the Presidential
+election year analysis, and gives the OSCAR
+pattern for currencies. It serves as a
+practical companion to the book, showing
+how the theoretical framework translates to
+specific markets.
+</p>
+
+<p>
+The 4-Year Cycle data reveals that the
+minimum cycle length since 1917 was 32
+months. Markets that exceed the previous
+cycle&rsquo;s high advance on average 107%
+from the low. Markets that do NOT exceed the
+previous high average only 49% advance and
+typically end in significant bear markets.
+This distinction is critical for position
+sizing and hold duration.
+</p>
+
+<p>
+Bressert provides Seasonal timing for the
+S&amp;P: lows September&ndash;November or
+February&ndash;March, highs
+August&ndash;October or April. Interest
+rates: lows in Q1 or Q3, highs in Q3 or Q4.
+These are the time windows where oscillator
+patterns should be watched most carefully
+for cycle confirmations.
+</p>
+
+<!-- ════════════════════════════════════════ -->
+<h2 id="part3">Part III: Cycle Trading
+Pattern Manual (1997-1998)</h2>
+<hr>
+
+<p>
+The Manual distills Bressert&rsquo;s entire
+system into a streamlined reference, built
+around T-Bonds and the RSI3M3. The core
+message: standalone buy/sell signals
+don&rsquo;t consider the whole picture.
+Combining them with cycles, retracements,
+trend indicators, and trendlines into
+<strong>Cycle Trading Patterns</strong>
+dramatically improves accuracy. The Manual
+presents two complete tradable patterns
+step by step.
+</p>
+
+<div class="chart-figure">
+<div class="chart-caption">
+Chart 2 &mdash; T-Bonds daily with 21-day
+Trading Cycle measured bottom to bottom
+<a class="chart-view-link"
+  href="javascript:void(0)"
+  onclick="bLB('charts/manual_p002_002.jpeg',
+  'T-Bond Trading Cycle')">[view]</a>
+</div></div>
+
+<p>
+The centered detrend is built first: a 20-bar
+MA of the close, centered back 10 bars. Most
+cycle tops above the sell line at +0.80, most
+bottoms below the buy line at -0.80. A rise
+above +2.0 means a top is imminent; a drop
+below -2.0 means a bottom is ready. But the
+centered detrend lags by 10 bars &mdash;
+excellent for historical cycles, useless for
+real-time trading. Enter the RSI3M3.
+</p>
+
+<p>
+The RSI3M3 overlaid on the centered detrend
+(Chart 5) shows cycle tops and bottoms almost
+as well as the centered version, but is
+current to the most recent bar. Four steps
+construct a mechanical buy signal: (1) RSI3M3
+drops below buy line at 30, (2) oscillator
+turns up &mdash; this bar is the setup bar,
+(3) buy stop placed one tick above the setup
+bar&rsquo;s high, (4) once entered,
+protective sell stop one tick below the
+cycle bottom. By waiting for the setup
+bar&rsquo;s high to be exceeded (instead of
+trading on the close), accuracy improves
+10&ndash;25%.
+</p>
+
+<div class="chart-figure">
+<div class="chart-caption">
+Chart 5 &mdash; RSI3M3 overlaid on centered
+detrend, matching cycle turns
+<a class="chart-view-link"
+  href="javascript:void(0)"
+  onclick="bLB('charts/manual_p005_005.jpeg',
+  'RSI3M3 vs Centered Detrend')">[view]</a>
+</div></div>
+
+<div class="chart-figure">
+<div class="chart-caption">
+Chart 6 &mdash; RSI3M3 mechanical buy signal
+4-step process with setup bar examples
+<a class="chart-view-link"
+  href="javascript:void(0)"
+  onclick="bLB('charts/manual_p006_006.jpeg',
+  'RSI3M3 Buy Signal Steps')">[view]</a>
+</div></div>
+
+<p>
+Results for the RSI3M3 alone: 8 buy signals,
+6 of 8 (75%) profitable. Four at Trading
+Cycle bottoms, three following bottoms with
+higher prices, only one before the bottom.
+Problem: Trading Cycle bottoms 2, 4, and 6
+were missed because the oscillator
+didn&rsquo;t reach the buy line at 30. Raising
+the buy line would add more losers long-term.
+Solution: the <strong>RSI3M3 Detrend</strong>.
+</p>
+
+<p>
+The RSI3M3 Detrend subtracts a 5-bar
+crossover from the RSI3M3. It is more
+sensitive and catches buy signals in strong
+trending markets. Results: 12 buy signals,
+9 of 12 (75%) profitable. Six of seven
+Trading Cycle bottoms identified. Most
+importantly, it caught the bottoms the
+RSI3M3 missed. Combined, the RSI3M3 and
+its detrend identified <strong>all seven
+Trading Cycle bottoms and six of seven
+half-cycle bottoms</strong>. Accuracy of
+10-day half-cycle identification: 85%.
+Full 20-day cycle: only 60&ndash;70%.
+</p>
+
+<div class="chart-figure">
+<div class="chart-caption">
+Chart 8 &mdash; RSI3M3 Detrend catching
+signals missed by RSI3M3, 12 buy signals
+<a class="chart-view-link"
+  href="javascript:void(0)"
+  onclick="bLB('charts/manual_p008_008.jpeg',
+  'RSI3M3 Detrend Signals')">[view]</a>
+</div></div>
+
+<p>
+<strong>Pattern 1 &mdash; Retracement +
+RSI3M3:</strong> Wait for 38&ndash;62%
+Fibonacci retracement into a Trading Cycle
+bottom, then enter on RSI3M3 mechanical buy
+signal. In T-Bonds (Chart 11a), 10 of 11
+buy signals were in the direction of the
+Trading Cycle, with 7 entering 1&ndash;3
+days after the cycle bottom. Simple, elegant,
+and consistently profitable.
+</p>
+
+<div class="chart-figure">
+<div class="chart-caption">
+Chart 11a &mdash; Buy signals combined with
+38-62% retracements, 10 of 11 with trend
+<a class="chart-view-link"
+  href="javascript:void(0)"
+  onclick="bLB('charts/manual_p011_011.jpeg',
+  'Retracement + RSI3M3')">[view]</a>
+</div></div>
+
+<p>
+<strong>Pattern 2 &mdash; Keltner + EMA +
+MACD + RSI3M3:</strong> The complete Cycle
+Trading Pattern. (1) Drop below the Keltner
+Channel midline (5-week MA with 1.1 standard
+deviation bands) but price stays above the
+lower band, (2) EMA trend moving up (fast
+above slow), (3) MACD trend line above its
+signal and rising, (4) 20-day cycle due to
+bottom, (5) RSI3M3 mechanical buy signal as
+entry trigger. Six Trading Cycle bottoms
+matching this full pattern were all followed
+by sizable upmoves. The Keltner overextension
+creates a &ldquo;rubber band&rdquo; effect
+&mdash; the bigger the drop below the midline
+(while staying above the lower band), the
+more powerful the snap-back.
+</p>
+
+<div class="chart-figure">
+<div class="chart-caption">
+Chart 18 &mdash; Keltner Channel with
+RSI3M3 showing six cycle bottoms followed
+by sizable upmoves
+<a class="chart-view-link"
+  href="javascript:void(0)"
+  onclick="bLB('charts/manual_p017_016.jpeg',
+  'Keltner + RSI3M3')">[view]</a>
+</div></div>
+
+<div class="chart-figure">
+<div class="chart-caption">
+Chart 21 &mdash; Complete Cycle Trading
+Pattern: MACD + EMA + RSI3M3 on daily
+T-Bonds
+<a class="chart-view-link"
+  href="javascript:void(0)"
+  onclick="bLB('charts/manual_p024_023.jpeg',
+  'Complete CTP')">[view]</a>
+</div></div>
+
+<p>
+Trend determination uses three indicators:
+(1) <strong>EMA Trend</strong> &mdash; fast
+EMA above slow and rising = trend up.
+Weekly EMAs plotted on daily chart show trend
+clearly. WARNING: six of eight buy signals
+in a downtrend were losers. Do NOT take buy
+signals in a downtrending market.
+(2) <strong>MACD</strong> &mdash; when both
+MACD and EMA move in the same direction, odds
+strongly favor a trending move.
+(3) <strong>Keltner Channel</strong> &mdash;
+5-week MA with 1.1 standard deviation bands.
+Trading Cycle bottoms occurring above the
+midline had much smaller upmoves than those
+below it.
+</p>
+
+<p>
+Trendlines add the final confirmation: drawn
+across Trading Cycle bottoms, their
+penetration confirms the top of weekly
+cycles. Upside penetration of downtrend
+lines confirms the weekly cycle bottom.
+Key insight: a close below a close-chart
+trendline is much more significant than
+simple bar-chart trendline penetration.
+Most people use bar chart trendlines, but
+close-chart trendlines are the real deal.
+</p>
+
+<p>
+The Manual&rsquo;s alternative oscillators
+section notes that the same Cycle Trading
+Patterns can be traded with the 3-10
+indicator, CCI, long-term RSI, Stochastic,
+MACD detrend, or any oscillator that tracks
+prices. The framework is universal &mdash;
+only the specific oscillator settings change
+by market.
+</p>
+
+<!-- ════════════════════════════════════════ -->
+<h2 id="trading-lessons">Trading &amp;
+Investing Lessons</h2>
+<hr>
+
+<h3>Cycles as a Market Timing Edge</h3>
+<p>
+Markets are not random. Documented cycles
+exist in every asset class. Knowing where
+you are in the cycle is the single most
+powerful edge a trader can have. When
+fundamentals look worst, the cycle is
+bottoming. When fundamentals look best,
+the cycle is topping. The 4-Year Cycle in
+the S&amp;P has averaged 107% gains from
+bottom to top since 1917 &mdash; more than
+a doubling each time.
+</p>
+
+<h3>Confluence Is Everything</h3>
+<p>
+No single oscillator picks every turn. Stack
+confirmations: timing band says a bottom is
+due, RSI3M3 below 30 and turning up, CCI
+crosses above its crossover, 38&ndash;62%
+Fibonacci zone reached, EMA trend up,
+Keltner overextended. Three or more confluent
+signals produce dramatically higher win rates
+than any single signal.
+</p>
+
+<h3>The 3-Contract System</h3>
+<p>
+Money Contract locks in quick profit within
+5 days, reducing risk by two-thirds.
+Short-Term captures the Trading Cycle.
+Long-Term stays on for the rare massive
+move. Without the Money Contract, 80% of
+T-Bond short trades would have lost money.
+With it, the system was consistently
+profitable.
+</p>
+
+<h3>Patience Pays More Than Precision</h3>
+<p>
+Probability is much higher later in the
+timing band. Waiting for three timing bands
+to overlap before taking a signal
+dramatically increases odds. Rush in early
+and you fight the flow. Wait for convergence
+and the market does the heavy lifting.
+</p>
+
+<h3>Translation Tells the Trend</h3>
+<p>
+Right translation = longer cycle is up.
+Bull: bottom to top 3 weeks, top to bottom
+1 week. Bear: reversed. Knowing this tells
+you whether to hold or take profits.
+</p>
+
+<h3>Your Equity Has Cycles Too</h3>
+<p>
+Biggest losses come after biggest wins.
+Success breeds overconfidence. Remove
+profits at predetermined levels, reduce
+position sizes as equity grows, never
+change strategy during market hours.
+</p>
+
+<!-- ════════════════════════════════════════ -->
+<h2 id="takeaways">Key Takeaways</h2>
+<hr>
+
+<h3>Every Market Has a Cycle Profile</h3>
+<p>
+Four dominant cycles: long-term (2&ndash;11
+years), Seasonal (annual), Primary (weekly),
+Trading (daily). Each longer cycle determines
+the trend for the next shorter one.
+</p>
+
+<h3>The 70% Timing Band</h3>
+<p>
+Seven of ten turns occur within the band.
+By the end, 90% are done. Late-band setups
+have dramatically higher success rates.
+</p>
+
+<h3>Oscillators + Cycles = Mechanical</h3>
+<p>
+Neither works well alone. Combined through
+Setup/Trigger entries, they produce signals
+with researched probabilities.
+</p>
+
+<h3>RSI3M3 Is the Workhorse</h3>
+<p>
+RSI(3) smoothed with 3-bar MA, buy 30, sell
+70&ndash;75. Plus its detrend (minus 5-bar
+crossover) for strong-trend signals.
+Together they catch virtually all Trading
+Cycle turns.
+</p>
+
+<h3>Trade in Multiples of Three</h3>
+<p>
+Money, Short-Term, Long-Term. Different exit
+objectives. Be wrong on expectations and
+still make money.
+</p>
+
+<h3>Research Before Trading</h3>
+<p>
+Minimum 5 years (preferably 10&ndash;20)
+of backtesting. Keep a notebook. Catalog
+bull and bear separately. Review buy/sell
+lines every 6&ndash;12 months.
+</p>
+
+<!-- ════════════════════════════════════════ -->
+<h2 id="contrarian">Contrarian Ideas</h2>
+<hr>
+
+<h3>Fundamentals Are Lagging</h3>
+<p>
+Most bullish at tops, most bearish at
+bottoms. The news follows the cycle.
+</p>
+
+<h3>Cycle Lows Aren&rsquo;t Price Lows</h3>
+<p>
+In powerful uptrends, the actual cycle low
+occurs at a higher price than the preceding
+price low. Traders fixated on price lows
+miss these turns.
+</p>
+
+<h3>Success Is Dangerous</h3>
+<p>
+Biggest losses follow biggest wins.
+Overconfidence breeds reckless sizing.
+</p>
+
+<h3>Oscillator Wiggles Are Meaningless</h3>
+<p>
+Without cycle timing context, oscillator
+signals are mostly noise.
+</p>
+
+<h3>Never Meet a Margin Call</h3>
+<p>
+It means you&rsquo;re wrong. Meeting it
+only increases the loss.
+</p>
+
+<!-- ════════════════════════════════════════ -->
+<h2 id="quotes">Notable Quotes</h2>
+<hr>
+
+<blockquote>
+&ldquo;There is no magic oscillator. Knowledge
+of trading techniques to improve TIMING and
+determine TREND is the key to low risk, high
+probability trades.&rdquo;
+<cite>&mdash; Walter Bressert</cite>
+</blockquote>
+
+<blockquote>
+&ldquo;The probability of making a successful
+trade is much greater later in the timing
+bands than earlier.&rdquo;
+<cite>&mdash; Walter Bressert</cite>
+</blockquote>
+
+<blockquote>
+&ldquo;Hope is the most devastating of all
+emotions in trading.&rdquo;
+<cite>&mdash; Walter Bressert</cite>
+</blockquote>
+
+<blockquote>
+&ldquo;The first loss is the smallest. It is
+also the easiest to take.&rdquo;
+<cite>&mdash; Walter Bressert</cite>
+</blockquote>
+
+<blockquote>
+&ldquo;The real key to trading futures is not
+making money; it is keeping it.&rdquo;
+<cite>&mdash; Walter Bressert</cite>
+</blockquote>
+
+<blockquote>
+&ldquo;In your elation at success, you make
+mistakes of greed. In your reluctance to take
+a loss, you make mistakes of fear.&rdquo;
+<cite>&mdash; Walter Bressert</cite>
+</blockquote>
+
+<blockquote>
+&ldquo;If the trend is up, buy the dips. Easy
+to say, but how do you know what the trend
+IS?&rdquo;
+<cite>&mdash; Walter Bressert</cite>
+</blockquote>
+
+<blockquote>
+&ldquo;You will make mistakes, and you will
+lose money, but with the proper approach you
+can turn futures into a profitable venture.
+&rdquo;
+<cite>&mdash; Walter Bressert</cite>
+</blockquote>
+
+<!-- ════════════════════════════════════════ -->
+<h2 id="allegories">Allegories &amp;
+Cultural References</h2>
+<hr>
+
+<table>
+<tr><th>Reference</th>
+<th>Concept Illustrated</th></tr>
+<tr><td>Salmon spawning cycles</td>
+<td>Natural cycles govern all systems
+including markets</td></tr>
+<tr><td>Taking a bus without knowing
+your stop</td>
+<td>Trading without an MCP price objective
+</td></tr>
+<tr><td>Stretching a rubber band</td>
+<td>Deep 38-62% retracements snap back
+powerfully</td></tr>
+<tr><td>The Kiss</td>
+<td>MACD bouncing off crossover like a
+brief embrace</td></tr>
+<tr><td>Right/left translation</td>
+<td>Cycle crests shifting like a pendulum
+</td></tr>
+<tr><td>Two Step Sell</td>
+<td>Oscillator climbing stairs before
+falling</td></tr>
+<tr><td>Small Bump Sell</td>
+<td>Failed rally attempt after deeper
+low</td></tr>
+<tr><td>Money in the bank</td>
+<td>Recurring research patterns that
+reliably profit</td></tr>
+<tr><td>No thinkums</td>
+<td>Mechanical trades removing judgment
+</td></tr>
+<tr><td>The Hook</td>
+<td>Fishing-hook shaped false recovery
+</td></tr>
+<tr><td>3-D Analysis</td>
+<td>Three timeframe layers revealing
+market depth</td></tr>
+<tr><td>The Money Contract</td>
+<td>Insurance that pays for the trade&rsquo;s
+risk</td></tr>
+<tr><td>Free time</td>
+<td>Period after cycle bottom before CCI
+reaches sell line &mdash; buy aggressively
+</td></tr>
+<tr><td>Overconfidence as the real
+enemy</td>
+<td>Success breeds the twelve cardinal
+mistakes</td></tr>
+</table>
+
+<!-- ════════════════════════════════════════ -->
+<h2 id="frameworks">Proposals &amp;
+Frameworks</h2>
+<hr>
+
+<h3>Oscillator/Cycle Combination</h3>
+<p>
+Three steps: (1) TIME right per timing bands,
+(2) Price/Oscillator Pattern sets up,
+(3) price triggers entry. Predetermined
+probability from research.
+</p>
+
+<h3>70% Timing Band System</h3>
+<p>
+Middle 70% of historical cycle lengths.
+Adjust for bull/bear. By end of band, 90%
+have turned.
+</p>
+
+<h3>Seven Enhancement Techniques</h3>
+<p>
+Turns, smoothing, buy/sell lines, crossovers,
+zero line, patterns, Setup/Trigger entries.
+Sequential filtering from noise to signal.
+</p>
+
+<h3>3-Contract Money Management</h3>
+<p>
+Money (quick profit = risk), Short-Term
+(Trading Cycle), Long-Term (Primary/Seasonal).
+Max 10% per trade, 20% total.
+</p>
+
+<h3>Cycle Trading Patterns</h3>
+<p>
+Pattern 1: 38-62% retracement + RSI3M3.
+Pattern 2: Keltner + EMA + MACD + RSI3M3.
+Both universal across markets and timeframes.
+</p>
+
+<!-- ════════════════════════════════════════ -->
+<h2 id="references">Referenced Works</h2>
+<hr>
+
+<table>
+<tr><th>Name</th><th>Work/Role</th>
+<th>Connection</th></tr>
+<tr><td><strong>Gerald Appel</strong></td>
+<td><em>The Moving Average
+Convergence-Divergence Method</em></td>
+<td>Invented MACD; popularized Speed
+Resistance Lines</td></tr>
+<tr><td><strong>Foundation for the Study
+of Cycles</strong></td>
+<td>Non-profit research org</td>
+<td>3,000+ cycles documented since 1930s;
+pioneered centered detrending</td></tr>
+<tr><td><strong>J. Welles Wilder Jr.</strong>
+</td>
+<td><em>New Concepts in Technical
+Trading Systems</em></td>
+<td>Created the RSI</td></tr>
+<tr><td><strong>Donald Lambert</strong></td>
+<td>&ldquo;Commodity Channel Index&rdquo;
+(<em>Commodities</em>, 1980)</td>
+<td>Created the CCI</td></tr>
+<tr><td><strong>Edson Gould</strong></td>
+<td>Market analyst</td>
+<td>Developed Speed Resistance Lines</td>
+</tr>
+<tr><td><strong>George Lane</strong></td>
+<td>Stochastic developer</td>
+<td>Created the Stochastic</td></tr>
+<tr><td><strong>CompuTrac</strong></td>
+<td>Analytical software</td>
+<td>Bressert co-founded; used for all
+research</td></tr>
+<tr><td><strong>HAL Commodity
+Cycles</strong></td>
+<td>Newsletter 1974-1985</td>
+<td>Profitable 10/12 years; rated #1 by
+<em>Futures</em></td></tr>
+<tr><td><strong>CycleWatch</strong></td>
+<td>Advisory 1991-1995</td>
+<td>Live application of book methods</td>
+</tr>
+</table>
+
+<!-- ════════════════════════════════════════ -->
+<h2 id="didnt-fit">What Didn&rsquo;t
+Fit</h2>
+<hr>
+
+<h3>Pivot Point Entry System</h3>
+<p>
+Bressert spent two years in the 1970s
+hand-charting intraday movement and discovered
+seven pivot points that professionals watch:
+yesterday&rsquo;s high/low/close and today&rsquo;s
+open/high/low/close. Combined with four time
+windows (the open, 30 minutes after, mid-day
+11:20&ndash;11:45 Chicago time, 35 minutes
+before close), these create a mechanical entry
+system. A breakout above yesterday&rsquo;s high
+in the last 35 minutes is far more significant
+than the same breakout 30 minutes after the
+open. Different markets behave differently
+&mdash; currencies can knock out both pivots
+in the last 30 minutes, while gold almost
+never does. Stops are placed at the most
+distant opposing pivot point, giving you a
+predetermined dollar risk before the order is
+placed. The system forces you to wait for the
+market to tell you it&rsquo;s ready to move.
+</p>
+
+<h3>Calendar Days vs. Market Days</h3>
+<p>
+Bressert insists on counting Trading Cycle
+timing bands in calendar days including
+weekends because the world doesn&rsquo;t
+stop. Currency transactions, metals trading,
+government decisions continue. Many cycle
+highs and lows show up as Friday or Monday
+extremes. But oscillator calculations must
+use market days only. This requires
+maintaining two separate timing band tables
+for each market &mdash; a detail most
+traders skip but Bressert considers essential.
+</p>
+
+<h3>The Outside Up Month at Major Bottoms</h3>
+<p>
+At the 1974 and 1982 S&amp;P bottoms, the CCI
+and detrend turned up in the same month as an
+outside up month (higher high, higher low than
+previous month, closing near the high). This
+offered an aggressive buy signal before the
+full Setup/Trigger sequence completed. When a
+confirmed cycle bottom is followed by a test
+of the lows that holds, buy against those
+lows. One of the lowest-risk entries possible,
+though it doesn&rsquo;t occur often.
+</p>
+
+<h3>Soybean Oil Seasonal Patterns</h3>
+<p>
+The CCI identified 8 of 9 Seasonal lows in
+soybean oil. All 8 confirmed lows had the CCI
+slightly above or below the -100 buy line.
+The crossover occurred within 0&ndash;2 weeks
+of the price low. In 8 of 8 years, the high
+of crossover week was exceeded the following
+week. Following entry, the nearest overhead
+trendline was exceeded in all 8 years. In 5
+of 7 years, the move exceeded 20% from entry.
+Seasonal oscillators should be researched over
+20&ndash;30 years minimum, but even then, in
+the heat of the market, accepting a single
+pattern as confirmation is hard &mdash; which
+is why multiple oscillator confirmations
+matter even more at Seasonal turns.
+</p>
+
+<h3>The Federal Reserve Effect on T-Bonds</h3>
+<p>
+The Fed can move interest rates for prolonged
+periods, extending Primary Cycle lengths and
+keeping oscillators at extremes far longer
+than in other markets. T-Bonds have two
+interactive Primary Cycles (21-week and
+14-week), with most 21-week cycles actually
+composed of two 14-week cycles. This dual
+interaction makes T-Bonds tricky for pure
+cycle analysis but rich for those who
+understand the interplay and use multiple
+oscillators to sort the signals.
+</p>
+
+<!-- ════════════════════════════════════════ -->
+<footer>
+<p>
+<strong>Author:</strong> Walter Bressert<br>
+<strong>Works:</strong>
+<em>The Power of Oscillator/Cycle
+Combinations</em> (1991, 218 pp.),
+<em>Cycles, Patterns and Oscillators in the
+Stock Market</em> (1992, 47 pp.),
+<em>The Cycle Trading Pattern Manual</em>
+(1997-1998, 24 pp.)<br>
+<strong>Total:</strong> 289 pages<br>
+<strong>Summary:</strong> A complete system
+for combining cycle timing with oscillator
+patterns to produce mechanical trading
+signals &mdash; RSI3M3, CCI, MACD Detrend,
+Stochastic, and 3-10 Oscillator across
+every major futures market and timeframe.
+</p>
+</footer>
+
+<!-- ════════════════════════════════════════ -->
+<h2 id="about">About the Author</h2>
+<hr>
+
+<p>
+<strong>Walter Bressert</strong> is
+acknowledged as the man who brought cyclical
+analysis to the futures markets. He published
+the <em>HAL Commodity Cycles</em> newsletter
+from 1974 to 1985, rated #1 in Bull Markets
+by <em>Futures</em> magazine and profitable
+10 of 12 years. In 1983, <em>Futures</em>
+stated his forecasts were so accurate that
+&ldquo;he gets the readership he deserves
+because he is right so often.&rdquo; His
+performance was rated #1 in the S&amp;P
+Index by the <em>Commodity Trader&rsquo;s
+Consumer Report</em>.
+</p>
+
+<p>
+Bressert co-founded <strong>CompuTrac</strong>,
+one of the original computerized technical
+analysis platforms, and served as long-standing
+director of the <strong>Foundation for the
+Study of Cycles</strong>. In 1981 he
+co-authored the <em>HAL Blue Book</em>, a
+classic study on cycles and oscillator/price
+patterns using %R and momentum. He managed
+hedge accounts in the S&amp;P Index with
+minimum sizes of $500,000 and developed the
+<strong>CycleTrader</strong> software for
+mechanical signal generation.
+</p>
+
+<p>
+After semi-retiring in 1985, Bressert
+published the book in 1991 and launched
+<strong>CycleWatch</strong>, covering S&amp;P,
+Bonds, Metals, Currencies, and Agricultural
+markets. He continued teaching through
+workshops at the Traders&rsquo; Advisory
+Group (TAG) conferences and published the
+Cycle Trading Pattern Manual through his
+website. His work remains the foundational
+reference for cycle-based trading.
+</p>
+
+<!-- ════════════════════════════════════════ -->
+<h2 id="why-matters">Why This
+Book Matters</h2>
+<hr>
+
+<p>
+Bressert&rsquo;s work provides what most
+technical analysis books don&rsquo;t: a
+<strong>complete, testable system</strong>
+with exact settings, buy/sell levels, and
+mechanical entry rules, researched across
+decades and published with full results.
+The 30-month CCI confirming every 4-year
+S&amp;P bottom from 1953 to 1987. Three
+MACD detrend patterns identifying 80% of
+gold Primary Cycle lows. RSI3M3 achieving
+85% profitability on T-Bond Trading Cycles.
+$58,880 in profits from 12 CCI trades with
+91.7% win rate. These aren&rsquo;t vague
+guidelines &mdash; they&rsquo;re specific,
+repeatable frameworks backed by historical
+performance tables.
+</p>
+
+<p>
+The psychology of execution receives equal
+treatment. The 12 Cardinal Mistakes are
+confessions from a man who made and lost
+millions. The Controlled Risk Money
+Management system with the 3-contract
+approach is a practical solution to human
+nature in leveraged markets. The Money
+Contract pays for the trade&rsquo;s risk
+within days, freeing the trader emotionally
+to let other positions run. It is elegant,
+tested, and works in any market.
+</p>
+
+<p>
+The cycle framework remains remarkably
+durable. The 4-year stock market cycle,
+seasonal commodity tendencies, and 20-day
+Trading Cycles were documented starting in
+the 1930s and continue operating. Specific
+oscillator settings may need recalibration
+for modern markets, but the core principle
+&mdash; that TIME and PRICE must be combined,
+that cycles provide the context making
+oscillator signals meaningful &mdash; is as
+valid today as in 1991.
+</p>
+
+<!-- ════════════════════════════════════════ -->
+<!-- LIGHTBOX -->
+<div id="fig-lb">
+<span id="fig-lb-close"
+  title="Close">&#x2715;</span>
+<img id="fig-lb-img" src="" alt="">
+<div id="fig-lb-caption"></div>
+</div>
+
+<script>
+function bLB(src,cap){
+  var lb=document.getElementById('fig-lb');
+  document.getElementById('fig-lb-img').src=src;
+  document.getElementById('fig-lb-caption')
+    .textContent=cap||'';
+  lb.classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function bClose(){
+  var lb=document.getElementById('fig-lb');
+  lb.classList.remove('open');
+  document.body.style.overflow='';
+  document.getElementById('fig-lb-img').src='';
+}
+document.getElementById('fig-lb')
+  .addEventListener('click',function(e){
+  if(e.target===this||e.target.id==='fig-lb-close')
+    bClose();
+});
+document.addEventListener('keydown',function(e){
+  if(e.key==='Escape') bClose();
+});
+</script>
+
+<script src="../book.js?v=5"></script>
 </body>
 </html>
