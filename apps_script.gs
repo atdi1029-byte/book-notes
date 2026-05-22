@@ -108,6 +108,26 @@ function doGet(e) {
     return jsonpWrap_(JSON.stringify({ status: 'ok', masterlist_read: mlExisting }), callback);
   }
 
+  // ── MOVED TO SHELF ──
+  if (action === 'get_moved') {
+    var mSheet = ss.getSheetByName('Settings');
+    if (!mSheet) mSheet = ss.insertSheet('Settings');
+    var raw = mSheet.getRange('D1').getValue() || '{}';
+    return jsonpWrap_(JSON.stringify({ status: 'ok', moved: JSON.parse(raw) }), callback);
+  }
+
+  if (action === 'move_to_shelf') {
+    var mSheet = ss.getSheetByName('Settings');
+    if (!mSheet) mSheet = ss.insertSheet('Settings');
+    var mBook = e.parameter.book || '';
+    var mSection = e.parameter.section || '';
+    var existing = {};
+    try { existing = JSON.parse(mSheet.getRange('D1').getValue() || '{}'); } catch(err) {}
+    existing[mBook] = { ts: Date.now(), section: mSection };
+    mSheet.getRange('D1').setValue(JSON.stringify(existing));
+    return jsonpWrap_(JSON.stringify({ status: 'ok', moved: existing }), callback);
+  }
+
   // ── ZERCHER ──
   var zSheet = ss.getSheetByName('Zercher');
   if (!zSheet && action.indexOf('zercher') === 0) {
@@ -144,7 +164,7 @@ function doGet(e) {
     for (var i = 0; i < total; i++) {
       zSheet.getRange('D' + (i + 1)).clearContent();
     }
-    return jsonpWrap_(JSON.stringify({ ok: true }), callback);
+    return jsonpWrap_(JSON.stringify({ ok: true, ts: new Date().toISOString() }), callback);
   }
 
   if (action === 'zercher_save_extra') {
@@ -222,7 +242,7 @@ function doGet(e) {
         } catch(err) {}
       }
     }
-    return jsonpWrap_(JSON.stringify({ status: 'ok', config: config, extra: extra, logs: logs, runLogs: runLogs, prs: config.prs || {} }), callback);
+    return jsonpWrap_(JSON.stringify({ status: 'ok', config: config, extra: extra, logs: logs, runLogs: runLogs, prs: config.prs || {}, ts: new Date().toISOString() }), callback);
   }
 
   return jsonpWrap_(JSON.stringify({ status: 'error', message: 'Unknown action' }), callback);

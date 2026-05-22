@@ -2936,7 +2936,7 @@
     var got = 0;
     function checkDone() {
       got++;
-      if (got >= 2) {
+      if (got >= 3) {
         syncReady = true;
         render();
         // Pre-cache reading books after sync completes
@@ -2955,6 +2955,17 @@
       if (!err && bmData && bmData.status === 'ok' && bmData.bookmarks) {
         activeBookmarks = bmData.bookmarks;
         localStorage.setItem('books_bookmarks', JSON.stringify(activeBookmarks));
+      }
+      checkDone();
+    });
+    jsonpFetch(SYNC_URL + '?action=get_moved', function(err, movedData) {
+      if (!err && movedData && movedData.status === 'ok' && movedData.moved) {
+        // Merge remote into local (remote wins for conflicts)
+        var local = getMovedToShelf();
+        var remote = movedData.moved;
+        for (var k in remote) { local[k] = remote[k]; }
+        localStorage.setItem(SHELF_MOVED_KEY, JSON.stringify(local));
+        renderMovedToShelf();
       }
       checkDone();
     });
@@ -3015,6 +3026,10 @@
     moved[id] = { ts: Date.now(), section: sectionName };
     localStorage.setItem(SHELF_MOVED_KEY, JSON.stringify(moved));
     renderMovedToShelf();
+    // Sync to backend
+    if (syncReady && SYNC_URL && SYNC_URL !== 'YOUR_APPS_SCRIPT_URL_HERE') {
+      jsonpFetch(SYNC_URL + '?action=move_to_shelf&book=' + encodeURIComponent(id) + '&section=' + encodeURIComponent(sectionName), function(){});
+    }
   }
 
   function renderMovedToShelf() {
