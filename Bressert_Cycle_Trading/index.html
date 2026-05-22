@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Project Hub</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #0e0804;
+    color: #e8dcc8;
+    font-family: Georgia, 'Times New Roman', serif;
+    line-height: 1.7;
+    min-height: 100vh;
+  }
+
+  .bg {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: radial-gradient(ellipse at 30% 20%, rgba(60,40,20,0.4), transparent 60%),
+                radial-gradient(ellipse at 70% 80%, rgba(40,25,50,0.3), transparent 60%),
+                #0e0804;
+    z-index: 0;
+  }
+
+  .content {
+    position: relative;
+    z-index: 1;
+    padding: 2.5rem 1.5rem;
+    max-width: 960px;
+    margin: 0 auto;
+  }
+
+  h1 {
+    font-size: 2.2rem;
+    color: #fff;
+    margin-bottom: 0.3rem;
+    text-shadow: 0 2px 16px rgba(0,0,0,0.5);
+  }
+
+  .subtitle {
+    color: rgba(255,255,255,0.7);
+    font-size: 1rem;
+    font-style: italic;
+    margin-bottom: 2.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid rgba(255,255,255,0.15);
+  }
+
+  .section-title {
+    font-size: 1.1rem;
+    color: rgba(255,255,255,0.85);
+    text-shadow: 0 1px 8px rgba(0,0,0,0.4);
+    margin-top: 2.2rem;
+    margin-bottom: 0.8rem;
+    padding-bottom: 0.4rem;
+    border-bottom: 1px solid rgba(255,255,255,0.15);
+    font-style: italic;
+  }
+
+  .section-title:first-of-type { margin-top: 0; }
+
+  .shelf {
+    display: flex;
+    gap: 1.2rem;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 0.5rem;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .shelf::-webkit-scrollbar { display: none; }
+
+  .card {
+    display: block;
+    text-decoration: none;
+    color: #e8dcc8;
+    transition: transform 0.25s ease;
+    min-width: 180px;
+    width: calc(33.333% - 0.8rem);
+    flex-shrink: 0;
+  }
+
+  .card:hover { transform: translateY(-6px); }
+
+  .card-face {
+    position: relative;
+    border-radius: 12px;
+    overflow: hidden;
+    aspect-ratio: 3 / 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 2px 4px 12px rgba(0,0,0,0.6), 6px 8px 24px rgba(0,0,0,0.3);
+    transition: box-shadow 0.25s ease;
+  }
+
+  .card:hover .card-face {
+    box-shadow: 2px 4px 16px rgba(0,0,0,0.7), 8px 12px 32px rgba(0,0,0,0.4), 0 0 40px rgba(180,120,40,0.1);
+  }
+
+  .card-face .icon { font-size: 2.5rem; z-index: 1; }
+
+  .card-face .overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.25);
+    border-radius: 12px;
+  }
+
+  .card-title {
+    font-size: 0.95rem;
+    color: #fff;
+    font-weight: 700;
+    margin-top: 0.6rem;
+    line-height: 1.3;
+    text-shadow: 0 1px 6px rgba(0,0,0,0.4);
+  }
+
+  .card-desc {
+    font-size: 0.78rem;
+    color: rgba(255,255,255,0.55);
+    margin-top: 0.15rem;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.3);
+  }
+
+  .tag {
+    display: inline-block;
+    font-size: 0.6rem;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 10px;
+    margin-top: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-family: -apple-system, sans-serif;
+  }
+
+  .tag.pwa { background: rgba(58,158,74,0.35); color: #6ee87a; }
+  .tag.web { background: rgba(96,165,250,0.25); color: #93bbfd; }
+  .tag.local { background: rgba(251,191,36,0.25); color: #fbbf24; }
+
+  /* Card gradients */
+  .bg-crypto { background: linear-gradient(135deg, #1a1040, #2d1b69, #1a1040); }
+  .bg-spx { background: linear-gradient(135deg, #0a2a2a, #0e3d3d, #0a2a2a); }
+  .bg-bloom { background: linear-gradient(135deg, #2d1a24, #3d2030, #2d1a24); }
+  .bg-sora { background: linear-gradient(135deg, #1a0a2a, #2d1040, #1a0a2a); }
+  .bg-trade { background: linear-gradient(135deg, #1a2010, #2a3518, #1a2010); }
+  .bg-roman { background: linear-gradient(135deg, #1a2035, #253050, #1a2035); }
+  .bg-cadence { background: linear-gradient(135deg, #2a1a08, #3d2810, #2a1a08); }
+  .bg-zercher { background: linear-gradient(135deg, #2a0a0a, #3d1515, #2a0a0a); }
+  .bg-books { background: linear-gradient(135deg, #1a1020, #281838, #1a1020); }
+  .bg-reading { background: linear-gradient(135deg, #201a10, #352a18, #201a10); }
+  .bg-email { background: linear-gradient(135deg, #0a2015, #103525, #0a2015); }
+  .bg-emailhelp { background: linear-gradient(135deg, #102020, #183530, #102020); }
+  .bg-counter { background: linear-gradient(135deg, #1a1520, #281f30, #1a1520); }
+  .bg-bible { background: linear-gradient(135deg, #201510, #352518, #201510); }
+
+  @media (max-width: 600px) {
+    .content { padding: 1.2rem; }
+    h1 { font-size: 1.6rem; }
+    .card { width: 42vw; min-width: 150px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="bg"></div>
+
+<div class="content">
+  <h1>Project Hub</h1>
+  <p class="subtitle">Everything we built together</p>
+
+  <!-- TRADING -->
+  <h2 class="section-title">Trading</h2>
+  <div class="shelf">
+    <a class="card" href="https://atdi1029-byte.github.io/crypto-trade/" target="_blank">
+      <div class="card-face bg-crypto"><div class="overlay"></div><span class="icon">📊</span></div>
+      <div class="card-title">Crypto Dashboard</div>
+      <div class="card-desc">Signals, Pokemon scaling, DCA levels</div>
+      <span class="tag pwa">PWA</span>
+    </a>
+    <a class="card" href="https://atdi1029-byte.github.io/spx-trade/" target="_blank">
+      <div class="card-face bg-spx"><div class="overlay"></div><span class="icon">📈</span></div>
+      <div class="card-title">SPX Dashboard</div>
+      <div class="card-desc">Stocks, badges, treasury liquidity</div>
+      <span class="tag pwa">PWA</span>
+    </a>
+    <a class="card" href="https://atdi1029-byte.github.io/sora-signal/" target="_blank">
+      <div class="card-face bg-sora"><div class="overlay"></div><span class="icon">🔮</span></div>
+      <div class="card-title">Sora Signal</div>
+      <div class="card-desc">Signal tracking dashboard</div>
+      <span class="tag pwa">PWA</span>
+    </a>
+    <a class="card" href="Trade/index.html">
+      <div class="card-face bg-trade"><div class="overlay"></div><span class="icon">💹</span></div>
+      <div class="card-title">Trade Analytics</div>
+      <div class="card-desc">Upload &amp; analyze trade data</div>
+      <span class="tag local">Local</span>
+    </a>
+  </div>
+
+  <!-- FINANCE -->
+  <h2 class="section-title">Finance</h2>
+  <div class="shelf">
+    <a class="card" href="https://atdi1029-byte.github.io/bloom-portfolios/" target="_blank">
+      <div class="card-face bg-bloom"><div class="overlay"></div><span class="icon">🌸</span></div>
+      <div class="card-title">Bloom Portfolio</div>
+      <div class="card-desc">Valuations, buy/sell opps, growth charts</div>
+      <span class="tag pwa">PWA</span>
+    </a>
+    <a class="card" href="https://atdi1029-byte.github.io/roman-chariots/" target="_blank">
+      <div class="card-face bg-roman"><div class="overlay"></div><span class="icon">🏛️</span></div>
+      <div class="card-title">Roman Chariots</div>
+      <div class="card-desc">Budgeting, receipts, insights</div>
+      <span class="tag pwa">PWA</span>
+    </a>
+  </div>
+
+  <!-- PRODUCTIVITY -->
+  <h2 class="section-title">Productivity</h2>
+  <div class="shelf">
+    <a class="card" href="https://atdi1029-byte.github.io/cadence/" target="_blank">
+      <div class="card-face bg-cadence"><div class="overlay"></div><span class="icon">⚡</span></div>
+      <div class="card-title">Cadence</div>
+      <div class="card-desc">Task manager with cloud sync</div>
+      <span class="tag pwa">PWA</span>
+    </a>
+    <a class="card" href="https://atdi1029-byte.github.io/workout-tracker/" target="_blank">
+      <div class="card-face bg-zercher"><div class="overlay"></div><span class="icon">🏋️</span></div>
+      <div class="card-title">Zercher</div>
+      <div class="card-desc">Workouts, running, interval timer</div>
+      <span class="tag pwa">PWA</span>
+    </a>
+  </div>
+
+  <!-- LEARNING -->
+  <h2 class="section-title">Learning</h2>
+  <div class="shelf">
+    <a class="card" href="https://atdi1029-byte.github.io/book-notes/" target="_blank">
+      <div class="card-face bg-books"><div class="overlay"></div><span class="icon">📚</span></div>
+      <div class="card-title">Book Notes</div>
+      <div class="card-desc">Chapter-by-chapter deep dives</div>
+      <span class="tag pwa">PWA</span>
+    </a>
+    <a class="card" href="https://atdi1029-byte.github.io/reading-list/" target="_blank">
+      <div class="card-face bg-reading"><div class="overlay"></div><span class="icon">📖</span></div>
+      <div class="card-title">Reading List</div>
+      <div class="card-desc">Master investment reading list</div>
+      <span class="tag web">Web</span>
+    </a>
+    <a class="card" href="Bible/index.html">
+      <div class="card-face bg-bible"><div class="overlay"></div><span class="icon">✝️</span></div>
+      <div class="card-title">Bible Study</div>
+      <div class="card-desc">Verse-by-verse commentary</div>
+      <span class="tag local">Local</span>
+    </a>
+  </div>
+
+  <!-- OUTREACH -->
+  <h2 class="section-title">Outreach</h2>
+  <div class="shelf">
+    <a class="card" href="https://atdi1029-byte.github.io/gig-outreach/" target="_blank">
+      <div class="card-face bg-email"><div class="overlay"></div><span class="icon">📧</span></div>
+      <div class="card-title">Gig Outreach</div>
+      <div class="card-desc">Email templates &amp; contacts</div>
+      <span class="tag pwa">PWA</span>
+    </a>
+  </div>
+
+  <!-- OTHER -->
+  <h2 class="section-title">Other</h2>
+  <div class="shelf">
+    <a class="card" href="Counterpoint/index.html">
+      <div class="card-face bg-counter"><div class="overlay"></div><span class="icon">🎵</span></div>
+      <div class="card-title">Counterpoint</div>
+      <div class="card-desc">Music composition workbench</div>
+      <span class="tag local">Local</span>
+    </a>
+  </div>
+
+</div>
+
+</body>
+</html>

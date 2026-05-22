@@ -1,0 +1,500 @@
+// This Pine Script(TM) v6 indicator implements Walter Bressert's
+// Cycle Trading methodology from "The Power of Oscillator/Cycle
+// Combinations" (1991), "Cycles, Patterns and Oscillators in the
+// Stock Market" (1992), and "The Cycle Trading Pattern Manual"
+// (1997-1998).
+//
+// Core concept: Combine cycle TIMING with oscillator PATTERNS
+// to identify high-probability cycle tops and bottoms, then
+// use mechanical Setup/Trigger entries.
+//
+// Components:
+// 1. RSI3M3 — RSI(3) smoothed with 3-bar MA (primary oscillator)
+// 2. RSI3M3 Detrend — catches signals missed by RSI3M3
+// 3. CCI with smoothing and crossover
+// 4. 3-10 Oscillator with TSS/SBS patterns
+// 5. EMA Trend filter (weekly EMAs on daily)
+// 6. Keltner Channel (trend/overextension)
+// 7. Cycle counting and timing bands
+// 8. Mechanical buy/sell signals
+
+//@version=6
+indicator("Bressert Cycle Trader", overlay=true,
+  max_labels_count=500, max_lines_count=500)
+
+// ─── INPUTS ─────────────────────────────────────────────────
+// Cycle Settings
+cycleLen      = input.int(20, "Trading Cycle Length (bars)",
+  minval=10, maxval=60, group="Cycle Settings")
+cycleMinBand  = input.int(15, "Timing Band Min",
+  minval=5, group="Cycle Settings")
+cycleMaxBand  = input.int(30, "Timing Band Max",
+  minval=10, group="Cycle Settings")
+
+// RSI3M3 Settings
+rsiPeriod     = input.int(3, "RSI Period",
+  minval=2, maxval=8, group="RSI3M3")
+rsiSmooth     = input.int(3, "RSI Smoothing (MA)",
+  minval=2, maxval=8, group="RSI3M3")
+rsiBuyLine    = input.int(30, "RSI Buy Line",
+  minval=10, maxval=40, group="RSI3M3")
+rsiSellLine   = input.int(70, "RSI Sell Line",
+  minval=60, maxval=90, group="RSI3M3")
+rsiXoverLen   = input.int(5, "RSI Crossover Length",
+  minval=3, maxval=10, group="RSI3M3")
+
+// CCI Settings
+cciLen        = input.int(5, "CCI Length",
+  minval=3, maxval=30, group="CCI")
+cciSmooth     = input.int(8, "CCI Smoothing",
+  minval=3, maxval=15, group="CCI")
+cciBuyLine    = input.float(-35, "CCI Buy Line",
+  group="CCI")
+cciSellLine   = input.float(60, "CCI Sell Line",
+  group="CCI")
+cciXoverLen   = input.int(8, "CCI Crossover Length",
+  minval=3, maxval=15, group="CCI")
+
+// 3-10 Oscillator Settings
+maFast310     = input.int(3, "3-10 Fast MA",
+  minval=2, maxval=5, group="3-10 Oscillator")
+maSlow310     = input.int(10, "3-10 Slow MA",
+  minval=8, maxval=20, group="3-10 Oscillator")
+xover310Len   = input.int(16, "3-10 Crossover Length",
+  minval=8, maxval=25, group="3-10 Oscillator")
+
+// EMA Trend Settings
+emaFastLen    = input.int(10, "EMA Fast Length",
+  minval=5, maxval=30, group="EMA Trend")
+emaSlowLen    = input.int(40, "EMA Slow Length",
+  minval=20, maxval=100, group="EMA Trend")
+
+// Keltner Channel Settings
+keltnerLen    = input.int(25, "Keltner MA Length",
+  minval=10, maxval=50, group="Keltner Channel")
+keltnerMult   = input.float(1.1, "Keltner StdDev Mult",
+  minval=0.5, maxval=3.0, step=0.1,
+  group="Keltner Channel")
+
+// Display Settings
+showKeltner   = input.bool(true, "Show Keltner Channel",
+  group="Display")
+showEMA       = input.bool(true, "Show EMA Trend Lines",
+  group="Display")
+showCycleCount = input.bool(true, "Show Cycle Bar Count",
+  group="Display")
+showSignals   = input.bool(true, "Show Buy/Sell Signals",
+  group="Display")
+
+// ─── RSI3M3 CALCULATION ────────────────────────────────────
+// RSI(3) smoothed with 3-bar MA — Bressert's primary
+// oscillator for identifying Trading Cycle tops/bottoms
+rawRSI        = ta.rsi(close, rsiPeriod)
+rsi3m3        = ta.sma(rawRSI, rsiSmooth)
+rsiCrossover  = ta.sma(rsi3m3, rsiXoverLen)
+rsiDetrend    = rsi3m3 - rsiCrossover
+
+// RSI3M3 states
+rsiBelowBuy   = rsi3m3 < rsiBuyLine
+rsiAboveSell  = rsi3m3 > rsiSellLine
+rsiTurnUp     = rsi3m3 > rsi3m3[1] and rsi3m3[1] <= rsi3m3[2]
+rsiTurnDown   = rsi3m3 < rsi3m3[1] and rsi3m3[1] >= rsi3m3[2]
+
+// RSI3M3 Detrend states — catches signals in strong trends
+// where RSI3M3 doesn't reach buy/sell lines
+detBelowZero  = rsiDetrend < 0
+detAboveZero  = rsiDetrend > 0
+detTurnUp     = rsiDetrend > rsiDetrend[1] and
+  rsiDetrend[1] <= rsiDetrend[2]
+detTurnDown   = rsiDetrend < rsiDetrend[1] and
+  rsiDetrend[1] >= rsiDetrend[2]
+
+// ─── CCI CALCULATION ───────────────────────────────────────
+// CCI smoothed with MA, plus crossover line
+rawCCI        = ta.cci(close, cciLen)
+smoothCCI     = ta.sma(rawCCI, cciSmooth)
+cciXover      = ta.sma(smoothCCI, cciXoverLen)
+
+cciBelowBuy   = smoothCCI < cciBuyLine
+cciAboveSell  = smoothCCI > cciSellLine
+cciAboveXover = smoothCCI > cciXover
+cciBelowXover = smoothCCI < cciXover
+cciCrossUp    = ta.crossover(smoothCCI, cciXover)
+cciCrossDown  = ta.crossunder(smoothCCI, cciXover)
+
+// ─── 3-10 OSCILLATOR ───────────────────────────────────────
+// 3-day MA minus 10-day MA — sensitive daily oscillator
+// TSS and SBS patterns identify Primary Cycle highs
+ma3           = ta.sma(close, maFast310)
+ma10          = ta.sma(close, maSlow310)
+osc310        = ma3 - ma10
+xover310      = ta.sma(osc310, xover310Len)
+
+oscAboveXover = osc310 > xover310
+oscBelowXover = osc310 < xover310
+oscAboveZero  = osc310 > 0
+
+// Track 3-10 highs and lows for TSS/SBS detection
+var float lastOscHigh = na
+var float lastOscLow  = na
+var bool  lastWasHigh = false
+
+oscTurnDown310 = osc310 < osc310[1] and
+  osc310[1] >= osc310[2]
+oscTurnUp310   = osc310 > osc310[1] and
+  osc310[1] <= osc310[2]
+
+// Valid high: above zero line AND above crossover,
+// following a low below crossover
+if oscTurnDown310 and oscAboveZero and oscAboveXover
+    lastOscHigh := osc310[1]
+    lastWasHigh := true
+
+if oscTurnUp310 and oscBelowXover
+    lastOscLow := osc310[1]
+    lastWasHigh := false
+
+// TSS Detection: current high > previous high
+// (two-step pattern — higher second oscillator high)
+tssDetect = oscTurnDown310 and oscAboveZero and
+  oscAboveXover and not na(lastOscHigh) and
+  osc310[1] > lastOscHigh and lastWasHigh
+
+// SBS Detection: current high < previous high but above
+// zero and crossover (small bump after deeper low)
+sbsDetect = oscTurnDown310 and oscAboveZero and
+  oscAboveXover and not na(lastOscHigh) and
+  osc310[1] < lastOscHigh and not lastWasHigh
+
+// ─── EMA TREND ─────────────────────────────────────────────
+// Fast EMA above slow EMA = uptrend
+// Trade only in direction of trend
+emaFast       = ta.ema(close, emaFastLen)
+emaSlow       = ta.ema(close, emaSlowLen)
+trendUp       = emaFast > emaSlow
+trendDown     = emaFast < emaSlow
+
+// ─── KELTNER CHANNEL ───────────────────────────────────────
+// Price dropping below Keltner midline but staying above
+// lower band = overextension → rubber band snap back
+keltnerMid    = ta.sma(close, keltnerLen)
+keltnerStd    = ta.stdev(close, keltnerLen)
+keltnerUpper  = keltnerMid + keltnerMult * keltnerStd
+keltnerLower  = keltnerMid - keltnerMult * keltnerStd
+
+belowKeltMid  = close < keltnerMid
+aboveKeltLow  = close > keltnerLower
+keltnerOS     = belowKeltMid and aboveKeltLow
+
+// ─── CYCLE COUNTING ────────────────────────────────────────
+// Count bars since last identified cycle low
+// Uses RSI3M3 buy line penetration + upturn as cycle low
+var int   barsSinceLow = 0
+var float lastCycleLow = na
+var int   cycleNumber  = 0
+
+barsSinceLow += 1
+
+// Detect cycle low: RSI3M3 was below buy line and turned up
+cycleLowDetect = rsiTurnUp and
+  (rsiBelowBuy or rsiBelowBuy[1] or rsiBelowBuy[2])
+
+if cycleLowDetect
+    barsSinceLow  := 0
+    lastCycleLow  := low
+    cycleNumber  += 1
+
+// Timing band status
+inTimingBand  = barsSinceLow >= cycleMinBand and
+  barsSinceLow <= cycleMaxBand
+pastTimingBand = barsSinceLow > cycleMaxBand
+earlyInCycle  = barsSinceLow < cycleMinBand
+
+// ─── FIBONACCI RETRACEMENT ZONE ────────────────────────────
+// Track swing high since last cycle low for 38-62% zone
+var float swingHighSinceLow = na
+var float retrace38 = na
+var float retrace62 = na
+
+if cycleLowDetect
+    swingHighSinceLow := high
+
+if not na(swingHighSinceLow) and high > swingHighSinceLow
+    swingHighSinceLow := high
+
+if not na(swingHighSinceLow) and not na(lastCycleLow)
+    moveSize  = swingHighSinceLow - lastCycleLow
+    retrace38 := swingHighSinceLow - moveSize * 0.38
+    retrace62 := swingHighSinceLow - moveSize * 0.62
+
+inFibZone = not na(retrace38) and not na(retrace62) and
+  close <= retrace38 and close >= retrace62
+
+// ─── COMPOSITE BUY SIGNALS ─────────────────────────────────
+// Bressert's Cycle Trading Pattern: multiple confirmations
+//
+// SIGNAL 1: RSI3M3 Buy Signal
+// RSI3M3 drops below buy line, turns up → setup bar
+// Trigger: price exceeds high of setup bar
+rsi3m3Setup = rsiTurnUp and
+  (rsiBelowBuy or rsiBelowBuy[1] or rsiBelowBuy[2] or
+   rsiBelowBuy[3])
+rsi3m3Buy   = rsi3m3Setup and trendUp
+
+// SIGNAL 2: RSI3M3 Detrend Buy Signal
+// Catches buys in strong trends where RSI3M3 stays
+// above buy line
+detrendSetup = detTurnUp and
+  (detBelowZero or detBelowZero[1] or detBelowZero[2])
+detrendBuy   = detrendSetup and trendUp
+
+// SIGNAL 3: CCI Buy Signal
+// CCI drops below buy line, crosses above crossover
+cciBuySetup  = cciCrossUp and
+  (cciBelowBuy[1] or cciBelowBuy[2] or cciBelowBuy[3] or
+   cciBelowBuy[4] or cciBelowBuy[5])
+cciBuySignal = cciBuySetup and trendUp
+
+// SIGNAL 4: Keltner + RSI3M3 Pattern
+// Price below Keltner midline but above lower band,
+// RSI3M3 gives buy signal
+keltnerBuy   = rsi3m3Setup and keltnerOS and trendUp
+
+// ─── COMPOSITE SELL SIGNALS ────────────────────────────────
+// SIGNAL 1: RSI3M3 Sell Signal
+rsi3m3SellSetup = rsiTurnDown and
+  (rsiAboveSell or rsiAboveSell[1] or rsiAboveSell[2] or
+   rsiAboveSell[3])
+rsi3m3Sell   = rsi3m3SellSetup and trendDown
+
+// SIGNAL 2: CCI Sell Signal
+// CCI rises above sell line, crosses below crossover
+cciSellSetup = cciCrossDown and
+  (cciAboveSell[1] or cciAboveSell[2] or cciAboveSell[3] or
+   cciAboveSell[4] or cciAboveSell[5])
+cciSellSignal = cciSellSetup and trendDown
+
+// SIGNAL 3: 3-10 TSS/SBS Sell Patterns
+tssSell = tssDetect
+sbsSell = sbsDetect
+
+// ─── SIGNAL STRENGTH (confluence count) ────────────────────
+// More confirmations = higher probability trade
+buyStrength = (rsi3m3Buy ? 1 : 0) +
+  (detrendBuy ? 1 : 0) +
+  (cciBuySignal ? 1 : 0) +
+  (keltnerBuy ? 1 : 0) +
+  (inTimingBand ? 1 : 0) +
+  (inFibZone ? 1 : 0)
+
+sellStrength = (rsi3m3Sell ? 1 : 0) +
+  (cciSellSignal ? 1 : 0) +
+  (tssSell ? 1 : 0) +
+  (sbsSell ? 1 : 0) +
+  (inTimingBand ? 1 : 0)
+
+// Any buy or sell signal fired
+anyBuy  = rsi3m3Buy or detrendBuy or cciBuySignal or
+  keltnerBuy
+anySell = rsi3m3Sell or cciSellSignal or tssSell or
+  sbsSell
+
+// Strong signals: 3+ confluences
+strongBuy  = buyStrength >= 3
+strongSell = sellStrength >= 3
+
+// ─── PLOTTING: OVERLAYS ────────────────────────────────────
+// EMA Trend Lines
+plot(showEMA ? emaFast : na, "EMA Fast",
+  color=color.new(#26a69a, 30), linewidth=2)
+plot(showEMA ? emaSlow : na, "EMA Slow",
+  color=color.new(#ef5350, 30), linewidth=2)
+
+// Keltner Channel
+pKU = plot(showKeltner ? keltnerUpper : na,
+  "Keltner Upper",
+  color=color.new(#ff9800, 60))
+pKM = plot(showKeltner ? keltnerMid : na,
+  "Keltner Mid",
+  color=color.new(#ff9800, 40),
+  style=plot.style_circles)
+pKL = plot(showKeltner ? keltnerLower : na,
+  "Keltner Lower",
+  color=color.new(#ff9800, 60))
+fill(pKU, pKL,
+  color=color.new(#ff9800, 92))
+
+// ─── PLOTTING: SIGNALS ─────────────────────────────────────
+// Setup bars (colored)
+setupColor = rsi3m3Setup ? color.new(#00e676, 0) :
+  rsi3m3SellSetup ? color.new(#ff1744, 0) : na
+barcolor(showSignals ? setupColor : na)
+
+// Buy signals
+plotshape(showSignals and strongBuy,
+  title="Strong Buy", style=shape.triangleup,
+  location=location.belowbar,
+  color=#00e676, size=size.normal,
+  text="BUY")
+
+plotshape(showSignals and anyBuy and not strongBuy,
+  title="Buy Setup", style=shape.triangleup,
+  location=location.belowbar,
+  color=color.new(#00e676, 50), size=size.small)
+
+// Sell signals
+plotshape(showSignals and strongSell,
+  title="Strong Sell", style=shape.triangledown,
+  location=location.abovebar,
+  color=#ff1744, size=size.normal,
+  text="SELL")
+
+plotshape(showSignals and anySell and not strongSell,
+  title="Sell Setup", style=shape.triangledown,
+  location=location.abovebar,
+  color=color.new(#ff1744, 50), size=size.small)
+
+// TSS/SBS markers
+plotshape(showSignals and tssSell,
+  title="TSS Pattern", style=shape.xcross,
+  location=location.abovebar,
+  color=#ff6d00, size=size.tiny, text="TSS")
+
+plotshape(showSignals and sbsSell,
+  title="SBS Pattern", style=shape.xcross,
+  location=location.abovebar,
+  color=#ffab00, size=size.tiny, text="SBS")
+
+// Cycle low markers
+plotshape(showSignals and cycleLowDetect,
+  title="Cycle Low", style=shape.diamond,
+  location=location.belowbar,
+  color=#2196f3, size=size.tiny)
+
+// ─── PLOTTING: CYCLE COUNT LABEL ───────────────────────────
+// Show bar count since last cycle low
+if showCycleCount and barsSinceLow > 0
+    countColor = inTimingBand ? #00e676 :
+      pastTimingBand ? #ff1744 : #9e9e9e
+    label.new(bar_index, low,
+      str.tostring(barsSinceLow),
+      style=label.style_none,
+      textcolor=color.new(countColor, 40),
+      size=size.tiny)
+
+// ─── BACKGROUND: TIMING BAND HIGHLIGHT ─────────────────────
+bgcolor(inTimingBand ?
+  color.new(#00e676, 94) : na,
+  title="In Timing Band")
+bgcolor(pastTimingBand ?
+  color.new(#ff1744, 94) : na,
+  title="Past Timing Band")
+
+// ─── INFO TABLE ────────────────────────────────────────────
+var table infoTbl = table.new(position.top_right, 2, 10,
+  bgcolor=color.new(#1a1a2e, 10),
+  border_color=color.new(#ffffff, 80),
+  border_width=1)
+
+if barstate.islast
+    table.cell(infoTbl, 0, 0, "Bressert Cycle Trader",
+      text_color=#e0e0e0, text_size=size.small,
+      bgcolor=color.new(#0d47a1, 20))
+    table.merge_cells(infoTbl, 0, 0, 1, 0)
+
+    table.cell(infoTbl, 0, 1, "Trend",
+      text_color=#9e9e9e, text_size=size.tiny)
+    table.cell(infoTbl, 1, 1,
+      trendUp ? "UP" : "DOWN",
+      text_color=trendUp ? #00e676 : #ff1744,
+      text_size=size.tiny)
+
+    table.cell(infoTbl, 0, 2, "Cycle Bar",
+      text_color=#9e9e9e, text_size=size.tiny)
+    table.cell(infoTbl, 1, 2,
+      str.tostring(barsSinceLow) + " / " +
+      str.tostring(cycleLen),
+      text_color=inTimingBand ? #00e676 :
+        pastTimingBand ? #ff1744 : #e0e0e0,
+      text_size=size.tiny)
+
+    table.cell(infoTbl, 0, 3, "RSI3M3",
+      text_color=#9e9e9e, text_size=size.tiny)
+    table.cell(infoTbl, 1, 3,
+      str.tostring(math.round(rsi3m3, 1)),
+      text_color=rsi3m3 < rsiBuyLine ? #00e676 :
+        rsi3m3 > rsiSellLine ? #ff1744 : #e0e0e0,
+      text_size=size.tiny)
+
+    table.cell(infoTbl, 0, 4, "RSI Detrend",
+      text_color=#9e9e9e, text_size=size.tiny)
+    table.cell(infoTbl, 1, 4,
+      str.tostring(math.round(rsiDetrend, 1)),
+      text_color=rsiDetrend < 0 ? #ff9800 : #e0e0e0,
+      text_size=size.tiny)
+
+    table.cell(infoTbl, 0, 5, "CCI",
+      text_color=#9e9e9e, text_size=size.tiny)
+    table.cell(infoTbl, 1, 5,
+      str.tostring(math.round(smoothCCI, 0)),
+      text_color=smoothCCI < cciBuyLine ? #00e676 :
+        smoothCCI > cciSellLine ? #ff1744 : #e0e0e0,
+      text_size=size.tiny)
+
+    table.cell(infoTbl, 0, 6, "3-10 Osc",
+      text_color=#9e9e9e, text_size=size.tiny)
+    table.cell(infoTbl, 1, 6,
+      str.tostring(math.round(osc310, 2)),
+      text_color=osc310 > 0 ? #00e676 : #ff1744,
+      text_size=size.tiny)
+
+    table.cell(infoTbl, 0, 7, "Keltner",
+      text_color=#9e9e9e, text_size=size.tiny)
+    table.cell(infoTbl, 1, 7,
+      keltnerOS ? "OVERSOLD" :
+        close > keltnerUpper ? "OVERBOUGHT" : "NEUTRAL",
+      text_color=keltnerOS ? #00e676 :
+        close > keltnerUpper ? #ff1744 : #e0e0e0,
+      text_size=size.tiny)
+
+    table.cell(infoTbl, 0, 8, "Fib Zone",
+      text_color=#9e9e9e, text_size=size.tiny)
+    table.cell(infoTbl, 1, 8,
+      inFibZone ? "IN 38-62%" : "—",
+      text_color=inFibZone ? #00e676 : #9e9e9e,
+      text_size=size.tiny)
+
+    table.cell(infoTbl, 0, 9, "Confluence",
+      text_color=#9e9e9e, text_size=size.tiny)
+    confVal = math.max(buyStrength, sellStrength)
+    table.cell(infoTbl, 1, 9,
+      str.tostring(confVal) + " / 6",
+      text_color=confVal >= 3 ? #00e676 :
+        confVal >= 2 ? #ff9800 : #9e9e9e,
+      text_size=size.tiny)
+
+// ─── ALERTS ────────────────────────────────────────────────
+alertcondition(strongBuy,
+  title="Strong Buy Signal",
+  message="Bressert: STRONG BUY — {{ticker}} — " +
+    "3+ confluences at cycle low")
+alertcondition(strongSell,
+  title="Strong Sell Signal",
+  message="Bressert: STRONG SELL — {{ticker}} — " +
+    "3+ confluences at cycle high")
+alertcondition(anyBuy,
+  title="Any Buy Signal",
+  message="Bressert: Buy setup on {{ticker}}")
+alertcondition(anySell,
+  title="Any Sell Signal",
+  message="Bressert: Sell setup on {{ticker}}")
+alertcondition(cycleLowDetect,
+  title="Cycle Low Detected",
+  message="Bressert: Trading Cycle low detected " +
+    "on {{ticker}}")
+alertcondition(tssSell,
+  title="TSS Pattern",
+  message="Bressert: Two Step Sell pattern on {{ticker}}")
+alertcondition(sbsSell,
+  title="SBS Pattern",
+  message="Bressert: Small Bump Sell pattern on {{ticker}}")
