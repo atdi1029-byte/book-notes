@@ -1,0 +1,3382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"
+  content="width=device-width, initial-scale=1.0">
+<title>The RSI Bible</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Playfair+Display:wght@400;700&display=swap');
+
+:root {
+  --bg: #0d1117;
+  --bg2: #161b22;
+  --bg3: #1c2333;
+  --text: #e6edf3;
+  --muted: #8b949e;
+  --accent: #58a6ff;
+  --accent2: #79c0ff;
+  --orange: #d4822a;
+  --green: #3fb950;
+  --red: #f85149;
+  --purple: #bc8cff;
+  --border: #30363d;
+  --code-bg: #0d1117;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Inter', -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.75;
+  overflow-x: hidden;
+}
+
+/* ====== PROGRESS BAR ====== */
+.progress-bar {
+  position: fixed;
+  top: 0; left: 0;
+  height: 3px;
+  background: linear-gradient(90deg,
+    var(--accent), var(--accent2));
+  z-index: 1000;
+  transition: width 0.2s;
+}
+
+/* ====== NAV ====== */
+.nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  background: rgba(13,17,23,0.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  z-index: 999;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  height: 52px;
+  gap: 24px;
+}
+.nav-title {
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--accent);
+  white-space: nowrap;
+}
+.nav-links {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.nav-links::-webkit-scrollbar { display: none; }
+.nav-links a {
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 12px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  white-space: nowrap;
+  transition: all 0.2s;
+}
+.nav-links a:hover,
+.nav-links a.active {
+  color: var(--text);
+  background: var(--bg3);
+}
+
+/* ====== MAIN CONTENT ====== */
+.content {
+  max-width: 780px;
+  margin: 0 auto;
+  padding: 80px 28px 100px;
+}
+
+/* ====== COVER ====== */
+.cover {
+  text-align: center;
+  padding: 80px 0 70px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 60px;
+}
+.cover h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: 42px;
+  font-weight: 700;
+  line-height: 1.2;
+  margin-bottom: 16px;
+  background: linear-gradient(135deg,
+    var(--accent), var(--accent2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.cover .sub {
+  font-size: 18px;
+  color: var(--muted);
+  font-weight: 300;
+  margin-bottom: 32px;
+  line-height: 1.6;
+}
+.cover .meta {
+  font-size: 13px;
+  color: var(--muted);
+  opacity: 0.7;
+}
+
+/* ====== TABLE OF CONTENTS ====== */
+.toc {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 28px 32px;
+  margin-bottom: 60px;
+}
+.toc-title {
+  font-weight: 600;
+  font-size: 16px;
+  margin-bottom: 16px;
+  color: var(--accent);
+}
+.toc ol {
+  list-style: none;
+  counter-reset: toc;
+}
+.toc li {
+  counter-increment: toc;
+  margin-bottom: 8px;
+}
+.toc li::before {
+  content: counter(toc) ".";
+  color: var(--accent);
+  font-weight: 600;
+  margin-right: 10px;
+  font-size: 14px;
+}
+.toc a {
+  color: var(--text);
+  text-decoration: none;
+  font-size: 15px;
+  transition: color 0.2s;
+}
+.toc a:hover { color: var(--accent); }
+.toc .toc-desc {
+  color: var(--muted);
+  font-size: 13px;
+  margin-left: 24px;
+  display: block;
+}
+
+/* ====== SECTIONS ====== */
+.section {
+  margin-bottom: 70px;
+  padding-top: 20px;
+}
+.section h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 30px;
+  font-weight: 700;
+  color: var(--accent);
+  margin-bottom: 8px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--border);
+}
+.section .section-sub {
+  color: var(--muted);
+  font-size: 15px;
+  margin-bottom: 28px;
+}
+h3 {
+  font-size: 20px;
+  font-weight: 600;
+  margin: 36px 0 14px;
+  color: var(--text);
+}
+h4 {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 24px 0 10px;
+  color: var(--accent2);
+}
+p { margin-bottom: 16px; font-size: 15.5px; }
+ul, ol {
+  margin: 12px 0 18px 24px;
+  font-size: 15.5px;
+}
+li { margin-bottom: 8px; }
+strong { color: #fff; font-weight: 600; }
+
+/* ====== CALLOUTS ====== */
+.callout {
+  background: var(--bg2);
+  border-left: 4px solid var(--accent);
+  padding: 18px 22px;
+  margin: 22px 0;
+  border-radius: 0 10px 10px 0;
+  font-size: 14.5px;
+}
+.callout-title {
+  font-weight: 600;
+  color: var(--accent);
+  margin-bottom: 6px;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.callout-green { border-left-color: var(--green); }
+.callout-green .callout-title {
+  color: var(--green); }
+.callout-orange {
+  border-left-color: var(--orange); }
+.callout-orange .callout-title {
+  color: var(--orange); }
+.callout-purple {
+  border-left-color: var(--purple); }
+.callout-purple .callout-title {
+  color: var(--purple); }
+.callout-red { border-left-color: var(--red); }
+.callout-red .callout-title { color: var(--red); }
+
+/* ====== CODE ====== */
+code {
+  font-family: 'JetBrains Mono', monospace;
+  background: var(--bg3);
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-size: 13.5px;
+  color: var(--accent2);
+}
+pre {
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  padding: 20px 24px;
+  border-radius: 10px;
+  overflow-x: auto;
+  margin: 16px 0 22px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--text);
+}
+pre code {
+  background: none;
+  padding: 0;
+  font-size: inherit;
+  color: inherit;
+}
+
+/* ====== TABLES ====== */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 18px 0 24px;
+  font-size: 14px;
+}
+th {
+  background: var(--bg3);
+  color: var(--accent);
+  font-weight: 600;
+  text-align: left;
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+}
+td {
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  color: var(--text);
+}
+tr:nth-child(even) {
+  background: rgba(22,27,34,0.5);
+}
+
+/* ====== DIAGRAMS ====== */
+.diagram {
+  text-align: center;
+  margin: 28px 0;
+  padding: 24px;
+  background: var(--bg2);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  overflow-x: auto;
+}
+.diagram svg {
+  max-width: 100%;
+  height: auto;
+}
+.diagram-caption {
+  font-size: 13px;
+  color: var(--muted);
+  margin-top: 12px;
+  font-style: italic;
+}
+
+/* ====== FORMULA BOX ====== */
+.formula {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 20px 24px;
+  margin: 18px 0 24px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  line-height: 1.8;
+  color: var(--accent2);
+}
+.formula-label {
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+/* ====== COMPARE BOXES ====== */
+.compare {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin: 20px 0;
+}
+.compare-box {
+  padding: 16px 18px;
+  border-radius: 10px;
+  font-size: 14px;
+  line-height: 1.6;
+}
+.compare-bad {
+  background: rgba(248,81,73,0.08);
+  border: 1px solid rgba(248,81,73,0.25);
+}
+.compare-good {
+  background: rgba(63,185,80,0.08);
+  border: 1px solid rgba(63,185,80,0.25);
+}
+.compare-label {
+  font-weight: 600;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+}
+.compare-bad .compare-label {
+  color: var(--red); }
+.compare-good .compare-label {
+  color: var(--green); }
+
+/* ====== BOOKMARK SYSTEM ====== */
+.bookmark-bar {
+  position: sticky;
+  top: 52px;
+  z-index: 998;
+  background: var(--bg2);
+  color: var(--text);
+  padding: 0.5rem 1rem;
+  display: none;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  border-bottom: 1px solid var(--border);
+}
+.bookmark-bar:hover { background: var(--bg3); }
+.bookmark-bar .bm-label {
+  flex: 1; color: var(--text);
+}
+.bookmark-bar .bm-clear {
+  background: none;
+  border: 1px solid rgba(255,255,255,0.25);
+  color: var(--text);
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  margin-left: 0.75rem;
+  font-family: inherit;
+}
+.bookmark-bar .bm-clear:hover {
+  background: rgba(255,255,255,0.1);
+}
+.bm-btn {
+  display: inline-block;
+  cursor: pointer;
+  font-size: 0.75rem;
+  opacity: 0;
+  margin-left: 0.5rem;
+  vertical-align: middle;
+  transition: opacity 0.2s, transform 0.2s;
+  user-select: none;
+}
+h2:hover .bm-btn, h3:hover .bm-btn,
+h4:hover .bm-btn { opacity: 0.5; }
+p:hover > .bm-p { opacity: 0.5; }
+.bm-btn:hover {
+  opacity: 0.8 !important;
+  transform: scale(1.2);
+}
+.bm-btn.active {
+  opacity: 1 !important;
+  color: var(--accent);
+}
+.bm-p {
+  position: absolute;
+  left: -1.8rem;
+  top: 0.15em;
+  margin-left: 0;
+  font-size: 0.65rem;
+}
+p { position: relative; }
+.bm-toast {
+  position: fixed;
+  bottom: 1.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--bg2);
+  color: var(--text);
+  padding: 0.5rem 1.25rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  z-index: 1100;
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+  border: 1px solid var(--border);
+  font-family: 'Inter', sans-serif;
+}
+.bm-toast.show { opacity: 1; }
+
+/* ====== TIMELINE ====== */
+.timeline {
+  position: relative;
+  padding-left: 28px;
+  margin: 24px 0;
+}
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 8px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--border);
+}
+.timeline-item {
+  position: relative;
+  margin-bottom: 24px;
+  padding-left: 20px;
+}
+.timeline-item::before {
+  content: '';
+  position: absolute;
+  left: -24px;
+  top: 8px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--accent);
+  border: 2px solid var(--bg);
+}
+.timeline-year {
+  font-weight: 600;
+  color: var(--accent);
+  font-size: 14px;
+  margin-bottom: 4px;
+}
+.timeline-text {
+  font-size: 14.5px;
+  color: var(--text);
+}
+
+/* ====== MOBILE ====== */
+@media (max-width: 600px) {
+  .cover h1 { font-size: 28px; }
+  .cover .sub { font-size: 15px; }
+  .content { padding: 70px 18px 60px; }
+  .section h2 { font-size: 24px; }
+  h3 { font-size: 18px; }
+  .nav-title { display: none; }
+  .compare { grid-template-columns: 1fr; }
+  .bookmark-bar { top: 0; }
+  .bm-p {
+    position: static;
+    float: right;
+    margin: 0;
+  }
+  .formula { font-size: 12px; }
+}
+</style>
+</head>
+<body>
+
+<!-- Bookmark Bar -->
+<div class="bookmark-bar" id="bookmarkBar"
+  onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel">
+    Resume reading</span>
+  <button class="bm-clear"
+    onclick="event.stopPropagation();clearBookmark()">
+    Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+
+<!-- Progress Bar -->
+<div class="progress-bar" id="progressBar"></div>
+
+<!-- Navigation -->
+<nav class="nav">
+  <span class="nav-title">RSI Bible</span>
+  <div class="nav-links">
+    <a href="#ch1">Origins</a>
+    <a href="#ch2">The Math</a>
+    <a href="#ch3">Classic Signals</a>
+    <a href="#ch4">Cardwell</a>
+    <a href="#ch5">Stochastic</a>
+    <a href="#ch6">Variants</a>
+    <a href="#ch7">DSS Bressert</a>
+    <a href="#ch8">Wilder's Toolkit</a>
+    <a href="#ch9">Trading</a>
+    <a href="#ch10">Cheat Sheet</a>
+  </div>
+</nav>
+
+<!-- Main Content -->
+<div class="content">
+
+<!-- ============ COVER ============ -->
+<div class="cover">
+  <h1>The RSI Bible</h1>
+  <p class="sub">
+    A complete guide to the Relative Strength Index,
+    the Stochastic Oscillator, and every variant
+    worth knowing &mdash; from Wilder's 1978 original
+    through Ehlers' signal processing innovations.
+  </p>
+  <p class="meta">
+    A trading reference guide
+    by Alex Barnett &amp; Claude
+  </p>
+</div>
+
+<!-- ============ TOC ============ -->
+<div class="toc">
+  <div class="toc-title">Table of Contents</div>
+  <ol>
+    <li>
+      <a href="#ch1">The Man Who Built the Dashboard</a>
+      <span class="toc-desc">
+        J. Welles Wilder Jr. &mdash; from mechanical
+        engineer to the most influential technical
+        analyst who ever lived</span>
+    </li>
+    <li>
+      <a href="#ch2">How RSI Actually Works</a>
+      <span class="toc-desc">
+        The formula, the smoothing, why 14,
+        and the math nobody explains</span>
+    </li>
+    <li>
+      <a href="#ch3">Classic RSI Signals</a>
+      <span class="toc-desc">
+        Overbought/oversold, divergence,
+        failure swings, and RSI trendlines</span>
+    </li>
+    <li>
+      <a href="#ch4">Andrew Cardwell's Revolution</a>
+      <span class="toc-desc">
+        Range shift rules, positive/negative
+        reversals, and why divergence
+        is misunderstood</span>
+    </li>
+    <li>
+      <a href="#ch5">The Stochastic Oscillator</a>
+      <span class="toc-desc">
+        George Lane, the Chicago trading floor,
+        and the philosophy of closing price
+        within range</span>
+    </li>
+    <li>
+      <a href="#ch6">Every RSI Variant Worth Knowing</a>
+      <span class="toc-desc">
+        Cutler's RSI, Connors RSI, StochRSI,
+        Laguerre RSI, RSI3M3, RSX,
+        Ehlers adaptive &mdash; the full family</span>
+    </li>
+    <li>
+      <a href="#ch7">DSS Bressert</a>
+      <span class="toc-desc">
+        The Double Smoothed Stochastic &mdash;
+        Blau's innovation, Bressert's refinement,
+        and why double smoothing matters</span>
+    </li>
+    <li>
+      <a href="#ch8">Wilder's Complete Toolkit</a>
+      <span class="toc-desc">
+        ATR, Parabolic SAR, ADX/DMI &mdash;
+        the other indicators from the
+        same 1978 book</span>
+    </li>
+    <li>
+      <a href="#ch9">Trading Applications</a>
+      <span class="toc-desc">
+        Putting it all together &mdash;
+        real strategies, multi-timeframe
+        analysis, and when to use what</span>
+    </li>
+    <li>
+      <a href="#ch10">Quick Reference &amp; Cheat Sheet</a>
+      <span class="toc-desc">
+        Settings tables, signal summaries,
+        and the comparison matrix</span>
+    </li>
+  </ol>
+</div>
+
+<!-- =========================================
+     CHAPTER 1: THE MAN WHO BUILT THE DASHBOARD
+     ========================================= -->
+<div class="section" id="ch1">
+<h2>The Man Who Built the Dashboard</h2>
+<p class="section-sub">
+  J. Welles Wilder Jr. &mdash; mechanical engineer,
+  real estate developer, commodities trader,
+  and the man who gave us the tools that
+  still run every trading screen on earth.
+</p>
+
+<p>
+Before there was a Relative Strength Index, before
+there was an ATR or a Parabolic SAR or an ADX,
+there was a mechanical engineer from North Carolina
+who could not find a single technical indicator
+that satisfied him. <strong>J. Welles Wilder Jr.</strong>
+was born on June 11, 1935, graduated from
+<strong>North Carolina State University</strong>
+with an engineering degree in 1962, and had served
+in the U.S. Navy during the Korean War before that.
+He was methodical, quantitative, and frustrated.
+The existing tools for analyzing commodity futures
+in the 1970s were primitive. Chart patterns were
+subjective. Moving averages lagged badly. There was
+no standardized way to measure momentum, volatility,
+or trend strength. Wilder decided to build his own.
+</p>
+
+<p>
+His path to trading was not direct. After engineering
+he went into real estate development, made money,
+got interested in commodity futures, lost money,
+and then applied his engineering brain to the
+problem of why. He founded
+<strong>Trend Research Ltd.</strong> and its subsidiary
+<strong>The Delta Society</strong> as vehicles for
+his research. He worked alone, with a calculator
+and reams of price data, in an era before personal
+computers. Every formula he developed had to be
+hand-calculated, which meant every formula had to
+be elegant enough to compute by hand. This
+constraint shaped everything &mdash; the smoothing
+method he chose, the 14-period default, the
+simplicity of the RSI formula itself. Complexity
+was not an option when you were doing the math
+with pencil and paper.
+</p>
+
+<p>
+In 1978 he self-published a slim book called
+<strong>"New Concepts in Technical Trading
+Systems."</strong> It was not flashy. It had no
+marketing campaign. It was a technical manual
+written by an engineer for other systematic
+thinkers. And it quietly became one of the most
+influential books in the history of financial
+markets. <em>Forbes</em> magazine called Wilder
+"the premier technical trader publishing his
+work today" in October 1980. The book has never
+been updated. It has never gone out of print.
+</p>
+
+<p>
+What made the book extraordinary was not any single
+indicator but the sheer density of innovation it
+contained. In one volume, Wilder introduced
+<strong>six new technical indicators</strong>, any
+one of which would have been a career-defining
+contribution: the Relative Strength Index (RSI),
+the Average True Range (ATR), the Parabolic SAR,
+the Directional Movement Index (DMI), the Average
+Directional Index (ADX), and the Commodity
+Selection Index (CSI). Nearly fifty years later,
+RSI, ATR, and ADX remain among the five most
+widely used indicators in the world. Every trading
+platform on earth includes them as defaults.
+</p>
+
+<div class="callout">
+<div class="callout-title">Why "Relative Strength"?</div>
+The name is a source of endless confusion.
+In traditional securities analysis,
+"relative strength" means comparing one
+stock's performance against another stock
+or an index &mdash; an <em>external</em>
+comparison. Wilder's RSI measures something
+completely different: a security's price
+strength relative to <em>its own</em> recent
+history. It is internally referenced. Wilder
+acknowledged the naming could confuse people
+but kept it anyway. When you see "RS" in the
+RSI formula, it means "Relative Strength" as
+Wilder defined it: the ratio of average gains
+to average losses over the lookback period.
+</div>
+
+<h3>The Timeline</h3>
+
+<div class="timeline">
+  <div class="timeline-item">
+    <div class="timeline-year">1935</div>
+    <div class="timeline-text">
+      Born June 11 in North Carolina
+    </div>
+  </div>
+  <div class="timeline-item">
+    <div class="timeline-year">1950s</div>
+    <div class="timeline-text">
+      Serves in U.S. Navy during Korean War
+    </div>
+  </div>
+  <div class="timeline-item">
+    <div class="timeline-year">1962</div>
+    <div class="timeline-text">
+      Graduates NC State with mechanical
+      engineering degree
+    </div>
+  </div>
+  <div class="timeline-item">
+    <div class="timeline-year">1960s&ndash;70s</div>
+    <div class="timeline-text">
+      Real estate development, then pivots to
+      commodity futures trading
+    </div>
+  </div>
+  <div class="timeline-item">
+    <div class="timeline-year">June 1978</div>
+    <div class="timeline-text">
+      RSI first published in <em>Commodities</em>
+      magazine (now <em>Futures</em>);
+      "New Concepts in Technical Trading Systems"
+      released the same month
+    </div>
+  </div>
+  <div class="timeline-item">
+    <div class="timeline-year">1980</div>
+    <div class="timeline-text">
+      <em>Forbes</em> names Wilder
+      "the premier technical trader
+      publishing his work today"
+    </div>
+  </div>
+  <div class="timeline-item">
+    <div class="timeline-year">2021</div>
+    <div class="timeline-text">
+      Dies April 18, age 85. His indicators
+      still run on every trading platform
+      on earth.
+    </div>
+  </div>
+</div>
+
+<p>
+Wilder eventually moved to New Zealand and later
+Christchurch, continuing to trade and refine his
+ideas but largely stepping away from the public
+eye. He became interested in the
+<strong>Delta Phenomenon</strong>, a theory about
+hidden order in market cycles based on lunar and
+solar rhythms, which he published through The Delta
+Society. It was more esoteric than his early
+engineering-driven work, and it never achieved the
+same mainstream adoption. But his 1978 contribution
+was already locked in. By the time personal
+computers arrived and charting software became
+standard, Wilder's indicators were the first ones
+programmed into every platform. They became the
+default not because of marketing or institutional
+backing, but because they worked, and because they
+were simple enough to compute efficiently even on
+early hardware.
+</p>
+
+<p>
+The man died in 2021 at age 85, having outlived
+most of the traders who first used his tools. His
+obituary was small. Most retail traders today who
+use RSI daily have never heard his name. But every
+time someone opens a chart and toggles on that
+oscillator panel at the bottom &mdash; the one
+that bounces between 0 and 100 with lines at 30
+and 70 &mdash; they are using something a
+mechanical engineer from North Carolina built
+by hand, with a calculator, in the 1970s.
+</p>
+</div>
+
+<!-- =========================================
+     CHAPTER 2: HOW RSI ACTUALLY WORKS
+     ========================================= -->
+<div class="section" id="ch2">
+<h2>How RSI Actually Works</h2>
+<p class="section-sub">
+  The formula, the smoothing, why he chose 14,
+  and the mathematical details most tutorials skip.
+</p>
+
+<p>
+The RSI formula looks simple on the surface, but
+there are subtleties in how the averaging works
+that most tutorials either skip or get wrong.
+Understanding these details matters because
+different software implementations can produce
+slightly different RSI values for the same data
+&mdash; and once you understand why, you will also
+understand why several RSI variants exist.
+</p>
+
+<h3>Step 1: Calculate Price Changes</h3>
+
+<p>
+For each bar (day, hour, whatever your timeframe),
+calculate the change from the prior close. If the
+change is positive, it is a <strong>gain</strong>.
+If negative, take the absolute value and call it
+a <strong>loss</strong>. If flat, both gain and loss
+are zero for that bar. You now have two parallel
+series: a gains series and a losses series, each
+the same length as your price data minus one bar.
+</p>
+
+<h3>Step 2: Seed the Averages</h3>
+
+<p>
+For the very first RSI value, Wilder uses a plain
+arithmetic average to create the initial seed:
+</p>
+
+<div class="formula">
+<div class="formula-label">First Average (seed)</div>
+First Avg Gain = Sum of Gains over 14 bars / 14<br>
+First Avg Loss = Sum of Losses over 14 bars / 14
+</div>
+
+<p>
+This simple average is calculated exactly once.
+Every subsequent bar uses a different method.
+</p>
+
+<h3>Step 3: Wilder's Smoothed Moving Average</h3>
+
+<p>
+This is where most people get confused. After the
+seed, Wilder does <em>not</em> use a simple moving
+average. He does not use a standard EMA either.
+He uses what is now called <strong>Wilder's
+Smoothed Moving Average</strong> (also called
+<strong>Modified Moving Average</strong>,
+<strong>SMMA</strong>, or <strong>RMA</strong>
+on different platforms):
+</p>
+
+<div class="formula">
+<div class="formula-label">
+  Wilder's Smoothed Average
+</div>
+Avg Gain = ((Prior Avg Gain x 13) + Current Gain) / 14<br>
+Avg Loss = ((Prior Avg Loss x 13) + Current Loss) / 14
+</div>
+
+<p>
+Generalized for any period <em>n</em>:
+</p>
+
+<div class="formula">
+<div class="formula-label">General form</div>
+Avg = ((Prior Avg x (n-1)) + Current Value) / n
+</div>
+
+<div class="callout callout-orange">
+<div class="callout-title">Why this matters</div>
+Wilder's SMMA is mathematically equivalent to an
+Exponential Moving Average (EMA) with a smoothing
+factor of <code>alpha = 1/n</code>. A standard
+EMA uses <code>alpha = 2/(n+1)</code>. For n=14,
+Wilder's alpha is 0.0714 versus a standard EMA's
+0.1333. This means Wilder's smoothing decays
+<strong>more slowly</strong> &mdash; it gives more
+weight to older data, producing a smoother, less
+reactive oscillator. A "14-period Wilder RSI"
+behaves more like a 27-period standard EMA in
+terms of responsiveness.
+</div>
+
+<h3>Step 4: Relative Strength</h3>
+
+<div class="formula">
+<div class="formula-label">RS</div>
+RS = Average Gain / Average Loss
+</div>
+
+<p>
+RS is just a ratio. When gains dominate, RS is
+large. When losses dominate, RS is small. When
+gains and losses are equal, RS = 1.
+</p>
+
+<h3>Step 5: The RSI Formula</h3>
+
+<div class="formula">
+<div class="formula-label">RSI</div>
+RSI = 100 - (100 / (1 + RS))
+</div>
+
+<p>
+This formula maps the RS ratio onto a bounded
+0 to 100 scale. When all bars are gains (RS
+approaches infinity), RSI approaches 100. When
+all bars are losses (RS = 0), RSI = 0. When
+gains equal losses (RS = 1), RSI = 50. The
+formula is an elegant normalization that makes
+RSI values comparable across any security,
+timeframe, or market.
+</p>
+
+<h3>Why 14 Periods?</h3>
+
+<p>
+Wilder chose 14 based on the
+<strong>half lunar cycle</strong> &mdash; a
+28-day lunar month divided by two gives 14
+trading days. He believed commodity markets
+exhibited natural rhythms tied to lunar cycles,
+and a half-cycle lookback would capture one
+complete swing. Whether you believe in lunar
+market cycles or not, the choice stuck. Every
+charting platform in the world still defaults
+RSI to 14. It has become a self-fulfilling
+standard &mdash; because millions of traders
+watch RSI(14), the levels it identifies become
+significant through collective attention even
+if the original astronomical reasoning was
+arbitrary.
+</p>
+
+<h3>The Data Length Dependency Problem</h3>
+
+<p>
+Here is something most RSI tutorials never
+mention: because Wilder's SMMA never truly
+forgets old data (it decays exponentially but
+never reaches zero), the <em>starting point</em>
+in a dataset affects every subsequent RSI value.
+If two charting platforms start calculating from
+different historical dates, they will produce
+slightly different RSI readings for the same
+security on the same day. This is called
+<strong>data length dependency</strong>.
+</p>
+
+<p>
+In practice, the differences are usually small
+after a few hundred bars because the exponential
+decay makes very old data negligible. But the
+issue is real, and it is one of the reasons
+<strong>Peter Cutler</strong> developed his
+variant (covered in Chapter 6) that uses a
+simple moving average instead, eliminating
+the dependency entirely.
+</p>
+
+<div class="diagram">
+<svg viewBox="0 0 700 280" xmlns="http://www.w3.org/2000/svg">
+  <text x="350" y="24" fill="#8b949e"
+    text-anchor="middle" font-size="13"
+    font-family="Inter">
+    RSI Scale &mdash; What the Numbers Mean
+  </text>
+  <!-- Scale bar -->
+  <rect x="50" y="50" width="600" height="40"
+    rx="6" fill="none"
+    stroke="#30363d" stroke-width="1"/>
+  <!-- Oversold zone -->
+  <rect x="50" y="50" width="180" height="40"
+    rx="6" fill="rgba(248,81,73,0.15)"/>
+  <!-- Neutral zone -->
+  <rect x="230" y="50" width="240" height="40"
+    fill="rgba(88,166,255,0.08)"/>
+  <!-- Overbought zone -->
+  <rect x="470" y="50" width="180" height="40"
+    rx="6" fill="rgba(63,185,80,0.15)"/>
+  <!-- Labels -->
+  <text x="50" y="110" fill="#f85149"
+    font-size="13" font-family="Inter">0</text>
+  <text x="230" y="110" fill="#f85149"
+    font-size="13" font-family="Inter"
+    font-weight="600">30</text>
+  <text x="350" y="110" fill="#8b949e"
+    font-size="13" font-family="Inter"
+    text-anchor="middle">50</text>
+  <text x="470" y="110" fill="#3fb950"
+    font-size="13" font-family="Inter"
+    font-weight="600">70</text>
+  <text x="640" y="110" fill="#3fb950"
+    font-size="13" font-family="Inter"
+    text-anchor="end">100</text>
+  <!-- Zone labels -->
+  <text x="140" y="75" fill="#f85149"
+    text-anchor="middle" font-size="12"
+    font-family="Inter" font-weight="600">
+    OVERSOLD</text>
+  <text x="350" y="75" fill="#8b949e"
+    text-anchor="middle" font-size="12"
+    font-family="Inter">NEUTRAL</text>
+  <text x="560" y="75" fill="#3fb950"
+    text-anchor="middle" font-size="12"
+    font-family="Inter" font-weight="600">
+    OVERBOUGHT</text>
+  <!-- Annotations -->
+  <text x="140" y="145" fill="#8b949e"
+    text-anchor="middle" font-size="11"
+    font-family="Inter">
+    Avg losses &gt; avg gains</text>
+  <text x="140" y="162" fill="#8b949e"
+    text-anchor="middle" font-size="11"
+    font-family="Inter">
+    Price may be stretched down</text>
+  <text x="560" y="145" fill="#8b949e"
+    text-anchor="middle" font-size="11"
+    font-family="Inter">
+    Avg gains &gt; avg losses</text>
+  <text x="560" y="162" fill="#8b949e"
+    text-anchor="middle" font-size="11"
+    font-family="Inter">
+    Price may be stretched up</text>
+  <!-- RS values -->
+  <text x="350" y="200" fill="#58a6ff"
+    text-anchor="middle" font-size="12"
+    font-family="Inter" font-weight="600">
+    At RSI 50: RS = 1.0
+    (gains = losses)</text>
+  <text x="350" y="220" fill="#58a6ff"
+    text-anchor="middle" font-size="12"
+    font-family="Inter">
+    At RSI 70: RS = 2.33
+    (gains 2.3x losses)</text>
+  <text x="350" y="240" fill="#58a6ff"
+    text-anchor="middle" font-size="12"
+    font-family="Inter">
+    At RSI 30: RS = 0.43
+    (losses 2.3x gains)</text>
+</svg>
+<div class="diagram-caption">
+  RSI maps the gain/loss ratio to a
+  bounded 0-100 scale. The relationship
+  is not linear &mdash; extreme readings
+  require increasingly lopsided ratios.
+</div>
+</div>
+
+</div>
+
+<!-- =========================================
+     CHAPTER 3: CLASSIC RSI SIGNALS
+     ========================================= -->
+<div class="section" id="ch3">
+<h2>Classic RSI Signals</h2>
+<p class="section-sub">
+  The four core techniques Wilder published,
+  plus RSI trendlines &mdash; arguably
+  the most underused trick in technical analysis.
+</p>
+
+<h3>Overbought and Oversold</h3>
+
+<p>
+The most basic RSI signal: when RSI rises above
+<strong>70</strong>, the security is considered
+overbought. When it drops below <strong>30</strong>,
+oversold. These thresholds have been the default
+on every charting platform since 1978 and they
+are the first thing every new trader learns about
+RSI. They are also the most frequently misused.
+</p>
+
+<p>
+The trap is simple: in a strong uptrend, RSI can
+remain above 70 for weeks or months. Selling just
+because RSI hit 70 in a bull market will have you
+shorting into a freight train. Similarly, in a
+bear market, RSI can camp below 30 for extended
+periods. Buying every touch of 30 in a downtrend
+is a recipe for catching falling knives. Wilder
+himself acknowledged this limitation &mdash; he
+suggested using longer periods (like 21 or 25)
+to reduce false signals in strong trends, and he
+considered overbought/oversold to be his
+<em>least</em> reliable RSI technique. His
+favorite was the failure swing, covered below.
+</p>
+
+<div class="callout callout-red">
+<div class="callout-title">The #1 RSI Mistake</div>
+Treating overbought as "sell" and oversold as
+"buy" without any trend context. Overbought in
+an uptrend often means "strongly trending up"
+not "about to reverse." Andrew Cardwell's range
+shift rules (Chapter 4) solve this problem
+entirely.
+</div>
+
+<h3>Divergence</h3>
+
+<p>
+Divergence occurs when price and RSI disagree
+about the direction of momentum. It comes in
+two forms:
+</p>
+
+<h4>Regular (Classic) Divergence</h4>
+
+<p>
+<strong>Bullish divergence:</strong> price makes a
+<strong>lower low</strong>, but RSI makes a
+<strong>higher low</strong>. The new price low is
+not confirmed by new momentum low &mdash; the
+selling pressure is weakening even as price drops
+further. This can signal that the downtrend is
+running out of steam.
+</p>
+
+<p>
+<strong>Bearish divergence:</strong> price makes a
+<strong>higher high</strong>, but RSI makes a
+<strong>lower high</strong>. The new price high is
+not confirmed by new momentum high &mdash; buying
+pressure is weakening even as price pushes higher.
+This can signal the uptrend is exhausting itself.
+</p>
+
+<p>
+Wilder included divergence in his original book
+but considered it secondary to failure swings. The
+problem with divergence in practice is that it can
+persist for many bars without producing a reversal.
+In strong trends, you can see three, four, five
+bearish divergences in a row, each followed by
+higher prices. Divergence tells you momentum is
+decelerating; it does not tell you momentum has
+reversed. There is a critical difference.
+</p>
+
+<h4>Hidden Divergence</h4>
+
+<p>
+Hidden divergence signals <strong>trend
+continuation</strong>, not reversal. It is the
+mirror image of regular divergence:
+</p>
+
+<p>
+<strong>Bullish hidden divergence:</strong> price
+makes a <strong>higher low</strong> (uptrend
+pullback), but RSI makes a <strong>lower
+low</strong>. The price structure says uptrend
+intact (higher low). RSI is temporarily weaker,
+but the trend structure is dominant. Signal:
+expect continuation higher.
+</p>
+
+<p>
+<strong>Bearish hidden divergence:</strong> price
+makes a <strong>lower high</strong> (downtrend
+rally), but RSI makes a <strong>higher high</strong>.
+Price structure says downtrend intact (lower high).
+RSI is temporarily stronger, but the trend
+structure is dominant. Signal: expect continuation
+lower.
+</p>
+
+<div class="callout callout-green">
+<div class="callout-title">Memory Rule</div>
+<strong>Regular divergence = Reversal signal.</strong>
+Price and RSI disagree, and you expect price to
+follow RSI's direction.<br><br>
+<strong>Hidden divergence = Continuation signal.</strong>
+Price and RSI disagree, and you expect the
+existing trend to continue.
+</div>
+
+<h3>Failure Swings</h3>
+
+<p>
+This was <strong>Wilder's own favorite RSI
+signal</strong> &mdash; the one he considered
+most reliable. A failure swing is formed entirely
+within the RSI panel, independent of what price
+is doing. It signals that momentum has attempted
+to return to an extreme and <em>failed</em>,
+which Wilder viewed as a stronger sign of
+exhaustion than divergence.
+</p>
+
+<h4>Bullish Failure Swing (Bottom)</h4>
+
+<ol>
+  <li>RSI drops <strong>below 30</strong>
+    (enters oversold territory)</li>
+  <li>RSI bounces back <strong>above 30</strong>
+    (exits oversold)</li>
+  <li>RSI pulls back but
+    <strong>holds above 30</strong> &mdash;
+    it cannot re-enter oversold territory</li>
+  <li>RSI breaks above the prior bounce high
+    &mdash; <strong>buy signal</strong></li>
+</ol>
+
+<p>
+The logic: momentum dropped into oversold, tried
+to get back there, and failed. It could not muster
+enough selling pressure to return to the extreme.
+The failure to re-enter oversold is the signal
+that sellers are exhausted.
+</p>
+
+<h4>Bearish Failure Swing (Top)</h4>
+
+<ol>
+  <li>RSI rises <strong>above 70</strong>
+    (enters overbought territory)</li>
+  <li>RSI pulls back <strong>below 70</strong>
+    (exits overbought)</li>
+  <li>RSI bounces but
+    <strong>stays below 70</strong> &mdash;
+    it cannot re-enter overbought territory</li>
+  <li>RSI breaks below the prior pullback low
+    &mdash; <strong>sell signal</strong></li>
+</ol>
+
+<div class="diagram">
+<svg viewBox="0 0 700 260"
+  xmlns="http://www.w3.org/2000/svg">
+  <text x="350" y="20" fill="#8b949e"
+    text-anchor="middle" font-size="13"
+    font-family="Inter">
+    Bullish Failure Swing Pattern
+  </text>
+  <!-- 30 line -->
+  <line x1="50" y1="160" x2="650" y2="160"
+    stroke="#f85149" stroke-width="1"
+    stroke-dasharray="4,4" opacity="0.5"/>
+  <text x="38" y="164" fill="#f85149"
+    font-size="11" font-family="Inter"
+    text-anchor="end">30</text>
+  <!-- RSI path -->
+  <polyline points="80,120 150,180 220,140
+    300,155 380,130 480,100 580,80"
+    fill="none" stroke="#58a6ff"
+    stroke-width="2.5"/>
+  <!-- Point labels -->
+  <circle cx="150" cy="180" r="5"
+    fill="#f85149"/>
+  <text x="150" y="200" fill="#f85149"
+    text-anchor="middle" font-size="11"
+    font-family="Inter" font-weight="600">
+    1. Below 30</text>
+  <circle cx="220" cy="140" r="5"
+    fill="#3fb950"/>
+  <text x="220" y="128" fill="#3fb950"
+    text-anchor="middle" font-size="11"
+    font-family="Inter" font-weight="600">
+    2. Bounce</text>
+  <circle cx="300" cy="155" r="5"
+    fill="#d4822a"/>
+  <text x="300" y="175" fill="#d4822a"
+    text-anchor="middle" font-size="11"
+    font-family="Inter" font-weight="600">
+    3. Holds above 30</text>
+  <!-- Break line -->
+  <line x1="220" y1="140" x2="650" y2="140"
+    stroke="#3fb950" stroke-width="1"
+    stroke-dasharray="3,3" opacity="0.4"/>
+  <circle cx="380" cy="130" r="5"
+    fill="#3fb950"/>
+  <text x="380" y="118" fill="#3fb950"
+    text-anchor="middle" font-size="11"
+    font-family="Inter" font-weight="600">
+    4. Breaks above = BUY</text>
+</svg>
+<div class="diagram-caption">
+  The failure swing forms entirely in the
+  RSI panel. Momentum tries to revisit
+  oversold and fails &mdash; sellers
+  are exhausted.
+</div>
+</div>
+
+<h3>RSI Trendlines</h3>
+
+<p>
+This is arguably the most <strong>underused
+technique</strong> in all of RSI analysis. The
+idea is simple: draw trendlines directly on the
+RSI panel, just like you would on a price chart.
+Connect swing lows for support, swing highs for
+resistance.
+</p>
+
+<p>
+The reason this works so well is that RSI
+trendline breaks frequently <strong>precede</strong>
+price trendline breaks. Momentum shifts before
+price does. If you are watching only price
+trendlines, you are getting the signal late.
+The RSI trendline gives you advance warning
+that the trend is about to break, often by
+several bars. Many traders who have backtested
+this technique report that RSI trendline breaks
+are among their most reliable leading signals.
+</p>
+
+<p>
+The technique is particularly powerful on higher
+timeframes (daily and weekly charts). On
+intraday charts the noise level can produce too
+many false trendline breaks. But on daily charts,
+a clean RSI trendline that has held for multiple
+touches breaking cleanly is a strong signal that
+deserves attention regardless of whether the
+price trendline has broken yet.
+</p>
+
+</div>
+
+<!-- =========================================
+     CHAPTER 4: ANDREW CARDWELL'S REVOLUTION
+     ========================================= -->
+<div class="section" id="ch4">
+<h2>Andrew Cardwell's Revolution</h2>
+<p class="section-sub">
+  The man known as "Dr. RSI" who trained under
+  Wilder, spent decades extending the theory,
+  and fixed the biggest problem with
+  overbought/oversold.
+</p>
+
+<p>
+<strong>Andrew Cardwell</strong> is the most
+important figure in RSI analysis after Wilder
+himself. He trained directly under Wilder, then
+spent the next several decades studying RSI
+behavior across thousands of charts in every
+market and timeframe. His two major contributions
+&mdash; <strong>range shift rules</strong> and
+<strong>positive/negative reversals</strong>
+&mdash; fundamentally changed how sophisticated
+traders use RSI, and they solved the single
+biggest problem with Wilder's original framework.
+</p>
+
+<h3>The Range Shift Discovery</h3>
+
+<p>
+Wilder's original framework treats 30 and 70 as
+fixed thresholds that apply in all conditions.
+Cardwell discovered that RSI does not oscillate
+symmetrically between 0 and 100. Instead, its
+operating range <strong>shifts</strong> depending
+on the prevailing trend:
+</p>
+
+<div class="compare">
+<div class="compare-box compare-good">
+  <div class="compare-label">
+    Bull Market RSI Range</div>
+  RSI oscillates between
+  <strong>40 and 80</strong>.<br><br>
+  Pullbacks to 40-50 are buying opportunities.
+  RSI touching 40 in an uptrend is the
+  equivalent of "oversold" &mdash; not 30.<br><br>
+  RSI rarely drops below 40 unless the
+  trend is reversing.
+</div>
+<div class="compare-box compare-bad">
+  <div class="compare-label">
+    Bear Market RSI Range</div>
+  RSI oscillates between
+  <strong>20 and 60</strong>.<br><br>
+  Rallies to 50-60 are shorting opportunities.
+  RSI touching 60 in a downtrend is the
+  equivalent of "overbought" &mdash; not 70.<br><br>
+  RSI rarely rises above 60 unless the
+  trend is reversing.
+</div>
+</div>
+
+<p>
+This is the <strong>range shift</strong>. When RSI
+breaks out of one range and establishes itself in
+another, it signals a <strong>trend change</strong>.
+A market that was oscillating in the 20&ndash;60
+bear range that now pushes above 60 and holds
+there has shifted into the bull range. The trend
+has changed. Conversely, a market oscillating in
+the 40&ndash;80 bull range that breaks below 40
+and stays there has shifted into the bear range.
+</p>
+
+<p>
+This single insight eliminates the biggest problem
+with traditional RSI usage. You no longer sell
+because RSI hit 70 in a bull market &mdash; you
+recognize that 70 is within the normal bull range
+and wait for the range to actually shift before
+turning bearish. You no longer buy because RSI
+hit 30 in a bear market &mdash; you recognize
+that 30 is within the normal bear range and
+wait for the range to shift before turning
+bullish.
+</p>
+
+<h3>Positive and Negative Reversals</h3>
+
+<p>
+This is where Cardwell really challenged
+conventional wisdom. He discovered a class of
+RSI signals that <em>look</em> like divergence
+but are actually <strong>trend continuation
+signals</strong>, not reversal signals. He called
+them reversals because they reverse the
+traditional interpretation of divergence.
+</p>
+
+<h4>Positive Reversal</h4>
+<p>
+Price makes a <strong>lower low</strong>, but RSI
+makes a <strong>higher low</strong>. This looks
+identical to classic bullish divergence. But
+Cardwell's key insight: if this pattern occurs
+<em>within an uptrend</em> (RSI operating in the
+40&ndash;80 bull range), it is not a reversal
+signal. It is a <strong>continuation signal</strong>
+that predicts price will go higher. The trend is
+intact; the dip is a buying opportunity.
+</p>
+
+<h4>Negative Reversal</h4>
+<p>
+Price makes a <strong>higher high</strong>, but
+RSI makes a <strong>lower high</strong>. This
+looks identical to classic bearish divergence.
+But if it occurs <em>within a downtrend</em>
+(RSI operating in the 20&ndash;60 bear range),
+it is a <strong>continuation signal</strong>
+that predicts price will go lower. The trend is
+intact; the rally is a shorting opportunity.
+</p>
+
+<div class="callout callout-purple">
+<div class="callout-title">
+  The Cardwell Rule</div>
+Whether a divergence pattern is a reversal
+or a continuation signal depends entirely on
+the prevailing trend context. <strong>Same
+pattern, opposite interpretation</strong>,
+depending on which range RSI is operating in.
+This is why Cardwell considers most
+"bearish divergence" signals in uptrends
+to be false alarms &mdash; they are actually
+positive reversals predicting continuation.
+</div>
+
+<p>
+Cardwell's framework reframes RSI from a simple
+overbought/oversold toggle into a
+<strong>trend identification and confirmation
+tool</strong>. The range tells you the trend.
+The reversals tell you the trend is continuing.
+The actual range shift tells you the trend is
+changing. It is a complete system, and it makes
+the classic "sell at 70, buy at 30" approach
+look crude by comparison.
+</p>
+
+</div>
+
+<!-- =========================================
+     CHAPTER 5: THE STOCHASTIC OSCILLATOR
+     ========================================= -->
+<div class="section" id="ch5">
+<h2>The Stochastic Oscillator</h2>
+<p class="section-sub">
+  George Lane, the Chicago trading floors,
+  and a fundamentally different question
+  about price.
+</p>
+
+<p>
+The Stochastic Oscillator predates RSI by over
+twenty years. Its origin is not a book or an
+academic paper but a <strong>back room behind
+the Chicago Board of Trade</strong>, where a
+group of commodities traders spent their evenings
+after the market close trying to build better
+analytical tools. The man who led that effort
+was <strong>George C. Lane</strong>.
+</p>
+
+<h3>The Origin Story</h3>
+
+<p>
+Lane joined <strong>Investment Educators</strong>
+in Chicago in 1954 as an assistant. Investment
+Educators was a commodities trading education firm
+founded by <strong>Ralph Dystant</strong> and
+<strong>Roy Larson</strong>. Lane started by
+handling logistics for their seminars &mdash;
+setting up chairs, distributing handouts. He was
+not a trader yet. But he was sharp, and he
+absorbed everything.
+</p>
+
+<p>
+After Larson retired, Lane moved up to teaching
+courses himself. Meanwhile, a group of active
+traders from the <strong>Chicago Board of
+Trade</strong>, the <strong>Chicago Mercantile
+Exchange</strong>, and the <strong>MidAmerica
+Commodity Exchange</strong> would come to
+Investment Educators after trading hours to
+collaborate on indicator development. It was a
+workshop atmosphere &mdash; floor traders
+contributing market intuition, Lane contributing
+the mathematical frameworks to test their ideas.
+</p>
+
+<p>
+They worked through a series of oscillator
+concepts, expressing each as a percentage of 100.
+As they tested each candidate, they named them
+sequentially: <strong>%A, %B, %C, %D, %K,
+%R</strong>, and so on. The letters were not
+abbreviations for anything &mdash; they were
+just sequence labels, the way an engineer might
+name prototypes. The ones that survived the
+testing process kept their letters. That is why
+the stochastic oscillator has <strong>%K</strong>
+and <strong>%D</strong> as its two lines &mdash;
+those were the designations from the original
+development sequence. <strong>%K</strong> was
+the raw oscillator that worked. <strong>%D</strong>
+was the smoothed signal line that confirmed it.
+</p>
+
+<p>
+Lane first taught the stochastic in Investment
+Educators seminars beginning in <strong>1957</strong>.
+He never published it in a single definitive
+academic paper. It spread through seminars,
+word of mouth, and the trading floor community.
+By the time RSI appeared in 1978, the stochastic
+had already been in active use for two decades.
+Lane continued teaching and refining it until
+his death in <strong>2004</strong>.
+</p>
+
+<h3>The Core Philosophy: Where Does Price Close?</h3>
+
+<p>
+The stochastic asks a fundamentally different
+question than RSI. RSI asks: <em>how much is
+price gaining versus losing on average?</em>
+The stochastic asks: <em>where did today's
+price close within the recent range?</em>
+</p>
+
+<p>
+Lane's observation was based on studying closing
+prices in relation to daily ranges. In uptrends,
+closes tend to accumulate <strong>near the top
+of the range</strong>. In downtrends, closes
+accumulate <strong>near the bottom of the
+range</strong>. As a trend ages and momentum
+fades, closes begin to drift away from the
+extreme of the range. The stochastic captures
+this drift. When prices have been closing near
+the top of their range and then start closing
+in the middle or bottom, the stochastic turns
+down &mdash; signaling that buyers are losing
+their grip before the price trend itself reverses.
+</p>
+
+<div class="callout">
+<div class="callout-title">
+  RSI vs. Stochastic: Two Questions</div>
+<strong>RSI:</strong> "Are recent gains bigger
+than recent losses?" (momentum)<br><br>
+<strong>Stochastic:</strong> "Where is price
+closing within its recent range?" (position)<br><br>
+Both are momentum oscillators, but they measure
+different aspects of momentum. This is why
+they sometimes diverge from each other &mdash;
+and why using both can give you more
+information than either alone.
+</div>
+
+<h3>The Formula</h3>
+
+<h4>%K (Fast Stochastic)</h4>
+
+<div class="formula">
+<div class="formula-label">%K</div>
+%K = ((Close - Lowest Low over n periods) /
+  (Highest High over n - Lowest Low over n))
+  x 100
+</div>
+
+<p>
+Default <em>n</em> = 14 periods. %K = 100 means
+today's close is at the very top of the 14-period
+range. %K = 0 means today's close is at the very
+bottom. %K = 50 means the close is exactly in the
+middle of the range.
+</p>
+
+<h4>%D (Signal Line)</h4>
+
+<div class="formula">
+<div class="formula-label">%D</div>
+%D = 3-period SMA of %K
+</div>
+
+<p>
+%D is simply a smoothed version of %K. It creates
+a slower, smoother line that acts as a trigger.
+Crossovers of %K through %D generate buy and sell
+signals, similar to MACD signal line crossovers.
+</p>
+
+<h3>Fast, Slow, and Full Stochastic</h3>
+
+<p>
+This is one of the most confusing aspects of the
+stochastic, and most tutorials make it worse. Here
+is the clean version:
+</p>
+
+<table>
+<tr>
+  <th>Version</th>
+  <th>%K</th>
+  <th>%D</th>
+  <th>Character</th>
+</tr>
+<tr>
+  <td><strong>Fast</strong></td>
+  <td>Raw %K (no smoothing)</td>
+  <td>3-period SMA of raw %K</td>
+  <td>Very reactive, noisy, original form</td>
+</tr>
+<tr>
+  <td><strong>Slow</strong></td>
+  <td>Fast %D (the 3-period SMA)</td>
+  <td>3-period SMA of Slow %K</td>
+  <td>One extra smoothing step,
+    most commonly used</td>
+</tr>
+<tr>
+  <td><strong>Full</strong></td>
+  <td>Fully parameterized
+    (period, slowing factor)</td>
+  <td>Parameterized SMA of %K</td>
+  <td>Complete control; slowing=1
+    equals Fast, slowing=3 equals Slow</td>
+</tr>
+</table>
+
+<p>
+When most traders say "stochastics" they mean the
+<strong>Slow Stochastic</strong>. The Fast
+Stochastic is rarely used in practice because it
+whipsaws too aggressively. The Full Stochastic is
+what you get on most charting platforms when you
+add the indicator &mdash; it defaults to settings
+that reproduce the Slow Stochastic but lets you
+customize all three parameters.
+</p>
+
+<h3>Stochastic Signals</h3>
+
+<p>
+<strong>Overbought/Oversold:</strong> Above 80 is
+overbought, below 20 is oversold. Same caveats as
+RSI &mdash; in strong trends, stochastics can camp
+in overbought or oversold for extended periods.
+</p>
+
+<p>
+<strong>%K/%D Crossovers:</strong> When %K crosses
+above %D in oversold territory (below 20), that is
+a buy signal. When %K crosses below %D in
+overbought territory (above 80), that is a sell
+signal. Crossovers in the middle zone (20&ndash;80)
+are generally ignored as noise.
+</p>
+
+<p>
+<strong>Divergence:</strong> Lane himself stressed
+that divergence was the highest-quality stochastic
+signal &mdash; more reliable than crossovers alone.
+The same regular and hidden divergence concepts
+from RSI apply here.
+</p>
+
+<p>
+<strong>Lane's personal preference:</strong> he
+emphasized watching %D, not %K. He said the signal
+was in the turns of %D, and that %K was useful
+primarily as a timing trigger for entries after
+%D had confirmed the direction.
+</p>
+
+</div>
+
+<!-- =========================================
+     CHAPTER 6: EVERY RSI VARIANT WORTH KNOWING
+     ========================================= -->
+<div class="section" id="ch6">
+<h2>Every RSI Variant Worth Knowing</h2>
+<p class="section-sub">
+  From Cutler's simple fix to Ehlers' signal
+  processing wizardry &mdash; the complete
+  family tree of RSI descendants.
+</p>
+
+<h3>Cutler's RSI</h3>
+
+<p>
+<strong>Peter Cutler</strong> developed this
+variant to solve one specific problem: the data
+length dependency in Wilder's RSI (discussed in
+Chapter 2). The fix is straightforward &mdash;
+replace Wilder's SMMA with a <strong>simple
+moving average (SMA)</strong> for both the
+average gain and average loss calculations.
+</p>
+
+<div class="formula">
+<div class="formula-label">Cutler's RSI</div>
+Avg Gain = Sum of Gains over n periods / n
+  (fresh SMA each bar)<br>
+Avg Loss = Sum of Losses over n periods / n
+  (fresh SMA each bar)
+</div>
+
+<p>
+The consequences are subtle but real. Cutler's
+RSI produces identical values regardless of where
+in the historical data you start calculating,
+because the SMA has a fixed window &mdash; old
+data drops off cleanly. The tradeoff: by giving
+equal weight to all bars in the window rather
+than emphasizing recent bars, Cutler's version is
+slightly more reactive and crosses
+overbought/oversold levels more frequently than
+Wilder's. In practice the two track closely,
+but they will diverge in fast-moving markets
+where the weighting difference matters.
+</p>
+
+<h3>RSI(2) &mdash; Connors Mean Reversion</h3>
+
+<p>
+This is not a new formula &mdash; it is Wilder's
+exact RSI with the period set to <strong>2</strong>
+instead of 14. <strong>Larry Connors</strong> and
+<strong>Cesar Alvarez</strong> popularized it in
+their 2008 book <em>"Short-Term Trading Strategies
+That Work"</em> as the core of a mean-reversion
+system for equities.
+</p>
+
+<p>
+With only 2 periods, RSI becomes hyper-reactive.
+It swings violently between extremes. This is
+the point. The strategy is specifically designed
+for short-term bounce trades in stocks that are
+trending up on a longer timeframe but have pulled
+back sharply:
+</p>
+
+<ol>
+  <li>Confirm the stock is above its
+    <strong>200-day SMA</strong>
+    (long-term uptrend)</li>
+  <li>Buy when RSI(2) drops below
+    <strong>10</strong>
+    (deeply oversold short-term)</li>
+  <li>Exit when price crosses above the
+    <strong>5-day SMA</strong>
+    (dynamic exit, not a fixed target)</li>
+  <li>No hard stop-loss in Connors'
+    original research (controversial)</li>
+</ol>
+
+<p>
+Connors' backtesting showed that the more extreme
+the RSI(2) reading, the stronger the subsequent
+bounce. Buying below 5 outperformed buying below
+10. Buying below 2 outperformed buying below 5.
+The strategy backtested well on the S&P 500
+through the 1990s and 2000s, but it is a
+<strong>pure mean-reversion play</strong> &mdash;
+it fails catastrophically in crash environments
+where "oversold" can stay oversold for months.
+</p>
+
+<h3>Connors RSI (CRSI)</h3>
+
+<p>
+<strong>Larry Connors</strong> later developed a
+composite oscillator that averages three separate
+momentum components into a single value. It was
+formalized in his research reports and the book
+<em>"Short-Term Trading Strategies That Work."</em>
+</p>
+
+<h4>The Three Components</h4>
+
+<p>
+<strong>Component 1 &mdash; RSI(3):</strong>
+Standard Wilder RSI with a 3-period lookback.
+Extremely fast and reactive to short-term
+price swings.
+</p>
+
+<p>
+<strong>Component 2 &mdash; Streak RSI:</strong>
+First, count the consecutive up-closes or
+down-closes (the "streak"). Three up days in a
+row = +3. Four down days = &minus;4. Then apply
+RSI(2) to the time series of these streak counts.
+This captures the momentum of the streak itself.
+</p>
+
+<p>
+<strong>Component 3 &mdash; ROC Percent Rank:</strong>
+Calculate today's rate of change (one-day
+percentage price change) and rank it as a
+percentile against the last 100 periods. If
+today's move is larger than 85 of the last 100
+moves, the rank is 85. This tells you whether
+today's move is historically large or small.
+</p>
+
+<div class="formula">
+<div class="formula-label">Connors RSI</div>
+CRSI(3,2,100) = [RSI(3) + RSI(Streak,2)
+  + ROC Percentile(100)] / 3
+</div>
+
+<p>
+The composite moves faster than standard RSI,
+which is why the thresholds are wider:
+<strong>below 10 = oversold</strong>,
+<strong>above 90 = overbought</strong> (versus
+30/70 for classic RSI). CRSI is specifically
+designed for short-term mean reversion in
+equities, not trend following.
+</p>
+
+<h3>Stochastic RSI (StochRSI)</h3>
+
+<p>
+Developed by <strong>Tushar S. Chande</strong>
+and <strong>Stanley Kroll</strong> in their 1994
+book <em>"The New Technical Trader."</em> The
+motivation was a real problem: in strong trends,
+standard RSI can spend weeks between 40 and 70
+without touching the overbought or oversold
+zones, making those zones useless as signals.
+</p>
+
+<p>
+Their solution was elegant: apply the
+<strong>stochastic formula to RSI values</strong>
+instead of price values. Literally a stochastic
+of the RSI.
+</p>
+
+<div class="formula">
+<div class="formula-label">Stochastic RSI</div>
+StochRSI = (RSI - Lowest RSI over m periods) /
+  (Highest RSI over m - Lowest RSI over m)
+</div>
+
+<p>
+The result ranges from 0 to 1 (or 0 to 100).
+Common defaults: 14-period RSI, 14-period
+lookback for the stochastic calculation, with
+a 3-period SMA for smoothing. Overbought above
+0.80, oversold below 0.20.
+</p>
+
+<p>
+StochRSI is <strong>significantly more
+sensitive</strong> than RSI. It reaches extreme
+readings more often, turns faster, and generates
+more signals. The cost is more false signals
+and more noise. It has become particularly
+popular in <strong>crypto trading</strong>
+precisely because crypto markets move faster
+and more violently than equities, and the extra
+sensitivity matches the asset class's character.
+</p>
+
+<h3>Laguerre RSI</h3>
+
+<p>
+<strong>John F. Ehlers</strong> is a former
+aerospace engineer who spent decades applying
+<strong>digital signal processing (DSP)
+theory</strong> to market indicators. He published
+the Laguerre RSI in his 2004 book
+<em>"Cybernetic Analysis for Stocks and
+Futures."</em> It represents the most
+mathematically sophisticated RSI variant
+in common use.
+</p>
+
+<p>
+The core idea: the <strong>Laguerre filter</strong>
+is a mathematical construct from DSP that creates
+a multi-stage smoothing cascade. Ehlers applies
+it to price data to extract four progressively
+smoothed layers, then applies RSI logic across
+those layers.
+</p>
+
+<div class="formula">
+<div class="formula-label">
+  Laguerre Filter (4 stages)</div>
+L0 = (1 - g) x Price + g x L0[prior]<br>
+L1 = -g x L0 + L0[prior] + g x L1[prior]<br>
+L2 = -g x L1 + L1[prior] + g x L2[prior]<br>
+L3 = -g x L2 + L2[prior] + g x L3[prior]<br>
+<br>
+Where g (gamma) = damping factor (0.2 to 0.8)
+</div>
+
+<p>
+Lower gamma (0.2) means more reactive, faster
+response, more noise. Higher gamma (0.8) means
+smoother, slower response, less noise. After
+computing the four filter stages, RSI logic is
+applied by summing the positive differences
+between consecutive layers (CU = "count up")
+and the negative differences (CD = "count down"):
+</p>
+
+<div class="formula">
+<div class="formula-label">Laguerre RSI output</div>
+CU = sum of (Ln - Ln+1) where Ln > Ln+1<br>
+CD = sum of (Ln+1 - Ln) where Ln &lt; Ln+1<br>
+LaRSI = CU / (CU + CD)
+</div>
+
+<p>
+The key property that makes Laguerre RSI
+special: its value distribution is approximately
+<strong>U-shaped</strong>, spending more time at
+the extremes (near 0 and 1) rather than
+clustering near 0.5 like standard RSI tends to.
+This makes it naturally better at identifying
+overbought and oversold conditions because
+those zones are where it spends the most time.
+The four-stage cascade also gives it unusually
+low lag relative to its smoothness &mdash; the
+holy grail tradeoff in signal processing.
+</p>
+
+<h3>RSI3M3 (Bressert)</h3>
+
+<p>
+<strong>Walter Bressert</strong> was a cycle
+trader who published extensively on market cycle
+timing from the 1970s through the 1990s. He
+ran the <strong>HAL Commodity Cycles</strong>
+newsletter from 1974 to 1985 (profitable 10 of
+12 years, rated #1 in bull markets by
+<em>Futures</em> magazine) and later published
+<strong>CycleWatch</strong>. His primary
+oscillator was deceptively simple:
+</p>
+
+<div class="formula">
+<div class="formula-label">RSI3M3</div>
+RSI3M3 = SMA(3) of RSI(3)
+</div>
+
+<p>
+A 3-period RSI smoothed by a 3-period simple
+moving average. That is it. Despite its
+simplicity, Bressert reported an average
+<strong>85% accuracy</strong> for identifying
+10-day cycle bottoms on daily charts. The
+double-3 configuration is fast enough to catch
+short-cycle turns (5&ndash;10 day cycles)
+while smooth enough to reduce the extreme
+whipsaws of a raw RSI(3).
+</p>
+
+<p>
+Bressert used it with a mechanical
+<strong>setup/trigger entry system</strong>:
+RSI3M3 drops below 30 (setup), turns up
+(setup bar identified), then a buy stop is
+placed one tick above the high of the setup bar
+(trigger). The protective stop goes below the
+cycle low. He combined this with
+<strong>cycle timing bands</strong> &mdash;
+historical windows where 70% of cycle
+tops/bottoms had occurred. When the RSI3M3
+signal fires within a timing band, the
+probability of a successful trade increases
+significantly.
+</p>
+
+<h3>Ehlers Smoothed RSI</h3>
+
+<p>
+A separate contribution from
+<strong>John Ehlers</strong>, published in
+<em>Technical Analysis of Stocks &amp;
+Commodities</em> magazine. He applies a
+<strong>SuperSmoother filter</strong> &mdash;
+a two-pole Butterworth filter adapted for
+market data &mdash; to the RSI output. The
+SuperSmoother is a low-pass filter: it passes
+trends and medium-frequency cycles while
+attenuating high-frequency noise. Applied to
+RSI, the result is noticeably smoother with
+fewer false crossings of the overbought/oversold
+levels, at the cost of slightly more lag than
+raw RSI.
+</p>
+
+<h3>Ehlers Adaptive RSI</h3>
+
+<p>
+Ehlers' most ambitious RSI variant. It uses his
+<strong>Autocorrelation Periodogram</strong>
+algorithm to dynamically measure the dominant
+cycle length in the current price data, then
+feeds that cycle length as the RSI period.
+When the market's dominant cycle is long, the
+RSI period lengthens automatically. When cycles
+shorten, the period contracts.
+</p>
+
+<p>
+The result: the RSI is always tuned to the
+current market rhythm rather than locked to an
+arbitrary fixed period. This is the DSP
+philosophy taken to its logical conclusion
+&mdash; let the market tell you its own
+periodicity rather than imposing a static
+number. The tradeoff is computational complexity
+and the challenge of the periodogram producing
+unstable cycle estimates in choppy, non-cyclical
+markets.
+</p>
+
+<h3>RSX (Jurik RSI)</h3>
+
+<p>
+Developed by <strong>Mark Jurik</strong> of
+Jurik Research. RSX replaces Wilder's SMMA with
+Jurik's proprietary <strong>JMA (Jurik Moving
+Average)</strong> smoothing, which is a
+multi-stage adaptive filter with near-zero
+phase lag. The result looks like a smoother
+version of RSI with significantly less lag.
+The catch: the JMA algorithm is
+<strong>closed-source and proprietary</strong>.
+You cannot see the math. You have to trust
+Jurik's implementation or license it. RSX is
+available in some commercial indicator packages
+and has a following among traders willing to
+pay for reduced lag, but the black-box nature
+keeps many systematic traders away.
+</p>
+
+<h3>The Family Tree</h3>
+
+<table>
+<tr>
+  <th>Variant</th>
+  <th>Creator</th>
+  <th>Year</th>
+  <th>Key Difference</th>
+</tr>
+<tr>
+  <td><strong>Wilder's RSI</strong></td>
+  <td>Wilder</td>
+  <td>1978</td>
+  <td>Original; SMMA smoothing; 14-period</td>
+</tr>
+<tr>
+  <td><strong>Cutler's RSI</strong></td>
+  <td>Peter Cutler</td>
+  <td>~1994</td>
+  <td>SMA; fixes data length dependency</td>
+</tr>
+<tr>
+  <td><strong>RSI(2)</strong></td>
+  <td>Larry Connors</td>
+  <td>~1996</td>
+  <td>Same formula, period=2;
+    mean reversion</td>
+</tr>
+<tr>
+  <td><strong>Connors RSI</strong></td>
+  <td>Larry Connors</td>
+  <td>~2000s</td>
+  <td>Composite: RSI(3) + Streak +
+    ROC Percentile</td>
+</tr>
+<tr>
+  <td><strong>StochRSI</strong></td>
+  <td>Chande &amp; Kroll</td>
+  <td>1994</td>
+  <td>Stochastic formula on RSI values</td>
+</tr>
+<tr>
+  <td><strong>RSI3M3</strong></td>
+  <td>Walter Bressert</td>
+  <td>~1991</td>
+  <td>RSI(3) smoothed by SMA(3);
+    cycle timing</td>
+</tr>
+<tr>
+  <td><strong>Laguerre RSI</strong></td>
+  <td>John Ehlers</td>
+  <td>2004</td>
+  <td>DSP Laguerre filter cascade;
+    gamma control</td>
+</tr>
+<tr>
+  <td><strong>Ehlers Smoothed</strong></td>
+  <td>John Ehlers</td>
+  <td>~2000s</td>
+  <td>SuperSmoother filter on RSI</td>
+</tr>
+<tr>
+  <td><strong>Ehlers Adaptive</strong></td>
+  <td>John Ehlers</td>
+  <td>~2000s</td>
+  <td>Period auto-adjusts via
+    autocorrelation</td>
+</tr>
+<tr>
+  <td><strong>RSX</strong></td>
+  <td>Mark Jurik</td>
+  <td>~2000s</td>
+  <td>Proprietary JMA smoothing;
+    near-zero lag</td>
+</tr>
+</table>
+
+</div>
+
+<!-- =========================================
+     CHAPTER 7: DSS BRESSERT
+     ========================================= -->
+<div class="section" id="ch7">
+<h2>DSS Bressert</h2>
+<p class="section-sub">
+  The Double Smoothed Stochastic &mdash;
+  William Blau's mathematical innovation,
+  Walter Bressert's practical refinement,
+  and why double smoothing solves a real
+  problem with regular stochastics.
+</p>
+
+<h3>The Problem With Standard Stochastics</h3>
+
+<p>
+The standard stochastic oscillator, whether
+fast, slow, or full, uses <strong>simple moving
+averages</strong> for smoothing. SMA-based
+smoothing has a specific mathematical weakness:
+it gives equal weight to every bar in the
+window, and when the oldest bar drops off the
+window, it creates an abrupt step-change in the
+average. If the bar dropping off happened to be
+a large gain or large loss, the SMA jumps
+discretely even if recent price action has been
+smooth. These discontinuities show up as small
+jags and false signals in the stochastic output
+&mdash; noise that has nothing to do with actual
+price momentum and everything to do with old
+data exiting the calculation window.
+</p>
+
+<h3>William Blau's Innovation</h3>
+
+<p>
+<strong>William Blau</strong> published the
+foundational concept of double smoothing in
+<em>Technical Analysis of Stocks &amp;
+Commodities</em> magazine in January 1991, and
+expanded it in his 1995 book <em>"Momentum,
+Direction, and Divergence."</em> Blau was a
+mathematician and electrical engineer whose
+insight was both simple and powerful:
+<strong>apply EMA smoothing twice</strong> to
+the stochastic formula &mdash; once to the
+raw components, then again to the result.
+</p>
+
+<p>
+The EMA does not have the "oldest bar drops off"
+problem because it decays exponentially rather
+than using a fixed window. Every past data point
+contributes some weight, but recent data
+dominates. Applying this twice creates a double
+cascade of smoothing that eliminates most of
+the artificial jags while preserving the
+sensitivity to genuine momentum shifts.
+</p>
+
+<h3>The DSS Formula</h3>
+
+<p>
+The standard stochastic ratio is:
+</p>
+
+<div class="formula">
+<div class="formula-label">
+  Raw stochastic ratio</div>
+Raw = (Close - Lowest Low(n)) /
+  (Highest High(n) - Lowest Low(n)) x 100
+</div>
+
+<p>
+The DSS applies EMA smoothing in two passes:
+</p>
+
+<h4>First Pass: EMA of the Raw Ratio</h4>
+
+<div class="formula">
+<div class="formula-label">
+  First smoothing (MIT)</div>
+MIT = EMA(Raw Stochastic Ratio, period)
+</div>
+
+<p>
+This produces a smoothed intermediate value
+called <strong>MIT</strong> (Moving Intermediate
+Term). It has already eliminated most of the
+SMA step-change artifacts.
+</p>
+
+<h4>Second Pass: Stochastic of the Smoothed Value</h4>
+
+<div class="formula">
+<div class="formula-label">
+  Second smoothing (DSS)</div>
+DSS = EMA(
+  (MIT - Lowest MIT(n)) /
+  (Highest MIT(n) - Lowest MIT(n)) x 100,
+  period
+)
+</div>
+
+<p>
+The second pass applies the stochastic formula
+again &mdash; but this time to the already-smoothed
+MIT values, and then smooths <em>that</em> with
+another EMA. The result is an oscillator that is
+doubly smoothed, doubly normalized, and
+significantly cleaner than a standard stochastic
+with equivalent parameter settings.
+</p>
+
+<h3>Bressert's Calibration</h3>
+
+<p>
+<strong>Walter Bressert</strong> took Blau's
+mathematical framework and calibrated it for
+his own cycle trading methodology. The Bressert
+version uses shorter default periods than Blau
+&mdash; typically <strong>period = 8 or 13</strong>
+with <strong>EMA smoothing period = 5</strong>
+&mdash; producing a more sensitive oscillator
+tuned for short trading cycles of 5 to 13 bars.
+Common thresholds: overbought above 80, oversold
+below 20.
+</p>
+
+<p>
+Bressert integrated DSS into his
+<strong>Cycle Trading Pattern Manual</strong>
+as a primary oscillator for timing entries at
+cycle tops and bottoms. Combined with his timing
+bands and trend indicators (EMA Trend, MACD
+Trend), the DSS provided the price confirmation
+component while the cycles provided the time
+component.
+</p>
+
+<h3>Why Double Smoothing Matters</h3>
+
+<div class="compare">
+<div class="compare-box compare-bad">
+  <div class="compare-label">
+    Standard Stochastic</div>
+  SMA smoothing creates step-changes when
+  old data drops off the window. Equal
+  weighting means recent and old data
+  contribute equally. More false crossings
+  of overbought/oversold. Slower to reach
+  extremes with heavy smoothing.
+</div>
+<div class="compare-box compare-good">
+  <div class="compare-label">
+    DSS Bressert</div>
+  EMA smoothing decays exponentially &mdash;
+  no step-changes. Recent data dominates.
+  Fewer false crossings. Faster to reach
+  overbought/oversold extremes despite
+  being smoother. Better suited for short
+  cycle identification.
+</div>
+</div>
+
+<p>
+The DSS is one of those rare indicators where
+the mathematical improvement translates directly
+into practical trading improvement. The smoother
+curve produces cleaner crossover signals, the
+faster response to extremes gives earlier
+entries, and the elimination of SMA artifacts
+reduces the number of times you get whipsawed
+on noise. If you use standard stochastics and
+find yourself getting faked out by small jags
+that reverse immediately, the DSS addresses
+exactly that problem.
+</p>
+
+<h3>DSS vs. StochRSI vs. Standard Stochastic</h3>
+
+<table>
+<tr>
+  <th>Feature</th>
+  <th>Standard Stoch</th>
+  <th>StochRSI</th>
+  <th>DSS Bressert</th>
+</tr>
+<tr>
+  <td>Smoothing method</td>
+  <td>SMA</td>
+  <td>SMA (on RSI)</td>
+  <td>Double EMA</td>
+</tr>
+<tr>
+  <td>Sensitivity</td>
+  <td>Moderate</td>
+  <td>Very high</td>
+  <td>High (adjustable)</td>
+</tr>
+<tr>
+  <td>False signals</td>
+  <td>Moderate</td>
+  <td>High</td>
+  <td>Low</td>
+</tr>
+<tr>
+  <td>Lag</td>
+  <td>Moderate</td>
+  <td>Low</td>
+  <td>Low</td>
+</tr>
+<tr>
+  <td>Best for</td>
+  <td>General use</td>
+  <td>Fast markets, crypto</td>
+  <td>Cycle timing, swing</td>
+</tr>
+<tr>
+  <td>SMA drop-off issue</td>
+  <td>Yes</td>
+  <td>Partially</td>
+  <td>No</td>
+</tr>
+</table>
+
+</div>
+
+<!-- =========================================
+     CHAPTER 8: WILDER'S COMPLETE TOOLKIT
+     ========================================= -->
+<div class="section" id="ch8">
+<h2>Wilder's Complete Toolkit</h2>
+<p class="section-sub">
+  RSI was not alone in that 1978 book.
+  The other five indicators Wilder published
+  alongside it are still among the most widely
+  used tools in technical analysis.
+</p>
+
+<p>
+To fully appreciate what Wilder accomplished,
+you need to understand that he did not just
+invent one indicator. He published six in one
+book, and three of them &mdash; RSI, ATR, and
+ADX &mdash; became permanent fixtures on every
+trading platform on earth. Here are the other
+five, briefly:
+</p>
+
+<h3>Average True Range (ATR)</h3>
+
+<p>
+The <strong>Average True Range</strong> measures
+market volatility. The "true range" of a bar is
+the greatest of three values: the high minus the
+low, the absolute value of the high minus the
+prior close, or the absolute value of the low
+minus the prior close. The last two account for
+overnight gaps, which the simple high-minus-low
+range would miss. ATR is the smoothed average
+of true range values over <em>n</em> periods
+(default 14, using Wilder's SMMA).
+</p>
+
+<p>
+ATR does not tell you direction. It tells you
+<em>how much</em> a security is moving. High ATR
+means high volatility. Low ATR means low
+volatility. It is foundational for
+<strong>stop-loss placement</strong> (many traders
+set stops at 1.5x or 2x ATR from entry),
+<strong>position sizing</strong> (adjusting share
+count inversely to ATR so that each position
+carries roughly equal dollar risk), and it is
+the building block for dozens of later indicators
+including <strong>Keltner Channels</strong>,
+<strong>SuperTrend</strong>, and
+<strong>Chandelier Exits</strong>.
+</p>
+
+<h3>Parabolic SAR (Stop and Reverse)</h3>
+
+<p>
+A trailing stop system that gets tighter as a
+trend extends. The SAR (Stop And Reverse) is a
+dot that appears below price in uptrends and
+above price in downtrends. It uses an
+<strong>Acceleration Factor (AF)</strong> that
+starts at 0.02 and increases by 0.02 each time
+price makes a new extreme in the trend direction,
+capping at 0.20.
+</p>
+
+<p>
+When price hits the SAR dot, the system reverses
+&mdash; if you were long, you go short; if short,
+you go long. It is an always-in-the-market system,
+which is both its strength (you never miss a
+major trend) and its weakness (you get whipsawed
+badly in ranging markets). Modern traders often
+use Parabolic SAR as a <strong>trailing stop
+mechanism</strong> rather than a reversal system,
+keeping the exit logic but not automatically
+reversing.
+</p>
+
+<h3>Directional Movement Index (DMI) and
+  Average Directional Index (ADX)</h3>
+
+<p>
+The <strong>DMI</strong> consists of two lines:
+<strong>+DI</strong> (positive directional
+indicator, measuring upward price movement) and
+<strong>&minus;DI</strong> (measuring downward
+price movement). When +DI is above &minus;DI,
+the trend is up. When &minus;DI is above +DI,
+the trend is down. Crossovers of the two lines
+generate directional signals.
+</p>
+
+<p>
+The <strong>ADX</strong> is derived from the
+difference between +DI and &minus;DI, smoothed
+and normalized to a 0&ndash;100 scale. It
+measures <strong>trend strength regardless of
+direction</strong>. ADX above 25 typically
+indicates a trending market. Below 20 suggests
+a ranging, trendless market. ADX does not tell
+you whether the trend is up or down &mdash;
+only how strong the trend is.
+</p>
+
+<p>
+This is one of Wilder's most elegant
+contributions. The insight that trend
+<em>strength</em> is a separate dimension from
+trend <em>direction</em> was not obvious in 1978.
+ADX lets you answer the question "should I be
+using trend-following tools or mean-reversion
+tools right now?" before choosing which tool to
+apply. In a high-ADX environment, use RSI for
+trend confirmation. In a low-ADX environment,
+use RSI for overbought/oversold mean reversion.
+</p>
+
+<h3>Commodity Selection Index (CSI)</h3>
+
+<p>
+A ranking tool that combines ATR and ADX to score
+commodities by their suitability for trading.
+High ATR (big moves) plus high ADX (trending)
+equals a high CSI score. The idea was portfolio
+selection &mdash; focus your capital on the
+markets that are both moving and trending, not
+the ones that are flat or choppy. It is rarely
+used today, but the concept of ranking markets
+by "tradability" has been adopted by many
+quantitative strategies.
+</p>
+
+<h3>Swing Index</h3>
+
+<p>
+The least remembered of Wilder's six indicators.
+It attempts to assign a numerical value to price
+swings using open, high, low, and close data.
+Wilder used it as a confirmation filter for
+other signals. It never achieved the adoption
+of his other tools and is not available on
+most modern platforms.
+</p>
+
+<div class="callout callout-green">
+<div class="callout-title">
+  The 1978 Score Card</div>
+Out of six indicators published in one book:<br>
+&bull; <strong>RSI</strong> &mdash; default on
+every platform, used by millions daily<br>
+&bull; <strong>ATR</strong> &mdash; foundation of
+modern volatility measurement, basis for dozens
+of derived indicators<br>
+&bull; <strong>ADX/DMI</strong> &mdash;
+standard trend strength tool, on every
+platform<br>
+&bull; <strong>Parabolic SAR</strong> &mdash;
+widely available, commonly used as trailing
+stop<br>
+&bull; <strong>CSI</strong> &mdash;
+concept adopted, indicator itself less used<br>
+&bull; <strong>Swing Index</strong> &mdash;
+mostly forgotten<br><br>
+Four out of six in permanent, widespread use
+nearly fifty years later. There is no comparable
+single-book contribution in the history of
+technical analysis.
+</div>
+
+</div>
+
+<!-- =========================================
+     CHAPTER 9: TRADING APPLICATIONS
+     ========================================= -->
+<div class="section" id="ch9">
+<h2>Trading Applications</h2>
+<p class="section-sub">
+  Putting it all together &mdash;
+  which indicator to use when, multi-timeframe
+  analysis, and real strategy frameworks.
+</p>
+
+<h3>Choosing the Right RSI Variant</h3>
+
+<p>
+The number of RSI variants can be paralyzing.
+Here is the decision framework that matters:
+</p>
+
+<table>
+<tr>
+  <th>If you are...</th>
+  <th>Use...</th>
+  <th>Why</th>
+</tr>
+<tr>
+  <td>Swing trading stocks (3-10 days)</td>
+  <td>RSI(14) with Cardwell ranges</td>
+  <td>Standard, well-tested, range
+    shifts identify trend context</td>
+</tr>
+<tr>
+  <td>Short-term mean reversion</td>
+  <td>RSI(2) or Connors RSI</td>
+  <td>Hyper-fast, designed for
+    1-3 day bounces</td>
+</tr>
+<tr>
+  <td>Crypto day trading</td>
+  <td>StochRSI or Laguerre RSI</td>
+  <td>Fast enough for volatile
+    crypto, frequent signals</td>
+</tr>
+<tr>
+  <td>Cycle-based timing</td>
+  <td>RSI3M3 + DSS Bressert</td>
+  <td>Designed for cycle top/bottom
+    identification</td>
+</tr>
+<tr>
+  <td>Reducing false signals</td>
+  <td>Ehlers Smoothed RSI</td>
+  <td>SuperSmoother filter cuts
+    noise while preserving signal</td>
+</tr>
+<tr>
+  <td>Adaptive, hands-off</td>
+  <td>Ehlers Adaptive RSI</td>
+  <td>Auto-adjusting period, no
+    manual tuning needed</td>
+</tr>
+</table>
+
+<h3>Multi-Timeframe RSI Analysis</h3>
+
+<p>
+One of the most powerful RSI techniques is
+checking it across multiple timeframes before
+making a trade. The principle is simple:
+<strong>align the trend on the higher timeframe
+with the entry on the lower timeframe.</strong>
+</p>
+
+<h4>The Three-Screen Framework</h4>
+
+<p>
+Originally from <strong>Alexander Elder's</strong>
+Triple Screen Trading System, adapted for RSI:
+</p>
+
+<ol>
+  <li><strong>Weekly RSI(14)</strong> &mdash;
+    establishes the trend. Is RSI in the
+    40&ndash;80 bull range or the 20&ndash;60
+    bear range (Cardwell)? This sets your
+    directional bias.</li>
+  <li><strong>Daily RSI(14)</strong> &mdash;
+    identifies pullback opportunities within
+    the trend. In a weekly uptrend, you want
+    daily RSI to pull back to the lower
+    end of its range.</li>
+  <li><strong>4-hour or intraday RSI
+    or StochRSI</strong> &mdash;
+    timing the entry. Look for the
+    failure swing or divergence that
+    confirms the pullback is ending.</li>
+</ol>
+
+<p>
+The key: never take an entry on the lower
+timeframe that contradicts the higher timeframe.
+If weekly RSI says bear range (20&ndash;60), do
+not go long just because the 4-hour RSI shows
+a bullish failure swing. The failure swing might
+produce a bounce, but you are fighting the
+larger trend.
+</p>
+
+<h3>RSI + Stochastic Confluence</h3>
+
+<p>
+Because RSI and stochastic measure different
+aspects of momentum (average gains/losses vs.
+position within range), they sometimes give
+conflicting signals. When they <strong>agree</strong>,
+the signal is significantly stronger. Here is
+how to combine them:
+</p>
+
+<p>
+<strong>Strong buy signal:</strong> RSI in
+oversold territory (or pulling back to 40 in a
+bull trend using Cardwell ranges) <em>and</em>
+stochastic %K crossing above %D in oversold
+territory. Both indicators independently confirm
+that the pullback is ending.
+</p>
+
+<p>
+<strong>Strong sell signal:</strong> RSI in
+overbought territory (or pushing up to 60 in a
+bear trend) <em>and</em> stochastic %K crossing
+below %D in overbought territory.
+</p>
+
+<p>
+<strong>Conflicting signals:</strong> when RSI
+says one thing and stochastic says another, the
+signal is weak. This usually happens during
+transitions or in choppy markets. The proper
+response to conflicting signals is no trade,
+not trying to pick which indicator is "right."
+</p>
+
+<h3>RSI + ADX: The Wilder Combination</h3>
+
+<p>
+Wilder published both RSI and ADX in the same
+book, and combining them is one of the most
+powerful yet underused approaches. ADX tells
+you the character of the market right now:
+</p>
+
+<p>
+<strong>ADX above 25 (trending):</strong> use RSI
+for <strong>trend confirmation</strong>. Look for
+bullish failure swings and Cardwell positive
+reversals in uptrends. Use overbought/oversold
+readings as signs of trend strength, not reversal.
+Apply RSI trendlines for early exit signals.
+</p>
+
+<p>
+<strong>ADX below 20 (ranging):</strong> use RSI
+for <strong>mean reversion</strong>. Now the
+classic 30/70 overbought/oversold approach works
+well because the market genuinely is oscillating
+within a range. Divergences are more reliable
+here. Failure swings are more reliable here.
+</p>
+
+<p>
+The mistake most traders make is using the same
+RSI interpretation in both environments. Buying
+oversold in a trending down market is catching
+knives. Buying oversold in a ranging market is
+a legitimate mean reversion trade. ADX is the
+switch that tells you which mode to operate in.
+</p>
+
+<h3>RSI Trendline Breakout Strategy</h3>
+
+<p>
+A specific trading strategy built around the
+RSI trendline technique from Chapter 3:
+</p>
+
+<ol>
+  <li>On a daily chart, identify a clear RSI
+    trendline with at least 2&ndash;3 touches
+    (support in uptrend, resistance in
+    downtrend)</li>
+  <li>Wait for the RSI trendline to break
+    cleanly</li>
+  <li>Confirm with either a failure swing
+    forming or a Cardwell range shift
+    in progress</li>
+  <li>Enter on the next candle after the RSI
+    trendline break, with a stop below the
+    most recent swing low (for longs) or
+    above swing high (for shorts)</li>
+  <li>Use ATR for stop distance calibration
+    &mdash; if your stop is less than 1x ATR
+    from entry, it is probably too tight</li>
+</ol>
+
+<p>
+This strategy works because RSI trendlines
+frequently break before price trendlines.
+You are getting into the trade before the crowd
+that is watching price trendlines.
+</p>
+
+<h3>Bressert's Cycle Timing Framework</h3>
+
+<p>
+For traders who want to combine oscillators
+with cycle analysis (Bressert's core
+methodology):
+</p>
+
+<ol>
+  <li><strong>Identify the cycle:</strong>
+    determine which cycle you are trading
+    (Trading Cycle, Primary Cycle, etc.)
+    and where you are within it</li>
+  <li><strong>Check the timing band:</strong>
+    are you within the window where 70%
+    of cycle tops/bottoms historically
+    occur?</li>
+  <li><strong>Watch RSI3M3 or DSS:</strong>
+    wait for the oscillator to reach an
+    extreme and form a setup</li>
+  <li><strong>Trigger entry:</strong>
+    price action confirms &mdash; buy stop
+    above the setup bar high for longs</li>
+  <li><strong>Protective stop:</strong>
+    below the cycle low for longs, above
+    the cycle high for shorts</li>
+</ol>
+
+<p>
+The key insight from Bressert: the probability
+of a successful trade is much greater
+<strong>later in the timing band</strong> than
+earlier. If the timing band is days 15&ndash;25
+from the last cycle low, a signal on day 22 is
+far more reliable than a signal on day 16. Be
+patient. Let the cycle mature before acting on
+the oscillator.
+</p>
+
+<h3>Divergence Trading Rules</h3>
+
+<p>
+Divergence is one of the most misused RSI
+signals. Here are rules to filter for
+higher-quality divergence trades:
+</p>
+
+<ol>
+  <li><strong>Trend context first:</strong>
+    use Cardwell range shifts to determine
+    the trend. Only trade regular bearish
+    divergence in ranging or bear markets.
+    In bull markets, what looks like bearish
+    divergence is often a negative reversal
+    (continuation).</li>
+  <li><strong>Require extreme readings:</strong>
+    divergence where RSI stays between 40 and
+    60 is meaningless noise. Require at least
+    one leg of the divergence to touch or
+    penetrate the 30 or 70 level.</li>
+  <li><strong>Fewer bars = better:</strong>
+    divergence that forms over 5&ndash;15 bars
+    is stronger than divergence stretched over
+    30&ndash;50 bars. Extended divergence
+    tends to resolve by RSI catching up to
+    price rather than price reversing.</li>
+  <li><strong>Wait for confirmation:</strong>
+    divergence alone is not an entry signal.
+    Wait for a failure swing, trendline break,
+    or candle pattern to confirm before
+    entering.</li>
+  <li><strong>Hidden divergence for
+    continuation:</strong> in clear trends,
+    hidden divergence (higher low in price /
+    lower low in RSI for uptrend) is often
+    a better signal than regular divergence
+    because you are trading with the trend.</li>
+</ol>
+
+</div>
+
+<!-- =========================================
+     CHAPTER 10: QUICK REFERENCE & CHEAT SHEET
+     ========================================= -->
+<div class="section" id="ch10">
+<h2>Quick Reference &amp; Cheat Sheet</h2>
+<p class="section-sub">
+  Everything on one page &mdash; settings,
+  signals, and the comparison matrix.
+</p>
+
+<h3>Standard Settings</h3>
+
+<table>
+<tr>
+  <th>Indicator</th>
+  <th>Period</th>
+  <th>Oversold</th>
+  <th>Overbought</th>
+</tr>
+<tr>
+  <td>RSI (Wilder)</td>
+  <td>14</td>
+  <td>30</td>
+  <td>70</td>
+</tr>
+<tr>
+  <td>RSI (Cardwell Bull)</td>
+  <td>14</td>
+  <td>40</td>
+  <td>80</td>
+</tr>
+<tr>
+  <td>RSI (Cardwell Bear)</td>
+  <td>14</td>
+  <td>20</td>
+  <td>60</td>
+</tr>
+<tr>
+  <td>RSI(2) Connors</td>
+  <td>2</td>
+  <td>10</td>
+  <td>90</td>
+</tr>
+<tr>
+  <td>Connors RSI</td>
+  <td>3,2,100</td>
+  <td>10</td>
+  <td>90</td>
+</tr>
+<tr>
+  <td>RSI3M3 (Bressert)</td>
+  <td>3 + SMA(3)</td>
+  <td>30</td>
+  <td>60&ndash;70</td>
+</tr>
+<tr>
+  <td>StochRSI</td>
+  <td>14,14,3</td>
+  <td>0.20</td>
+  <td>0.80</td>
+</tr>
+<tr>
+  <td>Laguerre RSI</td>
+  <td>gamma 0.2&ndash;0.8</td>
+  <td>0.15</td>
+  <td>0.85</td>
+</tr>
+<tr>
+  <td>Stochastic (Slow)</td>
+  <td>14,3,3</td>
+  <td>20</td>
+  <td>80</td>
+</tr>
+<tr>
+  <td>DSS Bressert</td>
+  <td>8&ndash;13, EMA 5</td>
+  <td>20</td>
+  <td>80</td>
+</tr>
+</table>
+
+<h3>Signal Quality Matrix</h3>
+
+<table>
+<tr>
+  <th>Signal Type</th>
+  <th>Reliability</th>
+  <th>Best In</th>
+  <th>Watch Out For</th>
+</tr>
+<tr>
+  <td>Overbought/Oversold</td>
+  <td>Low (alone)</td>
+  <td>Ranging markets (low ADX)</td>
+  <td>Trending markets &mdash;
+    can stay extreme for weeks</td>
+</tr>
+<tr>
+  <td>Failure Swing</td>
+  <td>High</td>
+  <td>All markets</td>
+  <td>Requires patience to
+    fully form</td>
+</tr>
+<tr>
+  <td>Regular Divergence</td>
+  <td>Medium</td>
+  <td>Ranging, late trends</td>
+  <td>Can persist for many bars
+    without reversal</td>
+</tr>
+<tr>
+  <td>Hidden Divergence</td>
+  <td>Medium-High</td>
+  <td>Clear trends</td>
+  <td>Requires correct trend
+    identification first</td>
+</tr>
+<tr>
+  <td>Range Shift (Cardwell)</td>
+  <td>High</td>
+  <td>Trend changes</td>
+  <td>Lagging &mdash; confirms
+    after the fact</td>
+</tr>
+<tr>
+  <td>RSI Trendline Break</td>
+  <td>High</td>
+  <td>Daily/weekly charts</td>
+  <td>Too noisy on intraday</td>
+</tr>
+<tr>
+  <td>%K/%D Crossover (Stoch)</td>
+  <td>Medium</td>
+  <td>At extremes (20/80)</td>
+  <td>Ignore crossovers in
+    the middle zone</td>
+</tr>
+</table>
+
+<h3>RSI vs. Stochastic at a Glance</h3>
+
+<table>
+<tr>
+  <th>Dimension</th>
+  <th>RSI</th>
+  <th>Stochastic</th>
+</tr>
+<tr>
+  <td>Measures</td>
+  <td>Avg gains vs avg losses
+    (momentum magnitude)</td>
+  <td>Close position within
+    range (momentum location)</td>
+</tr>
+<tr>
+  <td>Creator</td>
+  <td>Wilder, 1978</td>
+  <td>Lane, ~1957</td>
+</tr>
+<tr>
+  <td>Default period</td>
+  <td>14</td>
+  <td>14,3,3 (Slow)</td>
+</tr>
+<tr>
+  <td>Smoothing</td>
+  <td>Wilder's SMMA (EMA alpha=1/n)</td>
+  <td>SMA</td>
+</tr>
+<tr>
+  <td>Best signal</td>
+  <td>Failure swing, Cardwell
+    range shift</td>
+  <td>%K/%D crossover at
+    extremes, divergence</td>
+</tr>
+<tr>
+  <td>Weakness</td>
+  <td>Can stay overbought/oversold
+    for extended periods</td>
+  <td>SMA drop-off creates
+    false jags</td>
+</tr>
+<tr>
+  <td>Better for trends?</td>
+  <td>Yes (with Cardwell)</td>
+  <td>No (better for ranges)</td>
+</tr>
+</table>
+
+<h3>The Decision Tree</h3>
+
+<div class="diagram">
+<svg viewBox="0 0 700 400"
+  xmlns="http://www.w3.org/2000/svg">
+  <!-- Root -->
+  <rect x="250" y="10" width="200" height="36"
+    rx="6" fill="none" stroke="#58a6ff"
+    stroke-width="1.5"/>
+  <text x="350" y="33" fill="#58a6ff"
+    text-anchor="middle" font-size="13"
+    font-family="Inter" font-weight="600">
+    What kind of market?</text>
+  <!-- Branches -->
+  <line x1="300" y1="46" x2="150" y2="80"
+    stroke="#30363d" stroke-width="1"/>
+  <line x1="400" y1="46" x2="550" y2="80"
+    stroke="#30363d" stroke-width="1"/>
+  <!-- Trending -->
+  <rect x="60" y="80" width="180" height="36"
+    rx="6" fill="rgba(63,185,80,0.1)"
+    stroke="#3fb950" stroke-width="1"/>
+  <text x="150" y="103" fill="#3fb950"
+    text-anchor="middle" font-size="12"
+    font-family="Inter" font-weight="600">
+    Trending (ADX > 25)</text>
+  <!-- Ranging -->
+  <rect x="460" y="80" width="180" height="36"
+    rx="6" fill="rgba(248,81,73,0.1)"
+    stroke="#f85149" stroke-width="1"/>
+  <text x="550" y="103" fill="#f85149"
+    text-anchor="middle" font-size="12"
+    font-family="Inter" font-weight="600">
+    Ranging (ADX &lt; 20)</text>
+  <!-- Trending branches -->
+  <line x1="150" y1="116" x2="150" y2="150"
+    stroke="#30363d" stroke-width="1"/>
+  <rect x="40" y="150" width="220" height="50"
+    rx="6" fill="rgba(22,27,34,0.8)"
+    stroke="#30363d" stroke-width="1"/>
+  <text x="150" y="170" fill="#e6edf3"
+    text-anchor="middle" font-size="11"
+    font-family="Inter">
+    Use RSI with Cardwell ranges</text>
+  <text x="150" y="188" fill="#8b949e"
+    text-anchor="middle" font-size="11"
+    font-family="Inter">
+    Bull: 40-80 | Bear: 20-60</text>
+  <!-- Trending signal types -->
+  <line x1="100" y1="200" x2="80" y2="230"
+    stroke="#30363d" stroke-width="1"/>
+  <line x1="200" y1="200" x2="220" y2="230"
+    stroke="#30363d" stroke-width="1"/>
+  <rect x="10" y="230" width="140" height="40"
+    rx="6" fill="rgba(22,27,34,0.8)"
+    stroke="#30363d" stroke-width="1"/>
+  <text x="80" y="245" fill="#79c0ff"
+    text-anchor="middle" font-size="11"
+    font-family="Inter">Failure swings</text>
+  <text x="80" y="261" fill="#79c0ff"
+    text-anchor="middle" font-size="11"
+    font-family="Inter">RSI trendlines</text>
+  <rect x="160" y="230" width="140" height="40"
+    rx="6" fill="rgba(22,27,34,0.8)"
+    stroke="#30363d" stroke-width="1"/>
+  <text x="230" y="245" fill="#79c0ff"
+    text-anchor="middle" font-size="11"
+    font-family="Inter">Hidden divergence</text>
+  <text x="230" y="261" fill="#79c0ff"
+    text-anchor="middle" font-size="11"
+    font-family="Inter">Cardwell reversals</text>
+  <!-- Ranging branches -->
+  <line x1="550" y1="116" x2="550" y2="150"
+    stroke="#30363d" stroke-width="1"/>
+  <rect x="440" y="150" width="220" height="50"
+    rx="6" fill="rgba(22,27,34,0.8)"
+    stroke="#30363d" stroke-width="1"/>
+  <text x="550" y="170" fill="#e6edf3"
+    text-anchor="middle" font-size="11"
+    font-family="Inter">
+    RSI classic 30/70 levels</text>
+  <text x="550" y="188" fill="#8b949e"
+    text-anchor="middle" font-size="11"
+    font-family="Inter">
+    + Stochastic for confluence</text>
+  <!-- Ranging signal types -->
+  <line x1="500" y1="200" x2="480" y2="230"
+    stroke="#30363d" stroke-width="1"/>
+  <line x1="600" y1="200" x2="620" y2="230"
+    stroke="#30363d" stroke-width="1"/>
+  <rect x="410" y="230" width="140" height="40"
+    rx="6" fill="rgba(22,27,34,0.8)"
+    stroke="#30363d" stroke-width="1"/>
+  <text x="480" y="245" fill="#79c0ff"
+    text-anchor="middle" font-size="11"
+    font-family="Inter">Overbought/Oversold</text>
+  <text x="480" y="261" fill="#79c0ff"
+    text-anchor="middle" font-size="11"
+    font-family="Inter">Mean reversion</text>
+  <rect x="560" y="230" width="140" height="40"
+    rx="6" fill="rgba(22,27,34,0.8)"
+    stroke="#30363d" stroke-width="1"/>
+  <text x="630" y="245" fill="#79c0ff"
+    text-anchor="middle" font-size="11"
+    font-family="Inter">Regular divergence</text>
+  <text x="630" y="261" fill="#79c0ff"
+    text-anchor="middle" font-size="11"
+    font-family="Inter">%K/%D crossovers</text>
+  <!-- Bottom note -->
+  <text x="350" y="320" fill="#8b949e"
+    text-anchor="middle" font-size="12"
+    font-family="Inter">
+    ADX between 20&ndash;25?
+    Market is transitioning.
+    Reduce position size.</text>
+  <text x="350" y="345" fill="#8b949e"
+    text-anchor="middle" font-size="12"
+    font-family="Inter">
+    Multi-timeframe: weekly trend +
+    daily pullback + intraday entry</text>
+  <text x="350" y="370" fill="#d4822a"
+    text-anchor="middle" font-size="12"
+    font-family="Inter" font-weight="600">
+    When RSI and Stochastic agree, signal
+    strength doubles</text>
+</svg>
+<div class="diagram-caption">
+  The indicator decision tree. Start with ADX
+  to determine market character, then choose
+  the right RSI technique for that environment.
+</div>
+</div>
+
+<h3>Quick Formulas</h3>
+
+<table>
+<tr>
+  <th>Indicator</th>
+  <th>Formula</th>
+</tr>
+<tr>
+  <td>RSI</td>
+  <td><code>100 - (100 / (1 + RS))</code>
+    where RS = Avg Gain / Avg Loss</td>
+</tr>
+<tr>
+  <td>Wilder's SMMA</td>
+  <td><code>((Prior x (n-1)) + Current) / n</code></td>
+</tr>
+<tr>
+  <td>Stochastic %K</td>
+  <td><code>((C - LL) / (HH - LL)) x 100</code></td>
+</tr>
+<tr>
+  <td>Stochastic %D</td>
+  <td><code>SMA(3) of %K</code></td>
+</tr>
+<tr>
+  <td>StochRSI</td>
+  <td><code>(RSI - Min RSI) /
+    (Max RSI - Min RSI)</code></td>
+</tr>
+<tr>
+  <td>Connors RSI</td>
+  <td><code>(RSI(3) + RSI(Streak,2) +
+    ROC%Rank(100)) / 3</code></td>
+</tr>
+<tr>
+  <td>RSI3M3</td>
+  <td><code>SMA(3) of RSI(3)</code></td>
+</tr>
+<tr>
+  <td>DSS</td>
+  <td><code>EMA(stoch(EMA(stoch(price))))</code>
+    (double smoothed stochastic)</td>
+</tr>
+<tr>
+  <td>ATR</td>
+  <td><code>SMMA of True Range</code>
+    (max of H-L, |H-PC|, |L-PC|)</td>
+</tr>
+</table>
+
+<h3>Key Dates in Oscillator History</h3>
+
+<div class="timeline">
+  <div class="timeline-item">
+    <div class="timeline-year">~1957</div>
+    <div class="timeline-text">
+      <strong>George Lane</strong> begins
+      teaching the Stochastic Oscillator
+      at Investment Educators, Chicago
+    </div>
+  </div>
+  <div class="timeline-item">
+    <div class="timeline-year">1978</div>
+    <div class="timeline-text">
+      <strong>J. Welles Wilder Jr.</strong>
+      publishes RSI, ATR, ADX, Parabolic SAR,
+      DMI, CSI in "New Concepts in Technical
+      Trading Systems"
+    </div>
+  </div>
+  <div class="timeline-item">
+    <div class="timeline-year">1991</div>
+    <div class="timeline-text">
+      <strong>William Blau</strong> publishes
+      Double Smoothed Stochastic concept in
+      <em>S&amp;C</em> magazine;
+      <strong>Walter Bressert</strong> publishes
+      "The Power of Oscillator/Cycle
+      Combinations" with RSI3M3
+    </div>
+  </div>
+  <div class="timeline-item">
+    <div class="timeline-year">1994</div>
+    <div class="timeline-text">
+      <strong>Chande &amp; Kroll</strong>
+      publish Stochastic RSI in
+      "The New Technical Trader"
+    </div>
+  </div>
+  <div class="timeline-item">
+    <div class="timeline-year">1995</div>
+    <div class="timeline-text">
+      <strong>William Blau</strong> expands
+      double smoothing in "Momentum,
+      Direction, and Divergence"
+    </div>
+  </div>
+  <div class="timeline-item">
+    <div class="timeline-year">~1996-2008</div>
+    <div class="timeline-text">
+      <strong>Larry Connors</strong> develops
+      RSI(2) and Connors RSI for short-term
+      mean reversion strategies
+    </div>
+  </div>
+  <div class="timeline-item">
+    <div class="timeline-year">2004</div>
+    <div class="timeline-text">
+      <strong>John Ehlers</strong> publishes
+      Laguerre RSI and Adaptive RSI in
+      "Cybernetic Analysis for Stocks
+      and Futures"
+    </div>
+  </div>
+</div>
+
+</div>
+
+<!-- ============ FOOTER ============ -->
+<div style="text-align: center; padding: 60px 0 40px;
+  border-top: 1px solid var(--border);
+  margin-top: 40px;">
+  <p style="color: var(--muted); font-size: 13px;">
+    The RSI Bible &mdash;
+    A comprehensive guide to oscillator analysis<br>
+    Built from primary sources and original research
+  </p>
+  <p style="color: var(--muted); font-size: 12px;
+    opacity: 0.6; margin-top: 8px;">
+    Alex Barnett &amp; Claude &middot; 2026
+  </p>
+</div>
+
+</div><!-- /content -->
+
+<script>var BM_KEY = 'bm_rsi_bible';</script>
+<script src="../book.js?v=3"></script>
+<script>
+// Progress bar
+window.addEventListener('scroll', () => {
+  const h = document.documentElement;
+  const pct = (h.scrollTop / (h.scrollHeight - h.clientHeight)) * 100;
+  document.getElementById('progressBar').style.width = pct + '%';
+});
+
+// Nav highlighting
+const navLinks = document.querySelectorAll('.nav-links a');
+const sections = document.querySelectorAll('.section');
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      const id = e.target.id;
+      navLinks.forEach(l => {
+        l.classList.toggle('active',
+          l.getAttribute('href') === '#' + id);
+      });
+    }
+  });
+}, { rootMargin: '-80px 0px -60% 0px' });
+sections.forEach(s => observer.observe(s));
+</script>
+</body>
+</html>
