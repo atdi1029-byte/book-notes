@@ -1,0 +1,3913 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"
+  content="width=device-width, initial-scale=1.0">
+<title>PropertyScout</title>
+<meta name="theme-color" content="#1a1a2e">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style"
+  content="black-translucent">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #0f0f1a;
+  --card: #1a1a2e;
+  --card-hover: #22223a;
+  --accent: #4ecdc4;
+  --accent2: #ff6b6b;
+  --accent3: #ffe66d;
+  --accent4: #a8e6cf;
+  --text: #e0e0e0;
+  --text-dim: #8888a0;
+  --text-bright: #ffffff;
+  --border: #2a2a4a;
+  --success: #4ecdc4;
+  --warning: #ffe66d;
+  --danger: #ff6b6b;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont,
+    'Segoe UI', system-ui, sans-serif;
+  line-height: 1.7;
+  min-height: 100vh;
+  padding-bottom: 80px;
+}
+
+/* ── Header ── */
+.header {
+  background: linear-gradient(135deg, #1a1a2e, #16213e);
+  padding: 1.5rem 1rem 1rem;
+  text-align: center;
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.header h1 {
+  font-size: 1.5rem;
+  color: var(--accent);
+  letter-spacing: 1px;
+}
+.header .tagline {
+  font-size: 0.8rem;
+  color: var(--text-dim);
+  margin-top: 0.25rem;
+}
+
+/* ── Navigation ── */
+.nav {
+  display: flex;
+  gap: 0.25rem;
+  padding: 0.75rem 0.5rem;
+  overflow-x: auto;
+  background: var(--bg);
+  position: sticky;
+  top: 72px;
+  z-index: 99;
+  border-bottom: 1px solid var(--border);
+  -webkit-overflow-scrolling: touch;
+}
+.nav-btn {
+  flex-shrink: 0;
+  padding: 0.5rem 0.9rem;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  background: var(--card);
+  color: var(--text-dim);
+  font-size: 0.78rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+.nav-btn.active {
+  background: var(--accent);
+  color: var(--bg);
+  border-color: var(--accent);
+  font-weight: 600;
+}
+
+/* ── Sections ── */
+.section {
+  display: none;
+  padding: 1rem;
+  max-width: 820px;
+  margin: 0 auto;
+}
+.section.active { display: block; }
+
+/* ── Cards ── */
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.25rem;
+  margin-bottom: 1rem;
+}
+.card h2 {
+  color: var(--accent);
+  font-size: 1.2rem;
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid var(--border);
+}
+.card h3 {
+  color: var(--accent);
+  font-size: 1.05rem;
+  margin-bottom: 0.5rem;
+}
+.card h4 {
+  color: var(--accent3);
+  font-size: 0.95rem;
+  margin-top: 1rem;
+  margin-bottom: 0.4rem;
+}
+.card p {
+  color: var(--text);
+  font-size: 0.9rem;
+  margin-bottom: 0.6rem;
+}
+.card ul, .card ol {
+  padding-left: 1.25rem;
+  margin-bottom: 0.6rem;
+}
+.card li {
+  font-size: 0.88rem;
+  margin-bottom: 0.35rem;
+  color: var(--text);
+}
+
+/* ── Callouts ── */
+.highlight {
+  background: rgba(78, 205, 196, 0.1);
+  border-left: 3px solid var(--accent);
+  padding: 0.75rem 1rem;
+  margin: 0.75rem 0;
+  border-radius: 0 8px 8px 0;
+  font-size: 0.88rem;
+}
+.warning {
+  background: rgba(255, 107, 107, 0.1);
+  border-left: 3px solid var(--danger);
+  padding: 0.75rem 1rem;
+  margin: 0.75rem 0;
+  border-radius: 0 8px 8px 0;
+  font-size: 0.88rem;
+}
+.tip {
+  background: rgba(255, 230, 109, 0.1);
+  border-left: 3px solid var(--warning);
+  padding: 0.75rem 1rem;
+  margin: 0.75rem 0;
+  border-radius: 0 8px 8px 0;
+  font-size: 0.88rem;
+}
+.example {
+  background: rgba(168, 230, 207, 0.1);
+  border-left: 3px solid var(--accent4);
+  padding: 0.75rem 1rem;
+  margin: 0.75rem 0;
+  border-radius: 0 8px 8px 0;
+  font-size: 0.88rem;
+}
+
+.badge {
+  display: inline-block;
+  padding: 0.15rem 0.5rem;
+  border-radius: 10px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.badge-easy {
+  background: rgba(78, 205, 196, 0.2);
+  color: var(--accent);
+}
+.badge-medium {
+  background: rgba(255, 230, 109, 0.2);
+  color: var(--warning);
+}
+.badge-hard {
+  background: rgba(255, 107, 107, 0.2);
+  color: var(--danger);
+}
+
+/* ── Links ── */
+a.site-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 600;
+  padding: 0.4rem 0.8rem;
+  background: rgba(78, 205, 196, 0.1);
+  border-radius: 8px;
+  margin: 0.25rem 0.25rem 0.25rem 0;
+  font-size: 0.85rem;
+  transition: background 0.2s;
+}
+a.site-link:hover {
+  background: rgba(78, 205, 196, 0.2);
+}
+
+/* ── Steps ── */
+.step {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  align-items: flex-start;
+}
+.step-num {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.8rem;
+  margin-top: 0.1rem;
+}
+.step-content {
+  font-size: 0.9rem;
+}
+.step-content strong {
+  color: var(--text-bright);
+}
+
+/* ── Table ── */
+.info-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0.75rem 0;
+  font-size: 0.85rem;
+}
+.info-table th {
+  text-align: left;
+  color: var(--accent);
+  padding: 0.5rem;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.8rem;
+}
+.info-table td {
+  padding: 0.5rem;
+  border-bottom: 1px solid rgba(42,42,74,0.5);
+  vertical-align: top;
+}
+
+/* ── Calculator ── */
+.calc-input {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.6rem 0.8rem;
+  color: var(--text-bright);
+  font-size: 1rem;
+  width: 100%;
+  margin-bottom: 0.5rem;
+}
+.calc-input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+.calc-label {
+  font-size: 0.8rem;
+  color: var(--text-dim);
+  margin-bottom: 0.25rem;
+  display: block;
+}
+.calc-result {
+  background: rgba(78, 205, 196, 0.1);
+  border: 1px solid var(--accent);
+  border-radius: 8px;
+  padding: 1rem;
+  margin-top: 0.75rem;
+  font-size: 0.95rem;
+}
+.calc-result .big-num {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--accent);
+}
+.calc-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+}
+.calc-btn {
+  background: var(--accent);
+  color: var(--bg);
+  border: none;
+  padding: 0.7rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  margin-top: 0.5rem;
+  width: 100%;
+}
+
+/* ── Checklist ── */
+.checklist-item {
+  display: flex;
+  gap: 0.6rem;
+  padding: 0.6rem 0;
+  border-bottom: 1px solid rgba(42,42,74,0.3);
+  align-items: flex-start;
+  cursor: pointer;
+}
+.checklist-item input[type="checkbox"] {
+  margin-top: 0.2rem;
+  accent-color: var(--accent);
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+.checklist-item.done .cl-text {
+  text-decoration: line-through;
+  color: var(--text-dim);
+}
+.cl-text { font-size: 0.9rem; }
+
+.gloss-term {
+  color: var(--accent3);
+  font-weight: 600;
+}
+
+/* ── County cards ── */
+.county-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.5rem;
+}
+.county-card {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.88rem;
+}
+.county-name {
+  font-weight: 600;
+  color: var(--text-bright);
+}
+.county-date {
+  color: var(--accent);
+  font-size: 0.8rem;
+}
+.county-format {
+  color: var(--text-dim);
+  font-size: 0.75rem;
+}
+
+.progress-bar {
+  background: var(--border);
+  border-radius: 10px;
+  height: 8px;
+  overflow: hidden;
+  margin: 0.5rem 0;
+}
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(
+    90deg, var(--accent), var(--accent4));
+  border-radius: 10px;
+  transition: width 0.3s;
+}
+.progress-label {
+  font-size: 0.8rem;
+  color: var(--text-dim);
+  display: flex;
+  justify-content: space-between;
+}
+
+/* ── Scenario cards ── */
+.scenario {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1rem;
+  margin: 0.75rem 0;
+  background: var(--bg);
+}
+.scenario-title {
+  color: var(--accent3);
+  font-weight: 600;
+  margin-bottom: 0.4rem;
+}
+
+/* ── Bookmarks ── */
+.bm-btn {
+  display: none;
+  position: absolute;
+  right: 0.5rem;
+  top: 0.25rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  opacity: 0.3;
+  transition: opacity 0.2s;
+  color: var(--text-dim);
+  z-index: 5;
+  padding: 0.2rem;
+}
+.card:hover .bm-btn,
+.card .bm-btn.bookmarked { display: block; }
+.bm-btn.bookmarked { opacity: 1; color: var(--accent3); }
+.card { position: relative; }
+
+.bm-resume {
+  position: fixed;
+  bottom: 90px;
+  right: 1rem;
+  background: var(--accent);
+  color: var(--bg);
+  border: none;
+  border-radius: 10px;
+  padding: 0.6rem 1rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  z-index: 200;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.4);
+  display: none;
+}
+.bm-resume.show { display: block; }
+
+/* ── Responsive ── */
+@media (min-width: 600px) {
+  .county-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>PropertyScout</h1>
+  <div class="tagline">
+    The complete guide to buying government
+    property -- Maryland focus
+  </div>
+</div>
+
+<div class="nav" id="topNav">
+  <button class="nav-btn active"
+    data-section="basics">Basics</button>
+  <button class="nav-btn"
+    data-section="taxlien">Tax Liens</button>
+  <button class="nav-btn"
+    data-section="hud">HUD Homes</button>
+  <button class="nav-btn"
+    data-section="federal">Federal</button>
+  <button class="nav-btn"
+    data-section="homebuying">Homebuying 101</button>
+  <button class="nav-btn"
+    data-section="maryland">Maryland</button>
+  <button class="nav-btn"
+    data-section="evaluate">Evaluate</button>
+  <button class="nav-btn"
+    data-section="math">The Math</button>
+  <button class="nav-btn"
+    data-section="traps">Traps</button>
+  <button class="nav-btn"
+    data-section="sites">All Sites</button>
+  <button class="nav-btn"
+    data-section="glossary">Glossary</button>
+  <button class="nav-btn"
+    data-section="checklist">Checklists</button>
+</div>
+
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- BASICS                                      -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="section active" id="basics">
+
+<div class="card">
+  <h2>Why Government Properties Sell Cheap</h2>
+  <p>
+    The government is not in the real estate business.
+    When they end up owning property -- through unpaid
+    taxes, criminal seizures, or loan defaults -- they
+    want to get rid of it as fast as possible and
+    recover whatever money they're owed. They don't
+    care about getting market value. They care about
+    getting the tax debt, the loan balance, or just
+    clearing their books.
+  </p>
+  <p>
+    This creates a massive gap between what the
+    government sells a property for and what it's
+    actually worth on the open market. A house assessed
+    at $150,000 might have $8,000 in unpaid taxes. The
+    county doesn't need $150,000 -- they need $8,000.
+    So they auction it for $8,000. That gap is your
+    opportunity.
+  </p>
+  <p>
+    There are five main pipelines that funnel cheap
+    property from the government to everyday buyers.
+    Each works differently, has different risks, and
+    requires different amounts of money and knowledge.
+    Understanding all five -- and knowing which one
+    fits your situation -- is the entire game.
+  </p>
+</div>
+
+<div class="card">
+  <h2>Pipeline 1: Tax Lien Certificates</h2>
+  <span class="badge badge-medium">Medium difficulty</span>
+  <p>
+    When a property owner doesn't pay their property
+    taxes for about two years, the county government
+    steps in. They can't just let people not pay -- the
+    county needs that revenue for schools, roads, and
+    services. So they put a "lien" on the property. A
+    lien is a legal claim that says "this property owes
+    us money."
+  </p>
+  <p>
+    Then the county holds an auction. But here's the
+    key: in a tax lien state like Maryland, they're not
+    selling the property itself. They're selling that
+    lien -- the debt. When you buy a tax lien
+    certificate, you're essentially paying the county
+    what the owner owed, and now the owner owes YOU
+    instead. You become the new creditor.
+  </p>
+  <p>
+    The property owner now has to pay you back the full
+    amount plus interest. In Maryland, interest rates
+    range from 6% (owner-occupied properties in some
+    counties) up to 20% per year (non-owner-occupied
+    in Montgomery County). That interest is guaranteed
+    by law -- it's not negotiable.
+  </p>
+  <p>
+    Most of the time, the owner pays. Maybe it takes 3
+    months, maybe 18 months, but they pay. You get your
+    money back plus the interest. That's the typical
+    outcome -- and it's still a great return. Where else
+    are you getting 12-20% guaranteed by a real property?
+  </p>
+  <p>
+    But sometimes the owner doesn't pay. Maybe they
+    abandoned the house. Maybe they died and the heirs
+    don't know about it. Maybe they just can't afford
+    it. When that happens, you can file for
+    foreclosure. After a waiting period (6 months in
+    most of Maryland, 9 months for owner-occupied
+    properties in Baltimore City), you hire a Maryland
+    attorney, file a complaint in Circuit Court, and if
+    the court approves, you get a deed. You now own the
+    property. That $8,000 tax lien just turned into a
+    house.
+  </p>
+  <div class="example">
+    <strong>Real example:</strong> You buy a tax lien
+    certificate at a Washington County auction. The
+    delinquent taxes are $4,200. You win the bid at
+    $4,200 (no overbid). The interest rate is 18%.
+    After 8 months, the owner redeems. You get back
+    $4,200 + $504 interest = $4,704. You earned $504
+    on a $4,200 investment in 8 months. Annualized,
+    that's 18%.
+    <br><br>
+    <strong>Alternative outcome:</strong> The owner
+    doesn't pay. After 6 months you file foreclosure.
+    Attorney and legal fees cost you $3,500. Court
+    process takes 10 more months. Total time: 16
+    months. Total invested: $7,700. But the property
+    is worth $95,000. You just bought a $95K house for
+    $7,700.
+  </div>
+</div>
+
+<div class="card">
+  <h2>Pipeline 2: Tax Deed Sales</h2>
+  <span class="badge badge-medium">Medium difficulty</span>
+  <p>
+    In tax deed states, the county skips the lien step
+    entirely and sells the actual property at auction.
+    You bid, you win, you get the deed -- you own the
+    house immediately. No waiting for redemption, no
+    foreclosure process, no attorney needed for the
+    acquisition itself.
+  </p>
+  <p>
+    Maryland is NOT a tax deed state -- it's a tax lien
+    state. But this matters to you because neighboring
+    states ARE tax deed states. Pennsylvania does tax
+    deed sales. So does Georgia, Florida, and Texas. If
+    you're willing to look beyond Maryland, you can buy
+    properties outright at auction in a single day.
+  </p>
+  <p>
+    The tradeoff: tax deed states tend to have more
+    competition because the prize is more obvious. In a
+    tax lien state, you might be the only bidder on a
+    $3,000 lien because most people don't understand
+    the system. In a tax deed state, everyone
+    understands "I'm buying a house for cheap" -- so
+    more people show up.
+  </p>
+  <div class="tip">
+    <strong>The Pennsylvania option:</strong> PA is
+    right next door and runs judicial tax sales where
+    you can buy properties outright. The counties of
+    Adams, Franklin, and Cumberland are all within
+    driving distance of the Harpers Ferry area.
+    Pennsylvania tax sales happen year-round --
+    different counties, different schedules.
+  </div>
+</div>
+
+<div class="card">
+  <h2>Pipeline 3: HUD / USDA / VA Foreclosures</h2>
+  <span class="badge badge-easy">Easiest</span>
+  <p>
+    The federal government backs a huge portion of
+    home mortgages in America. When you get an FHA
+    loan, USDA loan, or VA loan, the federal agency
+    is guaranteeing that loan. If the borrower stops
+    paying, the bank forecloses, and the agency takes
+    ownership of the property. Now the government owns
+    a house they don't want.
+  </p>
+  <p>
+    <strong>HUD homes</strong> come from defaulted FHA
+    loans. The Department of Housing and Urban
+    Development lists them on HUDHomeStore.gov. This is
+    the most beginner-friendly pipeline because it
+    works like normal home buying -- you use a real
+    estate agent, you can get financing, and if you're
+    going to live in the property, you get first dibs
+    before investors can even bid.
+  </p>
+  <p>
+    <strong>USDA properties</strong> come from
+    defaulted rural development loans. Listed on
+    resales.usda.gov. These are specifically in rural
+    areas -- which is great if you're looking near
+    Harpers Ferry, Western Maryland, or the Eastern
+    Shore. Rural doesn't mean middle-of-nowhere -- many
+    suburban areas qualify as "rural" under USDA's
+    definition.
+  </p>
+  <p>
+    <strong>VA properties</strong> come from defaulted
+    VA loans. Listed on listings.vrmco.com. You do NOT
+    need to be a veteran to buy a VA-foreclosed
+    property -- anyone can buy them. They just
+    originated from veteran loans.
+  </p>
+  <p>
+    The incredible thing about HUD homes is the
+    <strong>$100 down program</strong>. When you buy a
+    HUD-owned home with an FHA loan, your down payment
+    is literally $100. Not 3.5%, not $10,000 -- one
+    hundred dollars. HUD also offers a 3% closing cost
+    credit on eligible properties. With $30,000 in
+    savings, you could buy a HUD home, keep almost all
+    your cash, and use it for repairs and living
+    expenses while you fix the place up.
+  </p>
+  <div class="highlight">
+    <strong>Why this is probably your best first
+    move:</strong> You want to live near Harpers
+    Ferry. You have $30K. HUD homes let you buy with
+    $100 down, keep your cash, get into a house you
+    can live in, and build equity while you learn the
+    rest of this system. No auctions, no foreclosure
+    lawsuits, no attorneys beyond the standard closing.
+    Just find a house, make an offer, close.
+  </div>
+</div>
+
+<div class="card">
+  <h2>Pipeline 4: Federal Seized Assets</h2>
+  <span class="badge badge-hard">Advanced</span>
+  <p>
+    When someone commits a federal crime -- drug
+    trafficking, money laundering, fraud, tax evasion
+    -- the government can seize their assets. Houses,
+    cars, boats, jewelry, bank accounts, businesses.
+    The US Marshals Service and the IRS are the two
+    main agencies that handle these seizures.
+  </p>
+  <p>
+    <strong>US Marshals</strong> manages seized assets
+    from criminal cases. These get auctioned through
+    Bid4Assets (the same platform used for Maryland tax
+    sales). The Marshals typically provide clear title
+    via a Government Deed, which is better than most
+    government sales. No buyer's premium. But inventory
+    is tiny and sporadic -- a property near you might
+    pop up once or twice a year.
+  </p>
+  <p>
+    <strong>IRS auctions</strong> sell property seized
+    for unpaid taxes. About 300 auctions per year
+    nationwide (not just real estate -- also cars,
+    equipment, etc.). These are riskier because the IRS
+    provides NO title guarantee. You might need a quiet
+    title action afterward ($1,500-$3,000 legal cost)
+    to clean up the ownership. Auctions can be
+    in-person, online, or sealed bid.
+  </p>
+  <p>
+    <strong>Treasury Department</strong> handles
+    forfeitures from customs, Secret Service, and ATF
+    cases. Listed at treasury.gov/auctions. Mostly
+    vehicles and personal property, but occasionally
+    real estate.
+  </p>
+  <p>
+    These are exciting to read about but shouldn't be
+    your primary strategy. The inventory is too small
+    and unpredictable. Think of it as a bonus -- check
+    the sites weekly, and if something shows up near
+    you at a good price, jump on it. But don't wait
+    around for it.
+  </p>
+</div>
+
+<div class="card">
+  <h2>Pipeline 5: Surplus Government Property</h2>
+  <span class="badge badge-hard">Advanced</span>
+  <p>
+    The federal government owns about 640 million acres
+    of land -- nearly 28% of the entire United States.
+    They also own hundreds of thousands of buildings.
+    When they no longer need a piece of real estate
+    (closed military bases, decommissioned post
+    offices, excess federal land, abandoned buildings),
+    it gets classified as "surplus" and sold.
+  </p>
+  <p>
+    <strong>RealEstateSales.gov</strong> (run by GSA)
+    is the main portal. You need a Login.gov account to
+    register. Properties range from vacant lots to
+    massive commercial buildings. Most are not
+    residential, but occasionally a small property
+    shows up that could work.
+  </p>
+  <p>
+    <strong>GSA Auctions</strong> (gsaauctions.gov)
+    handles more general government surplus -- vehicles,
+    furniture, equipment, plus some real estate.
+    <strong>GovDeals.com</strong> is where state and
+    local governments sell surplus (Maryland State
+    Police sells seized vehicles here).
+    <strong>GovPlanet.com</strong> sells heavy
+    equipment and military vehicles if that interests
+    you.
+  </p>
+  <p>
+    For your situation, this pipeline is mostly
+    interesting for land. If you find a cheap federal
+    surplus lot in Western Maryland, you could buy land
+    for almost nothing and build later, or hold it as
+    an investment. But residential opportunities are
+    rare.
+  </p>
+</div>
+
+<div class="card">
+  <h2>Which Pipeline Should You Start With?</h2>
+
+  <div class="scenario">
+    <div class="scenario-title">
+      Scenario A: "I want to live in a house
+      near Harpers Ferry"
+    </div>
+    <p>
+      <strong>Go with HUD homes.</strong> Search
+      HUDHomeStore.gov for Washington County MD,
+      Frederick County MD, and Jefferson County WV.
+      Use the FHA $100 down program. Keep your $30K
+      for repairs and a financial cushion. You could
+      be in a house within 60-90 days.
+    </p>
+  </div>
+
+  <div class="scenario">
+    <div class="scenario-title">
+      Scenario B: "I want to invest my $30K
+      and earn passive returns"
+    </div>
+    <p>
+      <strong>Buy tax lien certificates.</strong>
+      Spread $20K across 5-8 liens at Maryland's
+      annual tax sales (May-June). Keep $10K as
+      reserve for foreclosure costs on any that
+      don't redeem. Target 12-18% returns. This is
+      essentially lending money at high interest,
+      secured by real property.
+    </p>
+  </div>
+
+  <div class="scenario">
+    <div class="scenario-title">
+      Scenario C: "I want to buy the cheapest
+      property possible"
+    </div>
+    <p>
+      <strong>Target tax liens on cheap properties
+      in rural counties.</strong> Allegany County
+      (Cumberland, MD) has the lowest property values
+      in the state. Liens can be as low as $500-$2,000.
+      If the owner doesn't redeem, you foreclose and
+      own a house for under $10K total. Combine this
+      with checking IRS auctions and US Marshals weekly
+      for windfalls.
+    </p>
+  </div>
+
+  <div class="scenario">
+    <div class="scenario-title">
+      Scenario D: "I want to flip houses"
+    </div>
+    <p>
+      <strong>Combine HUD homes + tax liens.</strong>
+      Buy a HUD home with FHA $100 down, fix it up
+      with your $30K, live in it for 1 year (FHA
+      requirement), then rent or sell it. Meanwhile,
+      buy tax liens on the side with leftover cash.
+      When one doesn't redeem, you get a second
+      property for almost nothing.
+    </p>
+  </div>
+
+  <div class="card" style="background:var(--bg);
+    border:none; padding:0; margin-top:0.5rem;">
+    <h3>Your Learning Progress</h3>
+    <div class="progress-label">
+      <span>Sections visited</span>
+      <span id="progressCount">0 / 12</span>
+    </div>
+    <div class="progress-bar">
+      <div class="progress-fill"
+        id="progressFill" style="width: 0%"></div>
+    </div>
+  </div>
+</div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- TAX LIENS DEEP DIVE                        -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="section" id="taxlien">
+
+<div class="card">
+  <h2>Maryland Tax Lien Sales -- The Complete Guide</h2>
+  <p>
+    This section covers absolutely everything about
+    how tax lien sales work in Maryland. Read this
+    front to back and you'll know more than 90% of
+    people who show up at auction.
+  </p>
+</div>
+
+<div class="card">
+  <h3>The Timeline: How a Property Ends Up at
+  Tax Sale</h3>
+  <p>
+    Maryland property taxes are due July 1st of each
+    year and become delinquent on October 1st. When a
+    property owner doesn't pay, the county starts
+    adding interest and penalties. But they don't
+    immediately auction it off -- they give the owner
+    about two years to catch up.
+  </p>
+  <p>
+    After roughly two years of non-payment, the county
+    treasurer places the property on the "tax sale
+    list." This list is published in local newspapers
+    and posted on the county's website 4-8 weeks
+    before the auction. This is your research window
+    -- the time to investigate every property on the
+    list before you bid.
+  </p>
+  <p>
+    The actual auctions happen once per year in most
+    counties. The bulk of Maryland tax sales fall
+    between May and June. Baltimore County is the
+    exception -- they run theirs in August through
+    October. St. Mary's County goes early in March.
+    Each county runs independently with its own rules,
+    deposits, and platforms.
+  </p>
+</div>
+
+<div class="card">
+  <h3>How the Bidding Actually Works</h3>
+  <p>
+    Maryland uses a <strong>highest-bidder</strong>
+    auction format. This is different from some states
+    (like New Jersey) where you bid DOWN the interest
+    rate. In Maryland, you bid UP from a minimum.
+  </p>
+  <p>
+    The <strong>minimum bid</strong> (called the "sale
+    amount") is the total of all unpaid taxes, interest,
+    penalties, and the county's costs to run the
+    auction. If a property has $4,000 in delinquent
+    taxes and $800 in fees, the minimum bid is $4,800.
+  </p>
+  <p>
+    Bidders compete by offering more than the minimum.
+    The highest bidder wins. But here's the critical
+    thing most beginners don't understand:
+    <strong>you only earn interest on the original lien
+    amount (the unpaid taxes), NOT on whatever extra
+    you bid above that.</strong>
+  </p>
+  <div class="warning">
+    <strong>The overbid trap explained:</strong>
+    Say the lien amount is $4,000. You bid $12,000 to
+    win the auction (because someone else bid $11,000).
+    You paid $12,000 total. The interest rate is 18%.
+    The owner redeems after 12 months. You earn
+    interest only on the $4,000 lien: $4,000 x 18% =
+    $720. Your total return: $720 on a $12,000
+    investment = 6%. The $8,000 overbid earned you
+    nothing. If you'd won at $4,000, you'd have made
+    18%. Overbidding is the #1 way beginners destroy
+    their returns.
+  </div>
+  <p>
+    So why do people overbid? Because they're betting
+    the owner won't redeem. If you overbid $8,000 and
+    the owner doesn't pay, you get to foreclose on a
+    property that might be worth $100,000+. The overbid
+    is the "price of admission" to potentially getting
+    the property. Experienced investors calculate: "Is
+    this property worth enough that even with my
+    overbid + foreclosure costs, it's still a great
+    deal?" If yes, they bid aggressively.
+  </p>
+</div>
+
+<div class="card">
+  <h3>The High Bid Premium (Maryland-Specific)</h3>
+  <p>
+    Maryland has a unique rule: if your winning bid
+    exceeds <strong>40% of the property's full cash
+    value</strong> (the assessed value from SDAT), you
+    must pay an additional "high bid premium" equal to
+    20% of the amount exceeding that threshold.
+  </p>
+  <div class="example">
+    <strong>Example:</strong><br>
+    Property assessed at $100,000<br>
+    40% threshold: $40,000<br>
+    Your winning bid: $55,000<br>
+    Amount over threshold: $15,000<br>
+    High bid premium: $15,000 x 20% = $3,000<br><br>
+    You pay $55,000 + $3,000 = $58,000 total.<br>
+    The premium is refundable if the owner redeems
+    or you foreclose, but it earns ZERO interest.
+    It's dead capital.
+  </div>
+</div>
+
+<div class="card">
+  <h3>Interest Rates by County</h3>
+  <p>
+    Maryland law allows each county to set its own
+    interest rate, with different rates for
+    owner-occupied vs. non-owner-occupied properties.
+  </p>
+  <table class="info-table">
+    <tr>
+      <th>Category</th>
+      <th>Typical Rate</th>
+    </tr>
+    <tr>
+      <td>Non-owner-occupied (most counties)</td>
+      <td>12-18% per year</td>
+    </tr>
+    <tr>
+      <td>Montgomery County non-owner-occupied</td>
+      <td>20% per year</td>
+    </tr>
+    <tr>
+      <td>Owner-occupied (reduced rate)</td>
+      <td>6-10% per year</td>
+    </tr>
+    <tr>
+      <td>Montgomery County owner-occupied</td>
+      <td>6% per year</td>
+    </tr>
+  </table>
+  <p>
+    Interest is calculated daily from the date of the
+    tax sale. The rate applies to the lien amount only
+    (not overbid, not high bid premium). When the owner
+    redeems, they pay you the full principal + accrued
+    interest + documented costs (title search up to
+    $250, attorney fees up to $500 pre-foreclosure).
+  </p>
+</div>
+
+<div class="card">
+  <h3>Redemption -- When the Owner Pays You Back</h3>
+  <p>
+    In Maryland, the property owner (or anyone with a
+    legal interest -- a mortgage holder, an heir, even
+    a tenant in some cases) can "redeem" the property
+    by paying you back at any time. There is no fixed
+    redemption period that expires automatically.
+    Instead, the right to redeem exists until a court
+    finalizes the foreclosure.
+  </p>
+  <p>
+    <strong>What the owner must pay you to redeem:
+    </strong>
+  </p>
+  <ul>
+    <li>The full amount you paid at auction (your
+    winning bid)</li>
+    <li>Interest at the applicable rate (on the lien
+    amount, not the overbid)</li>
+    <li>Title search fees (up to $250)</li>
+    <li>Attorney fees (up to $500 before foreclosure
+    is filed; "reasonable" amount after filing)</li>
+    <li>Recording fees, certified mail costs, and
+    other documented expenses</li>
+    <li>The high bid premium (refunded to you without
+    interest)</li>
+  </ul>
+  <p>
+    Most owners who redeem do so within 6-18 months.
+    The most frustrating scenario: you've already spent
+    $3,000+ on foreclosure legal fees, you're 11
+    months into the process, and the owner redeems at
+    the last minute. You get your money back plus
+    interest, plus reasonable attorney fees -- but your
+    net return after all the hassle might be modest.
+    This is a real risk you need to accept.
+  </p>
+</div>
+
+<div class="card">
+  <h3>Foreclosure -- Getting the Property</h3>
+  <p>
+    If the owner doesn't redeem, here's the legal
+    process to actually get the property. This is
+    Maryland-specific and governed by the Tax-Property
+    Article, Title 14, Subtitle 8, Part III.
+  </p>
+
+  <div class="step">
+    <div class="step-num">1</div>
+    <div class="step-content">
+      <strong>Wait the required period.</strong>
+      6 months from the sale date for most properties.
+      9 months for owner-occupied residential
+      properties in Baltimore City. You cannot file
+      before this -- the court will dismiss it.
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">2</div>
+    <div class="step-content">
+      <strong>Send two separate written notices.</strong>
+      Maryland law requires you to send formal notices
+      to the property owner and ALL parties with a
+      legal interest (mortgage holders, other lien
+      holders, heirs if known). The notices must include
+      specific information mandated by statute -- your
+      name, the sale date, the property description,
+      the amount owed, and the owner's right to redeem.
+      These must be sent by certified mail AND regular
+      mail. Keep proof of mailing -- you'll need it
+      in court.
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">3</div>
+    <div class="step-content">
+      <strong>Hire a Maryland attorney.</strong>
+      You CANNOT file a tax sale foreclosure pro se
+      (by yourself) in Maryland. You must use a
+      licensed attorney. This is non-negotiable.
+      Attorneys who specialize in tax sale foreclosures
+      typically charge $1,500-$4,000 for the full
+      process. Some work on a flat fee, others bill
+      hourly. Get quotes from at least 3 attorneys.
+      Search "Maryland tax sale attorney" -- there are
+      firms that do nothing but this.
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">4</div>
+    <div class="step-content">
+      <strong>File the Complaint to Foreclose
+      the Right of Redemption.</strong>
+      Your attorney files this in the Circuit Court
+      for the county where the property is located.
+      The complaint must include proof of purchase,
+      proof of notice, a title search, and other
+      documentation. Court filing fees run $200-$400.
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">5</div>
+    <div class="step-content">
+      <strong>Serve all parties.</strong>
+      Every person and entity with a legal interest
+      must be formally served with the lawsuit. This
+      includes the owner, all mortgage holders, all
+      lien holders, and anyone else who appears in
+      the title search. Service costs $100-$300.
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">6</div>
+    <div class="step-content">
+      <strong>Court review and judgment.</strong>
+      If all parties are properly served and no one
+      contests (or the court rules in your favor after
+      a hearing), the court enters a judgment
+      foreclosing the right of redemption. This order
+      directs the county to issue you a deed. The
+      court can also order publication in a newspaper
+      if parties can't be located ($200-$500).
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">7</div>
+    <div class="step-content">
+      <strong>Receive your deed.</strong>
+      The county or municipality issues a tax sale
+      deed to you. You record it at the county clerk's
+      office ($100-$300 in recording fees). You now
+      legally own the property. The previous owner
+      and all subordinate lien holders lose their
+      rights.
+    </div>
+  </div>
+
+  <p>
+    <strong>Total timeline:</strong> From buying the
+    lien to holding the deed: 12-24 months. The
+    foreclosure process alone (steps 2-7) typically
+    takes 6-18 months depending on how complicated
+    the title is and how busy the court is.
+  </p>
+
+  <table class="info-table">
+    <tr><th>Cost Item</th><th>Range</th></tr>
+    <tr>
+      <td>Attorney fees</td>
+      <td>$1,500 - $4,000+</td>
+    </tr>
+    <tr>
+      <td>Title search</td>
+      <td>$250 - $500</td>
+    </tr>
+    <tr>
+      <td>Court filing</td>
+      <td>$200 - $400</td>
+    </tr>
+    <tr>
+      <td>Service of process</td>
+      <td>$100 - $300</td>
+    </tr>
+    <tr>
+      <td>Newspaper publication</td>
+      <td>$200 - $500</td>
+    </tr>
+    <tr>
+      <td>Recording the deed</td>
+      <td>$100 - $300</td>
+    </tr>
+    <tr>
+      <td>MD recordation tax</td>
+      <td>$4.10 per $500 of value</td>
+    </tr>
+    <tr>
+      <td><strong>Total</strong></td>
+      <td><strong>$2,500 - $5,500+</strong></td>
+    </tr>
+  </table>
+</div>
+
+<div class="card">
+  <h3>The 2-Year Deadline -- Don't Miss This</h3>
+  <div class="warning">
+    <strong>Your tax lien certificate expires after
+    2 years.</strong> If you do not file a foreclosure
+    complaint within 2 years of the sale date, your
+    certificate becomes VOID. You lose your entire
+    investment -- the lien amount, the overbid,
+    everything. The property goes back to the owner
+    free and clear. There is no extension, no appeal,
+    no second chance. This is the single biggest
+    mistake passive investors make.
+  </div>
+  <p>
+    Set a calendar reminder for 5 months after
+    purchase. At that point, you're 1 month away from
+    being eligible to file (6-month wait) and you have
+    19 months of runway. If the owner hasn't redeemed
+    by month 5, start talking to an attorney and
+    preparing to file.
+  </p>
+</div>
+
+<div class="card">
+  <h3>What Liens Survive a Tax Sale Foreclosure</h3>
+  <p>
+    One of the most powerful things about tax lien
+    foreclosure is that most other debts attached to
+    the property get wiped out. But not all of them.
+  </p>
+
+  <h4>Wiped Out (you get clean title):</h4>
+  <ul>
+    <li>Private mortgages (first mortgage, second
+    mortgage, HELOC)</li>
+    <li>Judgment liens (court-ordered debts)</li>
+    <li>HOA and condo association liens</li>
+    <li>Mechanic's liens (contractor debts)</li>
+    <li>Most other private encumbrances</li>
+  </ul>
+  <p>
+    This is huge. Imagine a house with a $200,000
+    mortgage that you acquire through tax sale
+    foreclosure for $10,000. That $200,000 mortgage
+    is gone. The bank loses their claim. This is
+    why tax sales can produce such insane returns.
+  </p>
+
+  <h4>Survives (these DON'T go away):</h4>
+  <ul>
+    <li><strong>IRS federal tax liens:</strong> The
+    IRS gets a 120-day right of redemption AFTER your
+    foreclosure is finalized. During those 120 days,
+    the IRS can pay what you paid and take the property
+    from you. If they don't act in 120 days, their
+    lien is extinguished. But the uncertainty is
+    stressful -- and the IRS does occasionally exercise
+    this right on valuable properties.</li>
+    <li><strong>Other federal liens:</strong> SBA
+    loans, HUD liens, USDA liens may have similar
+    federal protections.</li>
+    <li><strong>EPA / environmental liens:</strong>
+    Superfund liens survive tax sales. If the property
+    has environmental contamination, YOU become the
+    responsible party for cleanup. This can cost more
+    than the property is worth -- sometimes millions.
+    </li>
+    <li><strong>Some municipal liens:</strong>
+    Water/sewer bills may carry over depending on the
+    jurisdiction.</li>
+  </ul>
+</div>
+
+<div class="card">
+  <h3>Registering for a Maryland Tax Sale</h3>
+  <p>
+    Each county has its own registration process,
+    but here's what's generally required:
+  </p>
+  <ul>
+    <li>Register 1-3 weeks before the sale date
+    (deadlines vary -- check your county)</li>
+    <li>Government-issued photo ID</li>
+    <li>Deposit required (varies by county):
+      <ul>
+        <li>Cecil County: $100 (non-refundable)</li>
+        <li>Howard County: $1,000 via ACH</li>
+        <li>Prince George's: $150 registration +
+        $1,000 deposit via ACH</li>
+        <li>Baltimore City: varies by year</li>
+      </ul>
+    </li>
+    <li>Payment for won properties due within
+    24 hours to 3 business days</li>
+    <li>Accepted payment: certified check, wire
+    transfer, or ACH (varies)</li>
+    <li>Some counties require proof you haven't
+    defaulted on prior tax sales</li>
+  </ul>
+  <p>
+    <strong>Platform:</strong> Most Maryland counties
+    now use online auctions, primarily through
+    <strong>Bid4Assets.com</strong>. Baltimore City,
+    Baltimore County, and several others run their
+    sales there. Some counties (Montgomery, Prince
+    George's) use their own sealed-bid systems. A few
+    rural counties (Allegany, Garrett) still do
+    in-person auctions at the courthouse.
+  </p>
+  <p>
+    Create your Bid4Assets account now -- it's free.
+    Set up alerts for Maryland tax sales. When a
+    county posts their sale, you'll get notified.
+    One deposit covers all properties in that
+    county's sale.
+  </p>
+</div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- HUD HOMES DEEP DIVE                        -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="section" id="hud">
+
+<div class="card">
+  <h2>HUD Homes -- Complete Guide</h2>
+  <p>
+    If tax liens are the advanced play, HUD homes
+    are the entry point. This is the closest thing
+    to "normal" home buying in the government
+    property world, and it's probably where you
+    should start.
+  </p>
+</div>
+
+<div class="card">
+  <h3>What Creates a HUD Home</h3>
+  <p>
+    About 15% of all US mortgages are FHA loans --
+    loans insured by the Federal Housing
+    Administration (part of HUD). When an FHA borrower
+    stops paying their mortgage, the bank forecloses.
+    Because the loan was FHA-insured, HUD pays the
+    bank's loss and takes ownership of the property.
+    Now HUD owns a house they need to sell.
+  </p>
+  <p>
+    HUD doesn't want to be a landlord. They don't want
+    to maintain these houses. They want to sell them
+    fast, recover as much as possible, and move on.
+    This urgency is why HUD homes often sell 10-30%
+    below market value. They'll sometimes accept even
+    lower offers on properties that have been sitting
+    unsold for months.
+  </p>
+</div>
+
+<div class="card">
+  <h3>How to Search and Bid</h3>
+
+  <div class="step">
+    <div class="step-num">1</div>
+    <div class="step-content">
+      <strong>Search HUDHomeStore.gov.</strong>
+      Filter by state (Maryland), county, price range,
+      bedrooms, property type. Each listing shows the
+      address, asking price, listing date, bid
+      deadline, and property condition rating. New
+      properties appear regularly -- check at least
+      twice a week.
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">2</div>
+    <div class="step-content">
+      <strong>Understand the condition codes.</strong>
+      HUD rates properties in three categories:
+      <br><br>
+      <strong>"Insured" (IE):</strong> The property
+      meets FHA minimum standards. You can use an FHA
+      loan with just $100 down. The house is livable
+      as-is, though it may need cosmetic work.
+      <br><br>
+      <strong>"Insured with Escrow" (IN):</strong>
+      The property needs some repairs but is mostly
+      OK. You can use FHA financing, and HUD sets
+      aside money in escrow for the specific repairs
+      needed. Repairs must be completed within a set
+      timeframe after closing.
+      <br><br>
+      <strong>"Uninsured" (UI):</strong> The property
+      does NOT meet FHA standards -- too much damage.
+      You'll need cash or conventional financing (no
+      FHA). These are the cheapest but roughest
+      properties. Often missing major systems (HVAC,
+      plumbing), have structural issues, or have been
+      stripped/vandalized.
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">3</div>
+    <div class="step-content">
+      <strong>Get a HUD-registered real estate
+      agent.</strong>
+      You MUST submit bids through a real estate agent
+      who is registered in HUD's online system (SAMS).
+      This is free -- any licensed agent can register.
+      The agent's commission (typically 3%) is paid by
+      HUD, not you. If your current agent isn't
+      registered, ask them to sign up -- it takes about
+      a day.
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">4</div>
+    <div class="step-content">
+      <strong>Bid during the owner-occupant
+      exclusive period.</strong>
+      For the first 7-15 days after listing (varies by
+      property), ONLY people who will live in the house
+      can bid. No investors. This is your advantage --
+      you're competing against fewer people. After the
+      exclusive period, investors can bid too.
+      <br><br>
+      Your agent submits the bid electronically. You
+      can bid at, above, or below the asking price. HUD
+      evaluates all bids received during each bidding
+      period and picks the highest "net" offer (your
+      bid minus any closing cost credits HUD is
+      providing).
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">5</div>
+    <div class="step-content">
+      <strong>Get pre-approved for financing.</strong>
+      Before bidding, get pre-approved with an
+      FHA-approved lender. This shows HUD you're
+      serious and can close. The pre-approval letter
+      goes with your bid. For the $100 down program,
+      tell your lender specifically that you're buying
+      a HUD home and want the FHA $100 down payment
+      option.
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">6</div>
+    <div class="step-content">
+      <strong>Close the deal.</strong>
+      Standard closing process -- title search,
+      appraisal, inspection (highly recommended even
+      though the property is as-is), and settlement
+      with a Maryland attorney. Typical closing
+      timeline: 30-60 days from accepted offer.
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <h3>The $100 Down Program -- How It
+  Actually Works</h3>
+  <p>
+    This is the single best deal in government
+    real estate for someone in your situation. Here
+    are the specifics:
+  </p>
+  <ul>
+    <li>Only applies to HUD-owned properties listed
+    on HUDHomeStore.gov -- not random houses</li>
+    <li>Property must be coded "Insured" (IE) or
+    "Insured with Escrow" (IN)</li>
+    <li>You must use an FHA loan from an
+    FHA-approved lender</li>
+    <li>You must be an owner-occupant (live in the
+    house for at least 1 year)</li>
+    <li>Your down payment is exactly $100. That's
+    it. Not a percentage -- a flat $100.</li>
+    <li>HUD offers a 3% closing cost credit on
+    eligible properties (this comes off the sale
+    price)</li>
+    <li>Standard FHA qualification: credit score
+    580+ for 3.5% down (but you're paying $100, so
+    the credit threshold may effectively be higher
+    -- talk to your lender)</li>
+    <li>You still pay closing costs (appraisal,
+    title insurance, attorney, recording fees) --
+    typically $5,000-$10,000 depending on price.
+    But the 3% credit helps offset this.</li>
+    <li>The 2026 FHA loan limit for most Maryland
+    counties is $541,287 (higher in some DC-adjacent
+    counties)</li>
+  </ul>
+  <div class="example">
+    <strong>Real math example:</strong><br>
+    HUD home in Washington County, MD: $85,000<br>
+    Down payment: $100<br>
+    3% HUD closing cost credit: -$2,550<br>
+    Estimated closing costs: $6,000<br>
+    Net closing costs: $3,450<br>
+    <strong>Total cash needed: $3,550</strong><br><br>
+    You'd have $26,450 left from your $30K for
+    repairs, furniture, and a financial cushion.
+    Your monthly mortgage payment (30-year FHA at
+    ~7% including PMI, taxes, insurance): roughly
+    $750-$850/month.
+  </div>
+</div>
+
+<div class="card">
+  <h3>USDA Properties -- Rural Deals</h3>
+  <p>
+    USDA Rural Development loans are designed for
+    properties in "rural" areas -- but USDA's
+    definition of rural is surprisingly broad. Many
+    suburbs qualify. Pretty much everything around
+    Harpers Ferry qualifies.
+  </p>
+  <p>
+    When USDA borrowers default, USDA takes the
+    properties and lists them at
+    <strong>resales.usda.gov</strong>. You can also
+    use the USDA eligibility map at
+    eligibility.sc.egov.usda.gov to check which areas
+    qualify for USDA financing.
+  </p>
+  <p>
+    <strong>The USDA advantage:</strong> USDA loans
+    offer 0% down payment. Zero. For eligible buyers
+    in eligible areas, you can buy a home with
+    literally no money down (you still pay closing
+    costs). Income limits apply -- you must be at or
+    below 115% of the area median income. For a single
+    person in Washington County, MD, that's roughly
+    $90,000-$100,000/year.
+  </p>
+  <p>
+    USDA REO properties can sometimes be purchased
+    with USDA financing, giving you both the below-
+    market price of a government foreclosure AND the
+    0% down payment benefit. Check resales.usda.gov
+    weekly.
+  </p>
+</div>
+
+<div class="card">
+  <h3>VA Foreclosures -- Open to Everyone</h3>
+  <p>
+    VA (Department of Veterans Affairs) properties come
+    from defaulted VA loans. They're listed at
+    listings.vrmco.com. Important:
+    <strong>you do NOT need to be a veteran to buy a
+    VA-foreclosed property.</strong> Anyone can buy
+    them.
+  </p>
+  <p>
+    VA properties are typically in better condition
+    than HUD properties because VA borrowers tend to
+    have higher financial stability. Prices may be
+    slightly higher, but the properties need less work.
+    Worth checking, especially in the Harpers Ferry
+    area where there are military installations nearby
+    (Fort Detrick in Frederick, various DC-area
+    installations).
+  </p>
+</div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- FEDERAL SEIZED                             -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="section" id="federal">
+
+<div class="card">
+  <h2>Federal Seized Property -- Complete Guide</h2>
+  <p>
+    When the federal government seizes assets from
+    criminals and tax evaders, those assets eventually
+    get sold to the public. Here's exactly how each
+    agency works.
+  </p>
+</div>
+
+<div class="card">
+  <h3>US Marshals Service</h3>
+  <p>
+    The Marshals manage the largest federal asset
+    forfeiture program. When FBI, DEA, ATF, or other
+    federal agencies seize property during criminal
+    investigations, the Marshals take custody and
+    eventually sell it.
+  </p>
+  <h4>How to buy from the US Marshals:</h4>
+  <ol>
+    <li>Go to <strong>bid4assets.com</strong> and
+    search for "US Marshals" or browse their
+    storefront at bid4assets.com/storefront/usms</li>
+    <li>Create a free Bid4Assets account</li>
+    <li>Browse current auctions -- they list real
+    estate, vehicles, jewelry, electronics, and more
+    </li>
+    <li>Register for the specific auction you want
+    to bid on (deposit required, varies per auction)
+    </li>
+    <li>Bid online during the auction window</li>
+    <li>Highest bidder wins</li>
+    <li>Payment due within the timeframe specified
+    (usually a few business days)</li>
+  </ol>
+  <h4>Key details:</h4>
+  <ul>
+    <li><strong>No buyer's premium</strong> -- what
+    you bid is what you pay. Many private auction
+    houses add 10-15% on top; USMS doesn't.</li>
+    <li><strong>Clear title via Government Deed</strong>
+    -- the Marshals typically provide good title, which
+    is better than IRS or tax sale purchases.</li>
+    <li><strong>Open houses sometimes available</strong>
+    -- for real estate, they may allow in-person
+    viewing before the auction.</li>
+    <li><strong>Everything is as-is</strong> -- no
+    warranties on condition, no returns.</li>
+    <li>Inventory is unpredictable and sparse.
+    Maryland-specific properties might appear a few
+    times per year at most.</li>
+  </ul>
+</div>
+
+<div class="card">
+  <h3>IRS Seized Property</h3>
+  <p>
+    When someone owes the IRS a lot of money and
+    refuses to pay, the IRS can seize their assets --
+    houses, cars, businesses, land. About 300 auctions
+    happen per year nationwide.
+  </p>
+  <h4>How to buy from the IRS:</h4>
+  <ol>
+    <li>Check <strong>irsauctions.gov</strong> for
+    current listings</li>
+    <li>Also check
+    <strong>treasury.gov/auctions/treasury/rp/</strong>
+    for Treasury Department seizures</li>
+    <li>Auctions can be:
+      <ul>
+        <li><strong>In-person:</strong> Show up with
+        government ID, cashier's checks in various
+        denominations ($1,000, $2,500, $5,000), and
+        cash for the deposit</li>
+        <li><strong>Online:</strong> Register on
+        irsauctions.gov, submit deposit, bid
+        electronically</li>
+        <li><strong>Sealed bid:</strong> Submit your
+        bid in a sealed envelope by the deadline</li>
+      </ul>
+    </li>
+    <li>Minimum deposit is typically 20% of the
+    minimum bid price, paid by cashier's check</li>
+    <li>Balance due within a specified period (usually
+    30 days)</li>
+  </ol>
+  <div class="warning">
+    <strong>The big IRS risk: no title guarantee.</strong>
+    Unlike the US Marshals, the IRS does NOT guarantee
+    clean title. Other liens may still be attached to
+    the property. You might need a "quiet title action"
+    -- a lawsuit to establish clean ownership --
+    costing $1,500-$3,000 in attorney fees. Always do
+    a thorough title search before bidding on IRS
+    property.
+  </div>
+</div>
+
+<div class="card">
+  <h3>Other Federal Sources</h3>
+
+  <h4>RealEstateSales.gov (GSA)</h4>
+  <p>
+    The General Services Administration sells surplus
+    federal real property -- decommissioned buildings,
+    excess land, former military installations. You
+    need a Login.gov account to register. Most
+    properties are commercial/institutional, but
+    occasionally smaller residential-scale properties
+    or raw land appears. Check monthly.
+  </p>
+
+  <h4>GSA Auctions (gsaauctions.gov)</h4>
+  <p>
+    Broader government surplus including vehicles,
+    office furniture, electronics, and occasionally
+    real estate. Good for non-property finds -- you
+    can buy a fleet vehicle for $3,000 that's worth
+    $15,000.
+  </p>
+
+  <h4>FDIC.gov -- Failed Bank Assets</h4>
+  <p>
+    When a bank fails, the FDIC (Federal Deposit
+    Insurance Corporation) takes over and sells off
+    the bank's assets -- including any real estate
+    the bank owned or had loans on. This includes
+    foreclosed homes the bank hadn't sold yet, bank
+    branches, commercial properties, and vacant land.
+    Search at <strong>fdic.gov/buying/owned</strong>
+    for current listings. Properties are sold through
+    contracted brokers -- you can often use a real
+    estate agent and sometimes get financing. FDIC
+    properties can be in surprisingly good condition
+    because banks typically maintain them better than
+    individual owners who abandoned the property.
+    Inventory spikes after bank failures -- when a
+    regional bank goes under, suddenly dozens of
+    properties flood the market at once.
+  </p>
+
+  <h4>GovDeals.com</h4>
+  <p>
+    Where state and local governments sell surplus.
+    Maryland State Police lists seized vehicles here.
+    Counties sell surplus equipment, vehicles, and
+    occasionally property. Good browsing for
+    non-real-estate deals.
+  </p>
+
+  <h4>GovPlanet.com</h4>
+  <p>
+    Military surplus vehicles and heavy equipment.
+    Want a decommissioned Humvee or a backhoe? This
+    is the place. Not real estate related but
+    interesting if you're buying property to develop
+    and need equipment.
+  </p>
+
+  <h4>Maryland DHCD REO</h4>
+  <p>
+    The Maryland Department of Housing and Community
+    Development sells foreclosed properties from
+    state-backed mortgage programs. This is a hidden
+    gem most people don't know about. Listed at
+    dhcd.maryland.gov/Residents/Pages/reo/default.aspx
+    and through Homesource Real Estate Solutions.
+    State-owned REO properties in Maryland
+    communities, often below market.
+  </p>
+</div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- HOMEBUYING 101                              -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="section" id="homebuying">
+
+<div class="card">
+  <h2>Homebuying 101 -- The Complete Guide
+  for People Without Much Money</h2>
+  <p>
+    Forget the government auction stuff for a moment.
+    This section covers everything you need to know
+    about buying a home in general -- especially when
+    you don't have a lot of money. The basics of
+    mortgages, credit, down payments, closing costs,
+    and all the programs designed to help people in
+    your exact situation.
+  </p>
+</div>
+
+<div class="card">
+  <h3>How Mortgages Work -- From Zero</h3>
+  <p>
+    A mortgage is a loan to buy a house. The house
+    itself is the collateral -- if you stop paying,
+    the bank takes the house (foreclosure). You borrow
+    money, buy the house, and pay it back over 15 or
+    30 years with interest.
+  </p>
+  <p>
+    Your monthly payment has four components, called
+    <strong>PITI</strong>:
+  </p>
+  <ul>
+    <li><strong>Principal:</strong> The actual loan
+    amount being paid down. Early in the loan, most
+    of your payment goes to interest; later, more
+    goes to principal.</li>
+    <li><strong>Interest:</strong> The cost of
+    borrowing. If your rate is 7% on a $100,000
+    loan, you're paying about $7,000/year in interest
+    (more in year 1, less in year 30 as the balance
+    shrinks).</li>
+    <li><strong>Taxes:</strong> Property taxes,
+    collected monthly and held in "escrow" by the
+    bank, then paid to the county for you.</li>
+    <li><strong>Insurance:</strong> Homeowner's
+    insurance, also collected monthly in escrow.
+    Protects the house (and the bank's investment)
+    from fire, storms, theft, etc.</li>
+  </ul>
+  <p>
+    On top of PITI, FHA and USDA loans add
+    <strong>mortgage insurance (PMI/MIP)</strong>.
+    This protects the bank (not you) in case you
+    default. FHA charges an upfront MIP of 1.75% of
+    the loan amount (rolled into the loan) plus an
+    annual MIP of about 0.55% (added to monthly
+    payment). On a $100K loan, that's roughly
+    $46/month extra.
+  </p>
+</div>
+
+<div class="card">
+  <h3>Types of Loans and Which to Get</h3>
+
+  <h4>FHA Loan
+    <span class="badge badge-easy">Best for you</span>
+  </h4>
+  <p>
+    Backed by the Federal Housing Administration.
+    Designed for first-time and lower-income buyers.
+    Down payment: 3.5% with 580+ credit score (or
+    10% with 500-579). On HUD homes: $100 down. More
+    lenient credit requirements than conventional
+    loans. Downside: mortgage insurance for the life
+    of the loan (unless you refinance later).
+  </p>
+
+  <h4>USDA Loan</h4>
+  <p>
+    Zero down payment. Seriously -- 0%. But only for
+    properties in USDA-eligible rural areas (check
+    their map -- much of Maryland outside DC/Baltimore
+    qualifies). Income limits apply (115% of area
+    median). Lower mortgage insurance than FHA.
+    Great option for the Harpers Ferry area.
+  </p>
+
+  <h4>VA Loan</h4>
+  <p>
+    Zero down payment, no mortgage insurance. Best
+    loan product in America. Only for veterans, active
+    military, and some surviving spouses. If you
+    qualify, use this.
+  </p>
+
+  <h4>Conventional Loan</h4>
+  <p>
+    Not government-backed. Requires 5-20% down
+    (PMI if under 20%). Stricter credit requirements
+    (usually 620-680 minimum). Better terms if you
+    have great credit and 20% down, but harder to
+    qualify for with limited funds.
+  </p>
+
+  <h4>Hard Money Loan</h4>
+  <p>
+    From private lenders, not banks. Short-term (6-18
+    months), high interest (10-15%), based on the
+    property value -- not your income or credit. Used
+    by investors for flips, not for living in. Quick
+    approval (days vs weeks). You'd use this if you
+    find an incredible deal that needs cash fast.
+  </p>
+</div>
+
+<div class="card">
+  <h3>Credit Scores -- What You Need and
+  How to Fix Yours</h3>
+  <p>
+    Your credit score determines what loans you
+    qualify for and what interest rate you get. Here's
+    the breakdown:
+  </p>
+  <table class="info-table">
+    <tr><th>Score</th><th>What You Get</th></tr>
+    <tr>
+      <td>740+</td>
+      <td>Best rates on everything. Conventional
+      loans easy to get.</td>
+    </tr>
+    <tr>
+      <td>680-739</td>
+      <td>Good rates. Conventional and FHA both
+      available.</td>
+    </tr>
+    <tr>
+      <td>620-679</td>
+      <td>FHA is your best bet. Conventional possible
+      but at higher rates.</td>
+    </tr>
+    <tr>
+      <td>580-619</td>
+      <td>FHA with 3.5% down (or $100 on HUD homes).
+      Few other options.</td>
+    </tr>
+    <tr>
+      <td>500-579</td>
+      <td>FHA with 10% down. Very limited options.
+      </td>
+    </tr>
+    <tr>
+      <td>Below 500</td>
+      <td>No standard mortgages. Cash only, hard
+      money, or seller financing.</td>
+    </tr>
+  </table>
+
+  <h4>How to improve your score fast:</h4>
+  <ul>
+    <li><strong>Pay every bill on time.</strong>
+    Payment history is 35% of your score. One late
+    payment can drop you 50-100 points. Set up
+    autopay for everything.</li>
+    <li><strong>Lower your credit utilization.</strong>
+    This is 30% of your score. If you have a $1,000
+    credit limit and a $900 balance, that's 90%
+    utilization = terrible. Get it below 30% ($300
+    on a $1,000 limit). Below 10% is ideal.</li>
+    <li><strong>Don't close old accounts.</strong>
+    Length of credit history matters (15% of score).
+    That old credit card you never use? Keep it open.
+    </li>
+    <li><strong>Don't apply for new credit.</strong>
+    Each application is a "hard inquiry" that drops
+    your score 5-10 points. Exception: mortgage
+    shopping within a 14-45 day window counts as one
+    inquiry.</li>
+    <li><strong>Dispute errors.</strong> Pull your
+    free report at annualcreditreport.com. If
+    anything is wrong (old debts you already paid,
+    accounts that aren't yours), dispute them. This
+    alone can boost your score significantly.</li>
+    <li><strong>Become an authorized user.</strong>
+    If someone you trust has a credit card with a long
+    history and low balance, ask them to add you as
+    an authorized user. Their history appears on your
+    report. You don't even need the physical card.</li>
+  </ul>
+  <p>
+    <strong>Timeline:</strong> Paying down credit card
+    balances can improve your score within 30-60 days
+    (next billing cycle). Dispute resolutions take
+    30-45 days. Building from a thin file takes 6-12
+    months.
+  </p>
+</div>
+
+<div class="card">
+  <h3>Down Payment Assistance Programs --
+  Maryland Edition</h3>
+  <p>
+    Maryland has some of the best down payment
+    assistance programs in the country. These are
+    not handouts -- they're low-interest or deferred
+    loans and grants specifically designed to help
+    people buy homes.
+  </p>
+
+  <h4>Maryland Mortgage Program (MMP)</h4>
+  <ul>
+    <li>Below-market interest rates on 30-year fixed
+    mortgages</li>
+    <li>Down payment assistance up to $10,000 or
+    3-6% of the mortgage amount</li>
+    <li>Available for first-time buyers AND repeat
+    buyers in targeted areas</li>
+    <li>Works with FHA, VA, USDA, and conventional
+    loans</li>
+    <li>Apply through any MMP-approved lender</li>
+    <li>Income and purchase price limits apply
+    (varies by county)</li>
+  </ul>
+
+  <h4>1st Time Advantage</h4>
+  <ul>
+    <li>30-year fixed-rate mortgages with competitive
+    rates</li>
+    <li>Includes DPA (down payment assistance) as a
+    0% interest deferred second mortgage</li>
+    <li>You don't pay the DPA back until you sell,
+    refinance, or pay off the first mortgage</li>
+    <li>Must be a first-time buyer (haven't owned a
+    home in 3 years)</li>
+  </ul>
+
+  <h4>Flex Loans</h4>
+  <ul>
+    <li>Available to repeat buyers too (not just
+    first-time)</li>
+    <li>Includes a 0% interest second mortgage for
+    down payment and closing costs</li>
+    <li>Same deferred repayment as 1st Time
+    Advantage</li>
+  </ul>
+
+  <h4>HomeAbility</h4>
+  <ul>
+    <li>For buyers with disabilities</li>
+    <li>Up to 25% of the purchase price as a 0%
+    interest deferred second loan</li>
+    <li>Enormous assistance -- on a $100K house,
+    that's $25,000</li>
+  </ul>
+
+  <h4>SmartBuy 3.0</h4>
+  <ul>
+    <li>Up to $20,000 toward student loan debt
+    payoff</li>
+    <li>Must use the payoff to eliminate ALL
+    outstanding student debt</li>
+    <li>Can combine with other MMP programs</li>
+  </ul>
+
+  <h4>Local Programs</h4>
+  <ul>
+    <li>Prince George's County: up to $10,000 in
+    assistance</li>
+    <li>Gaithersburg: up to $40,000 as a 0% deferred
+    loan</li>
+    <li>Montgomery County: various programs through
+    HOC (Housing Opportunities Commission)</li>
+    <li>Baltimore City: several programs through
+    the city's housing department</li>
+    <li>Check your specific county -- most have
+    something</li>
+  </ul>
+
+  <div class="highlight">
+    <strong>Stack them together.</strong> You can
+    often combine multiple assistance programs. FHA
+    $100 down on a HUD home + Maryland MMP down
+    payment assistance + county-level assistance.
+    People buy homes with essentially zero out of
+    pocket using these combinations. Talk to an
+    MMP-approved lender about what you qualify for.
+  </div>
+</div>
+
+<div class="card">
+  <h3>Closing Costs -- What to Expect</h3>
+  <p>
+    Beyond the down payment, you need cash for closing
+    costs. In Maryland, expect 2-5% of the purchase
+    price. On a $100,000 house, that's $2,000-$5,000.
+  </p>
+  <table class="info-table">
+    <tr><th>Cost</th><th>Typical Range</th></tr>
+    <tr>
+      <td>Appraisal</td>
+      <td>$400 - $600</td>
+    </tr>
+    <tr>
+      <td>Home inspection</td>
+      <td>$350 - $500</td>
+    </tr>
+    <tr>
+      <td>Title search</td>
+      <td>$250 - $500</td>
+    </tr>
+    <tr>
+      <td>Title insurance</td>
+      <td>$500 - $1,500</td>
+    </tr>
+    <tr>
+      <td>Attorney / settlement fee</td>
+      <td>$500 - $1,500</td>
+    </tr>
+    <tr>
+      <td>Recording fees</td>
+      <td>$100 - $300</td>
+    </tr>
+    <tr>
+      <td>MD transfer tax</td>
+      <td>~0.5% of price (split)</td>
+    </tr>
+    <tr>
+      <td>MD recordation tax</td>
+      <td>$4.10 per $500 of value</td>
+    </tr>
+    <tr>
+      <td>Prepaid taxes & insurance</td>
+      <td>2-6 months upfront</td>
+    </tr>
+    <tr>
+      <td>FHA upfront MIP</td>
+      <td>1.75% (rolled into loan)</td>
+    </tr>
+  </table>
+  <p>
+    <strong>Ways to reduce closing costs:</strong>
+    Ask the seller to pay some (common with HUD homes
+    -- they offer the 3% credit). Use MMP down payment
+    assistance. Negotiate with the lender. Shop around
+    for title insurance. Some closing costs are
+    negotiable, others are fixed by the state.
+  </p>
+  <div class="tip">
+    <strong>First-time buyer tax exemption:</strong>
+    Maryland first-time buyers pay ZERO county
+    transfer tax on properties up to a certain value
+    (varies by county). This can save you $500-$2,000.
+    Make sure your attorney applies for this at
+    closing.
+  </div>
+</div>
+
+<div class="card">
+  <h3>The Home Buying Process -- Every Step</h3>
+
+  <div class="step">
+    <div class="step-num">1</div>
+    <div class="step-content">
+      <strong>Check your credit score.</strong>
+      Free at annualcreditreport.com or through your
+      bank/credit card app. Know where you stand
+      before talking to lenders.
+    </div>
+  </div>
+  <div class="step">
+    <div class="step-num">2</div>
+    <div class="step-content">
+      <strong>Get pre-approved.</strong>
+      Talk to 2-3 lenders (including at least one
+      MMP-approved lender). They'll tell you how much
+      you can borrow, what rate you'll get, and what
+      programs you qualify for. Pre-approval takes
+      1-3 days. You'll need: pay stubs, tax returns,
+      bank statements, ID.
+    </div>
+  </div>
+  <div class="step">
+    <div class="step-num">3</div>
+    <div class="step-content">
+      <strong>Find a real estate agent.</strong>
+      As a buyer, you don't pay your agent -- the
+      seller does (typically 2.5-3% commission).
+      Find someone who knows the area you're looking
+      in and is registered for HUD bidding.
+    </div>
+  </div>
+  <div class="step">
+    <div class="step-num">4</div>
+    <div class="step-content">
+      <strong>Search and tour homes.</strong>
+      HUDHomeStore.gov, Zillow, Redfin, Realtor.com,
+      resales.usda.gov. Drive through neighborhoods.
+      See places in person. Look beyond the cosmetic
+      -- a ugly house with good bones is better than
+      a pretty house with foundation problems.
+    </div>
+  </div>
+  <div class="step">
+    <div class="step-num">5</div>
+    <div class="step-content">
+      <strong>Make an offer.</strong>
+      Your agent writes the offer. Include your
+      pre-approval letter, earnest money deposit
+      (typically $500-$2,000 held in escrow -- you
+      get it back if the deal falls through for
+      covered reasons), and any contingencies
+      (inspection, financing, appraisal).
+    </div>
+  </div>
+  <div class="step">
+    <div class="step-num">6</div>
+    <div class="step-content">
+      <strong>Home inspection.</strong>
+      ALWAYS get an inspection, even on as-is
+      properties. Cost: $350-$500. The inspector
+      checks foundation, roof, HVAC, plumbing,
+      electrical, structure. This tells you what
+      you're really buying and what repairs will
+      cost.
+    </div>
+  </div>
+  <div class="step">
+    <div class="step-num">7</div>
+    <div class="step-content">
+      <strong>Appraisal.</strong>
+      The lender sends an appraiser to confirm the
+      house is worth what you're paying. If the
+      appraisal comes in low, you can renegotiate
+      the price, pay the difference in cash, or
+      walk away. Cost: $400-$600 (you pay this).
+    </div>
+  </div>
+  <div class="step">
+    <div class="step-num">8</div>
+    <div class="step-content">
+      <strong>Final approval and clear to close.</strong>
+      The lender reviews everything one last time.
+      They may ask for additional documents. Don't
+      change jobs, make large purchases, or open new
+      credit during this period -- it can kill your
+      loan.
+    </div>
+  </div>
+  <div class="step">
+    <div class="step-num">9</div>
+    <div class="step-content">
+      <strong>Closing / settlement.</strong>
+      You sit down with a Maryland attorney, sign a
+      mountain of paperwork, hand over your closing
+      costs (certified check or wire), and get the
+      keys. The deed is recorded. You own a house.
+      Total time from offer to close: 30-60 days.
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <h3>Hidden Costs of Homeownership
+  Nobody Tells You About</h3>
+  <ul>
+    <li><strong>Maintenance: 1-2% of home value per
+    year.</strong> A $100K house costs $1,000-$2,000/yr
+    in maintenance. Things break constantly -- water
+    heater, appliances, pipes, roof patches.</li>
+    <li><strong>Utilities: $200-$400/month.</strong>
+    Electric, gas/oil, water, sewer, trash, internet.
+    Older houses (which is what you'll be buying) cost
+    more to heat and cool.</li>
+    <li><strong>HOA fees:</strong> If there's an HOA,
+    $50-$300+/month. Avoid HOAs if possible --
+    especially on a tight budget.</li>
+    <li><strong>Yard/exterior maintenance:</strong>
+    Mower, snow removal, gutter cleaning, tree
+    trimming. Budget $500-$1,500/year or do it
+    yourself.</li>
+    <li><strong>Property tax increases:</strong>
+    Taxes can go up. Maryland reassesses every 3
+    years. If you buy cheap and the area improves,
+    your taxes could jump significantly.</li>
+    <li><strong>Emergency fund:</strong> You need
+    $3,000-$5,000 accessible at all times for
+    emergencies. Furnace dies in January? That's
+    $5,000 you need immediately.</li>
+  </ul>
+  <div class="warning">
+    <strong>The real rule:</strong> Your total housing
+    cost (PITI + insurance + maintenance + utilities)
+    should not exceed 35% of your gross monthly income.
+    Push it to 40% and you're house-poor -- owning
+    property but unable to enjoy your life. With $30K
+    saved up, make sure you still have a financial
+    cushion after buying.
+  </div>
+</div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- MARYLAND                                    -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="section" id="maryland">
+
+<div class="card">
+  <h2>Maryland-Specific Guide</h2>
+  <p>
+    Everything about buying property in Maryland
+    specifically -- laws, counties, tax sales,
+    programs, and the Harpers Ferry area.
+  </p>
+</div>
+
+<div class="card">
+  <h3>Maryland Tax Sale Law</h3>
+  <p>
+    The governing statute is the <strong>Tax-Property
+    Article, Title 14, Subtitle 8, Part III</strong>
+    of the Maryland Code. Key provisions:
+  </p>
+  <ul>
+    <li><strong>Section 14-808:</strong> County
+    authority to conduct tax sales</li>
+    <li><strong>Section 14-817:</strong> High bid
+    premium calculation</li>
+    <li><strong>Section 14-820:</strong> Interest
+    rates on redemption</li>
+    <li><strong>Section 14-827:</strong> Right of
+    redemption (until court forecloses)</li>
+    <li><strong>Section 14-833:</strong> Foreclosure
+    complaint requirements, notice rules, 6-month
+    and 9-month waiting periods</li>
+    <li><strong>Section 14-843:</strong> Expense
+    reimbursement rules</li>
+  </ul>
+  <p>
+    Maryland is an <strong>attorney state</strong>
+    for real estate. An attorney must handle
+    settlement/closing on any property purchase, and
+    you must use an attorney for tax sale foreclosures.
+    Budget $500-$1,500 for standard closings,
+    $1,500-$4,000+ for foreclosures.
+  </p>
+</div>
+
+<div class="card">
+  <h3>2026 Tax Sale Calendar -- All Counties</h3>
+  <p style="font-size:0.8rem; color:var(--text-dim);">
+    Check your county's website for exact dates and
+    registration deadlines. These are approximate
+    based on historical patterns and published dates.
+  </p>
+  <div class="county-grid">
+    <div class="county-card">
+      <div>
+        <div class="county-name">St. Mary's</div>
+        <div class="county-format">Online</div>
+      </div>
+      <div class="county-date">March</div>
+    </div>
+    <div class="county-card">
+      <div>
+        <div class="county-name">Queen Anne's</div>
+        <div class="county-format">Varies</div>
+      </div>
+      <div class="county-date">May 19</div>
+    </div>
+    <div class="county-card">
+      <div>
+        <div class="county-name">Baltimore City</div>
+        <div class="county-format">Bid4Assets</div>
+      </div>
+      <div class="county-date">May</div>
+    </div>
+    <div class="county-card">
+      <div>
+        <div class="county-name">Allegany</div>
+        <div class="county-format">In-person</div>
+      </div>
+      <div class="county-date">May 28</div>
+    </div>
+    <div class="county-card">
+      <div>
+        <div class="county-name">Washington</div>
+        <div class="county-format">Varies</div>
+      </div>
+      <div class="county-date">May-June</div>
+    </div>
+    <div class="county-card">
+      <div>
+        <div class="county-name">Frederick</div>
+        <div class="county-format">Varies</div>
+      </div>
+      <div class="county-date">May-June</div>
+    </div>
+    <div class="county-card">
+      <div>
+        <div class="county-name">Charles</div>
+        <div class="county-format">Varies</div>
+      </div>
+      <div class="county-date">May-June</div>
+    </div>
+    <div class="county-card">
+      <div>
+        <div class="county-name">Calvert</div>
+        <div class="county-format">Varies</div>
+      </div>
+      <div class="county-date">May-June</div>
+    </div>
+    <div class="county-card">
+      <div>
+        <div class="county-name">Cecil</div>
+        <div class="county-format">Online</div>
+      </div>
+      <div class="county-date">May-June</div>
+    </div>
+    <div class="county-card">
+      <div>
+        <div class="county-name">Harford</div>
+        <div class="county-format">Online</div>
+      </div>
+      <div class="county-date">May-June</div>
+    </div>
+    <div class="county-card">
+      <div>
+        <div class="county-name">Dorchester</div>
+        <div class="county-format">Varies</div>
+      </div>
+      <div class="county-date">June</div>
+    </div>
+    <div class="county-card">
+      <div>
+        <div class="county-name">Montgomery</div>
+        <div class="county-format">Sealed bid</div>
+      </div>
+      <div class="county-date">June 8</div>
+    </div>
+    <div class="county-card">
+      <div>
+        <div class="county-name">Howard</div>
+        <div class="county-format">Online portal</div>
+      </div>
+      <div class="county-date">June 10</div>
+    </div>
+    <div class="county-card">
+      <div>
+        <div class="county-name">Anne Arundel</div>
+        <div class="county-format">Online</div>
+      </div>
+      <div class="county-date">June</div>
+    </div>
+    <div class="county-card">
+      <div>
+        <div class="county-name">Prince George's</div>
+        <div class="county-format">Sealed bid</div>
+      </div>
+      <div class="county-date">May-June</div>
+    </div>
+    <div class="county-card">
+      <div>
+        <div class="county-name">Garrett</div>
+        <div class="county-format">In-person</div>
+      </div>
+      <div class="county-date">June</div>
+    </div>
+    <div class="county-card">
+      <div>
+        <div class="county-name">Talbot</div>
+        <div class="county-format">Online</div>
+      </div>
+      <div class="county-date">May-June</div>
+    </div>
+    <div class="county-card">
+      <div>
+        <div class="county-name">Wicomico</div>
+        <div class="county-format">Varies</div>
+      </div>
+      <div class="county-date">June</div>
+    </div>
+    <div class="county-card">
+      <div>
+        <div class="county-name">Worcester</div>
+        <div class="county-format">Varies</div>
+      </div>
+      <div class="county-date">May-June</div>
+    </div>
+    <div class="county-card">
+      <div>
+        <div class="county-name">Baltimore County</div>
+        <div class="county-format">Online</div>
+      </div>
+      <div class="county-date">Aug-Oct</div>
+    </div>
+    <div class="county-card">
+      <div>
+        <div class="county-name">Caroline</div>
+        <div class="county-format">Online</div>
+      </div>
+      <div class="county-date">Aug 20-21</div>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <h3>The Harpers Ferry Area</h3>
+  <p>
+    Harpers Ferry sits at the confluence of the
+    Potomac and Shenandoah rivers, right where West
+    Virginia, Maryland, and Virginia meet. It's one of
+    the most scenic spots on the East Coast. The town
+    itself is in Jefferson County, WV, but the
+    surrounding Maryland counties -- Washington and
+    Frederick -- are where you'd look for Maryland
+    properties.
+  </p>
+  <table class="info-table">
+    <tr>
+      <th>Area</th>
+      <th>Median Home</th>
+      <th>Tax Sale</th>
+      <th>Notes</th>
+    </tr>
+    <tr>
+      <td>Washington Co, MD<br>(Hagerstown)</td>
+      <td>~$260K</td>
+      <td>May-June</td>
+      <td>Most affordable MD county
+      near Harpers Ferry. Good rental
+      market. USDA eligible areas.</td>
+    </tr>
+    <tr>
+      <td>Frederick Co, MD</td>
+      <td>~$420K</td>
+      <td>May-June</td>
+      <td>More expensive but growing.
+      Closer to DC jobs. Some USDA
+      eligible areas in western part.</td>
+    </tr>
+    <tr>
+      <td>Jefferson Co, WV<br>(Harpers Ferry)</td>
+      <td>~$330K</td>
+      <td>Oct-Nov (WV)</td>
+      <td>The actual Harpers Ferry area.
+      WV has its own tax lien system.
+      Lower property taxes than MD.</td>
+    </tr>
+    <tr>
+      <td>Allegany Co, MD<br>(Cumberland)</td>
+      <td>~$145K</td>
+      <td>May (in-person)</td>
+      <td>Cheapest in MD. 1.5 hrs from
+      Harpers Ferry. Great for first
+      investment property.</td>
+    </tr>
+    <tr>
+      <td>Berkeley Co, WV<br>(Martinsburg)</td>
+      <td>~$270K</td>
+      <td>Oct-Nov (WV)</td>
+      <td>Just south of Hagerstown.
+      Growing rapidly. MARC train
+      to DC.</td>
+    </tr>
+  </table>
+  <div class="tip">
+    <strong>Pro tip:</strong> Martinsburg, WV
+    (Berkeley County) has a MARC commuter train
+    station with service to Washington DC. This makes
+    it uniquely attractive -- you can live in an
+    affordable WV town and commute to DC-level jobs.
+    Properties here are appreciating faster than
+    surrounding areas because of this.
+  </div>
+</div>
+
+<div class="card">
+  <h3>Baltimore City vs Suburbs vs Rural</h3>
+
+  <h4>Baltimore City</h4>
+  <p>
+    Thousands of vacant and abandoned properties.
+    Tax sale inventory is massive -- hundreds of
+    properties per sale. Less competition per
+    individual property because there are so many.
+    Liens can be very cheap ($1,000-$5,000). But the
+    condition risk is extreme -- many properties are
+    gutted shells, have structural collapse, or need
+    $50,000+ in rehab. Water bills are included in
+    Baltimore City tax liens (combined with property
+    taxes). Owner-occupied properties get a 9-month
+    wait before foreclosure (vs 6 months elsewhere).
+    High crime in some areas makes renovation and
+    rental challenging.
+  </p>
+
+  <h4>Suburban Counties (Montgomery, Howard,
+  Anne Arundel, Prince George's)</h4>
+  <p>
+    Higher property values, better neighborhoods,
+    stronger rental demand. But tax sales are fiercely
+    competitive -- institutional investors and
+    experienced bidders drive overbids sky-high. A
+    $3,000 lien might get bid to $40,000+ in
+    Montgomery County. Returns on the lien investment
+    get crushed. These counties make sense only if
+    you're specifically targeting the foreclosure
+    play (betting the owner won't redeem) and you've
+    done deep due diligence on the property's value.
+  </p>
+
+  <h4>Rural Counties (Allegany, Garrett,
+  Dorchester, Somerset, Caroline)</h4>
+  <p>
+    Lowest competition, lowest prices, easiest to win
+    auctions at or near the minimum bid. Properties
+    may be cheaper but they're also in slower markets
+    -- harder to flip, lower rental demand. Best for
+    building a portfolio of passive lien income (earn
+    interest) or finding a personal home on the cheap.
+    Allegany County (Cumberland) in particular has
+    homes under $100K everywhere and tax liens
+    sometimes go for the minimum bid because nobody
+    else shows up.
+  </p>
+</div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- EVALUATE PROPERTIES                        -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="section" id="evaluate">
+
+<div class="card">
+  <h2>How to Evaluate Any Property</h2>
+  <p>
+    Before you spend a single dollar, you need to know
+    how to research a property and figure out if it's
+    worth buying. This is the skill that separates
+    people who make money from people who lose money.
+  </p>
+</div>
+
+<div class="card">
+  <h3>Step 1: Look It Up on SDAT</h3>
+  <p>
+    SDAT (State Department of Assessments and Taxation)
+    is Maryland's official property database. Go to
+    <strong>sdat.dat.maryland.gov/RealProperty</strong>
+    and search by address.
+  </p>
+  <p>You'll find:</p>
+  <ul>
+    <li><strong>Assessed value:</strong> The
+    government's estimate of the property's worth (for
+    tax purposes). Usually lower than market value, but
+    gives you a floor.</li>
+    <li><strong>Owner name:</strong> Who currently owns
+    the property.</li>
+    <li><strong>Land use code:</strong> Residential,
+    commercial, agricultural, vacant, etc.</li>
+    <li><strong>Zoning:</strong> What you're allowed to
+    do with the property.</li>
+    <li><strong>Transfer history:</strong> When it last
+    sold and for how much.</li>
+    <li><strong>Tax account status:</strong> Is it
+    current, delinquent, or in tax sale?</li>
+    <li><strong>Building details:</strong> Square
+    footage, number of rooms, year built, construction
+    type.</li>
+  </ul>
+  <div class="highlight">
+    <strong>Red flag:</strong> If the assessed value
+    is lower than the tax lien amount, that's a
+    warning. You might end up owning something worth
+    less than what you paid.
+  </div>
+</div>
+
+<div class="card">
+  <h3>Step 2: Google Earth / Street View</h3>
+  <p>
+    Type the address into Google Maps and drop into
+    Street View. Look for:
+  </p>
+  <ul>
+    <li>Condition of the house (roof, siding, windows,
+    yard)</li>
+    <li>Is it boarded up? Vacant? Occupied?</li>
+    <li>What do the neighboring houses look like?</li>
+    <li>Is the neighborhood maintained or declining?</li>
+    <li>Proximity to amenities, main roads, schools</li>
+    <li>Any obvious problems (leaning walls, caved-in
+    roof, overgrown lot)</li>
+  </ul>
+  <p>
+    Note: Street View images can be years old. Check
+    the date stamp in the bottom of the image. A house
+    that looked fine in 2020 might be a wreck in 2026.
+    Nothing replaces an in-person drive-by if the
+    property is within driving distance.
+  </p>
+</div>
+
+<div class="card">
+  <h3>Step 3: Check Comparable Sales (Comps)</h3>
+  <p>
+    Comps tell you what a property is actually worth
+    in today's market. Search for recently sold homes
+    near your target that are similar in size,
+    condition, and type.
+  </p>
+  <p><strong>How to find comps:</strong></p>
+  <ul>
+    <li>Go to Zillow or Redfin</li>
+    <li>Search the address, then filter for "Recently
+    Sold" within 0.5-1 mile</li>
+    <li>Look for homes sold in the last 6 months</li>
+    <li>Match: similar square footage (within 20%),
+    similar bedrooms/bathrooms, similar lot size,
+    similar age</li>
+    <li>Find 3-5 good comps and average their sale
+    prices</li>
+  </ul>
+  <p>
+    <strong>For the ARV (After Repair Value):</strong>
+    Find comps that are renovated/updated. That's what
+    your property could sell for after you fix it up.
+    <strong>For the as-is value:</strong> Find comps in
+    similar condition to how the property looks now.
+  </p>
+  <div class="example">
+    <strong>Example:</strong> You're looking at a 3BR
+    1200sf house in Hagerstown. You find 3 similar
+    renovated homes that sold recently: $175K, $182K,
+    $168K. Average: $175K. That's your ARV estimate.
+    Now find 3 similar unrenovated homes: $85K, $92K,
+    $78K. Average: $85K. That's the as-is value.
+  </div>
+</div>
+
+<div class="card">
+  <h3>Step 4: Check for Liens and Title Issues</h3>
+  <p>
+    A property might look great and be priced right,
+    but hidden liens can destroy the deal. Here's
+    what to check:
+  </p>
+  <p>
+    <strong>Maryland Land Records</strong>
+    (mdlandrec.net): Search by owner name or property
+    address. Look for recorded mortgages, judgment
+    liens, mechanic's liens, and releases. Free
+    registration required. If you're buying through
+    tax sale foreclosure, most private liens get wiped
+    out -- but you need to know they exist for proper
+    notice requirements.
+  </p>
+  <p>
+    <strong>MD Judiciary Case Search</strong>
+    (casesearch.courts.state.md.us): Search by the
+    owner's name. Look for pending lawsuits, judgments,
+    and foreclosure actions. Multiple lawsuits against
+    the owner = trouble.
+  </p>
+  <p>
+    <strong>IRS lien search:</strong> Check Maryland
+    Land Records for any "Notice of Federal Tax Lien"
+    recorded against the property. If there's an IRS
+    lien, the IRS has 120 days post-foreclosure to
+    take the property from you. This is a serious risk.
+  </p>
+  <p>
+    <strong>Environmental check:</strong> Search EPA's
+    site (epa.gov/superfund) and Maryland Department
+    of the Environment records. Was this property ever
+    a gas station, dry cleaner, auto shop, or
+    industrial site? Environmental contamination makes
+    a property radioactive (sometimes literally).
+  </p>
+  <div class="tip">
+    <strong>For serious purchases:</strong> Hire a
+    title company or attorney to do a full title
+    search. Cost: $250-$500. Worth every penny.
+    They'll find things you'll miss. If you're buying
+    through normal channels (HUD, agent), your lender
+    will require title insurance anyway -- the title
+    company does the search as part of that process.
+  </div>
+</div>
+
+<div class="card">
+  <h3>Step 5: Estimate Repair Costs</h3>
+  <p>
+    If you're buying a rough property, you need to
+    know what it'll cost to make it livable or
+    sellable. These are 2026 Maryland ranges:
+  </p>
+  <table class="info-table">
+    <tr><th>Item</th><th>Cost Range</th></tr>
+    <tr><td>Roof (full replacement, shingle)</td>
+      <td>$8,000 - $15,000</td></tr>
+    <tr><td>HVAC (new system)</td>
+      <td>$5,000 - $12,000</td></tr>
+    <tr><td>Kitchen remodel (mid-grade)</td>
+      <td>$15,000 - $35,000</td></tr>
+    <tr><td>Bathroom remodel (mid-grade)</td>
+      <td>$8,000 - $20,000</td></tr>
+    <tr><td>Foundation repair</td>
+      <td>$5,000 - $30,000+</td></tr>
+    <tr><td>Electrical panel + rewire</td>
+      <td>$5,000 - $15,000</td></tr>
+    <tr><td>Plumbing (repipe whole house)</td>
+      <td>$5,000 - $15,000</td></tr>
+    <tr><td>Flooring (LVP or hardwood, whole house)</td>
+      <td>$5,000 - $15,000</td></tr>
+    <tr><td>Interior paint (whole house)</td>
+      <td>$3,000 - $7,000</td></tr>
+    <tr><td>Windows (10-15 windows)</td>
+      <td>$5,000 - $15,000</td></tr>
+    <tr><td>Siding replacement</td>
+      <td>$8,000 - $20,000</td></tr>
+    <tr><td>Water heater</td>
+      <td>$1,500 - $3,000</td></tr>
+    <tr><td>Driveway</td>
+      <td>$3,000 - $8,000</td></tr>
+    <tr><td>Septic system (rural MD)</td>
+      <td>$10,000 - $30,000</td></tr>
+    <tr><td>Well pump (rural)</td>
+      <td>$1,500 - $5,000</td></tr>
+  </table>
+  <div class="warning">
+    <strong>Always add 20% contingency.</strong>
+    Whatever you estimate, add 20%. Things behind
+    walls, under floors, and in crawl spaces are
+    ALWAYS worse than expected. A $30K estimate
+    becomes $36K. Budget for it upfront so you're
+    not scrambling later.
+  </div>
+</div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- THE MATH                                    -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="section" id="math">
+
+<div class="card">
+  <h2>The Math -- Calculators and Real Scenarios</h2>
+  <p>
+    Run the numbers on any deal before you commit.
+    These calculators use real Maryland costs and
+    rates.
+  </p>
+</div>
+
+<div class="card">
+  <h3>Tax Lien Return Calculator</h3>
+  <p>What you'd earn if the owner pays you back.</p>
+  <label class="calc-label">
+    Lien amount (unpaid taxes)</label>
+  <input class="calc-input" type="number"
+    id="lienAmt" placeholder="e.g. 5000">
+  <label class="calc-label">
+    Your winning bid</label>
+  <input class="calc-input" type="number"
+    id="bidAmt" placeholder="e.g. 7000">
+  <label class="calc-label">
+    Annual interest rate (%)</label>
+  <input class="calc-input" type="number"
+    id="intRate" placeholder="e.g. 18" value="18">
+  <label class="calc-label">
+    Months until owner redeems</label>
+  <input class="calc-input" type="number"
+    id="redeemMonths" placeholder="e.g. 10" value="10">
+  <button class="calc-btn"
+    onclick="calcLien()">Calculate Return</button>
+  <div class="calc-result" id="lienResult"
+    style="display:none;"></div>
+</div>
+
+<div class="card">
+  <h3>Flip Profit Calculator</h3>
+  <p>Estimate profit on a buy-fix-sell deal.</p>
+  <label class="calc-label">Purchase price</label>
+  <input class="calc-input" type="number"
+    id="flipPurchase" placeholder="e.g. 15000">
+  <label class="calc-label">Repair costs</label>
+  <input class="calc-input" type="number"
+    id="flipRepair" placeholder="e.g. 40000">
+  <label class="calc-label">
+    ARV (sale price after repairs)</label>
+  <input class="calc-input" type="number"
+    id="flipArv" placeholder="e.g. 150000">
+  <label class="calc-label">
+    Holding months</label>
+  <input class="calc-input" type="number"
+    id="flipMonths" placeholder="6" value="6">
+  <button class="calc-btn"
+    onclick="calcFlip()">Calculate Profit</button>
+  <div class="calc-result" id="flipResult"
+    style="display:none;"></div>
+</div>
+
+<div class="card">
+  <h3>70% Rule Quick Check</h3>
+  <p>The golden rule: never pay more than 70% of
+  ARV minus repair costs.</p>
+  <div class="calc-row">
+    <div>
+      <label class="calc-label">ARV</label>
+      <input class="calc-input" type="number"
+        id="rule70Arv" placeholder="150000">
+    </div>
+    <div>
+      <label class="calc-label">Repairs</label>
+      <input class="calc-input" type="number"
+        id="rule70Repair" placeholder="40000">
+    </div>
+  </div>
+  <button class="calc-btn" style="background:var(--accent3)"
+    onclick="calc70()">Max Purchase Price</button>
+  <div class="calc-result" id="rule70Result"
+    style="display:none;"></div>
+</div>
+
+<div class="card">
+  <h3>Rental Analysis</h3>
+  <p>Should you rent it out instead of flipping?</p>
+  <div class="calc-row">
+    <div>
+      <label class="calc-label">
+        Total invested</label>
+      <input class="calc-input" type="number"
+        id="rentInvested" placeholder="55000">
+    </div>
+    <div>
+      <label class="calc-label">
+        Monthly rent</label>
+      <input class="calc-input" type="number"
+        id="rentMonthly" placeholder="1200">
+    </div>
+  </div>
+  <button class="calc-btn" style="background:var(--accent4)"
+    onclick="calcRent()">Analyze Rental</button>
+  <div class="calc-result" id="rentResult"
+    style="display:none;"></div>
+</div>
+
+<div class="card">
+  <h3>Monthly Mortgage Payment</h3>
+  <p>What will the monthly payment actually be?</p>
+  <label class="calc-label">Loan amount</label>
+  <input class="calc-input" type="number"
+    id="mtgLoan" placeholder="85000">
+  <label class="calc-label">Interest rate (%)</label>
+  <input class="calc-input" type="number"
+    id="mtgRate" placeholder="7" value="7">
+  <label class="calc-label">Loan term (years)</label>
+  <input class="calc-input" type="number"
+    id="mtgTerm" placeholder="30" value="30">
+  <label class="calc-label">
+    Annual property tax</label>
+  <input class="calc-input" type="number"
+    id="mtgTax" placeholder="1500" value="1500">
+  <label class="calc-label">
+    Annual insurance</label>
+  <input class="calc-input" type="number"
+    id="mtgIns" placeholder="1200" value="1200">
+  <button class="calc-btn" style="background:#7c6fdb"
+    onclick="calcMortgage()">
+    Calculate Payment</button>
+  <div class="calc-result" id="mtgResult"
+    style="display:none;"></div>
+</div>
+
+<div class="card">
+  <h3>Real Scenarios with Maryland Numbers</h3>
+
+  <div class="scenario">
+    <div class="scenario-title">
+      Scenario 1: Tax Lien Passive Income</div>
+    <p>
+      You buy 6 tax liens at the Washington County
+      sale for a total of $18,000 (average $3,000
+      each). Keep $12,000 in reserve.
+    </p>
+    <p>
+      5 owners redeem within 12 months at 18%
+      interest. You earn $2,700 in interest on $15,000
+      invested. 1 owner doesn't redeem -- you decide
+      whether to foreclose ($3,500 legal cost) or let
+      it go.
+    </p>
+    <p>
+      <strong>Return if all redeem:</strong> $3,240 on
+      $18,000 = 18% in one year. That's $270/month
+      passively.
+    </p>
+  </div>
+
+  <div class="scenario">
+    <div class="scenario-title">
+      Scenario 2: HUD Home Near Harpers Ferry</div>
+    <p>
+      HUD lists a 3BR/1BA in Hagerstown for $75,000
+      (condition: Insured with Escrow). You bid $72,000,
+      HUD accepts. FHA $100 down program.
+    </p>
+    <p>
+      Down payment: $100. HUD 3% credit: -$2,160.
+      Closing costs: ~$5,500. Net cash needed: ~$3,440.
+      Monthly PITI: ~$680. You move in, fix cosmetic
+      issues with remaining cash over 6 months.
+    </p>
+    <p>
+      <strong>After 1 year:</strong> House worth
+      ~$105K with your improvements. You've built
+      ~$33K in equity. Monthly cost is less than rent.
+      You can now refinance, rent it out, or sell.
+    </p>
+  </div>
+
+  <div class="scenario">
+    <div class="scenario-title">
+      Scenario 3: Tax Lien to Foreclosure</div>
+    <p>
+      You buy a lien on a 2BR house in Allegany
+      County. Lien amount: $2,800. You win at $2,800
+      (no competition in rural counties). Property
+      assessed at $65,000.
+    </p>
+    <p>
+      Owner doesn't redeem. You file foreclosure
+      after 6 months. Legal costs: $3,200. Property
+      taxes during process: $1,100. Total wait: 16
+      months. Total invested: $7,100.
+    </p>
+    <p>
+      <strong>Result:</strong> You own a house worth
+      $65,000 for $7,100. Even if it needs $15,000 in
+      work, your all-in cost is $22,100 on a property
+      worth $65K-$80K fixed up. ROI: 190-260%.
+    </p>
+  </div>
+</div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- TRAPS                                       -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="section" id="traps">
+
+<div class="card">
+  <h2>Traps, Risks, and How to Avoid Them</h2>
+  <p>
+    Every one of these has cost real people real money.
+    Read them all before you spend a dollar.
+  </p>
+</div>
+
+<div class="card">
+  <h3>1. Buying a Lien on Worthless Property</h3>
+  <p>
+    You see a tax lien for $2,000 and think "cheap!"
+    But the property is a condemned building on a
+    postage-stamp lot worth $1,500. Even if you
+    foreclose, you own something worth less than you
+    paid. Add in $3,000-$5,000 in foreclosure costs
+    and you're deep in the hole.
+  </p>
+  <p>
+    <strong>How to avoid:</strong> ALWAYS check the
+    assessed value on SDAT before bidding. Google
+    Earth the address. If the lien amount is more than
+    30% of the assessed value, scrutinize hard. Drive
+    by if you can. Never bid on a property you haven't
+    at least virtually visited.
+  </p>
+</div>
+
+<div class="card">
+  <h3>2. Overbidding and Killing Your Returns</h3>
+  <p>
+    Auction fever is real. You planned to bid $5,000
+    but someone else bids $4,800 and your competitive
+    instinct kicks in. You end up at $15,000 on a
+    $3,000 lien. If the owner redeems, you earned 18%
+    on the $3,000 lien ($540) but tied up $15,000 for
+    a year. Your actual return: 3.6%. You'd have done
+    better in a savings account.
+  </p>
+  <p>
+    <strong>How to avoid:</strong> Write down your
+    maximum bid for every property BEFORE the auction.
+    Tape it to your monitor. When the bidding hits
+    your max, stop. No exceptions. The next property
+    might go for the minimum.
+  </p>
+</div>
+
+<div class="card">
+  <h3>3. IRS Liens Surviving Your Foreclosure</h3>
+  <p>
+    You spend 18 months and $4,000 in legal fees to
+    foreclose on a property. You get the deed. Then
+    the IRS exercises their 120-day right of
+    redemption and takes the property. They pay what
+    you paid -- no profit, no premium for your time
+    and legal costs.
+  </p>
+  <p>
+    <strong>How to avoid:</strong> Search Maryland
+    Land Records (mdlandrec.net) for "Notice of
+    Federal Tax Lien" on every property before
+    bidding. If you find an IRS lien, walk away
+    unless the numbers are so good that even losing
+    to the IRS doesn't hurt.
+  </p>
+</div>
+
+<div class="card">
+  <h3>4. Environmental Contamination</h3>
+  <p>
+    You foreclose on a former gas station lot. Soil
+    is contaminated with petroleum. EPA Superfund
+    liens survive tax sales. You're now the
+    "responsible party" for cleanup. Cost: $50,000
+    to $500,000+. The property is worth $20,000.
+    You're financially destroyed.
+  </p>
+  <p>
+    <strong>How to avoid:</strong> Check EPA's
+    Superfund search. Google the property's history.
+    What was it before? Commercial or industrial
+    history = red flag. Stick to residential
+    properties when starting out. If it was ever a
+    gas station, dry cleaner, auto repair shop,
+    factory, or chemical business, walk away.
+  </p>
+</div>
+
+<div class="card">
+  <h3>5. Letting Your Certificate Expire</h3>
+  <p>
+    In Maryland, your tax lien certificate becomes
+    void after 2 years if you haven't filed
+    foreclosure. Zero refund, zero recourse, total
+    loss. This happens to passive investors who buy
+    liens and forget about them.
+  </p>
+  <p>
+    <strong>How to avoid:</strong> Set a calendar
+    reminder for 5 months after purchase. At month 5,
+    evaluate: has the owner redeemed? If not, start
+    the foreclosure process. Don't wait until month 22
+    hoping they'll pay.
+  </p>
+</div>
+
+<div class="card">
+  <h3>6. Occupied Properties and Eviction</h3>
+  <p>
+    You foreclose and discover someone is living in the
+    house -- either the former owner or a tenant.
+    Maryland is a tenant-friendly state. Eviction takes
+    2-4 months and costs $1,000-$3,000 in legal fees.
+    During that time, the property may be damaged,
+    especially if the occupant is hostile.
+  </p>
+  <p>
+    <strong>How to avoid:</strong> Drive by the
+    property before bidding. Check for signs of
+    occupancy (cars, mail, lights, maintained yard).
+    Budget for eviction costs on any property that
+    might be occupied. Consider "cash for keys" --
+    offering the occupant $1,000-$3,000 to leave
+    voluntarily. It's faster, cheaper, and less
+    adversarial than court.
+  </p>
+</div>
+
+<div class="card">
+  <h3>7. The High Bid Premium Surprise</h3>
+  <p>
+    You bid $60,000 on a property assessed at
+    $100,000. The 40% threshold is $40,000. You're
+    $20,000 over. The premium: $20,000 x 20% = $4,000
+    extra. This is refundable but earns zero interest.
+    It's dead capital that inflates your investment
+    without improving your return.
+  </p>
+  <p>
+    <strong>How to avoid:</strong> Know the assessed
+    value (from SDAT) before you bid. Calculate your
+    40% threshold. If you'll go over, factor the
+    premium into your return calculations.
+  </p>
+</div>
+
+<div class="card">
+  <h3>8. Confusing Tax Lien with Tax Deed</h3>
+  <p>
+    The single most common beginner mistake: thinking
+    you bought a house when you bought a piece of
+    paper. A tax lien certificate is NOT ownership.
+    You own the debt. The property owner still owns
+    the house. You can't move in, you can't renovate,
+    you can't rent it out. You have to go through the
+    entire foreclosure process (6-24 months, $2,500-
+    $5,500+ in legal costs) before you own anything.
+  </p>
+  <p>
+    <strong>How to avoid:</strong> Just knowing this
+    puts you ahead. Tax LIEN = you own the debt. Tax
+    DEED = you own the property. Maryland is a lien
+    state. Always.
+  </p>
+</div>
+
+<div class="card">
+  <h3>9. Not Budgeting for Property Taxes
+  During Foreclosure</h3>
+  <p>
+    While you're waiting 12-24 months for the
+    foreclosure process, the property is still
+    accruing new taxes. If you don't pay them, someone
+    else can buy a NEW tax lien on top of yours. Now
+    you're in a mess -- competing lien holders, legal
+    complications, potential loss of your investment.
+  </p>
+  <p>
+    <strong>How to avoid:</strong> Budget for ongoing
+    property taxes from the day you buy the lien.
+    In Maryland, rates range from about $0.60 to $1.10
+    per $100 of assessed value per year. On a $100K
+    property, that's $600-$1,100/year you need to set
+    aside.
+  </p>
+</div>
+
+<div class="card">
+  <h3>10. Falling for "Tax Lien Guru" Scams</h3>
+  <p>
+    Instagram, YouTube, and TikTok are full of
+    people selling $997 courses on "how to buy houses
+    for pennies on the dollar through tax liens."
+    They show screenshots of properties, flash cash,
+    and promise passive income. Most of them have
+    never actually completed a tax lien foreclosure.
+  </p>
+  <p>
+    <strong>Reality:</strong> The information is
+    all public and free. County websites, state law,
+    auction platforms -- it's all accessible. You're
+    reading a guide right now that covers everything
+    those courses teach. The real knowledge comes from
+    doing your first deal, not watching someone else
+    talk about it. Save your $997 for an actual lien.
+  </p>
+</div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- ALL SITES                                   -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="section" id="sites">
+
+<div class="card">
+  <h2>Every Site You Need -- With Links</h2>
+</div>
+
+<div class="card">
+  <h3>Tax Lien Auctions</h3>
+  <a class="site-link"
+    href="https://www.bid4assets.com"
+    target="_blank">Bid4Assets.com</a>
+  <p>Main platform for MD county tax sales + US
+  Marshals auctions. Free account. Set alerts for
+  Maryland.</p>
+
+  <a class="site-link"
+    href="https://dat.maryland.gov/pages/tax-sale-schedule.aspx"
+    target="_blank">MD Tax Sale Schedule</a>
+  <p>Official calendar for all 23 counties + Baltimore
+  City. Bookmark this.</p>
+
+  <a class="site-link"
+    href="https://taxsale.howardcountymd.gov"
+    target="_blank">Howard County Tax Sale Portal</a>
+  <p>Howard County runs its own auction platform.</p>
+</div>
+
+<div class="card">
+  <h3>Government Foreclosures</h3>
+  <a class="site-link"
+    href="https://www.hudhomestore.gov"
+    target="_blank">HUDHomeStore.gov</a>
+  <p>HUD-owned foreclosures. FHA $100 down. Search
+  by state, county, price. Check twice a week.</p>
+
+  <a class="site-link"
+    href="https://www.resales.usda.gov"
+    target="_blank">USDA Resales</a>
+  <p>USDA rural foreclosures. Great for Western MD,
+  Eastern Shore, Harpers Ferry area.</p>
+
+  <a class="site-link"
+    href="https://listings.vrmco.com"
+    target="_blank">VA Foreclosures (VRMCO)</a>
+  <p>VA-owned properties. Open to everyone -- you
+  don't need to be a veteran to buy.</p>
+
+  <a class="site-link"
+    href="https://dhcd.maryland.gov/Residents/Pages/reo/default.aspx"
+    target="_blank">Maryland DHCD REO</a>
+  <p>State-owned foreclosures from MD housing
+  programs. Hidden gem.</p>
+</div>
+
+<div class="card">
+  <h3>Federal Seized Property</h3>
+  <a class="site-link"
+    href="https://www.usmarshals.gov/what-we-do/asset-forfeiture"
+    target="_blank">US Marshals</a>
+  <p>Criminal asset seizures. Auctions via
+  Bid4Assets.</p>
+
+  <a class="site-link"
+    href="https://www.irsauctions.gov"
+    target="_blank">IRS Auctions</a>
+  <p>Seized for tax debt. ~300/yr nationwide.
+  No title guarantee.</p>
+
+  <a class="site-link"
+    href="https://www.treasury.gov/auctions/treasury/rp/"
+    target="_blank">Treasury Auctions</a>
+  <p>Treasury Dept seized real estate.</p>
+
+  <a class="site-link"
+    href="https://www.realestatesales.gov"
+    target="_blank">RealEstateSales.gov</a>
+  <p>GSA surplus federal property.</p>
+
+  <a class="site-link"
+    href="https://www.fdic.gov/buying/owned"
+    target="_blank">FDIC.gov</a>
+  <p>Failed bank assets -- foreclosed homes, bank
+  branches, commercial property. Can use an agent
+  and sometimes get financing.</p>
+
+  <a class="site-link"
+    href="https://www.gsaauctions.gov"
+    target="_blank">GSA Auctions</a>
+  <p>General government surplus -- vehicles,
+  equipment, some real estate.</p>
+
+  <a class="site-link"
+    href="https://www.govdeals.com"
+    target="_blank">GovDeals</a>
+  <p>State/local government surplus. MD State
+  Police sells seized vehicles here.</p>
+</div>
+
+<div class="card">
+  <h3>Research & Due Diligence</h3>
+  <a class="site-link"
+    href="https://sdat.dat.maryland.gov/RealProperty"
+    target="_blank">SDAT Property Search</a>
+  <p>Maryland property database. Assessed values,
+  owner info, tax status, transfer history. Your
+  #1 research tool.</p>
+
+  <a class="site-link"
+    href="https://mdlandrec.net"
+    target="_blank">MD Land Records</a>
+  <p>Deeds, mortgages, liens, judgments. Free
+  registration. Check for IRS liens here.</p>
+
+  <a class="site-link"
+    href="https://casesearch.courts.state.md.us"
+    target="_blank">MD Judiciary Case Search</a>
+  <p>Lawsuits, judgments, foreclosures against
+  property owners.</p>
+
+  <a class="site-link"
+    href="https://dat.maryland.gov/pages/tax-sale-information.aspx"
+    target="_blank">MD Tax Sale Ombudsman</a>
+  <p>Official MD guidance and FAQ on tax sales.</p>
+</div>
+
+<div class="card">
+  <h3>Home Buying & Financing</h3>
+  <a class="site-link"
+    href="https://mmp.maryland.gov"
+    target="_blank">Maryland Mortgage Program</a>
+  <p>Below-market rates, down payment assistance,
+  first-time and repeat buyer programs.</p>
+
+  <a class="site-link"
+    href="https://www.annualcreditreport.com"
+    target="_blank">Free Credit Report</a>
+  <p>Official free credit report -- check before
+  applying for any loan.</p>
+
+  <a class="site-link"
+    href="https://eligibility.sc.egov.usda.gov"
+    target="_blank">USDA Eligibility Map</a>
+  <p>Check if an area qualifies for USDA 0%
+  down loans.</p>
+
+  <a class="site-link"
+    href="https://www.zillow.com"
+    target="_blank">Zillow</a>
+  <p>Comps, market values, recently sold homes.
+  Essential for evaluating any property.</p>
+</div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- GLOSSARY                                    -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="section" id="glossary">
+
+<div class="card">
+  <h2>Glossary -- Every Term Explained</h2>
+  <p>Plain English definitions for everything you'll
+  encounter in government property buying.</p>
+</div>
+
+<div class="card" id="glossaryList"></div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- CHECKLISTS                                  -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="section" id="checklist">
+
+<div class="card">
+  <h2>Checklists</h2>
+  <p>Tap items to check them off. Progress saves
+  automatically.</p>
+</div>
+
+<div class="card">
+  <h3>Getting Started -- Do This Week</h3>
+  <div id="checklistStart"></div>
+</div>
+
+<div class="card">
+  <h3>Before You Bid on ANY Property</h3>
+  <div id="checklistDD"></div>
+</div>
+
+<div class="card">
+  <h3>After Winning a Tax Lien</h3>
+  <div id="checklistPostWin"></div>
+</div>
+
+<div class="card">
+  <h3>HUD Home Purchase</h3>
+  <div id="checklistHUD"></div>
+</div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════ -->
+<script>
+// ── Navigation ──
+const sections = document.querySelectorAll('.section');
+const navBtns = document.querySelectorAll('.nav-btn');
+const allSectionIds = [
+  'basics','taxlien','hud','federal','homebuying',
+  'maryland','evaluate','math','traps','sites',
+  'glossary','checklist'
+];
+let visited = JSON.parse(
+  localStorage.getItem('ps_visited') || '[]');
+
+function switchSection(id) {
+  sections.forEach(s => s.classList.remove('active'));
+  navBtns.forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelector(
+    `[data-section="${id}"]`).classList.add('active');
+  if (!visited.includes(id)) {
+    visited.push(id);
+    localStorage.setItem(
+      'ps_visited', JSON.stringify(visited));
+  }
+  updateProgress();
+  window.scrollTo(0, 0);
+}
+
+navBtns.forEach(btn => {
+  btn.addEventListener('click', () =>
+    switchSection(btn.dataset.section));
+});
+
+function updateProgress() {
+  const n = visited.length, t = allSectionIds.length;
+  const el = document.getElementById('progressCount');
+  const fill = document.getElementById('progressFill');
+  if (el) el.textContent = `${n} / ${t}`;
+  if (fill) fill.style.width =
+    Math.round((n/t)*100) + '%';
+}
+updateProgress();
+
+// ── Calculators ──
+function fmt(n) {
+  return '$' + n.toLocaleString('en-US',
+    {maximumFractionDigits:0});
+}
+
+function calcLien() {
+  const lien = +document.getElementById('lienAmt').value;
+  const bid = +document.getElementById('bidAmt').value;
+  const rate = +document.getElementById('intRate').value;
+  const mo = +document.getElementById('redeemMonths').value;
+  if (!lien || !bid) return;
+  const interest = lien * (rate/100) * (mo/12);
+  const roi = (interest/bid) * (12/mo) * 100;
+  const ob = bid - lien;
+  let h = `<div class="big-num">${fmt(interest)} profit</div>
+    <p>You get back: ${fmt(bid + interest)}</p>
+    <p>Annualized ROI: <strong>${roi.toFixed(1)}%</strong></p>`;
+  if (ob > 0) {
+    const pureRoi = (interest/lien)*(12/mo)*100;
+    h += `<div class="warning" style="margin-top:0.75rem">
+      Overbid: ${fmt(ob)} earning 0% interest.
+      Without overbid, ROI would be
+      <strong>${pureRoi.toFixed(1)}%</strong>.</div>`;
+  }
+  const el = document.getElementById('lienResult');
+  el.innerHTML = h; el.style.display = 'block';
+}
+
+function calcFlip() {
+  const p = +document.getElementById('flipPurchase').value;
+  const r = +document.getElementById('flipRepair').value;
+  const arv = +document.getElementById('flipArv').value;
+  const mo = +document.getElementById('flipMonths').value||6;
+  if (!p || !arv) return;
+  const cb = p*0.03, hold = mo*800, cs = arv*0.075;
+  const total = p+r+cb+hold+cs;
+  const profit = arv - total;
+  const roi = (profit/(p+r))*100;
+  const c = profit>=0 ? 'var(--accent)' : 'var(--danger)';
+  document.getElementById('flipResult').innerHTML = `
+    <div class="big-num" style="color:${c}">
+      ${fmt(profit)} ${profit>=0?'profit':'loss'}</div>
+    <table class="info-table">
+      <tr><td>Purchase</td><td>${fmt(p)}</td></tr>
+      <tr><td>Repairs</td><td>${fmt(r)}</td></tr>
+      <tr><td>Closing (buy ~3%)</td><td>${fmt(cb)}</td></tr>
+      <tr><td>Holding (~$800/mo x${mo})</td>
+        <td>${fmt(hold)}</td></tr>
+      <tr><td>Closing (sell ~7.5%)</td>
+        <td>${fmt(cs)}</td></tr>
+      <tr><td><strong>Total cost</strong></td>
+        <td><strong>${fmt(total)}</strong></td></tr>
+      <tr><td><strong>ROI</strong></td>
+        <td><strong>${roi.toFixed(1)}%</strong></td></tr>
+    </table>`;
+  document.getElementById('flipResult')
+    .style.display = 'block';
+}
+
+function calc70() {
+  const arv = +document.getElementById('rule70Arv').value;
+  const rep = +document.getElementById('rule70Repair').value;
+  if (!arv) return;
+  const max = arv*0.7 - rep;
+  const c = max>0 ? 'var(--accent)' : 'var(--danger)';
+  document.getElementById('rule70Result').innerHTML = `
+    <div class="big-num" style="color:${c}">
+      ${fmt(max)}</div>
+    <p>Maximum you should pay for this property.</p>
+    <p style="font-size:0.85rem;color:var(--text-dim)">
+      70% of ${fmt(arv)} = ${fmt(arv*0.7)},
+      minus ${fmt(rep)} repairs</p>`;
+  document.getElementById('rule70Result')
+    .style.display = 'block';
+}
+
+function calcRent() {
+  const inv = +document.getElementById('rentInvested').value;
+  const rent = +document.getElementById('rentMonthly').value;
+  if (!inv || !rent) return;
+  const ratio = rent/inv*100;
+  const annual = rent*12, exp = annual*0.45;
+  const noi = annual-exp, cap = noi/inv*100;
+  const payback = inv/(noi/12);
+  let v = ratio>=1 ?
+    `<span style="color:var(--accent)">Great</span> -- hits 1% rule` :
+    ratio>=0.8 ?
+    `<span style="color:var(--warning)">Decent</span> -- near 1%` :
+    `<span style="color:var(--danger)">Weak</span> -- below 0.8%`;
+  document.getElementById('rentResult').innerHTML = `
+    <p><strong>Rent/price:</strong> ${ratio.toFixed(2)}%
+      -- ${v}</p>
+    <table class="info-table">
+      <tr><td>Gross annual rent</td>
+        <td>${fmt(annual)}</td></tr>
+      <tr><td>Expenses (45%)</td>
+        <td>${fmt(exp)}</td></tr>
+      <tr><td>Net operating income</td>
+        <td>${fmt(noi)}/yr</td></tr>
+      <tr><td>Cap rate</td>
+        <td>${cap.toFixed(1)}%</td></tr>
+      <tr><td>Payback</td>
+        <td>${payback.toFixed(1)} months</td></tr>
+    </table>`;
+  document.getElementById('rentResult')
+    .style.display = 'block';
+}
+
+function calcMortgage() {
+  const loan = +document.getElementById('mtgLoan').value;
+  const rate = +document.getElementById('mtgRate').value;
+  const term = +document.getElementById('mtgTerm').value;
+  const tax = +document.getElementById('mtgTax').value;
+  const ins = +document.getElementById('mtgIns').value;
+  if (!loan) return;
+  const mr = rate/100/12;
+  const n = term*12;
+  const pi = loan * (mr * Math.pow(1+mr,n)) /
+    (Math.pow(1+mr,n) - 1);
+  const ti = (tax+ins)/12;
+  const mip = loan * 0.0055 / 12;
+  const total = pi + ti + mip;
+  document.getElementById('mtgResult').innerHTML = `
+    <div class="big-num">${fmt(total)}/mo</div>
+    <table class="info-table">
+      <tr><td>Principal & Interest</td>
+        <td>${fmt(pi)}</td></tr>
+      <tr><td>Property Tax</td>
+        <td>${fmt(tax/12)}</td></tr>
+      <tr><td>Insurance</td>
+        <td>${fmt(ins/12)}</td></tr>
+      <tr><td>FHA Mortgage Insurance</td>
+        <td>${fmt(mip)}</td></tr>
+      <tr><td><strong>Total PITI</strong></td>
+        <td><strong>${fmt(total)}</strong></td></tr>
+    </table>
+    <p style="font-size:0.8rem;color:var(--text-dim)">
+      Total paid over ${term} years:
+      ${fmt(total*n)} (${fmt(total*n - loan)}
+      in interest + insurance + taxes)</p>`;
+  document.getElementById('mtgResult')
+    .style.display = 'block';
+}
+
+// ── Checklists ──
+const checklists = {
+  checklistStart: [
+    'Check your credit score at annualcreditreport.com',
+    'Create a free account on Bid4Assets.com',
+    'Create an account on HUDHomeStore.gov',
+    'Search HUDHomeStore.gov for Maryland under $100K',
+    'Look up your county at SDAT (sdat.dat.maryland.gov)',
+    'Google "[your county] tax sale 2026" -- find the date',
+    'Browse realestatesales.gov for MD listings',
+    'Check resales.usda.gov for rural MD properties',
+    'Set Google Alert for "Maryland tax sale 2026"',
+    'Practice: pick 3 cheap properties and research them (SDAT + Google Earth + Zillow comps)',
+    'Talk to 2-3 mortgage lenders about FHA pre-approval',
+    'Ask at least one MMP-approved lender about down payment assistance',
+    'Find a real estate agent registered for HUD bidding',
+    'Find a Maryland attorney who handles tax sale foreclosures',
+    'Register for your county\'s next tax sale when available',
+    'Set calendar reminders for tax sales in your target counties',
+    'Open a dedicated savings account for your property fund',
+  ],
+  checklistDD: [
+    'Look up assessed value on SDAT',
+    'Google Earth / Street View the property',
+    'Check neighborhood -- what do surrounding houses look like?',
+    'Search Zillow/Redfin for comparable recent sales within 0.5 miles',
+    'Calculate ARV using 3-5 renovated comps',
+    'Search MD Land Records for mortgages and liens',
+    'Search MD Judiciary Case Search for lawsuits against owner',
+    'Check for IRS/federal tax liens specifically',
+    'Check EPA Superfund search for environmental issues',
+    'Verify zoning and land use code on SDAT',
+    'Check if property is occupied (drive by if possible)',
+    'Estimate repair costs using the cost table',
+    'Add 20% contingency to repair estimate',
+    'Run the 70% Rule calculator -- does the deal work?',
+    'Calculate your max bid and write it down',
+    'Verify you have payment ready (certified check / ACH)',
+  ],
+  checklistPostWin: [
+    'Record your purchase: date, property, amount paid, lien amount, county',
+    'Set calendar reminder for 5 months post-purchase (foreclosure prep)',
+    'Set calendar reminder for 23 months (2-year expiration warning)',
+    'Pay ongoing property taxes to prevent new liens',
+    'Monitor: has the owner redeemed? Check with county.',
+    'At 5 months: if unredeemed, contact a tax sale attorney',
+    'At 6 months: file foreclosure if owner hasn\'t paid',
+    'Track all expenses (attorney, postage, title search, taxes) for reimbursement',
+    'If property is occupied, budget for potential eviction costs',
+    'Keep all documentation -- receipts, certified mail receipts, court filings',
+  ],
+  checklistHUD: [
+    'Get FHA pre-approval from an FHA-approved lender',
+    'Ask lender specifically about HUD $100 down program',
+    'Ask about Maryland Mortgage Program (MMP) assistance',
+    'Find a HUD-registered real estate agent (any agent can register)',
+    'Search HUDHomeStore.gov -- filter by state, county, price',
+    'Visit properties in person if possible',
+    'Submit bid during owner-occupant exclusive period',
+    'Get a home inspection even though property is as-is ($350-$500)',
+    'Review appraisal when lender orders it',
+    'Apply for MD first-time buyer transfer tax exemption',
+    'Review all closing documents with your attorney',
+    'Close, get keys, move in',
+    'Live in the property for minimum 12 months (FHA requirement)',
+  ],
+};
+
+function renderCL(containerId, storageKey) {
+  const items = checklists[containerId];
+  const saved = JSON.parse(
+    localStorage.getItem(storageKey) || '[]');
+  document.getElementById(containerId).innerHTML =
+    items.map((item, i) => {
+      const done = saved.includes(i);
+      return `<div class="checklist-item ${done?'done':''}"
+        onclick="toggleCL(this,${i},'${storageKey}')">
+        <input type="checkbox" ${done?'checked':''}
+          onclick="event.stopPropagation()">
+        <span class="cl-text">${item}</span>
+      </div>`;
+    }).join('');
+}
+
+function toggleCL(el, idx, key) {
+  let s = JSON.parse(localStorage.getItem(key)||'[]');
+  const cb = el.querySelector('input');
+  if (s.includes(idx)) {
+    s = s.filter(i => i !== idx);
+    cb.checked = false;
+    el.classList.remove('done');
+  } else {
+    s.push(idx);
+    cb.checked = true;
+    el.classList.add('done');
+  }
+  localStorage.setItem(key, JSON.stringify(s));
+}
+
+renderCL('checklistStart', 'ps_cl_start');
+renderCL('checklistDD', 'ps_cl_dd');
+renderCL('checklistPostWin', 'ps_cl_postwin');
+renderCL('checklistHUD', 'ps_cl_hud');
+
+// ── Glossary ──
+const glossary = [
+  ['Tax Lien', 'A legal claim on a property for unpaid taxes. When you buy one at auction, the property owner now owes YOU instead of the county. You earn interest, and if they don\'t pay, you can foreclose.'],
+  ['Tax Lien Certificate', 'The physical/digital document proving you bought a tax lien. This is your proof that the owner owes you money and your ticket to foreclose if they don\'t pay.'],
+  ['Tax Deed', 'Direct ownership of a property sold for unpaid taxes. Some states sell deeds at auction (PA, FL, TX). Maryland does NOT -- you must foreclose a lien to get a deed.'],
+  ['Redemption', 'When the property owner pays you back with interest, "redeeming" their property. In MD, they can redeem anytime until the court finalizes foreclosure.'],
+  ['Redemption Period', 'The time during which the owner can pay you back. In Maryland, there\'s no fixed period -- it lasts until the court enters final judgment on your foreclosure.'],
+  ['Foreclosure', 'The legal process of taking someone\'s property for non-payment. In MD tax sales, you file in Circuit Court with an attorney after a 6-month wait.'],
+  ['Overbid', 'The amount you bid above the minimum (the unpaid taxes). Critical: you only earn interest on the lien amount, NOT the overbid. Overbidding destroys returns.'],
+  ['High Bid Premium', 'Maryland-specific: if your bid exceeds 40% of assessed value, you pay an extra 20% on the excess. Refundable but earns zero interest.'],
+  ['SDAT', 'State Department of Assessments and Taxation. Maryland\'s property database. Shows assessed values, owner info, tax status, building details.'],
+  ['Assessed Value', 'The government\'s estimate of a property\'s worth for tax purposes. Usually lower than market value. Found on SDAT.'],
+  ['REO', 'Real Estate Owned. Property owned by a bank or government agency after a failed foreclosure. HUD homes, USDA properties, and bank-owned listings are all REO.'],
+  ['HUD Home', 'A house owned by the Department of Housing and Urban Development, taken back when an FHA borrower defaults. Sold on HUDHomeStore.gov.'],
+  ['FHA Loan', 'Mortgage insured by the Federal Housing Administration. Low down payment (3.5% or $100 on HUD homes). Easier qualification than conventional loans.'],
+  ['FHA $100 Down', 'Special program for HUD-owned homes only. Your entire down payment is $100. Must use FHA financing and live in the property.'],
+  ['USDA Loan', 'Zero down payment mortgage for properties in USDA-eligible rural areas. Income limits apply. Lower mortgage insurance than FHA.'],
+  ['VA Loan', 'Zero down payment, no mortgage insurance. For veterans, active military, and some surviving spouses. Best loan product available.'],
+  ['Conventional Loan', 'Non-government-backed mortgage. Usually 5-20% down. Better rates with great credit and 20% down.'],
+  ['Hard Money Loan', 'Short-term private loan (6-18 months) at high interest (10-15%). Based on property value, not your income. Used for flips.'],
+  ['PMI / MIP', 'Private Mortgage Insurance / Mortgage Insurance Premium. Extra monthly cost on loans with less than 20% down. Protects the lender, not you.'],
+  ['PITI', 'Principal, Interest, Taxes, Insurance. The four components of your monthly mortgage payment.'],
+  ['ARV', 'After Repair Value. What a property would sell for after renovations. Estimated by finding comparable renovated homes that sold recently.'],
+  ['Comps', 'Comparable sales. Recently sold properties similar to yours in size, location, and condition. Used to estimate market value.'],
+  ['70% Rule', 'Flipping rule of thumb: never pay more than 70% of ARV minus repair costs. This builds in margin for expenses and profit.'],
+  ['1% Rule', 'Rental quick-test: monthly rent should be at least 1% of total investment. $100K invested = $1,000+/month rent.'],
+  ['Cap Rate', 'Capitalization rate. Annual net operating income divided by total investment. Higher = better return. 8%+ is good.'],
+  ['As-Is', 'Sold in current condition. No repairs, no warranties. What you see is what you get (or worse).'],
+  ['Title', 'Legal proof of property ownership and all claims against it. "Clean title" = no liens or disputes.'],
+  ['Title Insurance', 'Insurance protecting you if ownership problems surface later. Costs 0.5-1% of property value. Required by lenders.'],
+  ['Quiet Title Action', 'A lawsuit to establish clean ownership, removing old claims. Often needed after IRS auction purchases. $1,500-$3,000.'],
+  ['Lien', 'A legal claim on property for money owed. Mortgages, taxes, court judgments, and contractor bills can all create liens.'],
+  ['Super Priority', 'Tax liens rank first, ahead of mortgages and most other liens. This is why tax sale foreclosure can wipe out a $200K mortgage.'],
+  ['Earnest Money', 'A deposit you put down when making an offer on a house ($500-$2,000). Shows you\'re serious. Held in escrow, applied to closing costs.'],
+  ['Escrow', 'Money held by a neutral third party during a transaction. Also: the account your lender uses to collect and pay taxes/insurance monthly.'],
+  ['Closing / Settlement', 'The final step in buying property. You sign paperwork, pay costs, and receive the deed. In MD, must use an attorney.'],
+  ['Cash for Keys', 'Paying an occupant $1,000-$3,000 to voluntarily leave instead of going through formal eviction. Faster and cheaper.'],
+  ['Wholesale', 'Finding a deal, putting it under contract, then selling the contract to another buyer for a fee. You never actually buy the property.'],
+  ['Pre-Approval', 'A lender\'s conditional commitment to lend you a specific amount. Based on your credit, income, and debts. Get this before house hunting.'],
+  ['Down Payment Assistance (DPA)', 'Government or nonprofit programs that provide money for your down payment. Maryland has several (MMP, 1st Time Advantage, Flex).'],
+  ['Recordation Tax', 'Maryland tax on recording documents (deeds, mortgages) with the county. $4.10 per $500 of property value.'],
+  ['Transfer Tax', 'Maryland tax on property transfers. About 0.5% of sale price, split between buyer and seller (varies by county).'],
+];
+
+document.getElementById('glossaryList').innerHTML =
+  glossary.map(([term, def]) => `
+    <div style="margin-bottom:1rem;padding-bottom:1rem;
+      border-bottom:1px solid var(--border);">
+      <span class="gloss-term">${term}</span>
+      <p style="margin-top:0.3rem;font-size:0.88rem;">
+        ${def}</p>
+    </div>`).join('');
+
+// ── Save calc inputs ──
+document.querySelectorAll('.calc-input').forEach(inp => {
+  const k = 'ps_c_' + inp.id;
+  const v = localStorage.getItem(k);
+  if (v && !inp.value) inp.value = v;
+  inp.addEventListener('input', () =>
+    localStorage.setItem(k, inp.value));
+});
+
+// ── Bookmarks ──
+const BM_KEY = 'ps_bookmarks';
+const BM_POS_KEY = 'ps_last_position';
+
+function getBookmarks() {
+  return JSON.parse(localStorage.getItem(BM_KEY)||'{}');
+}
+
+function saveBookmarks(bm) {
+  localStorage.setItem(BM_KEY, JSON.stringify(bm));
+}
+
+// Add bookmark buttons to every card with an h2 or h3
+document.querySelectorAll('.card').forEach((card, i) => {
+  const heading = card.querySelector('h2, h3');
+  if (!heading) return;
+  const id = 'card_' + i;
+  card.dataset.bmId = id;
+
+  const btn = document.createElement('button');
+  btn.className = 'bm-btn';
+  btn.textContent = '\u2605';
+  btn.title = 'Bookmark this section';
+
+  const bm = getBookmarks();
+  if (bm[id]) btn.classList.add('bookmarked');
+
+  btn.onclick = (e) => {
+    e.stopPropagation();
+    const bm = getBookmarks();
+    if (bm[id]) {
+      delete bm[id];
+      btn.classList.remove('bookmarked');
+    } else {
+      const section = card.closest('.section');
+      bm[id] = {
+        title: heading.textContent.trim().slice(0,60),
+        section: section ? section.id : '',
+        idx: i
+      };
+      btn.classList.add('bookmarked');
+    }
+    saveBookmarks(bm);
+    updateResumeBtn();
+  };
+  card.appendChild(btn);
+});
+
+// Save scroll position + section on scroll
+let saveTimer;
+window.addEventListener('scroll', () => {
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => {
+    const active = document.querySelector(
+      '.section.active');
+    if (active) {
+      localStorage.setItem(BM_POS_KEY, JSON.stringify({
+        section: active.id,
+        scrollY: window.scrollY
+      }));
+    }
+  }, 300);
+});
+
+// Resume button
+const resumeBtn = document.createElement('button');
+resumeBtn.className = 'bm-resume';
+resumeBtn.textContent = '\u25B6 Resume reading';
+document.body.appendChild(resumeBtn);
+
+function updateResumeBtn() {
+  const pos = localStorage.getItem(BM_POS_KEY);
+  if (pos) {
+    const {section} = JSON.parse(pos);
+    const active = document.querySelector(
+      '.section.active');
+    if (active && active.id !== section) {
+      resumeBtn.classList.add('show');
+    } else {
+      resumeBtn.classList.remove('show');
+    }
+  }
+}
+
+resumeBtn.onclick = () => {
+  const pos = JSON.parse(
+    localStorage.getItem(BM_POS_KEY) || '{}');
+  if (pos.section) {
+    switchSection(pos.section);
+    setTimeout(() => {
+      window.scrollTo(0, pos.scrollY || 0);
+    }, 50);
+  }
+  resumeBtn.classList.remove('show');
+};
+
+// Show resume button on load if returning
+setTimeout(updateResumeBtn, 500);
+
+// On first load, restore last section
+const lastPos = localStorage.getItem(BM_POS_KEY);
+if (lastPos) {
+  const {section, scrollY} = JSON.parse(lastPos);
+  if (section && section !== 'basics') {
+    switchSection(section);
+    setTimeout(() => window.scrollTo(0, scrollY||0), 100);
+  }
+}
+</script>
+
+</body>
+</html>
