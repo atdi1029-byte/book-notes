@@ -128,6 +128,17 @@ function doGet(e) {
     return jsonpWrap_(JSON.stringify({ status: 'ok', moved: existing }), callback);
   }
 
+  if (action === 'unmove_from_shelf') {
+    var mSheet = ss.getSheetByName('Settings');
+    if (!mSheet) mSheet = ss.insertSheet('Settings');
+    var mBook = e.parameter.book || '';
+    var existing = {};
+    try { existing = JSON.parse(mSheet.getRange('D1').getValue() || '{}'); } catch(err) {}
+    delete existing[mBook];
+    mSheet.getRange('D1').setValue(JSON.stringify(existing));
+    return jsonpWrap_(JSON.stringify({ status: 'ok', moved: existing }), callback);
+  }
+
   // ── ZERCHER ──
   var zSheet = ss.getSheetByName('Zercher');
   if (!zSheet && action.indexOf('zercher') === 0) {

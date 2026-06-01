@@ -3156,6 +3156,19 @@
     }
   }
 
+  function unmoveFromShelf(e, id) {
+    e.preventDefault();
+    e.stopPropagation();
+    var moved = getMovedToShelf();
+    delete moved[id];
+    localStorage.setItem(SHELF_MOVED_KEY, JSON.stringify(moved));
+    renderMovedToShelf();
+    render();
+    if (syncReady && SYNC_URL && SYNC_URL !== 'YOUR_APPS_SCRIPT_URL_HERE') {
+      jsonpFetch(SYNC_URL + '?action=unmove_from_shelf&book=' + encodeURIComponent(id), function(){});
+    }
+  }
+
   function renderMovedToShelf() {
     var moved = getMovedToShelf();
 
@@ -3193,6 +3206,12 @@
             if (btn) btn.remove();
             var tier = clone.querySelector('.tier-badge');
             if (tier) tier.remove();
+            var undo = document.createElement('button');
+            undo.className = 'move-to-shelf';
+            undo.title = 'Back to To Read';
+            undo.textContent = '\u2190 To Read';
+            undo.onclick = function(ev) { unmoveFromShelf(ev, id); };
+            clone.querySelector('.cover-wrap').appendChild(undo);
             fallbackShelf.appendChild(clone);
             if (fallbackTitle)
               fallbackTitle.style.display = '';
@@ -3208,6 +3227,12 @@
         if (btn) btn.remove();
         var tier = clone.querySelector('.tier-badge');
         if (tier) tier.remove();
+        var undo = document.createElement('button');
+        undo.className = 'move-to-shelf';
+        undo.title = 'Back to To Read';
+        undo.textContent = '\u2190 To Read';
+        undo.onclick = function(ev) { unmoveFromShelf(ev, id); };
+        clone.querySelector('.cover-wrap').appendChild(undo);
         targetShelf.appendChild(clone);
         if (touchedShelves.indexOf(targetShelf) === -1)
           touchedShelves.push(targetShelf);
@@ -3225,6 +3250,20 @@
       }
       if (title) title.style.display = '';
       shelf.style.display = '';
+    });
+
+    // Hide To Read sections where all books are moved
+    document.querySelectorAll(
+      '#toReadView .section-title'
+    ).forEach(function(title) {
+      var shelf = title.nextElementSibling;
+      if (!shelf || !shelf.classList.contains('shelf')) return;
+      var hasVisible = false;
+      shelf.querySelectorAll('.book').forEach(function(b) {
+        if (b.style.display !== 'none') hasVisible = true;
+      });
+      title.style.display = hasVisible ? '' : 'none';
+      shelf.style.display = hasVisible ? '' : 'none';
     });
   }
 
