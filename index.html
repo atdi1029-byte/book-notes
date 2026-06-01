@@ -3037,8 +3037,9 @@
       }
     });
 
-    // Hide/show category sections
-    document.querySelectorAll('.section-title:not(#recentlyAddedTitle)').forEach(function(title) {
+    if (typeof renderMovedToShelf === 'function') renderMovedToShelf();
+    // Hide/show category sections AFTER moved cards are injected
+    document.querySelectorAll('#shelfView .section-title:not(#recentlyAddedTitle)').forEach(function(title) {
       var shelf = title.nextElementSibling;
       if (!shelf || !shelf.classList.contains('shelf')) return;
       var hasVisible = false;
@@ -3048,7 +3049,6 @@
       title.style.display = hasVisible ? '' : 'none';
       shelf.style.display = hasVisible ? '' : 'none';
     });
-    if (typeof renderMovedToShelf === 'function') renderMovedToShelf();
   }
 
   // Initial render from localStorage (instant)
@@ -3239,18 +3239,8 @@
       }
     );
 
-    // Re-show sections that gained moved cards
-    // (render() may have hidden them before clones
-    // were injected)
-    touchedShelves.forEach(function(shelf) {
-      var title = shelf.previousElementSibling;
-      while (title && !title.classList.contains(
-        'section-title')) {
-        title = title.previousElementSibling;
-      }
-      if (title) title.style.display = '';
-      shelf.style.display = '';
-    });
+    // Section visibility is handled by render()
+    // after renderMovedToShelf completes
 
     // Hide To Read sections where all books are moved
     document.querySelectorAll(
