@@ -139,6 +139,51 @@ function doGet(e) {
     return jsonpWrap_(JSON.stringify({ status: 'ok', moved: existing }), callback);
   }
 
+  // ── SCALP JOURNAL ──
+  if (action === 'scalp_get') {
+    var sSheet = ss.getSheetByName('Settings');
+    if (!sSheet) sSheet = ss.insertSheet('Settings');
+    var raw = sSheet.getRange('E1').getValue() || '[]';
+    return jsonpWrap_(JSON.stringify({ status: 'ok', entries: JSON.parse(raw) }), callback);
+  }
+
+  if (action === 'scalp_save') {
+    var sSheet = ss.getSheetByName('Settings');
+    if (!sSheet) sSheet = ss.insertSheet('Settings');
+    var data = e.parameter.data || '[]';
+    JSON.parse(data); // validate
+    sSheet.getRange('E1').setValue(data);
+    return jsonpWrap_(JSON.stringify({ status: 'ok' }), callback);
+  }
+
+  if (action === 'scalp_add') {
+    var sSheet = ss.getSheetByName('Settings');
+    if (!sSheet) sSheet = ss.insertSheet('Settings');
+    var existing = [];
+    try { existing = JSON.parse(sSheet.getRange('E1').getValue() || '[]'); } catch(err) {}
+    var entry = JSON.parse(e.parameter.data || '{}');
+    var idx = -1;
+    for (var i = 0; i < existing.length; i++) {
+      if (existing[i].date === entry.date) { idx = i; break; }
+    }
+    if (idx >= 0) existing[idx] = entry;
+    else existing.push(entry);
+    existing.sort(function(a, b) { return a.date < b.date ? -1 : 1; });
+    sSheet.getRange('E1').setValue(JSON.stringify(existing));
+    return jsonpWrap_(JSON.stringify({ status: 'ok', entries: existing }), callback);
+  }
+
+  if (action === 'scalp_delete') {
+    var sSheet = ss.getSheetByName('Settings');
+    if (!sSheet) sSheet = ss.insertSheet('Settings');
+    var delDate = e.parameter.date || '';
+    var existing = [];
+    try { existing = JSON.parse(sSheet.getRange('E1').getValue() || '[]'); } catch(err) {}
+    existing = existing.filter(function(e) { return e.date !== delDate; });
+    sSheet.getRange('E1').setValue(JSON.stringify(existing));
+    return jsonpWrap_(JSON.stringify({ status: 'ok', entries: existing }), callback);
+  }
+
   // ── ZERCHER ──
   var zSheet = ss.getSheetByName('Zercher');
   if (!zSheet && action.indexOf('zercher') === 0) {
