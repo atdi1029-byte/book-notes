@@ -1,0 +1,977 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"
+  content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style"
+  content="black-translucent">
+<meta name="theme-color" content="#1a1612">
+<title>SMC Course — Order Block (Parte 1)</title>
+<link rel="stylesheet" href="../book.css?v=3">
+<style>
+  .concept-box {
+    background: rgba(255,255,255,0.05);
+    border-left: 3px solid #c9a84c;
+    padding: 1rem 1.2rem;
+    margin: 1.2rem 0;
+    border-radius: 0 6px 6px 0;
+  }
+  .concept-box h4 {
+    color: #c9a84c;
+    margin-bottom: 0.4rem;
+    font-size: 1rem;
+  }
+  .vs-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0;
+  }
+  .vs-table th {
+    background: rgba(201,168,76,0.15);
+    color: #c9a84c;
+    padding: 0.5rem 0.8rem;
+    text-align: left;
+    font-size: 0.9rem;
+  }
+  .vs-table td {
+    padding: 0.5rem 0.8rem;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    font-size: 0.9rem;
+  }
+  .badge {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: bold;
+  }
+  .badge-valid {
+    background: rgba(58,158,74,0.2);
+    color: #5ecf6a;
+    border: 1px solid rgba(58,158,74,0.3);
+  }
+  .badge-quality {
+    background: rgba(201,168,76,0.2);
+    color: #c9a84c;
+    border: 1px solid rgba(201,168,76,0.3);
+  }
+  .warning-box {
+    background: rgba(220,80,60,0.08);
+    border-left: 3px solid #dc503c;
+    padding: 1rem 1.2rem;
+    margin: 1.2rem 0;
+    border-radius: 0 6px 6px 0;
+  }
+</style>
+</head>
+<body>
+
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar"
+  style="display:none" onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+    onclick="event.stopPropagation();clearBookmark()">
+    Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+
+<h1>SMC Course — Lesson 2</h1>
+<p class="subtitle">
+  Order Block (Parte 1) &middot; 44 minutes
+  &middot; Video Course
+</p>
+<p class="subtitle"
+  style="font-size:0.9em; opacity:0.7;">
+  Smart Money Concepts &middot; Portuguese
+  &middot; Transcribed &amp; structured by AI
+</p>
+
+<nav class="toc">
+  <h2>Contents</h2>
+  <ol>
+    <li><a href="#glossary">Glossary</a></li>
+    <li><a href="#core">What Is an Order Block?</a></li>
+    <li><a href="#cause-effect">
+      The Law of Cause and Effect</a></li>
+    <li><a href="#fractals">
+      Fractal Markets &amp; Timeframes</a></li>
+    <li><a href="#validity">
+      Validity Principles (Requirements)</a></li>
+    <li><a href="#bms">
+      BMS, CHoCH, and BOS Explained</a></li>
+    <li><a href="#types">
+      Bullish vs Bearish Order Blocks</a></li>
+    <li><a href="#quality">
+      Quality Principles (Enhancements)</a></li>
+    <li><a href="#trend">
+      Trading with the Trend</a></li>
+    <li><a href="#mistakes">
+      The Biggest Beginner Mistake</a></li>
+    <li><a href="#confirmation">
+      Confirmation Approach</a></li>
+    <li><a href="#flow">
+      Market Flow &amp; Macro Control</a></li>
+    <li><a href="#takeaways">Key Takeaways</a></li>
+  </ol>
+</nav>
+
+<!-- ============ GLOSSARY ============ -->
+<h2 id="glossary">Glossary</h2>
+
+<table class="vs-table">
+<tr>
+  <th>Term</th>
+  <th>Definition</th>
+</tr>
+<tr>
+  <td><strong>Order Block (OB)</strong></td>
+  <td>A supply or demand zone created by
+    institutional bulk entry — "buying wholesale."
+    On lower timeframes it appears as a consolidation;
+    on higher timeframes as a single candle zone.</td>
+</tr>
+<tr>
+  <td><strong>BMS</strong></td>
+  <td>Break of Market Structure — the general term
+    for any structural break. Encompasses both
+    CHoCH and BOS.</td>
+</tr>
+<tr>
+  <td><strong>CHoCH</strong></td>
+  <td>Change of Character — breaking a valid swing
+    high or swing low, signaling a potential reversal
+    in market direction.</td>
+</tr>
+<tr>
+  <td><strong>BOS</strong></td>
+  <td>Break of Structure — renewal of a high (bullish)
+    or low (bearish) in a classic 1-2-3 pivot pattern.
+    Continuation signal.</td>
+</tr>
+<tr>
+  <td><strong>POI</strong></td>
+  <td>Point of Interest — an Order Block located at
+    a micro-manipulation of price, typically a
+    liquidity sweep. A higher-quality OB.</td>
+</tr>
+<tr>
+  <td><strong>Movimento Forte</strong></td>
+  <td>Strong movement — characterized by full-bodied
+    candles, velocity, and a steep angle. Indicates
+    institutional participation.</td>
+</tr>
+<tr>
+  <td><strong>Lateralização</strong></td>
+  <td>Consolidation / sideways movement — the "cause"
+    that precedes a directional "effect." Hidden inside
+    every Order Block on a lower timeframe.</td>
+</tr>
+<tr>
+  <td><strong>ICOF</strong></td>
+  <td>Change of state from disequilibrium (trend) to
+    equilibrium (lateral). When market nature shifts,
+    new control emerges within the range.</td>
+</tr>
+<tr>
+  <td><strong>VPOC</strong></td>
+  <td>Volume Profile Point of Control — the price
+    level with the highest traded volume. When it
+    aligns with an OB, adds quality to the zone.</td>
+</tr>
+<tr>
+  <td><strong>Bullish OB</strong></td>
+  <td>Demand zone — the last bearish candle before
+    a strong upward impulse.</td>
+</tr>
+<tr>
+  <td><strong>Bearish OB</strong></td>
+  <td>Supply zone — the last bullish candle before
+    a strong downward impulse.</td>
+</tr>
+</table>
+
+<!-- ============ CORE CONCEPT ============ -->
+<h2 id="core">What Is an Order Block?</h2>
+
+<p>
+An Order Block is a zone on the chart where institutional
+players entered the market in bulk — the instructor
+calls it "comprar no atacado" (buying wholesale). Unlike
+retail traders who scale in gradually, institutions
+concentrate their entries into a block of orders,
+creating a zone of intense supply or demand that leaves
+a visible footprint on the chart. When price returns to
+this zone later, the remaining unfilled orders often
+cause price to react, making it a high-probability
+area for trade entries.
+</p>
+
+<p>
+The concept is deceptively simple on the surface: find
+the last bearish candle before a strong bullish move
+(demand block), or the last bullish candle before a
+strong bearish move (supply block). But the instructor
+spends the entire 44-minute lesson building the
+<em>reasoning</em> behind this identification, because
+without understanding WHY order blocks work, traders
+will misidentify them, trade them in the wrong context,
+and lose money consistently.
+</p>
+
+<p>
+Every sustained price movement — every strong impulse
+that actually goes somewhere — is caused by institutional
+participation. When you see price drifting sideways with
+small candles, going nowhere, that is the absence of
+institutional interest. When you see price ripping in
+one direction with full-bodied candles, covering
+distance quickly at a steep angle, institutions are
+involved. The Order Block is where they placed their
+bets, and the strong move that follows is the proof
+that those bets were real.
+</p>
+
+<!-- ============ CAUSE AND EFFECT ============ -->
+<h2 id="cause-effect">
+  The Law of Cause and Effect
+</h2>
+
+<p>
+Everything in SMC flows from one foundational principle:
+the <strong>Law of Cause and Effect</strong>. The
+instructor opens the lesson with this, calling it "the
+first point of everything." The cause is consolidation
+— sideways price action where the market is building
+energy, accumulating or distributing positions. The
+effect is the directional move that follows — the impulse
+that shoots price up or down. Markets spend the majority
+of their time in the cause phase (lateral), punctuated
+by relatively brief effect phases (trending).
+</p>
+
+<p>
+This law is the engine behind Order Blocks. Every Order
+Block is a cause. The consolidation happening inside the
+block — visible on lower timeframes — is the accumulation
+or distribution of institutional positions. The strong
+move that explodes out of the block is the effect: the
+market responding to the imbalance that was built during
+the cause. If you see a strong move without a preceding
+cause, you should be skeptical. If you see a cause
+without a subsequent effect, the block is not validated.
+The two are inseparable.
+</p>
+
+<div class="concept-box">
+<h4>Cause → Effect Pattern</h4>
+<p>
+Price rises → moves sideways (cause) → rises again
+(effect) → moves sideways (cause) → drops (effect).
+Each sideways phase on a higher timeframe is potentially
+an Order Block. Drop to a lower timeframe and you will
+see the consolidation that formed it.
+</p>
+</div>
+
+<!-- ============ FRACTALS ============ -->
+<h2 id="fractals">
+  Fractal Markets &amp; Timeframes
+</h2>
+
+<p>
+The instructor spends significant time on why an Order
+Block looks like a single zone on one timeframe but
+reveals its internal structure on another. Markets are
+<strong>fractal</strong> — the same patterns repeat across
+every timeframe. Smaller timeframe candles combine to form
+the candles of larger timeframes. The consolidation
+patterns on the 5-minute chart become the Order Block
+candles on the 1-hour chart. This is not abstract theory;
+it is a mechanical reality of how charts are constructed.
+</p>
+
+<p>
+He demonstrates this live: starting on the 5-minute chart
+where a clear consolidation zone is visible — price
+moving sideways, building a range. Switching to the
+15-minute chart, the consolidation is still visible but
+starting to compress. On the 30-minute chart, it has
+disappeared entirely, replaced by what looks like a
+single bearish candle followed by a strong bullish
+impulse — the classic Order Block appearance. The lesson
+is that what you identify as an Order Block on a higher
+timeframe ALWAYS contains a consolidation on a lower
+timeframe. If you cannot find that consolidation when
+you drill down, you may be misidentifying the block.
+</p>
+
+<p>
+This fractal perspective also explains why experienced
+traders use multiple timeframes. You identify the
+Order Block on the higher timeframe (where it appears
+as a clean zone), then drop to the lower timeframe to
+understand what is happening inside it — where the
+consolidation boundaries are, where the institutional
+entry likely concentrated. This gives you a more precise
+entry and tighter stop placement.
+</p>
+
+<!-- ============ VALIDITY ============ -->
+<h2 id="validity">
+  Validity Principles
+  <span class="badge badge-valid">REQUIRED</span>
+</h2>
+
+<p>
+The instructor makes a crucial distinction that many
+SMC courses gloss over: <strong>validity</strong>
+principles versus <strong>quality</strong> principles.
+Validity is binary — the block either meets these
+criteria or it does not count as an Order Block at all.
+Quality is a spectrum — additional factors that make a
+valid block stronger or weaker. Conflating the two leads
+to either taking every block (ignoring quality) or
+adding so many requirements that you never take a trade
+(treating quality as validity).
+</p>
+
+<h3>1. Strong Movement (Movimento Forte)</h3>
+
+<p>
+The impulse that comes out of the Order Block must
+demonstrate genuine institutional interest. Three
+observable characteristics define a strong movement:
+</p>
+
+<div class="concept-box">
+<h4>The Three Signs of Institutional Interest</h4>
+<p>
+<strong>Full-bodied candles</strong> (candos mais cheios)
+— large real bodies relative to wicks. The bodies show
+actual buying or selling pressure, not indecision.
+</p>
+<p>
+<strong>Velocity</strong> — the movement happens quickly.
+Price covers distance in few candles rather than
+grinding slowly over many bars. A move that takes
+50 candles to travel the same distance as one that
+takes 8 candles is fundamentally different in character.
+</p>
+<p>
+<strong>Steep angle</strong> — price moves almost
+vertically, not at a shallow or lateral slope. A 70-80
+degree impulse shows conviction; a 20-30 degree drift
+shows indifference. The instructor draws the contrast:
+a move that "falls almost straight down" versus one
+that "drifts sideways, barely moving" — only the
+first qualifies.
+</p>
+</div>
+
+<p>
+When all three characteristics are present, you can be
+confident that institutional participants drove the
+move. When even one is missing, the "move" may just be
+noise — retail traders pushing price around without
+conviction, creating zones that will not hold on retest.
+</p>
+
+<h3>2. Break of Structure (BMS)</h3>
+
+<p>
+The strong movement must break a structural level —
+it must renew a high, break a low, violate a valid
+swing point. A move can be strong in terms of candle
+bodies and speed, but if it does not actually break
+any structure, it has not proven itself. The structure
+break is the market's confirmation that the move is
+real and sustained, not just a brief spike that
+reverses immediately.
+</p>
+
+<p>
+The instructor illustrates with a comparison: price
+rises strongly toward a previous high. In Scenario A,
+it approaches the high but stalls, barely touching it
+with a small wick before falling back — that is NOT
+a valid structure break. In Scenario B, price blasts
+through the high with a full-bodied candle and
+continues higher — that IS a valid break. "It renews
+properly, it goes up there, it flows." The conviction
+of the break matters.
+</p>
+
+<!-- ============ BMS EXPLAINED ============ -->
+<h2 id="bms">BMS, CHoCH, and BOS Explained</h2>
+
+<p>
+This is the section where many beginners get confused
+by terminology, and the instructor addresses it head-on.
+<strong>BMS</strong> (Break of Market Structure) is the
+umbrella term — it simply means "a structure break
+happened." But BMS comes in two flavors, and
+understanding the difference is essential for reading
+market intent.
+</p>
+
+<h3>CHoCH — Change of Character</h3>
+
+<p>
+CHoCH occurs when price breaks a <strong>valid swing
+point against the prevailing direction</strong>. In an
+uptrend, price leaves swing lows as it climbs; when
+price breaks below one of those swing lows, that is a
+CHoCH — a signal that the market's character may be
+changing from bullish to bearish. In a downtrend, the
+opposite: breaking above a valid swing high signals
+potential shift to bullish character.
+</p>
+
+<p>
+CHoCH is inherently a reversal signal. When an Order
+Block produces a strong move that results in a CHoCH,
+you are looking at a potential trend change. The
+block at the origin of that CHoCH move tends to be
+significant because it represents the point where
+institutions decided to reverse the market's direction.
+</p>
+
+<h3>BOS — Break of Structure (Pivot)</h3>
+
+<p>
+BOS is the continuation counterpart to CHoCH. It
+follows the classic 1-2-3 pivot pattern: in a
+downtrend, price makes a low (1), retraces up (2),
+then makes a new lower low (3) — that renewal of
+the low is a BOS. In an uptrend: higher high (1),
+pullback (2), new higher high (3). BOS confirms that
+the existing trend is continuing with institutional
+backing.
+</p>
+
+<p>
+When an Order Block produces a strong move that
+results in a BOS, you are looking at a continuation
+setup. The block formed during a pullback, and the
+move out of it renewed the trend's extreme — this is
+the bread-and-butter of trend-following with SMC.
+</p>
+
+<h3>BMS = CHoCH + BOS</h3>
+
+<div class="concept-box">
+<h4>The Relationship</h4>
+<p>
+"An Order Block needs BMS to be valid" — this is a
+correct statement. It means the block needs EITHER a
+CHoCH OR a BOS. Both are types of BMS. When you hear
+"BMS," think "structure break of any kind." When you
+need to specify which kind, use CHoCH (reversal) or
+BOS (continuation).
+</p>
+</div>
+
+<!-- ============ TYPES ============ -->
+<h2 id="types">
+  Bullish vs Bearish Order Blocks
+</h2>
+
+<h3>Bullish Order Block (Demand Zone)</h3>
+
+<p>
+A Bullish OB sits at the <strong>bottom</strong> of a
+strong upward movement. Specifically, it is the
+<strong>last bearish candle</strong> (or last downward
+candle) before the strong bullish impulse begins. This
+is where institutions placed their buy orders in bulk
+before driving price higher. When price returns to
+this zone on a pullback, those same institutions —
+or others recognizing the zone — tend to buy again,
+creating a bounce.
+</p>
+
+<p>
+If the last bearish candle is unusually small (a tiny
+body, a doji), the instructor advises extending the
+zone to include the last two bearish candles. This is
+a practical reading adjustment, not a rule change —
+you are simply acknowledging that the institutional
+footprint may span more than one candle in that
+specific price action context.
+</p>
+
+<h3>Bearish Order Block (Supply Zone)</h3>
+
+<p>
+The mirror image: a Bearish OB sits at the
+<strong>top</strong> of a strong downward movement.
+It is the <strong>last bullish candle</strong> before
+the strong bearish impulse. Institutions sold or
+shorted in bulk here, and the zone becomes resistance
+on any subsequent rally back to the area. Same rules
+apply — if the last bullish candle is tiny, consider
+extending to the last two.
+</p>
+
+<!-- ============ QUALITY ============ -->
+<h2 id="quality">
+  Quality Principles
+  <span class="badge badge-quality">ENHANCEMENT</span>
+</h2>
+
+<p>
+Once a block meets the validity requirements (strong
+move + BMS), these additional factors determine how
+<em>good</em> the setup is. None of them are required,
+but each one present adds confidence.
+</p>
+
+<h3>1. No RSI Divergence</h3>
+
+<p>
+The instructor pulls up the RSI on a live chart example.
+When price makes a new high and RSI also makes a new
+high (no divergence), the move is "healthy" — momentum
+confirms price. When RSI diverges (price makes a higher
+high but RSI makes a lower high), it is a warning sign
+that momentum is fading. No divergence on the move
+that validates the block is a quality enhancement —
+not a dealbreaker, but a confidence booster.
+</p>
+
+<h3>2. Liquidity Capture Position</h3>
+
+<p>
+An Order Block that sits at a position where liquidity
+was captured is stronger. The classic setup: equal highs
+form above (creating a pool of stop losses), price
+sweeps through those highs (triggering the stops and
+capturing liquidity), then reverses hard. The Order
+Block at the extreme of that sweep — where the reversal
+originated — benefits from the liquidity capture. It
+is both a valid block AND a <strong>POI</strong>
+(Point of Interest) in traditional SMC terminology.
+</p>
+
+<h3>3. Trend Alignment</h3>
+
+<p>
+Blocks that align with the prevailing trend direction
+carry more weight. This is not a hard rule — counter-
+trend blocks can work with strong confluent context —
+but trend-aligned blocks have one extra factor in their
+favor. The instructor's emphasis: "It is one more
+positive point. Being against a clear trend is a
+negative point, but sometimes there are so many other
+positive factors that it is worth the risk, depending
+on the scenario."
+</p>
+
+<!-- ============ TREND ============ -->
+<h2 id="trend">Trading with the Trend</h2>
+
+<p>
+The instructor repeatedly returns to one theme:
+<strong>context is everything</strong>. An Order Block
+is not a buy or sell signal in isolation — it is one
+piece of a puzzle. The puzzle is context: the reunion
+of multiple concepts, well-configured, aligned in the
+same location, forming a genuine opportunity. Trend
+direction is one piece. RSI behavior is another.
+Liquidity capture is another. Volume Profile
+confirmation is another. When multiple pieces align,
+the probability tilts in your favor. When only one
+piece (the block exists) is present, you are
+gambling.
+</p>
+
+<blockquote>
+"A context is a reunion of concepts. Several good
+concepts, well-configured, reunited in the same
+location — they form a beautiful trade opportunity.
+Whether in favor or against the trend."
+<cite>— Instructor</cite>
+</blockquote>
+
+<p>
+That said, trading with the trend provides an
+inherent advantage. In an uptrend where price is
+stair-stepping higher, each pullback creates a new
+bullish Order Block. Buying these continuation blocks
+as price pulls back into them is far more reliable
+than trying to catch a reversal at an old block
+from a previous trend. The trend provides the wind
+at your back — you need fewer confirming factors
+because the macro direction is already helping you.
+</p>
+
+<!-- ============ MISTAKES ============ -->
+<h2 id="mistakes">The Biggest Beginner Mistake</h2>
+
+<div class="warning-box">
+<p>
+<strong>Counter-trend block trading</strong> is the
+most common mistake the instructor sees in new SMC
+traders — and one he admits making himself early on.
+</p>
+</div>
+
+<p>
+The pattern is always the same: a trader learns to
+identify Order Blocks, finds an old demand zone far
+below current price, and waits for price to "come
+back to it." Price has been trending down, creating
+supply blocks on the way, but the trader ignores all
+of those in favor of the one demand block that sits
+at the bottom. Price eventually reaches it and the
+trader buys — only to watch price blast right through
+the zone and keep falling.
+</p>
+
+<p>
+The insidious part is that this strategy works
+<em>sometimes</em>. One out of several attempts, price
+does bounce from the old block, and the trader takes
+that as validation. "You keep doing it wrong because
+every now and then you relive that one good
+experience," the instructor says. The occasional
+success reinforces a fundamentally flawed approach.
+</p>
+
+<p>
+The correct approach is to trade the continuation
+blocks that form WITH the trend:
+</p>
+
+<div class="concept-box">
+<h4>Continuation vs Reversal Blocks</h4>
+<p>
+<strong>In an uptrend</strong>: buy the demand blocks
+that form at each pullback as price stair-steps higher.
+Each new block has the trend behind it.
+</p>
+<p>
+<strong>In a downtrend</strong>: sell the supply blocks
+that form at each rally as price stair-steps lower.
+The macro direction supports each entry.
+</p>
+<p>
+<strong>Counter-trend</strong>: only when there is
+overwhelming confluence — liquidity sweep, volume
+profile alignment, higher-timeframe block, accumulation
+pattern, and CHoCH confirmation all present. This is
+an advanced setup, not a beginner strategy.
+</p>
+</div>
+
+<!-- ============ CONFIRMATION ============ -->
+<h2 id="confirmation">Confirmation Approach</h2>
+
+<p>
+Even when a counter-trend block has strong context,
+the instructor recommends a confirmation-based entry
+rather than a blind limit order at the zone. The
+process he outlines:
+</p>
+
+<p>
+Wait for price to reach the Order Block zone. On a
+lower timeframe (e.g., 5-minute), watch for an
+<strong>accumulation</strong> to form on top of the
+block — price moving sideways, building a base.
+Within that accumulation, look for a
+<strong>liquidity sweep</strong> — price dips below
+the range, triggering stops, then reclaims. Then
+wait for a <strong>CHoCH with interest</strong> — a
+momentum shift where price breaks a swing high within
+the accumulation, confirming that buyers have taken
+control. Enter on the retest of that CHoCH level.
+</p>
+
+<p>
+This approach sacrifices some of the potential move
+(you will not catch the exact bottom) in exchange for
+significantly higher win rates. You are not predicting
+that the block will hold — you are waiting for the
+market to SHOW you that it is holding, then entering
+with confirmation.
+</p>
+
+<!-- ============ FLOW ============ -->
+<h2 id="flow">Market Flow &amp; Macro Control</h2>
+
+<p>
+The instructor introduces a nuanced concept toward
+the end of the lesson: the difference between trading
+with the <em>trend</em> and trading with the
+<em>macro control</em>. These are not always the same
+thing, and understanding the distinction separates
+intermediate from advanced traders.
+</p>
+
+<p>
+Consider a market that has been in a strong downtrend.
+At some point, price stops making new lows and begins
+to move sideways — it enters a lateral range. This is
+the <strong>ICOF</strong> (change of state): the market
+transitions from disequilibrium (trending) to
+equilibrium (ranging). Within this range, signs of
+buyer control may emerge: price spends more time near
+the top, resistance gets tested repeatedly, demand
+pressure builds.
+</p>
+
+<p>
+When price eventually breaks out of the range to the
+upside, a new trend begins. The Order Blocks that form
+during this early uptrend are excellent continuation
+entries — even though you are technically trading
+"against the trend" if you define trend by the prior
+downtrend. You are trading WITH the new macro control
+that was established during the lateral phase. The
+instructor emphasizes: "You are going in favor of
+market control, which is the part where the
+lateralization showed clear buyer dominance."
+</p>
+
+<p>
+This is why rigid "only trade with the trend" rules
+can be limiting. The better framework is: trade with
+the <strong>flow</strong> — the current directional
+intent of the dominant players, whether that aligns
+with the historical trend or represents a fresh shift
+in control.
+</p>
+
+<!-- ============ TAKEAWAYS ============ -->
+<h2 id="takeaways">Key Takeaways</h2>
+
+<h3>Order Block = Institutional Footprint</h3>
+<p>
+Every Order Block is a zone where institutions entered
+in bulk. The consolidation (cause) is hidden inside on
+lower timeframes. The strong move (effect) is the proof.
+Without the strong move, you have no proof.
+</p>
+
+<h3>Validity is Binary, Quality is a Spectrum</h3>
+<p>
+Two requirements for validity: strong movement + break
+of structure (BMS). Everything else — RSI confirmation,
+liquidity capture, trend alignment — adds quality but
+is not required. Do not conflate the two categories.
+</p>
+
+<h3>BMS Taxonomy</h3>
+<p>
+BMS is the umbrella term. CHoCH (reversal) and BOS
+(continuation) are the two specific types. When someone
+says "the block needs BMS," they mean either CHoCH or
+BOS — any structure break that confirms the move was
+real.
+</p>
+
+<h3>Trend-Aligned Continuation Blocks Win</h3>
+<p>
+Trading Order Blocks that form during pullbacks within
+an existing trend is far more reliable than trying to
+catch reversals at old counter-trend blocks. The
+occasional counter-trend success is a trap that
+reinforces bad habits.
+</p>
+
+<h3>Context Over Concept</h3>
+<p>
+An Order Block alone is not a trade signal. Context —
+the reunion of multiple aligned concepts — determines
+whether a block is worth trading. No amount of
+technical validity replaces the need for contextual
+reading of the market environment.
+</p>
+
+<h3>Flow Over Rigid Trend Rules</h3>
+<p>
+"Trade with the trend" is a simplification. The more
+accurate principle is "trade with the flow" — the
+current directional intent of dominant players, which
+may be a fresh shift emerging from a lateral phase
+rather than the historical trend direction.
+</p>
+
+<!-- ============ DIAGRAMS ============ -->
+
+<h2 id="diagrams">Visual Concepts</h2>
+
+<h3>Order Block Formation</h3>
+<div class="diagram">
+<svg viewBox="0 0 500 300" style="width:100%;
+  max-width:500px; margin:1rem auto; display:block;">
+  <!-- Consolidation zone -->
+  <rect x="80" y="140" width="120" height="50"
+    fill="rgba(201,168,76,0.15)"
+    stroke="#c9a84c" stroke-width="1"
+    stroke-dasharray="4,4" rx="4"/>
+  <text x="140" y="168" fill="#c9a84c"
+    text-anchor="middle" font-size="11"
+    font-family="Georgia">CAUSE</text>
+  <text x="140" y="182" fill="#c9a84c"
+    text-anchor="middle" font-size="9"
+    font-family="Georgia">(consolidation)</text>
+
+  <!-- Price path before -->
+  <polyline points="30,220 50,200 70,210 80,190"
+    fill="none" stroke="#888" stroke-width="2"/>
+
+  <!-- Lateral movement inside block -->
+  <polyline
+    points="80,190 100,170 120,175 140,155
+            160,160 180,150 200,140"
+    fill="none" stroke="#888"
+    stroke-width="2" stroke-dasharray="3,3"/>
+
+  <!-- Strong impulse (effect) -->
+  <polyline points="200,140 220,100 240,60 260,30"
+    fill="none" stroke="#5ecf6a"
+    stroke-width="3"/>
+  <text x="270" y="35" fill="#5ecf6a"
+    font-size="11"
+    font-family="Georgia">EFFECT</text>
+  <text x="270" y="48" fill="#5ecf6a"
+    font-size="9"
+    font-family="Georgia">(strong move)</text>
+
+  <!-- Order Block zone -->
+  <rect x="170" y="135" width="35" height="55"
+    fill="rgba(58,158,74,0.15)"
+    stroke="#5ecf6a" stroke-width="1.5" rx="3"/>
+  <text x="187" y="210" fill="#5ecf6a"
+    text-anchor="middle" font-size="10"
+    font-family="Georgia">Bullish OB</text>
+  <text x="187" y="222" fill="#5ecf6a"
+    text-anchor="middle" font-size="8"
+    font-family="Georgia">(last bearish candle)</text>
+
+  <!-- Arrow showing return -->
+  <path d="M 300,50 Q 350,80 320,130 Q 300,160 280,140"
+    fill="none" stroke="#c9a84c"
+    stroke-width="1.5" stroke-dasharray="4,4"
+    marker-end="url(#arrowGold)"/>
+  <text x="340" y="95" fill="#c9a84c"
+    font-size="9" font-family="Georgia">
+    Price returns</text>
+
+  <defs>
+    <marker id="arrowGold" markerWidth="8"
+      markerHeight="8" refX="6" refY="4"
+      orient="auto">
+      <path d="M 0,0 L 8,4 L 0,8 Z"
+        fill="#c9a84c"/>
+    </marker>
+  </defs>
+</svg>
+</div>
+
+<h3>BMS: CHoCH vs BOS</h3>
+<div class="diagram">
+<svg viewBox="0 0 500 250" style="width:100%;
+  max-width:500px; margin:1rem auto; display:block;">
+  <!-- CHoCH side -->
+  <text x="120" y="20" fill="#dc503c"
+    text-anchor="middle" font-size="13"
+    font-weight="bold"
+    font-family="Georgia">CHoCH</text>
+  <text x="120" y="34" fill="#888"
+    text-anchor="middle" font-size="9"
+    font-family="Georgia">(reversal)</text>
+
+  <!-- Uptrend then break low -->
+  <polyline
+    points="30,180 60,140 80,160 110,100 130,130"
+    fill="none" stroke="#5ecf6a"
+    stroke-width="2"/>
+  <!-- Swing low line -->
+  <line x1="50" y1="160" x2="180" y2="160"
+    stroke="#888" stroke-width="1"
+    stroke-dasharray="3,3"/>
+  <text x="185" y="163" fill="#888" font-size="9"
+    font-family="Georgia">swing low</text>
+  <!-- Break below -->
+  <polyline points="130,130 160,170 180,200"
+    fill="none" stroke="#dc503c"
+    stroke-width="2.5"/>
+  <text x="155" y="215" fill="#dc503c"
+    font-size="9" text-anchor="middle"
+    font-family="Georgia">breaks below</text>
+
+  <!-- Divider -->
+  <line x1="250" y1="10" x2="250" y2="240"
+    stroke="rgba(255,255,255,0.15)"
+    stroke-width="1"/>
+
+  <!-- BOS side -->
+  <text x="380" y="20" fill="#5ecf6a"
+    text-anchor="middle" font-size="13"
+    font-weight="bold"
+    font-family="Georgia">BOS</text>
+  <text x="380" y="34" fill="#888"
+    text-anchor="middle" font-size="9"
+    font-family="Georgia">(continuation)</text>
+
+  <!-- 1-2-3 pivot down -->
+  <polyline
+    points="290,80 320,140 340,110 370,60 400,100
+            430,40"
+    fill="none" stroke="#5ecf6a"
+    stroke-width="2"/>
+  <!-- Labels -->
+  <text x="320" y="155" fill="#888" font-size="10"
+    text-anchor="middle"
+    font-family="Georgia">1</text>
+  <text x="340" y="105" fill="#888" font-size="10"
+    text-anchor="middle"
+    font-family="Georgia">2</text>
+  <text x="430" y="35" fill="#5ecf6a" font-size="10"
+    text-anchor="middle"
+    font-family="Georgia">3 (new high)</text>
+  <!-- High line -->
+  <line x1="360" y1="60" x2="440" y2="60"
+    stroke="#5ecf6a" stroke-width="1"
+    stroke-dasharray="3,3"/>
+  <text x="448" y="63" fill="#5ecf6a" font-size="8"
+    font-family="Georgia">prior high</text>
+</svg>
+</div>
+
+<!-- ============ FOOTER ============ -->
+<h2 id="footer">About This Lesson</h2>
+
+<p>
+<strong>Course</strong>: Smart Money Concepts (SMC)
+<br>
+<strong>Lesson</strong>: 2 — Order Block (Parte 1)
+<br>
+<strong>Duration</strong>: 44 minutes
+<br>
+<strong>Language</strong>: Portuguese (Brazilian)
+<br>
+<strong>Processing</strong>: Audio extracted via ffmpeg,
+transcribed via OpenAI Whisper (base model),
+structured notes generated by Claude
+</p>
+
+<p>
+This is the first experiment in a "courseAI" pipeline —
+taking video courses and processing them through the
+same system used for book notes on this shelf. The raw
+transcript (848 segments with timestamps) was processed
+into structured English notes, then built into this
+HTML format.
+</p>
+
+<script>var BM_KEY = 'bm_smc_02_ob_p1';</script>
+<script src="../book.js"></script>
+</body>
+</html>
