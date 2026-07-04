@@ -25,9 +25,16 @@ function L(m){ log.textContent += m + '\n'; }
     L('Deleted cache: ' + n);
   }
 
+  // 3. Force-refresh key JS files (bypass HTTP cache)
+  var files = ['./book.js', './index.html'];
+  for (var f of files) {
+    await fetch(f, { cache: 'no-store' });
+    L('Cache-busted: ' + f);
+  }
+
   L('\nDone! Redirecting in 2s...');
   setTimeout(function(){
-    window.location.href = './index.html';
+    window.location.href = './index.html?bust=' + Date.now();
   }, 2000);
 })();
 </script>
