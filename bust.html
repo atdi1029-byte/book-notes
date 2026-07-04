@@ -13,12 +13,18 @@ function L(m){ log.textContent += m + '\n'; }
   if ('serviceWorker' in navigator) {
     var regs = await navigator.serviceWorker.getRegistrations();
     for (var r of regs) {
+      // Force waiting SW to activate before unregistering
+      if (r.waiting) {
+        r.waiting.postMessage({type: 'SKIP_WAITING'});
+        L('Forced waiting SW to activate');
+        await new Promise(function(res) { setTimeout(res, 500); });
+      }
       await r.unregister();
       L('Unregistered SW: ' + r.scope);
     }
   } else { L('No SW support'); }
 
-  // 2. Delete all caches
+  // 2. Delete ALL caches
   var names = await caches.keys();
   for (var n of names) {
     await caches.delete(n);
@@ -26,10 +32,16 @@ function L(m){ log.textContent += m + '\n'; }
   }
 
   // 3. Force-refresh key JS files (bypass HTTP cache)
-  var files = ['./book.js', './index.html'];
+  var files = ['./book.js', './service-worker.js', './index.html'];
   for (var f of files) {
-    await fetch(f, { cache: 'no-store' });
+    await fetch(f, { cache: 'reload' });
     L('Cache-busted: ' + f);
+  }
+
+  // 4. Re-register fresh SW
+  if ('serviceWorker' in navigator) {
+    var reg = await navigator.serviceWorker.register('./service-worker.js');
+    L('Re-registered SW (new)');
   }
 
   L('\nDone! Redirecting in 2s...');
