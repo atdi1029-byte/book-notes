@@ -423,6 +423,7 @@
       return Math.min(1, window.scrollY / docH);
     }
 
+    var _scrollSaveTimer = null;
     window.addEventListener('scroll', function() {
       // Progress bar
       updateProgress();
@@ -432,6 +433,13 @@
       var pct = getProgress();
       if (pct > (data.books[bookPath].maxScroll || 0)) {
         data.books[bookPath].maxScroll = pct;
+        // Debounced save — persist maxScroll every 2s of scrolling
+        if (!_scrollSaveTimer) {
+          _scrollSaveTimer = setTimeout(function() {
+            _scrollSaveTimer = null;
+            saveSpeedData(data);
+          }, 2000);
+        }
       }
     });
 
