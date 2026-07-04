@@ -442,6 +442,11 @@
     }, 1000);
 
     // ── Reader model (Kindle-style EMA) ──
+    // One-time fix: reset if WPM got corrupted by outlier
+    if (data.reader && (data.reader.averageWPM > 500 || data.reader.averageWPM < 80)) {
+      data.reader = { averageWPM: 225, samples: 0 };
+      saveSpeedData(data);
+    }
     if (!data.reader) {
       data.reader = { averageWPM: 225, samples: 0 };
       // Bootstrap from existing sessions if upgrading
@@ -463,21 +468,20 @@
 
     function updateReaderModel(sessionWpm) {
       var r = data.reader;
+      // Always clamp to ±50% of current average to reject outliers
+      var clamped = Math.max(
+        r.averageWPM * 0.5,
+        Math.min(sessionWpm, r.averageWPM * 1.5)
+      );
       if (r.samples < 5) {
-        // Bootstrap: simple weighted accumulation
-        r.averageWPM = (r.averageWPM * r.samples + sessionWpm)
+        // Bootstrap: weighted accumulation with clamped input
+        r.averageWPM = (r.averageWPM * r.samples + clamped)
           / (r.samples + 1);
-        r.samples++;
       } else {
-        // Clamp to ±25% of current average
-        var clamped = Math.max(
-          r.averageWPM * 0.75,
-          Math.min(sessionWpm, r.averageWPM * 1.25)
-        );
         // EMA with alpha=0.2
         r.averageWPM = r.averageWPM * 0.8 + clamped * 0.2;
-        r.samples++;
       }
+      r.samples++;
       r.averageWPM = Math.round(r.averageWPM);
     }
 
