@@ -3349,6 +3349,12 @@
     } catch(e) { return; }
     if (!data || !data.books) return;
 
+    // Reset corrupted WPM (one-time fix for outlier spikes)
+    if (data.reader && (data.reader.averageWPM > 500 || data.reader.averageWPM < 80)) {
+      data.reader = { averageWPM: 225, samples: 0 };
+      localStorage.setItem(RS_KEY, JSON.stringify(data));
+    }
+
     // Use Kindle-style EMA average if available, else default
     var avgWpm = (data.reader && data.reader.samples >= 3)
       ? data.reader.averageWPM
