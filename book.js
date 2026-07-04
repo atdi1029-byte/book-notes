@@ -303,7 +303,7 @@
     );
   }
 
-  // Restore reading speed data from backend if local is empty
+  // Merge remote reading data with local on every load
   jsonpFetch(
     SYNC_URL + '?action=get_bookmarks',
     function(err, json) {
@@ -311,10 +311,52 @@
       if (!json.bookmarks || !json.bookmarks[RS_KEY]) return;
       var remote = json.bookmarks[RS_KEY];
       var local = loadSpeedData();
-      // Only restore if local is empty (cache cleared)
-      if ((!local.sessions || local.sessions.length === 0) &&
-          remote.sessions && remote.sessions.length > 0) {
-        localStorage.setItem(RS_KEY, JSON.stringify(remote));
+      var changed = false;
+
+      // Merge books: keep higher maxScroll, higher words
+      if (remote.books) {
+        if (!local.books) local.books = {};
+        Object.keys(remote.books).forEach(function(path) {
+          var rb = remote.books[path];
+          var lb = local.books[path];
+          if (!lb) {
+            local.books[path] = rb;
+            changed = true;
+          } else {
+            if ((rb.maxScroll || 0) > (lb.maxScroll || 0)) {
+              lb.maxScroll = rb.maxScroll;
+              changed = true;
+            }
+            if ((rb.words || 0) > (lb.words || 0)) {
+              lb.words = rb.words;
+              changed = true;
+            }
+          }
+        });
+      }
+
+      // Merge sessions: dedupe by timestamp
+      if (remote.sessions && remote.sessions.length > 0) {
+        if (!local.sessions) local.sessions = [];
+        var existing = {};
+        local.sessions.forEach(function(s) {
+          existing[s.ts || s.date] = true;
+        });
+        remote.sessions.forEach(function(s) {
+          var key = s.ts || s.date;
+          if (!existing[key]) {
+            local.sessions.push(s);
+            changed = true;
+          }
+        });
+        // Keep last 50
+        if (local.sessions.length > 50) {
+          local.sessions = local.sessions.slice(-50);
+        }
+      }
+
+      if (changed) {
+        localStorage.setItem(RS_KEY, JSON.stringify(local));
       }
     }
   );
