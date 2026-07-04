@@ -300,10 +300,18 @@
     var now = Date.now();
     if (now - _lastSync < 60000) return;
     _lastSync = now;
+    // Send lightweight payload — only current book + reader model
+    var bookPath = getBookPath();
+    var lite = { books: {}, reader: data.reader };
+    if (data.books[bookPath]) {
+      lite.books[bookPath] = data.books[bookPath];
+    }
+    // Include recent sessions (last 5 only)
+    lite.sessions = (data.sessions || []).slice(-5);
     jsonpFetch(
       SYNC_URL + '?action=set_bookmark&key=' +
       encodeURIComponent(RS_KEY) + '&data=' +
-      encodeURIComponent(JSON.stringify(data)),
+      encodeURIComponent(JSON.stringify(lite)),
       function() {}
     );
   }

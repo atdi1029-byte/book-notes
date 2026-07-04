@@ -79,7 +79,40 @@ function doGet(e) {
       var all = {};
       try { all = JSON.parse(bmSheet.getRange('A1').getValue() || '{}'); } catch(err) {}
       if (bmData) {
-        all[key] = JSON.parse(bmData);
+        var incoming = JSON.parse(bmData);
+        // Deep merge for reading_speed_data — merge books, keep highest maxScroll
+        if (key === 'reading_speed_data' && all[key] && all[key].books) {
+          var existing = all[key];
+          // Merge books — keep highest maxScroll per book
+          if (incoming.books) {
+            Object.keys(incoming.books).forEach(function(bk) {
+              if (!existing.books[bk] ||
+                  (incoming.books[bk].maxScroll || 0) > (existing.books[bk].maxScroll || 0)) {
+                existing.books[bk] = incoming.books[bk];
+              }
+            });
+          }
+          // Update reader model if incoming has more samples
+          if (incoming.reader && (!existing.reader ||
+              incoming.reader.samples > existing.reader.samples)) {
+            existing.reader = incoming.reader;
+          }
+          // Merge sessions — dedupe by timestamp
+          if (incoming.sessions && incoming.sessions.length) {
+            if (!existing.sessions) existing.sessions = [];
+            var tsSet = {};
+            existing.sessions.forEach(function(s) { tsSet[s.ts] = true; });
+            incoming.sessions.forEach(function(s) {
+              if (!tsSet[s.ts]) existing.sessions.push(s);
+            });
+            if (existing.sessions.length > 50) {
+              existing.sessions = existing.sessions.slice(-50);
+            }
+          }
+          all[key] = existing;
+        } else {
+          all[key] = incoming;
+        }
       } else {
         delete all[key];
       }
