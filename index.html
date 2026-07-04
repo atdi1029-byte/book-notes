@@ -3310,83 +3310,144 @@
 // ── Reading Progress on Shelf ──
 (function() {
   var RS_KEY = 'reading_speed_data';
-  try {
-    var data = JSON.parse(
-      localStorage.getItem(RS_KEY)
-    );
-  } catch(e) { return; }
-  if (!data || !data.books) return;
+  var SYNC_URL = 'https://script.google.com/macros/s/AKfycbwt438APIycBc534W6T66O3IgtxLUU9cczw-PZAN6Mc9p2xfU2ySsND_wEMJDHUvrXyUg/exec';
 
-  // Calculate average WPM from all sessions
-  var avgWpm = 0;
-  if (data.sessions && data.sessions.length > 0) {
-    var totalWpm = 0;
-    data.sessions.forEach(function(s) {
-      totalWpm += s.wpm;
-    });
-    avgWpm = Math.round(totalWpm / data.sessions.length);
-  }
+  function renderProgress() {
+    // Clear any previously rendered progress elements
+    document.querySelectorAll(
+      '.read-progress-wrap, .read-eta'
+    ).forEach(function(el) { el.remove(); });
+    var oldBadge = document.getElementById('wpmBadge');
+    if (oldBadge) oldBadge.remove();
 
-  // Match shelf book hrefs to tracked book paths
-  document.querySelectorAll('.book[href]').forEach(function(el) {
-    var href = el.getAttribute('href');
-    if (!href) return;
+    try {
+      var data = JSON.parse(
+        localStorage.getItem(RS_KEY)
+      );
+    } catch(e) { return; }
+    if (!data || !data.books) return;
 
-    // Find matching book in tracking data
-    var match = null;
-    Object.keys(data.books).forEach(function(path) {
-      if (href.indexOf(path) !== -1 ||
-          path.indexOf(href) !== -1 ||
-          path.endsWith(href)) {
-        match = data.books[path];
+    // Calculate average WPM from all sessions
+    var avgWpm = 0;
+    if (data.sessions && data.sessions.length > 0) {
+      var totalWpm = 0;
+      data.sessions.forEach(function(s) {
+        totalWpm += s.wpm;
+      });
+      avgWpm = Math.round(totalWpm / data.sessions.length);
+    }
+
+    // Match shelf book hrefs to tracked book paths
+    document.querySelectorAll('.book[href]').forEach(function(el) {
+      var href = el.getAttribute('href');
+      if (!href) return;
+
+      // Find matching book in tracking data
+      var match = null;
+      Object.keys(data.books).forEach(function(path) {
+        if (href.indexOf(path) !== -1 ||
+            path.indexOf(href) !== -1 ||
+            path.endsWith(href)) {
+          match = data.books[path];
+        }
+      });
+      if (!match) return;
+
+      var pct = Math.round((match.maxScroll || 0) * 100);
+      if (pct < 1) return; // not started
+
+      // Progress bar
+      var wrap = document.createElement('div');
+      wrap.className = 'read-progress-wrap';
+      var bar = document.createElement('div');
+      bar.className = 'read-progress-bar';
+      bar.style.width = pct + '%';
+      wrap.appendChild(bar);
+      el.appendChild(wrap);
+
+      // ETA label
+      if (avgWpm > 0 && match.words) {
+        var wordsLeft = match.words *
+          (1 - (match.maxScroll || 0));
+        var minsLeft = Math.round(wordsLeft / avgWpm);
+        var eta = document.createElement('div');
+        eta.className = 'read-eta';
+        if (pct >= 95) {
+          eta.textContent = 'Finished';
+        } else if (minsLeft < 60) {
+          eta.textContent = '~' + minsLeft + 'm left';
+        } else {
+          var hrs = Math.floor(minsLeft / 60);
+          var mins = minsLeft % 60;
+          eta.textContent = '~' + hrs + 'h ' +
+            mins + 'm left';
+        }
+        el.appendChild(eta);
       }
     });
-    if (!match) return;
 
-    var pct = Math.round((match.maxScroll || 0) * 100);
-    if (pct < 1) return; // not started
-
-    // Progress bar
-    var wrap = document.createElement('div');
-    wrap.className = 'read-progress-wrap';
-    var bar = document.createElement('div');
-    bar.className = 'read-progress-bar';
-    bar.style.width = pct + '%';
-    wrap.appendChild(bar);
-    el.appendChild(wrap);
-
-    // ETA label
-    if (avgWpm > 0 && match.words) {
-      var wordsLeft = match.words * (1 - (match.maxScroll || 0));
-      var minsLeft = Math.round(wordsLeft / avgWpm);
-      var eta = document.createElement('div');
-      eta.className = 'read-eta';
-      if (pct >= 95) {
-        eta.textContent = 'Finished';
-      } else if (minsLeft < 60) {
-        eta.textContent = '~' + minsLeft + 'm left';
-      } else {
-        var hrs = Math.floor(minsLeft / 60);
-        var mins = minsLeft % 60;
-        eta.textContent = '~' + hrs + 'h ' + mins + 'm left';
-      }
-      el.appendChild(eta);
-    }
-  });
-
-  // Show global reading speed in subtitle if enough data
-  if (avgWpm > 0 && data.sessions.length >= 3) {
-    var sub = document.querySelector('.subtitle');
-    if (sub) {
-      var badge = document.createElement('span');
-      badge.style.cssText =
-        'font-size:0.7rem;color:rgba(255,255,255,0.35);' +
-        'font-family:-apple-system,sans-serif;' +
-        'margin-left:0.8rem;font-style:normal;';
-      badge.textContent = avgWpm + ' WPM avg';
-      sub.appendChild(badge);
+    // Show global reading speed in subtitle
+    if (avgWpm > 0 && data.sessions.length >= 3) {
+      var sub = document.querySelector('.subtitle');
+      if (sub) {
+        var badge = document.createElement('span');
+        badge.id = 'wpmBadge';
+        badge.style.cssText =
+          'font-size:0.7rem;color:rgba(255,255,255,0.35);' +
+          'font-family:-apple-system,sans-serif;' +
+          'margin-left:0.8rem;font-style:normal;';
+        badge.textContent = avgWpm + ' WPM avg';
+        sub.appendChild(badge);
     }
   }
+
+  // Render from local data first
+  renderProgress();
+
+  // Then try restoring from backend (if cache was cleared)
+  function jsonpFetch(url, cb) {
+    var cbName = '_rsCb_' + Date.now() +
+      '_' + Math.random().toString(36).substr(2, 5);
+    var script = document.createElement('script');
+    var done = false;
+    window[cbName] = function(resp) {
+      done = true; delete window[cbName];
+      script.remove(); cb(null, resp);
+    };
+    script.src = url + (url.includes('?') ? '&' : '?') +
+      'callback=' + cbName;
+    script.onerror = function() {
+      if (!done) {
+        delete window[cbName]; script.remove(); cb('Failed');
+      }
+    };
+    setTimeout(function() {
+      if (!done) {
+        delete window[cbName]; script.remove(); cb('Timeout');
+      }
+    }, 15000);
+    document.head.appendChild(script);
+  }
+
+  jsonpFetch(
+    SYNC_URL + '?action=get_bookmarks',
+    function(err, json) {
+      if (err || !json || json.status !== 'ok') return;
+      if (!json.bookmarks || !json.bookmarks[RS_KEY]) return;
+      var remote = json.bookmarks[RS_KEY];
+      var local;
+      try {
+        local = JSON.parse(localStorage.getItem(RS_KEY));
+      } catch(e) { local = null; }
+      // Restore if local is empty but remote has data
+      if ((!local || !local.sessions ||
+            local.sessions.length === 0) &&
+          remote.sessions && remote.sessions.length > 0) {
+        localStorage.setItem(RS_KEY, JSON.stringify(remote));
+        renderProgress(); // re-render with restored data
+      }
+    }
+  );
 })();
 </script>
 

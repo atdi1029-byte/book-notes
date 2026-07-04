@@ -285,7 +285,39 @@
       data.sessions = data.sessions.slice(-50);
     }
     localStorage.setItem(RS_KEY, JSON.stringify(data));
+    // Sync to backend for backup
+    syncSpeedToBackend(data);
   }
+
+  var _lastSync = 0;
+  function syncSpeedToBackend(data) {
+    // Throttle: sync at most once per 60s
+    var now = Date.now();
+    if (now - _lastSync < 60000) return;
+    _lastSync = now;
+    jsonpFetch(
+      SYNC_URL + '?action=set_bookmark&key=' +
+      encodeURIComponent(RS_KEY) + '&data=' +
+      encodeURIComponent(JSON.stringify(data)),
+      function() {}
+    );
+  }
+
+  // Restore reading speed data from backend if local is empty
+  jsonpFetch(
+    SYNC_URL + '?action=get_bookmarks',
+    function(err, json) {
+      if (err || !json || json.status !== 'ok') return;
+      if (!json.bookmarks || !json.bookmarks[RS_KEY]) return;
+      var remote = json.bookmarks[RS_KEY];
+      var local = loadSpeedData();
+      // Only restore if local is empty (cache cleared)
+      if ((!local.sessions || local.sessions.length === 0) &&
+          remote.sessions && remote.sessions.length > 0) {
+        localStorage.setItem(RS_KEY, JSON.stringify(remote));
+      }
+    }
+  );
 
   (function initReadingTracker() {
     var totalWords = countWords();
