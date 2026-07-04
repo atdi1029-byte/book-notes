@@ -234,4 +234,192 @@
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('../service-worker.js');
   }
+
+  // ── Reading Speed Tracker ──
+  // Silently tracks scroll behavior to estimate reading speed (WPM)
+  // and progress. Data saved to localStorage for shelf display.
+
+  var RS_KEY = 'reading_speed_data';
+
+  function countWords() {
+    // Count words in main content, excluding nav/UI elements
+    var body = document.body.cloneNode(true);
+    // Remove bookmark bar, progress bar, toast, TOC nav
+    ['bookmarkBar', 'bmToast', 'progressBar'].forEach(function(id) {
+      var el = body.querySelector('#' + id);
+      if (el) el.remove();
+    });
+    body.querySelectorAll('script, style, nav, .bm-btn').forEach(
+      function(el) { el.remove(); }
+    );
+    var text = body.textContent || '';
+    return text.split(/\s+/).filter(function(w) {
+      return w.length > 0;
+    }).length;
+  }
+
+  function getBookPath() {
+    // e.g. "/book-notes/Some_Book/index.html" → "Some_Book/index.html"
+    var p = location.pathname;
+    var parts = p.split('/');
+    // Get last two segments: folder/file
+    if (parts.length >= 2) {
+      return parts.slice(-2).join('/');
+    }
+    return p;
+  }
+
+  function loadSpeedData() {
+    try {
+      return JSON.parse(
+        localStorage.getItem(RS_KEY)
+      ) || { books: {}, sessions: [] };
+    } catch(e) {
+      return { books: {}, sessions: [] };
+    }
+  }
+
+  function saveSpeedData(data) {
+    // Keep sessions array from growing forever — last 50
+    if (data.sessions.length > 50) {
+      data.sessions = data.sessions.slice(-50);
+    }
+    localStorage.setItem(RS_KEY, JSON.stringify(data));
+  }
+
+  (function initReadingTracker() {
+    var totalWords = countWords();
+    if (totalWords < 200) return; // too short, skip
+
+    var bookPath = getBookPath();
+    var data = loadSpeedData();
+
+    // Save word count + current progress for this book
+    if (!data.books[bookPath]) {
+      data.books[bookPath] = {
+        words: totalWords,
+        maxScroll: 0,
+        title: document.title
+      };
+    }
+    data.books[bookPath].words = totalWords;
+    data.books[bookPath].title = document.title;
+
+    var lastY = window.scrollY;
+    var lastT = Date.now();
+    var readingWords = 0;
+    var readingTime = 0; // ms of actual reading
+
+    // Pause detection: skip if tab hidden or idle too long
+    var tabVisible = true;
+    document.addEventListener('visibilitychange', function() {
+      tabVisible = !document.hidden;
+      if (tabVisible) {
+        // Reset timer so gap during hide isn't counted
+        lastT = Date.now();
+        lastY = window.scrollY;
+      }
+    });
+
+    // Sample every 2 seconds
+    var tracker = setInterval(function() {
+      // Skip if tab is hidden (phone locked, switched tabs)
+      if (!tabVisible) {
+        lastT = Date.now();
+        lastY = window.scrollY;
+        return;
+      }
+
+      var nowY = window.scrollY;
+      var nowT = Date.now();
+      var dt = nowT - lastT; // ms since last sample
+      var dy = Math.abs(nowY - lastY); // px moved
+
+      // If dt > 30s, user was idle (thinking, AFK)
+      // Reset without counting
+      if (dt > 30000) {
+        lastT = nowT;
+        lastY = nowY;
+        return;
+      }
+
+      // Velocity in px/s
+      var vel = dy / (dt / 1000);
+
+      // Only count as reading if:
+      // - scrolled some (not idle) but not too fast
+      // - velocity < 1500 px/s (reading pace)
+      // - velocity > 5 px/s (not completely idle)
+      if (vel > 5 && vel < 1500 && dt > 500) {
+        // Map scroll distance to words
+        var docH = document.documentElement.scrollHeight
+          - window.innerHeight;
+        if (docH > 0) {
+          var pctMoved = dy / docH;
+          var wordsRead = pctMoved * totalWords;
+          readingWords += wordsRead;
+          readingTime += dt;
+        }
+      }
+
+      // Track max scroll position (progress %)
+      var docH2 = document.documentElement.scrollHeight
+        - window.innerHeight;
+      if (docH2 > 0) {
+        var pct = Math.min(1, nowY / docH2);
+        if (pct > (data.books[bookPath].maxScroll || 0)) {
+          data.books[bookPath].maxScroll = pct;
+        }
+      }
+
+      lastY = nowY;
+      lastT = nowT;
+    }, 2000);
+
+    // Save session data on page unload
+    function saveSession() {
+      if (readingTime < 10000) return; // < 10s, skip
+
+      var wpm = readingWords / (readingTime / 60000);
+      // Sanity check: typical reading is 150-500 WPM
+      if (wpm >= 50 && wpm <= 800) {
+        data.sessions.push({
+          book: bookPath,
+          wpm: Math.round(wpm),
+          duration: Math.round(readingTime / 1000),
+          words: Math.round(readingWords),
+          ts: Date.now()
+        });
+      }
+
+      // Update max scroll
+      var docH = document.documentElement.scrollHeight
+        - window.innerHeight;
+      if (docH > 0) {
+        var pct = Math.min(1, window.scrollY / docH);
+        if (pct > (data.books[bookPath].maxScroll || 0)) {
+          data.books[bookPath].maxScroll = pct;
+        }
+      }
+
+      saveSpeedData(data);
+    }
+
+    window.addEventListener('beforeunload', saveSession);
+    // Also save periodically (every 30s) in case
+    // beforeunload doesn't fire (mobile)
+    setInterval(function() {
+      if (readingTime >= 10000) {
+        var docH = document.documentElement.scrollHeight
+          - window.innerHeight;
+        if (docH > 0) {
+          var pct = Math.min(1, window.scrollY / docH);
+          if (pct > (data.books[bookPath].maxScroll || 0)) {
+            data.books[bookPath].maxScroll = pct;
+          }
+        }
+        saveSpeedData(data);
+      }
+    }, 30000);
+  })();
 })();

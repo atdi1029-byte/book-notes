@@ -247,6 +247,29 @@
     text-shadow: 0 1px 4px rgba(0,0,0,0.3);
   }
 
+  /* Reading progress bar under covers */
+  .read-progress-wrap {
+    margin-top: 0.35rem;
+    height: 4px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 2px;
+    overflow: hidden;
+    position: relative;
+  }
+  .read-progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #3a9e4a, #5bc46a);
+    border-radius: 2px;
+    transition: width 0.3s ease;
+  }
+  .read-eta {
+    font-size: 0.65rem;
+    color: rgba(255,255,255,0.45);
+    font-family: -apple-system, sans-serif;
+    margin-top: 0.15rem;
+    letter-spacing: 0.02em;
+  }
+
   .section-title {
     font-size: 1.1rem;
     color: rgba(255,255,255,0.85);
@@ -3281,6 +3304,90 @@
   );
 
   renderMovedToShelf();
+</script>
+
+<script>
+// ── Reading Progress on Shelf ──
+(function() {
+  var RS_KEY = 'reading_speed_data';
+  try {
+    var data = JSON.parse(
+      localStorage.getItem(RS_KEY)
+    );
+  } catch(e) { return; }
+  if (!data || !data.books) return;
+
+  // Calculate average WPM from all sessions
+  var avgWpm = 0;
+  if (data.sessions && data.sessions.length > 0) {
+    var totalWpm = 0;
+    data.sessions.forEach(function(s) {
+      totalWpm += s.wpm;
+    });
+    avgWpm = Math.round(totalWpm / data.sessions.length);
+  }
+
+  // Match shelf book hrefs to tracked book paths
+  document.querySelectorAll('.book[href]').forEach(function(el) {
+    var href = el.getAttribute('href');
+    if (!href) return;
+
+    // Find matching book in tracking data
+    var match = null;
+    Object.keys(data.books).forEach(function(path) {
+      if (href.indexOf(path) !== -1 ||
+          path.indexOf(href) !== -1 ||
+          path.endsWith(href)) {
+        match = data.books[path];
+      }
+    });
+    if (!match) return;
+
+    var pct = Math.round((match.maxScroll || 0) * 100);
+    if (pct < 1) return; // not started
+
+    // Progress bar
+    var wrap = document.createElement('div');
+    wrap.className = 'read-progress-wrap';
+    var bar = document.createElement('div');
+    bar.className = 'read-progress-bar';
+    bar.style.width = pct + '%';
+    wrap.appendChild(bar);
+    el.appendChild(wrap);
+
+    // ETA label
+    if (avgWpm > 0 && match.words) {
+      var wordsLeft = match.words * (1 - (match.maxScroll || 0));
+      var minsLeft = Math.round(wordsLeft / avgWpm);
+      var eta = document.createElement('div');
+      eta.className = 'read-eta';
+      if (pct >= 95) {
+        eta.textContent = 'Finished';
+      } else if (minsLeft < 60) {
+        eta.textContent = '~' + minsLeft + 'm left';
+      } else {
+        var hrs = Math.floor(minsLeft / 60);
+        var mins = minsLeft % 60;
+        eta.textContent = '~' + hrs + 'h ' + mins + 'm left';
+      }
+      el.appendChild(eta);
+    }
+  });
+
+  // Show global reading speed in subtitle if enough data
+  if (avgWpm > 0 && data.sessions.length >= 3) {
+    var sub = document.querySelector('.subtitle');
+    if (sub) {
+      var badge = document.createElement('span');
+      badge.style.cssText =
+        'font-size:0.7rem;color:rgba(255,255,255,0.35);' +
+        'font-family:-apple-system,sans-serif;' +
+        'margin-left:0.8rem;font-style:normal;';
+      badge.textContent = avgWpm + ' WPM avg';
+      sub.appendChild(badge);
+    }
+  }
+})();
 </script>
 
 <script>
