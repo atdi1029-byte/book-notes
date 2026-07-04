@@ -1,7 +1,7 @@
 // Caches books you're reading for offline access
 
-// Book Notes Service Worker v23
-var CACHE = 'books-v23';
+// Book Notes Service Worker v24
+var CACHE = 'books-v24';
 
 // Core assets always cached
 var CORE = [
