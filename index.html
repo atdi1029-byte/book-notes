@@ -3129,6 +3129,13 @@
             });
             if (local.sessions.length > 50) local.sessions = local.sessions.slice(-50);
           }
+          // Sync reader model — take the one with more samples
+          if (remote.reader) {
+            if (!local.reader || (remote.reader.samples || 0) > (local.reader.samples || 0)) {
+              local.reader = remote.reader;
+              changed = true;
+            }
+          }
           if (changed) {
             localStorage.setItem(window._RS_KEY, JSON.stringify(local));
             if (window._renderProgress) window._renderProgress();

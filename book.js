@@ -353,6 +353,14 @@
       }
     }
 
+    // Sync reader model — take the one with more samples
+    if (remote.reader) {
+      if (!local.reader || (remote.reader.samples || 0) > (local.reader.samples || 0)) {
+        local.reader = remote.reader;
+        changed = true;
+      }
+    }
+
     if (changed) {
       localStorage.setItem(RS_KEY, JSON.stringify(local));
     }
