@@ -506,14 +506,17 @@
     var lastSavedTime = 0;
 
     function saveSession() {
+      // Always persist progress, even if WPM sample doesn't qualify
+      saveSpeedData(data);
+
       var timeDelta = activeTime - lastSavedTime;
-      if (timeDelta < 60000) return; // min 1 minute
+      if (timeDelta < 60000) return; // min 1 minute for WPM sample
 
       var endProgress = data.books[bookPath].maxScroll || 0;
       var progressDelta = Math.max(0, endProgress - lastSavedProgress);
 
       var wordsRead = progressDelta * totalWords;
-      if (wordsRead < 300) return; // min 300 words
+      if (wordsRead < 300) return; // min 300 words for WPM sample
 
       var minutes = timeDelta / 60000;
       var wpm = wordsRead / minutes;
@@ -536,14 +539,18 @@
     }
 
     window.addEventListener('beforeunload', saveSession);
-    // Periodic save — only if progress changed or >60s elapsed
+    // Also save on visibilitychange (mobile tab switches/closes)
+    document.addEventListener('visibilitychange', function() {
+      if (document.hidden) saveSession();
+    });
+    // Also save on pagehide (iOS Safari kills tabs without beforeunload)
+    window.addEventListener('pagehide', saveSession);
+    // Periodic save every 15s if progress changed
     setInterval(function() {
-      var timeDelta = activeTime - lastSavedTime;
       var endProgress = data.books[bookPath].maxScroll || 0;
-      var progressDelta = endProgress - lastSavedProgress;
-      if (progressDelta > 0 || timeDelta > 60000) {
+      if (endProgress > lastSavedProgress || activeTime - lastSavedTime > 60000) {
         saveSession();
       }
-    }, 30000);
+    }, 15000);
   })();
 })();
