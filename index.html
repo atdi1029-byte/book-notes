@@ -3109,6 +3109,40 @@
       if (!err && bmData && bmData.status === 'ok' && bmData.bookmarks) {
         activeBookmarks = bmData.bookmarks;
         localStorage.setItem('books_bookmarks', JSON.stringify(activeBookmarks));
+        // Merge reading speed data from same response (avoids second request)
+        if (window._RS_KEY && bmData.bookmarks[window._RS_KEY]) {
+          var remote = bmData.bookmarks[window._RS_KEY];
+          var local;
+          try { local = JSON.parse(localStorage.getItem(window._RS_KEY)); }
+          catch(e) { local = null; }
+          if (!local) local = { books: {}, sessions: [] };
+          var changed = false;
+          if (remote.books) {
+            if (!local.books) local.books = {};
+            Object.keys(remote.books).forEach(function(path) {
+              var rb = remote.books[path];
+              var lb = local.books[path];
+              if (!lb) { local.books[path] = rb; changed = true; }
+              else {
+                if ((rb.maxScroll || 0) > (lb.maxScroll || 0)) { lb.maxScroll = rb.maxScroll; changed = true; }
+                if ((rb.words || 0) > (lb.words || 0)) { lb.words = rb.words; changed = true; }
+              }
+            });
+          }
+          if (remote.sessions && remote.sessions.length > 0) {
+            if (!local.sessions) local.sessions = [];
+            var existing = {};
+            local.sessions.forEach(function(s) { existing[s.ts || s.date] = true; });
+            remote.sessions.forEach(function(s) {
+              if (!existing[s.ts || s.date]) { local.sessions.push(s); changed = true; }
+            });
+            if (local.sessions.length > 50) local.sessions = local.sessions.slice(-50);
+          }
+          if (changed) {
+            localStorage.setItem(window._RS_KEY, JSON.stringify(local));
+            if (window._renderProgress) window._renderProgress();
+          }
+        }
       }
       checkDone();
     });
@@ -3310,51 +3344,50 @@
 // ── Reading Progress on Shelf ──
 (function() {
   var RS_KEY = 'reading_speed_data';
-  var SYNC_URL = 'https://script.google.com/macros/s/AKfycbwt438APIycBc534W6T66O3IgtxLUU9cczw-PZAN6Mc9p2xfU2ySsND_wEMJDHUvrXyUg/exec';
 
   function renderProgress() {
-    // Clear any previously rendered progress elements
     document.querySelectorAll(
       '.read-progress-wrap, .read-eta'
     ).forEach(function(el) { el.remove(); });
     var oldBadge = document.getElementById('wpmBadge');
     if (oldBadge) oldBadge.remove();
 
+    var data;
     try {
-      var data = JSON.parse(
-        localStorage.getItem(RS_KEY)
-      );
+      data = JSON.parse(localStorage.getItem(RS_KEY));
     } catch(e) { return; }
     if (!data || !data.books) return;
 
-    // Calculate average WPM from all sessions
-    var avgWpm = 0;
-    if (data.sessions && data.sessions.length > 0) {
-      var totalWpm = 0;
-      data.sessions.forEach(function(s) {
-        totalWpm += s.wpm;
-      });
-      avgWpm = Math.round(totalWpm / data.sessions.length);
-    }
+    // Use Kindle-style EMA average if available, else default
+    var avgWpm = (data.reader && data.reader.samples >= 3)
+      ? data.reader.averageWPM
+      : 225;
 
-    // Match shelf book hrefs to tracked book paths
+    // Build lookup: normalize paths once
+    var bookIndex = {};
+    Object.keys(data.books).forEach(function(path) {
+      // Store by last two path segments for fast matching
+      var parts = path.split('/');
+      var key = parts.slice(-2).join('/');
+      bookIndex[key] = data.books[path];
+      // Also store by folder name alone
+      if (parts.length >= 2) {
+        bookIndex[parts[parts.length - 2]] = data.books[path];
+      }
+    });
+
     document.querySelectorAll('.book[href]').forEach(function(el) {
       var href = el.getAttribute('href');
       if (!href) return;
 
-      // Find matching book in tracking data
-      var match = null;
-      Object.keys(data.books).forEach(function(path) {
-        if (href.indexOf(path) !== -1 ||
-            path.indexOf(href) !== -1 ||
-            path.endsWith(href)) {
-          match = data.books[path];
-        }
-      });
+      // Fast lookup instead of O(n) scan
+      var hParts = href.replace(/^\.\//, '').split('/');
+      var match = bookIndex[hParts.slice(-2).join('/')] ||
+                  bookIndex[hParts[0]] || null;
       if (!match) return;
 
       var pct = Math.round((match.maxScroll || 0) * 100);
-      if (pct < 1) return; // not started
+      if (pct < 1) return;
 
       // Progress bar
       var wrap = document.createElement('div');
@@ -3366,9 +3399,8 @@
       el.appendChild(wrap);
 
       // ETA label
-      if (avgWpm > 0 && match.words) {
-        var wordsLeft = match.words *
-          (1 - (match.maxScroll || 0));
+      if (match.words) {
+        var wordsLeft = match.words * (1 - (match.maxScroll || 0));
         var minsLeft = Math.round(wordsLeft / avgWpm);
         var eta = document.createElement('div');
         eta.className = 'read-eta';
@@ -3379,103 +3411,19 @@
         } else {
           var hrs = Math.floor(minsLeft / 60);
           var mins = minsLeft % 60;
-          eta.textContent = '~' + hrs + 'h ' +
-            mins + 'm left';
+          eta.textContent = '~' + hrs + 'h ' + mins + 'm left';
         }
         el.appendChild(eta);
       }
     });
-
   }
 
-  // Render from local data first
+  // Render from localStorage immediately (no network wait)
   renderProgress();
 
-  // Then try restoring from backend (if cache was cleared)
-  function jsonpFetch(url, cb) {
-    var cbName = '_rsCb_' + Date.now() +
-      '_' + Math.random().toString(36).substr(2, 5);
-    var script = document.createElement('script');
-    var done = false;
-    window[cbName] = function(resp) {
-      done = true; delete window[cbName];
-      script.remove(); cb(null, resp);
-    };
-    script.src = url + (url.includes('?') ? '&' : '?') +
-      'callback=' + cbName;
-    script.onerror = function() {
-      if (!done) {
-        delete window[cbName]; script.remove(); cb('Failed');
-      }
-    };
-    setTimeout(function() {
-      if (!done) {
-        delete window[cbName]; script.remove(); cb('Timeout');
-      }
-    }, 15000);
-    document.head.appendChild(script);
-  }
-
-  jsonpFetch(
-    SYNC_URL + '?action=get_bookmarks',
-    function(err, json) {
-      if (err || !json || json.status !== 'ok') return;
-      if (!json.bookmarks || !json.bookmarks[RS_KEY]) return;
-      var remote = json.bookmarks[RS_KEY];
-      var local;
-      try {
-        local = JSON.parse(localStorage.getItem(RS_KEY));
-      } catch(e) { local = null; }
-      if (!local) local = { books: {}, sessions: [] };
-      var changed = false;
-
-      // Merge books: keep higher maxScroll, higher words
-      if (remote.books) {
-        if (!local.books) local.books = {};
-        Object.keys(remote.books).forEach(function(path) {
-          var rb = remote.books[path];
-          var lb = local.books[path];
-          if (!lb) {
-            local.books[path] = rb;
-            changed = true;
-          } else {
-            if ((rb.maxScroll || 0) > (lb.maxScroll || 0)) {
-              lb.maxScroll = rb.maxScroll;
-              changed = true;
-            }
-            if ((rb.words || 0) > (lb.words || 0)) {
-              lb.words = rb.words;
-              changed = true;
-            }
-          }
-        });
-      }
-
-      // Merge sessions: dedupe by timestamp
-      if (remote.sessions && remote.sessions.length > 0) {
-        if (!local.sessions) local.sessions = [];
-        var existing = {};
-        local.sessions.forEach(function(s) {
-          existing[s.ts || s.date] = true;
-        });
-        remote.sessions.forEach(function(s) {
-          var key = s.ts || s.date;
-          if (!existing[key]) {
-            local.sessions.push(s);
-            changed = true;
-          }
-        });
-        if (local.sessions.length > 50) {
-          local.sessions = local.sessions.slice(-50);
-        }
-      }
-
-      if (changed) {
-        localStorage.setItem(RS_KEY, JSON.stringify(local));
-        renderProgress(); // re-render with merged data
-      }
-    }
-  );
+  // Expose for the main sync to call after merging remote data
+  window._renderProgress = renderProgress;
+  window._RS_KEY = RS_KEY;
 })();
 </script>
 

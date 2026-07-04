@@ -125,7 +125,6 @@
     var h = document.documentElement.scrollHeight - window.innerHeight;
     document.getElementById('progressBar').style.width = h > 0 ? (window.scrollY / h * 100) + '%' : '0%';
   }
-  window.addEventListener('scroll', updateProgress);
 
   // Wrap tables for horizontal scroll on mobile
   document.querySelectorAll('table').forEach(function(t) {
@@ -169,14 +168,21 @@
     }
   }
 
-  // Sync from backend (backend wins), then auto-scroll
+  // Single sync request — handles both bookmarks and reading data
   jsonpFetch(SYNC_URL + '?action=get_bookmarks', function(err, json) {
-    if (!err && json && json.status === 'ok' && json.bookmarks && json.bookmarks[BM_KEY]) {
-      var remote = json.bookmarks[BM_KEY];
-      localStorage.setItem(BM_KEY, JSON.stringify(remote));
-      applyBookmark(remote);
+    if (!err && json && json.status === 'ok' && json.bookmarks) {
+      // Bookmark restore
+      if (json.bookmarks[BM_KEY]) {
+        var remote = json.bookmarks[BM_KEY];
+        localStorage.setItem(BM_KEY, JSON.stringify(remote));
+        applyBookmark(remote);
+      } else {
+        var local = localStorage.getItem(BM_KEY);
+        if (local) applyBookmark(JSON.parse(local));
+      }
+      // Reading speed merge (shared from same response)
+      window._bmSyncJson = json;
     } else {
-      // Offline or no remote — use local if exists
       var local = localStorage.getItem(BM_KEY);
       if (local) applyBookmark(JSON.parse(local));
     }
@@ -236,33 +242,35 @@
   }
 
   // ── Reading Speed Tracker ──
-  // Silently tracks scroll behavior to estimate reading speed (WPM)
-  // and progress. Data saved to localStorage for shelf display.
+  // Tracks active reading time (not scroll time) to estimate WPM.
+  // Uses activity-based timing: counts seconds the user is engaged,
+  // and progress-based word estimation from max scroll reached.
 
   var RS_KEY = 'reading_speed_data';
 
   function countWords() {
-    // Count words in main content, excluding nav/UI elements
-    var body = document.body.cloneNode(true);
-    // Remove bookmark bar, progress bar, toast, TOC nav
+    // Count words in main content only — skip UI chrome
+    var container = document.querySelector(
+      'main, article, .content'
+    ) || document.body;
+    var clone = container.cloneNode(true);
+    // Remove UI elements that aren't reading content
     ['bookmarkBar', 'bmToast', 'progressBar'].forEach(function(id) {
-      var el = body.querySelector('#' + id);
+      var el = clone.querySelector('#' + id);
       if (el) el.remove();
     });
-    body.querySelectorAll('script, style, nav, .bm-btn').forEach(
-      function(el) { el.remove(); }
-    );
-    var text = body.textContent || '';
+    clone.querySelectorAll(
+      'script, style, nav, .bm-btn, footer, .toc'
+    ).forEach(function(el) { el.remove(); });
+    var text = clone.textContent || '';
     return text.split(/\s+/).filter(function(w) {
       return w.length > 0;
     }).length;
   }
 
   function getBookPath() {
-    // e.g. "/book-notes/Some_Book/index.html" → "Some_Book/index.html"
     var p = location.pathname;
     var parts = p.split('/');
-    // Get last two segments: folder/file
     if (parts.length >= 2) {
       return parts.slice(-2).join('/');
     }
@@ -280,18 +288,15 @@
   }
 
   function saveSpeedData(data) {
-    // Keep sessions array from growing forever — last 50
     if (data.sessions.length > 50) {
       data.sessions = data.sessions.slice(-50);
     }
     localStorage.setItem(RS_KEY, JSON.stringify(data));
-    // Sync to backend for backup
     syncSpeedToBackend(data);
   }
 
   var _lastSync = 0;
   function syncSpeedToBackend(data) {
-    // Throttle: sync at most once per 60s
     var now = Date.now();
     if (now - _lastSync < 60000) return;
     _lastSync = now;
@@ -303,196 +308,221 @@
     );
   }
 
-  // Merge remote reading data with local on every load
-  jsonpFetch(
-    SYNC_URL + '?action=get_bookmarks',
-    function(err, json) {
-      if (err || !json || json.status !== 'ok') return;
-      if (!json.bookmarks || !json.bookmarks[RS_KEY]) return;
-      var remote = json.bookmarks[RS_KEY];
-      var local = loadSpeedData();
-      var changed = false;
+  // Merge remote reading data — reuse the bookmark sync response
+  function mergeRemoteReadingData(json) {
+    if (!json || !json.bookmarks || !json.bookmarks[RS_KEY]) return;
+    var remote = json.bookmarks[RS_KEY];
+    var local = loadSpeedData();
+    var changed = false;
 
-      // Merge books: keep higher maxScroll, higher words
-      if (remote.books) {
-        if (!local.books) local.books = {};
-        Object.keys(remote.books).forEach(function(path) {
-          var rb = remote.books[path];
-          var lb = local.books[path];
-          if (!lb) {
-            local.books[path] = rb;
-            changed = true;
-          } else {
-            if ((rb.maxScroll || 0) > (lb.maxScroll || 0)) {
-              lb.maxScroll = rb.maxScroll;
-              changed = true;
-            }
-            if ((rb.words || 0) > (lb.words || 0)) {
-              lb.words = rb.words;
-              changed = true;
-            }
-          }
-        });
-      }
-
-      // Merge sessions: dedupe by timestamp
-      if (remote.sessions && remote.sessions.length > 0) {
-        if (!local.sessions) local.sessions = [];
-        var existing = {};
-        local.sessions.forEach(function(s) {
-          existing[s.ts || s.date] = true;
-        });
-        remote.sessions.forEach(function(s) {
-          var key = s.ts || s.date;
-          if (!existing[key]) {
-            local.sessions.push(s);
+    if (remote.books) {
+      if (!local.books) local.books = {};
+      Object.keys(remote.books).forEach(function(path) {
+        var rb = remote.books[path];
+        var lb = local.books[path];
+        if (!lb) {
+          local.books[path] = rb;
+          changed = true;
+        } else {
+          if ((rb.maxScroll || 0) > (lb.maxScroll || 0)) {
+            lb.maxScroll = rb.maxScroll;
             changed = true;
           }
-        });
-        // Keep last 50
-        if (local.sessions.length > 50) {
-          local.sessions = local.sessions.slice(-50);
+          if ((rb.words || 0) > (lb.words || 0)) {
+            lb.words = rb.words;
+            changed = true;
+          }
         }
-      }
+      });
+    }
 
-      if (changed) {
-        localStorage.setItem(RS_KEY, JSON.stringify(local));
+    if (remote.sessions && remote.sessions.length > 0) {
+      if (!local.sessions) local.sessions = [];
+      var existing = {};
+      local.sessions.forEach(function(s) {
+        existing[s.ts || s.date] = true;
+      });
+      remote.sessions.forEach(function(s) {
+        if (!existing[s.ts || s.date]) {
+          local.sessions.push(s);
+          changed = true;
+        }
+      });
+      if (local.sessions.length > 50) {
+        local.sessions = local.sessions.slice(-50);
       }
     }
-  );
+
+    if (changed) {
+      localStorage.setItem(RS_KEY, JSON.stringify(local));
+    }
+  }
+
+  // If sync already completed, merge now; otherwise poll briefly
+  if (window._bmSyncJson) {
+    mergeRemoteReadingData(window._bmSyncJson);
+  } else {
+    var _pollCount = 0;
+    var _pollTimer = setInterval(function() {
+      _pollCount++;
+      if (window._bmSyncJson) {
+        clearInterval(_pollTimer);
+        mergeRemoteReadingData(window._bmSyncJson);
+      } else if (_pollCount > 20) {
+        clearInterval(_pollTimer); // give up after 2s
+      }
+    }, 100);
+  }
 
   (function initReadingTracker() {
-    var totalWords = countWords();
-    if (totalWords < 200) return; // too short, skip
-
     var bookPath = getBookPath();
     var data = loadSpeedData();
 
-    // Save word count + current progress for this book
     if (!data.books[bookPath]) {
       data.books[bookPath] = {
-        words: totalWords,
+        words: 0,
         maxScroll: 0,
         title: document.title
       };
     }
-    data.books[bookPath].words = totalWords;
+
+    // Cache word count — only recount if not yet stored
+    var totalWords = data.books[bookPath].words;
+    if (!totalWords) {
+      totalWords = countWords();
+      data.books[bookPath].words = totalWords;
+      saveSpeedData(data);
+    }
     data.books[bookPath].title = document.title;
 
-    var lastY = window.scrollY;
-    var lastT = Date.now();
-    var readingWords = 0;
-    var readingTime = 0; // ms of actual reading
+    if (totalWords < 200) return;
 
-    // Pause detection: skip if tab hidden or idle too long
-    var tabVisible = true;
-    document.addEventListener('visibilitychange', function() {
-      tabVisible = !document.hidden;
-      if (tabVisible) {
-        // Reset timer so gap during hide isn't counted
-        lastT = Date.now();
-        lastY = window.scrollY;
+    // ── Activity-based timing ──
+    var activeTime = 0;
+    var lastActivity = Date.now();
+    var startProgress = data.books[bookPath].maxScroll || 0;
+    var IDLE_THRESHOLD = 30000;
+
+    function markActivity() {
+      lastActivity = Date.now();
+    }
+
+    // ── Single scroll listener for everything ──
+    function getProgress() {
+      var docH = document.documentElement.scrollHeight
+        - window.innerHeight;
+      if (docH <= 0) return 0;
+      return Math.min(1, window.scrollY / docH);
+    }
+
+    window.addEventListener('scroll', function() {
+      // Progress bar
+      updateProgress();
+      // Activity tracking
+      markActivity();
+      // Max scroll progress
+      var pct = getProgress();
+      if (pct > (data.books[bookPath].maxScroll || 0)) {
+        data.books[bookPath].maxScroll = pct;
       }
     });
 
-    // Sample every 2 seconds
-    var tracker = setInterval(function() {
-      // Skip if tab is hidden (phone locked, switched tabs)
-      if (!tabVisible) {
-        lastT = Date.now();
-        lastY = window.scrollY;
-        return;
+    // Non-scroll activity signals
+    window.addEventListener('keydown', markActivity);
+    window.addEventListener('touchstart', markActivity);
+    window.addEventListener('click', markActivity);
+    window.addEventListener('wheel', markActivity);
+
+    // Tick every 1 second — count if user was recently active
+    setInterval(function() {
+      if (document.hidden) return;
+      if (Date.now() - lastActivity < IDLE_THRESHOLD) {
+        activeTime += 1000;
       }
+    }, 1000);
 
-      var nowY = window.scrollY;
-      var nowT = Date.now();
-      var dt = nowT - lastT; // ms since last sample
-      var dy = Math.abs(nowY - lastY); // px moved
-
-      // If dt > 30s, user was idle (thinking, AFK)
-      // Reset without counting
-      if (dt > 30000) {
-        lastT = nowT;
-        lastY = nowY;
-        return;
-      }
-
-      // Velocity in px/s
-      var vel = dy / (dt / 1000);
-
-      // Only count as reading if:
-      // - scrolled some (not idle) but not too fast
-      // - velocity < 1500 px/s (reading pace)
-      // - velocity > 5 px/s (not completely idle)
-      if (vel > 5 && vel < 1500 && dt > 500) {
-        // Map scroll distance to words
-        var docH = document.documentElement.scrollHeight
-          - window.innerHeight;
-        if (docH > 0) {
-          var pctMoved = dy / docH;
-          var wordsRead = pctMoved * totalWords;
-          readingWords += wordsRead;
-          readingTime += dt;
+    // ── Reader model (Kindle-style EMA) ──
+    if (!data.reader) {
+      data.reader = { averageWPM: 225, samples: 0 };
+      // Bootstrap from existing sessions if upgrading
+      if (data.sessions && data.sessions.length > 0) {
+        var recent = data.sessions.slice(-10);
+        var tw = 0, tm = 0;
+        recent.forEach(function(s) {
+          if (s.words >= 300 && s.duration >= 60) {
+            tw += s.words;
+            tm += s.duration / 60;
+          }
+        });
+        if (tm > 0) {
+          data.reader.averageWPM = Math.round(tw / tm);
+          data.reader.samples = recent.length;
         }
       }
+    }
 
-      // Track max scroll position (progress %)
-      var docH2 = document.documentElement.scrollHeight
-        - window.innerHeight;
-      if (docH2 > 0) {
-        var pct = Math.min(1, nowY / docH2);
-        if (pct > (data.books[bookPath].maxScroll || 0)) {
-          data.books[bookPath].maxScroll = pct;
-        }
+    function updateReaderModel(sessionWpm) {
+      var r = data.reader;
+      if (r.samples < 5) {
+        // Bootstrap: simple weighted accumulation
+        r.averageWPM = (r.averageWPM * r.samples + sessionWpm)
+          / (r.samples + 1);
+        r.samples++;
+      } else {
+        // Clamp to ±25% of current average
+        var clamped = Math.max(
+          r.averageWPM * 0.75,
+          Math.min(sessionWpm, r.averageWPM * 1.25)
+        );
+        // EMA with alpha=0.2
+        r.averageWPM = r.averageWPM * 0.8 + clamped * 0.2;
+        r.samples++;
       }
+      r.averageWPM = Math.round(r.averageWPM);
+    }
 
-      lastY = nowY;
-      lastT = nowT;
-    }, 2000);
+    // ── Session save ──
+    var lastSavedProgress = startProgress;
+    var lastSavedTime = 0;
 
-    // Save session data on page unload
     function saveSession() {
-      if (readingTime < 10000) return; // < 10s, skip
+      var timeDelta = activeTime - lastSavedTime;
+      if (timeDelta < 60000) return; // min 1 minute
 
-      var wpm = readingWords / (readingTime / 60000);
-      // Sanity check: typical reading is 150-500 WPM
+      var endProgress = data.books[bookPath].maxScroll || 0;
+      var progressDelta = Math.max(0, endProgress - lastSavedProgress);
+
+      var wordsRead = progressDelta * totalWords;
+      if (wordsRead < 300) return; // min 300 words
+
+      var minutes = timeDelta / 60000;
+      var wpm = wordsRead / minutes;
+
       if (wpm >= 50 && wpm <= 800) {
         data.sessions.push({
           book: bookPath,
           wpm: Math.round(wpm),
-          duration: Math.round(readingTime / 1000),
-          words: Math.round(readingWords),
+          duration: Math.round(timeDelta / 1000),
+          words: Math.round(wordsRead),
+          progress: endProgress,
           ts: Date.now()
         });
+        updateReaderModel(wpm);
       }
 
-      // Update max scroll
-      var docH = document.documentElement.scrollHeight
-        - window.innerHeight;
-      if (docH > 0) {
-        var pct = Math.min(1, window.scrollY / docH);
-        if (pct > (data.books[bookPath].maxScroll || 0)) {
-          data.books[bookPath].maxScroll = pct;
-        }
-      }
-
+      lastSavedProgress = endProgress;
+      lastSavedTime = activeTime;
       saveSpeedData(data);
     }
 
     window.addEventListener('beforeunload', saveSession);
-    // Also save periodically (every 30s) in case
-    // beforeunload doesn't fire (mobile)
+    // Periodic save — only if progress changed or >60s elapsed
     setInterval(function() {
-      if (readingTime >= 10000) {
-        var docH = document.documentElement.scrollHeight
-          - window.innerHeight;
-        if (docH > 0) {
-          var pct = Math.min(1, window.scrollY / docH);
-          if (pct > (data.books[bookPath].maxScroll || 0)) {
-            data.books[bookPath].maxScroll = pct;
-          }
-        }
-        saveSpeedData(data);
+      var timeDelta = activeTime - lastSavedTime;
+      var endProgress = data.books[bookPath].maxScroll || 0;
+      var progressDelta = endProgress - lastSavedProgress;
+      if (progressDelta > 0 || timeDelta > 60000) {
+        saveSession();
       }
     }, 30000);
   })();
