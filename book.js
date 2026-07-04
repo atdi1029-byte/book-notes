@@ -296,9 +296,19 @@
   }
 
   var _lastSync = 0;
+  function _debugToast(msg) {
+    var d = document.createElement('div');
+    d.textContent = msg;
+    d.style.cssText = 'position:fixed;bottom:10px;left:10px;background:rgba(0,0,0,0.85);color:#0f0;padding:8px 12px;font:12px monospace;z-index:99999;border-radius:4px;max-width:90vw;word-break:break-all';
+    document.body.appendChild(d);
+    setTimeout(function() { d.remove(); }, 5000);
+  }
   function syncSpeedToBackend(data) {
     var now = Date.now();
-    if (now - _lastSync < 60000) return;
+    if (now - _lastSync < 60000) {
+      _debugToast('SYNC THROTTLED (wait ' + Math.round((60000 - (now - _lastSync))/1000) + 's)');
+      return;
+    }
     _lastSync = now;
     // Send lightweight payload — only current book + reader model
     var bookPath = getBookPath();
@@ -308,12 +318,13 @@
     }
     // Include recent sessions (last 5 only)
     lite.sessions = (data.sessions || []).slice(-5);
-    jsonpFetch(
-      SYNC_URL + '?action=set_bookmark&key=' +
+    var url = SYNC_URL + '?action=set_bookmark&key=' +
       encodeURIComponent(RS_KEY) + '&data=' +
-      encodeURIComponent(JSON.stringify(lite)),
-      function() {}
-    );
+      encodeURIComponent(JSON.stringify(lite));
+    _debugToast('SYNCING... URL len=' + url.length + ' scroll=' + Math.round((lite.books[bookPath]||{}).maxScroll*100) + '%');
+    jsonpFetch(url, function(err, resp) {
+      _debugToast(err ? 'SYNC FAIL: ' + err : 'SYNC OK');
+    });
   }
 
   // Merge remote reading data — reuse the bookmark sync response
