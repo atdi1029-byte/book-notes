@@ -3234,6 +3234,22 @@
   function renderMovedToShelf() {
     var moved = getMovedToShelf();
 
+    // Auto-clean: remove moved entries that already
+    // exist as hardcoded shelf cards
+    var dominated = false;
+    Object.keys(moved).forEach(function(id) {
+      var existing = document.querySelector(
+        '#shelfView .book[data-book="' + id +
+        '"]:not([data-moved="1"])'
+      );
+      if (existing) { delete moved[id]; dominated = true; }
+    });
+    if (dominated) {
+      localStorage.setItem(
+        SHELF_MOVED_KEY, JSON.stringify(moved)
+      );
+    }
+
     // Hide the old "Recently Added" fallback section
     var fallbackTitle =
       document.getElementById('recentlyAddedTitle');
