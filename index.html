@@ -3059,6 +3059,14 @@
     });
 
     if (typeof renderMovedToShelf === 'function') renderMovedToShelf();
+    // Auto-hide To Read entries that are already on the shelf
+    document.querySelectorAll('#toReadView .book').forEach(function(el) {
+      var id = el.dataset.book;
+      if (!id) return;
+      var onShelf = document.querySelector(
+        '#shelfView .book[data-book="' + id + '"]:not([data-moved="1"])');
+      if (onShelf) el.style.display = 'none';
+    });
     // Hide/show category sections AFTER moved cards are injected
     document.querySelectorAll('#shelfView .section-title:not(#recentlyAddedTitle)').forEach(function(title) {
       var shelf = title.nextElementSibling;
@@ -3066,6 +3074,17 @@
       var hasVisible = false;
       shelf.querySelectorAll('.book').forEach(function(b) {
         if (b.style.display !== 'none' && !b.classList.contains('hidden-read')) hasVisible = true;
+      });
+      title.style.display = hasVisible ? '' : 'none';
+      shelf.style.display = hasVisible ? '' : 'none';
+    });
+    // Same for To Read sections
+    document.querySelectorAll('#toReadView .section-title').forEach(function(title) {
+      var shelf = title.nextElementSibling;
+      if (!shelf || !shelf.classList.contains('shelf')) return;
+      var hasVisible = false;
+      shelf.querySelectorAll('.book').forEach(function(b) {
+        if (b.style.display !== 'none') hasVisible = true;
       });
       title.style.display = hasVisible ? '' : 'none';
       shelf.style.display = hasVisible ? '' : 'none';
