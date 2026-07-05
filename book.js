@@ -275,6 +275,12 @@
     var LOCK_TIME = 2000;
     var UNLOCK_TIME = 5000;
 
+    function beforeUnloadBlock(e) {
+      e.preventDefault();
+      e.returnValue = '';
+      return '';
+    }
+
     function animateRing() {
       var elapsed = Date.now() - holdStart;
       var duration = isLocked ? UNLOCK_TIME : LOCK_TIME;
@@ -306,6 +312,8 @@
           if (el.requestFullscreen) el.requestFullscreen();
           else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
           showToast('Focus locked \u2014 hold 5s to unlock');
+          // Prevent tab close / navigation
+          window.addEventListener('beforeunload', beforeUnloadBlock);
         } else {
           // Unlock
           isLocked = false;
@@ -315,6 +323,7 @@
           // Exit fullscreen
           if (document.exitFullscreen) document.exitFullscreen();
           else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+          window.removeEventListener('beforeunload', beforeUnloadBlock);
           showToast('Unlocked');
         }
         resetRing();
@@ -350,6 +359,19 @@
     btn.addEventListener('mousedown', startHold);
     btn.addEventListener('mouseup', endHold);
     btn.addEventListener('mouseleave', endHold);
+
+    // Nudge when returning to tab while locked
+    document.addEventListener('visibilitychange', function() {
+      if (!document.hidden && isLocked) {
+        showToast('Focus mode still on \u2014 get back to reading');
+        // Re-enter fullscreen if they left it
+        var el = document.documentElement;
+        if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+          if (el.requestFullscreen) el.requestFullscreen();
+          else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+        }
+      }
+    });
 
     // Handle fullscreen exit (e.g. user swipes from edge)
     document.addEventListener('fullscreenchange', function() {
