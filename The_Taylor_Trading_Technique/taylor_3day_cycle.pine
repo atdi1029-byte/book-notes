@@ -1,0 +1,300 @@
+// This Pine Script™ is subject to the terms of the Mozilla Public License 2.0
+// https://mozilla.org/MPL/2.0/
+// © alexbarnett
+
+//@version=6
+indicator("Taylor 3-Day Cycle", overlay=true,
+     max_labels_count=500,
+     max_lines_count=500)
+
+// ─── INPUTS ───────────────────────────────────────────────
+cycleStart = input.int(0, "Cycle Start Offset (0=auto)",
+     minval=0, maxval=2,
+     tooltip="0 = auto-detect from swing lows. " +
+     "1 = force today as Buy Day, " +
+     "2 = Sell Day, 3 = Short Sale Day")
+showLabels = input.bool(true, "Show Day Labels")
+showSignals = input.bool(true, "Show Trade Signals")
+showColumns = input.bool(true, "Show D/R Column Values")
+showPenetrations = input.bool(true, "Show Penetration Markers")
+labelSize = input.string("small", "Label Size",
+     options=["tiny","small","normal"])
+buyColor = input.color(color.new(#00C853, 0), "Buy Day Color")
+sellColor = input.color(color.new(#FFD600, 0), "Sell Day Color")
+shortColor = input.color(color.new(#FF1744, 0), "Short Sale Day Color")
+
+// ─── HELPER: label size ───────────────────────────────────
+sz = labelSize == "tiny" ? size.tiny :
+     labelSize == "small" ? size.small : size.normal
+
+// ─── AUTO-DETECT CYCLE START ──────────────────────────────
+// Find swing lows (pivot lows) as natural Buy Day anchors.
+// A swing low = bar whose low is lower than the prior 2
+// and following 2 bars. We anchor the cycle from the most
+// recent confirmed swing low = Buy Day.
+pivotLen = 2
+pl = ta.pivotlow(low, pivotLen, pivotLen)
+
+// Track the bar_index of the last confirmed swing low
+var int lastSwingLowBar = 0
+if not na(pl)
+    lastSwingLowBar := bar_index - pivotLen
+
+// Cycle phase: 0 = Buy Day, 1 = Sell Day, 2 = Short Sale Day
+// Count bars since last swing low, mod 3
+int rawPhase = 0
+if cycleStart > 0
+    // manual override: fixed rotation
+    rawPhase := (bar_index + cycleStart - 1) % 3
+else
+    // auto: anchor from last swing low
+    rawPhase := (bar_index - lastSwingLowBar) % 3
+
+// ─── DAY CLASSIFICATION ──────────────────────────────────
+isBuyDay   = rawPhase == 0
+isSellDay  = rawPhase == 1
+isShortDay = rawPhase == 2
+
+// ─── SIGNAL MARKS: HIGH/LOW MADE FIRST OR LAST ───────────
+// Taylor's X (FIRST) and ✓ (LAST) marks.
+// We approximate using intrabar position:
+//   - If close > (high+low)/2 → low was made first (bullish)
+//   - If close < (high+low)/2 → high was made first (bearish)
+// For Buy Days: we want LOW made FIRST (X) = bullish
+// For Sell/Short Days: we want HIGH made FIRST (X) = bearish
+midPrice = (high + low) / 2.0
+closedAboveMid = close > midPrice
+closedBelowMid = close < midPrice
+
+// Buy Day: X = low made FIRST (close > mid, rallied off low)
+buyDayX = isBuyDay and closedAboveMid
+// Sell Day: X = high made FIRST (close < mid, sold off from high)
+sellDayX = isSellDay and closedBelowMid
+// Short Sale Day: X = high made FIRST (close < mid)
+shortDayX = isShortDay and closedBelowMid
+
+// ─── TAYLOR'S BOOK COLUMNS ───────────────────────────────
+// D column: decline from Short Sale Day high to Buy Day low
+// R column: rally from Buy Day low to Sell Day high
+// BU: how far Buy Day low is under Short Sale Day low
+// BV: violation of Buy Day low (next bar's low < Buy Day low)
+
+// Store key prices from each day type
+var float lastSSHigh = na  // Short Sale Day high
+var float lastSSLow  = na  // Short Sale Day low
+var float lastBuyLow = na  // Buy Day low
+var float lastBuyHigh = na // Buy Day high
+var float lastSellHigh = na // Sell Day high
+
+// Update stored prices
+if isShortDay
+    lastSSHigh := high
+    lastSSLow  := low
+if isBuyDay
+    lastBuyLow  := low
+    lastBuyHigh := high
+if isSellDay
+    lastSellHigh := high
+
+// Calculate columns on the appropriate days
+float dColumn = na  // Decline: SS high → Buy low
+float rColumn = na  // Rally: Buy low → Sell high
+float buColumn = na // Buy Under: Buy low - SS low
+float bvColumn = na // Buy Violation
+float tlColumn = na // 3-day: Buy low → SS high
+
+if isBuyDay and not na(lastSSHigh)
+    dColumn := lastSSHigh - low
+    if not na(lastSSLow)
+        buColumn := lastSSLow - low
+        if buColumn < 0
+            buColumn := 0
+
+if isSellDay and not na(lastBuyLow)
+    rColumn := high - lastBuyLow
+
+if isShortDay and not na(lastBuyLow)
+    tlColumn := high - lastBuyLow
+
+// Buy Violation: current low < previous Buy Day low
+// (checked on Sell Day — the day after Buy Day)
+if isSellDay and not na(lastBuyLow)
+    if low < lastBuyLow
+        bvColumn := lastBuyLow - low
+
+// ─── PENETRATION DETECTION ───────────────────────────────
+// Sell Day: did price penetrate Buy Day high?
+sellPenetration = isSellDay and not na(lastBuyHigh) and
+     high > lastBuyHigh
+// Short Sale Day: did price penetrate Sell Day high?
+shortPenetration = isShortDay and not na(lastSellHigh) and
+     high > lastSellHigh
+// Buy Day: did price penetrate (go under) SS Day low?
+buyPenetration = isBuyDay and not na(lastSSLow) and
+     low < lastSSLow
+
+// ─── TRADE SIGNALS ───────────────────────────────────────
+// BUY signal: Buy Day + low made FIRST (X) +
+//   price near/below previous SS low
+buySignal = isBuyDay and buyDayX and
+     not na(lastSSLow) and low <= lastSSLow * 1.002
+
+// SELL signal: Sell Day + penetration of Buy Day high +
+//   high made FIRST (X)
+sellSignal = isSellDay and sellDayX and sellPenetration
+
+// SHORT signal: Short Sale Day + penetration of Sell Day
+//   high + high made FIRST (X)
+shortSignal = isShortDay and shortDayX and shortPenetration
+
+// Buy Day Violation signal: Sell Day low < Buy Day low,
+//   low made FIRST → buy the violation dip
+violationBuy = isSellDay and not na(lastBuyLow) and
+     low < lastBuyLow and closedAboveMid
+
+// ─── BACKGROUND COLORING ─────────────────────────────────
+dayColor = isBuyDay ? color.new(buyColor, 90) :
+     isSellDay ? color.new(sellColor, 90) :
+     color.new(shortColor, 90)
+bgcolor(dayColor)
+
+// ─── LABELS ──────────────────────────────────────────────
+if showLabels and barstate.isconfirmed
+    string dayText = ""
+    string signalMark = ""
+
+    if isBuyDay
+        dayText := "BUY"
+        signalMark := buyDayX ? " ✕" : " ✓"
+    else if isSellDay
+        dayText := "SELL"
+        signalMark := sellDayX ? " ✕" : " ✓"
+    else if isShortDay
+        dayText := "SS"
+        signalMark := shortDayX ? " ✕" : " ✓"
+
+    lblColor = isBuyDay ? buyColor :
+         isSellDay ? sellColor : shortColor
+
+    label.new(bar_index, low,
+         dayText + signalMark,
+         style=label.style_label_up,
+         color=color.new(lblColor, 70),
+         textcolor=lblColor,
+         size=sz)
+
+// ─── COLUMN VALUES (data window) ─────────────────────────
+if showColumns
+    if isBuyDay and not na(dColumn)
+        label.new(bar_index, high,
+             "D:" + str.tostring(dColumn, "#.##"),
+             style=label.style_label_down,
+             color=color.new(shortColor, 80),
+             textcolor=shortColor,
+             size=size.tiny)
+
+    if isSellDay and not na(rColumn)
+        label.new(bar_index, high,
+             "R:" + str.tostring(rColumn, "#.##"),
+             style=label.style_label_down,
+             color=color.new(buyColor, 80),
+             textcolor=buyColor,
+             size=size.tiny)
+
+    if isShortDay and not na(tlColumn)
+        label.new(bar_index, high,
+             "T:" + str.tostring(tlColumn, "#.##"),
+             style=label.style_label_down,
+             color=color.new(sellColor, 80),
+             textcolor=sellColor,
+             size=size.tiny)
+
+// ─── PENETRATION MARKERS ─────────────────────────────────
+if showPenetrations and barstate.isconfirmed
+    if sellPenetration
+        label.new(bar_index, high,
+             "▲P",
+             style=label.style_label_down,
+             color=color.new(buyColor, 60),
+             textcolor=color.white,
+             size=size.tiny)
+
+    if shortPenetration
+        label.new(bar_index, high,
+             "▼P",
+             style=label.style_label_down,
+             color=color.new(shortColor, 60),
+             textcolor=color.white,
+             size=size.tiny)
+
+// ─── TRADE SIGNAL SHAPES ─────────────────────────────────
+if showSignals
+    // Buy signal: green triangle up below bar
+    plotshape(buySignal and barstate.isconfirmed,
+         title="Buy Signal",
+         location=location.belowbar,
+         style=shape.triangleup,
+         color=buyColor,
+         size=size.small)
+
+    // Sell signal: yellow diamond above bar
+    plotshape(sellSignal and barstate.isconfirmed,
+         title="Sell Signal",
+         location=location.abovebar,
+         style=shape.diamond,
+         color=sellColor,
+         size=size.small)
+
+    // Short signal: red triangle down above bar
+    plotshape(shortSignal and barstate.isconfirmed,
+         title="Short Signal",
+         location=location.abovebar,
+         style=shape.triangledown,
+         color=shortColor,
+         size=size.small)
+
+    // Violation buy: blue cross below bar
+    plotshape(violationBuy and barstate.isconfirmed,
+         title="Violation Buy",
+         location=location.belowbar,
+         style=shape.cross,
+         color=color.new(#2196F3, 0),
+         size=size.small)
+
+// ─── REFERENCE LINES ─────────────────────────────────────
+// Draw horizontal lines at key Taylor levels
+// Previous Buy Day Low (support reference)
+plot(lastBuyLow, "Buy Day Low",
+     color=color.new(buyColor, 60),
+     style=plot.style_stepline,
+     linewidth=1)
+// Previous Sell Day High (resistance reference)
+plot(lastSellHigh, "Sell Day High",
+     color=color.new(sellColor, 60),
+     style=plot.style_stepline,
+     linewidth=1)
+// Previous Short Sale Day High (resistance reference)
+plot(lastSSHigh, "SS Day High",
+     color=color.new(shortColor, 60),
+     style=plot.style_stepline,
+     linewidth=1)
+
+// ─── DATA WINDOW PLOTS ──────────────────────────────────
+plot(dColumn, "D Column (Decline)",
+     display=display.data_window,
+     color=shortColor)
+plot(rColumn, "R Column (Rally)",
+     display=display.data_window,
+     color=buyColor)
+plot(buColumn, "BU Column (Buy Under)",
+     display=display.data_window,
+     color=color.orange)
+plot(bvColumn, "BV Column (Violation)",
+     display=display.data_window,
+     color=color.purple)
+plot(tlColumn, "T-L Column (3-Day)",
+     display=display.data_window,
+     color=sellColor)
+plot(rawPhase, "Cycle Phase (0=Buy,1=Sell,2=SS)",
+     display=display.data_window,
+     color=color.gray)

@@ -136,6 +136,7 @@
   });
 
   initBookmark();
+  initScreenLock();
 
   // Prevent browser from restoring its own scroll position
   if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
@@ -239,6 +240,137 @@
   // Register service worker from book pages too
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('../service-worker.js');
+  }
+
+  // ── Screen Lock (Focus Mode) ──
+  function initScreenLock() {
+    // Create DOM elements
+    var overlay = document.createElement('div');
+    overlay.className = 'screen-lock-overlay';
+    document.body.appendChild(overlay);
+
+    var lockLabel = document.createElement('div');
+    lockLabel.className = 'screen-lock-label';
+    lockLabel.textContent = 'FOCUS LOCKED';
+    document.body.appendChild(lockLabel);
+
+    var btn = document.createElement('button');
+    btn.className = 'screen-lock-btn';
+    btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">'
+      + '<rect x="3" y="11" width="18" height="11" rx="2"/>'
+      + '<path class="lock-shackle" d="M7 11V7a5 5 0 0 1 10 0v4"/>'
+      + '</svg>'
+      + '<svg class="screen-lock-ring" viewBox="0 0 40 40">'
+      + '<circle cx="20" cy="20" r="16"/></svg>';
+    document.body.appendChild(btn);
+
+    var isLocked = false;
+    var holdTimer = null;
+    var holdStart = 0;
+    var ringCircle = btn.querySelector('.screen-lock-ring circle');
+    var circumference = 2 * Math.PI * 16; // r=16
+    ringCircle.style.strokeDasharray = circumference;
+    ringCircle.style.strokeDashoffset = circumference;
+
+    var LOCK_TIME = 2000;
+    var UNLOCK_TIME = 5000;
+
+    function animateRing() {
+      var elapsed = Date.now() - holdStart;
+      var duration = isLocked ? UNLOCK_TIME : LOCK_TIME;
+      var progress = Math.min(1, elapsed / duration);
+      ringCircle.style.strokeDashoffset =
+        circumference * (1 - progress);
+
+      if (progress < 1) {
+        requestAnimationFrame(animateRing);
+      }
+    }
+
+    function startHold(e) {
+      e.preventDefault();
+      holdStart = Date.now();
+      var duration = isLocked ? UNLOCK_TIME : LOCK_TIME;
+
+      requestAnimationFrame(animateRing);
+
+      holdTimer = setTimeout(function() {
+        if (!isLocked) {
+          // Lock
+          isLocked = true;
+          btn.classList.add('locked');
+          overlay.classList.add('active');
+          lockLabel.classList.add('active');
+          // Enter fullscreen
+          var el = document.documentElement;
+          if (el.requestFullscreen) el.requestFullscreen();
+          else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+          showToast('Focus locked \u2014 hold 5s to unlock');
+        } else {
+          // Unlock
+          isLocked = false;
+          btn.classList.remove('locked');
+          overlay.classList.remove('active');
+          lockLabel.classList.remove('active');
+          // Exit fullscreen
+          if (document.exitFullscreen) document.exitFullscreen();
+          else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+          showToast('Unlocked');
+        }
+        resetRing();
+      }, duration);
+    }
+
+    function endHold() {
+      if (holdTimer) {
+        clearTimeout(holdTimer);
+        holdTimer = null;
+      }
+      resetRing();
+    }
+
+    function resetRing() {
+      ringCircle.style.strokeDashoffset = circumference;
+    }
+
+    // Block all clicks/taps on links and interactive elements while locked
+    // pointer-events:none on overlay lets scrolling pass through
+    document.addEventListener('click', function(e) {
+      if (!isLocked) return;
+      if (btn.contains(e.target)) return;
+      e.preventDefault();
+      e.stopPropagation();
+    }, true);
+
+    // Lock button events - touch
+    btn.addEventListener('touchstart', startHold, { passive: false });
+    btn.addEventListener('touchend', endHold);
+    btn.addEventListener('touchcancel', endHold);
+    // Lock button events - mouse
+    btn.addEventListener('mousedown', startHold);
+    btn.addEventListener('mouseup', endHold);
+    btn.addEventListener('mouseleave', endHold);
+
+    // Handle fullscreen exit (e.g. user swipes from edge)
+    document.addEventListener('fullscreenchange', function() {
+      if (!document.fullscreenElement && isLocked) {
+        // They broke out via system gesture — unlock
+        isLocked = false;
+        btn.classList.remove('locked');
+        overlay.classList.remove('active');
+        lockLabel.classList.remove('active');
+        resetRing();
+      }
+    });
+    document.addEventListener('webkitfullscreenchange', function() {
+      if (!document.webkitFullscreenElement && isLocked) {
+        isLocked = false;
+        btn.classList.remove('locked');
+        overlay.classList.remove('active');
+        lockLabel.classList.remove('active');
+        resetRing();
+      }
+    });
   }
 
   // ── Reading Speed Tracker ──
