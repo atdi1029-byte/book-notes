@@ -3150,7 +3150,25 @@
         var local = getMovedToShelf();
         var remote = movedData.moved;
         for (var k in remote) { local[k] = remote[k]; }
+        // Auto-clean: drop entries already on shelf
+        var cleaned = false;
+        Object.keys(local).forEach(function(id) {
+          var onShelf = document.querySelector(
+            '#shelfView .book[data-book="' + id +
+            '"]:not([data-moved="1"])');
+          if (onShelf) { delete local[id]; cleaned = true; }
+        });
         localStorage.setItem(SHELF_MOVED_KEY, JSON.stringify(local));
+        if (cleaned) {
+          // Sync removals to backend
+          Object.keys(remote).forEach(function(id) {
+            if (!local[id]) {
+              jsonpFetch(SYNC_URL +
+                '?action=unmove_from_shelf&book=' +
+                encodeURIComponent(id), function(){});
+            }
+          });
+        }
         renderMovedToShelf();
       }
       checkDone();
