@@ -3232,6 +3232,26 @@
       if (!match) return;
 
       var pct = Math.round((match.maxScroll || 0) * 100);
+      var inToRead = !!el.closest('#toReadView');
+
+      if (inToRead) {
+        // To Read: show total reading time, no progress bar
+        if (match.words) {
+          var totalMins = Math.round(match.words / avgWpm);
+          var eta = document.createElement('div');
+          eta.className = 'read-eta';
+          if (totalMins < 60) {
+            eta.textContent = '~' + totalMins + 'm read';
+          } else {
+            var hrs = Math.floor(totalMins / 60);
+            var mins = totalMins % 60;
+            eta.textContent = '~' + hrs + 'h ' + mins + 'm read';
+          }
+          el.appendChild(eta);
+        }
+        return;
+      }
+
       if (pct < 1) return;
 
       // Progress bar
