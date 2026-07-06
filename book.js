@@ -137,6 +137,25 @@
 
   initBookmark();
 
+  // On mobile, tap a paragraph to reveal its bookmark button
+  if ('ontouchstart' in window) {
+    var lastRevealedP = null;
+    document.addEventListener('click', function(e) {
+      var p = e.target.closest('p');
+      if (lastRevealedP && lastRevealedP !== p) {
+        var oldBtn = lastRevealedP.querySelector('.bm-p');
+        if (oldBtn) oldBtn.style.opacity = '';
+      }
+      if (p) {
+        var btn = p.querySelector('.bm-p');
+        if (btn && !e.target.classList.contains('bm-btn')) {
+          btn.style.opacity = '0.5';
+          lastRevealedP = p;
+        }
+      }
+    });
+  }
+
   // Prevent browser from restoring its own scroll position
   if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
 
