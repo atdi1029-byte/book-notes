@@ -447,7 +447,12 @@
       var docH = document.documentElement.scrollHeight
         - window.innerHeight;
       if (docH <= 0) return 0;
-      return Math.min(1, window.scrollY / docH);
+      // scrollY/docH = scroll position (0-1), but content visible
+      // on screen has already been read. Convert to content-based
+      // progress: (scrollY + innerHeight) / scrollHeight
+      var contentPct = (window.scrollY + window.innerHeight)
+        / document.documentElement.scrollHeight;
+      return Math.min(1, contentPct);
     }
 
     var _scrollSaveTimer = null;
