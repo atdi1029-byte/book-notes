@@ -508,6 +508,11 @@
     var sessionWordsStart = data.books[bookPath].maxWordsRead || 0;
     var sessionWpm = 0;
 
+    // Rolling window: track recent reading snapshots (words + time)
+    // to compute speed from last ~1000 words, not entire session.
+    var _snapshots = []; // { words: N, time: activeTimeMs }
+    var ROLLING_WORDS = 1000; // window size in words
+
     function markActivity() {
       lastActivity = Date.now();
     }
@@ -551,14 +556,28 @@
         return;
       }
 
-      // Compute session WPM from content-based words
-      var sessionWordsRead = currentWords - sessionWordsStart;
-      var sessionMinutes = activeTime / 60000;
-      if (sessionMinutes > 0.5 && sessionWordsRead > 50) {
-        sessionWpm = sessionWordsRead / sessionMinutes;
+      // Record snapshot for rolling window
+      _snapshots.push({ words: currentWords, time: activeTime });
+
+      // Trim snapshots: keep only those within the rolling window
+      // Find the earliest snapshot where (current - snapshot) <= ROLLING_WORDS
+      var cutoff = currentWords - ROLLING_WORDS;
+      while (_snapshots.length > 2 && _snapshots[0].words < cutoff) {
+        _snapshots.shift();
       }
 
-      // Blend: 70% session speed, 30% lifetime average
+      // Compute rolling WPM from the window
+      if (_snapshots.length >= 2) {
+        var oldest = _snapshots[0];
+        var newest = _snapshots[_snapshots.length - 1];
+        var wDelta = newest.words - oldest.words;
+        var tDelta = (newest.time - oldest.time) / 60000; // minutes
+        if (tDelta > 0.3 && wDelta > 30) {
+          sessionWpm = wDelta / tDelta;
+        }
+      }
+
+      // Blend: 70% rolling speed, 30% lifetime average
       var lifetimeWpm = data.reader
         ? data.reader.averageWPM : 225;
       var effectiveWpm;
