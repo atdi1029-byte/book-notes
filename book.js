@@ -511,7 +511,9 @@
     // Rolling window: track recent reading snapshots (words + time)
     // to compute speed from last ~1000 words, not entire session.
     var _snapshots = []; // { words: N, time: activeTimeMs }
-    var ROLLING_WORDS = 1000; // window size in words
+    var _lastSnapshotWords = sessionWordsStart;
+    var SNAPSHOT_INTERVAL = 50; // only snapshot every 50 words read
+    var ROLLING_WORDS = Math.min(1000, Math.round(totalWords * 0.1));
 
     function markActivity() {
       lastActivity = Date.now();
@@ -551,13 +553,16 @@
       var currentWords = getWordsRead();
       var wordsRemaining = Math.max(0, totalWords - currentWords);
 
-      if (wordsRemaining < 10) {
-        etaEl.textContent = '';
+      if (wordsRemaining < 30) {
+        etaEl.textContent = 'Finished';
         return;
       }
 
-      // Record snapshot for rolling window
-      _snapshots.push({ words: currentWords, time: activeTime });
+      // Record snapshot only when reader has progressed ~50 words
+      if (currentWords - _lastSnapshotWords >= SNAPSHOT_INTERVAL) {
+        _snapshots.push({ words: currentWords, time: activeTime });
+        _lastSnapshotWords = currentWords;
+      }
 
       // Trim snapshots: keep only those within the rolling window
       // Find the earliest snapshot where (current - snapshot) <= ROLLING_WORDS
