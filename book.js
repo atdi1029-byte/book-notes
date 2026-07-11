@@ -261,9 +261,9 @@
   }
 
   // ── Reading Speed Tracker ──
-  // Tracks active reading time (not scroll time) to estimate WPM.
-  // Uses activity-based timing: counts seconds the user is engaged,
-  // and progress-based word estimation from max scroll reached.
+  // Content-based word tracking: counts words per DOM element,
+  // determines words read from viewport position (not scroll %).
+  // Blends session speed (70%) with lifetime average (30%) for ETA.
 
   var RS_KEY = 'reading_speed_data';
 
@@ -285,6 +285,72 @@
     return text.split(/\s+/).filter(function(w) {
       return w.length > 0;
     }).length;
+  }
+
+  // Build a map of content elements with cumulative word counts.
+  // Used to convert viewport position → exact words read.
+  var _wordMap = null;
+  var _totalMappedWords = 0;
+
+  function buildWordMap() {
+    var container = document.querySelector(
+      'main, article, .content'
+    ) || document.body;
+    var els = container.querySelectorAll(
+      'p, li, td, th, blockquote, h1, h2, h3, h4, h5, h6, figcaption, dt, dd'
+    );
+    var map = [];
+    var cumulative = 0;
+    for (var i = 0; i < els.length; i++) {
+      var el = els[i];
+      // Skip UI chrome
+      if (el.closest('nav, .toc, .bookmark-bar, #bookmarkBar, #bmToast, .bm-toast')) continue;
+      if (el.classList.contains('bm-btn')) continue;
+      // Don't double-count nested elements (li inside td, etc.)
+      var dominated = false;
+      for (var j = 0; j < map.length; j++) {
+        if (map[j].el.contains(el)) { dominated = true; break; }
+      }
+      if (dominated) continue;
+      // Count direct text words (exclude bookmark button text)
+      var clone = el.cloneNode(true);
+      clone.querySelectorAll('.bm-btn').forEach(function(b) { b.remove(); });
+      var words = (clone.textContent || '').split(/\s+/).filter(function(w) {
+        return w.length > 0;
+      }).length;
+      if (words === 0) continue;
+      cumulative += words;
+      map.push({ el: el, words: words, cumWords: cumulative });
+    }
+    _wordMap = map;
+    _totalMappedWords = cumulative;
+    return cumulative;
+  }
+
+  // Given current scroll position, count how many words have been read
+  // by checking which content elements are above the viewport bottom.
+  function getWordsRead() {
+    if (!_wordMap || _wordMap.length === 0) return 0;
+    var viewBottom = window.scrollY + window.innerHeight;
+    var wordsRead = 0;
+    for (var i = 0; i < _wordMap.length; i++) {
+      var entry = _wordMap[i];
+      var rect = entry.el.getBoundingClientRect();
+      var elTop = window.scrollY + rect.top;
+      var elBottom = elTop + rect.height;
+      if (elBottom <= viewBottom) {
+        // Fully above viewport bottom — fully read
+        wordsRead = entry.cumWords;
+      } else if (elTop < viewBottom) {
+        // Partially visible — proportional
+        var visible = (viewBottom - elTop) / rect.height;
+        wordsRead = (entry.cumWords - entry.words)
+          + Math.round(entry.words * visible);
+      } else {
+        break; // Below viewport — stop
+      }
+    }
+    return wordsRead;
   }
 
   function getBookPath() {
@@ -417,61 +483,122 @@
       data.books[bookPath] = {
         words: 0,
         maxScroll: 0,
+        maxWordsRead: 0,
         title: document.title
       };
     }
 
-    // Cache word count — only recount if not yet stored
-    var totalWords = data.books[bookPath].words;
+    // Build content-based word map for accurate tracking
+    var totalWords = buildWordMap();
     if (!totalWords) {
-      totalWords = countWords();
-      data.books[bookPath].words = totalWords;
-      saveSpeedData(data);
+      totalWords = countWords(); // fallback
     }
+    data.books[bookPath].words = totalWords;
     data.books[bookPath].title = document.title;
+    saveSpeedData(data);
 
     if (totalWords < 200) return;
 
     // ── Activity-based timing ──
     var activeTime = 0;
     var lastActivity = Date.now();
-    var startProgress = data.books[bookPath].maxScroll || 0;
     var IDLE_THRESHOLD = 30000;
+
+    // Session-level speed tracking (for blended ETA)
+    var sessionWordsStart = data.books[bookPath].maxWordsRead || 0;
+    var sessionWpm = 0;
 
     function markActivity() {
       lastActivity = Date.now();
     }
 
-    // ── Single scroll listener for everything ──
-    function getProgress() {
+    // ── Scroll-based progress (for progress bar only) ──
+    function getScrollProgress() {
       var docH = document.documentElement.scrollHeight
         - window.innerHeight;
       if (docH <= 0) return 0;
-      // scrollY/docH = scroll position (0-1), but content visible
-      // on screen has already been read. Convert to content-based
-      // progress: (scrollY + innerHeight) / scrollHeight
-      var contentPct = (window.scrollY + window.innerHeight)
-        / document.documentElement.scrollHeight;
-      return Math.min(1, contentPct);
+      return Math.min(1, window.scrollY / docH);
     }
 
+    // ── ETA display element ──
+    var etaEl = document.createElement('span');
+    etaEl.className = 'reading-eta';
+    etaEl.style.cssText =
+      'font-size:0.8rem;color:rgba(255,255,255,0.7);' +
+      'margin-left:0.75rem;white-space:nowrap;';
+    // Insert ETA into bookmark bar (after the label)
+    var bmBar = document.getElementById('bookmarkBar');
+    if (bmBar) {
+      var clearBtn = bmBar.querySelector('.bm-clear');
+      if (clearBtn) bmBar.insertBefore(etaEl, clearBtn);
+      else bmBar.appendChild(etaEl);
+    }
+
+    function formatEta(minutes) {
+      if (minutes < 1) return '< 1 min left';
+      if (minutes < 60) return Math.round(minutes) + ' min left';
+      var h = Math.floor(minutes / 60);
+      var m = Math.round(minutes % 60);
+      return h + 'h ' + m + 'm left';
+    }
+
+    function updateEta() {
+      var currentWords = getWordsRead();
+      var wordsRemaining = Math.max(0, totalWords - currentWords);
+
+      if (wordsRemaining < 10) {
+        etaEl.textContent = '';
+        return;
+      }
+
+      // Compute session WPM from content-based words
+      var sessionWordsRead = currentWords - sessionWordsStart;
+      var sessionMinutes = activeTime / 60000;
+      if (sessionMinutes > 0.5 && sessionWordsRead > 50) {
+        sessionWpm = sessionWordsRead / sessionMinutes;
+      }
+
+      // Blend: 70% session speed, 30% lifetime average
+      var lifetimeWpm = data.reader
+        ? data.reader.averageWPM : 225;
+      var effectiveWpm;
+      if (sessionWpm > 50 && sessionWpm < 800) {
+        effectiveWpm = sessionWpm * 0.7 + lifetimeWpm * 0.3;
+      } else {
+        effectiveWpm = lifetimeWpm;
+      }
+
+      if (effectiveWpm < 50) effectiveWpm = 225; // sanity floor
+
+      var minutesLeft = wordsRemaining / effectiveWpm;
+      etaEl.textContent = formatEta(minutesLeft);
+    }
+
+    // ── Single scroll listener for everything ──
     var _scrollSaveTimer = null;
     window.addEventListener('scroll', function() {
-      // Progress bar
+      // Progress bar (still scroll-based — that's fine for the bar)
       updateProgress();
       // Activity tracking
       markActivity();
-      // Max scroll progress
-      var pct = getProgress();
-      if (pct > (data.books[bookPath].maxScroll || 0)) {
-        data.books[bookPath].maxScroll = pct;
-        // Debounced save — persist maxScroll every 2s of scrolling
-        if (!_scrollSaveTimer) {
-          _scrollSaveTimer = setTimeout(function() {
-            _scrollSaveTimer = null;
-            saveSpeedData(data);
-          }, 2000);
-        }
+      // Content-based word tracking
+      var wordsNow = getWordsRead();
+      var maxWords = data.books[bookPath].maxWordsRead || 0;
+      if (wordsNow > maxWords) {
+        data.books[bookPath].maxWordsRead = wordsNow;
+      }
+      // Also update legacy maxScroll for backward compat
+      var scrollPct = getScrollProgress();
+      if (scrollPct > (data.books[bookPath].maxScroll || 0)) {
+        data.books[bookPath].maxScroll = scrollPct;
+      }
+      // Debounced save
+      if (!_scrollSaveTimer) {
+        _scrollSaveTimer = setTimeout(function() {
+          _scrollSaveTimer = null;
+          saveSpeedData(data);
+          updateEta();
+        }, 2000);
       }
     });
 
@@ -489,20 +616,21 @@
       }
     }, 1000);
 
+    // Update ETA every 10 seconds
+    setInterval(updateEta, 10000);
+
     // ── Reader model (Kindle-style EMA) ──
-    // One-time fix: reset if WPM got corrupted by outlier
     if (data.reader && (data.reader.averageWPM > 500 || data.reader.averageWPM < 80)) {
       data.reader = { averageWPM: 225, samples: 0 };
       saveSpeedData(data);
     }
     if (!data.reader) {
       data.reader = { averageWPM: 225, samples: 0 };
-      // Bootstrap from existing sessions if upgrading
       if (data.sessions && data.sessions.length > 0) {
         var recent = data.sessions.slice(-10);
         var tw = 0, tm = 0;
         recent.forEach(function(s) {
-          if (s.words >= 300 && s.duration >= 60) {
+          if (s.words >= 100 && s.duration >= 60) {
             tw += s.words;
             tm += s.duration / 60;
           }
@@ -514,75 +642,80 @@
       }
     }
 
-    function updateReaderModel(sessionWpm) {
+    function updateReaderModel(sessionWpmVal) {
       var r = data.reader;
-      // Always clamp to ±50% of current average to reject outliers
       var clamped = Math.max(
         r.averageWPM * 0.5,
-        Math.min(sessionWpm, r.averageWPM * 1.5)
+        Math.min(sessionWpmVal, r.averageWPM * 1.5)
       );
       if (r.samples < 5) {
-        // Bootstrap: weighted accumulation with clamped input
         r.averageWPM = (r.averageWPM * r.samples + clamped)
           / (r.samples + 1);
       } else {
-        // EMA with alpha=0.2
         r.averageWPM = r.averageWPM * 0.8 + clamped * 0.2;
       }
       r.samples++;
       r.averageWPM = Math.round(r.averageWPM);
     }
 
-    // ── Session save ──
-    var lastSavedProgress = startProgress;
+    // ── Session save (content-based) ──
+    var lastSavedWords = sessionWordsStart;
     var lastSavedTime = 0;
 
     function saveSession() {
-      // Always persist progress, even if WPM sample doesn't qualify
       saveSpeedData(data);
 
       var timeDelta = activeTime - lastSavedTime;
-      if (timeDelta < 60000) return; // min 1 minute for WPM sample
+      if (timeDelta < 60000) return; // min 1 minute
 
-      var endProgress = data.books[bookPath].maxScroll || 0;
-      var progressDelta = Math.max(0, endProgress - lastSavedProgress);
+      var currentMaxWords = data.books[bookPath].maxWordsRead || 0;
+      var wordsDelta = Math.max(0, currentMaxWords - lastSavedWords);
 
-      var wordsRead = progressDelta * totalWords;
-      if (wordsRead < 300) return; // min 300 words for WPM sample
+      // Lower threshold near end of book: if <500 words remain,
+      // accept any reading progress for model update
+      var wordsRemaining = totalWords - currentMaxWords;
+      var minWords = wordsRemaining < 500 ? 50 : 300;
+      if (wordsDelta < minWords) return;
 
       var minutes = timeDelta / 60000;
-      var wpm = wordsRead / minutes;
+      var wpm = wordsDelta / minutes;
 
       if (wpm >= 50 && wpm <= 800) {
         data.sessions.push({
           book: bookPath,
           wpm: Math.round(wpm),
           duration: Math.round(timeDelta / 1000),
-          words: Math.round(wordsRead),
-          progress: endProgress,
+          words: Math.round(wordsDelta),
+          wordsRead: currentMaxWords,
           ts: Date.now()
         });
         updateReaderModel(wpm);
       }
 
-      lastSavedProgress = endProgress;
+      lastSavedWords = currentMaxWords;
       lastSavedTime = activeTime;
       saveSpeedData(data);
     }
 
     window.addEventListener('beforeunload', saveSession);
-    // Also save on visibilitychange (mobile tab switches/closes)
     document.addEventListener('visibilitychange', function() {
       if (document.hidden) saveSession();
     });
-    // Also save on pagehide (iOS Safari kills tabs without beforeunload)
     window.addEventListener('pagehide', saveSession);
-    // Periodic save every 15s if progress changed
     setInterval(function() {
-      var endProgress = data.books[bookPath].maxScroll || 0;
-      if (endProgress > lastSavedProgress || activeTime - lastSavedTime > 60000) {
+      var currentMaxWords = data.books[bookPath].maxWordsRead || 0;
+      if (currentMaxWords > lastSavedWords || activeTime - lastSavedTime > 60000) {
         saveSession();
       }
     }, 15000);
+
+    // Show bookmark bar if it was hidden, so ETA is visible
+    // (only if there's a bookmark or meaningful progress)
+    setTimeout(function() {
+      updateEta();
+      if (etaEl.textContent && bmBar) {
+        bmBar.style.display = 'flex';
+      }
+    }, 3000);
   })();
 })();
