@@ -72,6 +72,11 @@
     var rawTitle = el.textContent.replace('\u{1F516}','').trim();
     var d = { id: id, title: rawTitle.length > 60 ? rawTitle.slice(0, 60) + '...' : rawTitle, y: window.scrollY, ts: Date.now() };
     localStorage.setItem(BM_KEY, JSON.stringify(d));
+    // Update shared bookmark collection for library page
+    var all = {};
+    try { all = JSON.parse(localStorage.getItem('books_bookmarks')) || {}; } catch(e) {}
+    all[BM_KEY] = d;
+    localStorage.setItem('books_bookmarks', JSON.stringify(all));
     bar.style.display = 'flex';
     label.textContent = 'Resume: ' + d.title;
     showToast('Bookmark saved \u2014 available offline');
@@ -190,14 +195,27 @@
   // Single sync request — handles both bookmarks and reading data
   jsonpFetch(SYNC_URL + '?action=get_bookmarks', function(err, json) {
     if (!err && json && json.status === 'ok' && json.bookmarks) {
-      // Bookmark restore
-      if (json.bookmarks[BM_KEY]) {
-        var remote = json.bookmarks[BM_KEY];
+      // Bookmark restore — keep newest by timestamp
+      var local = null;
+      try {
+        local = JSON.parse(localStorage.getItem(BM_KEY));
+      } catch(e) {}
+
+      var remote = json.bookmarks[BM_KEY];
+
+      if (remote && (!local || (remote.ts || 0) > (local.ts || 0))) {
         localStorage.setItem(BM_KEY, JSON.stringify(remote));
         applyBookmark(remote);
-      } else {
-        var local = localStorage.getItem(BM_KEY);
-        if (local) applyBookmark(JSON.parse(local));
+      } else if (local) {
+        applyBookmark(local);
+        // Push newer local bookmark back to server
+        jsonpFetch(
+          SYNC_URL +
+          '?action=set_bookmark' +
+          '&key=' + encodeURIComponent(BM_KEY) +
+          '&data=' + encodeURIComponent(JSON.stringify(local)),
+          function(){}
+        );
       }
       // Reading speed merge (shared from same response)
       window._bmSyncJson = json;
