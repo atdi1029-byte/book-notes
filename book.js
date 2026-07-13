@@ -281,7 +281,7 @@
   // ── Reading Speed Tracker ──
   // Content-based word tracking: counts words per DOM element,
   // determines words read from viewport position (not scroll %).
-  // Blends session speed (70%) with lifetime average (30%) for ETA.
+  // Blends session speed (40%) with lifetime average (60%) for ETA.
 
   var RS_KEY = 'reading_speed_data';
 
@@ -717,10 +717,8 @@
     var lastSavedTime = 0;
 
     function saveSession() {
-      saveSpeedData(data);
-
       var timeDelta = activeTime - lastSavedTime;
-      if (timeDelta < 60000) return; // min 1 minute
+      if (timeDelta < 60000) { saveSpeedData(data); return; }
 
       var currentMaxWords = data.books[bookPath].maxWordsRead || 0;
       var wordsDelta = Math.max(0, currentMaxWords - lastSavedWords);
@@ -729,7 +727,7 @@
       // accept any reading progress for model update
       var wordsRemaining = totalWords - currentMaxWords;
       var minWords = wordsRemaining < 500 ? 50 : 300;
-      if (wordsDelta < minWords) return;
+      if (wordsDelta < minWords) { saveSpeedData(data); return; }
 
       var minutes = timeDelta / 60000;
       var wpm = wordsDelta / minutes;
@@ -744,6 +742,20 @@
           ts: Date.now()
         });
         updateReaderModel(wpm, wordsDelta);
+        // Accumulate lifetime stats
+        var r = data.reader;
+        r.totalWordsRead = (r.totalWordsRead || 0) + Math.round(wordsDelta);
+        r.totalMinutesRead = (r.totalMinutesRead || 0) + Math.round(minutes);
+      }
+
+      // Check if book is finished (>95% read)
+      if (currentMaxWords / totalWords > 0.95) {
+        var r = data.reader;
+        if (!r._finished) r._finished = {};
+        if (!r._finished[bookPath]) {
+          r._finished[bookPath] = true;
+          r.totalBooksFinished = (r.totalBooksFinished || 0) + 1;
+        }
       }
 
       lastSavedWords = currentMaxWords;
