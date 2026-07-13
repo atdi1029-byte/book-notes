@@ -560,19 +560,26 @@
     }
 
     function formatEta(minutes) {
-      if (minutes < 1) return '< 1 min left';
-      if (minutes < 60) return Math.round(minutes) + ' min left';
+      if (minutes < 1) return 'Less than a minute left';
+      if (minutes < 60) return '~' + Math.round(minutes) + ' min remaining';
       var h = Math.floor(minutes / 60);
       var m = Math.round(minutes % 60);
-      return h + 'h ' + m + 'm left';
+      return '~' + h + 'h ' + m + 'm remaining';
     }
 
     function updateEta() {
       var currentWords = getWordsRead();
       var wordsRemaining = Math.max(0, totalWords - currentWords);
 
+      var percent = Math.round(currentWords / totalWords * 100);
+
       if (wordsRemaining < 30) {
-        etaEl.textContent = 'Finished';
+        etaEl.textContent = '\u2714 Reading complete';
+        return;
+      }
+
+      if (currentWords < 300) {
+        etaEl.textContent = 'Estimating reading time...';
         return;
       }
 
@@ -600,12 +607,12 @@
         }
       }
 
-      // Blend: 70% rolling speed, 30% lifetime average
+      // Blend: 40% rolling speed, 60% lifetime for stability
       var lifetimeWpm = data.reader
         ? data.reader.averageWPM : 225;
       var effectiveWpm;
       if (sessionWpm > 50 && sessionWpm < 800) {
-        effectiveWpm = sessionWpm * 0.7 + lifetimeWpm * 0.3;
+        effectiveWpm = sessionWpm * 0.4 + lifetimeWpm * 0.6;
       } else {
         effectiveWpm = lifetimeWpm;
       }
@@ -613,7 +620,7 @@
       if (effectiveWpm < 50) effectiveWpm = 225; // sanity floor
 
       var minutesLeft = wordsRemaining / effectiveWpm;
-      etaEl.textContent = formatEta(minutesLeft);
+      etaEl.textContent = percent + '% read \u2022 ' + formatEta(minutesLeft);
     }
 
     // ── Single scroll listener for everything ──
@@ -623,6 +630,8 @@
       updateProgress();
       // Activity tracking
       markActivity();
+      // ETA updates on every scroll for responsiveness
+      updateEta();
       // Content-based word tracking
       var wordsNow = getWordsRead();
       var maxWords = data.books[bookPath].maxWordsRead || 0;
@@ -634,12 +643,11 @@
       if (scrollPct > (data.books[bookPath].maxScroll || 0)) {
         data.books[bookPath].maxScroll = scrollPct;
       }
-      // Debounced save
+      // Debounced save (data persistence only)
       if (!_scrollSaveTimer) {
         _scrollSaveTimer = setTimeout(function() {
           _scrollSaveTimer = null;
           saveSpeedData(data);
-          updateEta();
         }, 2000);
       }
     });
@@ -658,8 +666,7 @@
       }
     }, 1000);
 
-    // Update ETA every 10 seconds
-    setInterval(updateEta, 10000);
+    // ETA now updates on scroll — no interval needed
 
     // ── Reader model (Kindle-style EMA) ──
     if (data.reader && (data.reader.averageWPM > 500 || data.reader.averageWPM < 80)) {
@@ -684,17 +691,22 @@
       }
     }
 
-    function updateReaderModel(sessionWpmVal) {
+    function updateReaderModel(sessionWpmVal, wordsInSession) {
       var r = data.reader;
       var clamped = Math.max(
         r.averageWPM * 0.5,
         Math.min(sessionWpmVal, r.averageWPM * 1.5)
       );
+      // Weight by session length: longer sessions carry more influence
+      // 300 words = baseline weight (0.2), 1500+ words = max weight (0.4)
+      var weight = Math.min(0.4,
+        0.2 + (Math.min(wordsInSession || 300, 1500) - 300) / 6000
+      );
       if (r.samples < 5) {
         r.averageWPM = (r.averageWPM * r.samples + clamped)
           / (r.samples + 1);
       } else {
-        r.averageWPM = r.averageWPM * 0.8 + clamped * 0.2;
+        r.averageWPM = r.averageWPM * (1 - weight) + clamped * weight;
       }
       r.samples++;
       r.averageWPM = Math.round(r.averageWPM);
@@ -731,7 +743,7 @@
           wordsRead: currentMaxWords,
           ts: Date.now()
         });
-        updateReaderModel(wpm);
+        updateReaderModel(wpm, wordsDelta);
       }
 
       lastSavedWords = currentMaxWords;
