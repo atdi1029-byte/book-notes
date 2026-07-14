@@ -70,7 +70,7 @@
     var id = el.id || stableId(el.textContent);
     if (!el.id) el.id = id;
     var rawTitle = el.textContent.replace('\u{1F516}','').trim();
-    var d = { id: id, title: rawTitle.length > 60 ? rawTitle.slice(0, 60) + '...' : rawTitle, y: window.scrollY, ts: Date.now() };
+    var d = { id: id, title: rawTitle.length > 25 ? rawTitle.slice(0, 25) + '...' : rawTitle, y: window.scrollY, ts: Date.now() };
     localStorage.setItem(BM_KEY, JSON.stringify(d));
     // Update shared bookmark collection for library page
     var all = {};

@@ -2957,6 +2957,7 @@
               if (!lb) { local.books[path] = rb; changed = true; }
               else {
                 if ((rb.maxScroll || 0) > (lb.maxScroll || 0)) { lb.maxScroll = rb.maxScroll; changed = true; }
+                if ((rb.maxWordsRead || 0) > (lb.maxWordsRead || 0)) { lb.maxWordsRead = rb.maxWordsRead; changed = true; }
                 if ((rb.words || 0) > (lb.words || 0)) { lb.words = rb.words; changed = true; }
               }
             });
@@ -3231,7 +3232,7 @@
                   bookIndex[hParts[0]] || null;
       if (!match) return;
 
-      var pct = Math.round((match.maxScroll || 0) * 100);
+      var pct = match.words ? Math.round((match.maxWordsRead || 0) / match.words * 100) : 0;
       var inToRead = !!el.closest('#toReadView');
 
       if (inToRead) {
@@ -3265,7 +3266,7 @@
 
       // ETA label
       if (match.words) {
-        var wordsLeft = match.words * (1 - (match.maxScroll || 0));
+        var wordsLeft = Math.max(0, match.words - (match.maxWordsRead || 0));
         var minsLeft = Math.round(wordsLeft / avgWpm);
         var eta = document.createElement('div');
         eta.className = 'read-eta';
