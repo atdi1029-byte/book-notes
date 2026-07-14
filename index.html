@@ -251,37 +251,6 @@
     font-style: italic;
   }
 
-  /* Stats bar */
-  .stats-bar {
-    display: flex;
-    gap: 1.5rem;
-    margin-bottom: 2rem;
-    padding: 0.75rem 1.25rem;
-    background: rgba(255,255,255,0.06);
-    border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 12px;
-    flex-wrap: wrap;
-  }
-  .stat-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    min-width: 60px;
-  }
-  .stat-value {
-    font-size: 1.3rem;
-    font-weight: 700;
-    color: #fff;
-    font-family: -apple-system, sans-serif;
-    line-height: 1.2;
-  }
-  .stat-label {
-    font-size: 0.65rem;
-    color: rgba(255,255,255,0.45);
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    font-family: -apple-system, sans-serif;
-  }
 
   /* Reading progress bar under covers */
   .read-progress-wrap {
@@ -471,29 +440,6 @@
   <div class="tab-row">
     <button class="tab-btn active" id="tabShelf" onclick="switchTab('shelf')">Shelf</button>
     <button class="tab-btn" id="tabToRead" onclick="switchTab('toread')">To Read</button>
-  </div>
-
-  <div class="stats-bar" id="statsBar" style="display:none">
-    <div class="stat-item">
-      <span class="stat-value" id="statBooks">--</span>
-      <span class="stat-label">Books</span>
-    </div>
-    <div class="stat-item">
-      <span class="stat-value" id="statWords">--</span>
-      <span class="stat-label">Words Read</span>
-    </div>
-    <div class="stat-item">
-      <span class="stat-value" id="statTime">--</span>
-      <span class="stat-label">Hours Read</span>
-    </div>
-    <div class="stat-item">
-      <span class="stat-value" id="statWpm">--</span>
-      <span class="stat-label">WPM</span>
-    </div>
-    <div class="stat-item">
-      <span class="stat-value" id="statReading">--</span>
-      <span class="stat-label">In Progress</span>
-    </div>
   </div>
 
   <h2 class="section-title" id="currentlyReadingTitle"
@@ -3289,6 +3235,8 @@
     document.querySelectorAll('.book[href]').forEach(function(el) {
       var href = el.getAttribute('href');
       if (!href) return;
+      // Skip Currently Reading clones (they show % complete)
+      if (el.hasAttribute('data-no-eta')) return;
 
       // Fast lookup instead of O(n) scan
       var hParts = href.replace(/^\.\//, '').split('/');
@@ -3355,67 +3303,6 @@
   window._renderProgress = renderProgress;
   window._RS_KEY = RS_KEY;
 
-  // ── Stats Bar ──
-  function renderStats() {
-    var bar = document.getElementById('statsBar');
-    if (!bar) return;
-    var data;
-    try {
-      data = JSON.parse(localStorage.getItem(RS_KEY));
-    } catch(e) { return; }
-    if (!data || !data.books) return;
-
-    var totalBooks = document.querySelectorAll(
-      '#shelfView .book'
-    ).length;
-    var inProgress = 0;
-    var totalWordsRead = 0;
-
-    Object.keys(data.books).forEach(function(path) {
-      var b = data.books[path];
-      var maxW = b.maxWordsRead || 0;
-      var words = b.words || 0;
-      if (maxW > 0 && words > 0) {
-        totalWordsRead += maxW;
-        var pct = maxW / words;
-        if (pct > 0.01 && pct < 0.95) inProgress++;
-      }
-    });
-
-    var reader = data.reader || {};
-    var totalMins = reader.totalMinutesRead || 0;
-    var wpm = reader.averageWPM || 225;
-
-    document.getElementById('statBooks').textContent = totalBooks;
-    document.getElementById('statReading').textContent = inProgress;
-    document.getElementById('statWpm').textContent =
-      reader.samples >= 3 ? wpm : '--';
-
-    if (totalWordsRead > 1000000) {
-      document.getElementById('statWords').textContent =
-        (totalWordsRead / 1000000).toFixed(1) + 'M';
-    } else if (totalWordsRead > 1000) {
-      document.getElementById('statWords').textContent =
-        Math.round(totalWordsRead / 1000) + 'K';
-    } else {
-      document.getElementById('statWords').textContent =
-        totalWordsRead || '--';
-    }
-
-    if (totalMins >= 60) {
-      document.getElementById('statTime').textContent =
-        Math.round(totalMins / 60);
-    } else if (totalMins > 0) {
-      document.getElementById('statTime').textContent =
-        '<1';
-    } else {
-      document.getElementById('statTime').textContent = '--';
-    }
-
-    bar.style.display = 'flex';
-  }
-  renderStats();
-
   // ── Currently Reading Row ──
   function renderCurrentlyReading() {
     var title = document.getElementById('currentlyReadingTitle');
@@ -3467,6 +3354,8 @@
       // Remove any existing progress bars (will be re-added by renderProgress)
       clone.querySelectorAll('.read-progress-wrap, .read-eta')
         .forEach(function(el) { el.remove(); });
+      // Mark so renderProgress skips these clones
+      clone.setAttribute('data-no-eta', '1');
       // Add completion percentage label
       var pctLabel = document.createElement('div');
       pctLabel.className = 'read-eta';

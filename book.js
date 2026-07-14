@@ -860,12 +860,12 @@
     // Track which terms have already been linked (first occurrence only)
     var linked = {};
 
-    // Get all paragraphs in chapter content (before glossary)
+    // Get all paragraphs in chapter content (after glossary)
     var paras = document.querySelectorAll('p');
     paras.forEach(function(p) {
-      // Skip paragraphs inside or after the glossary
-      if (glossaryH2.compareDocumentPosition(p)
-          & Node.DOCUMENT_POSITION_FOLLOWING) return;
+      // Skip paragraphs before or inside the glossary
+      if (!(glossaryH2.compareDocumentPosition(p)
+          & Node.DOCUMENT_POSITION_FOLLOWING)) return;
 
       var walker = document.createTreeWalker(
         p, NodeFilter.SHOW_TEXT, null, false
