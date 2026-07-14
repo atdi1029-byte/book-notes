@@ -784,4 +784,203 @@
       }
     }, 3000);
   })();
+
+  // ── Glossary Tooltips ──
+  // Parses the glossary section, then highlights matching terms
+  // in chapter text with tap/hover tooltips showing definitions.
+  (function initGlossary() {
+    var glossaryH2 = document.getElementById('glossary');
+    if (!glossaryH2) return;
+
+    // Collect terms from glossary lists
+    var terms = [];
+    var sibling = glossaryH2.nextElementSibling;
+    while (sibling) {
+      // Stop at the next h2 (end of glossary section)
+      if (sibling.tagName === 'H2') break;
+      if (sibling.tagName === 'UL') {
+        sibling.querySelectorAll('li').forEach(function(li) {
+          var strong = li.querySelector('strong');
+          if (!strong) return;
+          var rawTerm = strong.textContent.replace(/:$/, '').trim();
+          // Get definition: everything after the strong tag
+          var def = li.textContent
+            .replace(strong.textContent, '').trim();
+          if (rawTerm && def) {
+            terms.push({ term: rawTerm, def: def });
+          }
+        });
+      }
+      sibling = sibling.nextElementSibling;
+    }
+
+    if (terms.length === 0) return;
+
+    // Sort by length descending so longer terms match first
+    // (e.g. "comparative advantage" before "advantage")
+    terms.sort(function(a, b) {
+      return b.term.length - a.term.length;
+    });
+
+    // Build regex matching all terms (case-insensitive, word boundary)
+    var escaped = terms.map(function(t) {
+      return t.term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    });
+    var re = new RegExp(
+      '\\b(' + escaped.join('|') + ')\\b', 'gi'
+    );
+
+    // Build term→def lookup (lowercase keys)
+    var lookup = {};
+    terms.forEach(function(t) {
+      lookup[t.term.toLowerCase()] = t;
+    });
+
+    // Walk text nodes in chapter content (skip glossary itself,
+    // headings, blockquotes with cite, and existing glossary spans)
+    var container = document.querySelector('body');
+    var glossarySection = glossaryH2.parentElement === container
+      ? null : glossaryH2.parentElement;
+
+    function shouldSkip(node) {
+      var el = node.parentElement;
+      while (el && el !== container) {
+        if (el === glossaryH2) return true;
+        if (el.id === 'glossary') return true;
+        if (el.classList && el.classList.contains('gloss')) return true;
+        if (el.tagName === 'A') return true;
+        if (el.tagName === 'H1' || el.tagName === 'H2') return true;
+        // Skip inside the glossary ULs
+        if (glossarySection && el === glossarySection) return true;
+        el = el.parentElement;
+      }
+      return false;
+    }
+
+    // Track which terms have already been linked (first occurrence only)
+    var linked = {};
+
+    // Get all paragraphs in chapter content (before glossary)
+    var paras = document.querySelectorAll('p');
+    paras.forEach(function(p) {
+      // Skip paragraphs inside or after the glossary
+      if (glossaryH2.compareDocumentPosition(p)
+          & Node.DOCUMENT_POSITION_FOLLOWING) return;
+
+      var walker = document.createTreeWalker(
+        p, NodeFilter.SHOW_TEXT, null, false
+      );
+      var textNodes = [];
+      while (walker.nextNode()) textNodes.push(walker.currentNode);
+
+      textNodes.forEach(function(textNode) {
+        if (shouldSkip(textNode)) return;
+        var text = textNode.textContent;
+        if (!re.test(text)) return;
+        re.lastIndex = 0;
+
+        var frag = document.createDocumentFragment();
+        var lastIdx = 0;
+        var match;
+
+        re.lastIndex = 0;
+        while ((match = re.exec(text)) !== null) {
+          var termKey = match[1].toLowerCase();
+          // Only link first occurrence of each term
+          if (linked[termKey]) continue;
+          linked[termKey] = true;
+
+          var entry = lookup[termKey];
+          if (!entry) continue;
+
+          // Text before match
+          if (match.index > lastIdx) {
+            frag.appendChild(
+              document.createTextNode(text.slice(lastIdx, match.index))
+            );
+          }
+
+          // Glossary span
+          var span = document.createElement('span');
+          span.className = 'gloss';
+          span.setAttribute('data-term', entry.term);
+          span.setAttribute('data-def', entry.def);
+          span.textContent = match[0];
+          frag.appendChild(span);
+
+          lastIdx = match.index + match[0].length;
+        }
+
+        if (lastIdx === 0) return; // no new matches
+        if (lastIdx < text.length) {
+          frag.appendChild(
+            document.createTextNode(text.slice(lastIdx))
+          );
+        }
+        textNode.parentNode.replaceChild(frag, textNode);
+      });
+    });
+
+    // Tooltip element (shared, repositioned on each hover/tap)
+    var tip = document.createElement('div');
+    tip.className = 'gloss-tip';
+    document.body.appendChild(tip);
+
+    var hideTimer = null;
+
+    function showTip(span) {
+      clearTimeout(hideTimer);
+      var term = span.getAttribute('data-term');
+      var def = span.getAttribute('data-def');
+      tip.innerHTML =
+        '<div class="gloss-tip-term">' + term + '</div>' +
+        '<div>' + def + '</div>';
+      tip.classList.add('show');
+
+      // Position below the term
+      var rect = span.getBoundingClientRect();
+      var tipW = 320;
+      var left = rect.left + window.scrollX;
+      // Keep within viewport
+      if (left + tipW > window.innerWidth - 16) {
+        left = window.innerWidth - tipW - 16;
+      }
+      if (left < 8) left = 8;
+      tip.style.left = left + 'px';
+      tip.style.top = (rect.bottom + window.scrollY + 8) + 'px';
+    }
+
+    function hideTip() {
+      hideTimer = setTimeout(function() {
+        tip.classList.remove('show');
+      }, 200);
+    }
+
+    // Desktop: hover
+    document.addEventListener('mouseover', function(e) {
+      var g = e.target.closest('.gloss');
+      if (g) showTip(g);
+    });
+    document.addEventListener('mouseout', function(e) {
+      var g = e.target.closest('.gloss');
+      if (g) hideTip();
+    });
+
+    // Mobile: tap to toggle
+    document.addEventListener('click', function(e) {
+      var g = e.target.closest('.gloss');
+      if (g) {
+        e.preventDefault();
+        if (tip.classList.contains('show') &&
+            tip.querySelector('.gloss-tip-term').textContent ===
+            g.getAttribute('data-term')) {
+          tip.classList.remove('show');
+        } else {
+          showTip(g);
+        }
+      } else if (!e.target.closest('.gloss-tip')) {
+        tip.classList.remove('show');
+      }
+    });
+  })();
 })();
