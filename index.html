@@ -101,7 +101,8 @@
     gap: 1.2rem;
     flex-wrap: nowrap;
     overflow-x: auto;
-    padding-bottom: 0.5rem;
+    padding-bottom: 1rem;
+    margin-bottom: 1rem;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
   }
@@ -120,7 +121,7 @@
   }
 
   .book:hover {
-    transform: translateY(-6px);
+    transform: translateY(-8px);
   }
 
   .cover-wrap {
@@ -156,13 +157,15 @@
     transition: box-shadow 0.25s ease;
     box-shadow:
       2px 4px 12px rgba(0,0,0,0.6),
-      6px 8px 24px rgba(0,0,0,0.3);
+      6px 10px 28px rgba(0,0,0,0.4),
+      0 12px 30px rgba(0,0,0,0.35);
   }
 
   .book:hover .book-cover {
     box-shadow:
       2px 4px 16px rgba(0,0,0,0.7),
-      8px 12px 32px rgba(0,0,0,0.4),
+      8px 14px 36px rgba(0,0,0,0.5),
+      0 16px 40px rgba(0,0,0,0.4),
       0 0 40px rgba(180,120,40,0.1);
   }
 
@@ -241,10 +244,43 @@
   }
 
   .book-author {
-    font-size: 0.8rem;
-    color: rgba(255,255,255,0.65);
-    margin-top: 0.15rem;
+    font-size: 0.78rem;
+    color: rgba(255,255,255,0.45);
+    margin-top: 0.2rem;
     text-shadow: 0 1px 4px rgba(0,0,0,0.3);
+    font-style: italic;
+  }
+
+  /* Stats bar */
+  .stats-bar {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+    padding: 0.75rem 1.25rem;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 12px;
+    flex-wrap: wrap;
+  }
+  .stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 60px;
+  }
+  .stat-value {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #fff;
+    font-family: -apple-system, sans-serif;
+    line-height: 1.2;
+  }
+  .stat-label {
+    font-size: 0.65rem;
+    color: rgba(255,255,255,0.45);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-family: -apple-system, sans-serif;
   }
 
   /* Reading progress bar under covers */
@@ -272,13 +308,14 @@
 
   .section-title {
     font-size: 1.1rem;
-    color: rgba(255,255,255,0.85);
+    color: #fff;
     text-shadow: 0 1px 8px rgba(0,0,0,0.4);
-    margin-top: 2rem;
-    margin-bottom: 0.8rem;
-    padding-bottom: 0.4rem;
+    margin-top: 3rem;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
     border-bottom: 1px solid rgba(255,255,255,0.15);
     font-style: italic;
+    letter-spacing: 0.02em;
   }
 
   .section-title:first-of-type {
@@ -434,6 +471,29 @@
   <div class="tab-row">
     <button class="tab-btn active" id="tabShelf" onclick="switchTab('shelf')">Shelf</button>
     <button class="tab-btn" id="tabToRead" onclick="switchTab('toread')">To Read</button>
+  </div>
+
+  <div class="stats-bar" id="statsBar" style="display:none">
+    <div class="stat-item">
+      <span class="stat-value" id="statBooks">--</span>
+      <span class="stat-label">Books</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-value" id="statWords">--</span>
+      <span class="stat-label">Words Read</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-value" id="statTime">--</span>
+      <span class="stat-label">Hours Read</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-value" id="statWpm">--</span>
+      <span class="stat-label">WPM</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-value" id="statReading">--</span>
+      <span class="stat-label">In Progress</span>
+    </div>
   </div>
 
   <div id="shelfView">
@@ -3290,6 +3350,67 @@
   // Expose for the main sync to call after merging remote data
   window._renderProgress = renderProgress;
   window._RS_KEY = RS_KEY;
+
+  // ── Stats Bar ──
+  function renderStats() {
+    var bar = document.getElementById('statsBar');
+    if (!bar) return;
+    var data;
+    try {
+      data = JSON.parse(localStorage.getItem(RS_KEY));
+    } catch(e) { return; }
+    if (!data || !data.books) return;
+
+    var totalBooks = document.querySelectorAll(
+      '#shelfView .book'
+    ).length;
+    var inProgress = 0;
+    var totalWordsRead = 0;
+
+    Object.keys(data.books).forEach(function(path) {
+      var b = data.books[path];
+      var maxW = b.maxWordsRead || 0;
+      var words = b.words || 0;
+      if (maxW > 0 && words > 0) {
+        totalWordsRead += maxW;
+        var pct = maxW / words;
+        if (pct > 0.01 && pct < 0.95) inProgress++;
+      }
+    });
+
+    var reader = data.reader || {};
+    var totalMins = reader.totalMinutesRead || 0;
+    var wpm = reader.averageWPM || 225;
+
+    document.getElementById('statBooks').textContent = totalBooks;
+    document.getElementById('statReading').textContent = inProgress;
+    document.getElementById('statWpm').textContent =
+      reader.samples >= 3 ? wpm : '--';
+
+    if (totalWordsRead > 1000000) {
+      document.getElementById('statWords').textContent =
+        (totalWordsRead / 1000000).toFixed(1) + 'M';
+    } else if (totalWordsRead > 1000) {
+      document.getElementById('statWords').textContent =
+        Math.round(totalWordsRead / 1000) + 'K';
+    } else {
+      document.getElementById('statWords').textContent =
+        totalWordsRead || '--';
+    }
+
+    if (totalMins >= 60) {
+      document.getElementById('statTime').textContent =
+        Math.round(totalMins / 60);
+    } else if (totalMins > 0) {
+      document.getElementById('statTime').textContent =
+        '<1';
+    } else {
+      document.getElementById('statTime').textContent = '--';
+    }
+
+    bar.style.display = 'flex';
+  }
+  renderStats();
 })();
 </script>
 
