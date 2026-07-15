@@ -442,9 +442,6 @@
     <button class="tab-btn" id="tabToRead" onclick="switchTab('toread')">To Read</button>
   </div>
 
-  <h2 class="section-title" id="currentlyReadingTitle"
-    style="display:none;margin-top:0">Currently Reading</h2>
-  <div class="shelf" id="currentlyReadingShelf" style="display:none"></div>
 
   <div id="shelfView">
   <h2 class="section-title" id="recentlyAddedTitle"
@@ -2872,22 +2869,16 @@
     var toReadView = document.getElementById('toReadView');
     var tabShelf = document.getElementById('tabShelf');
     var tabToRead = document.getElementById('tabToRead');
-    var crTitle = document.getElementById('currentlyReadingTitle');
-    var crShelf = document.getElementById('currentlyReadingShelf');
     if (tab === 'shelf') {
       shelfView.classList.remove('view-hidden');
       toReadView.classList.add('view-hidden');
       tabShelf.classList.add('active');
       tabToRead.classList.remove('active');
-      if (crTitle) crTitle.style.display = '';
-      if (crShelf) crShelf.style.display = '';
     } else {
       shelfView.classList.add('view-hidden');
       toReadView.classList.remove('view-hidden');
       tabShelf.classList.remove('active');
       tabToRead.classList.add('active');
-      if (crTitle) crTitle.style.display = 'none';
-      if (crShelf) crShelf.style.display = 'none';
     }
   }
 
@@ -3244,8 +3235,6 @@
     document.querySelectorAll('.book[href]').forEach(function(el) {
       var href = el.getAttribute('href');
       if (!href) return;
-      // Skip Currently Reading clones (they show % complete)
-      if (el.hasAttribute('data-no-eta')) return;
 
       // Fast lookup instead of O(n) scan
       var hParts = href.replace(/^\.\//, '').split('/');
@@ -3311,86 +3300,6 @@
   // Expose for the main sync to call after merging remote data
   window._renderProgress = renderProgress;
   window._RS_KEY = RS_KEY;
-
-  // ── Currently Reading Row ──
-  function renderCurrentlyReading() {
-    var title = document.getElementById('currentlyReadingTitle');
-    var shelf = document.getElementById('currentlyReadingShelf');
-    if (!title || !shelf) return;
-    shelf.innerHTML = '';
-
-    var data;
-    try {
-      data = JSON.parse(localStorage.getItem(RS_KEY));
-    } catch(e) { return; }
-    if (!data || !data.books) return;
-
-    // Build path→book element lookup (shelf + to-read)
-    var bookEls = document.querySelectorAll(
-      '#shelfView .book[href], #toReadView .book[href]');
-    var elByPath = {};
-    var toReadPaths = {};
-    bookEls.forEach(function(el) {
-      var href = el.getAttribute('href').replace(/^\.\//, '');
-      var parts = href.split('/');
-      var key = parts.slice(-2).join('/');
-      elByPath[key] = el;
-      if (parts.length >= 2) elByPath[parts[0]] = el;
-      if (el.closest('#toReadView')) {
-        toReadPaths[key] = true;
-        if (parts.length >= 2) toReadPaths[parts[0]] = true;
-      }
-    });
-
-    // Find in-progress books
-    var reading = [];
-    Object.keys(data.books).forEach(function(path) {
-      var b = data.books[path];
-      var maxW = b.maxWordsRead || 0;
-      var words = b.words || 0;
-      if (words < 200 || maxW < 1) return;
-      var pct = maxW / words;
-      if (pct >= 0.95) return;
-      // To Read books need >5% progress; shelf books need >1%
-      var parts = path.split('/');
-      var key = parts.slice(-2).join('/');
-      var isToRead = toReadPaths[key] ||
-        toReadPaths[parts[parts.length - 2]];
-      var minPct = isToRead ? 0.05 : 0.01;
-      if (pct < minPct) return;
-      // Find matching element
-      var parts = path.split('/');
-      var key = parts.slice(-2).join('/');
-      var el = elByPath[key] || elByPath[parts[parts.length - 2]];
-      if (!el) return;
-      reading.push({ pct: pct, el: el, path: path });
-    });
-
-    if (reading.length === 0) return;
-
-    // Sort by completion, most complete first
-    reading.sort(function(a, b) { return b.pct - a.pct; });
-
-    reading.forEach(function(item) {
-      var clone = item.el.cloneNode(true);
-      // Remove any existing progress bars (will be re-added by renderProgress)
-      clone.querySelectorAll('.read-progress-wrap, .read-eta')
-        .forEach(function(el) { el.remove(); });
-      // Mark so renderProgress skips these clones
-      clone.setAttribute('data-no-eta', '1');
-      // Add completion percentage label
-      var pctLabel = document.createElement('div');
-      pctLabel.className = 'read-eta';
-      pctLabel.textContent = Math.round(item.pct * 100) + '% complete';
-      pctLabel.style.color = 'rgba(255,255,255,0.6)';
-      clone.appendChild(pctLabel);
-      shelf.appendChild(clone);
-    });
-
-    title.style.display = '';
-    shelf.style.display = '';
-  }
-  renderCurrentlyReading();
 })();
 </script>
 
