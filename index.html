@@ -2872,16 +2872,22 @@
     var toReadView = document.getElementById('toReadView');
     var tabShelf = document.getElementById('tabShelf');
     var tabToRead = document.getElementById('tabToRead');
+    var crTitle = document.getElementById('currentlyReadingTitle');
+    var crShelf = document.getElementById('currentlyReadingShelf');
     if (tab === 'shelf') {
       shelfView.classList.remove('view-hidden');
       toReadView.classList.add('view-hidden');
       tabShelf.classList.add('active');
       tabToRead.classList.remove('active');
+      if (crTitle) crTitle.style.display = '';
+      if (crShelf) crShelf.style.display = '';
     } else {
       shelfView.classList.add('view-hidden');
       toReadView.classList.remove('view-hidden');
       tabShelf.classList.remove('active');
       tabToRead.classList.add('active');
+      if (crTitle) crTitle.style.display = 'none';
+      if (crShelf) crShelf.style.display = 'none';
     }
   }
 
@@ -3319,8 +3325,9 @@
     } catch(e) { return; }
     if (!data || !data.books) return;
 
-    // Build path→book element lookup
-    var bookEls = document.querySelectorAll('#shelfView .book[href]');
+    // Build path→book element lookup (scan both shelf and to-read)
+    var bookEls = document.querySelectorAll(
+      '#shelfView .book[href], #toReadView .book[href]');
     var elByPath = {};
     bookEls.forEach(function(el) {
       var href = el.getAttribute('href').replace(/^\.\//, '');
