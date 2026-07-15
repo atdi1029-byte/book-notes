@@ -3325,16 +3325,21 @@
     } catch(e) { return; }
     if (!data || !data.books) return;
 
-    // Build path→book element lookup (scan both shelf and to-read)
+    // Build path→book element lookup (shelf + to-read)
     var bookEls = document.querySelectorAll(
       '#shelfView .book[href], #toReadView .book[href]');
     var elByPath = {};
+    var toReadPaths = {};
     bookEls.forEach(function(el) {
       var href = el.getAttribute('href').replace(/^\.\//, '');
       var parts = href.split('/');
       var key = parts.slice(-2).join('/');
       elByPath[key] = el;
       if (parts.length >= 2) elByPath[parts[0]] = el;
+      if (el.closest('#toReadView')) {
+        toReadPaths[key] = true;
+        if (parts.length >= 2) toReadPaths[parts[0]] = true;
+      }
     });
 
     // Find in-progress books
@@ -3345,7 +3350,14 @@
       var words = b.words || 0;
       if (words < 200 || maxW < 1) return;
       var pct = maxW / words;
-      if (pct < 0.01 || pct >= 0.95) return;
+      if (pct >= 0.95) return;
+      // To Read books need >5% progress; shelf books need >1%
+      var parts = path.split('/');
+      var key = parts.slice(-2).join('/');
+      var isToRead = toReadPaths[key] ||
+        toReadPaths[parts[parts.length - 2]];
+      var minPct = isToRead ? 0.05 : 0.01;
+      if (pct < minPct) return;
       // Find matching element
       var parts = path.split('/');
       var key = parts.slice(-2).join('/');
