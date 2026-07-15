@@ -3246,17 +3246,43 @@
       var inToRead = !!el.closest('#toReadView');
 
       if (inToRead) {
-        // To Read: show total reading time, no progress bar
         if (match.words) {
-          var totalMins = Math.round(match.words / avgWpm);
+          // Show progress bar if started
+          if (pct >= 1) {
+            var wrap = document.createElement('div');
+            wrap.className = 'read-progress-wrap';
+            var bar = document.createElement('div');
+            bar.className = 'read-progress-bar';
+            bar.style.width = pct + '%';
+            wrap.appendChild(bar);
+            el.appendChild(wrap);
+          }
           var eta = document.createElement('div');
           eta.className = 'read-eta';
-          if (totalMins < 60) {
-            eta.textContent = '~' + totalMins + 'm read';
+          if (pct >= 1) {
+            var wordsLeft = Math.max(0,
+              match.words - (match.maxWordsRead || 0));
+            var minsLeft = Math.round(wordsLeft / avgWpm);
+            if (pct >= 95) {
+              eta.textContent = 'Finished';
+            } else if (minsLeft < 60) {
+              eta.textContent = pct + '% · ~' + minsLeft + 'm left';
+            } else {
+              var hrs = Math.floor(minsLeft / 60);
+              var mins = minsLeft % 60;
+              eta.textContent = pct + '% · ~' + hrs + 'h '
+                + mins + 'm left';
+            }
           } else {
-            var hrs = Math.floor(totalMins / 60);
-            var mins = totalMins % 60;
-            eta.textContent = '~' + hrs + 'h ' + mins + 'm read';
+            var totalMins = Math.round(match.words / avgWpm);
+            if (totalMins < 60) {
+              eta.textContent = '~' + totalMins + 'm read';
+            } else {
+              var hrs = Math.floor(totalMins / 60);
+              var mins = totalMins % 60;
+              eta.textContent = '~' + hrs + 'h '
+                + mins + 'm read';
+            }
           }
           el.appendChild(eta);
         }
