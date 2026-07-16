@@ -2,1025 +2,1681 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=3.0">
+<meta name="viewport"
+  content="width=device-width, initial-scale=1.0,
+  maximum-scale=3.0">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="theme-color" content="#ffffff">
-<title>Book Web — Cross-Reference Map</title>
+<meta name="theme-color" content="#0e0804">
+<title>Book Universe</title>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
+:root {
+  --bg: #0e0804;
+  --bg2: #1a120a;
+  --text: #e8dcc8;
+  --text2: rgba(232,220,200,0.6);
+  --text3: rgba(232,220,200,0.35);
+  --accent: #c5a55a;
+  --accent2: #4a9a8f;
+  --border: rgba(232,220,200,0.12);
+  --card-bg: rgba(232,220,200,0.04);
+  --card-hover: rgba(232,220,200,0.08);
+}
+
 body {
-  background: #ffffff;
-  color: #3a2e1e;
+  background: var(--bg);
+  color: var(--text);
   font-family: Georgia, 'Times New Roman', serif;
-  overflow: hidden;
-  height: 100vh;
-  width: 100vw;
+  line-height: 1.6;
+  min-height: 100vh;
+  overflow-x: hidden;
 }
 
-/* Loading */
-.loading {
-  position: fixed;
-  inset: 0;
-  z-index: 50;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  background: #ffffff;
-  transition: opacity 0.5s;
-}
-
-.loading.done { opacity: 0; pointer-events: none; }
-
-.loading h2 {
-  color: #3a2e1e;
-  font-size: 1.3rem;
-  margin-bottom: 12px;
-}
-
-.loading .progress {
-  font-size: 0.85rem;
-  color: rgba(0,0,0,0.4);
-  font-family: -apple-system, sans-serif;
-}
-
-.spinner {
-  width: 36px; height: 36px;
-  border: 3px solid rgba(0,0,0,0.1);
-  border-top-color: #4a9a8f;
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
-  margin-bottom: 16px;
-}
-
-@keyframes spin { to { transform: rotate(360deg); } }
-
-/* Header */
+/* ── Header ── */
 .header {
-  position: fixed;
-  top: 0; left: 0; right: 0;
-  z-index: 10;
+  position: sticky;
+  top: 0; z-index: 20;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 12px 20px;
-  background: linear-gradient(180deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.7) 80%, transparent 100%);
+  gap: 12px;
+  padding: 14px 20px;
+  background: rgba(14,8,4,0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
 }
 
-.back-link {
+.back-btn {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
   text-decoration: none;
-  color: rgba(0,0,0,0.5);
+  color: var(--text2);
   font-size: 0.8rem;
   font-family: -apple-system, sans-serif;
-  padding: 6px 14px;
-  border: 1px solid rgba(0,0,0,0.15);
-  border-radius: 20px;
+  padding: 5px 12px;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  cursor: pointer;
+  background: none;
   transition: all 0.2s;
   white-space: nowrap;
 }
 
-.back-link:hover {
-  color: #3a2e1e;
-  border-color: rgba(0,0,0,0.3);
-  background: rgba(0,0,0,0.04);
+.back-btn:hover {
+  color: var(--text);
+  border-color: rgba(232,220,200,0.3);
+  background: var(--card-bg);
 }
 
-.back-link svg {
-  width: 14px; height: 14px;
+.back-btn svg {
+  width: 13px; height: 13px;
   stroke: currentColor; fill: none;
-  stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 .header h1 {
   font-size: 1.2rem;
-  color: #3a2e1e;
+  color: var(--text);
+  flex: 1;
 }
 
 .header .stats {
-  font-size: 0.75rem;
-  color: rgba(0,0,0,0.4);
+  font-size: 0.72rem;
+  color: var(--text3);
   font-family: -apple-system, sans-serif;
 }
 
-/* Legend */
-.legend {
-  position: fixed;
-  bottom: 16px; left: 16px;
-  z-index: 10;
-  background: rgba(255,255,255,0.92);
-  border: 1px solid rgba(0,0,0,0.1);
+/* ── Search ── */
+.search-wrap {
+  padding: 16px 20px 8px;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.search-box {
+  width: 100%;
+  padding: 10px 16px 10px 38px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
   border-radius: 10px;
-  padding: 10px 14px;
-  font-size: 0.7rem;
+  color: var(--text);
+  font-size: 0.9rem;
   font-family: -apple-system, sans-serif;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.search-box::placeholder { color: var(--text3); }
+.search-box:focus { border-color: var(--accent); }
+
+.search-wrap .search-icon {
+  position: absolute;
+  left: 32px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px; height: 16px;
+  stroke: var(--text3);
+  fill: none;
+  stroke-width: 2;
+  pointer-events: none;
+}
+
+.search-wrap { position: relative; }
+
+/* ── Breadcrumb ── */
+.breadcrumb {
+  padding: 12px 20px 4px;
+  max-width: 700px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.78rem;
+  font-family: -apple-system, sans-serif;
+  color: var(--text3);
+  flex-wrap: wrap;
+}
+
+.breadcrumb .crumb {
+  cursor: pointer;
+  color: var(--text2);
+  transition: color 0.2s;
+}
+
+.breadcrumb .crumb:hover { color: var(--accent); }
+.breadcrumb .sep { color: var(--text3); }
+
+/* ── Content ── */
+.content {
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 8px 20px 60px;
+}
+
+/* ── Category cards (Level 1) ── */
+.cat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.cat-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+
+.cat-card:hover {
+  background: var(--card-hover);
+  border-color: rgba(232,220,200,0.2);
+  transform: translateY(-2px);
+}
+
+.cat-card .cat-icon {
+  font-size: 1.8rem;
+  margin-bottom: 8px;
+}
+
+.cat-card .cat-name {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+
+.cat-card .cat-count {
+  font-size: 0.78rem;
+  color: var(--text2);
+  font-family: -apple-system, sans-serif;
+}
+
+.cat-card .cat-bar {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 3px;
+}
+
+/* ── Subcategory pills ── */
+.subcat-row {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px 14px;
-  max-width: 360px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  gap: 8px;
+  margin: 16px 0 12px;
 }
 
-.legend-item {
+.subcat-pill {
+  padding: 6px 14px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-family: -apple-system, sans-serif;
+  color: var(--text2);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.subcat-pill:hover, .subcat-pill.active {
+  background: var(--card-hover);
+  border-color: var(--accent);
+  color: var(--text);
+}
+
+.subcat-pill .pill-count {
+  color: var(--text3);
+  margin-left: 4px;
+}
+
+/* ── Book list (Level 2) ── */
+.book-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.book-row {
   display: flex;
   align-items: center;
-  gap: 5px;
-  color: rgba(0,0,0,0.55);
+  gap: 14px;
+  padding: 12px 14px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
 }
 
-.legend-dot {
-  width: 10px; height: 10px;
-  border-radius: 50%;
+.book-row:hover {
+  background: var(--card-hover);
+  border-color: rgba(232,220,200,0.2);
+}
+
+.book-row .cover {
+  width: 44px; height: 58px;
+  border-radius: 4px;
+  object-fit: cover;
+  flex-shrink: 0;
+  background: var(--bg2);
+}
+
+.book-row .book-info { flex: 1; min-width: 0; }
+
+.book-row .book-title {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.book-row .book-author {
+  font-size: 0.78rem;
+  color: var(--text2);
+  font-family: -apple-system, sans-serif;
+}
+
+.book-row .book-meta {
+  display: flex;
+  gap: 10px;
+  font-size: 0.7rem;
+  color: var(--text3);
+  font-family: -apple-system, sans-serif;
+  margin-top: 2px;
+}
+
+.book-row .conn-badge {
+  font-size: 0.7rem;
+  color: var(--accent2);
+  background: rgba(74,154,143,0.12);
+  padding: 2px 8px;
+  border-radius: 10px;
+  white-space: nowrap;
   flex-shrink: 0;
 }
 
-/* Info Panel */
-.info-panel {
-  position: fixed;
-  top: 60px; right: 0;
-  z-index: 10;
-  width: 320px;
-  max-height: calc(100vh - 80px);
-  overflow-y: auto;
-  background: rgba(255,255,255,0.96);
-  border-left: 1px solid rgba(0,0,0,0.1);
-  border-bottom: 1px solid rgba(0,0,0,0.1);
-  border-radius: 0 0 0 12px;
-  padding: 20px;
-  transform: translateX(100%);
-  transition: transform 0.3s ease;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(0,0,0,0.15) transparent;
-  box-shadow: -2px 2px 12px rgba(0,0,0,0.08);
-}
-
-.info-panel.open { transform: translateX(0); }
-
-.info-panel .close-btn {
-  position: absolute;
-  top: 12px; right: 12px;
-  background: none; border: none;
-  color: rgba(0,0,0,0.35);
-  font-size: 1.2rem;
-  cursor: pointer;
-  padding: 4px 8px;
-}
-
-.info-panel .close-btn:hover { color: #3a2e1e; }
-
-.info-panel h2 {
-  font-size: 1.1rem;
-  color: #3a2e1e;
-  margin-bottom: 4px;
-  padding-right: 30px;
-}
-
-.info-panel .author {
-  font-size: 0.85rem;
-  color: rgba(0,0,0,0.45);
-  font-style: italic;
-  margin-bottom: 16px;
-}
-
-.info-panel .view-notes {
-  display: inline-block;
-  font-size: 0.8rem;
-  color: #4a7872;
-  text-decoration: none;
-  margin-bottom: 16px;
-}
-
-.info-panel .view-notes:hover { text-decoration: underline; color: #3a5f5a; }
-
-.info-panel h3 {
-  font-size: 0.85rem;
-  color: rgba(0,0,0,0.5);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin-bottom: 10px;
-  padding-bottom: 6px;
-  border-bottom: 1px solid rgba(0,0,0,0.08);
-}
-
-.connection-item {
-  margin-bottom: 14px;
-  padding: 10px 12px;
-  background: rgba(0,0,0,0.02);
-  border-radius: 8px;
-  border-left: 3px solid;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-
-.connection-item:hover { background: rgba(0,0,0,0.05); }
-
-.connection-item .book-name {
-  font-size: 0.9rem;
-  font-weight: 700;
-  color: #3a2e1e;
-  margin-bottom: 4px;
-}
-
-.connection-item .shared-label {
-  font-size: 0.72rem;
-  color: rgba(0,0,0,0.4);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  margin-bottom: 4px;
-}
-
-.connection-item .thinkers {
-  font-size: 0.82rem;
-  color: rgba(0,0,0,0.55);
-  line-height: 1.5;
-}
-
-.connection-item .thinker-name {
-  display: inline-block;
-  background: rgba(0,0,0,0.05);
-  padding: 1px 7px;
+.book-row .read-badge {
+  font-size: 0.65rem;
+  color: var(--accent);
+  background: rgba(197,165,90,0.12);
+  padding: 2px 7px;
   border-radius: 10px;
-  margin: 2px 2px;
-  font-size: 0.78rem;
+  flex-shrink: 0;
 }
 
-.ref-direction {
-  font-size: 0.78rem;
-  color: rgba(0,0,0,0.55);
-  margin-bottom: 4px;
+/* ── Book detail (Level 3) ── */
+.book-detail { margin-top: 8px; }
+
+.detail-header {
   display: flex;
-  align-items: center;
-  gap: 5px;
+  gap: 18px;
+  align-items: flex-start;
+  margin-bottom: 20px;
 }
 
-.ref-arrow {
+.detail-cover {
+  width: 90px; height: 120px;
+  border-radius: 6px;
+  object-fit: cover;
+  flex-shrink: 0;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+}
+
+.detail-info { flex: 1; }
+
+.detail-info h2 {
+  font-size: 1.3rem;
+  color: var(--text);
+  line-height: 1.3;
+  margin-bottom: 4px;
+}
+
+.detail-info .author {
+  font-size: 0.9rem;
+  color: var(--text2);
+  font-style: italic;
+  margin-bottom: 10px;
+}
+
+.detail-info .tag-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.detail-info .tag {
+  font-size: 0.7rem;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-family: -apple-system, sans-serif;
+  border: 1px solid var(--border);
+  color: var(--text2);
+}
+
+.view-notes-btn {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  font-size: 0.72rem;
-  font-weight: 700;
+  gap: 6px;
+  margin-top: 12px;
+  padding: 8px 16px;
+  background: rgba(197,165,90,0.12);
+  border: 1px solid rgba(197,165,90,0.25);
+  border-radius: 8px;
+  color: var(--accent);
+  text-decoration: none;
+  font-size: 0.82rem;
+  font-family: -apple-system, sans-serif;
+  transition: all 0.2s;
+}
+
+.view-notes-btn:hover {
+  background: rgba(197,165,90,0.2);
+  border-color: var(--accent);
+}
+
+/* ── Connection sections ── */
+.section-heading {
+  font-size: 0.82rem;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-family: -apple-system, sans-serif;
+  margin: 24px 0 10px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border);
+}
+
+.conn-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  margin-bottom: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.conn-card:hover {
+  background: var(--card-hover);
+  border-color: rgba(232,220,200,0.2);
+}
+
+.conn-card .conn-cover {
+  width: 36px; height: 48px;
+  border-radius: 3px;
+  object-fit: cover;
   flex-shrink: 0;
 }
 
-.ref-arrow.out { background: rgba(74,154,143,0.15); color: #4a9a8f; }
-.ref-arrow.in { background: rgba(197,165,90,0.15); color: #c5a55a; }
+.conn-card .conn-info { flex: 1; min-width: 0; }
 
-.ref-detail {
-  margin: 3px 0 8px 25px;
-  padding: 7px 10px;
-  background: rgba(0,0,0,0.025);
-  border-radius: 6px;
-  border-left: 2px solid rgba(0,0,0,0.08);
+.conn-card .conn-title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text);
 }
 
-.ref-name {
-  font-size: 0.84rem;
-  font-weight: 600;
-  color: #3a2e1e;
+.conn-card .conn-author {
+  font-size: 0.72rem;
+  color: var(--text2);
+  font-family: -apple-system, sans-serif;
 }
 
-.ref-desc {
-  font-size: 0.76rem;
-  color: rgba(0,0,0,0.45);
+.conn-card .conn-shared {
+  font-size: 0.7rem;
+  color: var(--text3);
+  font-family: -apple-system, sans-serif;
   margin-top: 2px;
-  line-height: 1.4;
-  font-style: italic;
 }
 
-.no-refs-note {
-  font-size: 0.8rem;
-  color: rgba(0,0,0,0.35);
-  font-style: italic;
-  margin-top: 4px;
-  padding: 8px 10px;
-  background: rgba(0,0,0,0.02);
-  border-radius: 6px;
+.conn-card .conn-arrow {
+  color: var(--text3);
+  font-size: 1rem;
+  flex-shrink: 0;
 }
 
-/* SVG */
-svg { display: block; }
+/* ── Referenced works table ── */
+.ref-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+  margin-top: 8px;
+}
 
-.link {
-  stroke-opacity: 0.2;
+.ref-table th {
+  text-align: left;
+  color: var(--text3);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 6px 10px;
+  border-bottom: 1px solid var(--border);
+  font-family: -apple-system, sans-serif;
+}
+
+.ref-table td {
+  padding: 7px 10px;
+  border-bottom: 1px solid rgba(232,220,200,0.06);
+  color: var(--text2);
+  vertical-align: top;
+}
+
+.ref-table td:first-child {
+  color: var(--text);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.ref-table tr.on-shelf td:first-child {
+  color: var(--accent2);
+  cursor: pointer;
+}
+
+.ref-table tr.on-shelf:hover { background: var(--card-bg); }
+
+/* ── Local graph ── */
+.local-graph-wrap {
+  margin-top: 12px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.local-graph-wrap svg {
+  display: block;
+  width: 100%;
+}
+
+.local-graph-wrap .graph-label {
+  font-family: -apple-system, sans-serif;
+  fill: var(--text2);
+  font-size: 9px;
+  text-anchor: middle;
+  pointer-events: none;
+}
+
+.local-graph-wrap .graph-node {
+  cursor: pointer;
+}
+
+.local-graph-wrap .graph-link {
+  stroke: rgba(232,220,200,0.15);
+  stroke-width: 1.5;
   fill: none;
 }
 
-.link.highlighted { stroke-opacity: 0.6; }
-.link.dimmed { stroke-opacity: 0.04; }
-
-.node-circle {
-  stroke: rgba(0,0,0,0.15);
+.local-graph-wrap .graph-node-circle {
+  stroke: rgba(232,220,200,0.2);
   stroke-width: 1.5;
+}
+
+/* ── Explore Ideas ── */
+.trail-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.trail-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px;
   cursor: pointer;
-  transition: stroke 0.2s, stroke-width 0.2s;
+  transition: all 0.2s;
 }
 
-.node-circle:hover {
-  stroke: rgba(0,0,0,0.4);
-  stroke-width: 2.5;
+.trail-card:hover {
+  background: var(--card-hover);
+  border-color: rgba(232,220,200,0.2);
+  transform: translateY(-1px);
 }
 
-.node-circle.selected { stroke: #3a2e1e; stroke-width: 3; }
-.node-circle.dimmed { opacity: 0.15; }
+.trail-card .trail-name {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 4px;
+}
 
-.node-cover { cursor: pointer; }
-.node-cover.dimmed { opacity: 0.15; }
-
-.node-label {
+.trail-card .trail-count {
+  font-size: 0.72rem;
+  color: var(--text3);
   font-family: -apple-system, sans-serif;
-  font-size: 10px;
-  fill: rgba(0,0,0,0.6);
-  pointer-events: none;
-  text-anchor: middle;
 }
 
-.node-label.dimmed { opacity: 0.1; }
+/* ── Trail view ── */
+.trail-chain {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin-top: 12px;
+}
 
-.edge-label {
+.trail-step {
+  display: flex;
+  align-items: stretch;
+  gap: 14px;
+}
+
+.trail-line {
+  width: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.trail-dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: var(--accent);
+  flex-shrink: 0;
+  margin-top: 18px;
+}
+
+.trail-stem {
+  width: 2px;
+  flex: 1;
+  background: var(--border);
+}
+
+.trail-step:last-child .trail-stem { display: none; }
+
+.trail-book {
+  flex: 1;
+  padding: 12px 0;
+}
+
+.trail-book .trail-title {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.trail-book .trail-title:hover { color: var(--accent); }
+
+.trail-book .trail-author {
+  font-size: 0.75rem;
+  color: var(--text2);
   font-family: -apple-system, sans-serif;
-  font-size: 8px;
-  fill: rgba(0,0,0,0.25);
-  pointer-events: none;
-  text-anchor: middle;
 }
 
-.edge-label.dimmed { opacity: 0; }
-.edge-label.highlighted { fill: rgba(0,0,0,0.5); }
-
-/* Tooltip */
-.tooltip {
-  position: fixed;
-  z-index: 20;
-  background: rgba(255,255,255,0.96);
-  border: 1px solid rgba(0,0,0,0.1);
-  border-radius: 8px;
-  padding: 8px 12px;
+.trail-book .trail-why {
   font-size: 0.78rem;
-  color: #3a2e1e;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 0.15s;
-  max-width: 200px;
-  font-family: -apple-system, sans-serif;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  color: var(--text3);
+  font-style: italic;
+  margin-top: 3px;
 }
 
-.tooltip.show { opacity: 1; }
+/* ── Tabs ── */
+.tab-row {
+  display: flex;
+  gap: 0;
+  margin-bottom: 4px;
+  border-bottom: 1px solid var(--border);
+}
 
-/* Mobile */
-@media (max-width: 600px) {
-  .header h1 { font-size: 1rem; }
-  .header .stats { display: none; }
-  .legend { bottom: 10px; left: 10px; padding: 8px 10px; font-size: 0.65rem; max-width: 280px; }
-  .info-panel {
-    width: 100%;
-    top: auto; bottom: 0; right: 0;
-    max-height: 55vh;
-    border-radius: 12px 12px 0 0;
-    border-left: none;
-    border-top: 1px solid rgba(0,0,0,0.1);
-    transform: translateY(100%);
+.tab-btn {
+  padding: 8px 18px;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--text3);
+  font-size: 0.82rem;
+  font-family: -apple-system, sans-serif;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.tab-btn:hover { color: var(--text2); }
+
+.tab-btn.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+/* ── Empty state ── */
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--text3);
+  font-style: italic;
+  font-size: 0.9rem;
+}
+
+/* ── Search results ── */
+.search-results { margin-top: 8px; }
+
+.search-section-label {
+  font-size: 0.72rem;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-family: -apple-system, sans-serif;
+  margin: 14px 0 6px;
+}
+
+/* ── Mobile ── */
+@media (max-width: 500px) {
+  .cat-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
   }
-  .info-panel.open { transform: translateY(0); }
+  .cat-card { padding: 14px; }
+  .cat-card .cat-icon { font-size: 1.4rem; }
+  .trail-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .detail-cover { width: 70px; height: 93px; }
+  .detail-info h2 { font-size: 1.1rem; }
 }
 </style>
 </head>
 <body>
 
-<div class="loading" id="loading">
-  <div class="spinner"></div>
-  <h2>Building Book Web</h2>
-  <div class="progress" id="loadProgress">Fetching shelf data...</div>
-</div>
-
 <div class="header">
-  <a class="back-link" href="index.html">
-    <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+  <a class="back-btn" href="index.html">
+    <svg viewBox="0 0 24 24">
+      <polyline points="15 18 9 12 15 6"/>
+    </svg>
     Shelf
   </a>
-  <h1>Book Web</h1>
+  <h1>Book Universe</h1>
   <span class="stats" id="stats"></span>
 </div>
 
-<div class="legend" id="legend"></div>
-
-<div class="info-panel" id="infoPanel">
-  <button class="close-btn" onclick="closePanel()">&times;</button>
-  <div id="panelContent"></div>
+<div class="search-wrap">
+  <svg class="search-icon" viewBox="0 0 24 24">
+    <circle cx="11" cy="11" r="8"/>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+  </svg>
+  <input type="text" class="search-box"
+    id="searchBox"
+    placeholder="Search books, authors, thinkers...">
 </div>
 
-<div class="tooltip" id="tooltip"></div>
+<div class="breadcrumb" id="breadcrumb"></div>
 
-<svg id="graph"></svg>
+<div class="content" id="content"></div>
 
-<script src="https://d3js.org/d3.v7.min.js"></script>
 <script>
-// ── Category colors ──
-const CATEGORIES = {
-  'Personal Finance': '#c5a55a',
-  'Economics': '#4a9a8f',
-  'Cycles': '#b87333',
-  'History': '#6b8f8b',
-  'Self Help': '#e07a5f',
-  'Sociology': '#c49a3c',
-  'Philosophy': '#9b7fbf',
-  'Psychology': '#5b9bd5'
+// ── State ──
+let DATA = null;
+let bookMap = {};
+let detailCache = {};
+let view = { level: 'categories', superCat: null,
+  subCat: null, bookId: null, trail: null };
+
+// ── Category config ──
+const CAT_ICONS = {
+  'Finance & Investing': '\u{1F4B0}',
+  'Economics': '\u{1F4CA}',
+  'Markets & Trading': '\u{1F4C8}',
+  'History & Crises': '\u{1F3DB}',
+  'Macro & Geopolitics': '\u{1F30D}',
+  'Mind & Behavior': '\u{1F9E0}',
+  'Other': '\u{1F4DA}',
 };
 
-// ── Dynamic Data Loading ──
-async function loadBookData() {
-  const progress = document.getElementById('loadProgress');
+const CAT_COLORS = {
+  'Finance & Investing': '#c5a55a',
+  'Economics': '#4a9a8f',
+  'Markets & Trading': '#e07a5f',
+  'History & Crises': '#b87333',
+  'Macro & Geopolitics': '#6b8f8b',
+  'Mind & Behavior': '#9b7fbf',
+  'Other': '#7a8a7a',
+};
 
-  // 1. Fetch shelf page to discover all books
-  progress.textContent = 'Fetching shelf data...';
-  let shelfHtml;
+// ── Idea trails ──
+const TRAILS = [
+  {
+    name: 'Austrian Economics',
+    desc: 'The free-market tradition from Menger to Mises',
+    books: [
+      { id: 'principles_of_economics',
+        why: 'Where it all started — Menger\'s marginal utility' },
+      { id: 'wealth-of-nations',
+        why: 'The invisible hand that Austrians built on' },
+      { id: 'capitalism_and_freedom',
+        why: 'Friedman\'s case for free markets' },
+      { id: 'theory-money-credit',
+        why: 'Mises on money, credit, and business cycles' },
+      { id: 'history-money-banking',
+        why: 'Rothbard\'s monetary history of America' },
+      { id: 'road_to_serfdom',
+        why: 'Hayek\'s warning against central planning' },
+      { id: 'how-economy-grows',
+        why: 'The Schiff brothers make it accessible' },
+      { id: 'crash_proof_2',
+        why: 'Austrian theory applied to investing' },
+    ]
+  },
+  {
+    name: 'Market Psychology',
+    desc: 'How minds move markets',
+    books: [
+      { id: 'against-the-gods',
+        why: 'The history of risk and probability' },
+      { id: 'thinking-fast-slow-toread',
+        why: 'Kahneman\'s two systems of thought' },
+      { id: 'psychology-of-money',
+        why: 'Why we make irrational financial decisions' },
+      { id: 'fooled-by-randomness',
+        why: 'Taleb on luck vs skill' },
+      { id: 'the-black-swan',
+        why: 'The impact of the highly improbable' },
+      { id: 'antifragile-toread',
+        why: 'Benefiting from disorder' },
+      { id: 'skin-in-the-game',
+        why: 'Why skin in the game matters' },
+      { id: 'hour-dog-wolf',
+        why: 'Biology of risk-taking on trading floors' },
+      { id: 'superforecasting',
+        why: 'What makes some people better at predicting' },
+    ]
+  },
+  {
+    name: 'Debt & Money',
+    desc: 'What money is and why debt crises happen',
+    books: [
+      { id: 'primer-on-money',
+        why: 'Congress explains how money works' },
+      { id: 'primer-money-banking-gold',
+        why: 'Bernstein on money, banking, and gold' },
+      { id: 'theory-money-credit',
+        why: 'Mises\'s theory of money and credit' },
+      { id: 'history-money-banking',
+        why: 'Rothbard traces US monetary history' },
+      { id: 'creature_jekyll_island',
+        why: 'How the Federal Reserve was created' },
+      { id: 'big_debt_crises',
+        why: 'Dalio\'s template for debt crises' },
+      { id: 'how_countries_go_broke',
+        why: 'Dalio on sovereign debt spirals' },
+      { id: 'when_money_dies',
+        why: 'Weimar hyperinflation — what it looked like' },
+      { id: 'price_of_time',
+        why: 'Interest rates through 5,000 years' },
+      { id: 'debt-5000-years-toread',
+        why: 'Graeber rethinks debt from scratch' },
+    ]
+  },
+  {
+    name: 'Rise & Fall of Powers',
+    desc: 'Why civilizations rise, peak, and collapse',
+    books: [
+      { id: 'lessons-of-history',
+        why: 'The Durants distill 5,000 years' },
+      { id: 'fate-of-empires',
+        why: 'Glubb\'s 250-year empire lifecycle' },
+      { id: 'rise-fall-great-powers',
+        why: 'Kennedy on imperial overstretch' },
+      { id: 'why-nations-fail-toread',
+        why: 'Extractive vs inclusive institutions' },
+      { id: 'historical-dynamics',
+        why: 'Turchin\'s mathematical models of history' },
+      { id: 'secular-cycles',
+        why: 'Population and political cycles' },
+      { id: 'generations',
+        why: 'Strauss-Howe generational theory' },
+      { id: 'fourth-turning-toread',
+        why: 'The crisis cycle in American history' },
+      { id: 'changing-world-order-toread',
+        why: 'Dalio on the big cycle of empires' },
+    ]
+  },
+  {
+    name: 'Cycles & Timing',
+    desc: 'Patterns that repeat in markets and history',
+    books: [
+      { id: 'cycles-prediction',
+        why: 'Dewey\'s foundational work on cycles' },
+      { id: 'secular-cycles',
+        why: 'Turchin\'s secular demographic cycles' },
+      { id: 'fourth-turning-toread',
+        why: '80-year generational turnings' },
+      { id: 'anatomy_of_the_bear',
+        why: 'Four great bear markets dissected' },
+      { id: 'long-good-buy',
+        why: 'Oppenheimer on market cycle stages' },
+      { id: 'bressert-cycles-toread',
+        why: 'Trading cycles with technical analysis' },
+      { id: 'manias_panics_crashes',
+        why: 'Kindleberger\'s anatomy of financial crises' },
+    ]
+  },
+  {
+    name: 'Quantitative Edge',
+    desc: 'Math, probability, and beating the market',
+    books: [
+      { id: 'beat-the-dealer',
+        why: 'Thorp proves you can beat blackjack' },
+      { id: 'beat-the-market',
+        why: 'Thorp & Kassouf find market inefficiencies' },
+      { id: 'a-man-for-all-markets',
+        why: 'Thorp\'s full autobiography' },
+      { id: 'fortunes-formula',
+        why: 'Kelly criterion and information theory' },
+      { id: 'man-who-solved-market',
+        why: 'Jim Simons and Renaissance Technologies' },
+      { id: 'the-quants',
+        why: 'Quant traders and the 2008 crisis' },
+      { id: 'math_money_mgmt',
+        why: 'Ralph Vince on position sizing math' },
+      { id: 'how-not-wrong',
+        why: 'Mathematical thinking for everyday life' },
+    ]
+  },
+  {
+    name: 'Building Habits',
+    desc: 'The science of behavior change',
+    books: [
+      { id: 'power-of-habit-toread',
+        why: 'Duhigg\'s habit loop: cue, routine, reward' },
+      { id: 'atomic-habits',
+        why: 'Clear\'s four laws of behavior change' },
+      { id: 'grit-toread',
+        why: 'Duckworth on passion and perseverance' },
+      { id: 'win-friends-toread',
+        why: 'Carnegie on influencing behavior' },
+      { id: 'principles',
+        why: 'Dalio\'s systematic decision-making' },
+    ]
+  },
+];
+
+// ── Load data ──
+async function init() {
   try {
-    const resp = await fetch('index.html');
-    shelfHtml = await resp.text();
+    const resp = await fetch('metadata.json');
+    DATA = await resp.json();
   } catch(e) {
-    progress.textContent = 'Error loading shelf: ' + e.message;
+    document.getElementById('content').innerHTML =
+      '<div class="empty-state">Failed to load metadata.json.'
+      + ' Run build_metadata.py first.</div>';
+    return;
+  }
+
+  // Build book lookup from lightweight stubs
+  DATA.books.forEach(b => { bookMap[b.id] = b; });
+
+  document.getElementById('stats').textContent =
+    DATA.totalBooks + ' books \u00B7 '
+    + DATA.totalEdges + ' connections';
+
+  // Check URL hash
+  if (location.hash) parseHash();
+  else renderCategories();
+
+  // Search
+  document.getElementById('searchBox')
+    .addEventListener('input', onSearch);
+}
+
+// Lazy-load per-book detail
+async function loadDetail(id) {
+  if (detailCache[id]) return detailCache[id];
+  try {
+    const resp = await fetch('metadata/' + id + '.json');
+    const detail = await resp.json();
+    detailCache[id] = detail;
+    return detail;
+  } catch(e) {
     return null;
   }
+}
 
-  // 2. Parse shelf HTML to extract books
-  const parser = new DOMParser();
-  const shelfDoc = parser.parseFromString(shelfHtml, 'text/html');
-  const books = [];
+function parseHash() {
+  const h = location.hash.slice(1);
+  if (h.startsWith('book/')) {
+    const id = h.slice(5);
+    if (bookMap[id]) {
+      navigateToBook(id, true);
+      return;
+    }
+  }
+  if (h.startsWith('cat/')) {
+    const sc = decodeURIComponent(h.slice(4));
+    navigateToSuperCat(sc, true);
+    return;
+  }
+  if (h.startsWith('trail/')) {
+    const idx = parseInt(h.slice(6));
+    if (TRAILS[idx]) {
+      showTrail(idx, true);
+      return;
+    }
+  }
+  renderCategories();
+}
 
-  const sections = shelfDoc.querySelectorAll('.section-title');
-  sections.forEach(section => {
-    // Skip non-book sections
-    if (section.id === 'readingTitle') return;
-    const category = section.textContent.trim();
-    if (category === 'Guides') return;
-    const shelf = section.nextElementSibling;
-    if (!shelf || !shelf.classList.contains('shelf')) return;
+// ── Navigation ──
+function setHash(h) { history.pushState(null, '', '#' + h); }
 
-    shelf.querySelectorAll('.book').forEach(bookEl => {
-      const href = bookEl.getAttribute('href');
-      if (!href) return;
-      // Skip hidden books
-      if (bookEl.style.display === 'none') return;
-      // Skip plain English companion versions
-      if (href.includes('plain.html')) return;
-      const dir = href.split('/')[0];
-      const title = bookEl.querySelector('.book-title')?.textContent?.trim() || dir;
-      const author = bookEl.querySelector('.book-author')?.textContent?.trim() || '';
-      const id = bookEl.dataset.book || dir;
-      books.push({ id, title, author, dir, category, thinkers: [], refRows: [] });
+function navigateToSuperCat(sc, noHash) {
+  view = { level: 'books', superCat: sc,
+    subCat: null, bookId: null, trail: null };
+  if (!noHash) setHash('cat/' + encodeURIComponent(sc));
+  renderBooks(sc);
+  updateBreadcrumb();
+  scrollTop();
+}
+
+async function navigateToBook(id, noHash) {
+  const book = bookMap[id];
+  if (!book) return;
+  view = { level: 'detail', superCat: book.sc,
+    subCat: book.category, bookId: id, trail: null };
+  if (!noHash) setHash('book/' + id);
+  await renderDetail(id);
+  updateBreadcrumb();
+  scrollTop();
+}
+
+function navigateHome() {
+  view = { level: 'categories', superCat: null,
+    subCat: null, bookId: null, trail: null };
+  history.pushState(null, '', location.pathname);
+  renderCategories();
+  updateBreadcrumb();
+  scrollTop();
+  document.getElementById('searchBox').value = '';
+}
+
+function showTrail(idx, noHash) {
+  view = { level: 'trail', trail: idx };
+  if (!noHash) setHash('trail/' + idx);
+  renderTrail(idx);
+  updateBreadcrumb();
+  scrollTop();
+}
+
+function scrollTop() {
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+window.addEventListener('popstate', () => {
+  if (location.hash) parseHash();
+  else { view.level = 'categories'; renderCategories();
+    updateBreadcrumb(); }
+});
+
+// ── Breadcrumb ──
+function updateBreadcrumb() {
+  const bc = document.getElementById('breadcrumb');
+  let html = '<span class="crumb" onclick="navigateHome()">'
+    + 'Universe</span>';
+
+  if (view.level === 'books' || view.level === 'detail') {
+    html += '<span class="sep">\u203A</span>';
+    html += '<span class="crumb" onclick="navigateToSuperCat(\''
+      + escQ(view.superCat) + '\')">'
+      + esc(view.superCat) + '</span>';
+  }
+  if (view.level === 'detail' && view.bookId) {
+    const b = bookMap[view.bookId];
+    html += '<span class="sep">\u203A</span>';
+    html += '<span>' + esc(b.title) + '</span>';
+  }
+  if (view.level === 'trail' && view.trail !== null) {
+    html += '<span class="sep">\u203A</span>';
+    html += '<span>Explore Ideas</span>';
+    html += '<span class="sep">\u203A</span>';
+    html += '<span>' + esc(TRAILS[view.trail].name)
+      + '</span>';
+  }
+
+  bc.innerHTML = html;
+}
+
+// ── Render: Categories (Level 1) ──
+function renderCategories() {
+  const el = document.getElementById('content');
+  let html = '';
+
+  // Category grid — precomputed, no sorting needed
+  html += '<div class="cat-grid">';
+  const entries = Object.entries(DATA.categories);
+  entries.sort((a, b) => b[1].count - a[1].count);
+  for (const [sc, info] of entries) {
+    const color = CAT_COLORS[sc] || '#999';
+    const icon = CAT_ICONS[sc] || '\u{1F4DA}';
+    html += '<div class="cat-card" onclick='
+      + '"navigateToSuperCat(\'' + escQ(sc) + '\')">';
+    html += '<div class="cat-icon">' + icon + '</div>';
+    html += '<div class="cat-name">' + esc(sc) + '</div>';
+    html += '<div class="cat-count">' + info.count
+      + ' books</div>';
+    html += '<div class="cat-bar" style="background:'
+      + color + '"></div>';
+    html += '</div>';
+  }
+  html += '</div>';
+
+  // Explore Ideas section
+  html += '<div class="section-heading" '
+    + 'style="margin-top:32px">'
+    + 'Explore Ideas</div>';
+  html += '<div class="trail-grid">';
+  TRAILS.forEach((trail, idx) => {
+    const validCount = trail.books
+      .filter(b => bookMap[b.id]).length;
+    html += '<div class="trail-card" onclick='
+      + '"showTrail(' + idx + ')">';
+    html += '<div class="trail-name">'
+      + esc(trail.name) + '</div>';
+    html += '<div class="trail-count">'
+      + validCount + ' books \u00B7 '
+      + esc(trail.desc) + '</div>';
+    html += '</div>';
+  });
+  html += '</div>';
+
+  // Most connected — precomputed list, just render
+  html += '<div class="section-heading" '
+    + 'style="margin-top:24px">'
+    + 'Most Connected</div>';
+  html += '<div class="book-list">';
+  for (const id of DATA.mostConnected) {
+    const b = bookMap[id];
+    if (b) html += bookRowHtml(b);
+  }
+  html += '</div>';
+
+  el.innerHTML = html;
+}
+
+// ── Render: Books in category (Level 2) ──
+function renderBooks(superCat) {
+  const el = document.getElementById('content');
+  const catInfo = DATA.categories[superCat];
+  if (!catInfo) return;
+
+  // Books already sorted by build script
+  const bookIds = catInfo.books;
+  const books = bookIds.map(id => bookMap[id])
+    .filter(Boolean);
+  const subcats = Object.entries(catInfo.subcategories);
+
+  let html = '';
+
+  // Subcategory pills
+  html += '<div class="subcat-row">';
+  html += '<div class="subcat-pill active" '
+    + 'onclick="filterSubcat(null, this)">All'
+    + '<span class="pill-count">'
+    + books.length + '</span></div>';
+  for (const [sc, count] of subcats) {
+    html += '<div class="subcat-pill" '
+      + 'onclick="filterSubcat(\'' + escQ(sc)
+      + '\', this)">' + esc(sc)
+      + '<span class="pill-count">'
+      + count + '</span></div>';
+  }
+  html += '</div>';
+
+  html += '<div class="book-list" id="bookList">';
+  for (const b of books) {
+    html += bookRowHtml(b);
+  }
+  html += '</div>';
+
+  el.innerHTML = html;
+}
+
+function filterSubcat(subCat, pill) {
+  document.querySelectorAll('.subcat-pill')
+    .forEach(p => p.classList.remove('active'));
+  pill.classList.add('active');
+
+  const list = document.getElementById('bookList');
+  const catInfo = DATA.categories[view.superCat];
+  const books = catInfo.books
+    .map(id => bookMap[id])
+    .filter(b => b && (!subCat || b.category === subCat));
+
+  let html = '';
+  for (const b of books) {
+    html += bookRowHtml(b);
+  }
+  list.innerHTML = html;
+}
+
+function bookRowHtml(b) {
+  let html = '<div class="book-row" '
+    + 'onclick="navigateToBook(\'' + escQ(b.id) + '\')">';
+  html += '<img class="cover" loading="lazy" src="'
+    + esc(b.dir) + '/thumb.jpg" alt=""'
+    + ' onerror="this.src=\'' + esc(b.dir)
+    + '/cover.jpg\'">';
+  html += '<div class="book-info">';
+  html += '<div class="book-title">'
+    + esc(b.title) + '</div>';
+  html += '<div class="book-author">'
+    + esc(b.author) + '</div>';
+  html += '<div class="book-meta">';
+  html += '<span>' + esc(b.category) + '</span>';
+  if (b.refs > 0)
+    html += '<span>' + b.refs + ' refs</span>';
+  html += '</div>';
+  html += '</div>';
+  if (b.conn > 0)
+    html += '<span class="conn-badge">'
+      + b.conn + ' conn</span>';
+  if (b.read)
+    html += '<span class="read-badge">\u2713 Read</span>';
+  html += '</div>';
+  return html;
+}
+
+// ── Render: Book detail (Level 3) ──
+async function renderDetail(id) {
+  const el = document.getElementById('content');
+  const b = bookMap[id];
+  if (!b) { el.innerHTML = '<div class="empty-state">'
+    + 'Book not found.</div>'; return; }
+
+  const color = CAT_COLORS[b.sc] || '#999';
+  let html = '';
+
+  // Header
+  html += '<div class="detail-header">';
+  html += '<img class="detail-cover" src="'
+    + esc(b.dir) + '/cover.jpg" alt="">';
+  html += '<div class="detail-info">';
+  html += '<h2>' + esc(b.title) + '</h2>';
+  html += '<div class="author">' + esc(b.author) + '</div>';
+  html += '<div class="tag-row">';
+  html += '<span class="tag" style="border-color:'
+    + color + ';color:' + color + '">'
+    + esc(b.sc) + '</span>';
+  html += '<span class="tag">' + esc(b.category) + '</span>';
+  if (b.conn > 0)
+    html += '<span class="tag" style="border-color:'
+      + 'var(--accent2);color:var(--accent2)">'
+      + b.conn + ' connections</span>';
+  if (b.read)
+    html += '<span class="tag" style="border-color:'
+      + 'var(--accent);color:var(--accent)">'
+      + '\u2713 Read</span>';
+  if (b.kw && b.kw.length > 0)
+    b.kw.forEach(k => {
+      html += '<span class="tag">' + esc(k) + '</span>';
+    });
+  html += '</div>';
+  html += '<a class="view-notes-btn" href="'
+    + esc(b.dir) + '/index.html">'
+    + 'View full notes \u2192</a>';
+  html += '</div></div>';
+
+  // Tabs
+  html += '<div class="tab-row">';
+  html += '<button class="tab-btn active" '
+    + 'onclick="switchDetailTab(\'connections\',this)">'
+    + 'Connections</button>';
+  html += '<button class="tab-btn" '
+    + 'onclick="switchDetailTab(\'references\',this)">'
+    + 'Referenced Works</button>';
+  html += '<button class="tab-btn" '
+    + 'onclick="switchDetailTab(\'graph\',this)">'
+    + 'Graph</button>';
+  html += '</div>';
+
+  html += '<div id="detailTabContent">'
+    + '<div class="empty-state">Loading...</div></div>';
+
+  el.innerHTML = html;
+
+  // Lazy-load detail, then render first tab
+  await loadDetail(id);
+  renderConnectionsTab(id);
+}
+
+function switchDetailTab(tab, btn) {
+  document.querySelectorAll('.tab-btn')
+    .forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+
+  if (tab === 'connections')
+    renderConnectionsTab(view.bookId);
+  else if (tab === 'references')
+    renderReferencesTab(view.bookId);
+  else if (tab === 'graph')
+    renderGraphTab(view.bookId);
+}
+
+function renderConnectionsTab(id) {
+  const el = document.getElementById('detailTabContent');
+  const detail = detailCache[id];
+  if (!detail || !detail.connections
+    || detail.connections.length === 0) {
+    el.innerHTML = '<div class="empty-state">'
+      + 'No connections found with other books '
+      + 'on your shelf.</div>';
+    return;
+  }
+
+  // Connections already sorted by build script
+  const b = bookMap[id];
+  const sameCat = detail.connections.filter(
+    c => c.superCategory === b.sc);
+  const diffCat = detail.connections.filter(
+    c => c.superCategory !== b.sc);
+
+  let html = '';
+
+  if (sameCat.length > 0) {
+    html += '<div class="section-heading">Within '
+      + esc(b.sc)
+      + ' (' + sameCat.length + ')</div>';
+    for (const c of sameCat)
+      html += connCardHtml(c);
+  }
+
+  if (diffCat.length > 0) {
+    html += '<div class="section-heading">'
+      + 'Cross-Category ('
+      + diffCat.length + ')</div>';
+    for (const c of diffCat)
+      html += connCardHtml(c);
+  }
+
+  el.innerHTML = html;
+}
+
+function connCardHtml(c) {
+  const color = CAT_COLORS[c.superCategory] || '#999';
+  let html = '<div class="conn-card" '
+    + 'onclick="navigateToBook(\''
+    + escQ(c.id) + '\')">';
+  html += '<img class="conn-cover" loading="lazy" src="'
+    + esc(c.dir) + '/thumb.jpg" alt=""'
+    + ' onerror="this.src=\'' + esc(c.dir)
+    + '/cover.jpg\'">';
+  html += '<div class="conn-info">';
+  html += '<div class="conn-title">'
+    + esc(c.title) + '</div>';
+  html += '<div class="conn-author">'
+    + esc(c.author) + '</div>';
+  html += '<div class="conn-shared">Shared: '
+    + c.shared.map(s => esc(s)).join(', ')
+    + '</div>';
+  html += '</div>';
+  html += '<span class="conn-arrow" '
+    + 'style="color:' + color + '">\u203A</span>';
+  html += '</div>';
+  return html;
+}
+
+function renderReferencesTab(id) {
+  const el = document.getElementById('detailTabContent');
+  const detail = detailCache[id];
+  if (!detail || !detail.references
+    || detail.references.length === 0) {
+    el.innerHTML = '<div class="empty-state">'
+      + 'No referenced works table found.</div>';
+    return;
+  }
+
+  // Build shelf author lookup
+  const shelfAuthors = {};
+  DATA.books.forEach(sb => {
+    const surnames = getSurnames(sb.author);
+    surnames.forEach(sn => {
+      shelfAuthors[sn.toLowerCase()] = sb.id;
     });
   });
 
-  // 3. Fetch each book's index.html and parse referenced works
-  progress.textContent = `Scanning ${books.length} books for references...`;
-  let loaded = 0;
-
-  await Promise.all(books.map(async (book) => {
-    try {
-      const resp = await fetch(`${book.dir}/index.html`);
-      const html = await resp.text();
-      const doc = parser.parseFromString(html, 'text/html');
-
-      // Find "Books & Thinkers Referenced" section
-      const h2s = doc.querySelectorAll('h2');
-      let refH2 = null;
-      for (const h2 of h2s) {
-        if (h2.textContent.includes('Referenced')) {
-          refH2 = h2;
-          break;
-        }
+  let html = '<table class="ref-table">';
+  html += '<tr><th>Name</th><th>Description</th></tr>';
+  for (const ref of detail.references) {
+    let onShelf = null;
+    const nameLower = ref.name.toLowerCase();
+    for (const [sn, sid] of Object.entries(shelfAuthors)) {
+      if (nameLower.includes(sn) && sid !== id) {
+        onShelf = sid;
+        break;
       }
-
-      if (refH2) {
-        // Find the table — might be direct sibling or inside a wrapper div
-        let table = null;
-        let el = refH2.nextElementSibling;
-        for (let i = 0; i < 5 && el; i++) {
-          if (el.tagName === 'TABLE') { table = el; break; }
-          if (el.tagName === 'H2') break;
-          const inner = el.querySelector('table');
-          if (inner) { table = inner; break; }
-          el = el.nextElementSibling;
-        }
-
-        if (table) {
-          table.querySelectorAll('tr').forEach(tr => {
-            const tds = tr.querySelectorAll('td');
-            if (tds.length >= 1) {
-              let name = tds[0].textContent.trim();
-              name = name.replace(/\s*\(.*\)\s*$/, '').trim();
-              name = name.replace(/["""'']/g, '').trim();
-              const desc = tds.length >= 2 ? tds[1].textContent.trim() : '';
-              if (name && name.length > 1) {
-                book.thinkers.push(name);
-                book.refRows.push({ name, desc });
-              }
-            }
-          });
-        }
-      }
-    } catch(e) {
-      // Book page not found — no thinkers
     }
-    loaded++;
-    progress.textContent = `Scanned ${loaded} of ${books.length} books...`;
-  }));
 
-  // 4. Generate short labels for nodes
-  books.forEach(b => {
-    b.short = shortenTitle(b.title);
+    const cls = onShelf ? ' class="on-shelf"' : '';
+    const onclick = onShelf
+      ? ' onclick="navigateToBook(\''
+        + escQ(onShelf) + '\')"'
+      : '';
+    html += '<tr' + cls + onclick + '>';
+    html += '<td>' + esc(ref.name)
+      + (onShelf ? ' \u{1F4DA}' : '') + '</td>';
+    html += '<td>' + esc(ref.desc
+      || ref.connection || '') + '</td>';
+    html += '</tr>';
+  }
+  html += '</table>';
+
+  el.innerHTML = html;
+}
+
+function renderGraphTab(id) {
+  const el = document.getElementById('detailTabContent');
+  const neighbors = DATA.adjacency[id];
+  if (!neighbors || neighbors.length === 0) {
+    el.innerHTML = '<div class="empty-state">'
+      + 'No connections to visualize.</div>';
+    return;
+  }
+
+  // Build local nodes from precomputed adjacency
+  const nodeIds = new Set([id, ...neighbors]);
+  const nodes = [...nodeIds].map(nid => ({
+    id: nid,
+    ...bookMap[nid],
+    isCenter: nid === id,
+  })).filter(n => n.title);
+
+  // Build links from adjacency
+  const links = [];
+  const seen = new Set();
+  for (const nid of neighbors) {
+    const key = [id, nid].sort().join('|');
+    if (!seen.has(key)) {
+      seen.add(key);
+      links.push({ source: id, target: nid });
+    }
+  }
+
+  el.innerHTML = '<div class="local-graph-wrap">'
+    + '<svg id="localGraph"></svg></div>';
+
+  renderLocalGraph(nodes, links, id);
+}
+
+function renderLocalGraph(nodes, links, centerId) {
+  const svg = document.getElementById('localGraph');
+  const W = svg.parentElement.clientWidth;
+  const H = Math.min(400, W * 0.7);
+  svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
+  svg.setAttribute('width', W);
+  svg.setAttribute('height', H);
+
+  const cx = W / 2, cy = H / 2;
+  const radius = Math.min(W, H) * 0.32;
+
+  // Position: center node in middle, others in a circle
+  const others = nodes.filter(n => n.id !== centerId);
+  const positions = {};
+  positions[centerId] = { x: cx, y: cy };
+
+  others.forEach((n, i) => {
+    const angle = (2 * Math.PI * i / others.length)
+      - Math.PI / 2;
+    positions[n.id] = {
+      x: cx + radius * Math.cos(angle),
+      y: cy + radius * Math.sin(angle),
+    };
   });
 
-  return books;
-}
+  let svgContent = '';
 
-function shortenTitle(title) {
-  // Create 2-line short labels for graph nodes
-  const map = {
-    'Personal Finance For Dummies': 'Personal\nFinance',
-    'I Will Teach You to Be Rich': 'I Will Teach\nYou to Be Rich',
-    'Asset Allocation': 'Asset\nAllocation',
-    "The Bogleheads' Guide to Investing": "Bogleheads'\nGuide",
-    'Bond Markets, Analysis, and Strategies': 'Bond\nMarkets',
-    'Talking to My Daughter About the Economy': 'Talking to\nMy Daughter',
-    'The Wealth of Nations': 'Wealth of\nNations',
-    'Big Debt Crises': 'Big Debt\nCrises',
-    'Capital Wars': 'Capital\nWars',
-    'Economics 101': 'Economics\n101',
-    'Capitalism and Freedom': 'Capitalism\n& Freedom',
-    'Cycles: The Science of Prediction': 'Cycles',
-    'The Golden Constant': 'Golden\nConstant',
-    'Against the Gods': 'Against\nthe Gods',
-    'A History of Money and Banking in the United States': 'History of\nMoney & Banking',
-    'Atomic Habits': 'Atomic\nHabits',
-    'Bowling Alone': 'Bowling\nAlone',
-    'Fooled by Randomness': 'Fooled by\nRandomness',
-  };
-  if (map[title]) return map[title];
-  // Default: if title is long, split at midpoint space
-  if (title.length > 14) {
-    const mid = Math.floor(title.length / 2);
-    const spaceAfter = title.indexOf(' ', mid);
-    const spaceBefore = title.lastIndexOf(' ', mid);
-    const splitAt = (spaceAfter !== -1 && spaceAfter - mid < mid - spaceBefore) ? spaceAfter : spaceBefore;
-    if (splitAt > 0) return title.substring(0, splitAt) + '\n' + title.substring(splitAt + 1);
-  }
-  return title;
-}
-
-// ── Extract surnames from an author string ──
-function getAuthorSurnames(authorStr) {
-  // Handle "Larimore, Lindauer & LeBoeuf", "William Strauss & Neil Howe", "Frank J. Fabozzi"
-  const parts = authorStr.split(/[,&]+/).map(s => s.trim()).filter(Boolean);
-  return parts.map(part => {
-    const words = part.split(/\s+/);
-    return words[words.length - 1]; // last word = surname
-  }).filter(s => s.length >= 3);
-}
-
-// ── Compute Edges: does Book A reference Book B's author? ──
-function computeEdges(books) {
-  const edges = [];
-  const edgeMap = {}; // "idA|idB" → edge (for merging bidirectional)
-
-  for (let i = 0; i < books.length; i++) {
-    for (let j = 0; j < books.length; j++) {
-      if (i === j) continue;
-      if (!books[i].refRows.length) continue;
-
-      const targetSurnames = getAuthorSurnames(books[j].author);
-      const matches = [];
-
-      for (const ref of books[i].refRows) {
-        const refNameLower = ref.name.toLowerCase();
-        const refDescLower = ref.desc.toLowerCase();
-        const fullText = refNameLower + ' ' + refDescLower;
-
-        // Check if this reference row mentions the target book's author
-        for (const sn of targetSurnames) {
-          if (refNameLower.includes(sn.toLowerCase())) {
-            matches.push({ name: ref.name, desc: ref.desc, matchType: 'author' });
-            break;
-          }
-        }
-
-        // Also check if the row mentions the target book's title
-        const titleLower = books[j].title.toLowerCase();
-        if (fullText.includes(titleLower)) {
-          matches.push({ name: ref.name, desc: ref.desc, matchType: 'title' });
-        }
-      }
-
-      if (matches.length > 0) {
-        // Create undirected edge key (alphabetical order)
-        const key = [books[i].id, books[j].id].sort().join('|');
-        if (!edgeMap[key]) {
-          edgeMap[key] = {
-            source: books[i].id,
-            target: books[j].id,
-            refs: {},  // { bookId: [{name, desc, matchType}] }
-            weight: 0
-          };
-        }
-        // Deduplicate by name
-        const seen = new Set();
-        edgeMap[key].refs[books[i].id] = matches.filter(m => {
-          if (seen.has(m.name)) return false;
-          seen.add(m.name);
-          return true;
-        });
-        edgeMap[key].weight++;
-      }
-    }
-  }
-
-  return Object.values(edgeMap);
-}
-
-// ── Build D3 Graph ──
-function buildGraph(books, edges) {
-  // Hide loading
-  document.getElementById('loading').classList.add('done');
-
-  // Stats
-  const connectedBooks = new Set();
-  edges.forEach(e => { connectedBooks.add(e.source); connectedBooks.add(e.target); });
-  document.getElementById('stats').textContent =
-    `${books.length} books · ${edges.length} cross-references`;
-
-  // Legend
-  const legendEl = document.getElementById('legend');
-  const usedCats = new Set(books.map(b => b.category));
-  for (const [cat, color] of Object.entries(CATEGORIES)) {
-    if (!usedCats.has(cat)) continue;
-    legendEl.innerHTML += `<span class="legend-item"><span class="legend-dot" style="background:${color}"></span>${cat}</span>`;
-  }
-
-  // SVG setup
-  const width = window.innerWidth;
-  const height = window.innerHeight;
-
-  const svg = d3.select('#graph')
-    .attr('width', width)
-    .attr('height', height);
-
-  const g = svg.append('g');
-  const zoom = d3.zoom()
-    .scaleExtent([0.3, 4])
-    .on('zoom', e => g.attr('transform', e.transform));
-  svg.call(zoom);
-
-  // Nodes
-  const nodes = books.map(b => ({
-    ...b,
-    connectionCount: edges.filter(e => e.source === b.id || e.target === b.id).length
-  }));
-
-  // Links
-  const links = edges.map(e => ({ ...e }));
-
-  // Scales
-  const maxConn = d3.max(nodes, d => d.connectionCount) || 1;
-  const radiusScale = d3.scaleSqrt().domain([0, maxConn]).range([22, 38]);
-  const linkWidthScale = d3.scaleLinear().domain([1, d3.max(edges, e => e.weight) || 1]).range([1, 4]);
-
-  // Simulation
-  const simulation = d3.forceSimulation(nodes)
-    .force('link', d3.forceLink(links).id(d => d.id)
-      .distance(d => 180 - d.weight * 15)
-      .strength(d => 0.3 + d.weight * 0.05))
-    .force('charge', d3.forceManyBody().strength(-400))
-    .force('center', d3.forceCenter(width / 2, height / 2))
-    .force('collision', d3.forceCollide().radius(d => radiusScale(d.connectionCount) + 20))
-    .force('x', d3.forceX(width / 2).strength(0.05))
-    .force('y', d3.forceY(height / 2).strength(0.05));
-
-  // Expand undirected links into directed sub-edges for arrow rendering
-  const directedLinks = [];
+  // Draw links
   links.forEach(l => {
-    const srcId = l.source.id || l.source;
-    const tgtId = l.target.id || l.target;
-    // If source book references target's author → arrow from source to target
-    if (l.refs[srcId] && l.refs[srcId].length > 0) {
-      directedLinks.push({ ...l, dirSource: srcId, dirTarget: tgtId, parentLink: l });
-    }
-    // If target book references source's author → arrow from target to source
-    if (l.refs[tgtId] && l.refs[tgtId].length > 0) {
-      directedLinks.push({ ...l, dirSource: tgtId, dirTarget: srcId, parentLink: l });
-    }
+    const p1 = positions[l.source];
+    const p2 = positions[l.target];
+    if (!p1 || !p2) return;
+    svgContent += '<line class="graph-link" '
+      + 'x1="' + p1.x + '" y1="' + p1.y + '" '
+      + 'x2="' + p2.x + '" y2="' + p2.y + '"/>';
   });
-
-  // Draw directed edges as paths with arrow markers
-  const link = g.append('g').selectAll('path')
-    .data(directedLinks).enter().append('path')
-    .attr('class', 'link')
-    .attr('stroke', d => {
-      const src = books.find(b => b.id === d.dirSource);
-      return CATEGORIES[src?.category] || '#4a9a8f';
-    })
-    .attr('stroke-width', d => linkWidthScale(d.parentLink.weight))
-    .attr('marker-end', 'url(#arrow)')
-    .attr('fill', 'none');
-
-  // Remove old edge count labels (confusing "1"s)
-  const edgeLabel = g.append('g').selectAll('text')
-    .data([]).enter().append('text');
-
-  // Defs: clip paths + arrow markers
-  const defs = svg.append('defs');
-  nodes.forEach(d => {
-    defs.append('clipPath')
-      .attr('id', 'clip-' + d.id)
-      .append('circle')
-      .attr('r', radiusScale(d.connectionCount));
-  });
-
-  // Arrow marker for directed edges
-  defs.append('marker')
-    .attr('id', 'arrow')
-    .attr('viewBox', '0 -4 8 8')
-    .attr('refX', 8)
-    .attr('refY', 0)
-    .attr('markerWidth', 6)
-    .attr('markerHeight', 6)
-    .attr('orient', 'auto')
-    .append('path')
-    .attr('d', 'M0,-3.5L8,0L0,3.5')
-    .attr('fill', 'rgba(0,0,0,0.18)');
-
-  defs.append('marker')
-    .attr('id', 'arrow-hl')
-    .attr('viewBox', '0 -4 8 8')
-    .attr('refX', 8)
-    .attr('refY', 0)
-    .attr('markerWidth', 6)
-    .attr('markerHeight', 6)
-    .attr('orient', 'auto')
-    .append('path')
-    .attr('d', 'M0,-3.5L8,0L0,3.5')
-    .attr('fill', 'rgba(0,0,0,0.45)');
 
   // Draw nodes
-  const node = g.append('g').selectAll('g')
-    .data(nodes).enter().append('g')
-    .call(d3.drag()
-      .on('start', (e, d) => { if (!e.active) simulation.alphaTarget(0.3).restart(); d.fx = d.x; d.fy = d.y; })
-      .on('drag', (e, d) => { d.fx = e.x; d.fy = e.y; })
-      .on('end', (e, d) => { if (!e.active) simulation.alphaTarget(0); d.fx = null; d.fy = null; }));
+  nodes.forEach(n => {
+    const p = positions[n.id];
+    if (!p) return;
+    const r = n.isCenter ? 28 : 20;
+    const color = CAT_COLORS[n.sc] || '#999';
 
-  // Cover art image clipped to circle
-  node.append('image')
-    .attr('href', d => d.dir + '/cover.jpg')
-    .attr('x', d => -radiusScale(d.connectionCount))
-    .attr('y', d => -radiusScale(d.connectionCount))
-    .attr('width', d => radiusScale(d.connectionCount) * 2)
-    .attr('height', d => radiusScale(d.connectionCount) * 2)
-    .attr('preserveAspectRatio', 'xMidYMid slice')
-    .attr('clip-path', d => `url(#clip-${d.id})`)
-    .attr('class', 'node-cover');
+    // Clip path for cover image
+    const clipId = 'gc-' + n.id.replace(/[^a-z0-9]/g, '');
+    svgContent += '<defs><clipPath id="' + clipId + '">'
+      + '<circle cx="' + p.x + '" cy="' + p.y
+      + '" r="' + r + '"/>'
+      + '</clipPath></defs>';
 
-  // Border circle on top
-  node.append('circle')
-    .attr('class', 'node-circle')
-    .attr('r', d => radiusScale(d.connectionCount))
-    .attr('fill', 'none');
+    svgContent += '<g class="graph-node" '
+      + 'onclick="navigateToBook(\''
+      + escQ(n.id) + '\')">';
 
-  // Connection count badge
-  const badgeGroup = node.filter(d => d.connectionCount > 0);
-  badgeGroup.append('circle')
-    .attr('cx', d => radiusScale(d.connectionCount) * 0.7)
-    .attr('cy', d => -radiusScale(d.connectionCount) * 0.7)
-    .attr('r', 9)
-    .attr('fill', d => CATEGORIES[d.category] || '#4a9a8f')
-    .attr('stroke', '#fff')
-    .attr('stroke-width', 1.5);
-  badgeGroup.append('text')
-    .attr('x', d => radiusScale(d.connectionCount) * 0.7)
-    .attr('y', d => -radiusScale(d.connectionCount) * 0.7)
-    .attr('text-anchor', 'middle')
-    .attr('dominant-baseline', 'central')
-    .attr('fill', '#fff')
-    .attr('font-size', '8px')
-    .attr('font-family', '-apple-system, sans-serif')
-    .attr('font-weight', '700')
-    .attr('pointer-events', 'none')
-    .text(d => d.connectionCount);
+    // Cover image
+    svgContent += '<image href="' + esc(n.dir)
+      + '/cover.jpg" '
+      + 'x="' + (p.x - r) + '" y="' + (p.y - r) + '" '
+      + 'width="' + (r * 2) + '" height="' + (r * 2) + '" '
+      + 'preserveAspectRatio="xMidYMid slice" '
+      + 'clip-path="url(#' + clipId + ')"/>';
 
-  // Labels
-  node.each(function(d) {
-    const lines = d.short.split('\n');
-    const el = d3.select(this);
-    lines.forEach((line, i) => {
-      el.append('text')
-        .attr('class', 'node-label')
-        .attr('dy', `${(i - (lines.length - 1) / 2) * 12 + radiusScale(d.connectionCount) + 14}px`)
-        .text(line);
-    });
+    // Border
+    svgContent += '<circle class="graph-node-circle" '
+      + 'cx="' + p.x + '" cy="' + p.y + '" r="' + r + '" '
+      + 'fill="none" stroke="' + color + '" '
+      + 'stroke-width="' + (n.isCenter ? 3 : 1.5) + '"/>';
+
+    // Label
+    const label = n.title.length > 18
+      ? n.title.substring(0, 16) + '\u2026' : n.title;
+    svgContent += '<text class="graph-label" '
+      + 'x="' + p.x + '" y="' + (p.y + r + 14) + '">'
+      + esc(label) + '</text>';
+
+    svgContent += '</g>';
   });
 
-  // Tooltip
-  const tooltip = document.getElementById('tooltip');
-  node.on('mouseover', (event, d) => {
-    let tip = `<strong>${d.title}</strong>`;
-    if (d.connectionCount > 0) {
-      tip += `<br>${d.connectionCount} connection${d.connectionCount !== 1 ? 's' : ''}`;
-    } else if (d.refRows.length === 0) {
-      tip += `<br><em>No reference table yet</em>`;
+  svg.innerHTML = svgContent;
+}
+
+// ── Render: Trail ──
+function renderTrail(idx) {
+  const el = document.getElementById('content');
+  const trail = TRAILS[idx];
+  if (!trail) return;
+
+  let html = '<h2 style="margin-top:12px">'
+    + esc(trail.name) + '</h2>';
+  html += '<p style="color:var(--text2);'
+    + 'font-size:0.88rem;margin-bottom:8px;'
+    + 'font-style:italic">'
+    + esc(trail.desc) + '</p>';
+
+  html += '<div class="trail-chain">';
+  for (const step of trail.books) {
+    const b = bookMap[step.id];
+    html += '<div class="trail-step">';
+    html += '<div class="trail-line">';
+    html += '<div class="trail-dot" style="background:'
+      + (b ? CAT_COLORS[b.sc] || '#999'
+        : 'var(--text3)')
+      + '"></div>';
+    html += '<div class="trail-stem"></div>';
+    html += '</div>';
+    html += '<div class="trail-book">';
+    if (b) {
+      html += '<div class="trail-title" '
+        + 'onclick="navigateToBook(\''
+        + escQ(b.id) + '\')">'
+        + esc(b.title) + '</div>';
+      html += '<div class="trail-author">'
+        + esc(b.author) + '</div>';
     } else {
-      tip += `<br><em>No shelf cross-references</em>`;
+      html += '<div class="trail-title" '
+        + 'style="color:var(--text3)">'
+        + esc(step.id) + ' (not on shelf)</div>';
     }
-    tooltip.innerHTML = tip;
-    tooltip.classList.add('show');
-  })
-  .on('mousemove', event => {
-    tooltip.style.left = (event.clientX + 14) + 'px';
-    tooltip.style.top = (event.clientY - 10) + 'px';
-  })
-  .on('mouseout', () => tooltip.classList.remove('show'));
+    html += '<div class="trail-why">'
+      + esc(step.why) + '</div>';
+    html += '</div></div>';
+  }
+  html += '</div>';
 
-  // Click
-  node.on('click', (event, d) => {
-    event.stopPropagation();
-    tooltip.classList.remove('show');
-    selectNode(d, nodes, links, books, node, link, edgeLabel);
-  });
-
-  svg.on('click', () => clearSelection(node, link, edgeLabel));
-
-  // Helper: find node object by id
-  const nodeById = {};
-  nodes.forEach(n => nodeById[n.id] = n);
-
-  // Tick
-  simulation.on('tick', () => {
-    link.attr('d', d => {
-      const src = nodeById[d.dirSource] || d.source;
-      const tgt = nodeById[d.dirTarget] || d.target;
-      if (!src.x || !tgt.x) return '';
-
-      const dx = tgt.x - src.x;
-      const dy = tgt.y - src.y;
-      const dist = Math.sqrt(dx * dx + dy * dy) || 1;
-      const ux = dx / dist;
-      const uy = dy / dist;
-
-      // Offset start/end to node edge (radius)
-      const r1 = radiusScale(src.connectionCount) + 4;
-      const r2 = radiusScale(tgt.connectionCount) + 8; // extra for arrow
-      const x1 = src.x + ux * r1;
-      const y1 = src.y + uy * r1;
-      const x2 = tgt.x - ux * r2;
-      const y2 = tgt.y - uy * r2;
-
-      // Check if bidirectional — offset perpendicular slightly
-      const isBidirectional = d.parentLink.refs[d.dirSource] && d.parentLink.refs[d.dirTarget]
-        && d.parentLink.refs[d.dirSource].length > 0 && d.parentLink.refs[d.dirTarget].length > 0;
-
-      if (isBidirectional) {
-        const off = 4; // perpendicular offset
-        const px = -uy * off;
-        const py = ux * off;
-        return `M${x1 + px},${y1 + py}L${x2 + px},${y2 + py}`;
-      }
-      return `M${x1},${y1}L${x2},${y2}`;
-    });
-
-    node.attr('transform', d => `translate(${d.x},${d.y})`);
-  });
-
-  // Resize
-  window.addEventListener('resize', () => {
-    const w = window.innerWidth, h = window.innerHeight;
-    svg.attr('width', w).attr('height', h);
-    simulation.force('center', d3.forceCenter(w / 2, h / 2));
-    simulation.alpha(0.3).restart();
-  });
-
-  // Store refs for click handlers
-  window._graphState = { nodes, links, books, node, link, edgeLabel };
+  el.innerHTML = html;
 }
 
-function selectNode(d, nodes, links, books, node, link, edgeLabel) {
-  const connectedEdges = links.filter(l =>
-    (l.source.id || l.source) === d.id || (l.target.id || l.target) === d.id
-  );
-  const connectedIds = new Set([d.id]);
-  connectedEdges.forEach(e => {
-    connectedIds.add(e.source.id || e.source);
-    connectedIds.add(e.target.id || e.target);
-  });
-
-  node.select('.node-circle')
-    .classed('selected', n => n.id === d.id)
-    .classed('dimmed', n => !connectedIds.has(n.id));
-  node.select('.node-cover')
-    .classed('dimmed', n => !connectedIds.has(n.id));
-  node.selectAll('.node-label')
-    .classed('dimmed', n => !connectedIds.has(n.id));
-  link.classed('highlighted', l =>
-    l.dirSource === d.id || l.dirTarget === d.id
-  ).classed('dimmed', l =>
-    l.dirSource !== d.id && l.dirTarget !== d.id
-  ).attr('marker-end', l =>
-    (l.dirSource === d.id || l.dirTarget === d.id) ? 'url(#arrow-hl)' : 'url(#arrow)'
-  );
-
-  // Build info panel
-  const bookColor = CATEGORIES[d.category] || '#666';
-  let html = `<h2 style="color:${bookColor}">${d.title}</h2>`;
-  html += `<div class="author">${d.author}</div>`;
-  html += `<a class="view-notes" href="${d.dir}/index.html">View full notes &rarr;</a>`;
-
-  // Show reference table status
-  if (d.refRows.length === 0) {
-    html += `<div class="no-refs-note">This book doesn't have a Referenced Works section yet.</div>`;
+// ── Search ──
+function onSearch(e) {
+  const q = e.target.value.trim().toLowerCase();
+  if (q.length < 2) {
+    // Restore current view
+    if (view.level === 'categories') renderCategories();
+    else if (view.level === 'books')
+      renderBooks(view.superCat);
+    else if (view.level === 'detail')
+      renderDetail(view.bookId);
+    else if (view.level === 'trail')
+      renderTrail(view.trail);
+    return;
   }
 
-  if (connectedEdges.length === 0) {
-    html += `<h3>No Connections</h3>`;
-    html += `<p style="font-size:0.85rem;color:rgba(0,0,0,0.4)">No cross-references found with other books on your shelf.</p>`;
-  } else {
-    html += `<h3>Connections (${connectedEdges.length})</h3>`;
-    connectedEdges.sort((a, b) => b.weight - a.weight);
-    connectedEdges.forEach(edge => {
-      const otherId = (edge.source.id || edge.source) === d.id
-        ? (edge.target.id || edge.target)
-        : (edge.source.id || edge.source);
-      const other = books.find(b => b.id === otherId);
-      if (!other) return;
-      const otherColor = CATEGORIES[other.category] || '#666';
+  const el = document.getElementById('content');
 
-      // Get directional references (now full objects with name, desc, matchType)
-      const thisRefs = edge.refs[d.id] || [];
-      const otherRefs = edge.refs[otherId] || [];
+  // Search books by title, author, category, keywords
+  const bookResults = DATA.books.filter(b =>
+    b.title.toLowerCase().includes(q)
+    || b.author.toLowerCase().includes(q)
+    || b.category.toLowerCase().includes(q)
+    || (b.kw && b.kw.some(k => k.includes(q)))
+  ).slice(0, 20);
 
-      const shortThis = d.title.split(':')[0].split(',')[0];
-      const shortOther = other.title.split(':')[0].split(',')[0];
-
-      html += `<div class="connection-item" style="border-color:${otherColor}" onclick="navBook('${otherId}')">`;
-      html += `<div class="book-name" style="color:${otherColor}">${other.title}</div>`;
-
-      if (thisRefs.length > 0) {
-        html += `<div class="ref-direction"><span class="ref-arrow out">&rarr;</span> <em>${shortThis}</em> references:</div>`;
-        thisRefs.forEach(ref => {
-          html += `<div class="ref-detail">`;
-          html += `<div class="ref-name">${ref.name}</div>`;
-          if (ref.desc) html += `<div class="ref-desc">${ref.desc}</div>`;
-          html += `</div>`;
+  // Thinker search requires loading detail files
+  // For now, search cached details only (instant)
+  const thinkerResults = [];
+  const seenThinkers = new Set();
+  for (const [bid, detail] of Object.entries(detailCache)) {
+    for (const ref of (detail.references || [])) {
+      if (ref.name.toLowerCase().includes(q)
+        && !seenThinkers.has(ref.name)) {
+        seenThinkers.add(ref.name);
+        const b = bookMap[bid];
+        thinkerResults.push({
+          name: ref.name,
+          desc: ref.desc || ref.connection || '',
+          bookId: bid,
+          bookTitle: b ? b.title : bid,
         });
       }
-      if (otherRefs.length > 0) {
-        html += `<div class="ref-direction" style="margin-top:8px"><span class="ref-arrow in">&larr;</span> <em>${shortOther}</em> references:</div>`;
-        otherRefs.forEach(ref => {
-          html += `<div class="ref-detail">`;
-          html += `<div class="ref-name">${ref.name}</div>`;
-          if (ref.desc) html += `<div class="ref-desc">${ref.desc}</div>`;
-          html += `</div>`;
-        });
-      }
-
-      html += `</div>`;
-    });
+    }
+    if (thinkerResults.length >= 15) break;
   }
 
-  document.getElementById('panelContent').innerHTML = html;
-  document.getElementById('infoPanel').classList.add('open');
+  // Search trails
+  const trailResults = TRAILS.filter((t, i) =>
+    t.name.toLowerCase().includes(q)
+    || t.desc.toLowerCase().includes(q)
+  );
+
+  let html = '<div class="search-results">';
+
+  if (bookResults.length > 0) {
+    html += '<div class="search-section-label">Books</div>';
+    html += '<div class="book-list">';
+    for (const b of bookResults)
+      html += bookRowHtml(b);
+    html += '</div>';
+  }
+
+  if (thinkerResults.length > 0) {
+    html += '<div class="search-section-label">'
+      + 'Thinkers & References</div>';
+    html += '<div class="book-list">';
+    for (const t of thinkerResults) {
+      html += '<div class="book-row" '
+        + 'onclick="navigateToBook(\''
+        + escQ(t.bookId) + '\')">';
+      html += '<div class="book-info">';
+      html += '<div class="book-title">'
+        + esc(t.name) + '</div>';
+      html += '<div class="book-author">'
+        + esc(t.desc) + '</div>';
+      html += '<div class="book-meta">'
+        + '<span>Referenced in '
+        + esc(t.bookTitle) + '</span></div>';
+      html += '</div></div>';
+    }
+    html += '</div>';
+  }
+
+  if (trailResults.length > 0) {
+    html += '<div class="search-section-label">'
+      + 'Idea Trails</div>';
+    html += '<div class="trail-grid">';
+    trailResults.forEach(trail => {
+      const idx = TRAILS.indexOf(trail);
+      const validCount = trail.books
+        .filter(b => bookMap[b.id]).length;
+      html += '<div class="trail-card" '
+        + 'onclick="showTrail(' + idx + ')">';
+      html += '<div class="trail-name">'
+        + esc(trail.name) + '</div>';
+      html += '<div class="trail-count">'
+        + validCount + ' books</div>';
+      html += '</div>';
+    });
+    html += '</div>';
+  }
+
+  if (bookResults.length === 0
+    && thinkerResults.length === 0
+    && trailResults.length === 0) {
+    html += '<div class="empty-state">'
+      + 'No results for "' + esc(q) + '"</div>';
+  }
+
+  html += '</div>';
+  el.innerHTML = html;
 }
 
-function navBook(id) {
-  const s = window._graphState;
-  const book = s.nodes.find(n => n.id === id);
-  if (book) selectNode(book, s.nodes, s.links, s.books, s.node, s.link, s.edgeLabel);
+// ── Helpers ──
+function esc(s) {
+  if (!s) return '';
+  return s.replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
 }
 
-function clearSelection(node, link, edgeLabel) {
-  const s = window._graphState;
-  if (!s) return;
-  s.node.select('.node-circle').classed('selected', false).classed('dimmed', false);
-  s.node.select('.node-cover').classed('dimmed', false);
-  s.node.selectAll('.node-label').classed('dimmed', false);
-  s.link.classed('highlighted', false).classed('dimmed', false).attr('marker-end', 'url(#arrow)');
-  document.getElementById('infoPanel').classList.remove('open');
+function escQ(s) {
+  return s.replace(/'/g, "\\'")
+    .replace(/"/g, '&quot;');
 }
 
-function closePanel() {
-  clearSelection();
+function getSurnames(authorStr) {
+  return authorStr.split(/[,&]+/)
+    .map(s => s.trim())
+    .filter(Boolean)
+    .map(part => {
+      const words = part.split(/\s+/);
+      return words[words.length - 1];
+    })
+    .filter(s => s.length >= 3);
 }
 
 // ── Init ──
-(async function() {
-  const books = await loadBookData();
-  if (!books) return;
-  const edges = computeEdges(books);
-  buildGraph(books, edges);
-})();
+init();
 </script>
-
 </body>
 </html>
