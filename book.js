@@ -686,14 +686,17 @@
       }
     }
 
-    // Tick every 1 second — count active time + dwell tracking
+    // Tick every 1 second
     setInterval(function() {
       if (document.hidden) return;
+      // Active time only counts with recent input (for WPM calc)
       if (Date.now() - lastActivity < IDLE_THRESHOLD) {
         activeTime += 1000;
-        tickDwell();
-        updateEta();
       }
+      // Dwell always ticks when tab is visible — you can read
+      // a long section for 60+ seconds without touching anything
+      tickDwell();
+      updateEta();
     }, 1000);
 
     // ETA updates via the 1-second dwell ticker above
