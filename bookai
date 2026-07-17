@@ -12,6 +12,8 @@
 #   ./bookai "/path/to/book.pdf" "My_Book" 1 300 20 5 3
 #   ./bookai "/path/to/book.pdf" "My_Book"              # auto-detect pages, defaults
 #   ./bookai "/path/to/book.pdf" "My_Book" 1 0 20 5 3 --ta   # technical analysis mode
+#
+# Requires: macOS (uses mdls for page count detection), claude CLI, python3
 
 set -euo pipefail
 
@@ -82,7 +84,9 @@ fi
 echo "========================================" | tee -a "$LOG"
 
 MAX_RETRIES=2
-TIMEOUT=180  # seconds per batch — kills frozen claude processes
+TIMEOUT=300  # seconds per batch — kills frozen claude processes
+MODEL_LOG="$DIR/.model_usage.log"
+: > "$MODEL_LOG"  # reset model usage log each run
 
 # Function: run a command with a timeout (macOS-compatible, no coreutils needed)
 run_with_timeout() {
@@ -143,13 +147,16 @@ WRITE the notes to '$OUT_FILE' using the Write tool. Target ~150-200 lines for t
 - Notable quotes as > blockquotes with attribution
 - **Bold** for key terms, concepts, and names
 $TA_INSTRUCTIONS
-Content guidelines — be CONCISE but THOROUGH:
-- Capture the core argument and reasoning chain for each section
-- Keep the BEST examples, data points, and evidence — not every single one
+Content guidelines — optimize for SIGNAL over NOISE:
+- Capture core arguments and reasoning that materially changes understanding
+- For each concept, keep the SINGLE best supporting example — not three that make the same point
 - Include contrarian/surprising claims with their supporting evidence
+- Include things a reader would remember 5 years from now
 - Include named individuals, books, or thinkers referenced
-- Skip filler: repetitive restatements, excessive context-setting, obvious transitions
-- One strong example per concept is enough — don't list three that make the same point
+- Tag each major idea with importance: [MUST KNOW], [SHOULD KNOW], or [NICE TO KNOW]
+- Flag obvious repetition: if the author restates a concept, note "repeats X from earlier" instead of re-capturing it
+- Flag weak sections: if a chapter is mostly padding/anecdotes around one core idea, say so
+- Skip filler: repetitive restatements, excessive context-setting, obvious transitions, motivational fluff
 - Do NOT output preamble — ONLY write the notes
 
 IMPORTANT: Only cover pages $P_START-$P_END. This is academic study material — process the content faithfully.
@@ -188,11 +195,12 @@ process_batch() {
       if [ -f "$TEMP_FILE" ] && [ "$(wc -c < "$TEMP_FILE" | tr -d ' ')" -gt 50 ]; then
         local LINES=$(wc -l < "$TEMP_FILE" | tr -d ' ')
         echo "  OK — pp. $B_START-$B_END ($MODEL, +$LINES lines)" >> "$BATCH_LOG"
+        echo "$B_START-$B_END:$MODEL" >> "$MODEL_LOG"
         return 0
       fi
 
       # Content filter? Skip straight to next model
-      if echo "$STDERR_CONTENT" | grep -q "content filtering"; then
+      if echo "$STDERR_CONTENT" | grep -qiE "content filter|content policy|unable to process"; then
         echo "  CONTENT_FILTER — pp. $B_START-$B_END ($MODEL)" >> "$BATCH_LOG"
         rm -f "$TEMP_FILE"
         break  # break retry loop, try next model
@@ -295,6 +303,20 @@ echo "========================================" | tee -a "$LOG"
 echo "DONE — $(date)" | tee -a "$LOG"
 echo "Batches: $TOTAL total, $FAILURES failed" | tee -a "$LOG"
 echo "Notes:   $(wc -l < "$NOTES") lines" | tee -a "$LOG"
+
+# Model usage summary
+if [ -f "$MODEL_LOG" ] && [ -s "$MODEL_LOG" ]; then
+  SONNET_COUNT=$(grep -c ':sonnet$' "$MODEL_LOG" || true)
+  HAIKU_COUNT=$(grep -c ':haiku$' "$MODEL_LOG" || true)
+  echo "" | tee -a "$LOG"
+  echo "Model usage: $SONNET_COUNT sonnet, $HAIKU_COUNT haiku" | tee -a "$LOG"
+  if [ "$HAIKU_COUNT" -gt 0 ]; then
+    echo "Haiku batches:" | tee -a "$LOG"
+    grep ':haiku$' "$MODEL_LOG" | sed 's/:haiku$//' | while read -r RANGE; do
+      echo "  pp. $RANGE" | tee -a "$LOG"
+    done
+  fi
+fi
 echo "========================================" | tee -a "$LOG"
 
 # === GAP-FILL PASS ===
@@ -364,9 +386,10 @@ IMPORTANT: Only cover page $FP. This is academic study material — process the 
           record_pages "$FP" "$FP"
           GAP_OK=true
           GAP_FIXED=$((GAP_FIXED + 1))
+          echo "$FP:$MODEL:gapfill" >> "$MODEL_LOG"
           echo "    OK — page $FP ($MODEL, +$(wc -l < "$TEMP" | tr -d ' ') lines)" | tee -a "$LOG"
           rm -f "$TEMP"
-        elif echo "$STDERR_CONTENT" | grep -q "content filtering"; then
+        elif echo "$STDERR_CONTENT" | grep -qiE "content filter|content policy|unable to process"; then
           echo "    CONTENT_FILTER — page $FP ($MODEL)" | tee -a "$LOG"
           rm -f "$TEMP"
           break  # try next model
@@ -400,8 +423,11 @@ fi
 echo "" | tee -a "$LOG"
 echo "=== DEDUP — removing duplicate sections ===" | tee -a "$LOG"
 
+cp "$NOTES" "$NOTES.pre-dedup"  # immutable backup before any modifications
+
 NOTES_FILE="$NOTES" python3 << 'DEDUP_EOF' 2>>"$LOG" | tee -a "$LOG"
-import sys, os
+import re, os
+from collections import defaultdict
 
 notes_path = os.environ['NOTES_FILE']
 with open(notes_path, 'r') as f:
@@ -416,18 +442,10 @@ for i in range(len(lines)):
         current_start = i
 sections.append((current_start, len(lines)))
 
-import re
-
-# Extract chapter number from header (e.g. "## Chapter 12: ..." -> 12)
-def get_chapter_num(header):
-    m = re.match(r'## Chapter (\d+)', header)
-    return int(m.group(1)) if m else None
-
-# Also extract appendix/book identifiers
 def get_section_key(header):
-    ch = get_chapter_num(header)
-    if ch is not None:
-        return f"chapter_{ch}"
+    m = re.match(r'## Chapter (\d+)', header)
+    if m:
+        return f"chapter_{m.group(1)}"
     if 'Appendix I:' in header or 'Appendix I ' in header:
         return 'appendix_i'
     if 'Appendix II' in header:
@@ -437,33 +455,61 @@ def get_section_key(header):
         return f"book_{m.group(1)}"
     return None
 
+def get_page_ranges(block):
+    """Extract page numbers covered by a section from <!-- pp. X-Y --> markers."""
+    pages = set()
+    for m in re.finditer(r'<!-- pp?\. (\d+)(?:-(\d+))? -->', block):
+        start = int(m.group(1))
+        end = int(m.group(2)) if m.group(2) else start
+        for p in range(start, end + 1):
+            pages.add(p)
+    return pages
+
 # Group sections by key
-from collections import defaultdict
 groups = defaultdict(list)
 for s, e in sections:
     h = lines[s].strip()
     key = get_section_key(h)
     if key:
-        groups[key].append((s, e, h, e - s))
+        block = ''.join(lines[s:e])
+        pages = get_page_ranges(block)
+        groups[key].append((s, e, h, e - s, pages))
 
-# Find duplicates (multiple sections with same key)
+# Find duplicates — page-aware merging
 remove_ranges = set()
 dedup_count = 0
 for key, secs in groups.items():
     if len(secs) <= 1:
         continue
-    # For chapter sections: "continued" sections are intentional, skip them
-    non_continued = [(s, e, h, sz) for s, e, h, sz in secs if '(cont' not in h.lower()]
+    # "continued" sections are intentional, skip them
+    non_continued = [(s, e, h, sz, pg) for s, e, h, sz, pg in secs if '(cont' not in h.lower()]
     if len(non_continued) <= 1:
         continue
-    # Keep the longest, remove the rest
-    non_continued.sort(key=lambda x: x[3], reverse=True)
-    keeper = non_continued[0]
-    for s, e, h, sz in non_continued[1:]:
-        remove_ranges.add((s, e))
-        dedup_count += 1
-        print(f"  REMOVE duplicate: [{s+1}-{e}] ({sz} lines) {h[:60]}")
-    print(f"  KEEP:             [{keeper[0]+1}-{keeper[1]}] ({keeper[3]} lines) {keeper[2][:60]}")
+
+    # Check if duplicates cover different pages (overlap vs distinct)
+    all_pages = set()
+    has_unique_pages = False
+    for s, e, h, sz, pg in non_continued:
+        if pg and not pg.issubset(all_pages):
+            if all_pages:  # second+ section has pages not in first
+                has_unique_pages = True
+            all_pages.update(pg)
+
+    if has_unique_pages:
+        # Different page ranges — keep all, just warn
+        page_strs = []
+        for s, e, h, sz, pg in non_continued:
+            page_strs.append(f"[{s+1}-{e}] pages {sorted(pg)[:5]}...")
+        print(f"  KEEP ALL {key} — sections cover different pages: {'; '.join(page_strs)}")
+    else:
+        # True duplicates (same or no page markers) — keep the longest
+        non_continued.sort(key=lambda x: x[3], reverse=True)
+        keeper = non_continued[0]
+        for s, e, h, sz, pg in non_continued[1:]:
+            remove_ranges.add((s, e))
+            dedup_count += 1
+            print(f"  REMOVE duplicate: [{s+1}-{e}] ({sz} lines) {h[:60]}")
+        print(f"  KEEP:             [{keeper[0]+1}-{keeper[1]}] ({keeper[3]} lines) {keeper[2][:60]}")
 
 # Also remove template placeholders
 for s, e in sections:
@@ -495,11 +541,12 @@ DEDUP_EOF
 echo "" | tee -a "$LOG"
 echo "=== VERIFY — checking chapter coverage ===" | tee -a "$LOG"
 
-NOTES_FILE="$NOTES" PAGES_DONE_FILE="$PAGES_DONE" END_PAGE_NUM="$END_PAGE" python3 << 'VERIFY_EOF' 2>>"$LOG" | tee -a "$LOG"
+NOTES_FILE="$NOTES" PAGES_DONE_FILE="$PAGES_DONE" START_PAGE_NUM="$START" END_PAGE_NUM="$END_PAGE" python3 << 'VERIFY_EOF' 2>>"$LOG" | tee -a "$LOG"
 import re, os
 
 notes_path = os.environ['NOTES_FILE']
 pages_done_path = os.environ['PAGES_DONE_FILE']
+start_page = int(os.environ['START_PAGE_NUM'])
 total_pages = int(os.environ['END_PAGE_NUM'])
 
 with open(notes_path, 'r') as f:
@@ -545,14 +592,14 @@ if chapters:
 print(f"  Page markers in notes: {len(pages_covered)} pages")
 print(f"  Pages in .pages_done: {len(pages_tracked)} of {total_pages}")
 
-missing_pages = [p for p in range(1, total_pages + 1) if p not in pages_tracked]
+missing_pages = [p for p in range(start_page, total_pages + 1) if p not in pages_tracked]
 if missing_pages:
     if len(missing_pages) <= 20:
         print(f"  Missing pages: {missing_pages}")
     else:
         print(f"  Missing pages: {len(missing_pages)} (first 20: {missing_pages[:20]})")
 else:
-    print(f"  All {total_pages} pages tracked — COMPLETE")
+    print(f"  All pages {start_page}-{total_pages} tracked — COMPLETE")
 
 # Count total lines
 line_count = content.count('\n')

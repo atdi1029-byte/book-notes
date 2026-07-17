@@ -345,30 +345,44 @@
     return cumulative;
   }
 
-  // Given current scroll position, count how many words have been read
-  // by checking which content elements are above the viewport bottom.
+  // Dwell-time paragraph tracking: a paragraph counts as "read" only
+  // after it has been visible (>70% in viewport) for DWELL_MS.
+  // Fast scrolling doesn't count — ETA only moves during actual reading.
+  var DWELL_MS = 2000; // 2 seconds visible before counting as read
+
   function getWordsRead() {
     if (!_wordMap || _wordMap.length === 0) return 0;
-    var viewBottom = window.scrollY + window.innerHeight;
     var wordsRead = 0;
     for (var i = 0; i < _wordMap.length; i++) {
-      var entry = _wordMap[i];
-      var rect = entry.el.getBoundingClientRect();
-      var elTop = window.scrollY + rect.top;
-      var elBottom = elTop + rect.height;
-      if (elBottom <= viewBottom) {
-        // Fully above viewport bottom — fully read
-        wordsRead = entry.cumWords;
-      } else if (elTop < viewBottom) {
-        // Partially visible — proportional
-        var visible = (viewBottom - elTop) / rect.height;
-        wordsRead = (entry.cumWords - entry.words)
-          + Math.round(entry.words * visible);
-      } else {
-        break; // Below viewport — stop
-      }
+      if (_wordMap[i].read) wordsRead += _wordMap[i].words;
     }
     return wordsRead;
+  }
+
+  // Called every second by the dwell ticker. Checks which paragraphs
+  // are currently visible and accumulates their dwell time.
+  function tickDwell() {
+    if (!_wordMap || _wordMap.length === 0) return;
+    var vpH = window.innerHeight;
+    for (var i = 0; i < _wordMap.length; i++) {
+      var entry = _wordMap[i];
+      if (entry.read) continue; // already counted
+      var rect = entry.el.getBoundingClientRect();
+      var elH = rect.height || 1;
+      // How much of the element is inside the viewport (0 to vpH)
+      var visTop = Math.max(rect.top, 0);
+      var visBot = Math.min(rect.bottom, vpH);
+      var visibleFrac = Math.max(0, visBot - visTop) / elH;
+      if (visibleFrac >= 0.7) {
+        entry.dwellMs = (entry.dwellMs || 0) + 1000;
+        if (entry.dwellMs >= DWELL_MS) {
+          entry.read = true;
+        }
+      } else {
+        // Reset dwell if scrolled away before threshold
+        entry.dwellMs = 0;
+      }
+    }
   }
 
   function getBookPath() {
@@ -630,9 +644,7 @@
       updateProgress();
       // Activity tracking
       markActivity();
-      // ETA updates on every scroll for responsiveness
-      updateEta();
-      // Content-based word tracking
+      // Update maxWordsRead from dwell-based count
       var wordsNow = getWordsRead();
       var maxWords = data.books[bookPath].maxWordsRead || 0;
       if (wordsNow > maxWords) {
@@ -658,15 +670,33 @@
     window.addEventListener('click', markActivity);
     window.addEventListener('wheel', markActivity);
 
-    // Tick every 1 second — count if user was recently active
+    // Restore dwell state: mark paragraphs up to saved maxWordsRead
+    // so returning to a book doesn't re-count already-read content
+    var savedMax = data.books[bookPath].maxWordsRead || 0;
+    if (savedMax > 0 && _wordMap && _wordMap.length > 0) {
+      var restored = 0;
+      for (var ri = 0; ri < _wordMap.length; ri++) {
+        if (restored + _wordMap[ri].words <= savedMax) {
+          _wordMap[ri].read = true;
+          _wordMap[ri].dwellMs = DWELL_MS;
+          restored += _wordMap[ri].words;
+        } else {
+          break;
+        }
+      }
+    }
+
+    // Tick every 1 second — count active time + dwell tracking
     setInterval(function() {
       if (document.hidden) return;
       if (Date.now() - lastActivity < IDLE_THRESHOLD) {
         activeTime += 1000;
+        tickDwell();
+        updateEta();
       }
     }, 1000);
 
-    // ETA now updates on scroll — no interval needed
+    // ETA updates via the 1-second dwell ticker above
 
     // ── Reader model (Kindle-style EMA) ──
     if (data.reader && (data.reader.averageWPM > 500 || data.reader.averageWPM < 80)) {
