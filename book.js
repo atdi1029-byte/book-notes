@@ -345,42 +345,48 @@
     return cumulative;
   }
 
-  // Dwell-time paragraph tracking: a paragraph counts as "read" only
-  // after it has been visible (>70% in viewport) for DWELL_MS.
-  // Fast scrolling doesn't count — ETA only moves during actual reading.
-  var DWELL_MS = 2000; // 2 seconds visible before counting as read
+  // Dwell-time paragraph tracking with proportional word crediting.
+  // Three independent concepts:
+  //   1. Dwell (visibility) — tracks which paragraphs are on screen
+  //   2. Active time — gated by user input, drives WPM calculation
+  //   3. Words read — proportional to dwell time and reading speed
+  // A paragraph's credited words ramp up based on how long it's been
+  // visible and the reader's average WPM, so fast scrolling past 700
+  // words credits nothing meaningful, but sitting on a paragraph
+  // gradually credits the full word count.
+  var _readerWpm = 225; // updated by initReadingTracker
 
   function getWordsRead() {
     if (!_wordMap || _wordMap.length === 0) return 0;
     var wordsRead = 0;
     for (var i = 0; i < _wordMap.length; i++) {
-      if (_wordMap[i].read) wordsRead += _wordMap[i].words;
+      wordsRead += (_wordMap[i].credited || 0);
     }
-    return wordsRead;
+    return Math.round(wordsRead);
   }
 
-  // Called every second by the dwell ticker. Checks which paragraphs
-  // are currently visible and accumulates their dwell time.
+  // Called every second when tab is visible. Accumulates visibility
+  // time per paragraph and credits words proportionally.
   function tickDwell() {
     if (!_wordMap || _wordMap.length === 0) return;
     var vpH = window.innerHeight;
+    var wps = _readerWpm / 60; // words per second at reader's pace
     for (var i = 0; i < _wordMap.length; i++) {
       var entry = _wordMap[i];
-      if (entry.read) continue; // already counted
+      if (entry.credited >= entry.words) continue; // fully read
       var rect = entry.el.getBoundingClientRect();
       var elH = rect.height || 1;
-      // How much of the element is inside the viewport (0 to vpH)
       var visTop = Math.max(rect.top, 0);
       var visBot = Math.min(rect.bottom, vpH);
       var visibleFrac = Math.max(0, visBot - visTop) / elH;
       if (visibleFrac >= 0.7) {
-        entry.dwellMs = (entry.dwellMs || 0) + 1000;
-        if (entry.dwellMs >= DWELL_MS) {
-          entry.read = true;
-        }
+        entry.visSec = (entry.visSec || 0) + 1;
+        // Credit words proportionally: can't read faster than WPM
+        var maxCredit = Math.min(entry.words, wps * entry.visSec);
+        entry.credited = maxCredit;
       } else {
-        // Reset dwell if scrolled away before threshold
-        entry.dwellMs = 0;
+        // Scrolled away — reset visibility timer but keep credits
+        entry.visSec = 0;
       }
     }
   }
@@ -670,15 +676,18 @@
     window.addEventListener('click', markActivity);
     window.addEventListener('wheel', markActivity);
 
-    // Restore dwell state: mark paragraphs up to saved maxWordsRead
+    // Set reader WPM for proportional crediting
+    _readerWpm = (data.reader && data.reader.averageWPM) || 225;
+
+    // Restore dwell state: credit paragraphs up to saved maxWordsRead
     // so returning to a book doesn't re-count already-read content
     var savedMax = data.books[bookPath].maxWordsRead || 0;
     if (savedMax > 0 && _wordMap && _wordMap.length > 0) {
       var restored = 0;
       for (var ri = 0; ri < _wordMap.length; ri++) {
         if (restored + _wordMap[ri].words <= savedMax) {
-          _wordMap[ri].read = true;
-          _wordMap[ri].dwellMs = DWELL_MS;
+          _wordMap[ri].credited = _wordMap[ri].words;
+          _wordMap[ri].visSec = 9999;
           restored += _wordMap[ri].words;
         } else {
           break;
@@ -686,16 +695,23 @@
       }
     }
 
-    // Tick every 1 second
+    // Tick every 1 second — three independent clocks:
+    // 1. Active time (30s idle gate) — drives WPM/speed model
+    // 2. Dwell (2min idle gate) — credits words proportionally
+    // 3. ETA display — always updates when tab visible
+    var DWELL_IDLE = 120000; // 2 min — stop crediting if away
     setInterval(function() {
       if (document.hidden) return;
-      // Active time only counts with recent input (for WPM calc)
-      if (Date.now() - lastActivity < IDLE_THRESHOLD) {
+      var sinceActivity = Date.now() - lastActivity;
+      // Active time: tight gate for accurate WPM
+      if (sinceActivity < IDLE_THRESHOLD) {
         activeTime += 1000;
       }
-      // Dwell always ticks when tab is visible — you can read
-      // a long section for 60+ seconds without touching anything
-      tickDwell();
+      // Dwell: looser gate — reading without touching is normal,
+      // but 2+ minutes idle means you probably left
+      if (sinceActivity < DWELL_IDLE) {
+        tickDwell();
+      }
       updateEta();
     }, 1000);
 
@@ -743,6 +759,7 @@
       }
       r.samples++;
       r.averageWPM = Math.round(r.averageWPM);
+      _readerWpm = r.averageWPM;
     }
 
     // ── Session save (content-based) ──
