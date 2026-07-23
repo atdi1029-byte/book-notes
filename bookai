@@ -5,13 +5,20 @@
 # Merges results in page order after each wave.
 #
 # Usage:
-#   ./bookai "/path/to/book.pdf" "Book_Folder" [start] [end] [batch] [sleep] [parallel] [--ta]
+#   ./bookai "/path/to/book.pdf" "Book_Folder" [start] [end] [batch] [sleep] [parallel] [--type=TYPE]
 #   ./bookai "/path/to/book.pdf" /full/path/to/Book_Folder/notes.md   # also works (auto-extracts folder)
+#
+# Book types: analytical (default), narrative, technical, textbook, practical
+#   analytical  — economics, macro, psychology. Signal over noise.
+#   narrative   — history, biography. Keep timelines, maps, key episodes.
+#   technical   — TA, trading, chart books. EVERY chart/example is content.
+#   textbook    — quant finance, math. Formulas + worked examples preserved.
+#   practical   — options, bonds. Step-by-step strategies + diagrams.
 #
 # Examples:
 #   ./bookai "/path/to/book.pdf" "My_Book" 1 300 20 5 3
 #   ./bookai "/path/to/book.pdf" "My_Book"              # auto-detect pages, defaults
-#   ./bookai "/path/to/book.pdf" "My_Book" 1 0 20 5 3 --ta   # technical analysis mode
+#   ./bookai "/path/to/book.pdf" "My_Book" 1 0 20 5 3 --type=technical
 #
 # Requires: macOS (uses mdls for page count detection), claude CLI, python3
 
@@ -19,15 +26,22 @@ set -euo pipefail
 
 BOOKS_DIR="$(cd "$(dirname "$0")" && pwd)"
 
-# Parse --ta flag from any position
-TA_MODE=false
+# Parse flags from any position
+BOOK_TYPE="analytical"
 POSITIONAL=()
 for arg in "$@"; do
   case "$arg" in
-    --ta) TA_MODE=true ;;
+    --type=*) BOOK_TYPE="${arg#--type=}" ;;
+    --ta) BOOK_TYPE="technical" ;;  # backwards compat
     *) POSITIONAL+=("$arg") ;;
   esac
 done
+
+# Validate book type
+case "$BOOK_TYPE" in
+  analytical|narrative|technical|textbook|practical) ;;
+  *) echo "ERROR: Unknown book type '$BOOK_TYPE'. Use: analytical, narrative, technical, textbook, practical"; exit 1 ;;
+esac
 
 PDF="${POSITIONAL[0]}"
 RAW_FOLDER="${POSITIONAL[1]}"
@@ -78,13 +92,203 @@ echo "Book PDF Processor — $(date)" | tee -a "$LOG"
 echo "PDF:    $PDF" | tee -a "$LOG"
 echo "Output: $NOTES" | tee -a "$LOG"
 echo "Pages:  $START → $END_PAGE (batch: $BATCH, parallel: $PARALLEL, sleep: ${SLEEP}s)" | tee -a "$LOG"
-if [ "$TA_MODE" = true ]; then
-  echo "Mode:   TECHNICAL ANALYSIS (chart tagging enabled)" | tee -a "$LOG"
-fi
+echo "Type:   $BOOK_TYPE" | tee -a "$LOG"
 echo "========================================" | tee -a "$LOG"
 
+# === IMAGE EXTRACTION (technical, practical, textbook) ===
+# Two-layer approach:
+#   1. Render every page as a full-page image (page_NNN.png) — deterministic, no matching needed
+#   2. Also extract individual chart assets (chart_pNNN_NN.ext) — available as fallback
+# Claude references page images in notes; HTML can display them inline.
+if [[ "$BOOK_TYPE" == "technical" || "$BOOK_TYPE" == "practical" || "$BOOK_TYPE" == "textbook" ]]; then
+  CHARTS_DIR="$DIR/charts"
+  mkdir -p "$CHARTS_DIR"
+
+  # Check if page renders already exist
+  EXISTING_PAGES=$(ls "$CHARTS_DIR"/page_*.png 2>/dev/null | wc -l | tr -d ' ')
+  EXISTING_CHARTS=$(ls "$CHARTS_DIR"/chart_* 2>/dev/null | wc -l | tr -d ' ')
+
+  if [ "$EXISTING_PAGES" -gt 0 ]; then
+    echo "Pages:  $EXISTING_PAGES page images already rendered — skipping" | tee -a "$LOG"
+    echo "Charts: $EXISTING_CHARTS individual charts already extracted" | tee -a "$LOG"
+  else
+    echo "Images: rendering pages + extracting charts from PDF..." | tee -a "$LOG"
+    PDF="$PDF" CHARTS_DIR="$CHARTS_DIR" START="$START" END_PAGE="$END_PAGE" python3 << 'EXTRACT_EOF'
+import fitz, os
+
+pdf_path = os.environ['PDF']
+charts_dir = os.environ['CHARTS_DIR']
+start = int(os.environ.get('START', '1')) - 1  # 0-indexed
+end = int(os.environ.get('END_PAGE', '0'))
+
+doc = fitz.open(pdf_path)
+if end == 0:
+    end = len(doc)
+
+# --- Layer 1: Full-page renders ---
+page_count = 0
+for page_num in range(start, min(end, len(doc))):
+    page = doc[page_num]
+    fname = f'page_{page_num+1:03d}.png'
+    fpath = os.path.join(charts_dir, fname)
+    if not os.path.exists(fpath):
+        # 2x scale for readability (default 72dpi -> 144dpi)
+        pix = page.get_pixmap(matrix=fitz.Matrix(2, 2))
+        pix.save(fpath)
+    page_count += 1
+
+# --- Layer 2: Individual chart extraction ---
+chart_count = 0
+for page_num in range(start, min(end, len(doc))):
+    page = doc[page_num]
+    images = page.get_images(full=True)
+    for idx, img in enumerate(images):
+        xref = img[0]
+        try:
+            base_image = doc.extract_image(xref)
+            w = base_image['width']
+            h = base_image['height']
+            # Extract nearly everything — storage is cheap, missing a chart is not
+            # Only skip pixel-level artifacts (bullets, dots, tiny decorative elements)
+            if w < 20 or h < 20:
+                continue
+            ext = base_image['ext']
+            fname = f'chart_p{page_num+1:03d}_{idx+1:02d}.{ext}'
+            fpath = os.path.join(charts_dir, fname)
+            if not os.path.exists(fpath):
+                with open(fpath, 'wb') as f:
+                    f.write(base_image['image'])
+            chart_count += 1
+        except Exception:
+            pass
+
+# Write manifest
+manifest_path = os.path.join(charts_dir, 'manifest.txt')
+all_files = sorted(f for f in os.listdir(charts_dir)
+                   if f.startswith('page_') or f.startswith('chart_'))
+with open(manifest_path, 'w') as f:
+    for fn in all_files:
+        if fn.startswith('page_'):
+            pnum = fn.split('_')[1].split('.')[0].lstrip('0') or '0'
+        else:
+            pnum = fn.split('_p')[1].split('_')[0].lstrip('0') or '0'
+        f.write(f'p{pnum} {fn}\n')
+
+print(f'Rendered {page_count} page images, extracted {chart_count} individual charts')
+EXTRACT_EOF
+    PAGE_IMG_COUNT=$(ls "$CHARTS_DIR"/page_*.png 2>/dev/null | wc -l | tr -d ' ')
+    CHART_COUNT=$(ls "$CHARTS_DIR"/chart_* 2>/dev/null | wc -l | tr -d ' ')
+    echo "Pages:  $PAGE_IMG_COUNT full-page images rendered" | tee -a "$LOG"
+    echo "Charts: $CHART_COUNT individual charts extracted" | tee -a "$LOG"
+
+    # --- Layer 3: OCR on extracted charts ---
+    # Builds ocr_manifest.txt with chart descriptions so Claude knows what each chart shows
+    OCR_MANIFEST="$CHARTS_DIR/ocr_manifest.txt"
+    if [ ! -f "$OCR_MANIFEST" ]; then
+      echo "OCR:    running text extraction on charts..." | tee -a "$LOG"
+      PDF="$PDF" CHARTS_DIR="$CHARTS_DIR" START="$START" END_PAGE="$END_PAGE" python3 << 'OCR_EOF'
+import fitz, os, re
+from collections import defaultdict
+
+charts_dir = os.environ['CHARTS_DIR']
+pdf_path = os.environ['PDF']
+start = int(os.environ.get('START', '1')) - 1
+end = int(os.environ.get('END_PAGE', '0'))
+
+doc = fitz.open(pdf_path)
+if end == 0:
+    end = len(doc)
+
+# Group chart files by page number
+page_charts = defaultdict(list)
+for fn in sorted(os.listdir(charts_dir)):
+    if fn.startswith('chart_'):
+        m = re.match(r'chart_p(\d+)_(\d+)', fn)
+        if m:
+            pnum = int(m.group(1))
+            page_charts[pnum].append(fn)
+
+ocr_path = os.path.join(charts_dir, 'ocr_manifest.txt')
+ocr_count = 0
+
+with open(ocr_path, 'w') as out:
+    for page_num in range(start, min(end, len(doc))):
+        pnum = page_num + 1
+        charts_on_page = page_charts.get(pnum, [])
+        if not charts_on_page:
+            continue
+
+        out.write(f'\nPAGE {pnum}\n')
+
+        # Get all text blocks from this PDF page for context
+        page = doc[page_num]
+        text_blocks = page.get_text("blocks")  # (x0, y0, x1, y1, text, block_no, block_type)
+
+        # For each chart, find nearby text and extract OCR from the image itself
+        image_list = page.get_images(full=True)
+        for chart_fn in charts_on_page:
+            chart_path = os.path.join(charts_dir, chart_fn)
+            if not os.path.exists(chart_path):
+                continue
+
+            out.write(f'\n  {chart_fn}\n')
+
+            # Get image dimensions
+            try:
+                img_doc = fitz.open(chart_path)
+                if len(img_doc) > 0:
+                    img_page = img_doc[0]
+                    w, h = img_page.rect.width, img_page.rect.height
+                    out.write(f'  Dimensions: {int(w)}x{int(h)}\n')
+                img_doc.close()
+            except Exception:
+                pass
+
+            # Try to OCR the chart image itself using PyMuPDF's built-in text extraction
+            try:
+                img_doc = fitz.open(chart_path)
+                if len(img_doc) > 0:
+                    img_text = img_doc[0].get_text().strip()
+                    if img_text:
+                        # Clean up and truncate
+                        img_text = ' '.join(img_text.split())[:500]
+                        out.write(f'  OCR: {img_text}\n')
+                img_doc.close()
+            except Exception:
+                pass
+
+            # Find text blocks near the image's position on the page
+            # Look for figure captions (text containing "Figure", "Fig.", "Chart", etc.)
+            nearby_captions = []
+            for block in text_blocks:
+                if block[6] != 0:  # skip non-text blocks
+                    continue
+                text = block[4].strip()
+                if re.match(r'(Figure|Fig\.|Chart|Table|Exhibit|Diagram)\s', text, re.I):
+                    nearby_captions.append(text[:200])
+
+            if nearby_captions:
+                out.write(f'  Captions: {" | ".join(nearby_captions)}\n')
+
+            out.write('  ----------------\n')
+            ocr_count += 1
+
+print(f'OCR manifest written: {ocr_count} charts annotated')
+OCR_EOF
+      echo "OCR:    manifest written to $OCR_MANIFEST" | tee -a "$LOG"
+    else
+      echo "OCR:    manifest already exists — skipping" | tee -a "$LOG"
+    fi
+  fi
+fi
+
 MAX_RETRIES=2
-TIMEOUT=300  # seconds per batch — kills frozen claude processes
+# Visual book types need more time to read chart images
+if [[ "$BOOK_TYPE" == "technical" || "$BOOK_TYPE" == "practical" || "$BOOK_TYPE" == "textbook" ]]; then
+  TIMEOUT=600  # 10 min for visual books (chart viewing takes time)
+else
+  TIMEOUT=300  # 5 min for text-only books
+fi
 MODEL_LOG="$DIR/.model_usage.log"
 : > "$MODEL_LOG"  # reset model usage log each run
 
@@ -120,18 +324,197 @@ record_pages() {
 make_prompt() {
   local P_START="$1" P_END="$2" OUT_FILE="$3"
 
-  local TA_INSTRUCTIONS=""
-  if [ "$TA_MODE" = true ]; then
-    TA_INSTRUCTIONS="
-CHART TAGGING (Technical Analysis mode):
-This book contains important charts, diagrams, and visual patterns. For EVERY figure/chart you see:
-- Add a tag on its own line: [CHART: p.XX \"Figure N.N — brief description\"]
-- XX = the PDF page number where the chart appears
-- Include the figure number and a short description of what it shows
-- Tag ALL charts — conceptual diagrams, real market charts, pattern illustrations
-- Place the tag right after the text that references the chart
-- Example: [CHART: p.87 \"Figure 4.1d — Dow 20 Bonds showing downtrend to sideways to uptrend\"]
+  # Type-specific line targets and content rules
+  local LINE_TARGET TYPE_INSTRUCTIONS
+  case "$BOOK_TYPE" in
+    analytical)
+      LINE_TARGET="Target ~150-200 lines for this section."
+      TYPE_INSTRUCTIONS="Content guidelines — optimize for SIGNAL over NOISE:
+- Capture core arguments and reasoning that materially changes understanding
+- For each concept, keep the SINGLE best supporting example — not three that make the same point
+- Include contrarian/surprising claims with their supporting evidence
+- Include things a reader would remember 5 years from now
+- Include named individuals, books, or thinkers referenced
+- Tag each major idea with importance: [MUST KNOW], [SHOULD KNOW], or [NICE TO KNOW]
+- Flag obvious repetition: if the author restates a concept, note \"repeats X from earlier\" instead of re-capturing it
+- Flag weak sections: if a chapter is mostly padding/anecdotes around one core idea, say so
+- Skip filler: repetitive restatements, excessive context-setting, obvious transitions, motivational fluff"
+      ;;
+    narrative)
+      LINE_TARGET="Target ~150-200 lines for this section."
+      TYPE_INSTRUCTIONS="Content guidelines — optimize for SIGNAL over NOISE:
+- Capture key historical episodes, turning points, and cause-effect chains
+- Preserve timelines, dates, and sequences of events — these are the backbone
+- Keep the best anecdotes and primary source quotes that bring events to life
+- Include named individuals, their roles, and their decisions
+- Note maps, charts, or visual references: [MAP: p.XX \"description\"] or [CHART: p.XX \"description\"]
+- Tag each major idea with importance: [MUST KNOW], [SHOULD KNOW], or [NICE TO KNOW]
+- Flag obvious repetition: note \"repeats X from earlier\" instead of re-capturing it
+- Skip filler: excessive context-setting, obvious transitions, motivational fluff"
+      ;;
+    technical)
+      LINE_TARGET="NO LINE TARGET — capture everything required to faithfully teach the material."
+      TYPE_INSTRUCTIONS="Content guidelines — THIS IS A TECHNICAL/VISUAL BOOK.
+
+NO LINE TARGET. Do not summarize instructional content. Do not compress chart explanations.
+Compaction happens in a later step — your job is completeness.
+
+CRITICAL RULE: A chart is NOT supplementary material. A chart IS the instructional content.
+
+If a page contains a chart, diagram, figure, table, or illustration, you MUST:
+1. Use the Read tool to OPEN and VIEW the chart image file at '$DIR/charts/chart_pNNN_MM.ext'
+   (NNN = 3-digit page number, MM = image index on that page, ext = png/jpeg)
+   If no chart file exists for that page, view the full page render at '$DIR/charts/page_NNN.png'
+2. Tag it with [CHART: chart_pNNN_MM.ext] or [PAGE IMAGE: page_NNN.png]
+3. After VIEWING the image, describe what you actually see in it
+4. Explain what the author is trying to teach with it
+5. State the trading rule or principle it illustrates
+6. Note any labels, arrows, annotations, or callouts visible in the image
+Never describe a chart without first viewing it with the Read tool.
+Never omit a chart explanation. Never summarize a chart as \"see figure X.\"
+
+Capture the full teaching sequence: concept → chart → interpretation → trading rule.
+Do NOT summarize a 5-step pattern explanation into 1 bullet. Preserve each step.
+Include every trading rule, entry/exit criteria, and risk management note verbatim.
+
+DO NOT REMOVE:
+- Price charts, candlestick diagrams, any market chart
+- Support/resistance illustrations, trendline examples
+- Chart pattern examples (head & shoulders, cup & handle, flags, etc.)
+- Annotated screenshots or trading platform examples
+- Indicator illustrations (RSI, MACD, volume, etc.)
+- Trade setup examples with entry/exit points
+- Any figure, diagram, or visual the author uses to teach a concept
+- Step-by-step trading rules or checklists
+
+PAGE IMAGES: Full-page renders exist in the charts/ folder as page_NNN.png.
+Example:
+  [PAGE IMAGE: page_087.png]
+  This page shows Figure 4.1d — Dow 20 Bonds demonstrating downtrend to sideways
+  to uptrend transition. The author marks three phases with arrows: the primary
+  downtrend (lower highs, lower lows), the sideways accumulation base, and the
+  breakout into a new uptrend. Key annotation: \"Buy signal confirmed when price
+  breaks above the accumulation range on increased volume.\"
+
+- Tag each major idea with importance: [MUST KNOW], [SHOULD KNOW], or [NICE TO KNOW]
+- Only skip: duplicated charts showing the same thing, publisher filler, advertisements"
+      ;;
+    textbook)
+      LINE_TARGET="NO LINE TARGET — capture everything required to faithfully teach the material."
+      TYPE_INSTRUCTIONS="Content guidelines — THIS IS A TEXTBOOK. Preserve formulas and worked examples.
+
+NO LINE TARGET. Do not summarize instructional content. Do not compress worked examples.
+Compaction happens in a later step — your job is completeness.
+
+CRITICAL RULE: A diagram is NOT supplementary material. A diagram IS the instructional content.
+
+If a page contains a diagram, figure, table, or illustration, you MUST:
+1. Use the Read tool to OPEN and VIEW the chart image file at '$DIR/charts/chart_pNNN_MM.ext'
+   (NNN = 3-digit page number, MM = image index on that page, ext = png/jpeg)
+   If no chart file exists for that page, view the full page render at '$DIR/charts/page_NNN.png'
+2. Tag it with [CHART: chart_pNNN_MM.ext] or [PAGE IMAGE: page_NNN.png]
+3. After VIEWING the image, describe what you actually see in it
+4. Explain what concept it teaches
+5. Note any labels, axes, annotations, or formulas visible in the image
+Never describe a chart without first viewing it with the Read tool.
+Never omit a diagram explanation.
+
+- For every formula: write it out, explain what each variable means, give a worked example
+- For proofs: skip the proof, but explain what the result MEANS and when it applies
+- Preserve step-by-step derivations only when the steps teach something (not algebraic busywork)
+- Include all definitions, theorems, and key results with their names
+- For each concept: \"What does this let you DO?\" and \"When does this break down?\"
+- Tag each major idea with importance: [MUST KNOW], [SHOULD KNOW], or [NICE TO KNOW]
+- Skip: exercises (unless they illustrate a concept not covered elsewhere), repetitive drill problems
+- Skip filler: excessive motivation, historical tangents that don't aid understanding"
+      ;;
+    practical)
+      LINE_TARGET="NO LINE TARGET — capture everything required to faithfully teach the material."
+      TYPE_INSTRUCTIONS="Content guidelines — THIS IS A PRACTICAL/STRATEGY BOOK. Preserve actionable detail.
+
+NO LINE TARGET. Do not summarize strategies. Do not compress worked examples.
+Compaction happens in a later step — your job is completeness.
+
+CRITICAL RULE: A diagram is NOT supplementary material. A diagram IS the instructional content.
+
+If a page contains a chart, diagram, payoff graph, table, or illustration, you MUST:
+1. Use the Read tool to OPEN and VIEW the chart image file at '$DIR/charts/chart_pNNN_MM.ext'
+   (NNN = 3-digit page number, MM = image index on that page, ext = png/jpeg)
+   If no chart file exists for that page, view the full page render at '$DIR/charts/page_NNN.png'
+2. Tag it with [CHART: chart_pNNN_MM.ext] or [PAGE IMAGE: page_NNN.png]
+3. After VIEWING the image, describe what you actually see in it
+4. Explain what strategy or concept it teaches
+5. Note any labels, strike prices, breakeven points, or annotations visible in the image
+Never describe a chart without first viewing it with the Read tool.
+Never omit a diagram explanation.
+
+DO NOT REMOVE:
+- Payoff diagrams, P&L charts, risk/reward illustrations
+- Strategy diagrams (spreads, straddles, iron condors, etc.)
+- Greeks sensitivity charts or tables
+- Step-by-step strategy construction with specific examples
+- Entry/exit criteria, adjustment rules, rolling techniques
+- Risk management rules and position sizing guidance
+- Any table comparing strategies, showing breakeven points, or listing criteria
+
+Preserve the full strategy walkthrough: setup → entry → management → exit.
+Include specific numbers from examples (strike prices, premiums, dates) — not just concepts.
+- Tag each major idea with importance: [MUST KNOW], [SHOULD KNOW], or [NICE TO KNOW]
+- Skip: motivational filler, repeated disclaimers, basic definitions covered in earlier chapters"
+      ;;
+  esac
+
+  # For visual book types, include page image + OCR context for this page range
+  local CHART_MANIFEST=""
+  if [[ "$BOOK_TYPE" == "technical" || "$BOOK_TYPE" == "practical" || "$BOOK_TYPE" == "textbook" ]]; then
+    local CHARTS_DIR_LOCAL="$DIR/charts"
+    local OCR_MANIFEST="$CHARTS_DIR_LOCAL/ocr_manifest.txt"
+    if [ -f "$OCR_MANIFEST" ]; then
+      # Filter OCR manifest to only pages in this range
+      local RELEVANT_OCR=""
+      local IN_RANGE=false
+      while IFS= read -r line; do
+        if [[ "$line" == "PAGE "* ]]; then
+          local PNUM="${line#PAGE }"
+          if [ "$PNUM" -ge "$P_START" ] 2>/dev/null && [ "$PNUM" -le "$P_END" ] 2>/dev/null; then
+            IN_RANGE=true
+            RELEVANT_OCR="$RELEVANT_OCR
+$line"
+          else
+            IN_RANGE=false
+          fi
+        elif [ "$IN_RANGE" = true ]; then
+          RELEVANT_OCR="$RELEVANT_OCR
+$line"
+        fi
+      done < "$OCR_MANIFEST"
+
+      if [ -n "$RELEVANT_OCR" ]; then
+        CHART_MANIFEST="
+CHART CONTEXT for pages $P_START-$P_END:
+Full-page images are saved as charts/page_NNN.png (NNN = 3-digit page number).
+Individual chart assets are also available as charts/chart_pNNN_NN.ext.
+
+OCR text extracted from charts on these pages (use this to identify what each chart shows):
+$RELEVANT_OCR
+
+When you see a visual on a page, reference the page image:
+  [PAGE IMAGE: page_NNN.png]
+  Description of what this page illustrates.
 "
+      fi
+    elif ls "$CHARTS_DIR_LOCAL"/page_*.png >/dev/null 2>&1; then
+      # No OCR manifest yet — just list page images
+      CHART_MANIFEST="
+PAGE IMAGES for pages $P_START-$P_END:
+Full-page images are saved as charts/page_NNN.png (NNN = 3-digit page number).
+Individual chart assets are also available as charts/chart_pNNN_NN.ext.
+
+When you see a visual on a page, reference the page image:
+  [PAGE IMAGE: page_NNN.png]
+  Description of what this page illustrates.
+"
+    fi
   fi
 
   cat <<PROMPT_EOF
@@ -139,24 +522,16 @@ You are creating study notes from a book PDF. This is a personal, educational bo
 
 READ pages $P_START-$P_END of the PDF at '$PDF'.
 
-WRITE the notes to '$OUT_FILE' using the Write tool. Target ~150-200 lines for this section. Markdown format:
+WRITE the notes to '$OUT_FILE' using the Write tool. $LINE_TARGET Markdown format:
 - START with: <!-- pp. $P_START-$P_END -->
 - Chapter headers: ## Chapter N: Title
 - Subheadings: ### Topic Name
 - Key points as bullet points (-)
 - Notable quotes as > blockquotes with attribution
 - **Bold** for key terms, concepts, and names
-$TA_INSTRUCTIONS
-Content guidelines — optimize for SIGNAL over NOISE:
-- Capture core arguments and reasoning that materially changes understanding
-- For each concept, keep the SINGLE best supporting example — not three that make the same point
-- Include contrarian/surprising claims with their supporting evidence
-- Include things a reader would remember 5 years from now
+$CHART_MANIFEST
+$TYPE_INSTRUCTIONS
 - Include named individuals, books, or thinkers referenced
-- Tag each major idea with importance: [MUST KNOW], [SHOULD KNOW], or [NICE TO KNOW]
-- Flag obvious repetition: if the author restates a concept, note "repeats X from earlier" instead of re-capturing it
-- Flag weak sections: if a chapter is mostly padding/anecdotes around one core idea, say so
-- Skip filler: repetitive restatements, excessive context-setting, obvious transitions, motivational fluff
 - Do NOT output preamble — ONLY write the notes
 
 IMPORTANT: Only cover pages $P_START-$P_END. This is academic study material — process the content faithfully.
@@ -181,10 +556,16 @@ process_batch() {
       PROMPT=$(make_prompt "$B_START" "$B_END" "$TEMP_FILE")
       local STDERR_FILE="$DIR/.stderr_${B_START}_${B_END}.tmp"
 
+      # Visual book types need more turns to read chart images
+      local MAX_TURNS=2
+      if [[ "$BOOK_TYPE" == "technical" || "$BOOK_TYPE" == "practical" || "$BOOK_TYPE" == "textbook" ]]; then
+        MAX_TURNS=8
+      fi
+
       run_with_timeout "$TIMEOUT" \
         claude -p "$PROMPT" \
         --model "$MODEL" \
-        --max-turns 2 \
+        --max-turns "$MAX_TURNS" \
         --allowedTools "Read" "Write" \
         2>"$STDERR_FILE" || true
 
