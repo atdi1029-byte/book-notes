@@ -3001,7 +3001,19 @@
 
   // Re-fetch when page becomes visible (fixes Reading filter after setting bookmark in a book)
   document.addEventListener('visibilitychange', function() {
-    if (document.visibilityState === 'visible') syncFromBackend();
+    if (document.visibilityState === 'visible') {
+      syncFromBackend();
+      // Always re-render progress from localStorage (local reading
+      // data changes won't trigger the remote-only sync re-render)
+      if (window._renderProgress) window._renderProgress();
+    }
+  });
+  // Handle bfcache restoration (Android back button)
+  window.addEventListener('pageshow', function(e) {
+    if (e.persisted) {
+      render();
+      if (window._renderProgress) window._renderProgress();
+    }
   });
 
   // ── Move to Shelf ─────────────────────────────────────────────
