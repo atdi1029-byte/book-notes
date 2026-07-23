@@ -50,9 +50,9 @@ END_PAGE="${POSITIONAL[3]:-0}"
 
 # Adaptive defaults by book type — visual books need smaller batches, fewer parallel
 case "$BOOK_TYPE" in
-  technical)   BATCH="${POSITIONAL[4]:-5}"  ; SLEEP="${POSITIONAL[5]:-5}" ; PARALLEL="${POSITIONAL[6]:-1}" ;;
-  practical)   BATCH="${POSITIONAL[4]:-7}"  ; SLEEP="${POSITIONAL[5]:-5}" ; PARALLEL="${POSITIONAL[6]:-2}" ;;
-  textbook)    BATCH="${POSITIONAL[4]:-7}"  ; SLEEP="${POSITIONAL[5]:-5}" ; PARALLEL="${POSITIONAL[6]:-2}" ;;
+  technical)   BATCH="${POSITIONAL[4]:-10}" ; SLEEP="${POSITIONAL[5]:-5}" ; PARALLEL="${POSITIONAL[6]:-1}" ;;
+  practical)   BATCH="${POSITIONAL[4]:-10}" ; SLEEP="${POSITIONAL[5]:-5}" ; PARALLEL="${POSITIONAL[6]:-2}" ;;
+  textbook)    BATCH="${POSITIONAL[4]:-12}" ; SLEEP="${POSITIONAL[5]:-5}" ; PARALLEL="${POSITIONAL[6]:-2}" ;;
   *)           BATCH="${POSITIONAL[4]:-20}" ; SLEEP="${POSITIONAL[5]:-5}" ; PARALLEL="${POSITIONAL[6]:-3}" ;;
 esac
 
@@ -100,103 +100,26 @@ echo "Pages:  $START → $END_PAGE (batch: $BATCH, parallel: $PARALLEL, sleep: $
 echo "Type:   $BOOK_TYPE" | tee -a "$LOG"
 echo "========================================" | tee -a "$LOG"
 
-# === IMAGE EXTRACTION (technical, practical, textbook) ===
-# Two-layer approach:
-#   1. Render every page as a full-page image (page_NNN.png) — deterministic, no matching needed
-#   2. Also extract individual chart assets (chart_pNNN_NN.ext) — available as fallback
-# Claude references page images in notes; HTML can display them inline.
+# === PAGE IMAGE RENDERING (technical, practical, textbook) ===
+# Render every page as a full-page PNG at 2x DPI. No individual chart extraction
+# or OCR — Claude views the full-page images directly via the Read tool, which
+# preserves captions, arrows, labels, and surrounding context better than
+# extracted chart fragments.
 if [[ "$BOOK_TYPE" == "technical" || "$BOOK_TYPE" == "practical" || "$BOOK_TYPE" == "textbook" ]]; then
   CHARTS_DIR="$DIR/charts"
   mkdir -p "$CHARTS_DIR"
 
-  # Check if page renders already exist
   EXISTING_PAGES=$(ls "$CHARTS_DIR"/page_*.png 2>/dev/null | wc -l | tr -d ' ')
-  EXISTING_CHARTS=$(ls "$CHARTS_DIR"/chart_* 2>/dev/null | wc -l | tr -d ' ')
 
   if [ "$EXISTING_PAGES" -gt 0 ]; then
     echo "Pages:  $EXISTING_PAGES page images already rendered — skipping" | tee -a "$LOG"
-    echo "Charts: $EXISTING_CHARTS individual charts already extracted" | tee -a "$LOG"
   else
-    echo "Images: rendering pages + extracting charts from PDF..." | tee -a "$LOG"
+    echo "Images: rendering full-page images from PDF..." | tee -a "$LOG"
     PDF="$PDF" CHARTS_DIR="$CHARTS_DIR" START="$START" END_PAGE="$END_PAGE" python3 << 'EXTRACT_EOF'
 import fitz, os
 
 pdf_path = os.environ['PDF']
 charts_dir = os.environ['CHARTS_DIR']
-start = int(os.environ.get('START', '1')) - 1  # 0-indexed
-end = int(os.environ.get('END_PAGE', '0'))
-
-doc = fitz.open(pdf_path)
-if end == 0:
-    end = len(doc)
-
-# --- Layer 1: Full-page renders ---
-page_count = 0
-for page_num in range(start, min(end, len(doc))):
-    page = doc[page_num]
-    fname = f'page_{page_num+1:03d}.png'
-    fpath = os.path.join(charts_dir, fname)
-    if not os.path.exists(fpath):
-        # 2x scale for readability (default 72dpi -> 144dpi)
-        pix = page.get_pixmap(matrix=fitz.Matrix(2, 2))
-        pix.save(fpath)
-    page_count += 1
-
-# --- Layer 2: Individual chart extraction ---
-chart_count = 0
-for page_num in range(start, min(end, len(doc))):
-    page = doc[page_num]
-    images = page.get_images(full=True)
-    for idx, img in enumerate(images):
-        xref = img[0]
-        try:
-            base_image = doc.extract_image(xref)
-            w = base_image['width']
-            h = base_image['height']
-            # Extract nearly everything — storage is cheap, missing a chart is not
-            # Only skip pixel-level artifacts (bullets, dots, tiny decorative elements)
-            if w < 20 or h < 20:
-                continue
-            ext = base_image['ext']
-            fname = f'chart_p{page_num+1:03d}_{idx+1:02d}.{ext}'
-            fpath = os.path.join(charts_dir, fname)
-            if not os.path.exists(fpath):
-                with open(fpath, 'wb') as f:
-                    f.write(base_image['image'])
-            chart_count += 1
-        except Exception:
-            pass
-
-# Write manifest
-manifest_path = os.path.join(charts_dir, 'manifest.txt')
-all_files = sorted(f for f in os.listdir(charts_dir)
-                   if f.startswith('page_') or f.startswith('chart_'))
-with open(manifest_path, 'w') as f:
-    for fn in all_files:
-        if fn.startswith('page_'):
-            pnum = fn.split('_')[1].split('.')[0].lstrip('0') or '0'
-        else:
-            pnum = fn.split('_p')[1].split('_')[0].lstrip('0') or '0'
-        f.write(f'p{pnum} {fn}\n')
-
-print(f'Rendered {page_count} page images, extracted {chart_count} individual charts')
-EXTRACT_EOF
-    PAGE_IMG_COUNT=$(ls "$CHARTS_DIR"/page_*.png 2>/dev/null | wc -l | tr -d ' ')
-    CHART_COUNT=$(ls "$CHARTS_DIR"/chart_* 2>/dev/null | wc -l | tr -d ' ')
-    echo "Pages:  $PAGE_IMG_COUNT full-page images rendered" | tee -a "$LOG"
-    echo "Charts: $CHART_COUNT individual charts extracted" | tee -a "$LOG"
-
-    # --- Layer 3: OCR on extracted charts ---
-    # Builds ocr_manifest.txt with chart descriptions so Claude knows what each chart shows
-    OCR_MANIFEST="$CHARTS_DIR/ocr_manifest.txt"
-    if [ ! -f "$OCR_MANIFEST" ]; then
-      echo "OCR:    running text extraction on charts..." | tee -a "$LOG"
-      PDF="$PDF" CHARTS_DIR="$CHARTS_DIR" START="$START" END_PAGE="$END_PAGE" python3 << 'OCR_EOF'
-import fitz, os, re
-from collections import defaultdict
-
-charts_dir = os.environ['CHARTS_DIR']
-pdf_path = os.environ['PDF']
 start = int(os.environ.get('START', '1')) - 1
 end = int(os.environ.get('END_PAGE', '0'))
 
@@ -204,86 +127,22 @@ doc = fitz.open(pdf_path)
 if end == 0:
     end = len(doc)
 
-# Group chart files by page number
-page_charts = defaultdict(list)
-for fn in sorted(os.listdir(charts_dir)):
-    if fn.startswith('chart_'):
-        m = re.match(r'chart_p(\d+)_(\d+)', fn)
-        if m:
-            pnum = int(m.group(1))
-            page_charts[pnum].append(fn)
+page_count = 0
+for page_num in range(start, min(end, len(doc))):
+    page = doc[page_num]
+    fname = f'page_{page_num+1:03d}.png'
+    fpath = os.path.join(charts_dir, fname)
+    if not os.path.exists(fpath):
+        pix = page.get_pixmap(matrix=fitz.Matrix(2, 2))
+        pix.save(fpath)
+    page_count += 1
+    if page_count % 50 == 0:
+        print(f'  Rendered {page_count} pages...')
 
-ocr_path = os.path.join(charts_dir, 'ocr_manifest.txt')
-ocr_count = 0
-
-with open(ocr_path, 'w') as out:
-    for page_num in range(start, min(end, len(doc))):
-        pnum = page_num + 1
-        charts_on_page = page_charts.get(pnum, [])
-        if not charts_on_page:
-            continue
-
-        out.write(f'\nPAGE {pnum}\n')
-
-        # Get all text blocks from this PDF page for context
-        page = doc[page_num]
-        text_blocks = page.get_text("blocks")  # (x0, y0, x1, y1, text, block_no, block_type)
-
-        # For each chart, find nearby text and extract OCR from the image itself
-        image_list = page.get_images(full=True)
-        for chart_fn in charts_on_page:
-            chart_path = os.path.join(charts_dir, chart_fn)
-            if not os.path.exists(chart_path):
-                continue
-
-            out.write(f'\n  {chart_fn}\n')
-
-            # Get image dimensions
-            try:
-                img_doc = fitz.open(chart_path)
-                if len(img_doc) > 0:
-                    img_page = img_doc[0]
-                    w, h = img_page.rect.width, img_page.rect.height
-                    out.write(f'  Dimensions: {int(w)}x{int(h)}\n')
-                img_doc.close()
-            except Exception:
-                pass
-
-            # Try to OCR the chart image itself using PyMuPDF's built-in text extraction
-            try:
-                img_doc = fitz.open(chart_path)
-                if len(img_doc) > 0:
-                    img_text = img_doc[0].get_text().strip()
-                    if img_text:
-                        # Clean up and truncate
-                        img_text = ' '.join(img_text.split())[:500]
-                        out.write(f'  OCR: {img_text}\n')
-                img_doc.close()
-            except Exception:
-                pass
-
-            # Find text blocks near the image's position on the page
-            # Look for figure captions (text containing "Figure", "Fig.", "Chart", etc.)
-            nearby_captions = []
-            for block in text_blocks:
-                if block[6] != 0:  # skip non-text blocks
-                    continue
-                text = block[4].strip()
-                if re.match(r'(Figure|Fig\.|Chart|Table|Exhibit|Diagram)\s', text, re.I):
-                    nearby_captions.append(text[:200])
-
-            if nearby_captions:
-                out.write(f'  Captions: {" | ".join(nearby_captions)}\n')
-
-            out.write('  ----------------\n')
-            ocr_count += 1
-
-print(f'OCR manifest written: {ocr_count} charts annotated')
-OCR_EOF
-      echo "OCR:    manifest written to $OCR_MANIFEST" | tee -a "$LOG"
-    else
-      echo "OCR:    manifest already exists — skipping" | tee -a "$LOG"
-    fi
+print(f'Rendered {page_count} full-page images')
+EXTRACT_EOF
+    PAGE_IMG_COUNT=$(ls "$CHARTS_DIR"/page_*.png 2>/dev/null | wc -l | tr -d ' ')
+    echo "Pages:  $PAGE_IMG_COUNT full-page images rendered" | tee -a "$LOG"
   fi
 fi
 
@@ -368,15 +227,19 @@ Compaction happens in a later step — your job is completeness.
 CRITICAL RULE: A chart is NOT supplementary material. A chart IS the instructional content.
 
 If a page contains a chart, diagram, figure, table, or illustration, you MUST:
-1. Use the Read tool to OPEN and VIEW the chart image file at '$DIR/charts/chart_pNNN_MM.ext'
-   (NNN = 3-digit page number, MM = image index on that page, ext = png/jpeg)
-   If no chart file exists for that page, view the full page render at '$DIR/charts/page_NNN.png'
-2. Tag it with [CHART: chart_pNNN_MM.ext] or [PAGE IMAGE: page_NNN.png]
-3. After VIEWING the image, describe what you actually see in it
+1. Use the Read tool to OPEN and VIEW the full-page image at '$DIR/charts/page_NNN.png'
+   (NNN = 3-digit zero-padded page number, e.g. page_087.png for page 87)
+2. Tag it with [PAGE IMAGE: page_NNN.png]
+3. After VIEWING the image, describe what you ACTUALLY SEE — axes, labels, data series,
+   arrows, annotations, patterns, figure numbers, captions
 4. Explain what the author is trying to teach with it
 5. State the trading rule or principle it illustrates
-6. Note any labels, arrows, annotations, or callouts visible in the image
-Never describe a chart without first viewing it with the Read tool.
+
+HALLUCINATION GUARD:
+- NEVER describe a chart you have not opened with the Read tool
+- If you cannot access the image file, write: [IMAGE NOT AVAILABLE: page_NNN.png]
+- Do NOT infer, invent, or guess labels, numbers, arrows, or annotations
+- If the page is purely text with no visual content, do NOT tag it as a page image
 Never omit a chart explanation. Never summarize a chart as \"see figure X.\"
 
 Capture the full teaching sequence: concept → chart → interpretation → trading rule.
@@ -415,14 +278,18 @@ Compaction happens in a later step — your job is completeness.
 CRITICAL RULE: A diagram is NOT supplementary material. A diagram IS the instructional content.
 
 If a page contains a diagram, figure, table, or illustration, you MUST:
-1. Use the Read tool to OPEN and VIEW the chart image file at '$DIR/charts/chart_pNNN_MM.ext'
-   (NNN = 3-digit page number, MM = image index on that page, ext = png/jpeg)
-   If no chart file exists for that page, view the full page render at '$DIR/charts/page_NNN.png'
-2. Tag it with [CHART: chart_pNNN_MM.ext] or [PAGE IMAGE: page_NNN.png]
-3. After VIEWING the image, describe what you actually see in it
+1. Use the Read tool to OPEN and VIEW the full-page image at '$DIR/charts/page_NNN.png'
+   (NNN = 3-digit zero-padded page number, e.g. page_087.png for page 87)
+2. Tag it with [PAGE IMAGE: page_NNN.png]
+3. After VIEWING the image, describe what you ACTUALLY SEE — axes, labels, formulas,
+   annotations, figure numbers, captions
 4. Explain what concept it teaches
-5. Note any labels, axes, annotations, or formulas visible in the image
-Never describe a chart without first viewing it with the Read tool.
+
+HALLUCINATION GUARD:
+- NEVER describe a diagram you have not opened with the Read tool
+- If you cannot access the image file, write: [IMAGE NOT AVAILABLE: page_NNN.png]
+- Do NOT infer, invent, or guess labels, numbers, or annotations
+- If the page is purely text with no visual content, do NOT tag it as a page image
 Never omit a diagram explanation.
 
 - For every formula: write it out, explain what each variable means, give a worked example
@@ -444,14 +311,18 @@ Compaction happens in a later step — your job is completeness.
 CRITICAL RULE: A diagram is NOT supplementary material. A diagram IS the instructional content.
 
 If a page contains a chart, diagram, payoff graph, table, or illustration, you MUST:
-1. Use the Read tool to OPEN and VIEW the chart image file at '$DIR/charts/chart_pNNN_MM.ext'
-   (NNN = 3-digit page number, MM = image index on that page, ext = png/jpeg)
-   If no chart file exists for that page, view the full page render at '$DIR/charts/page_NNN.png'
-2. Tag it with [CHART: chart_pNNN_MM.ext] or [PAGE IMAGE: page_NNN.png]
-3. After VIEWING the image, describe what you actually see in it
+1. Use the Read tool to OPEN and VIEW the full-page image at '$DIR/charts/page_NNN.png'
+   (NNN = 3-digit zero-padded page number, e.g. page_087.png for page 87)
+2. Tag it with [PAGE IMAGE: page_NNN.png]
+3. After VIEWING the image, describe what you ACTUALLY SEE — axes, labels, strike prices,
+   breakeven points, payoff curves, annotations, figure numbers, captions
 4. Explain what strategy or concept it teaches
-5. Note any labels, strike prices, breakeven points, or annotations visible in the image
-Never describe a chart without first viewing it with the Read tool.
+
+HALLUCINATION GUARD:
+- NEVER describe a chart you have not opened with the Read tool
+- If you cannot access the image file, write: [IMAGE NOT AVAILABLE: page_NNN.png]
+- Do NOT infer, invent, or guess labels, numbers, or annotations
+- If the page is purely text with no visual content, do NOT tag it as a page image
 Never omit a diagram explanation.
 
 DO NOT REMOVE:
@@ -470,55 +341,31 @@ Include specific numbers from examples (strike prices, premiums, dates) — not 
       ;;
   esac
 
-  # For visual book types, include page image + OCR context for this page range
+  # For visual book types, tell Claude where page images are and list which ones exist
   local CHART_MANIFEST=""
   if [[ "$BOOK_TYPE" == "technical" || "$BOOK_TYPE" == "practical" || "$BOOK_TYPE" == "textbook" ]]; then
     local CHARTS_DIR_LOCAL="$DIR/charts"
-    local OCR_MANIFEST="$CHARTS_DIR_LOCAL/ocr_manifest.txt"
-    if [ -f "$OCR_MANIFEST" ]; then
-      # Filter OCR manifest to only pages in this range
-      local RELEVANT_OCR=""
-      local IN_RANGE=false
-      while IFS= read -r line; do
-        if [[ "$line" == "PAGE "* ]]; then
-          local PNUM="${line#PAGE }"
-          if [ "$PNUM" -ge "$P_START" ] 2>/dev/null && [ "$PNUM" -le "$P_END" ] 2>/dev/null; then
-            IN_RANGE=true
-            RELEVANT_OCR="$RELEVANT_OCR
-$line"
-          else
-            IN_RANGE=false
-          fi
-        elif [ "$IN_RANGE" = true ]; then
-          RELEVANT_OCR="$RELEVANT_OCR
-$line"
+    if ls "$CHARTS_DIR_LOCAL"/page_*.png >/dev/null 2>&1; then
+      # List which page images exist in this range
+      local PAGE_LIST=""
+      for ((pg=P_START; pg<=P_END; pg++)); do
+        local PGFILE=$(printf "page_%03d.png" "$pg")
+        if [ -f "$CHARTS_DIR_LOCAL/$PGFILE" ]; then
+          PAGE_LIST="$PAGE_LIST $PGFILE"
         fi
-      done < "$OCR_MANIFEST"
-
-      if [ -n "$RELEVANT_OCR" ]; then
-        CHART_MANIFEST="
-CHART CONTEXT for pages $P_START-$P_END:
-Full-page images are saved as charts/page_NNN.png (NNN = 3-digit page number).
-Individual chart assets are also available as charts/chart_pNNN_NN.ext.
-
-OCR text extracted from charts on these pages (use this to identify what each chart shows):
-$RELEVANT_OCR
-
-When you see a visual on a page, reference the page image:
-  [PAGE IMAGE: page_NNN.png]
-  Description of what this page illustrates.
-"
-      fi
-    elif ls "$CHARTS_DIR_LOCAL"/page_*.png >/dev/null 2>&1; then
-      # No OCR manifest yet — just list page images
+      done
       CHART_MANIFEST="
-PAGE IMAGES for pages $P_START-$P_END:
-Full-page images are saved as charts/page_NNN.png (NNN = 3-digit page number).
-Individual chart assets are also available as charts/chart_pNNN_NN.ext.
+PAGE IMAGES available for pages $P_START-$P_END:
+Full-page renders are at '$DIR/charts/page_NNN.png' (NNN = 3-digit page number).
+Available:$PAGE_LIST
 
-When you see a visual on a page, reference the page image:
-  [PAGE IMAGE: page_NNN.png]
-  Description of what this page illustrates.
+For EVERY page that contains a chart, diagram, figure, or illustration:
+1. Use the Read tool to VIEW the page image file
+2. Describe what you ACTUALLY SEE after viewing it
+3. Tag it: [PAGE IMAGE: page_NNN.png]
+
+Do NOT describe any image you have not opened with Read.
+If a page is purely text, do NOT reference its image.
 "
     fi
   fi
@@ -539,6 +386,17 @@ $CHART_MANIFEST
 $TYPE_INSTRUCTIONS
 - Include named individuals, books, or thinkers referenced
 - Do NOT output preamble — ONLY write the notes
+$(if [ -n "$PREV_BATCH_CONTEXT" ]; then
+cat <<CONTEXT_EOF
+
+CONTINUITY CONTEXT — the previous batch ended with these notes (for context only):
+---
+$PREV_BATCH_CONTEXT
+---
+Use this ONLY for continuity. Do NOT rewrite or repeat this material.
+If the previous batch ended mid-concept, continue seamlessly.
+CONTEXT_EOF
+fi)
 
 IMPORTANT: Only cover pages $P_START-$P_END. This is academic study material — process the content faithfully.
 PROMPT_EOF
@@ -580,15 +438,21 @@ process_batch() {
         local HAS_HEADERS=$(grep -c '^##' "$TEMP_FILE" 2>/dev/null || echo 0)
         local HAS_BULLETS=$(grep -c '^- ' "$TEMP_FILE" 2>/dev/null || echo 0)
 
-        # Quality gate: minimum 100 words, has page markers or headers, has bullets
-        if [ "$WORDS" -ge 100 ] && [ "$((HAS_MARKERS + HAS_HEADERS))" -ge 1 ] && [ "$HAS_BULLETS" -ge 2 ]; then
-          # For visual books: check chart references exist when chart pages are present
-          local CHART_CHECK_OK=true
+        # Quality gate — thresholds vary by book type
+        local MIN_WORDS=100
+        local MIN_LINES=10
+        if [[ "$BOOK_TYPE" == "technical" || "$BOOK_TYPE" == "practical" || "$BOOK_TYPE" == "textbook" ]]; then
+          MIN_WORDS=300
+          MIN_LINES=30
+        fi
+
+        if [ "$WORDS" -ge "$MIN_WORDS" ] && [ "$LINES" -ge "$MIN_LINES" ] && [ "$((HAS_MARKERS + HAS_HEADERS))" -ge 1 ] && [ "$HAS_BULLETS" -ge 2 ]; then
+          # For visual books: check PAGE IMAGE references exist when page images are present
           if [[ "$BOOK_TYPE" == "technical" || "$BOOK_TYPE" == "practical" || "$BOOK_TYPE" == "textbook" ]]; then
-            local CHART_PAGES=$(ls "$DIR/charts"/chart_p*.* 2>/dev/null | sed 's/.*chart_p\([0-9]*\).*/\1/' | sort -un | awk -v s="$B_START" -v e="$B_END" '$1>=s && $1<=e' | wc -l | tr -d ' ')
-            local CHART_REFS=$(grep -cE '\[CHART:|PAGE IMAGE:' "$TEMP_FILE" 2>/dev/null || echo 0)
-            if [ "$CHART_PAGES" -gt 3 ] && [ "$CHART_REFS" -eq 0 ]; then
-              echo "  QUALITY_FAIL — pp. $B_START-$B_END ($MODEL): $CHART_PAGES chart pages but 0 references" >> "$BATCH_LOG"
+            local PAGE_IMGS=$(ls "$DIR/charts"/page_*.png 2>/dev/null | sed 's/.*page_\([0-9]*\).*/\1/' | sort -un | awk -v s="$B_START" -v e="$B_END" '$1>=s && $1<=e' | wc -l | tr -d ' ')
+            local IMG_REFS=$(grep -cE '\[PAGE IMAGE:|IMAGE NOT AVAILABLE:' "$TEMP_FILE" 2>/dev/null || echo 0)
+            if [ "$PAGE_IMGS" -gt 3 ] && [ "$IMG_REFS" -eq 0 ]; then
+              echo "  QUALITY_FAIL — pp. $B_START-$B_END ($MODEL): $PAGE_IMGS page images but 0 references" >> "$BATCH_LOG"
               rm -f "$TEMP_FILE"
               RETRY=$((RETRY + 1))
               continue
@@ -641,6 +505,8 @@ echo "Batches: $TOTAL (processing $PARALLEL at a time)" | tee -a "$LOG"
 IDX=0
 FAILURES=0
 WAVE_NUM=0
+PREV_BATCH_CONTEXT=""  # last 50 lines of previous batch for continuity
+export PREV_BATCH_CONTEXT
 
 while [ "$IDX" -lt "$TOTAL" ]; do
   WAVE_NUM=$((WAVE_NUM + 1))
@@ -688,6 +554,9 @@ while [ "$IDX" -lt "$TOTAL" ]; do
       cat "$TEMP" >> "$NOTES"
       echo "" >> "$NOTES"
       record_pages "$B_START" "$B_END"
+      # Capture last 50 lines for continuity context (used by next batch)
+      PREV_BATCH_CONTEXT=$(tail -50 "$TEMP")
+      export PREV_BATCH_CONTEXT
       echo "  Merged: pp. $B_START-$B_END ($LINES lines)" | tee -a "$LOG"
       rm -f "$TEMP"
     else
@@ -923,6 +792,15 @@ for s, e in sections:
 if dedup_count == 0:
     print("  No duplicates found — clean!")
 else:
+    # Non-destructive: save potential duplicates to a separate file for review
+    dupes_path = notes_path.replace('.md', '.duplicates.md')
+    with open(dupes_path, 'w') as df:
+        df.write("# Potential Duplicate Sections\n")
+        df.write("# Review these — they were removed from notes.md\n\n")
+        for s, e in sorted(remove_ranges):
+            df.writelines(lines[s:e])
+            df.write("\n---\n\n")
+
     # Rebuild file without removed ranges
     output = []
     for s, e in sections:
@@ -933,7 +811,7 @@ else:
         f.writelines(output)
 
     new_lines = len(output)
-    print(f"  Removed {dedup_count} duplicate sections ({len(lines) - new_lines} lines)")
+    print(f"  Moved {dedup_count} duplicate sections to {dupes_path}")
     print(f"  File: {len(lines)} → {new_lines} lines")
 DEDUP_EOF
 
