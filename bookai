@@ -47,9 +47,14 @@ PDF="${POSITIONAL[0]}"
 RAW_FOLDER="${POSITIONAL[1]}"
 START="${POSITIONAL[2]:-1}"
 END_PAGE="${POSITIONAL[3]:-0}"
-BATCH="${POSITIONAL[4]:-20}"
-SLEEP="${POSITIONAL[5]:-5}"
-PARALLEL="${POSITIONAL[6]:-3}"
+
+# Adaptive defaults by book type — visual books need smaller batches, fewer parallel
+case "$BOOK_TYPE" in
+  technical)   BATCH="${POSITIONAL[4]:-5}"  ; SLEEP="${POSITIONAL[5]:-5}" ; PARALLEL="${POSITIONAL[6]:-1}" ;;
+  practical)   BATCH="${POSITIONAL[4]:-7}"  ; SLEEP="${POSITIONAL[5]:-5}" ; PARALLEL="${POSITIONAL[6]:-2}" ;;
+  textbook)    BATCH="${POSITIONAL[4]:-7}"  ; SLEEP="${POSITIONAL[5]:-5}" ; PARALLEL="${POSITIONAL[6]:-2}" ;;
+  *)           BATCH="${POSITIONAL[4]:-20}" ; SLEEP="${POSITIONAL[5]:-5}" ; PARALLEL="${POSITIONAL[6]:-3}" ;;
+esac
 
 # Normalize folder: if user passed a full path or a path ending in notes.md, extract just the folder name
 if [[ "$RAW_FOLDER" == *"/notes.md" ]]; then
@@ -283,12 +288,13 @@ OCR_EOF
 fi
 
 MAX_RETRIES=2
-# Visual book types need more time to read chart images
-if [[ "$BOOK_TYPE" == "technical" || "$BOOK_TYPE" == "practical" || "$BOOK_TYPE" == "textbook" ]]; then
-  TIMEOUT=600  # 10 min for visual books (chart viewing takes time)
-else
-  TIMEOUT=300  # 5 min for text-only books
-fi
+# Visual book types need more time and turns to read chart images
+case "$BOOK_TYPE" in
+  technical)   TIMEOUT=1200 ; MAX_TURNS=15 ;;  # 20 min, 15 turns (5-page batches with many charts)
+  practical)   TIMEOUT=900  ; MAX_TURNS=12 ;;  # 15 min, 12 turns
+  textbook)    TIMEOUT=900  ; MAX_TURNS=12 ;;  # 15 min, 12 turns
+  *)           TIMEOUT=300  ; MAX_TURNS=3  ;;   # 5 min, 3 turns (text-only)
+esac
 MODEL_LOG="$DIR/.model_usage.log"
 : > "$MODEL_LOG"  # reset model usage log each run
 
@@ -298,7 +304,7 @@ run_with_timeout() {
   shift
   "$@" &
   local CMD_PID=$!
-  ( sleep "$SECS" && kill "$CMD_PID" 2>/dev/null && echo "  TIMEOUT after ${SECS}s (pid $CMD_PID)" ) &
+  ( sleep "$SECS" && kill -TERM -$CMD_PID 2>/dev/null; kill "$CMD_PID" 2>/dev/null && echo "  TIMEOUT after ${SECS}s (pid $CMD_PID)" ) &
   local TIMER_PID=$!
   if wait "$CMD_PID" 2>/dev/null; then
     kill "$TIMER_PID" 2>/dev/null
@@ -556,12 +562,6 @@ process_batch() {
       PROMPT=$(make_prompt "$B_START" "$B_END" "$TEMP_FILE")
       local STDERR_FILE="$DIR/.stderr_${B_START}_${B_END}.tmp"
 
-      # Visual book types need more turns to read chart images
-      local MAX_TURNS=2
-      if [[ "$BOOK_TYPE" == "technical" || "$BOOK_TYPE" == "practical" || "$BOOK_TYPE" == "textbook" ]]; then
-        MAX_TURNS=8
-      fi
-
       run_with_timeout "$TIMEOUT" \
         claude -p "$PROMPT" \
         --model "$MODEL" \
@@ -572,12 +572,38 @@ process_batch() {
       local STDERR_CONTENT=""
       [ -f "$STDERR_FILE" ] && STDERR_CONTENT=$(cat "$STDERR_FILE") && rm -f "$STDERR_FILE"
 
-      # Check if temp file was created with content
+      # Check if temp file was created with quality content
       if [ -f "$TEMP_FILE" ] && [ "$(wc -c < "$TEMP_FILE" | tr -d ' ')" -gt 50 ]; then
         local LINES=$(wc -l < "$TEMP_FILE" | tr -d ' ')
-        echo "  OK — pp. $B_START-$B_END ($MODEL, +$LINES lines)" >> "$BATCH_LOG"
-        echo "$B_START-$B_END:$MODEL" >> "$MODEL_LOG"
-        return 0
+        local WORDS=$(wc -w < "$TEMP_FILE" | tr -d ' ')
+        local HAS_MARKERS=$(grep -c '<!-- pp' "$TEMP_FILE" 2>/dev/null || echo 0)
+        local HAS_HEADERS=$(grep -c '^##' "$TEMP_FILE" 2>/dev/null || echo 0)
+        local HAS_BULLETS=$(grep -c '^- ' "$TEMP_FILE" 2>/dev/null || echo 0)
+
+        # Quality gate: minimum 100 words, has page markers or headers, has bullets
+        if [ "$WORDS" -ge 100 ] && [ "$((HAS_MARKERS + HAS_HEADERS))" -ge 1 ] && [ "$HAS_BULLETS" -ge 2 ]; then
+          # For visual books: check chart references exist when chart pages are present
+          local CHART_CHECK_OK=true
+          if [[ "$BOOK_TYPE" == "technical" || "$BOOK_TYPE" == "practical" || "$BOOK_TYPE" == "textbook" ]]; then
+            local CHART_PAGES=$(ls "$DIR/charts"/chart_p*.* 2>/dev/null | sed 's/.*chart_p\([0-9]*\).*/\1/' | sort -un | awk -v s="$B_START" -v e="$B_END" '$1>=s && $1<=e' | wc -l | tr -d ' ')
+            local CHART_REFS=$(grep -cE '\[CHART:|PAGE IMAGE:' "$TEMP_FILE" 2>/dev/null || echo 0)
+            if [ "$CHART_PAGES" -gt 3 ] && [ "$CHART_REFS" -eq 0 ]; then
+              echo "  QUALITY_FAIL — pp. $B_START-$B_END ($MODEL): $CHART_PAGES chart pages but 0 references" >> "$BATCH_LOG"
+              rm -f "$TEMP_FILE"
+              RETRY=$((RETRY + 1))
+              continue
+            fi
+          fi
+
+          echo "  OK — pp. $B_START-$B_END ($MODEL, +$LINES lines, $WORDS words)" >> "$BATCH_LOG"
+          echo "$B_START-$B_END:$MODEL" >> "$MODEL_LOG"
+          return 0
+        else
+          echo "  QUALITY_FAIL — pp. $B_START-$B_END ($MODEL): ${WORDS}w, ${HAS_MARKERS}m, ${HAS_HEADERS}h, ${HAS_BULLETS}b" >> "$BATCH_LOG"
+          rm -f "$TEMP_FILE"
+          RETRY=$((RETRY + 1))
+          continue
+        fi
       fi
 
       # Content filter? Skip straight to next model
@@ -727,22 +753,8 @@ else
     TEMP="$DIR/.gap_${FP}.md"
     rm -f "$TEMP"
 
-    GAP_PROMPT="You are creating study notes from a book PDF. This is a personal, educational book-analysis project.
-
-READ page $FP of the PDF at '$PDF'.
-
-WRITE the notes to '$TEMP' using the Write tool. Be concise but thorough. Markdown format:
-- START with: <!-- p. $FP -->
-- Chapter headers: ## Chapter N: Title
-- Subheadings: ### Topic Name
-- Key points as bullet points (-)
-- Notable quotes as > blockquotes with attribution
-- **Bold** for key terms, concepts, and names
-- Capture core arguments, reasoning, and best examples
-- Skip filler and repetitive restatements
-- Do NOT output preamble — ONLY write the notes
-
-IMPORTANT: Only cover page $FP. This is academic study material — process the content faithfully."
+    # Reuse the type-specific prompt for gap-fill (not a simplified version)
+    GAP_PROMPT=$(make_prompt "$FP" "$FP" "$TEMP")
 
     GAP_OK=false
     for MODEL in sonnet haiku; do
@@ -754,7 +766,7 @@ IMPORTANT: Only cover page $FP. This is academic study material — process the 
         run_with_timeout "$TIMEOUT" \
           claude -p "$GAP_PROMPT" \
           --model "$MODEL" \
-          --max-turns 2 \
+          --max-turns "$MAX_TURNS" \
           --allowedTools "Read" "Write" \
           2>"$STDERR_FILE" || true
 
@@ -883,7 +895,14 @@ for key, secs in groups.items():
             page_strs.append(f"[{s+1}-{e}] pages {sorted(pg)[:5]}...")
         print(f"  KEEP ALL {key} — sections cover different pages: {'; '.join(page_strs)}")
     else:
-        # True duplicates (same or no page markers) — keep the longest
+        # Same or no page markers — check if ALL sections lack markers (unsafe to dedup)
+        sections_with_markers = sum(1 for s, e, h, sz, pg in non_continued if pg)
+        if sections_with_markers == 0:
+            # No page markers at all — refuse to dedup, keep both to avoid data loss
+            print(f"  KEEP ALL {key} — no page markers on any section, refusing to dedup (safer)")
+            continue
+
+        # True duplicates (same page ranges) — keep the longest
         non_continued.sort(key=lambda x: x[3], reverse=True)
         keeper = non_continued[0]
         for s, e, h, sz, pg in non_continued[1:]:
