@@ -825,6 +825,40 @@
       }
     }, 15000);
 
+    // ── Reset reading progress button ──
+    var resetBtn = document.createElement('button');
+    resetBtn.className = 'bm-clear bm-reset';
+    resetBtn.textContent = 'Reset Progress';
+    resetBtn.title = 'Reset reading progress for this book';
+    resetBtn.onclick = function(e) {
+      e.stopPropagation();
+      data.books[bookPath].maxWordsRead = 0;
+      data.books[bookPath].maxScroll = 0;
+      // Reset dwell state on all paragraphs
+      if (_wordMap) {
+        for (var i = 0; i < _wordMap.length; i++) {
+          _wordMap[i].credited = 0;
+          _wordMap[i].visSec = 0;
+        }
+      }
+      sessionWordsStart = 0;
+      lastSavedWords = 0;
+      lastSavedTime = 0;
+      activeTime = 0;
+      _snapshots = [];
+      _lastSnapshotWords = 0;
+      sessionWpm = 0;
+      saveSpeedData(data);
+      updateProgress();
+      updateEta();
+      showToast('Reading progress reset');
+    };
+    if (bmBar) {
+      var clearBtn = bmBar.querySelector('.bm-clear');
+      if (clearBtn) bmBar.insertBefore(resetBtn, clearBtn);
+      else bmBar.appendChild(resetBtn);
+    }
+
     // Show bookmark bar if it was hidden, so ETA is visible
     // (only if there's a bookmark or meaningful progress)
     setTimeout(function() {
