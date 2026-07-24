@@ -426,18 +426,18 @@
     }
   }
 
-  function saveSpeedData(data) {
+  function saveSpeedData(data, forceSync) {
     if (data.sessions.length > 50) {
       data.sessions = data.sessions.slice(-50);
     }
     localStorage.setItem(RS_KEY, JSON.stringify(data));
-    syncSpeedToBackend(data);
+    syncSpeedToBackend(data, forceSync);
   }
 
   var _lastSync = 0;
-  function syncSpeedToBackend(data) {
+  function syncSpeedToBackend(data, force) {
     var now = Date.now();
-    if (now - _lastSync < 60000) return;
+    if (!force && now - _lastSync < 60000) return;
     _lastSync = now;
     // Send lightweight payload — only current book + reader model
     var bookPath = getBookPath();
@@ -471,13 +471,26 @@
           local.books[path] = rb;
           changed = true;
         } else {
-          if ((rb.maxScroll || 0) > (lb.maxScroll || 0)) {
-            lb.maxScroll = rb.maxScroll;
-            changed = true;
-          }
-          if ((rb.words || 0) > (lb.words || 0)) {
-            lb.words = rb.words;
-            changed = true;
+          var localTime = lb.updatedAt || lb.resetAt || 0;
+          var remoteTime = rb.updatedAt || rb.resetAt || 0;
+          if (localTime || remoteTime) {
+            // Timestamped: newest state wins (supports resets)
+            if (remoteTime > localTime) {
+              // Preserve local word count (total words in book)
+              rb.words = Math.max(rb.words || 0, lb.words || 0);
+              local.books[path] = rb;
+              changed = true;
+            }
+          } else {
+            // Legacy records without timestamps: highest wins
+            if ((rb.maxScroll || 0) > (lb.maxScroll || 0)) {
+              lb.maxScroll = rb.maxScroll;
+              changed = true;
+            }
+            if ((rb.words || 0) > (lb.words || 0)) {
+              lb.words = rb.words;
+              changed = true;
+            }
           }
         }
       });
@@ -538,7 +551,8 @@
         words: 0,
         maxScroll: 0,
         maxWordsRead: 0,
-        title: document.title
+        title: document.title,
+        updatedAt: Date.now()
       };
     }
 
@@ -736,6 +750,7 @@
         var savedWords = data.books[bookPath].maxWordsRead || 0;
         if (liveWords > savedWords) {
           data.books[bookPath].maxWordsRead = liveWords;
+          data.books[bookPath].updatedAt = Date.now();
         }
       }
       updateEta();
@@ -858,8 +873,11 @@
     resetBtn.title = 'Reset reading progress for this book';
     resetBtn.onclick = function(e) {
       e.stopPropagation();
-      data.books[bookPath].maxWordsRead = 0;
-      data.books[bookPath].maxScroll = 0;
+      var book = data.books[bookPath];
+      book.maxWordsRead = 0;
+      book.maxScroll = 0;
+      book.updatedAt = Date.now();
+      book.resetAt = book.updatedAt;
       // Reset dwell state on all paragraphs
       if (_wordMap) {
         for (var i = 0; i < _wordMap.length; i++) {
@@ -867,22 +885,37 @@
           _wordMap[i].visSec = 0;
         }
       }
+      // Clear sessions for this book
+      data.sessions = (data.sessions || []).filter(function(s) {
+        return s.book !== bookPath;
+      });
       sessionWordsStart = 0;
       lastSavedWords = 0;
       lastSavedTime = 0;
       activeTime = 0;
-      _snapshots = [];
+      _snapshots = [{ words: 0, time: 0 }];
       _lastSnapshotWords = 0;
       sessionWpm = 0;
-      saveSpeedData(data);
+      saveSpeedData(data, true);
+      // Also clear the bookmark so resume bar doesn't restore
+      localStorage.removeItem(BM_KEY);
+      jsonpFetch(
+        SYNC_URL + '?action=set_bookmark&key=' +
+        encodeURIComponent(BM_KEY) + '&data=',
+        function(){}
+      );
+      if (bar) bar.style.display = 'none';
       updateProgress();
       updateEta();
       showToast('Reading progress reset');
     };
-    if (bmBar) {
-      var clearBtn = bmBar.querySelector('.bm-clear');
-      if (clearBtn) bmBar.insertBefore(resetBtn, clearBtn);
-      else bmBar.appendChild(resetBtn);
+    // Place reset button at top of page, after first h1 or h2
+    var topAnchor = document.querySelector('h1') ||
+      document.querySelector('h2');
+    if (topAnchor && topAnchor.parentNode) {
+      topAnchor.parentNode.insertBefore(resetBtn, topAnchor.nextSibling);
+    } else {
+      document.body.insertBefore(resetBtn, document.body.firstChild);
     }
 
     // Show bookmark bar if it was hidden, so ETA is visible
