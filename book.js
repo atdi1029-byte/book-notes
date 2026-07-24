@@ -367,23 +367,39 @@
 
   // Called every second when tab is visible. Accumulates visibility
   // time per paragraph and credits words proportionally.
+  // Uses combined element/viewport fraction to handle tall elements
+  // that can never reach 70% visible on small screens.
   function tickDwell() {
     if (!_wordMap || _wordMap.length === 0) return;
     var vpH = window.innerHeight;
     var wps = _readerWpm / 60; // words per second at reader's pace
     for (var i = 0; i < _wordMap.length; i++) {
       var entry = _wordMap[i];
-      if (entry.credited >= entry.words) continue; // fully read
+      if ((entry.credited || 0) >= entry.words) continue;
       var rect = entry.el.getBoundingClientRect();
-      var elH = rect.height || 1;
-      var visTop = Math.max(rect.top, 0);
-      var visBot = Math.min(rect.bottom, vpH);
-      var visibleFrac = Math.max(0, visBot - visTop) / elH;
-      if (visibleFrac >= 0.7) {
+      var elementHeight = Math.max(1, rect.height);
+      var visiblePixels = Math.max(
+        0,
+        Math.min(rect.bottom, vpH) - Math.max(rect.top, 0)
+      );
+      var elementFraction = visiblePixels / elementHeight;
+      var viewportFraction = visiblePixels / Math.max(1, vpH);
+      // Normal elements: 35% visible. Tall elements (taller than
+      // viewport): accept if they fill 35%+ of the screen.
+      var isMeaningfullyVisible =
+        visiblePixels >= 80 &&
+        (elementFraction >= 0.35 ||
+         viewportFraction >= 0.35 ||
+         elementHeight > vpH);
+      if (isMeaningfullyVisible) {
         entry.visSec = (entry.visSec || 0) + 1;
-        // Credit words proportionally: can't read faster than WPM
-        var maxCredit = Math.min(entry.words, wps * entry.visSec);
-        entry.credited = maxCredit;
+        var visWeight = Math.min(
+          1, Math.max(0.35, viewportFraction)
+        );
+        var maxCredit = Math.min(
+          entry.words, wps * entry.visSec * visWeight
+        );
+        entry.credited = Math.max(entry.credited || 0, maxCredit);
       } else {
         // Scrolled away — reset visibility timer but keep credits
         entry.visSec = 0;
@@ -548,7 +564,7 @@
 
     // Rolling window: track recent reading snapshots (words + time)
     // to compute speed from last ~1000 words, not entire session.
-    var _snapshots = []; // { words: N, time: activeTimeMs }
+    var _snapshots = [{ words: sessionWordsStart, time: 0 }];
     var _lastSnapshotWords = sessionWordsStart;
     var SNAPSHOT_INTERVAL = 50; // only snapshot every 50 words read
     var ROLLING_WORDS = Math.min(1000, Math.round(totalWords * 0.1));
@@ -599,7 +615,11 @@
       }
 
       if (currentWords < 300) {
-        etaEl.textContent = 'Estimating reading time...';
+        var starterWpm = data.reader
+          ? data.reader.averageWPM : 225;
+        var starterMin = wordsRemaining / starterWpm;
+        etaEl.textContent = percent + '% read \u2022 '
+          + formatEta(starterMin) + ' \u2022 calibrating';
         return;
       }
 
@@ -685,13 +705,13 @@
     if (savedMax > 0 && _wordMap && _wordMap.length > 0) {
       var restored = 0;
       for (var ri = 0; ri < _wordMap.length; ri++) {
-        if (restored + _wordMap[ri].words <= savedMax) {
-          _wordMap[ri].credited = _wordMap[ri].words;
-          _wordMap[ri].visSec = 9999;
-          restored += _wordMap[ri].words;
-        } else {
-          break;
-        }
+        var remaining = savedMax - restored;
+        if (remaining <= 0) break;
+        var credit = Math.min(_wordMap[ri].words, remaining);
+        _wordMap[ri].credited = credit;
+        _wordMap[ri].visSec = credit >= _wordMap[ri].words ? 9999 : 0;
+        restored += credit;
+        if (credit < _wordMap[ri].words) break;
       }
     }
 
@@ -711,6 +731,12 @@
       // but 2+ minutes idle means you probably left
       if (sinceActivity < DWELL_IDLE) {
         tickDwell();
+        // Persist maxWordsRead from dwell credits (not just scroll)
+        var liveWords = getWordsRead();
+        var savedWords = data.books[bookPath].maxWordsRead || 0;
+        if (liveWords > savedWords) {
+          data.books[bookPath].maxWordsRead = liveWords;
+        }
       }
       updateEta();
     }, 1000);
@@ -960,6 +986,7 @@
       textNodes.forEach(function(textNode) {
         if (shouldSkip(textNode)) return;
         var text = textNode.textContent;
+        re.lastIndex = 0;
         if (!re.test(text)) return;
         re.lastIndex = 0;
 
@@ -1016,9 +1043,13 @@
       clearTimeout(hideTimer);
       var term = span.getAttribute('data-term');
       var def = span.getAttribute('data-def');
-      tip.innerHTML =
-        '<div class="gloss-tip-term">' + term + '</div>' +
-        '<div>' + def + '</div>';
+      tip.replaceChildren();
+      var termEl = document.createElement('div');
+      termEl.className = 'gloss-tip-term';
+      termEl.textContent = term;
+      var defEl = document.createElement('div');
+      defEl.textContent = def;
+      tip.append(termEl, defEl);
       tip.classList.add('show');
 
       // Position below the term
