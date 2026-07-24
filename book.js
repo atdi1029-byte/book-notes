@@ -689,11 +689,13 @@
       var maxWords = data.books[bookPath].maxWordsRead || 0;
       if (wordsNow > maxWords) {
         data.books[bookPath].maxWordsRead = wordsNow;
+        data.books[bookPath].updatedAt = Date.now();
       }
       // Also update legacy maxScroll for backward compat
       var scrollPct = getScrollProgress();
       if (scrollPct > (data.books[bookPath].maxScroll || 0)) {
         data.books[bookPath].maxScroll = scrollPct;
+        data.books[bookPath].updatedAt = Date.now();
       }
       // Debounced save (data persistence only)
       if (!_scrollSaveTimer) {
@@ -869,10 +871,13 @@
     // ── Reset reading progress button ──
     var resetBtn = document.createElement('button');
     resetBtn.className = 'bm-clear bm-reset';
-    resetBtn.textContent = 'Reset Progress';
-    resetBtn.title = 'Reset reading progress for this book';
+    resetBtn.textContent = 'Reset book progress';
+    resetBtn.title = 'Reset reading progress and bookmark for this book';
     resetBtn.onclick = function(e) {
       e.stopPropagation();
+      if (!confirm(
+        'Reset reading progress and remove the bookmark for this book?'
+      )) return;
       var book = data.books[bookPath];
       book.maxWordsRead = 0;
       book.maxScroll = 0;
@@ -907,7 +912,7 @@
       if (bar) bar.style.display = 'none';
       updateProgress();
       updateEta();
-      showToast('Reading progress reset');
+      showToast('Progress and bookmark reset');
     };
     // Place reset button at top of page, after first h1 or h2
     var topAnchor = document.querySelector('h1') ||
