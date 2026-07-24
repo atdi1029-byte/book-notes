@@ -2975,9 +2975,21 @@
               var lb = local.books[path];
               if (!lb) { local.books[path] = rb; changed = true; }
               else {
-                if ((rb.maxScroll || 0) > (lb.maxScroll || 0)) { lb.maxScroll = rb.maxScroll; changed = true; }
-                if ((rb.maxWordsRead || 0) > (lb.maxWordsRead || 0)) { lb.maxWordsRead = rb.maxWordsRead; changed = true; }
-                if ((rb.words || 0) > (lb.words || 0)) { lb.words = rb.words; changed = true; }
+                var localTime = lb.updatedAt || lb.resetAt || 0;
+                var remoteTime = rb.updatedAt || rb.resetAt || 0;
+                if (localTime || remoteTime) {
+                  // Timestamped: newest state wins (supports resets)
+                  if (remoteTime > localTime) {
+                    rb.words = Math.max(rb.words || 0, lb.words || 0);
+                    local.books[path] = rb;
+                    changed = true;
+                  }
+                } else {
+                  // Legacy records without timestamps: highest wins
+                  if ((rb.maxScroll || 0) > (lb.maxScroll || 0)) { lb.maxScroll = rb.maxScroll; changed = true; }
+                  if ((rb.maxWordsRead || 0) > (lb.maxWordsRead || 0)) { lb.maxWordsRead = rb.maxWordsRead; changed = true; }
+                  if ((rb.words || 0) > (lb.words || 0)) { lb.words = rb.words; changed = true; }
+                }
               }
             });
           }
