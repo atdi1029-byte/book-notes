@@ -599,8 +599,8 @@
     var etaEl = document.createElement('span');
     etaEl.className = 'reading-eta';
     etaEl.style.cssText =
-      'font-size:0.8rem;color:rgba(255,255,255,0.7);' +
-      'margin-left:0.75rem;white-space:nowrap;';
+      'font-size:0.7rem;color:rgba(255,255,255,0.7);' +
+      'margin-left:0.5rem;white-space:nowrap;';
     // Insert ETA into bookmark bar (after the label)
     var bmBar = document.getElementById('bookmarkBar');
     if (bmBar) {
