@@ -2918,9 +2918,8 @@
       }
     });
 
-    if (typeof renderMovedToShelf === 'function')
-      renderMovedToShelf();
-    // Hide/show category sections
+    if (typeof renderMovedToShelf === 'function') renderMovedToShelf();
+    // Hide/show category sections AFTER moved cards are injected
     document.querySelectorAll('#shelfView .section-title:not(#recentlyAddedTitle)').forEach(function(title) {
       var shelf = title.nextElementSibling;
       if (!shelf || !shelf.classList.contains('shelf')) return;
@@ -3020,16 +3019,10 @@
     });
     jsonpFetch(SYNC_URL + '?action=get_moved', function(err, movedData) {
       if (!err && movedData && movedData.status === 'ok' && movedData.moved) {
-        // Merge by newest timestamp
+        // Merge remote into local (remote wins for conflicts)
         var local = getMovedToShelf();
         var remote = movedData.moved;
-        for (var k in remote) {
-          var remoteTs = (remote[k] && remote[k].ts) || 0;
-          var localTs = (local[k] && local[k].ts) || 0;
-          if (remoteTs >= localTs) {
-            local[k] = remote[k];
-          }
-        }
+        for (var k in remote) { local[k] = remote[k]; }
         localStorage.setItem(SHELF_MOVED_KEY, JSON.stringify(local));
         renderMovedToShelf();
       }
@@ -3055,28 +3048,18 @@
     }
   });
 
-  // ── Catalog Reconciliation & Move to Shelf ─────────────────
-
+  // ── Move to Shelf ─────────────────────────────────────────────
   var SHELF_MOVED_KEY = 'books_moved_to_shelf';
-
-  function normalizeBookHref(href) {
-    if (!href) return '';
-    var h = href;
-    try { h = decodeURIComponent(h); } catch(e) {}
-    h = h.replace(/^\.\//, '').replace(/[?#].*$/, '');
-    h = h.replace(/\/+/g, '/');
-    return h;
-  }
 
   function getMovedToShelf() {
     try {
-      return JSON.parse(
-        localStorage.getItem(SHELF_MOVED_KEY)
-      ) || {};
+      return JSON.parse(localStorage.getItem(SHELF_MOVED_KEY)) || {};
     } catch(e) { return {}; }
   }
 
   function getSectionName(bookEl) {
+    // Walk up to the parent .shelf div, then get the
+    // preceding .section-title sibling
     var shelfDiv = bookEl.parentElement;
     if (!shelfDiv) return '';
     var prev = shelfDiv.previousElementSibling;
@@ -3090,6 +3073,7 @@
   }
 
   function findShelfSection(sectionName) {
+    // Find the matching section title in #shelfView
     var found = null;
     document.querySelectorAll(
       '#shelfView .section-title'
@@ -3097,6 +3081,7 @@
       if (h2.textContent.trim() === sectionName) found = h2;
     });
     if (!found) return null;
+    // Return the .shelf div that follows it
     var next = found.nextElementSibling;
     while (next) {
       if (next.classList.contains('shelf')) return next;
@@ -3105,153 +3090,104 @@
     return null;
   }
 
-  // Ensure every To Read book also exists on the shelf.
-  // Called once before first render.
-  function reconcileCatalog() {
-    // Build map of shelf books by normalized href
-    var shelfMap = {};
-    document.querySelectorAll(
-      '#shelfView .book[href]'
-    ).forEach(function(el) {
-      var nh = normalizeBookHref(el.getAttribute('href'));
-      // Remove any inline display:none from hardcoded cards
-      if (el.style.display === 'none') el.style.display = '';
-      shelfMap[nh] = el;
-    });
-
-    document.querySelectorAll(
-      '#toReadView .book[href]'
-    ).forEach(function(trEl) {
-      var href = trEl.getAttribute('href');
-      var nh = normalizeBookHref(href);
-      var shelfEl = shelfMap[nh];
-
-      if (shelfEl) {
-        // Book exists on both — unify data-book ID
-        var canonId = shelfEl.dataset.book;
-        if (trEl.dataset.book !== canonId) {
-          trEl.dataset.book = canonId;
-          // Update onclick handlers
-          var mr = trEl.querySelector('.mark-read');
-          var rb = trEl.querySelector('.read-badge');
-          if (mr) mr.setAttribute('onclick',
-            "toggleRead(event,'" + canonId + "')");
-          if (rb) rb.setAttribute('onclick',
-            "toggleRead(event,'" + canonId + "')");
-        }
-        return;
-      }
-
-      // Book missing from shelf — clone it in
-      var sectionName = getSectionName(trEl);
-      var targetShelf = sectionName
-        ? findShelfSection(sectionName) : null;
-
-      // Fallback to Recently Added if section doesn't exist
-      if (!targetShelf) {
-        var fallbackShelf =
-          document.getElementById('recentlyAddedShelf');
-        var fallbackTitle =
-          document.getElementById('recentlyAddedTitle');
-        if (fallbackShelf) {
-          targetShelf = fallbackShelf;
-          if (fallbackTitle)
-            fallbackTitle.style.display = '';
-          fallbackShelf.style.display = '';
-        }
-        if (!targetShelf) return;
-      }
-
-      // Prevent duplicate by checking again
-      var already = false;
-      targetShelf.querySelectorAll('.book[href]')
-        .forEach(function(existing) {
-          if (normalizeBookHref(
-            existing.getAttribute('href')) === nh
-          ) already = true;
-        });
-      if (already) return;
-
-      var clone = trEl.cloneNode(true);
-      clone.style.display = '';
-      delete clone.dataset.moved;
-      // Remove tier badges and move buttons
-      var tier = clone.querySelector('.tier-badge');
-      if (tier) tier.remove();
-      var moveBtn = clone.querySelector('.move-to-shelf');
-      if (moveBtn) moveBtn.remove();
-      // Use To Read's data-book as canonical since
-      // there's no shelf version
-      targetShelf.appendChild(clone);
-      shelfMap[nh] = clone;
-    });
-  }
-
-  // Move = remove from To Read queue. Shelf copy always stays.
   function moveToShelf(e, id, sectionName) {
     e.preventDefault();
     e.stopPropagation();
     var moved = getMovedToShelf();
-    moved[id] = {
-      section: sectionName,
-      ts: Date.now(),
-      removed: false
-    };
-    localStorage.setItem(
-      SHELF_MOVED_KEY, JSON.stringify(moved)
-    );
+    moved[id] = { ts: Date.now(), section: sectionName };
+    localStorage.setItem(SHELF_MOVED_KEY, JSON.stringify(moved));
     renderMovedToShelf();
-    if (syncReady && SYNC_URL &&
-        SYNC_URL !== 'YOUR_APPS_SCRIPT_URL_HERE') {
-      jsonpFetch(SYNC_URL +
-        '?action=move_to_shelf&book=' +
-        encodeURIComponent(id) +
-        '&section=' +
-        encodeURIComponent(sectionName), function(){});
+    // Sync to backend
+    if (syncReady && SYNC_URL && SYNC_URL !== 'YOUR_APPS_SCRIPT_URL_HERE') {
+      jsonpFetch(SYNC_URL + '?action=move_to_shelf&book=' + encodeURIComponent(id) + '&section=' + encodeURIComponent(sectionName), function(){});
     }
   }
 
-  // Restore = put back in To Read queue
   function unmoveFromShelf(e, id) {
     e.preventDefault();
     e.stopPropagation();
     var moved = getMovedToShelf();
-    // Store tombstone instead of deleting
-    if (moved[id]) {
-      moved[id].removed = true;
-      moved[id].ts = Date.now();
-    }
-    localStorage.setItem(
-      SHELF_MOVED_KEY, JSON.stringify(moved)
-    );
+    delete moved[id];
+    localStorage.setItem(SHELF_MOVED_KEY, JSON.stringify(moved));
     renderMovedToShelf();
     render();
-    if (syncReady && SYNC_URL &&
-        SYNC_URL !== 'YOUR_APPS_SCRIPT_URL_HERE') {
-      jsonpFetch(SYNC_URL +
-        '?action=unmove_from_shelf&book=' +
-        encodeURIComponent(id), function(){});
+    if (syncReady && SYNC_URL && SYNC_URL !== 'YOUR_APPS_SCRIPT_URL_HERE') {
+      jsonpFetch(SYNC_URL + '?action=unmove_from_shelf&book=' + encodeURIComponent(id), function(){});
     }
   }
 
-  // Moved state controls only To Read visibility.
-  // The shelf copy always stays visible.
   function renderMovedToShelf() {
     var moved = getMovedToShelf();
 
+    // Hide the old "Recently Added" fallback section
+    var fallbackTitle =
+      document.getElementById('recentlyAddedTitle');
+    var fallbackShelf =
+      document.getElementById('recentlyAddedShelf');
+    if (fallbackTitle) fallbackTitle.style.display = 'none';
+    if (fallbackShelf) fallbackShelf.style.display = 'none';
+
+    // Remove any previously injected moved cards
     document.querySelectorAll(
-      '#toReadView .book'
-    ).forEach(function(el) {
-      var id = el.dataset.book;
-      var entry = moved[id];
-      // Show in To Read unless actively moved
-      // (removed=true or no entry means show it)
-      if (entry && !entry.removed) {
+      '#shelfView .book[data-moved="1"]'
+    ).forEach(function(el) { el.remove(); });
+
+    var touchedShelves = [];
+    document.querySelectorAll('#toReadView .book').forEach(
+      function(el) {
+        var id = el.dataset.book;
+        var entry = moved[id];
+        if (!entry) { el.style.display = ''; return; }
         el.style.display = 'none';
-      } else {
-        el.style.display = '';
+        var sectionName = entry.section ||
+          (typeof entry === 'number' ? '' : '');
+        var targetShelf = sectionName
+          ? findShelfSection(sectionName) : null;
+        if (!targetShelf) {
+          // Fallback: use Recently Added
+          if (fallbackShelf) {
+            var clone = el.cloneNode(true);
+            clone.style.display = '';
+            clone.dataset.moved = '1';
+            var btn = clone.querySelector('.move-to-shelf');
+            if (btn) btn.remove();
+            var tier = clone.querySelector('.tier-badge');
+            if (tier) tier.remove();
+            var undo = document.createElement('button');
+            undo.className = 'move-to-shelf';
+            undo.title = 'Back to To Read';
+            undo.textContent = '\u2190 To Read';
+            undo.onclick = function(ev) { unmoveFromShelf(ev, id); };
+            clone.querySelector('.cover-wrap').appendChild(undo);
+            fallbackShelf.appendChild(clone);
+            if (fallbackTitle)
+              fallbackTitle.style.display = '';
+            if (fallbackShelf)
+              fallbackShelf.style.display = '';
+          }
+          return;
+        }
+        var clone = el.cloneNode(true);
+        clone.style.display = '';
+        clone.dataset.moved = '1';
+        var btn = clone.querySelector('.move-to-shelf');
+        if (btn) btn.remove();
+        var tier = clone.querySelector('.tier-badge');
+        if (tier) tier.remove();
+        var undo = document.createElement('button');
+        undo.className = 'move-to-shelf';
+        undo.title = 'Back to To Read';
+        undo.textContent = '\u2190 To Read';
+        undo.onclick = function(ev) { unmoveFromShelf(ev, id); };
+        clone.querySelector('.cover-wrap').appendChild(undo);
+        targetShelf.appendChild(clone);
+        if (touchedShelves.indexOf(targetShelf) === -1)
+          touchedShelves.push(targetShelf);
       }
-    });
+    );
+
+    // Section visibility is handled by render()
+    // after renderMovedToShelf completes
 
     // Hide To Read sections where all books are moved
     document.querySelectorAll(
@@ -3269,16 +3205,14 @@
   }
 
   // Inject "→ Shelf" button into every To Read card
-  // (idempotent — skips if already present)
   document.querySelectorAll('#toReadView .book').forEach(
     function(el) {
-      if (el.querySelector('.move-to-shelf')) return;
       var id = el.dataset.book;
       var section = getSectionName(el);
       var btn = document.createElement('button');
       btn.className = 'move-to-shelf';
       btn.title = 'Move to shelf';
-      btn.textContent = '\u2192 Shelf';
+      btn.textContent = '→ Shelf';
       btn.onclick = function(e) {
         moveToShelf(e, id, section);
       };
@@ -3286,8 +3220,6 @@
     }
   );
 
-  // Reconcile catalog before first render
-  reconcileCatalog();
   renderMovedToShelf();
 </script>
 
