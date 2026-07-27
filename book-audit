@@ -1,0 +1,243 @@
+#!/usr/bin/env python3
+"""
+Library auditor — validates books.json against filesystem
+and checks for consistency issues.
+
+Usage:
+    ./book-audit           # Run all checks
+    ./book-audit --fix     # Auto-fix what can be fixed
+
+Exit code 0 = all clear, 1 = issues found.
+"""
+
+import json
+import os
+import re
+import sys
+from collections import Counter
+
+BOOKS_DIR = os.path.dirname(os.path.abspath(__file__))
+JSON_PATH = os.path.join(BOOKS_DIR, 'books.json')
+
+SKIP_DIRS = {
+    'metadata', 'reports', '.git', 'node_modules',
+    '__pycache__', 'CourseAI-SMC',
+    'Franklin_Article_Temp', 'Thinking_Fast_and_Slow',
+}
+
+
+def load_manifest():
+    if not os.path.isfile(JSON_PATH):
+        print('FAIL: books.json does not exist.')
+        print('  Run: python3 generate_books_json.py')
+        sys.exit(1)
+    with open(JSON_PATH) as f:
+        return json.load(f)
+
+
+def check_missing_dirs(manifest):
+    """Built books in manifest must have their directory."""
+    issues = []
+    for b in manifest['books']:
+        d = os.path.join(BOOKS_DIR, b['folder'])
+        if not os.path.isdir(d):
+            issues.append(
+                f'Directory missing: {b["folder"]} '
+                f'(id: {b["id"]})'
+            )
+    return issues
+
+
+def check_broken_files(manifest):
+    """Check that index.html, plain.html, cover exist."""
+    issues = []
+    for b in manifest['books']:
+        d = os.path.join(BOOKS_DIR, b['folder'])
+        if not os.path.isdir(d):
+            continue
+
+        fmts = b.get('formats', {})
+        if 'full' in fmts:
+            p = os.path.join(d, fmts['full'])
+            if not os.path.isfile(p):
+                issues.append(
+                    f'Broken index: {b["folder"]}/{fmts["full"]}'
+                )
+        if 'plain' in fmts:
+            p = os.path.join(d, fmts['plain'])
+            if not os.path.isfile(p):
+                issues.append(
+                    f'Broken plain: {b["folder"]}/{fmts["plain"]}'
+                )
+        if b.get('cover'):
+            p = os.path.join(d, b['cover'])
+            if not os.path.isfile(p):
+                issues.append(
+                    f'Missing cover: {b["folder"]}/{b["cover"]}'
+                )
+    return issues
+
+
+def check_duplicate_ids(manifest):
+    """No two books should share the same ID."""
+    ids = [b['id'] for b in manifest['books']]
+    dupes = [i for i, c in Counter(ids).items() if c > 1]
+    return [f'Duplicate ID: {d}' for d in dupes]
+
+
+def check_duplicate_folders(manifest):
+    """No two entries should point to the same folder."""
+    folders = [b['folder'] for b in manifest['books']]
+    dupes = [f for f, c in Counter(folders).items() if c > 1]
+    return [f'Duplicate folder: {d}' for d in dupes]
+
+
+def check_orphan_dirs(manifest):
+    """Directories with index.html not in the manifest."""
+    manifest_folders = {b['folder'] for b in manifest['books']}
+    issues = []
+    for d in sorted(os.listdir(BOOKS_DIR)):
+        if d in SKIP_DIRS:
+            continue
+        full = os.path.join(BOOKS_DIR, d)
+        if not os.path.isdir(full):
+            continue
+        if os.path.isfile(os.path.join(full, 'index.html')):
+            if d not in manifest_folders:
+                issues.append(f'Orphan directory: {d}')
+    return issues
+
+
+def check_uncategorized(manifest):
+    """Books should not be Uncategorized."""
+    return [
+        f'Uncategorized: {b["folder"]}'
+        for b in manifest['books']
+        if b['category'] == 'Uncategorized'
+    ]
+
+
+def check_unknown_authors(manifest):
+    """Books should have a real author."""
+    return [
+        f'Unknown author: {b["folder"]}'
+        for b in manifest['books']
+        if b['author'] == 'Unknown'
+    ]
+
+
+def check_missing_covers(manifest):
+    """Built books should have a cover image."""
+    issues = []
+    skip_cats = {'Guides', 'Language Guides'}
+    for b in manifest['books']:
+        if not b['built']:
+            continue
+        if b['category'] in skip_cats:
+            continue
+        if not b.get('cover'):
+            issues.append(
+                f'No cover: {b["folder"]}'
+            )
+        elif b['cover'] == 'cover.jpg':
+            # Has cover but no thumb — should generate thumb
+            thumb = os.path.join(
+                BOOKS_DIR, b['folder'], 'thumb.jpg'
+            )
+            if not os.path.isfile(thumb):
+                issues.append(
+                    f'No thumbnail (has cover.jpg): '
+                    f'{b["folder"]}'
+                )
+    return issues
+
+
+def check_plain_without_full(manifest):
+    """Plain editions need a full edition too."""
+    issues = []
+    for b in manifest['books']:
+        fmts = b.get('formats', {})
+        if 'plain' in fmts and 'full' not in fmts:
+            issues.append(
+                f'Plain without full: {b["folder"]}'
+            )
+    return issues
+
+
+def check_queue_consistency(manifest):
+    """Queue books must be built."""
+    issues = []
+    for b in manifest['books']:
+        if b.get('queue') and not b['built']:
+            issues.append(
+                f'Queued but not built: {b["folder"]}'
+            )
+    return issues
+
+
+def check_category_in_list(manifest):
+    """All categories should be in the canonical list."""
+    known = set(manifest.get('categories', []))
+    issues = []
+    for b in manifest['books']:
+        if b['category'] not in known:
+            issues.append(
+                f'Unknown category "{b["category"]}": '
+                f'{b["folder"]}'
+            )
+    return issues
+
+
+def run_audit():
+    manifest = load_manifest()
+
+    checks = [
+        ('Missing directories', check_missing_dirs),
+        ('Broken files', check_broken_files),
+        ('Duplicate IDs', check_duplicate_ids),
+        ('Duplicate folders', check_duplicate_folders),
+        ('Orphan directories', check_orphan_dirs),
+        ('Uncategorized books', check_uncategorized),
+        ('Unknown authors', check_unknown_authors),
+        ('Missing covers', check_missing_covers),
+        ('Plain without full', check_plain_without_full),
+        ('Queue consistency', check_queue_consistency),
+        ('Unknown categories', check_category_in_list),
+    ]
+
+    total_issues = 0
+    for name, check_fn in checks:
+        issues = check_fn(manifest)
+        if issues:
+            print(f'\n{name} ({len(issues)}):')
+            for issue in issues:
+                print(f'  - {issue}')
+            total_issues += len(issues)
+        else:
+            print(f'  {name}: OK')
+
+    # Summary
+    books = manifest['books']
+    built = sum(1 for b in books if b['built'])
+    queued = sum(1 for b in books if b.get('queue'))
+    cats = len(set(b['category'] for b in books))
+    plains = sum(
+        1 for b in books if 'plain' in b.get('formats', {})
+    )
+
+    print(f'\n{"=" * 40}')
+    print(f'Library: {len(books)} books, {built} built, '
+          f'{queued} queued')
+    print(f'Categories: {cats}, Plain editions: {plains}')
+    print(f'Issues: {total_issues}')
+
+    if total_issues > 0:
+        print('\nAUDIT FAILED')
+        sys.exit(1)
+    else:
+        print('\nAUDIT PASSED')
+        sys.exit(0)
+
+
+if __name__ == '__main__':
+    run_audit()
