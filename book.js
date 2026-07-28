@@ -933,6 +933,150 @@
     }, 3000);
   })();
 
+  // ── Reader Settings ──
+  (function initReaderSettings() {
+    var SETTINGS_KEY = 'book-reader-settings';
+    var defaults = {fontSize:16, lineSpacing:1.7, maxWidth:900, font:'serif', theme:'warm'};
+    var s;
+    try { s = JSON.parse(localStorage.getItem(SETTINGS_KEY)) || {}; } catch(e) { s = {}; }
+    var fontSize = s.fontSize || defaults.fontSize;
+    var lineSpacing = s.lineSpacing || defaults.lineSpacing;
+    var maxWidth = s.maxWidth || defaults.maxWidth;
+    var currentFont = s.font || defaults.font;
+    var currentTheme = s.theme || defaults.theme;
+
+    // Inject CSS
+    var style = document.createElement('style');
+    style.textContent = [
+      '.rs-toggle{position:fixed;bottom:20px;right:20px;width:42px;height:42px;border-radius:50%;background:#8b6914;color:#fff;border:none;font-size:20px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.2);z-index:1000;transition:transform 0.3s}',
+      '.rs-toggle:hover{transform:rotate(45deg)}',
+      '.rs-toggle.active{transform:rotate(90deg)}',
+      '.rs-panel{position:fixed;bottom:72px;right:20px;width:270px;background:var(--bg,#faf8f4);border:1px solid var(--border,#e8e2d6);border-radius:10px;box-shadow:0 4px 20px rgba(0,0,0,0.15);z-index:999;display:none;padding:16px 18px;font-family:"Inter",sans-serif}',
+      '.rs-panel.open{display:block}',
+      '.rs-panel h3{font-family:"Playfair Display",serif;font-size:15px;margin:0 0 12px;color:var(--text,#2c2416)}',
+      '.rs-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}',
+      '.rs-row:last-child{margin-bottom:0}',
+      '.rs-label{font-size:12px;color:var(--muted,#8a7e6b);font-weight:500}',
+      '.rs-controls{display:flex;align-items:center;gap:6px}',
+      '.rs-btn{width:28px;height:28px;border-radius:6px;border:1px solid var(--border,#e8e2d6);background:var(--bg,#faf8f4);color:var(--text,#2c2416);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:600}',
+      '.rs-btn:hover{opacity:0.8}',
+      '.rs-val{font-size:12px;color:var(--text,#2c2416);min-width:32px;text-align:center;font-weight:600}',
+      '.rs-swatches{display:flex;gap:6px}',
+      '.rs-swatch{width:28px;height:28px;border-radius:50%;border:2px solid transparent;cursor:pointer;transition:border-color 0.2s}',
+      '.rs-swatch:hover{border-color:#8b6914}',
+      '.rs-swatch.active{border-color:#8b6914;box-shadow:0 0 0 2px rgba(139,105,20,0.2)}',
+      '.rs-swatch.t-warm{background:#faf8f4;border-color:#e8e2d6}',
+      '.rs-swatch.t-warm.active{border-color:#8b6914}',
+      '.rs-swatch.t-cool{background:#f4f6fa}',
+      '.rs-swatch.t-dark{background:#1a1a2e}',
+      '.rs-swatch.t-sepia{background:#f1e7d0}',
+      '.rs-fonts{display:flex;gap:4px}',
+      '.rs-font{padding:3px 10px;border-radius:12px;border:1px solid var(--border,#e8e2d6);background:var(--bg,#faf8f4);font-size:11px;cursor:pointer;color:var(--text,#2c2416)}',
+      '.rs-font:hover{opacity:0.8}',
+      '.rs-font.active{background:#8b6914;color:#fff;border-color:#8b6914}',
+      'body.rs-dark{--bg:#1a1a2e;--text:#e0ddd5;--muted:#8a8a9a;--accent:#c4a33a;--border:#333348}',
+      'body.rs-dark .rs-panel{background:#22223a;border-color:#333348}',
+      'body.rs-dark .rs-panel h3{color:#e0ddd5}',
+      'body.rs-dark .rs-btn{background:#2a2a3e;color:#e0ddd5;border-color:#333348}',
+      'body.rs-dark .rs-val{color:#e0ddd5}',
+      'body.rs-dark .rs-font{background:#2a2a3e;color:#e0ddd5;border-color:#333348}',
+      'body.rs-dark .rs-toggle{background:#c4a33a}',
+      'body.rs-cool{--bg:#f4f6fa;--text:#1e2a3a;--muted:#6b7a8e;--accent:#2a6cb6;--border:#d0d8e4}',
+      'body.rs-cool .rs-toggle{background:#2a6cb6}',
+      'body.rs-sepia{--bg:#f1e7d0;--text:#3a2e1a;--muted:#7a6b52;--accent:#8b5e14;--border:#d4c8a8}'
+    ].join('\n');
+    document.head.appendChild(style);
+
+    // Inject HTML
+    var gear = document.createElement('button');
+    gear.className = 'rs-toggle';
+    gear.innerHTML = '&#9881;';
+    document.body.appendChild(gear);
+
+    var panel = document.createElement('div');
+    panel.className = 'rs-panel';
+    panel.innerHTML = '<h3>Reader Settings</h3>'
+      + '<div class="rs-row"><span class="rs-label">Size</span><div class="rs-controls">'
+      + '<button class="rs-btn" data-action="size" data-d="-1">-</button>'
+      + '<span class="rs-val" id="rsSizeVal"></span>'
+      + '<button class="rs-btn" data-action="size" data-d="1">+</button></div></div>'
+      + '<div class="rs-row"><span class="rs-label">Spacing</span><div class="rs-controls">'
+      + '<button class="rs-btn" data-action="spacing" data-d="-0.1">-</button>'
+      + '<span class="rs-val" id="rsSpacingVal"></span>'
+      + '<button class="rs-btn" data-action="spacing" data-d="0.1">+</button></div></div>'
+      + '<div class="rs-row"><span class="rs-label">Width</span><div class="rs-controls">'
+      + '<button class="rs-btn" data-action="width" data-d="-50">-</button>'
+      + '<span class="rs-val" id="rsWidthVal"></span>'
+      + '<button class="rs-btn" data-action="width" data-d="50">+</button></div></div>'
+      + '<div class="rs-row"><span class="rs-label">Font</span><div class="rs-fonts">'
+      + '<button class="rs-font" data-font="serif" style="font-family:Playfair Display,serif">Serif</button>'
+      + '<button class="rs-font" data-font="sans" style="font-family:Inter,sans-serif">Sans</button>'
+      + '<button class="rs-font" data-font="mono" style="font-family:Courier New,monospace">Mono</button></div></div>'
+      + '<div class="rs-row"><span class="rs-label">Theme</span><div class="rs-swatches">'
+      + '<div class="rs-swatch t-warm" data-theme="warm" title="Warm"></div>'
+      + '<div class="rs-swatch t-cool" data-theme="cool" title="Cool"></div>'
+      + '<div class="rs-swatch t-sepia" data-theme="sepia" title="Sepia"></div>'
+      + '<div class="rs-swatch t-dark" data-theme="dark" title="Dark"></div></div></div>';
+    document.body.appendChild(panel);
+
+    function save() {
+      localStorage.setItem(SETTINGS_KEY, JSON.stringify({
+        fontSize:fontSize, lineSpacing:lineSpacing, maxWidth:maxWidth,
+        font:currentFont, theme:currentTheme
+      }));
+    }
+
+    function applyAll() {
+      document.body.style.fontSize = fontSize + 'px';
+      document.body.style.lineHeight = lineSpacing;
+      document.body.style.maxWidth = maxWidth + 'px';
+      document.body.style.margin = '0 auto';
+      var fonts = {
+        serif: "'Playfair Display', Georgia, serif",
+        sans: "'Inter', -apple-system, sans-serif",
+        mono: "'Courier New', monospace"
+      };
+      document.body.style.fontFamily = fonts[currentFont];
+      document.getElementById('rsSizeVal').textContent = fontSize + 'px';
+      document.getElementById('rsSpacingVal').textContent = lineSpacing.toFixed(1);
+      document.getElementById('rsWidthVal').textContent = maxWidth;
+      // Theme class
+      document.body.classList.remove('rs-dark','rs-cool','rs-sepia');
+      if (currentTheme !== 'warm') document.body.classList.add('rs-' + currentTheme);
+      // Active states
+      panel.querySelectorAll('.rs-swatch').forEach(function(sw) {
+        sw.classList.toggle('active', sw.dataset.theme === currentTheme);
+      });
+      panel.querySelectorAll('.rs-font').forEach(function(b) {
+        b.classList.toggle('active', b.dataset.font === currentFont);
+      });
+    }
+
+    gear.addEventListener('click', function() {
+      panel.classList.toggle('open');
+      gear.classList.toggle('active');
+    });
+
+    panel.addEventListener('click', function(e) {
+      var btn = e.target.closest('.rs-btn');
+      if (btn) {
+        var action = btn.dataset.action;
+        var d = parseFloat(btn.dataset.d);
+        if (action === 'size') fontSize = Math.max(10, Math.min(24, fontSize + d));
+        if (action === 'spacing') lineSpacing = Math.max(1.0, Math.min(2.5, +(lineSpacing + d).toFixed(1)));
+        if (action === 'width') maxWidth = Math.max(500, Math.min(1400, maxWidth + d));
+        applyAll(); save();
+        return;
+      }
+      var font = e.target.closest('.rs-font');
+      if (font) { currentFont = font.dataset.font; applyAll(); save(); return; }
+      var swatch = e.target.closest('.rs-swatch');
+      if (swatch) { currentTheme = swatch.dataset.theme; applyAll(); save(); return; }
+    });
+
+    applyAll();
+  })();
+
   // ── Glossary Tooltips ──
   // Parses the glossary section, then highlights matching terms
   // in chapter text with tap/hover tooltips showing definitions.
