@@ -1086,8 +1086,8 @@
       return false;
     }
 
-    // Track which terms have already been linked (first occurrence only)
-    var linked = {};
+    // Link every occurrence of each term, not just the first
+    var linked = null; // unused — kept for reference
 
     // Find the end of the glossary section (next h2 after glossary)
     var glossaryEnd = glossaryH2.nextElementSibling;
@@ -1121,10 +1121,6 @@
         re.lastIndex = 0;
         while ((match = re.exec(text)) !== null) {
           var termKey = match[1].toLowerCase();
-          // Only link first occurrence of each term
-          if (linked[termKey]) continue;
-          linked[termKey] = true;
-
           var entry = lookup[termKey];
           if (!entry) continue;
 
