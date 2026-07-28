@@ -948,14 +948,12 @@
     // Inject CSS
     var style = document.createElement('style');
     style.textContent = [
-      '.rs-toggle{position:fixed;bottom:20px;right:20px;width:42px;height:42px;border-radius:50%;background:#8b6914;color:#fff;border:none;font-size:20px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.2);z-index:1000;transition:transform 0.3s}',
-      '.rs-toggle:hover{transform:rotate(45deg)}',
-      '.rs-toggle.active{transform:rotate(90deg)}',
-      '.rs-panel{position:fixed;bottom:72px;right:20px;width:270px;background:var(--bg,#faf8f4);border:1px solid var(--border,#e8e2d6);border-radius:10px;box-shadow:0 4px 20px rgba(0,0,0,0.15);z-index:999;display:none;padding:16px 18px;font-family:"Inter",sans-serif}',
-      '.rs-panel.open{display:block}',
-      '.rs-panel h3{font-family:"Playfair Display",serif;font-size:15px;margin:0 0 12px;color:var(--text,#2c2416)}',
-      '.rs-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}',
-      '.rs-row:last-child{margin-bottom:0}',
+      '.rs-toggle{background:rgba(0,0,0,0.05);border:1px solid var(--border,#e8e2d6);color:var(--muted,#8a7e6b);padding:4px 14px;border-radius:16px;cursor:pointer;font-family:"Inter",sans-serif;font-size:12px;font-weight:500;transition:all 0.2s;margin:10px auto 0;display:block}',
+      '.rs-toggle:hover{background:rgba(0,0,0,0.08);color:var(--text,#2c2416)}',
+      '.rs-toggle.active{background:#8b6914;color:#fff;border-color:#8b6914}',
+      '.rs-panel{max-width:800px;margin:10px auto 0;background:var(--bg,#faf8f4);border:1px solid var(--border,#e8e2d6);border-radius:8px;display:none;padding:14px 18px;font-family:"Inter",sans-serif}',
+      '.rs-panel.open{display:flex;flex-wrap:wrap;gap:12px 24px;align-items:center}',
+      '.rs-row{display:flex;align-items:center;gap:8px}',
       '.rs-label{font-size:12px;color:var(--muted,#8a7e6b);font-weight:500}',
       '.rs-controls{display:flex;align-items:center;gap:6px}',
       '.rs-btn{width:28px;height:28px;border-radius:6px;border:1px solid var(--border,#e8e2d6);background:var(--bg,#faf8f4);color:var(--text,#2c2416);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:600}',
@@ -990,12 +988,18 @@
     // Inject HTML
     var gear = document.createElement('button');
     gear.className = 'rs-toggle';
-    gear.innerHTML = '&#9881;';
-    document.body.appendChild(gear);
+    gear.textContent = '\u2699 Settings';
+    // Insert at top of page, after first h1
+    var topH1 = document.querySelector('h1');
+    if (topH1 && topH1.parentNode) {
+      topH1.parentNode.insertBefore(gear, topH1.nextSibling);
+    } else {
+      document.body.insertBefore(gear, document.body.firstChild);
+    }
 
     var panel = document.createElement('div');
     panel.className = 'rs-panel';
-    panel.innerHTML = '<h3>Reader Settings</h3>'
+    panel.innerHTML = ''
       + '<div class="rs-row"><span class="rs-label">Size</span><div class="rs-controls">'
       + '<button class="rs-btn" data-action="size" data-d="-1">-</button>'
       + '<span class="rs-val" id="rsSizeVal"></span>'
@@ -1017,7 +1021,7 @@
       + '<div class="rs-swatch t-cool" data-theme="cool" title="Cool"></div>'
       + '<div class="rs-swatch t-sepia" data-theme="sepia" title="Sepia"></div>'
       + '<div class="rs-swatch t-dark" data-theme="dark" title="Dark"></div></div></div>';
-    document.body.appendChild(panel);
+    gear.parentNode.insertBefore(panel, gear.nextSibling);
 
     function save() {
       localStorage.setItem(SETTINGS_KEY, JSON.stringify({
