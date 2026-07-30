@@ -1040,6 +1040,18 @@
           }
         });
       }
+      // Also handle <p><strong>Term:</strong> definition</p> format
+      if (sibling.tagName === 'P') {
+        var strong = sibling.querySelector('strong');
+        if (strong) {
+          var rawTerm = strong.textContent.replace(/:$/, '').trim();
+          var def = sibling.textContent
+            .replace(strong.textContent, '').trim();
+          if (rawTerm && def) {
+            terms.push({ term: rawTerm, def: def });
+          }
+        }
+      }
       sibling = sibling.nextElementSibling;
     }
 
