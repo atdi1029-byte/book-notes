@@ -2892,6 +2892,9 @@
   function render() {
     var read = getRead();
 
+    // Inject moved-to-shelf clones BEFORE applying read filter
+    if (typeof renderMovedToShelf === 'function') renderMovedToShelf();
+
     document.querySelectorAll('.content .shelf .book').forEach(function(el) {
       var id = el.dataset.book;
       var badge = el.querySelector('.read-badge');
@@ -2906,8 +2909,6 @@
         el.classList.remove('hidden-read');
       }
     });
-
-    if (typeof renderMovedToShelf === 'function') renderMovedToShelf();
     // Hide/show category sections AFTER moved cards are injected
     document.querySelectorAll('#shelfView .section-title:not(#recentlyAddedTitle)').forEach(function(title) {
       var shelf = title.nextElementSibling;
