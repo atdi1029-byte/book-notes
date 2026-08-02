@@ -3014,7 +3014,7 @@
         var remote = movedData.moved;
         for (var k in remote) { local[k] = remote[k]; }
         localStorage.setItem(SHELF_MOVED_KEY, JSON.stringify(local));
-        renderMovedToShelf();
+        render();
       }
       checkDone();
     });
@@ -3086,7 +3086,7 @@
     var moved = getMovedToShelf();
     moved[id] = { ts: Date.now(), section: sectionName };
     localStorage.setItem(SHELF_MOVED_KEY, JSON.stringify(moved));
-    renderMovedToShelf();
+    render();
     // Sync to backend
     if (syncReady && SYNC_URL && SYNC_URL !== 'YOUR_APPS_SCRIPT_URL_HERE') {
       jsonpFetch(SYNC_URL + '?action=move_to_shelf&book=' + encodeURIComponent(id) + '&section=' + encodeURIComponent(sectionName), function(){});
@@ -3099,7 +3099,6 @@
     var moved = getMovedToShelf();
     delete moved[id];
     localStorage.setItem(SHELF_MOVED_KEY, JSON.stringify(moved));
-    renderMovedToShelf();
     render();
     if (syncReady && SYNC_URL && SYNC_URL !== 'YOUR_APPS_SCRIPT_URL_HERE') {
       jsonpFetch(SYNC_URL + '?action=unmove_from_shelf&book=' + encodeURIComponent(id), function(){});
@@ -3210,7 +3209,7 @@
     }
   );
 
-  renderMovedToShelf();
+  render();
 </script>
 
 <script>
