@@ -345,66 +345,52 @@
     return cumulative;
   }
 
-  // Dwell-time paragraph tracking with proportional word crediting.
-  // Three independent concepts:
-  //   1. Dwell (visibility) — tracks which paragraphs are on screen
-  //   2. Active time — gated by user input, drives WPM calculation
-  //   3. Words read — proportional to dwell time and reading speed
-  // A paragraph's credited words ramp up based on how long it's been
-  // visible and the reader's average WPM, so fast scrolling past 700
-  // words credits nothing meaningful, but sitting on a paragraph
-  // gradually credits the full word count.
-  var _readerWpm = 225; // updated by initReadingTracker
+  // ── Location-based reading progress ──
+  // Progress = furthest word position the viewport has reached.
+  // Uses a "reading line" ~65% down the viewport to determine
+  // which word the reader is currently on. Independent of WPM
+  // or dwell time — purely positional.
 
-  function getWordsRead() {
+  var READING_LINE = 0.65; // 65% down the viewport
+
+  function getCurrentWordPosition() {
     if (!_wordMap || _wordMap.length === 0) return 0;
-    var wordsRead = 0;
-    for (var i = 0; i < _wordMap.length; i++) {
-      wordsRead += (_wordMap[i].credited || 0);
-    }
-    return Math.round(wordsRead);
-  }
-
-  // Called every second when tab is visible. Accumulates visibility
-  // time per paragraph and credits words proportionally.
-  // Uses combined element/viewport fraction to handle tall elements
-  // that can never reach 70% visible on small screens.
-  function tickDwell() {
-    if (!_wordMap || _wordMap.length === 0) return;
     var vpH = window.innerHeight;
-    var wps = _readerWpm / 60; // words per second at reader's pace
-    for (var i = 0; i < _wordMap.length; i++) {
-      var entry = _wordMap[i];
-      if ((entry.credited || 0) >= entry.words) continue;
-      var rect = entry.el.getBoundingClientRect();
-      var elementHeight = Math.max(1, rect.height);
-      var visiblePixels = Math.max(
-        0,
-        Math.min(rect.bottom, vpH) - Math.max(rect.top, 0)
-      );
-      var elementFraction = visiblePixels / elementHeight;
-      var viewportFraction = visiblePixels / Math.max(1, vpH);
-      // Normal elements: 35% visible. Tall elements (taller than
-      // viewport): accept if they fill 35%+ of the screen.
-      var isMeaningfullyVisible =
-        visiblePixels >= 80 &&
-        (elementFraction >= 0.35 ||
-         viewportFraction >= 0.35 ||
-         elementHeight > vpH);
-      if (isMeaningfullyVisible) {
-        entry.visSec = (entry.visSec || 0) + 1;
-        var visWeight = Math.min(
-          1, Math.max(0.35, viewportFraction)
+    var readingY = vpH * READING_LINE; // px from top of viewport
+
+    // Find the element that crosses the reading line
+    for (var i = _wordMap.length - 1; i >= 0; i--) {
+      var rect = _wordMap[i].el.getBoundingClientRect();
+      // Element top is above the reading line
+      if (rect.top <= readingY) {
+        // Estimate word position within this element
+        var elH = Math.max(1, rect.height);
+        var fraction = Math.min(1, Math.max(0,
+          (readingY - rect.top) / elH
+        ));
+        var wordsIntoEl = Math.round(_wordMap[i].words * fraction);
+        var prevCum = i > 0 ? _wordMap[i - 1].cumWords : 0;
+        return Math.min(
+          _totalMappedWords,
+          prevCum + wordsIntoEl
         );
-        var maxCredit = Math.min(
-          entry.words, wps * entry.visSec * visWeight
-        );
-        entry.credited = Math.max(entry.credited || 0, maxCredit);
-      } else {
-        // Scrolled away — reset visibility timer but keep credits
-        entry.visSec = 0;
       }
     }
+    return 0;
+  }
+
+  // Check if user has reached the actual end of the document
+  function isAtDocumentEnd() {
+    var scrollTop = window.scrollY || window.pageYOffset;
+    var docH = document.documentElement.scrollHeight;
+    var vpH = window.innerHeight;
+    // Within 50px of the bottom
+    return (scrollTop + vpH) >= (docH - 50);
+  }
+
+  function getWordsRead() {
+    // Returns the current live word position (not persisted max)
+    return getCurrentWordPosition();
   }
 
   function getBookPath() {
@@ -583,6 +569,11 @@
     var SNAPSHOT_INTERVAL = 50; // only snapshot every 50 words read
     var ROLLING_WORDS = Math.min(1000, Math.round(totalWords * 0.1));
 
+    // Jump detection: track last known position to filter out
+    // TOC clicks, bookmark jumps, and page restore from WPM calc
+    var _lastWordPos = sessionWordsStart;
+    var JUMP_THRESHOLD = 2000; // words — larger = navigation jump
+
     function markActivity() {
       lastActivity = Date.now();
     }
@@ -618,12 +609,19 @@
     }
 
     function updateEta() {
-      var currentWords = getWordsRead();
-      var wordsRemaining = Math.max(0, totalWords - currentWords);
+      // Use persisted high-water mark for progress
+      var currentWords = data.books[bookPath].maxWordsRead || 0;
+      // Also check live position (might be ahead of saved)
+      var livePos = getCurrentWordPosition();
+      if (isAtDocumentEnd()) livePos = totalWords;
+      livePos = Math.max(0, Math.min(totalWords, livePos));
+      if (livePos > currentWords) currentWords = livePos;
 
+      var wordsRemaining = Math.max(0, totalWords - currentWords);
       var percent = Math.round(currentWords / totalWords * 100);
 
-      if (wordsRemaining < 30) {
+      // Finished: >= 95% or at document end
+      if (currentWords >= totalWords * 0.95 || wordsRemaining < 30) {
         etaEl.textContent = '\u2714 Reading complete';
         return;
       }
@@ -637,14 +635,18 @@
         return;
       }
 
-      // Record snapshot only when reader has progressed ~50 words
-      if (currentWords - _lastSnapshotWords >= SNAPSHOT_INTERVAL) {
+      // Record snapshot for WPM calculation.
+      // Skip if this looks like a navigation jump (not organic reading).
+      var jumpedRecently = data.books[bookPath]._lastJumpAt &&
+        (Date.now() - data.books[bookPath]._lastJumpAt) < 3000;
+
+      if (!jumpedRecently &&
+          currentWords - _lastSnapshotWords >= SNAPSHOT_INTERVAL) {
         _snapshots.push({ words: currentWords, time: activeTime });
         _lastSnapshotWords = currentWords;
       }
 
       // Trim snapshots: keep only those within the rolling window
-      // Find the earliest snapshot where (current - snapshot) <= ROLLING_WORDS
       var cutoff = currentWords - ROLLING_WORDS;
       while (_snapshots.length > 2 && _snapshots[0].words < cutoff) {
         _snapshots.shift();
@@ -684,13 +686,33 @@
       updateProgress();
       // Activity tracking
       markActivity();
-      // Update maxWordsRead from dwell-based count
-      var wordsNow = getWordsRead();
+
+      // Update maxWordsRead from location-based position
+      var wordPos = getCurrentWordPosition();
+
+      // If at document end, set to totalWords explicitly
+      if (isAtDocumentEnd()) {
+        wordPos = totalWords;
+      }
+
+      // Clamp to [0, totalWords]
+      wordPos = Math.max(0, Math.min(totalWords, wordPos));
+
+      // Jump detection: if position moved forward by more than
+      // JUMP_THRESHOLD, treat as navigation (TOC, bookmark, etc.)
+      // — update position but don't create a speed sample
+      var delta = wordPos - _lastWordPos;
+      if (delta > JUMP_THRESHOLD) {
+        data.books[bookPath]._lastJumpAt = Date.now();
+      }
+      _lastWordPos = wordPos;
+
       var maxWords = data.books[bookPath].maxWordsRead || 0;
-      if (wordsNow > maxWords) {
-        data.books[bookPath].maxWordsRead = wordsNow;
+      if (wordPos > maxWords) {
+        data.books[bookPath].maxWordsRead = wordPos;
         data.books[bookPath].updatedAt = Date.now();
       }
+
       // Also update legacy maxScroll for backward compat
       var scrollPct = getScrollProgress();
       if (scrollPct > (data.books[bookPath].maxScroll || 0)) {
@@ -712,48 +734,17 @@
     window.addEventListener('click', markActivity);
     window.addEventListener('wheel', markActivity);
 
-    // Set reader WPM for proportional crediting
-    _readerWpm = (data.reader && data.reader.averageWPM) || 225;
+    // No dwell restore needed — progress is from maxWordsRead directly
 
-    // Restore dwell state: credit paragraphs up to saved maxWordsRead
-    // so returning to a book doesn't re-count already-read content
-    var savedMax = data.books[bookPath].maxWordsRead || 0;
-    if (savedMax > 0 && _wordMap && _wordMap.length > 0) {
-      var restored = 0;
-      for (var ri = 0; ri < _wordMap.length; ri++) {
-        var remaining = savedMax - restored;
-        if (remaining <= 0) break;
-        var credit = Math.min(_wordMap[ri].words, remaining);
-        _wordMap[ri].credited = credit;
-        _wordMap[ri].visSec = credit >= _wordMap[ri].words ? 9999 : 0;
-        restored += credit;
-        if (credit < _wordMap[ri].words) break;
-      }
-    }
-
-    // Tick every 1 second — three independent clocks:
+    // Tick every 1 second — two clocks:
     // 1. Active time (30s idle gate) — drives WPM/speed model
-    // 2. Dwell (2min idle gate) — credits words proportionally
-    // 3. ETA display — always updates when tab visible
-    var DWELL_IDLE = 120000; // 2 min — stop crediting if away
+    // 2. ETA display — always updates when tab visible
     setInterval(function() {
       if (document.hidden) return;
       var sinceActivity = Date.now() - lastActivity;
       // Active time: tight gate for accurate WPM
       if (sinceActivity < IDLE_THRESHOLD) {
         activeTime += 1000;
-      }
-      // Dwell: looser gate — reading without touching is normal,
-      // but 2+ minutes idle means you probably left
-      if (sinceActivity < DWELL_IDLE) {
-        tickDwell();
-        // Persist maxWordsRead from dwell credits (not just scroll)
-        var liveWords = getWordsRead();
-        var savedWords = data.books[bookPath].maxWordsRead || 0;
-        if (liveWords > savedWords) {
-          data.books[bookPath].maxWordsRead = liveWords;
-          data.books[bookPath].updatedAt = Date.now();
-        }
       }
       updateEta();
     }, 1000);
@@ -802,7 +793,6 @@
       }
       r.samples++;
       r.averageWPM = Math.round(r.averageWPM);
-      _readerWpm = r.averageWPM;
     }
 
     // ── Session save (content-based) ──
@@ -883,13 +873,7 @@
       book.maxScroll = 0;
       book.updatedAt = Date.now();
       book.resetAt = book.updatedAt;
-      // Reset dwell state on all paragraphs
-      if (_wordMap) {
-        for (var i = 0; i < _wordMap.length; i++) {
-          _wordMap[i].credited = 0;
-          _wordMap[i].visSec = 0;
-        }
-      }
+      delete book._lastJumpAt;
       // Clear sessions for this book
       data.sessions = (data.sessions || []).filter(function(s) {
         return s.book !== bookPath;
@@ -900,6 +884,7 @@
       activeTime = 0;
       _snapshots = [{ words: 0, time: 0 }];
       _lastSnapshotWords = 0;
+      _lastWordPos = 0;
       sessionWpm = 0;
       saveSpeedData(data, true);
       // Also clear the bookmark so resume bar doesn't restore
