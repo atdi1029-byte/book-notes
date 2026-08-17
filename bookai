@@ -152,7 +152,7 @@ case "$BOOK_TYPE" in
   technical)   TIMEOUT=1200 ; MAX_TURNS=15 ;;  # 20 min, 15 turns (5-page batches with many charts)
   practical)   TIMEOUT=900  ; MAX_TURNS=12 ;;  # 15 min, 12 turns
   textbook)    TIMEOUT=900  ; MAX_TURNS=12 ;;  # 15 min, 12 turns
-  *)           TIMEOUT=300  ; MAX_TURNS=3  ;;   # 5 min, 3 turns (text-only)
+  *)           TIMEOUT=600  ; MAX_TURNS=8  ;;   # 10 min, 8 turns (text-only — needs room for page acks + nugget IDs)
 esac
 MODEL_LOG="$DIR/.model_usage.log"
 : > "$MODEL_LOG"  # reset model usage log each run
@@ -176,13 +176,34 @@ run_with_timeout() {
   fi
 }
 
-# Function: record successfully processed pages
+# Function: record successfully processed pages (legacy — used by gap-fill)
 record_pages() {
   local p_start="$1" p_end="$2"
   for ((p=p_start; p<=p_end; p++)); do
     echo "$p" >> "$PAGES_DONE"
   done
   sort -un "$PAGES_DONE" -o "$PAGES_DONE"
+}
+
+# Function: parse page acknowledgments from batch output and record only acknowledged pages
+# Returns the count of unacknowledged pages via stdout
+record_acknowledged_pages() {
+  local TEMP_FILE="$1" B_START="$2" B_END="$3"
+  local UNACKED=0
+
+  # Extract all acknowledged page numbers from <!-- page NNN: ... --> markers
+  local ACKED_PAGES
+  ACKED_PAGES=$(grep -oE '<!-- page ([0-9]+):' "$TEMP_FILE" 2>/dev/null | grep -oE '[0-9]+' || true)
+
+  for ((p=B_START; p<=B_END; p++)); do
+    if echo "$ACKED_PAGES" | grep -qx "$p"; then
+      echo "$p" >> "$PAGES_DONE"
+    else
+      UNACKED=$((UNACKED + 1))
+    fi
+  done
+  sort -un "$PAGES_DONE" -o "$PAGES_DONE"
+  echo "$UNACKED"
 }
 
 # Function: build the prompt for a page range
@@ -193,29 +214,34 @@ make_prompt() {
   local LINE_TARGET TYPE_INSTRUCTIONS
   case "$BOOK_TYPE" in
     analytical)
-      LINE_TARGET="Target ~150-200 lines for this section."
-      TYPE_INSTRUCTIONS="Content guidelines — optimize for SIGNAL over NOISE:
-- Capture core arguments and reasoning that materially changes understanding
-- For each concept, keep the SINGLE best supporting example — not three that make the same point
+      LINE_TARGET="No fixed line target — length is determined by information density. Dense sections need more lines; repetitive sections need fewer."
+      TYPE_INSTRUCTIONS="Content guidelines — optimize for COMPLETE USEFUL INFORMATION RECALL:
+- Capture every distinct idea that could change what the reader understands, believes, argues, decides, or does
+- For each concept, preserve: the claim, the reasoning/mechanism, the evidence, caveats/exceptions, and practical implications
+- Keep MULTIPLE supporting examples when they teach DIFFERENT things (different application, limitation, mechanism, context). Only merge examples that make essentially the same point.
 - Include contrarian/surprising claims with their supporting evidence
 - Include things a reader would remember 5 years from now
 - Include named individuals, books, or thinkers referenced
-- Tag each major idea with importance: [MUST KNOW], [SHOULD KNOW], or [NICE TO KNOW]
+- MANDATORY: Tag each major idea with importance: [MUST KNOW], [SHOULD KNOW], or [NICE TO KNOW]
+  Every batch MUST contain at least one tagged idea. If no tags are present, the batch fails quality.
 - Flag obvious repetition: if the author restates a concept, note \"repeats X from earlier\" instead of re-capturing it
 - Flag weak sections: if a chapter is mostly padding/anecdotes around one core idea, say so
-- Skip filler: repetitive restatements, excessive context-setting, obvious transitions, motivational fluff"
+- Skip TRUE filler only: repetitive restatements of the exact same point, excessive context-setting, obvious transitions, motivational fluff
+- Do NOT skip: distinct examples, caveats, exceptions, boundary conditions, counterarguments, mechanisms, or secondary ideas that add genuine understanding"
       ;;
     narrative)
-      LINE_TARGET="Target ~150-200 lines for this section."
-      TYPE_INSTRUCTIONS="Content guidelines — optimize for SIGNAL over NOISE:
+      LINE_TARGET="No fixed line target — length is determined by information density. Dense sections need more lines; repetitive sections need fewer."
+      TYPE_INSTRUCTIONS="Content guidelines — optimize for COMPLETE USEFUL INFORMATION RECALL:
 - Capture key historical episodes, turning points, and cause-effect chains
 - Preserve timelines, dates, and sequences of events — these are the backbone
-- Keep the best anecdotes and primary source quotes that bring events to life
+- Keep anecdotes and primary source quotes that bring events to life — include MULTIPLE anecdotes when they teach different things or reveal different aspects
 - Include named individuals, their roles, and their decisions
 - Note maps, charts, or visual references: [MAP: p.XX \"description\"] or [CHART: p.XX \"description\"]
-- Tag each major idea with importance: [MUST KNOW], [SHOULD KNOW], or [NICE TO KNOW]
+- MANDATORY: Tag each major idea with importance: [MUST KNOW], [SHOULD KNOW], or [NICE TO KNOW]
+  Every batch MUST contain at least one tagged idea. If no tags are present, the batch fails quality.
 - Flag obvious repetition: note \"repeats X from earlier\" instead of re-capturing it
-- Skip filler: excessive context-setting, obvious transitions, motivational fluff"
+- Skip TRUE filler only: repetitive restatements of the exact same point, excessive context-setting, obvious transitions, motivational fluff
+- Do NOT skip: distinct examples, caveats, mechanisms, causal explanations, counterarguments, or secondary ideas that add genuine understanding"
       ;;
     technical)
       LINE_TARGET="NO LINE TARGET — capture everything required to faithfully teach the material."
@@ -224,7 +250,78 @@ make_prompt() {
 NO LINE TARGET. Do not summarize instructional content. Do not compress chart explanations.
 Compaction happens in a later step — your job is completeness.
 
-CRITICAL RULE: A chart is NOT supplementary material. A chart IS the instructional content.
+CRITICAL RULE: These notes must teach the material as a STANDALONE LEARNING RESOURCE.
+Do NOT assume the reader already understands the concept.
+Do NOT assume the reader has read the original book.
+
+If the notes jump straight to example numbers, chart conclusions, or trade outcomes
+without first explaining the concept itself, they are INCOMPLETE.
+
+TEACH FOR UNDERSTANDING, NOT JUST COVERAGE.
+
+For every [MUST KNOW] technical concept, capture enough explanation that a beginner
+who has not read the original book can understand and apply the concept:
+
+1. WHAT IS IT?
+   Define the concept clearly and precisely.
+
+2. HOW IS IT STRUCTURED?
+   If it is a setup, pattern, spread, indicator, or method,
+   explain its components or construction.
+
+3. WHAT DO I LOOK FOR?
+   State the observable recognition criteria.
+   Be concrete: price structure, sequence of highs/lows, indicator
+   behavior, thresholds, relative movement, volume behavior, etc.
+
+4. WHY DOES IT MATTER?
+   Preserve the author's reasoning or market intuition.
+   Do NOT jump directly from observation to conclusion.
+   Explain the mechanism or logic connecting what you see to what it means.
+
+5. WHEN DO I USE IT?
+   Explain the situation, purpose, or decision context.
+   When would someone choose this over alternatives?
+
+6. HOW IS IT APPLIED?
+   Preserve the trading/investment implication, entry/exit rule,
+   confirmation rule, or analytical conclusion.
+
+7. WHAT CONFIRMS OR LIMITS IT?
+   Distinguish an early warning from a confirmed signal.
+   What would invalidate or make the interpretation premature?
+
+8. WHEN DOES IT FAIL?
+   Preserve risks, false signals, regime dependencies,
+   exceptions, and situations where the concept should not be trusted.
+
+9. SHOW ONE CLEAR EXAMPLE.
+   Preserve at least one strong worked example for every major concept.
+   Walk through the evidence in the order a reader should inspect it.
+
+[MUST KNOW] concepts get the full 9-point treatment.
+[SHOULD KNOW] can be somewhat more compact but still must define and explain.
+[NICE TO KNOW] can remain concise.
+
+Do NOT compress explanation into shorthand that only makes sense to an
+already-knowledgeable reader. Do NOT confuse recognizing the author's
+finished example with understanding the concept from first principles.
+
+HARD RULE: Never compress evidence → reasoning → conclusion into just conclusion.
+Very important: do not write only conclusions like:
+  \"Housing stocks broke their trendline, warning of a reversal.\"
+Instead preserve the reasoning needed to reproduce that conclusion:
+  where the trendline is drawn → what price behavior breaks it →
+  what changes afterward → why that matters → what confirms the reversal.
+
+Do not confuse KNOWING THE ANSWER with TEACHING THE METHOD.
+If the notes only tell the reader what a chart proves, they are incomplete.
+Preserve how the reader could discover the signal themselves.
+
+CHART HANDLING:
+
+A chart is NOT self-explanatory. A chart provides evidence.
+The explanation teaches what the chart means.
 
 If a page contains a chart, diagram, figure, table, or illustration, you MUST:
 1. Use the Read tool to OPEN and VIEW the full-page image at '$DIR/charts/page_NNN.png'
@@ -233,7 +330,7 @@ If a page contains a chart, diagram, figure, table, or illustration, you MUST:
 3. After VIEWING the image, describe what you ACTUALLY SEE — axes, labels, data series,
    arrows, annotations, patterns, figure numbers, captions
 4. Explain what the author is trying to teach with it
-5. State the trading rule or principle it illustrates
+5. Walk through the recognition → reasoning → conclusion chain
 
 HALLUCINATION GUARD:
 - NEVER describe a chart you have not opened with the Read tool
@@ -242,7 +339,9 @@ HALLUCINATION GUARD:
 - If the page is purely text with no visual content, do NOT tag it as a page image
 Never omit a chart explanation. Never summarize a chart as \"see figure X.\"
 
-Capture the full teaching sequence: concept → chart → interpretation → trading rule.
+Capture the full teaching sequence:
+  concept → structure → recognition → chart evidence →
+  reasoning/why → application/rule → confirmation/invalidation → failure mode
 Do NOT summarize a 5-step pattern explanation into 1 bullet. Preserve each step.
 Include every trading rule, entry/exit criteria, and risk management note verbatim.
 
@@ -372,6 +471,9 @@ If a page is purely text, do NOT reference its image.
 
   cat <<PROMPT_EOF
 You are creating study notes from a book PDF. This is a personal, educational book-analysis project.
+The goal is DEBATE-READY coverage: someone reading only these notes should capture every distinct
+useful idea — not just main claims, but reasoning, mechanisms, evidence, caveats, exceptions,
+counterarguments, and examples that teach something different.
 
 READ pages $P_START-$P_END of the PDF at '$PDF'.
 
@@ -385,6 +487,12 @@ WRITE the notes to '$OUT_FILE' using the Write tool. $LINE_TARGET Markdown forma
 $CHART_MANIFEST
 $TYPE_INSTRUCTIONS
 - Include named individuals, books, or thinkers referenced
+- MANDATORY: Tag important ideas with [MUST KNOW], [SHOULD KNOW], or [NICE TO KNOW]
+- MANDATORY: Assign each tagged nugget a unique sequential ID: [MUST KNOW][N001], [SHOULD KNOW][N002], etc.
+  Continue numbering from where the previous batch left off. IDs enable the coverage audit to track
+  every nugget from extraction through to the finished HTML. Example:
+    - [MUST KNOW][N042] Survivorship bias: Wald showed military was reinforcing where returning planes
+      had damage — but the damage on returning planes showed where planes could survive hits...
 - Do NOT output preamble — ONLY write the notes
 $(if [ -n "$PREV_BATCH_CONTEXT" ]; then
 cat <<CONTEXT_EOF
@@ -398,7 +506,17 @@ If the previous batch ended mid-concept, continue seamlessly.
 CONTEXT_EOF
 fi)
 
-IMPORTANT: Only cover pages $P_START-$P_END. This is academic study material — process the content faithfully.
+PAGE ACKNOWLEDGMENT (MANDATORY):
+For EVERY page in the range $P_START-$P_END, include a marker:
+  <!-- page NNN: X nuggets --> (if the page has substantive content)
+  <!-- page NNN: no content --> (if the page is blank, index, copyright, etc.)
+These markers are used to verify that every individual page was actually examined.
+A batch without page acknowledgments for every page in the range will be rejected.
+
+IMPORTANT: Extract notes for pages $P_START-$P_END. Page acknowledgments and nuggets should cover this range.
+If the batch starts reading from an earlier page (for boundary overlap), use those earlier pages ONLY for
+context continuity — do NOT re-extract or re-tag content from overlap pages.
+This is academic study material — process the content faithfully.
 PROMPT_EOF
 }
 
@@ -439,14 +557,37 @@ process_batch() {
         local HAS_BULLETS=$(grep -c '^- ' "$TEMP_FILE" 2>/dev/null || echo 0)
 
         # Quality gate — thresholds vary by book type
-        local MIN_WORDS=100
-        local MIN_LINES=10
-        if [[ "$BOOK_TYPE" == "technical" || "$BOOK_TYPE" == "practical" || "$BOOK_TYPE" == "textbook" ]]; then
-          MIN_WORDS=300
-          MIN_LINES=30
-        fi
+        local MIN_WORDS MIN_LINES MIN_BULLETS
+        case "$BOOK_TYPE" in
+          technical|practical|textbook)
+            MIN_WORDS=300 ; MIN_LINES=30 ; MIN_BULLETS=5 ;;
+          *)
+            MIN_WORDS=200 ; MIN_LINES=20 ; MIN_BULLETS=4 ;;
+        esac
 
-        if [ "$WORDS" -ge "$MIN_WORDS" ] && [ "$LINES" -ge "$MIN_LINES" ] && [ "$((HAS_MARKERS + HAS_HEADERS))" -ge 1 ] && [ "$HAS_BULLETS" -ge 2 ]; then
+        # Check for priority tags with nugget IDs (e.g. [MUST KNOW][N042])
+        local HAS_TAGS=$(grep -cE '\[(MUST KNOW|SHOULD KNOW|NICE TO KNOW)\]\[N[0-9]+\]' "$TEMP_FILE" 2>/dev/null || echo 0)
+        # Also accept tags without IDs (legacy format) but prefer with IDs
+        local HAS_TAGS_ANY=$(grep -cE '\[(MUST KNOW|SHOULD KNOW|NICE TO KNOW)\]' "$TEMP_FILE" 2>/dev/null || echo 0)
+
+        if [ "$WORDS" -ge "$MIN_WORDS" ] && [ "$LINES" -ge "$MIN_LINES" ] && [ "$((HAS_MARKERS + HAS_HEADERS))" -ge 1 ] && [ "$HAS_BULLETS" -ge "$MIN_BULLETS" ]; then
+          # MANDATORY: Priority tags must be present for coverage audit to work
+          if [ "$HAS_TAGS_ANY" -eq 0 ]; then
+            echo "  TAG_FAIL — pp. $B_START-$B_END ($MODEL): no [MUST KNOW]/[SHOULD KNOW]/[NICE TO KNOW] tags — retrying" >> "$BATCH_LOG"
+            rm -f "$TEMP_FILE"
+            RETRY=$((RETRY + 1))
+            continue
+          fi
+          # Warn if tags lack nugget IDs (needed for coverage audit)
+          if [ "$HAS_TAGS" -eq 0 ] && [ "$HAS_TAGS_ANY" -gt 0 ]; then
+            echo "  ID_WARNING — pp. $B_START-$B_END: tags present but missing nugget IDs [N###]" >> "$BATCH_LOG"
+          fi
+          # Check per-page acknowledgments (<!-- page NNN: ... -->)
+          local PAGE_ACKS=$(grep -cE '<!-- page [0-9]+:' "$TEMP_FILE" 2>/dev/null || echo 0)
+          local EXPECTED_PAGES=$(( B_END - B_START + 1 ))
+          if [ "$PAGE_ACKS" -lt "$EXPECTED_PAGES" ]; then
+            echo "  PAGE_ACK_WARNING — pp. $B_START-$B_END: $PAGE_ACKS/$EXPECTED_PAGES pages acknowledged" >> "$BATCH_LOG"
+          fi
           # For visual books: check PAGE IMAGE references exist when page images are present
           if [[ "$BOOK_TYPE" == "technical" || "$BOOK_TYPE" == "practical" || "$BOOK_TYPE" == "textbook" ]]; then
             local PAGE_IMGS=$(ls "$DIR/charts"/page_*.png 2>/dev/null | sed 's/.*page_\([0-9]*\).*/\1/' | sort -un | awk -v s="$B_START" -v e="$B_END" '$1>=s && $1<=e' | wc -l | tr -d ' ')
@@ -459,7 +600,7 @@ process_batch() {
             fi
           fi
 
-          echo "  OK — pp. $B_START-$B_END ($MODEL, +$LINES lines, $WORDS words)" >> "$BATCH_LOG"
+          echo "  OK — pp. $B_START-$B_END ($MODEL, +$LINES lines, $WORDS words, $HAS_TAGS tags)" >> "$BATCH_LOG"
           echo "$B_START-$B_END:$MODEL" >> "$MODEL_LOG"
           return 0
         else
@@ -488,13 +629,24 @@ process_batch() {
   return 1
 }
 
-# Build list of all batch ranges
+# Build list of all batch ranges with 2-page overlap for boundary protection
+# Each batch reads 2 extra pages from the previous batch's end to catch ideas
+# that span batch boundaries. The prompt tells Claude not to re-extract content
+# from the overlap pages — just use them for context continuity.
+OVERLAP=2
 BATCHES=()
 PAGE=$START
 while [ "$PAGE" -le "$END_PAGE" ]; do
   BATCH_END=$((PAGE + BATCH - 1))
   [ "$BATCH_END" -gt "$END_PAGE" ] && BATCH_END=$END_PAGE
-  BATCHES+=("$PAGE:$BATCH_END")
+  if [ "$PAGE" -gt "$START" ]; then
+    # Include overlap pages from previous batch for context
+    OVERLAP_START=$((PAGE - OVERLAP))
+    [ "$OVERLAP_START" -lt "$START" ] && OVERLAP_START=$START
+    BATCHES+=("${OVERLAP_START}o${PAGE}:$BATCH_END")  # format: overlapStart o realStart : end
+  else
+    BATCHES+=("$PAGE:$BATCH_END")
+  fi
   PAGE=$((BATCH_END + 1))
 done
 
@@ -518,14 +670,32 @@ while [ "$IDX" -lt "$TOTAL" ]; do
 
   # Launch parallel workers
   PIDS=()
+  WAVE_RANGES=()  # track real ranges for merge step
   for ((W=IDX; W<WAVE_END; W++)); do
-    IFS=: read -r B_START B_END <<< "${BATCHES[$W]}"
-    TEMP="$DIR/.batch_${B_START}_${B_END}.md"
-    BATCH_LOG="$DIR/.batch_${B_START}_${B_END}.log"
-    rm -f "$TEMP" "$BATCH_LOG"
+    BATCH_SPEC="${BATCHES[$W]}"
 
-    echo "  Starting: pp. $B_START-$B_END" | tee -a "$LOG"
-    process_batch "$B_START" "$B_END" "$TEMP" "$BATCH_LOG" &
+    # Parse batch spec: either "start:end" or "overlapStartoRealStart:end"
+    if [[ "$BATCH_SPEC" == *"o"* ]]; then
+      B_READ_START="${BATCH_SPEC%%o*}"
+      REST="${BATCH_SPEC#*o}"
+      B_REAL_START="${REST%%:*}"
+      B_END="${REST#*:}"
+    else
+      IFS=: read -r B_REAL_START B_END <<< "$BATCH_SPEC"
+      B_READ_START="$B_REAL_START"
+    fi
+
+    TEMP="$DIR/.batch_${B_REAL_START}_${B_END}.md"
+    BATCH_LOG="$DIR/.batch_${B_REAL_START}_${B_END}.log"
+    rm -f "$TEMP" "$BATCH_LOG"
+    WAVE_RANGES+=("$B_READ_START:$B_REAL_START:$B_END")
+
+    if [ "$B_READ_START" != "$B_REAL_START" ]; then
+      echo "  Starting: pp. $B_REAL_START-$B_END (reading from $B_READ_START for overlap)" | tee -a "$LOG"
+    else
+      echo "  Starting: pp. $B_REAL_START-$B_END" | tee -a "$LOG"
+    fi
+    process_batch "$B_READ_START" "$B_END" "$TEMP" "$BATCH_LOG" &
     PIDS+=($!)
   done
 
@@ -542,9 +712,9 @@ while [ "$IDX" -lt "$TOTAL" ]; do
   # Merge completed temp files in page order and log results
   for ((W=IDX; W<WAVE_END; W++)); do
     local_idx=$((W - IDX))
-    IFS=: read -r B_START B_END <<< "${BATCHES[$W]}"
-    TEMP="$DIR/.batch_${B_START}_${B_END}.md"
-    BATCH_LOG="$DIR/.batch_${B_START}_${B_END}.log"
+    IFS=: read -r B_READ_START B_REAL_START B_END <<< "${WAVE_RANGES[$local_idx]}"
+    TEMP="$DIR/.batch_${B_REAL_START}_${B_END}.md"
+    BATCH_LOG="$DIR/.batch_${B_REAL_START}_${B_END}.log"
 
     # Append batch log to main log
     [ -f "$BATCH_LOG" ] && cat "$BATCH_LOG" >> "$LOG" && rm -f "$BATCH_LOG"
@@ -553,15 +723,20 @@ while [ "$IDX" -lt "$TOTAL" ]; do
       LINES=$(wc -l < "$TEMP" | tr -d ' ')
       cat "$TEMP" >> "$NOTES"
       echo "" >> "$NOTES"
-      record_pages "$B_START" "$B_END"
+      # Parse actual page acknowledgments — only count real pages (not overlap)
+      UNACKED=$(record_acknowledged_pages "$TEMP" "$B_REAL_START" "$B_END")
       # Capture last 50 lines for continuity context (used by next batch)
       PREV_BATCH_CONTEXT=$(tail -50 "$TEMP")
       export PREV_BATCH_CONTEXT
-      echo "  Merged: pp. $B_START-$B_END ($LINES lines)" | tee -a "$LOG"
+      if [ "$UNACKED" -gt 0 ]; then
+        echo "  Merged: pp. $B_REAL_START-$B_END ($LINES lines, $UNACKED pages unacknowledged — will retry)" | tee -a "$LOG"
+      else
+        echo "  Merged: pp. $B_REAL_START-$B_END ($LINES lines, all pages acknowledged)" | tee -a "$LOG"
+      fi
       rm -f "$TEMP"
     else
       FAILURES=$((FAILURES + 1))
-      echo "  FAILED: pp. $B_START-$B_END" | tee -a "$LOG"
+      echo "  FAILED: pp. $B_REAL_START-$B_END" | tee -a "$LOG"
       rm -f "$TEMP"
     fi
   done
@@ -883,12 +1058,36 @@ else:
 line_count = content.count('\n')
 print(f"  Total notes: {line_count} lines")
 
+# Count nugget tags and IDs
+must_know = len(re.findall(r'\[MUST KNOW\]', content))
+should_know = len(re.findall(r'\[SHOULD KNOW\]', content))
+nice_to_know = len(re.findall(r'\[NICE TO KNOW\]', content))
+nugget_ids = set(re.findall(r'\[N(\d+)\]', content))
+print(f"  Nugget tags: {must_know} MUST, {should_know} SHOULD, {nice_to_know} NICE")
+print(f"  Nugget IDs: {len(nugget_ids)} unique")
+if must_know + should_know == 0:
+    print(f"  WARNING: No MUST KNOW or SHOULD KNOW tags — coverage audit will have nothing to verify")
+
+# Count per-page acknowledgments
+page_acks = set()
+for m in re.finditer(r'<!-- page (\d+):', content):
+    page_acks.add(int(m.group(1)))
+unacked = [p for p in range(start_page, total_pages + 1) if p not in page_acks and p in pages_tracked]
+print(f"  Page acknowledgments: {len(page_acks)} pages explicitly acknowledged")
+if unacked:
+    if len(unacked) <= 20:
+        print(f"  Unacknowledged pages (tracked but not explicitly acked): {unacked}")
+    else:
+        print(f"  Unacknowledged pages: {len(unacked)} (first 20: {unacked[:20]})")
+
 # Summary verdict
 issues = []
 if missing_chs:
     issues.append(f"{len(missing_chs)} missing chapters")
 if missing_pages:
     issues.append(f"{len(missing_pages)} missing pages")
+if must_know + should_know == 0:
+    issues.append("no priority tags")
 if issues:
     print(f"  VERDICT: INCOMPLETE — {', '.join(issues)}")
 else:
@@ -897,6 +1096,64 @@ VERIFY_EOF
 
 echo "" | tee -a "$LOG"
 echo "========================================" | tee -a "$LOG"
-echo "ALL DONE — $(date)" | tee -a "$LOG"
-echo "Notes ready for manual compaction + HTML build." | tee -a "$LOG"
+echo "EXTRACTION DONE — $(date)" | tee -a "$LOG"
+echo "Notes ready for compaction + HTML build." | tee -a "$LOG"
+echo "========================================" | tee -a "$LOG"
+
+# === RUN STATE — fail-closed enforcement ===
+# Create .run_state.json tracking every required stage.
+# Claude cannot mark a book COMPLETE without all stages passing.
+RUN_STATE="$DIR/.run_state.json"
+
+# Count nuggets for the state file
+MUST_COUNT=$(grep -cE '\[MUST KNOW\]' "$NOTES" 2>/dev/null || echo 0)
+SHOULD_COUNT=$(grep -cE '\[SHOULD KNOW\]' "$NOTES" 2>/dev/null || echo 0)
+NUGGET_COUNT=$(grep -oE '\[N[0-9]+\]' "$NOTES" 2>/dev/null | sort -u | wc -l | tr -d ' ')
+TOTAL_LINES=$(wc -l < "$NOTES" | tr -d ' ')
+
+cat > "$RUN_STATE" << STATE_EOF
+{
+  "book": "$FOLDER",
+  "pdf": "$PDF",
+  "type": "$BOOK_TYPE",
+  "pages": { "start": $START, "end": $END_PAGE },
+  "extraction": {
+    "status": "PASSED",
+    "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+    "total_lines": $TOTAL_LINES,
+    "must_know": $MUST_COUNT,
+    "should_know": $SHOULD_COUNT,
+    "nugget_ids": $NUGGET_COUNT,
+    "pages_tracked": $(wc -l < "$PAGES_DONE" | tr -d ' '),
+    "batches_failed": $FAILURES
+  },
+  "compaction": { "status": "PENDING" },
+  "summary": { "status": "PENDING" },
+  "html": { "status": "PENDING" },
+  "coverage_audit": {
+    "status": "PENDING",
+    "artifact": "coverage_audit.json",
+    "required": "zero MISSING or PARTIAL for MUST KNOW and SHOULD KNOW nuggets"
+  },
+  "debate_ready": {
+    "status": "PENDING",
+    "artifact": "debate_ready_report.json"
+  },
+  "shelf_update": { "status": "PENDING" },
+  "complete": false,
+  "completion_gate": "ALL stages must be PASSED and both audit artifacts must exist with zero failures"
+}
+STATE_EOF
+
+echo "" | tee -a "$LOG"
+echo "=== RUN STATE ===" | tee -a "$LOG"
+echo "  Created $RUN_STATE" | tee -a "$LOG"
+echo "  Extraction: PASSED ($MUST_COUNT MUST, $SHOULD_COUNT SHOULD, $NUGGET_COUNT IDs)" | tee -a "$LOG"
+echo "  Remaining: compaction → summary → HTML → coverage_audit.json → debate_ready_report.json → shelf" | tee -a "$LOG"
+echo "" | tee -a "$LOG"
+echo "  *** BOOK IS NOT COMPLETE UNTIL:" | tee -a "$LOG"
+echo "  ***   coverage_audit.json exists with 0 MISSING/PARTIAL required nuggets" | tee -a "$LOG"
+echo "  ***   debate_ready_report.json exists and passes" | tee -a "$LOG"
+echo "  ***   .run_state.json shows complete: true" | tee -a "$LOG"
+echo "  *** Do NOT skip these steps. Do NOT mark complete without artifacts." | tee -a "$LOG"
 echo "========================================" | tee -a "$LOG"
