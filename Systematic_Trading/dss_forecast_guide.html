@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DSS Forecast Guide</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+    font-family: 'Georgia', serif;
+    background: #0d1117;
+    color: #c9d1d9;
+    line-height: 1.7;
+    max-width: 820px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem;
+}
+h1 {
+    font-size: 2rem;
+    color: #58a6ff;
+    margin-bottom: 0.3rem;
+    border-bottom: 2px solid #21262d;
+    padding-bottom: 0.8rem;
+}
+.subtitle {
+    color: #8b949e;
+    font-size: 1rem;
+    margin-bottom: 2rem;
+    font-style: italic;
+}
+h2 {
+    font-size: 1.4rem;
+    color: #79c0ff;
+    margin: 2.2rem 0 0.8rem;
+    border-left: 4px solid #388bfd;
+    padding-left: 0.8rem;
+}
+h3 {
+    font-size: 1.1rem;
+    color: #d2a8ff;
+    margin: 1.5rem 0 0.5rem;
+}
+p { margin-bottom: 1rem; }
+strong { color: #e6edf3; }
+code {
+    background: #161b22;
+    color: #79c0ff;
+    padding: 0.15rem 0.4rem;
+    border-radius: 4px;
+    font-size: 0.9em;
+}
+pre {
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 8px;
+    padding: 1rem 1.2rem;
+    overflow-x: auto;
+    margin: 1rem 0;
+    font-size: 0.85em;
+    line-height: 1.5;
+    color: #c9d1d9;
+}
+.box {
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 8px;
+    padding: 1.2rem 1.4rem;
+    margin: 1.2rem 0;
+}
+.box.green { border-left: 4px solid #3fb950; }
+.box.red { border-left: 4px solid #f85149; }
+.box.blue { border-left: 4px solid #58a6ff; }
+.box.yellow { border-left: 4px solid #d29922; }
+.box-title {
+    font-weight: bold;
+    color: #e6edf3;
+    margin-bottom: 0.5rem;
+    font-size: 1.05rem;
+}
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0;
+    font-size: 0.9rem;
+}
+th {
+    background: #161b22;
+    color: #58a6ff;
+    text-align: left;
+    padding: 0.6rem 0.8rem;
+    border-bottom: 2px solid #30363d;
+}
+td {
+    padding: 0.5rem 0.8rem;
+    border-bottom: 1px solid #21262d;
+}
+tr:hover td { background: #161b22; }
+.diagram {
+    text-align: center;
+    margin: 1.5rem 0;
+}
+.diagram-caption {
+    color: #8b949e;
+    font-size: 0.85rem;
+    margin-top: 0.5rem;
+    font-style: italic;
+}
+.forecast-scale {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    margin: 1.5rem 0;
+}
+.scale-seg {
+    padding: 0.5rem 0.8rem;
+    text-align: center;
+    font-size: 0.8rem;
+    font-weight: bold;
+}
+ul, ol {
+    margin: 0.5rem 0 1rem 1.5rem;
+}
+li { margin-bottom: 0.4rem; }
+.pair-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.8rem;
+    margin: 1rem 0;
+}
+.pair-card {
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 6px;
+    padding: 0.8rem 1rem;
+}
+.pair-card .name {
+    font-weight: bold;
+    font-size: 1rem;
+}
+.pair-card .desc {
+    color: #8b949e;
+    font-size: 0.85rem;
+}
+.vs-table {
+    margin: 1rem 0;
+}
+.vs-table td:first-child {
+    color: #8b949e;
+    font-weight: bold;
+    width: 30%;
+}
+@media (max-width: 600px) {
+    body { padding: 1rem; }
+    h1 { font-size: 1.5rem; }
+    .pair-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<h1>DSS Forecast</h1>
+<p class="subtitle">
+Carver's Systematic Trading framework,
+rebuilt with DSS Bressert oscillators
+</p>
+
+<p>
+This indicator takes Robert Carver's
+<strong>EWMAC forecast system</strong> from
+<em>Systematic Trading</em> and replaces the
+EMA crossover engine with
+<strong>DSS Bressert</strong> (Double Smoothed
+Stochastic) oscillators. The result is a
+multi-speed trend/cycle detector that combines
+into a single forecast number between -20 and +20.
+</p>
+
+<h2>The Two Parent Systems</h2>
+
+<h3>EWMAC (what Carver built)</h3>
+<p>
+EWMAC stands for <strong>Exponentially Weighted
+Moving Average Crossover</strong>. Carver runs
+multiple fast/slow EMA pairs at a fixed 4:1 ratio
+(2/8, 4/16, 8/32, etc.). Each pair produces a raw
+crossover signal (fast EMA minus slow EMA), which
+gets divided by the 25-day standard deviation of
+price changes to normalize for volatility. A
+<strong>forecast scalar</strong> then rescales each
+signal so its average absolute value equals 10.
+The individual forecasts are combined with weights
+and a diversification multiplier, then hard-capped
+at +/-20.
+</p>
+<p>
+The system is elegant but has a weakness: EMAs are
+pure trend followers. They're always lagging. In
+choppy or ranging markets, the fast/slow crossover
+whipsaws constantly, generating noise.
+</p>
+
+<h3>DSS Bressert (what we swapped in)</h3>
+<p>
+The <strong>Double Smoothed Stochastic</strong>,
+invented by Walter Bressert, is a stochastic
+oscillator that gets smoothed twice. This double
+application creates a natural <strong>sine-wave
+pattern</strong> that tracks cycles in price,
+oscillating between 0 and 100.
+</p>
+
+<div class="box blue">
+<div class="box-title">DSS Bressert: 4-Step Process</div>
+<ol>
+<li><strong>First stochastic</strong> --
+where is the current price relative to its
+high/low range over <code>stochLen</code> bars?
+Outputs 0-100.</li>
+<li><strong>First EMA smooth</strong> --
+smooth the raw stochastic with an EMA of length
+<code>emaLen</code>. Kills the noise.</li>
+<li><strong>Second stochastic</strong> --
+take a stochastic of the <em>smoothed</em> value
+over the same period. This is the "double" in
+double-smoothed.</li>
+<li><strong>Second EMA smooth</strong> --
+smooth again. The result is the DSS line: a clean
+sine wave between 0 and 100.</li>
+</ol>
+</div>
+
+<p>
+The signal line is simply an EMA of the DSS line.
+Crossovers between DSS and signal mark cycle turns.
+</p>
+
+<div class="diagram">
+<svg width="700" height="200" viewBox="0 0 700 200">
+<rect width="700" height="200" fill="#161b22"
+      rx="8"/>
+<!-- Flow boxes -->
+<rect x="20" y="70" width="120" height="55"
+      rx="6" fill="none" stroke="#58a6ff"
+      stroke-width="2"/>
+<text x="80" y="92" fill="#c9d1d9"
+      text-anchor="middle" font-size="12"
+      font-family="monospace">Raw Stochastic</text>
+<text x="80" y="110" fill="#8b949e"
+      text-anchor="middle" font-size="10">
+(price vs range)</text>
+
+<polygon points="145,97 165,97 165,92 175,100
+165,108 165,103 145,103" fill="#388bfd"/>
+
+<rect x="180" y="70" width="110" height="55"
+      rx="6" fill="none" stroke="#d2a8ff"
+      stroke-width="2"/>
+<text x="235" y="92" fill="#c9d1d9"
+      text-anchor="middle" font-size="12"
+      font-family="monospace">EMA Smooth</text>
+<text x="235" y="110" fill="#8b949e"
+      text-anchor="middle" font-size="10">
+(kill noise)</text>
+
+<polygon points="295,97 315,97 315,92 325,100
+315,108 315,103 295,103" fill="#388bfd"/>
+
+<rect x="330" y="70" width="120" height="55"
+      rx="6" fill="none" stroke="#58a6ff"
+      stroke-width="2"/>
+<text x="390" y="92" fill="#c9d1d9"
+      text-anchor="middle" font-size="12"
+      font-family="monospace">2nd Stochastic</text>
+<text x="390" y="110" fill="#8b949e"
+      text-anchor="middle" font-size="10">
+(on smoothed)</text>
+
+<polygon points="455,97 475,97 475,92 485,100
+475,108 475,103 455,103" fill="#388bfd"/>
+
+<rect x="490" y="70" width="110" height="55"
+      rx="6" fill="none" stroke="#d2a8ff"
+      stroke-width="2"/>
+<text x="545" y="92" fill="#c9d1d9"
+      text-anchor="middle" font-size="12"
+      font-family="monospace">EMA Smooth</text>
+<text x="545" y="110" fill="#8b949e"
+      text-anchor="middle" font-size="10">
+(final sine)</text>
+
+<polygon points="605,97 625,97 625,92 635,100
+625,108 625,103 605,103" fill="#3fb950"/>
+
+<rect x="640" y="70" width="50" height="55"
+      rx="6" fill="none" stroke="#3fb950"
+      stroke-width="2"/>
+<text x="665" y="95" fill="#3fb950"
+      text-anchor="middle" font-size="13"
+      font-weight="bold"
+      font-family="monospace">DSS</text>
+<text x="665" y="112" fill="#8b949e"
+      text-anchor="middle" font-size="10">
+0-100</text>
+
+<text x="350" y="160" fill="#58a6ff"
+      text-anchor="middle" font-size="13"
+      font-family="Georgia">
+Double smoothing = clean cycle detection,
+minimal lag</text>
+</svg>
+<div class="diagram-caption">
+The DSS Bressert pipeline: stochastic,
+smooth, stochastic again, smooth again
+</div>
+</div>
+
+<h2>Why DSS Instead of EMA?</h2>
+
+<table class="vs-table">
+<tr>
+<th>Property</th>
+<th>EWMAC (EMA crossover)</th>
+<th>DSS Forecast</th>
+</tr>
+<tr>
+<td>Signal type</td>
+<td>Trend-following (lag by design)</td>
+<td>Cycle-detecting (finds turns)</td>
+</tr>
+<tr>
+<td>Range behavior</td>
+<td>Whipsaws around zero</td>
+<td>Clean oscillation, fewer false crosses</td>
+</tr>
+<tr>
+<td>Normalization</td>
+<td>Needs price volatility (std dev)</td>
+<td>Self-normalizing (0-100 by construction)</td>
+</tr>
+<tr>
+<td>Forecast scalars</td>
+<td>Needs Appendix B lookup per pair</td>
+<td>Not needed -- linear rescale from 0-100</td>
+</tr>
+<tr>
+<td>Trend detection</td>
+<td>Strong -- that's what EMAs do</td>
+<td>Good, but peaks/troughs at extremes</td>
+</tr>
+<tr>
+<td>Mean reversion</td>
+<td>Weak -- EMAs chase price</td>
+<td>Strong -- oscillator returns to center</td>
+</tr>
+</table>
+
+<p>
+The key insight: EWMAC is purely a trend system.
+DSS Bressert is a <strong>cycle system</strong>.
+By running DSS at multiple speeds through Carver's
+combining framework, you get a multi-timeframe
+cycle consensus instead of a multi-timeframe trend
+consensus. This is better for instruments that
+oscillate (crypto, commodities, rangebound stocks)
+and potentially worse for pure trending markets
+(strong bull runs where you want to ride the trend).
+</p>
+
+<div class="box yellow">
+<div class="box-title">When DSS > EWMAC</div>
+<p>
+Ranging/choppy markets, crypto, mean-reverting
+instruments, detecting bottoms and tops,
+shorter-term trading.
+</p>
+<div class="box-title" style="margin-top:0.5rem">
+When EWMAC > DSS</div>
+<p>
+Strong trends, long-term position sizing, markets
+with persistent momentum (e.g. bond futures in a
+rate cycle).
+</p>
+</div>
+
+<h2>The Six DSS Speeds</h2>
+
+<p>
+Like EWMAC's 6 EMA pairs, we run 6 DSS oscillators
+at increasing periods. The periods use
+Fibonacci-adjacent numbers for natural cycle
+spacing:
+</p>
+
+<div class="pair-grid">
+<div class="pair-card">
+<div class="name" style="color:#FF6B6B">
+DSS 5/3</div>
+<div class="desc">
+Fastest. Stoch period=5, EMA smooth=3.
+Catches short-term swings (2-5 bars).
+Noisy but responsive. Analogous to EWMAC 2/8.
+</div>
+</div>
+<div class="pair-card">
+<div class="name" style="color:#FFA07A">
+DSS 8/5</div>
+<div class="desc">
+Fast. Catches 5-10 bar swings.
+Good for intraday or short swing setups.
+Analogous to EWMAC 4/16.
+</div>
+</div>
+<div class="pair-card">
+<div class="name" style="color:#FFD700">
+DSS 13/8</div>
+<div class="desc">
+Medium-fast. The "Fibonacci sweet spot."
+10-20 bar cycles. Clean signals on 4h/daily.
+Analogous to EWMAC 8/32.
+</div>
+</div>
+<div class="pair-card">
+<div class="name" style="color:#90EE90">
+DSS 21/8</div>
+<div class="desc">
+Medium. 15-30 bar swings.
+Often the strongest individual predictor.
+Analogous to EWMAC 16/64.
+Default weight: 21% (highest).
+</div>
+</div>
+<div class="pair-card">
+<div class="name" style="color:#87CEEB">
+DSS 34/13</div>
+<div class="desc">
+Slow. Catches multi-week moves.
+Smooth and reliable but late.
+Analogous to EWMAC 32/128.
+</div>
+</div>
+<div class="pair-card">
+<div class="name" style="color:#DDA0DD">
+DSS 55/13</div>
+<div class="desc">
+Slowest. Monthly-scale cycles.
+Rarely flips, but when it does, it means
+something. Analogous to EWMAC 64/256.
+Default weight: 21%.
+</div>
+</div>
+</div>
+
+<h2>How the Forecast is Built</h2>
+
+<h3>Step 1: Compute each DSS</h3>
+<p>
+Each of the 6 DSS pairs runs independently on
+close price. The DSS function outputs a value
+between 0 and 100.
+</p>
+
+<h3>Step 2: Rescale to forecast range</h3>
+<p>
+The DSS value (0-100) maps linearly to -20/+20:
+</p>
+<pre>forecast = DSS * 0.4 - 20</pre>
+<p>
+So DSS = 0 becomes forecast -20 (max bearish),
+DSS = 50 becomes 0 (neutral), DSS = 100 becomes
++20 (max bullish). No volatility normalization
+needed -- DSS is already bounded.
+</p>
+
+<h3>Step 3: Weighted combination</h3>
+<p>
+Each forecast is multiplied by its weight,
+summed, and divided by total weight:
+</p>
+<pre>rawCombined = sum(forecast_i * weight_i)
+            / sum(weight_i)</pre>
+
+<h3>Step 4: Diversification multiplier</h3>
+<p>
+Carver's insight: because the individual forecasts
+aren't perfectly correlated, their combination
+underestimates true conviction. The diversification
+multiplier (default 1.31) corrects for this:
+</p>
+<pre>scaledCombined = rawCombined * 1.31</pre>
+
+<h3>Step 5: Cap at +/-20</h3>
+<p>
+No forecast ever exceeds +/-20. Carver shows this
+only clips about 5% of values and prevents
+over-leveraging during extreme moves.
+</p>
+
+<div class="diagram">
+<svg width="700" height="80" viewBox="0 0 700 80">
+<rect width="700" height="80" fill="#161b22"
+      rx="8"/>
+<!-- Scale bar -->
+<rect x="50" y="25" width="120" height="30"
+      rx="4" fill="#D50000" opacity="0.3"/>
+<rect x="170" y="25" width="120" height="30"
+      rx="0" fill="#EF5350" opacity="0.2"/>
+<rect x="290" y="25" width="120" height="30"
+      rx="0" fill="#B9F6CA" opacity="0.15"/>
+<rect x="410" y="25" width="120" height="30"
+      rx="0" fill="#69F0AE" opacity="0.2"/>
+<rect x="530" y="25" width="120" height="30"
+      rx="4" fill="#00C853" opacity="0.3"/>
+
+<text x="110" y="45" fill="#f85149"
+      text-anchor="middle" font-size="12"
+      font-weight="bold">-20 to -10</text>
+<text x="230" y="45" fill="#EF5350"
+      text-anchor="middle" font-size="12">
+-10 to -5</text>
+<text x="350" y="45" fill="#c9d1d9"
+      text-anchor="middle" font-size="12">
+-5 to +5</text>
+<text x="470" y="45" fill="#69F0AE"
+      text-anchor="middle" font-size="12">
++5 to +10</text>
+<text x="590" y="45" fill="#3fb950"
+      text-anchor="middle" font-size="12"
+      font-weight="bold">+10 to +20</text>
+
+<text x="110" y="68" fill="#8b949e"
+      text-anchor="middle" font-size="10">
+Strong Sell</text>
+<text x="350" y="68" fill="#8b949e"
+      text-anchor="middle" font-size="10">
+Neutral</text>
+<text x="590" y="68" fill="#8b949e"
+      text-anchor="middle" font-size="10">
+Strong Buy</text>
+</svg>
+<div class="diagram-caption">
+The forecast scale: -20 (max short)
+through +20 (max long)
+</div>
+</div>
+
+<h2>Reading the Indicator</h2>
+
+<h3>The combined line (thick)</h3>
+<p>
+This is your primary signal. It changes color
+based on strength: deep green above +10,
+light green +5 to +10, pale green 0 to +5,
+pink 0 to -5, red -5 to -10,
+deep red below -10. Background shading appears
+when the forecast exceeds +/-10 to highlight
+strong conviction zones.
+</p>
+
+<h3>The info table</h3>
+<p>
+Top-right corner shows each active DSS pair's
+current forecast and the combined value.
+The <strong>Agreement</strong> row at the bottom
+shows how many pairs agree on direction --
+e.g. "5/6 BULL" means 5 of 6 DSS speeds are
+positive. Full agreement (6/6) is rare and
+significant.
+</p>
+
+<h3>Individual forecasts (toggle on)</h3>
+<p>
+Enable "Show Individual Forecasts" to see all 6
+DSS lines overlaid. This reveals which timeframes
+are leading: if the fast DSS pairs have flipped
+bullish but the slow ones are still bearish,
+you're seeing early rotation. If all 6 align,
+you have a strong multi-timeframe consensus.
+</p>
+
+<h2>How to Trade With It</h2>
+
+<div class="box green">
+<div class="box-title">Bullish Setup</div>
+<ul>
+<li>Combined forecast crosses above <strong>+10</strong>
+(strong buy zone)</li>
+<li>Agreement shows 5/6 or 6/6 BULL</li>
+<li>Forecast was recently below 0 (recovering
+from oversold -- the cycle is turning up)</li>
+<li>Use as confirmation for your entry signal
+(RSI trendline break, support bounce, etc.)</li>
+</ul>
+</div>
+
+<div class="box red">
+<div class="box-title">Bearish Setup</div>
+<ul>
+<li>Combined forecast crosses below <strong>-10</strong>
+(strong sell zone)</li>
+<li>Agreement shows 5/6 or 6/6 BEAR</li>
+<li>Forecast was recently above 0 (rolling over
+from overbought)</li>
+<li>Confirm with your short signal or use to
+avoid longs</li>
+</ul>
+</div>
+
+<div class="box blue">
+<div class="box-title">Position Sizing (Carver method)</div>
+<p>
+The forecast number <em>is</em> your position size.
++20 = full long, +10 = half long, 0 = flat,
+-10 = half short, -20 = full short. Scale linearly.
+This is how Carver uses it in his systematic
+framework -- the forecast directly maps to how
+much exposure you want.
+</p>
+</div>
+
+<h3>What to watch for</h3>
+
+<table>
+<tr>
+<th>Signal</th>
+<th>Meaning</th>
+<th>Action</th>
+</tr>
+<tr>
+<td>Combined > +10</td>
+<td>Strong bullish consensus across speeds</td>
+<td>Full or heavy long</td>
+</tr>
+<tr>
+<td>Combined +5 to +10</td>
+<td>Moderately bullish, some divergence</td>
+<td>Light long, watch for confirmation</td>
+</tr>
+<tr>
+<td>Combined -5 to +5</td>
+<td>No conviction either way</td>
+<td>Flat or reduced size</td>
+</tr>
+<tr>
+<td>Combined -5 to -10</td>
+<td>Moderately bearish</td>
+<td>Light short or avoid longs</td>
+</tr>
+<tr>
+<td>Combined < -10</td>
+<td>Strong bearish consensus</td>
+<td>Full or heavy short</td>
+</tr>
+<tr>
+<td>6/6 agreement</td>
+<td>All timeframes aligned -- rare</td>
+<td>High conviction, size up</td>
+</tr>
+<tr>
+<td>Fast bull / slow bear</td>
+<td>Potential trend change brewing</td>
+<td>Watch for slow speeds to flip</td>
+</tr>
+<tr>
+<td>Combined pinned at +/-20</td>
+<td>Extreme -- may be near reversal</td>
+<td>Don't add, wait for cycle turn</td>
+</tr>
+</table>
+
+<h2>Settings Guide</h2>
+
+<h3>Weights</h3>
+<p>
+Default weights are based on Carver's original
+allocations adapted for DSS. The middle speeds
+(13/8 and 21/8) and the slowest (55/13) get the
+most weight because they tend to be the most
+reliable. Faster speeds are noisier and get less.
+Weights must sum to 100.
+</p>
+
+<table>
+<tr><th>DSS Pair</th><th>Default Weight</th>
+<th>Character</th></tr>
+<tr><td>5/3</td><td>10%</td>
+<td>Noisy, fast entries/exits</td></tr>
+<tr><td>8/5</td><td>15%</td>
+<td>Short-term swings</td></tr>
+<tr><td>13/8</td><td>15%</td>
+<td>Fibonacci sweet spot</td></tr>
+<tr><td>21/8</td><td>21%</td>
+<td>Core signal (Carver's pick)</td></tr>
+<tr><td>34/13</td><td>18%</td>
+<td>Multi-week trend</td></tr>
+<tr><td>55/13</td><td>21%</td>
+<td>Monthly direction</td></tr>
+</table>
+
+<h3>Diversification Multiplier</h3>
+<p>
+Default 1.31 (Carver's value for a 4-rule set).
+Increase it if you're only running 2-3 speeds
+(to compensate for less diversification).
+Decrease it if you want more conservative sizing.
+Range: 1.0 (no boost) to 2.5 (aggressive).
+</p>
+
+<h3>Timeframe suggestions</h3>
+<table>
+<tr><th>Chart Timeframe</th>
+<th>Best DSS Speeds</th>
+<th>Use Case</th></tr>
+<tr><td>5m - 15m</td>
+<td>5/3, 8/5, 13/8</td>
+<td>Scalping, intraday</td></tr>
+<tr><td>1h - 4h</td>
+<td>All 6 (default)</td>
+<td>Swing trading</td></tr>
+<tr><td>Daily</td>
+<td>13/8, 21/8, 34/13, 55/13</td>
+<td>Position trading</td></tr>
+<tr><td>Weekly</td>
+<td>21/8, 34/13, 55/13</td>
+<td>Long-term allocation</td></tr>
+</table>
+
+<h2>DSS vs EWMAC: Side by Side</h2>
+
+<p>
+Run both indicators simultaneously. You'll notice:
+</p>
+
+<ul>
+<li><strong>DSS turns earlier.</strong>
+Because it's a cycle detector, it'll start
+flipping before EWMAC catches the crossover.
+This gives earlier entries but more potential
+for premature signals in strong trends.</li>
+
+<li><strong>DSS is bounded, EWMAC isn't
+(before capping).</strong> EWMAC's raw signal
+can theoretically go to infinity before the cap
+clips it. DSS is always 0-100, so it naturally
+saturates at extremes. This makes DSS
+self-limiting -- it can't keep climbing during
+parabolic moves.</li>
+
+<li><strong>EWMAC trends, DSS oscillates.</strong>
+In a strong trending market, EWMAC will sit at
++15 to +20 for weeks. DSS will cycle through
+peaks and troughs even during trends, briefly
+dipping negative before resuming. This is
+feature-or-bug depending on your style.</li>
+
+<li><strong>Agreement is more meaningful on
+DSS.</strong> When all 6 DSS speeds agree, it
+means cycles across all timeframes are aligned.
+That's rarer and more significant than all EMAs
+pointing the same way (which happens in any
+decent trend).</li>
+</ul>
+
+<h2>Alerts</h2>
+
+<p>Five built-in alert conditions:</p>
+
+<table>
+<tr><th>Alert</th><th>Trigger</th></tr>
+<tr><td>Strong Buy Signal</td>
+<td>Combined crosses above +10</td></tr>
+<tr><td>Strong Sell Signal</td>
+<td>Combined crosses below -10</td></tr>
+<tr><td>Neutral Crossover</td>
+<td>Combined crosses zero</td></tr>
+<tr><td>Full Bull Agreement</td>
+<td>All active DSS speeds positive</td></tr>
+<tr><td>Full Bear Agreement</td>
+<td>All active DSS speeds negative</td></tr>
+</table>
+
+<h2>Combining with Other Indicators</h2>
+
+<p>
+This works well as a <strong>filter or
+confirmation layer</strong>, not a standalone
+entry system:
+</p>
+
+<ul>
+<li><strong>RSI Trendline Breakout</strong> --
+use DSS Forecast > 0 as a go/no-go filter.
+Only take RSI breakout longs when the
+multi-speed cycle consensus is bullish.</li>
+
+<li><strong>Breathing Score / Rhythm Filter</strong>
+-- DSS Forecast tells you the
+<em>instrument's</em> cycle state. Breathing Score
+tells you the <em>market's</em> cycle state.
+Both bullish = high conviction.</li>
+
+<li><strong>EWMAC Forecast</strong> --
+run both. When EWMAC and DSS agree, you have
+both trend AND cycle alignment. When they
+disagree, the market is probably choppy --
+reduce size.</li>
+
+<li><strong>DSS Composite MTF</strong> --
+the composite looks at one DSS across multiple
+chart timeframes. This indicator looks at
+multiple DSS speeds on one chart timeframe.
+They complement each other.</li>
+</ul>
+
+<div class="box yellow">
+<div class="box-title">Key Principle</div>
+<p>
+The forecast number is a <strong>conviction
+meter</strong>, not a binary signal. Don't think
+"buy when positive, sell when negative." Think
+"size proportionally to conviction." A +5
+forecast means a small position. A +18 means
+go heavy. Zero means sit it out. This continuous
+scaling is the core of Carver's system and it
+applies equally to the DSS version.
+</p>
+</div>
+
+<p style="color:#8b949e; margin-top:3rem;
+border-top:1px solid #21262d; padding-top:1rem;
+font-size:0.85rem;">
+DSS Forecast Guide -- August 2026.
+Based on Robert Carver's <em>Systematic Trading</em>
+framework with DSS Bressert oscillators by
+Walter Bressert. Built for TradingView Pine Script v6.
+</p>
+
+</body>
+</html>

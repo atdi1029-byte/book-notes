@@ -1,0 +1,768 @@
+//@version=6
+indicator("DSS Forecast — Scalp (Native TF)",
+     overlay=false, precision=2)
+
+// Carver forecast framework — original DSS pairs
+// and weights, NO timeframe remapping.
+// Runs purely on the chart's native timeframe.
+// Signals: stack flips, zero-crosses, majority
+// flips, extreme reversals, squeeze breakouts,
+// acceleration, cascade bursts.
+
+// === SETTINGS ===
+grpDSS = "DSS Pairs"
+show1 = input.bool(true,  "DSS 5/3 (fastest)",
+     group=grpDSS)
+show2 = input.bool(true,  "DSS 8/5",
+     group=grpDSS)
+show3 = input.bool(true,  "DSS 13/8",
+     group=grpDSS)
+show4 = input.bool(true,  "DSS 21/8",
+     group=grpDSS)
+show5 = input.bool(true,  "DSS 34/13",
+     group=grpDSS)
+show6 = input.bool(true,  "DSS 55/13 (slowest)",
+     group=grpDSS)
+
+grpComb = "Combined Forecast"
+showCombined = input.bool(true,
+     "Show Combined Forecast", group=grpComb)
+divMultiplier = input.float(1.31,
+     "Diversification Multiplier",
+     group=grpComb, minval=1.0, maxval=2.5,
+     step=0.01,
+     tooltip="Carver default 1.31. Higher = " +
+     "more aggressive sizing")
+
+grpWt = "Forecast Weights (must sum to 100)"
+w1 = input.float(10, "Weight: DSS 5/3",
+     group=grpWt, minval=0, maxval=100)
+w2 = input.float(15, "Weight: DSS 8/5",
+     group=grpWt, minval=0, maxval=100)
+w3 = input.float(15, "Weight: DSS 13/8",
+     group=grpWt, minval=0, maxval=100)
+w4 = input.float(21, "Weight: DSS 21/8",
+     group=grpWt, minval=0, maxval=100)
+w5 = input.float(18, "Weight: DSS 34/13",
+     group=grpWt, minval=0, maxval=100)
+w6 = input.float(21, "Weight: DSS 55/13",
+     group=grpWt, minval=0, maxval=100)
+
+grpMom = "Momentum Gate"
+useMomGate = input.bool(true,
+     "RSI Velocity Filter", group=grpMom,
+     tooltip="Require RSI momentum aligned with " +
+     "signal direction. Filters choppy flips.")
+rsiLen = input.int(9, "RSI Length",
+     group=grpMom, minval=2, maxval=21)
+rsiVelLen = input.int(3, "Velocity Lookback",
+     group=grpMom, minval=1, maxval=8,
+     tooltip="Bars to measure RSI change over")
+rsiVelThresh = input.float(2.0,
+     "Min Velocity",
+     group=grpMom, minval=0.5, maxval=10.0,
+     step=0.5,
+     tooltip="Minimum RSI change over lookback")
+
+grpVis = "Visual"
+showIndividual = input.bool(false,
+     "Show Individual Forecasts", group=grpVis)
+
+// === DSS BRESSERT FUNCTION ===
+dss_bressert(float src, int stochLen,
+     int emaLen) =>
+    hh = ta.highest(src, stochLen)
+    ll = ta.lowest(src, stochLen)
+    raw1 = hh != ll ?
+         (src - ll) / (hh - ll) * 100 : 50.0
+    smooth1 = ta.ema(raw1, emaLen)
+    hh2 = ta.highest(smooth1, stochLen)
+    ll2 = ta.lowest(smooth1, stochLen)
+    raw2 = hh2 != ll2 ?
+         (smooth1 - ll2) / (hh2 - ll2) * 100
+         : 50.0
+    dssLine = ta.ema(raw2, emaLen)
+    dssLine
+
+// === DSS FORECAST (0-100 → ±20) ===
+dss_fc(int stochLen, int emaLen) =>
+    dss = dss_bressert(close, stochLen, emaLen)
+    math.max(-20.0, math.min(20.0,
+         dss * 0.4 - 20.0))
+
+// === INDIVIDUAL FORECASTS ===
+f1_raw = dss_fc(5, 3)
+f2_raw = dss_fc(8, 5)
+f3_raw = dss_fc(13, 8)
+f4_raw = dss_fc(21, 8)
+f5_raw = dss_fc(34, 13)
+f6_raw = dss_fc(55, 13)
+
+// === COMBINED FORECAST (no HTF remap) ===
+totalWeight = (show1 ? w1 : 0) +
+     (show2 ? w2 : 0) +
+     (show3 ? w3 : 0) + (show4 ? w4 : 0) +
+     (show5 ? w5 : 0) + (show6 ? w6 : 0)
+
+weightedSum = (show1 ? f1_raw * w1 : 0) +
+     (show2 ? f2_raw * w2 : 0) +
+     (show3 ? f3_raw * w3 : 0) +
+     (show4 ? f4_raw * w4 : 0) +
+     (show5 ? f5_raw * w5 : 0) +
+     (show6 ? f6_raw * w6 : 0)
+
+rawCombined = totalWeight > 0 ?
+     weightedSum / totalWeight : 0.0
+scaledCombined = rawCombined * divMultiplier
+combined = math.max(-20.0,
+     math.min(20.0, scaledCombined))
+
+// === RSI MOMENTUM GATE ===
+rsiVal = ta.rsi(close, rsiLen)
+rsiVelocity = rsiVal - rsiVal[rsiVelLen]
+momBullOk = not useMomGate or
+     rsiVelocity > rsiVelThresh
+momBearOk = not useMomGate or
+     rsiVelocity < -rsiVelThresh
+
+// === AGREEMENT COUNTER ===
+bullCount = (show1 and f1_raw > 0 ? 1 : 0) +
+     (show2 and f2_raw > 0 ? 1 : 0) +
+     (show3 and f3_raw > 0 ? 1 : 0) +
+     (show4 and f4_raw > 0 ? 1 : 0) +
+     (show5 and f5_raw > 0 ? 1 : 0) +
+     (show6 and f6_raw > 0 ? 1 : 0)
+bearCount = (show1 and f1_raw < 0 ? 1 : 0) +
+     (show2 and f2_raw < 0 ? 1 : 0) +
+     (show3 and f3_raw < 0 ? 1 : 0) +
+     (show4 and f4_raw < 0 ? 1 : 0) +
+     (show5 and f5_raw < 0 ? 1 : 0) +
+     (show6 and f6_raw < 0 ? 1 : 0)
+activeCount = (show1 ? 1 : 0) + (show2 ? 1 : 0) +
+     (show3 ? 1 : 0) + (show4 ? 1 : 0) +
+     (show5 ? 1 : 0) + (show6 ? 1 : 0)
+
+// === FORECAST VELOCITY & ACCELERATION ===
+fcVel = combined - combined[3]
+fcAccel = fcVel - fcVel[2]
+
+// === FASTEST vs SLOWEST SPREAD ===
+fastSlow = f1_raw - f6_raw
+
+// === SQUEEZE (all 6 compressed) ===
+fcMax = math.max(f1_raw,
+     math.max(f2_raw,
+     math.max(f3_raw,
+     math.max(f4_raw,
+     math.max(f5_raw, f6_raw)))))
+fcMin = math.min(f1_raw,
+     math.min(f2_raw,
+     math.min(f3_raw,
+     math.min(f4_raw,
+     math.min(f5_raw, f6_raw)))))
+fcSpread = fcMax - fcMin
+
+// === CASCADE (how many flipped in last N bars) ===
+f1Flip = (f1_raw > 0 and f1_raw[1] <= 0) or
+     (f1_raw < 0 and f1_raw[1] >= 0) ? 1 : 0
+f2Flip = (f2_raw > 0 and f2_raw[1] <= 0) or
+     (f2_raw < 0 and f2_raw[1] >= 0) ? 1 : 0
+f3Flip = (f3_raw > 0 and f3_raw[1] <= 0) or
+     (f3_raw < 0 and f3_raw[1] >= 0) ? 1 : 0
+f4Flip = (f4_raw > 0 and f4_raw[1] <= 0) or
+     (f4_raw < 0 and f4_raw[1] >= 0) ? 1 : 0
+f5Flip = (f5_raw > 0 and f5_raw[1] <= 0) or
+     (f5_raw < 0 and f5_raw[1] >= 0) ? 1 : 0
+f6Flip = (f6_raw > 0 and f6_raw[1] <= 0) or
+     (f6_raw < 0 and f6_raw[1] >= 0) ? 1 : 0
+
+
+// =========================================================
+// SIGNAL 1: FULL STACK FLIP (original)
+// =========================================================
+grpFlip = "① Stack Flip"
+showFlips = input.bool(true,
+     "Show Stack Flips", group=grpFlip)
+confirmBars = input.int(1, "Confirmation Bars",
+     group=grpFlip, minval=1, maxval=5)
+flipCooldown = input.int(8,
+     "Cooldown (bars)",
+     group=grpFlip, minval=1, maxval=50)
+volLen = input.int(14, "Volume MA Length",
+     group=grpFlip)
+volMult = input.float(0.8,
+     "Volume Threshold (x avg)",
+     group=grpFlip, step=0.1)
+
+bearStack = f1_raw < 0 and f2_raw < 0 and
+     f3_raw < 0 and f4_raw < 0 and
+     f5_raw < 0 and f6_raw < 0
+bullStack = f1_raw > 0 and f2_raw > 0 and
+     f3_raw > 0 and f4_raw > 0 and
+     f5_raw > 0 and f6_raw > 0
+
+var int bearBrokenCount = 0
+var int bullBrokenCount = 0
+bearBrokenCount := bearStack ? 0 :
+     bearStack[1] ? 1 :
+     bearBrokenCount > 0 ?
+     bearBrokenCount + 1 : 0
+bullBrokenCount := bullStack ? 0 :
+     bullStack[1] ? 1 :
+     bullBrokenCount > 0 ?
+     bullBrokenCount + 1 : 0
+
+avgVol = ta.sma(volume, volLen)
+volConfirm = volume > avgVol * volMult
+
+rawBuy = bearBrokenCount == confirmBars and
+     volConfirm and momBullOk
+rawSell = bullBrokenCount == confirmBars and
+     volConfirm and momBearOk
+
+barsSinceBuy = ta.barssince(rawBuy[1])
+barsSinceSell = ta.barssince(rawSell[1])
+buySignal = rawBuy and (na(barsSinceBuy) or
+     barsSinceBuy >= flipCooldown)
+sellSignal = rawSell and (na(barsSinceSell) or
+     barsSinceSell >= flipCooldown)
+
+
+// =========================================================
+// SIGNAL 2: EXTREME REVERSAL
+// Combined at ±18+ and fastest DSS turns against
+// =========================================================
+grpExt = "② Extreme Reversal"
+showExtreme = input.bool(true,
+     "Show Extreme Reversals", group=grpExt)
+extThresh = input.float(16.0,
+     "Extreme Threshold",
+     group=grpExt, minval=12.0, maxval=20.0,
+     step=1.0)
+extCooldown = input.int(10,
+     "Cooldown (bars)",
+     group=grpExt, minval=1, maxval=50)
+
+// Combined is extreme + fastest DSS turning
+extBuyRaw = combined <= -extThresh and
+     f1_raw > f1_raw[1] and f1_raw[1] <= f1_raw[2]
+extSellRaw = combined >= extThresh and
+     f1_raw < f1_raw[1] and f1_raw[1] >= f1_raw[2]
+
+barsSinceEB = ta.barssince(extBuyRaw[1])
+barsSinceES = ta.barssince(extSellRaw[1])
+extBuyFinal = extBuyRaw and (na(barsSinceEB) or
+     barsSinceEB >= extCooldown)
+extSellFinal = extSellRaw and (na(barsSinceES) or
+     barsSinceES >= extCooldown)
+
+
+// =========================================================
+// SIGNAL 3: SQUEEZE BREAKOUT
+// All forecasts compress then expand
+// =========================================================
+grpSqz = "③ Squeeze Breakout"
+showSqueeze = input.bool(true,
+     "Show Squeeze Breakouts", group=grpSqz)
+sqzThresh = input.float(5.0,
+     "Squeeze Threshold (spread)",
+     group=grpSqz, minval=2.0, maxval=12.0,
+     step=0.5,
+     tooltip="Max spread for squeeze state")
+sqzExpand = input.float(10.0,
+     "Expansion Threshold",
+     group=grpSqz, minval=5.0, maxval=25.0,
+     step=1.0,
+     tooltip="Min spread after squeeze to fire")
+sqzCooldown = input.int(12,
+     "Cooldown (bars)",
+     group=grpSqz, minval=1, maxval=50)
+
+// Was squeezed recently (within last 5 bars)
+wasSqueezed = fcSpread[1] <= sqzThresh or
+     fcSpread[2] <= sqzThresh or
+     fcSpread[3] <= sqzThresh or
+     fcSpread[4] <= sqzThresh or
+     fcSpread[5] <= sqzThresh
+
+sqzBuyRaw = wasSqueezed and
+     fcSpread >= sqzExpand and combined > 0
+sqzSellRaw = wasSqueezed and
+     fcSpread >= sqzExpand and combined < 0
+
+barsSinceSqB = ta.barssince(sqzBuyRaw[1])
+barsSinceSqS = ta.barssince(sqzSellRaw[1])
+sqzBuyFinal = sqzBuyRaw and (na(barsSinceSqB) or
+     barsSinceSqB >= sqzCooldown)
+sqzSellFinal = sqzSellRaw and (na(barsSinceSqS) or
+     barsSinceSqS >= sqzCooldown)
+
+
+// =========================================================
+// SIGNAL 4: ACCELERATION FLIP
+// Forecast velocity negative but acceleration
+// turns positive = curve bending before zero cross
+// =========================================================
+grpAcc = "④ Acceleration"
+showAccel = input.bool(true,
+     "Show Acceleration Flips", group=grpAcc)
+accelCooldown = input.int(6,
+     "Cooldown (bars)",
+     group=grpAcc, minval=1, maxval=30)
+
+// Forecast below zero, velocity still negative,
+// but acceleration just flipped positive
+accelBuyRaw = combined < 0 and fcVel < 0 and
+     fcAccel > 0 and fcAccel[1] <= 0 and
+     momBullOk
+accelSellRaw = combined > 0 and fcVel > 0 and
+     fcAccel < 0 and fcAccel[1] >= 0 and
+     momBearOk
+
+barsSinceAB = ta.barssince(accelBuyRaw[1])
+barsSinceAS = ta.barssince(accelSellRaw[1])
+accelBuyFinal = accelBuyRaw and
+     (na(barsSinceAB) or
+     barsSinceAB >= accelCooldown)
+accelSellFinal = accelSellRaw and
+     (na(barsSinceAS) or
+     barsSinceAS >= accelCooldown)
+
+
+// =========================================================
+// SIGNAL 5: CASCADE BURST
+// 3+ DSS pairs flip zero in a short window
+// =========================================================
+grpCasc = "⑤ Cascade"
+showCascade = input.bool(true,
+     "Show Cascade Bursts", group=grpCasc)
+cascWindow = input.int(3,
+     "Window (bars)",
+     group=grpCasc, minval=1, maxval=8,
+     tooltip="Count flips within this many bars")
+cascMin = input.int(3,
+     "Min Flips to Trigger",
+     group=grpCasc, minval=2, maxval=6)
+cascCooldown = input.int(10,
+     "Cooldown (bars)",
+     group=grpCasc, minval=1, maxval=50)
+
+// Sum flips over the window
+cascCount = f1Flip + f2Flip + f3Flip +
+     f4Flip + f5Flip + f6Flip
+cascSum = cascCount
+i = 1
+while i < cascWindow
+    cascSum += nz(cascCount[i])
+    i += 1
+
+cascBuyRaw = cascSum >= cascMin and combined > 0
+cascSellRaw = cascSum >= cascMin and combined < 0
+
+barsSinceCB = ta.barssince(cascBuyRaw[1])
+barsSinceCS = ta.barssince(cascSellRaw[1])
+cascBuyFinal = cascBuyRaw and (na(barsSinceCB) or
+     barsSinceCB >= cascCooldown)
+cascSellFinal = cascSellRaw and (na(barsSinceCS) or
+     barsSinceCS >= cascCooldown)
+
+
+// =========================================================
+// PLOTTING
+// =========================================================
+
+// === PLOT INDIVIDUAL ===
+plot(showIndividual and show1 ? f1_raw : na,
+     "DSS 5/3", color.new(#FF6B6B, 60),
+     linewidth=1)
+plot(showIndividual and show2 ? f2_raw : na,
+     "DSS 8/5", color.new(#FFA07A, 60),
+     linewidth=1)
+plot(showIndividual and show3 ? f3_raw : na,
+     "DSS 13/8", color.new(#FFD700, 60),
+     linewidth=1)
+plot(showIndividual and show4 ? f4_raw : na,
+     "DSS 21/8", color.new(#90EE90, 60),
+     linewidth=1)
+plot(showIndividual and show5 ? f5_raw : na,
+     "DSS 34/13", color.new(#87CEEB, 60),
+     linewidth=1)
+plot(showIndividual and show6 ? f6_raw : na,
+     "DSS 55/13", color.new(#DDA0DD, 60),
+     linewidth=1)
+
+// === PLOT COMBINED ===
+combColor = combined > 10 ? #D50000 :
+     combined > 5  ? #EF5350 :
+     combined > 0  ? #FFCDD2 :
+     combined > -5 ? #B9F6CA :
+     combined > -10 ? #69F0AE :
+     #00C853
+
+plot(showCombined ? combined : na,
+     "Combined Forecast", combColor,
+     linewidth=3)
+
+// === REFERENCE LINES ===
+hline(20,  "Cap (+20)",
+     color.new(#D50000, 70), hline.style_dashed)
+hline(10,  "Strong (+10)",
+     color.new(#EF5350, 70), hline.style_dotted)
+hline(0,   "Neutral",
+     color.new(#888888, 50), hline.style_solid)
+hline(-10, "Strong (-10)",
+     color.new(#69F0AE, 70), hline.style_dotted)
+hline(-20, "Cap (-20)",
+     color.new(#00C853, 70), hline.style_dashed)
+
+// === BACKGROUND ZONES ===
+bgcolor(combined > 10 ?
+     color.new(#D50000, 92) :
+     combined < -10 ?
+     color.new(#00C853, 92) : na)
+
+// === PLOT SIGNALS ===
+// Buys = blue family (bottom). Sells = purple family (top).
+
+// ① Stack flip — big triangles
+plotshape(showFlips and buySignal ?
+     combined : na,
+     "Stack Buy", shape.triangleup,
+     location.bottom,
+     color=color.new(#2979FF, 0),
+     size=size.small)
+plotshape(showFlips and sellSignal ?
+     combined : na,
+     "Stack Sell", shape.triangledown,
+     location.top,
+     color=color.new(#D50000, 0),
+     size=size.small)
+
+// ② Extreme reversal — X marks
+plotshape(showExtreme and extBuyFinal ?
+     combined : na,
+     "Extreme Buy", shape.xcross,
+     location.bottom,
+     color=color.new(#00B0FF, 0),
+     size=size.small)
+plotshape(showExtreme and extSellFinal ?
+     combined : na,
+     "Extreme Sell", shape.xcross,
+     location.top,
+     color=color.new(#FF1744, 0),
+     size=size.small)
+
+// ③ Squeeze breakout — squares
+plotshape(showSqueeze and sqzBuyFinal ?
+     combined : na,
+     "Squeeze Buy", shape.square,
+     location.bottom,
+     color=color.new(#448AFF, 0),
+     size=size.tiny)
+plotshape(showSqueeze and sqzSellFinal ?
+     combined : na,
+     "Squeeze Sell", shape.square,
+     location.top,
+     color=color.new(#FF5252, 0),
+     size=size.tiny)
+
+// ④ Acceleration — small triangles
+plotshape(showAccel and accelBuyFinal ?
+     combined : na,
+     "Accel Buy", shape.triangleup,
+     location.bottom,
+     color=color.new(#82B1FF, 0),
+     size=size.tiny)
+plotshape(showAccel and accelSellFinal ?
+     combined : na,
+     "Accel Sell", shape.triangledown,
+     location.top,
+     color=color.new(#FF6E40, 0),
+     size=size.tiny)
+
+// ⑤ Cascade — diamonds
+plotshape(showCascade and cascBuyFinal ?
+     combined : na,
+     "Cascade Buy", shape.diamond,
+     location.bottom,
+     color=color.new(#00E676, 0),
+     size=size.small)
+plotshape(showCascade and cascSellFinal ?
+     combined : na,
+     "Cascade Sell", shape.diamond,
+     location.top,
+     color=color.new(#CE93D8, 0),
+     size=size.small)
+
+
+// =========================================================
+// INFO TABLE
+// =========================================================
+var table info = table.new(position.top_right,
+     3, 14,
+     bgcolor=color.new(#1a1a2e, 10),
+     border_width=1,
+     border_color=color.new(#333355, 50))
+
+if barstate.islast
+    table.cell(info, 0, 0, "DSS",
+         text_color=#aaaacc, text_size=size.small)
+    table.cell(info, 1, 0, "FC",
+         text_color=#aaaacc, text_size=size.small)
+    table.cell(info, 2, 0, "Vel",
+         text_color=#aaaacc, text_size=size.small)
+
+    row = 1
+    if show1
+        table.cell(info, 0, row, "5/3",
+             text_color=#FF6B6B,
+             text_size=size.small)
+        table.cell(info, 1, row,
+             str.tostring(f1_raw, "#.#"),
+             text_color=f1_raw > 0 ?
+             #69F0AE : #EF5350,
+             text_size=size.small)
+        f1vel = f1_raw - f1_raw[2]
+        table.cell(info, 2, row,
+             (f1vel > 0 ? "+" : "") +
+             str.tostring(f1vel, "#.#"),
+             text_color=f1vel > 0 ?
+             #69F0AE : #EF5350,
+             text_size=size.small)
+        row += 1
+    if show2
+        table.cell(info, 0, row, "8/5",
+             text_color=#FFA07A,
+             text_size=size.small)
+        table.cell(info, 1, row,
+             str.tostring(f2_raw, "#.#"),
+             text_color=f2_raw > 0 ?
+             #69F0AE : #EF5350,
+             text_size=size.small)
+        f2vel = f2_raw - f2_raw[2]
+        table.cell(info, 2, row,
+             (f2vel > 0 ? "+" : "") +
+             str.tostring(f2vel, "#.#"),
+             text_color=f2vel > 0 ?
+             #69F0AE : #EF5350,
+             text_size=size.small)
+        row += 1
+    if show3
+        table.cell(info, 0, row, "13/8",
+             text_color=#FFD700,
+             text_size=size.small)
+        table.cell(info, 1, row,
+             str.tostring(f3_raw, "#.#"),
+             text_color=f3_raw > 0 ?
+             #69F0AE : #EF5350,
+             text_size=size.small)
+        f3vel = f3_raw - f3_raw[2]
+        table.cell(info, 2, row,
+             (f3vel > 0 ? "+" : "") +
+             str.tostring(f3vel, "#.#"),
+             text_color=f3vel > 0 ?
+             #69F0AE : #EF5350,
+             text_size=size.small)
+        row += 1
+    if show4
+        table.cell(info, 0, row, "21/8",
+             text_color=#90EE90,
+             text_size=size.small)
+        table.cell(info, 1, row,
+             str.tostring(f4_raw, "#.#"),
+             text_color=f4_raw > 0 ?
+             #69F0AE : #EF5350,
+             text_size=size.small)
+        f4vel = f4_raw - f4_raw[2]
+        table.cell(info, 2, row,
+             (f4vel > 0 ? "+" : "") +
+             str.tostring(f4vel, "#.#"),
+             text_color=f4vel > 0 ?
+             #69F0AE : #EF5350,
+             text_size=size.small)
+        row += 1
+    if show5
+        table.cell(info, 0, row, "34/13",
+             text_color=#87CEEB,
+             text_size=size.small)
+        table.cell(info, 1, row,
+             str.tostring(f5_raw, "#.#"),
+             text_color=f5_raw > 0 ?
+             #69F0AE : #EF5350,
+             text_size=size.small)
+        f5vel = f5_raw - f5_raw[2]
+        table.cell(info, 2, row,
+             (f5vel > 0 ? "+" : "") +
+             str.tostring(f5vel, "#.#"),
+             text_color=f5vel > 0 ?
+             #69F0AE : #EF5350,
+             text_size=size.small)
+        row += 1
+    if show6
+        table.cell(info, 0, row, "55/13",
+             text_color=#DDA0DD,
+             text_size=size.small)
+        table.cell(info, 1, row,
+             str.tostring(f6_raw, "#.#"),
+             text_color=f6_raw > 0 ?
+             #69F0AE : #EF5350,
+             text_size=size.small)
+        f6vel = f6_raw - f6_raw[2]
+        table.cell(info, 2, row,
+             (f6vel > 0 ? "+" : "") +
+             str.tostring(f6vel, "#.#"),
+             text_color=f6vel > 0 ?
+             #69F0AE : #EF5350,
+             text_size=size.small)
+        row += 1
+
+    if showCombined
+        table.cell(info, 0, row, "COMB",
+             text_color=#ffffff,
+             text_size=size.small)
+        table.cell(info, 1, row,
+             str.tostring(combined, "#.#"),
+             text_color=combined > 0 ?
+             #00C853 : #D50000,
+             text_size=size.small)
+        table.cell(info, 2, row,
+             (fcVel > 0 ? "+" : "") +
+             str.tostring(fcVel, "#.#"),
+             text_color=fcVel > 0 ?
+             #69F0AE : #EF5350,
+             text_size=size.small)
+        row += 1
+
+    // Agreement
+    table.cell(info, 0, row, "Agree",
+         text_color=#aaaacc,
+         text_size=size.small)
+    agreeStr = bullCount > bearCount ?
+         str.tostring(bullCount) + "/" +
+         str.tostring(activeCount) + " BULL" :
+         bearCount > bullCount ?
+         str.tostring(bearCount) + "/" +
+         str.tostring(activeCount) + " BEAR" :
+         "SPLIT"
+    agreeCol = bullCount == activeCount ?
+         #00C853 :
+         bearCount == activeCount ?
+         #D50000 :
+         bullCount > bearCount ? #69F0AE :
+         bearCount > bullCount ? #EF5350 :
+         #FFD700
+    table.cell(info, 1, row, agreeStr,
+         text_color=agreeCol,
+         text_size=size.small)
+    table.cell(info, 2, row,
+         momBullOk ? "MOM ▲" :
+         momBearOk ? "MOM ▼" : "MOM —",
+         text_color=momBullOk ? #69F0AE :
+         momBearOk ? #EF5350 : #888888,
+         text_size=size.small)
+    row += 1
+
+    // Spread / Squeeze
+    sqzState = fcSpread <= sqzThresh ? "SQUEEZE" :
+         fcSpread >= sqzExpand ? "EXPAND" : "—"
+    sqzCol = fcSpread <= sqzThresh ?
+         #FFD740 :
+         fcSpread >= sqzExpand ? #00E5FF :
+         #888888
+    table.cell(info, 0, row, "Spread",
+         text_color=#aaaacc,
+         text_size=size.small)
+    table.cell(info, 1, row,
+         str.tostring(fcSpread, "#.#"),
+         text_color=sqzCol,
+         text_size=size.small)
+    table.cell(info, 2, row, sqzState,
+         text_color=sqzCol,
+         text_size=size.small)
+    row += 1
+
+    // Fast vs Slow tension
+    table.cell(info, 0, row, "F-S",
+         text_color=#aaaacc,
+         text_size=size.small)
+    table.cell(info, 1, row,
+         (fastSlow > 0 ? "+" : "") +
+         str.tostring(fastSlow, "#.#"),
+         text_color=fastSlow > 20 ? #76FF03 :
+         fastSlow < -20 ? #FF1744 :
+         fastSlow > 0 ? #69F0AE :
+         fastSlow < 0 ? #EF5350 : #888888,
+         text_size=size.small)
+    fsLabel = math.abs(fastSlow) > 25 ?
+         "TENSION" :
+         math.abs(fastSlow) > 15 ?
+         "BUILDING" : "—"
+    table.cell(info, 2, row, fsLabel,
+         text_color=math.abs(fastSlow) > 25 ?
+         #FFD740 :
+         math.abs(fastSlow) > 15 ?
+         #FFAB40 : #888888,
+         text_size=size.small)
+    row += 1
+
+    // Active signal
+    sigTxt = buySignal ? "▲ STACK" :
+         sellSignal ? "▼ STACK" :
+         extBuyFinal ? "▲ EXTRM" :
+         extSellFinal ? "▼ EXTRM" :
+         sqzBuyFinal ? "▲ SQZBK" :
+         sqzSellFinal ? "▼ SQZBK" :
+         cascBuyFinal ? "▲ CASC" :
+         cascSellFinal ? "▼ CASC" :
+         accelBuyFinal ? "▲ ACCEL" :
+         accelSellFinal ? "▼ ACCEL" : "—"
+    sigCol = buySignal or extBuyFinal or
+         sqzBuyFinal or cascBuyFinal or
+         accelBuyFinal ? #00C853 :
+         sellSignal or extSellFinal or
+         sqzSellFinal or cascSellFinal or
+         accelSellFinal ? #D50000 : #888888
+    table.cell(info, 0, row, "SIG",
+         text_color=#aaaacc,
+         text_size=size.small)
+    table.cell(info, 1, row, sigTxt,
+         text_color=sigCol,
+         text_size=size.small)
+    table.cell(info, 2, row, "",
+         text_size=size.small)
+
+
+// =========================================================
+// ALERTS
+// =========================================================
+anyBuy = buySignal or extBuyFinal or
+     sqzBuyFinal or accelBuyFinal or
+     cascBuyFinal
+anySell = sellSignal or extSellFinal or
+     sqzSellFinal or accelSellFinal or
+     cascSellFinal
+
+alertcondition(buySignal,
+     "① Stack Buy", "Stack flip buy")
+alertcondition(sellSignal,
+     "① Stack Sell", "Stack flip sell")
+alertcondition(extBuyFinal,
+     "② Extreme Buy", "Extreme reversal buy")
+alertcondition(extSellFinal,
+     "② Extreme Sell", "Extreme reversal sell")
+alertcondition(sqzBuyFinal,
+     "③ Squeeze Buy", "Squeeze breakout buy")
+alertcondition(sqzSellFinal,
+     "③ Squeeze Sell", "Squeeze breakout sell")
+alertcondition(accelBuyFinal,
+     "④ Accel Buy", "Acceleration flip buy")
+alertcondition(accelSellFinal,
+     "④ Accel Sell", "Acceleration flip sell")
+alertcondition(cascBuyFinal,
+     "⑤ Cascade Buy", "Cascade burst buy")
+alertcondition(cascSellFinal,
+     "⑤ Cascade Sell", "Cascade burst sell")
+alertcondition(anyBuy,
+     "Any Buy", "Any buy signal")
+alertcondition(anySell,
+     "Any Sell", "Any sell signal")

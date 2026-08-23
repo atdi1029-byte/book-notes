@@ -1,0 +1,306 @@
+//@version=6
+indicator("DSS Oscillator Lab — Beta",
+     overlay=false, precision=2)
+
+// DSS Forecast: Carver's framework with
+// DSS Bressert (double-smoothed stochastic).
+// DSS oscillates 0-100 as a natural sine wave
+// — rescaled to ±20 forecast range.
+// Multiple DSS speeds combined with weights +
+// diversification multiplier, capped ±20.
+
+// === SETTINGS ===
+grpDSS = "DSS Pairs"
+show1 = input.bool(true,  "DSS 5/3 (fastest)",
+     group=grpDSS)
+show2 = input.bool(true,  "DSS 8/5",
+     group=grpDSS)
+show3 = input.bool(true,  "DSS 13/8",
+     group=grpDSS)
+show4 = input.bool(true,  "DSS 21/8",
+     group=grpDSS)
+show5 = input.bool(true,  "DSS 34/13",
+     group=grpDSS)
+show6 = input.bool(true,  "DSS 55/13 (slowest)",
+     group=grpDSS)
+
+grpComb = "Combined Forecast"
+showCombined = input.bool(true,
+     "Show Combined Forecast", group=grpComb)
+divMultiplier = input.float(1.31,
+     "Diversification Multiplier",
+     group=grpComb, minval=1.0, maxval=2.5,
+     step=0.01,
+     tooltip="Carver default 1.31. Higher = " +
+     "more aggressive position sizing")
+
+grpWt = "Forecast Weights (must sum to 100)"
+w1 = input.float(10, "Weight: DSS 5/3",
+     group=grpWt, minval=0, maxval=100)
+w2 = input.float(15, "Weight: DSS 8/5",
+     group=grpWt, minval=0, maxval=100)
+w3 = input.float(15, "Weight: DSS 13/8",
+     group=grpWt, minval=0, maxval=100)
+w4 = input.float(21, "Weight: DSS 21/8",
+     group=grpWt, minval=0, maxval=100)
+w5 = input.float(18, "Weight: DSS 34/13",
+     group=grpWt, minval=0, maxval=100)
+w6 = input.float(21, "Weight: DSS 55/13",
+     group=grpWt, minval=0, maxval=100)
+
+grpHTF = "Higher Timeframe"
+showHTF = input.bool(true,
+     "Remap to Daily", group=grpHTF)
+htfTF = input.timeframe("D", "Timeframe",
+     group=grpHTF)
+
+grpVis = "Visual"
+showIndividual = input.bool(false,
+     "Show Individual Forecasts", group=grpVis)
+
+// === DSS BRESSERT FUNCTION ===
+dss_bressert(float src, int stochLen,
+     int emaLen) =>
+    hh = ta.highest(src, stochLen)
+    ll = ta.lowest(src, stochLen)
+    raw1 = hh != ll ?
+         (src - ll) / (hh - ll) * 100 : 50.0
+    smooth1 = ta.ema(raw1, emaLen)
+    hh2 = ta.highest(smooth1, stochLen)
+    ll2 = ta.lowest(smooth1, stochLen)
+    raw2 = hh2 != ll2 ?
+         (smooth1 - ll2) / (hh2 - ll2) * 100
+         : 50.0
+    dssLine = ta.ema(raw2, emaLen)
+    dssLine
+
+// === DSS FORECAST (0-100 → ±20) ===
+dss_fc(int stochLen, int emaLen) =>
+    dss = dss_bressert(close, stochLen, emaLen)
+    math.max(-20.0, math.min(20.0,
+         dss * 0.4 - 20.0))
+
+// === INDIVIDUAL FORECASTS ===
+f1_raw = dss_fc(5, 3)
+f2_raw = dss_fc(8, 5)
+f3_raw = dss_fc(13, 8)
+f4_raw = dss_fc(21, 8)
+f5_raw = dss_fc(34, 13)
+f6_raw = dss_fc(55, 13)
+
+// === COMBINED FORECAST ===
+totalWeight = (show1 ? w1 : 0) +
+     (show2 ? w2 : 0) +
+     (show3 ? w3 : 0) + (show4 ? w4 : 0) +
+     (show5 ? w5 : 0) + (show6 ? w6 : 0)
+
+weightedSum = (show1 ? f1_raw * w1 : 0) +
+     (show2 ? f2_raw * w2 : 0) +
+     (show3 ? f3_raw * w3 : 0) +
+     (show4 ? f4_raw * w4 : 0) +
+     (show5 ? f5_raw * w5 : 0) +
+     (show6 ? f6_raw * w6 : 0)
+
+rawCombined = totalWeight > 0 ?
+     weightedSum / totalWeight : 0.0
+scaledCombined = rawCombined * divMultiplier
+combined = math.max(-20.0,
+     math.min(20.0, scaledCombined))
+
+// === HIGHER TIMEFRAME ===
+htfRaw = request.security(syminfo.tickerid,
+     htfTF, combined)
+htfSmoothed = ta.ema(htfRaw, 6)
+displayCombined = showHTF ? htfSmoothed : combined
+
+// === PLOT INDIVIDUAL ===
+plot(showIndividual and show1 ? f1_raw : na,
+     "DSS 5/3", color.new(#FF6B6B, 60),
+     linewidth=1)
+plot(showIndividual and show2 ? f2_raw : na,
+     "DSS 8/5", color.new(#FFA07A, 60),
+     linewidth=1)
+plot(showIndividual and show3 ? f3_raw : na,
+     "DSS 13/8", color.new(#FFD700, 60),
+     linewidth=1)
+plot(showIndividual and show4 ? f4_raw : na,
+     "DSS 21/8", color.new(#90EE90, 60),
+     linewidth=1)
+plot(showIndividual and show5 ? f5_raw : na,
+     "DSS 34/13", color.new(#87CEEB, 60),
+     linewidth=1)
+plot(showIndividual and show6 ? f6_raw : na,
+     "DSS 55/13", color.new(#DDA0DD, 60),
+     linewidth=1)
+
+// === PLOT COMBINED ===
+combColor = displayCombined > 10 ? #D50000 :
+     displayCombined > 5  ? #EF5350 :
+     displayCombined > 0  ? #FFCDD2 :
+     displayCombined > -5 ? #B9F6CA :
+     displayCombined > -10 ? #69F0AE :
+     #00C853
+
+plot(showCombined ? displayCombined : na,
+     "Combined Forecast", combColor,
+     linewidth=3)
+
+// === REFERENCE LINES ===
+hline(20,  "Overbought Cap (+20)",
+     color.new(#D50000, 70), hline.style_dashed)
+hline(10,  "Overbought (+10)",
+     color.new(#EF5350, 70), hline.style_dotted)
+hline(0,   "Neutral",
+     color.new(#888888, 50), hline.style_solid)
+hline(-10, "Oversold (-10)",
+     color.new(#69F0AE, 70), hline.style_dotted)
+hline(-20, "Oversold Cap (-20)",
+     color.new(#00C853, 70), hline.style_dashed)
+
+// === BACKGROUND ZONES ===
+bgcolor(displayCombined > 10 ?
+     color.new(#D50000, 92) :
+     displayCombined < -10 ?
+     color.new(#00C853, 92) : na)
+
+// === AGREEMENT COUNTER ===
+bullCount = (show1 and f1_raw > 0 ? 1 : 0) +
+     (show2 and f2_raw > 0 ? 1 : 0) +
+     (show3 and f3_raw > 0 ? 1 : 0) +
+     (show4 and f4_raw > 0 ? 1 : 0) +
+     (show5 and f5_raw > 0 ? 1 : 0) +
+     (show6 and f6_raw > 0 ? 1 : 0)
+bearCount = (show1 and f1_raw < 0 ? 1 : 0) +
+     (show2 and f2_raw < 0 ? 1 : 0) +
+     (show3 and f3_raw < 0 ? 1 : 0) +
+     (show4 and f4_raw < 0 ? 1 : 0) +
+     (show5 and f5_raw < 0 ? 1 : 0) +
+     (show6 and f6_raw < 0 ? 1 : 0)
+activeCount = (show1 ? 1 : 0) + (show2 ? 1 : 0) +
+     (show3 ? 1 : 0) + (show4 ? 1 : 0) +
+     (show5 ? 1 : 0) + (show6 ? 1 : 0)
+
+// === INFO TABLE ===
+var table info = table.new(position.top_right,
+     2, 10,
+     bgcolor=color.new(#1a1a2e, 10),
+     border_width=1,
+     border_color=color.new(#333355, 50))
+
+if barstate.islast
+    table.cell(info, 0, 0, "DSS",
+         text_color=#aaaacc, text_size=size.small)
+    table.cell(info, 1, 0, "Forecast",
+         text_color=#aaaacc, text_size=size.small)
+
+    row = 1
+    if show1
+        table.cell(info, 0, row, "5/3",
+             text_color=#FF6B6B,
+             text_size=size.small)
+        table.cell(info, 1, row,
+             str.tostring(f1_raw, "#.#"),
+             text_color=f1_raw > 0 ?
+             #69F0AE : #EF5350,
+             text_size=size.small)
+        row += 1
+    if show2
+        table.cell(info, 0, row, "8/5",
+             text_color=#FFA07A,
+             text_size=size.small)
+        table.cell(info, 1, row,
+             str.tostring(f2_raw, "#.#"),
+             text_color=f2_raw > 0 ?
+             #69F0AE : #EF5350,
+             text_size=size.small)
+        row += 1
+    if show3
+        table.cell(info, 0, row, "13/8",
+             text_color=#FFD700,
+             text_size=size.small)
+        table.cell(info, 1, row,
+             str.tostring(f3_raw, "#.#"),
+             text_color=f3_raw > 0 ?
+             #69F0AE : #EF5350,
+             text_size=size.small)
+        row += 1
+    if show4
+        table.cell(info, 0, row, "21/8",
+             text_color=#90EE90,
+             text_size=size.small)
+        table.cell(info, 1, row,
+             str.tostring(f4_raw, "#.#"),
+             text_color=f4_raw > 0 ?
+             #69F0AE : #EF5350,
+             text_size=size.small)
+        row += 1
+    if show5
+        table.cell(info, 0, row, "34/13",
+             text_color=#87CEEB,
+             text_size=size.small)
+        table.cell(info, 1, row,
+             str.tostring(f5_raw, "#.#"),
+             text_color=f5_raw > 0 ?
+             #69F0AE : #EF5350,
+             text_size=size.small)
+        row += 1
+    if show6
+        table.cell(info, 0, row, "55/13",
+             text_color=#DDA0DD,
+             text_size=size.small)
+        table.cell(info, 1, row,
+             str.tostring(f6_raw, "#.#"),
+             text_color=f6_raw > 0 ?
+             #69F0AE : #EF5350,
+             text_size=size.small)
+        row += 1
+
+    if showCombined
+        table.cell(info, 0, row, "COMBINED",
+             text_color=#ffffff,
+             text_size=size.small)
+        table.cell(info, 1, row,
+             str.tostring(displayCombined, "#.#"),
+             text_color=displayCombined > 0 ?
+             #00C853 : #D50000,
+             text_size=size.small)
+        row += 1
+
+    // Agreement row
+    table.cell(info, 0, row, "Agreement",
+         text_color=#aaaacc,
+         text_size=size.small)
+    agreeStr = bullCount > bearCount ?
+         str.tostring(bullCount) + "/" +
+         str.tostring(activeCount) + " BULL" :
+         bearCount > bullCount ?
+         str.tostring(bearCount) + "/" +
+         str.tostring(activeCount) + " BEAR" :
+         "SPLIT"
+    agreeCol = bullCount == activeCount ?
+         #00C853 :
+         bearCount == activeCount ?
+         #D50000 :
+         bullCount > bearCount ? #69F0AE :
+         bearCount > bullCount ? #EF5350 :
+         #FFD700
+    table.cell(info, 1, row, agreeStr,
+         text_color=agreeCol,
+         text_size=size.small)
+
+// === ALERTS ===
+alertcondition(ta.crossover(displayCombined, 10),
+     "Strong Buy Signal",
+     "DSS combined forecast crossed above +10")
+alertcondition(ta.crossunder(displayCombined, -10),
+     "Strong Sell Signal",
+     "DSS combined forecast crossed below -10")
+alertcondition(ta.cross(displayCombined, 0.0),
+     "Neutral Crossover",
+     "DSS combined forecast crossed zero")
+alertcondition(bullCount == activeCount,
+     "Full Bull Agreement",
+     "All DSS timeframes bullish")
+alertcondition(bearCount == activeCount,
+     "Full Bear Agreement",
+     "All DSS timeframes bearish")

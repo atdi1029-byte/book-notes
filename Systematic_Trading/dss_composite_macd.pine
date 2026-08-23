@@ -1,0 +1,423 @@
+// DSS Composite MACD — Fibonacci Speed Ladder
+// Standard MACD architecture with DSS Fibonacci
+// periods: 5/13, 8/21, 13/34, 21/55.
+// Weighted composite of 4 histograms.
+// © alexbarnett
+//@version=6
+indicator("DSS Composite MACD", overlay=false)
+
+// === MACD PAIRS (Fibonacci periods) ===
+grpPairs = "MACD Pairs"
+show1 = input.bool(true,
+     "MACD 1: EMA 5/13 (scalp)",
+     group=grpPairs)
+show2 = input.bool(true,
+     "MACD 2: EMA 8/21 (swing)",
+     group=grpPairs)
+show3 = input.bool(true,
+     "MACD 3: EMA 13/34 (position)",
+     group=grpPairs)
+show4 = input.bool(true,
+     "MACD 4: EMA 21/55 (trend)",
+     group=grpPairs)
+
+// === SIGNAL ===
+grpSig = "Signal"
+sig1len = input.int(9, "Signal 1 (scalp)",
+     group=grpSig, minval=2, maxval=21)
+sig2len = input.int(9, "Signal 2 (swing)",
+     group=grpSig, minval=2, maxval=21)
+sig3len = input.int(9, "Signal 3 (position)",
+     group=grpSig, minval=2, maxval=21)
+sig4len = input.int(9, "Signal 4 (trend)",
+     group=grpSig, minval=2, maxval=21)
+
+// === WEIGHTS ===
+grpWt = "Weights (must sum to 100)"
+w1 = input.float(15, "Weight: Scalp (5/13)",
+     group=grpWt, minval=0, maxval=100)
+w2 = input.float(25, "Weight: Swing (8/21)",
+     group=grpWt, minval=0, maxval=100)
+w3 = input.float(30, "Weight: Position (13/34)",
+     group=grpWt, minval=0, maxval=100)
+w4 = input.float(30, "Weight: Trend (21/55)",
+     group=grpWt, minval=0, maxval=100)
+
+// === FILTERS ===
+grpFilt = "Filters"
+cooldown = input.int(10,
+     "Signal Cooldown (bars)",
+     group=grpFilt, minval=1)
+minAgreement = input.int(3,
+     "Min MACDs Agreeing (1-4)",
+     group=grpFilt, minval=1, maxval=4)
+zeroLookback = input.int(5,
+     "Zero-Line Lookback (bars)",
+     group=grpFilt, minval=1, maxval=20)
+momentumBars = input.int(2,
+     "Histogram Momentum Bars",
+     group=grpFilt, minval=1, maxval=5)
+
+// === VISUAL ===
+grpVis = "Visual"
+showComponents = input.bool(false,
+     "Show Individual Histograms",
+     group=grpVis)
+
+// === COMPUTE 4 MACDs ===
+[macd1, signal1, hist1] = ta.macd(close,
+     5, 13, sig1len)
+[macd2, signal2, hist2] = ta.macd(close,
+     8, 21, sig2len)
+[macd3, signal3, hist3] = ta.macd(close,
+     13, 34, sig3len)
+[macd4, signal4, hist4] = ta.macd(close,
+     21, 55, sig4len)
+
+// === WEIGHTED COMPOSITE ===
+totalW = (show1 ? w1 : 0) +
+     (show2 ? w2 : 0) +
+     (show3 ? w3 : 0) + (show4 ? w4 : 0)
+
+compHist = totalW > 0 ?
+     ((show1 ? hist1 * w1 : 0) +
+      (show2 ? hist2 * w2 : 0) +
+      (show3 ? hist3 * w3 : 0) +
+      (show4 ? hist4 * w4 : 0)) / totalW
+     : 0.0
+
+compMacd = totalW > 0 ?
+     ((show1 ? macd1 * w1 : 0) +
+      (show2 ? macd2 * w2 : 0) +
+      (show3 ? macd3 * w3 : 0) +
+      (show4 ? macd4 * w4 : 0)) / totalW
+     : 0.0
+
+compSig = totalW > 0 ?
+     ((show1 ? signal1 * w1 : 0) +
+      (show2 ? signal2 * w2 : 0) +
+      (show3 ? signal3 * w3 : 0) +
+      (show4 ? signal4 * w4 : 0)) / totalW
+     : 0.0
+
+// === AGREEMENT COUNT ===
+bullCount = (show1 and hist1 > 0 ? 1 : 0) +
+     (show2 and hist2 > 0 ? 1 : 0) +
+     (show3 and hist3 > 0 ? 1 : 0) +
+     (show4 and hist4 > 0 ? 1 : 0)
+bearCount = (show1 and hist1 < 0 ? 1 : 0) +
+     (show2 and hist2 < 0 ? 1 : 0) +
+     (show3 and hist3 < 0 ? 1 : 0) +
+     (show4 and hist4 < 0 ? 1 : 0)
+activeCount = (show1 ? 1 : 0) + (show2 ? 1 : 0) +
+     (show3 ? 1 : 0) + (show4 ? 1 : 0)
+
+// === HISTOGRAM COLOR BY AGREEMENT ===
+histColor = compHist >= 0 ?
+     (bullCount == activeCount ?
+     color.new(#00C853, 0) :
+     bullCount >= activeCount - 1 ?
+     color.new(#69F0AE, 0) :
+     color.new(#69F0AE, 60)) :
+     (bearCount == activeCount ?
+     color.new(#D50000, 0) :
+     bearCount >= activeCount - 1 ?
+     color.new(#EF5350, 0) :
+     color.new(#EF5350, 60))
+
+// === ZERO-LINE LOOKBACK ===
+wasBelowZero = ta.lowest(compMacd,
+     zeroLookback) < 0
+wasAboveZero = ta.highest(compMacd,
+     zeroLookback) > 0
+
+// === HISTOGRAM MOMENTUM ===
+bullMomentum = true
+bearMomentum = true
+for i = 0 to momentumBars - 2
+    bullMomentum := bullMomentum and
+         compHist[i] > compHist[i + 1]
+    bearMomentum := bearMomentum and
+         compHist[i] < compHist[i + 1]
+
+// === SIGNALS ===
+rawBull = ta.crossover(compMacd, compSig) and
+     wasBelowZero and
+     bullCount >= minAgreement
+rawBear = ta.crossunder(compMacd, compSig) and
+     wasAboveZero and
+     bearCount >= minAgreement
+
+bullConfirmed = rawBull and bullMomentum
+bearConfirmed = rawBear and bearMomentum
+
+// Pending momentum confirmation
+var bool pendingBull = false
+var bool pendingBear = false
+var int pendingBullAge = 0
+var int pendingBearAge = 0
+
+if rawBull and not bullMomentum
+    pendingBull := true
+    pendingBullAge := 0
+if rawBear and not bearMomentum
+    pendingBear := true
+    pendingBearAge := 0
+
+if pendingBull
+    pendingBullAge += 1
+    if bullMomentum and pendingBullAge <= 3
+        bullConfirmed := true
+        pendingBull := false
+    if pendingBullAge > 3
+        pendingBull := false
+
+if pendingBear
+    pendingBearAge += 1
+    if bearMomentum and pendingBearAge <= 3
+        bearConfirmed := true
+        pendingBear := false
+    if pendingBearAge > 3
+        pendingBear := false
+
+// Cooldown
+barsSinceBuy = ta.barssince(bullConfirmed[1])
+barsSinceSell = ta.barssince(bearConfirmed[1])
+bullCross = bullConfirmed and
+     (na(barsSinceBuy) or
+     barsSinceBuy >= cooldown)
+bearCross = bearConfirmed and
+     (na(barsSinceSell) or
+     barsSinceSell >= cooldown)
+
+// === PLOTTING ===
+plot(compHist, "Composite Histogram",
+     histColor, style=plot.style_columns)
+plot(compMacd, "Composite MACD",
+     color.aqua, 2)
+plot(compSig, "Composite Signal",
+     color.orange, 2)
+hline(0, "Zero", color.gray)
+
+// === SIGNAL MARKERS ===
+plotshape(bullCross, "Buy",
+     shape.triangleup, location.bottom,
+     color.new(#00C853, 0), size=size.tiny)
+plotshape(bearCross, "Sell",
+     shape.triangledown, location.top,
+     color.new(#D50000, 0), size=size.tiny)
+
+// === INDIVIDUAL HISTOGRAMS ===
+plot(showComponents and show1 ? hist1 : na,
+     "Scalp Hist (5/13)",
+     color.new(#FF6B6B, 60), 1)
+plot(showComponents and show2 ? hist2 : na,
+     "Swing Hist (8/21)",
+     color.new(#FFA07A, 60), 1)
+plot(showComponents and show3 ? hist3 : na,
+     "Position Hist (13/34)",
+     color.new(#87CEEB, 60), 1)
+plot(showComponents and show4 ? hist4 : na,
+     "Trend Hist (21/55)",
+     color.new(#DDA0DD, 60), 1)
+
+// === INFO TABLE ===
+var table info = table.new(position.top_right,
+     4, 8,
+     bgcolor=color.new(#1a1a2e, 10),
+     border_width=1,
+     border_color=color.new(#333355, 50))
+
+if barstate.islast
+    table.cell(info, 0, 0, "Pair",
+         text_color=#aaaacc,
+         text_size=size.small)
+    table.cell(info, 1, 0, "MACD",
+         text_color=#aaaacc,
+         text_size=size.small)
+    table.cell(info, 2, 0, "Hist",
+         text_color=#aaaacc,
+         text_size=size.small)
+    table.cell(info, 3, 0, "Vel",
+         text_color=#aaaacc,
+         text_size=size.small)
+
+    row = 1
+    if show1
+        h1vel = hist1 - hist1[2]
+        table.cell(info, 0, row, "5/13",
+             text_color=#FF6B6B,
+             text_size=size.small)
+        table.cell(info, 1, row,
+             str.tostring(macd1, "#.##"),
+             text_color=macd1 > 0 ?
+             #69F0AE : #EF5350,
+             text_size=size.small)
+        table.cell(info, 2, row,
+             str.tostring(hist1, "#.##"),
+             text_color=hist1 > 0 ?
+             #69F0AE : #EF5350,
+             text_size=size.small)
+        table.cell(info, 3, row,
+             (h1vel > 0 ? "+" : "") +
+             str.tostring(h1vel, "#.##"),
+             text_color=h1vel > 0 ?
+             #69F0AE : #EF5350,
+             text_size=size.small)
+        row += 1
+    if show2
+        h2vel = hist2 - hist2[2]
+        table.cell(info, 0, row, "8/21",
+             text_color=#FFA07A,
+             text_size=size.small)
+        table.cell(info, 1, row,
+             str.tostring(macd2, "#.##"),
+             text_color=macd2 > 0 ?
+             #69F0AE : #EF5350,
+             text_size=size.small)
+        table.cell(info, 2, row,
+             str.tostring(hist2, "#.##"),
+             text_color=hist2 > 0 ?
+             #69F0AE : #EF5350,
+             text_size=size.small)
+        table.cell(info, 3, row,
+             (h2vel > 0 ? "+" : "") +
+             str.tostring(h2vel, "#.##"),
+             text_color=h2vel > 0 ?
+             #69F0AE : #EF5350,
+             text_size=size.small)
+        row += 1
+    if show3
+        h3vel = hist3 - hist3[2]
+        table.cell(info, 0, row, "13/34",
+             text_color=#87CEEB,
+             text_size=size.small)
+        table.cell(info, 1, row,
+             str.tostring(macd3, "#.##"),
+             text_color=macd3 > 0 ?
+             #69F0AE : #EF5350,
+             text_size=size.small)
+        table.cell(info, 2, row,
+             str.tostring(hist3, "#.##"),
+             text_color=hist3 > 0 ?
+             #69F0AE : #EF5350,
+             text_size=size.small)
+        table.cell(info, 3, row,
+             (h3vel > 0 ? "+" : "") +
+             str.tostring(h3vel, "#.##"),
+             text_color=h3vel > 0 ?
+             #69F0AE : #EF5350,
+             text_size=size.small)
+        row += 1
+    if show4
+        h4vel = hist4 - hist4[2]
+        table.cell(info, 0, row, "21/55",
+             text_color=#DDA0DD,
+             text_size=size.small)
+        table.cell(info, 1, row,
+             str.tostring(macd4, "#.##"),
+             text_color=macd4 > 0 ?
+             #69F0AE : #EF5350,
+             text_size=size.small)
+        table.cell(info, 2, row,
+             str.tostring(hist4, "#.##"),
+             text_color=hist4 > 0 ?
+             #69F0AE : #EF5350,
+             text_size=size.small)
+        table.cell(info, 3, row,
+             (h4vel > 0 ? "+" : "") +
+             str.tostring(h4vel, "#.##"),
+             text_color=h4vel > 0 ?
+             #69F0AE : #EF5350,
+             text_size=size.small)
+        row += 1
+
+    // Composite row
+    compVel = compHist - compHist[2]
+    table.cell(info, 0, row, "COMP",
+         text_color=#ffffff,
+         text_size=size.small)
+    table.cell(info, 1, row,
+         str.tostring(compMacd, "#.##"),
+         text_color=compMacd > 0 ?
+         #00C853 : #D50000,
+         text_size=size.small)
+    table.cell(info, 2, row,
+         str.tostring(compHist, "#.##"),
+         text_color=compHist > 0 ?
+         #00C853 : #D50000,
+         text_size=size.small)
+    table.cell(info, 3, row,
+         (compVel > 0 ? "+" : "") +
+         str.tostring(compVel, "#.##"),
+         text_color=compVel > 0 ?
+         #69F0AE : #EF5350,
+         text_size=size.small)
+    row += 1
+
+    // Agreement
+    table.cell(info, 0, row, "Agree",
+         text_color=#aaaacc,
+         text_size=size.small)
+    agreeStr = bullCount > bearCount ?
+         str.tostring(bullCount) + "/" +
+         str.tostring(activeCount) + " BULL" :
+         bearCount > bullCount ?
+         str.tostring(bearCount) + "/" +
+         str.tostring(activeCount) + " BEAR" :
+         "SPLIT"
+    agreeCol = bullCount == activeCount ?
+         #00C853 :
+         bearCount == activeCount ?
+         #D50000 :
+         bullCount > bearCount ? #69F0AE :
+         bearCount > bullCount ? #EF5350 :
+         #FFD700
+    table.cell(info, 1, row, agreeStr,
+         text_color=agreeCol,
+         text_size=size.small)
+    sigTxt = bullCross ? "BUY" :
+         bearCross ? "SELL" : ""
+    sigCol = bullCross ? #00C853 :
+         bearCross ? #D50000 : #888888
+    table.cell(info, 2, row, sigTxt,
+         text_color=sigCol,
+         text_size=size.small)
+    table.cell(info, 3, row, "",
+         text_size=size.small)
+
+// === ALERTS ===
+rsi14 = ta.rsi(close, 14)
+tfString = timeframe.period == "1" ? "1m" :
+     timeframe.period == "5" ? "5m" :
+     timeframe.period == "15" ? "15m" :
+     timeframe.period == "60" ? "1h" :
+     timeframe.period == "240" ? "4h" :
+     timeframe.period == "D" ? "1d" :
+     timeframe.period == "W" ? "1w" :
+     timeframe.period
+
+if bullCross
+    alert('{"signal":"buy","symbol":"' +
+         syminfo.ticker +
+         '","entry":' +
+         str.tostring(close, "#.##") +
+         ',"rsi":' +
+         str.tostring(rsi14, "#.#") +
+         ',"timeframe":"' + tfString +
+         '","indicator":"dss_composite_macd"' +
+         ',"agree":' +
+         str.tostring(bullCount) + '}',
+         alert.freq_once_per_bar_close)
+if bearCross
+    alert('{"signal":"short","symbol":"' +
+         syminfo.ticker +
+         '","entry":' +
+         str.tostring(close, "#.##") +
+         ',"rsi":' +
+         str.tostring(rsi14, "#.#") +
+         ',"timeframe":"' + tfString +
+         '","indicator":"dss_composite_macd"' +
+         ',"agree":' +
+         str.tostring(bearCount) + '}',
+         alert.freq_once_per_bar_close)

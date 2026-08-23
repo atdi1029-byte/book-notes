@@ -1,0 +1,215 @@
+//@version=6
+indicator("Carver Trailing Stop — Volatility Units",
+     overlay=true, precision=2)
+
+// Trailing Stop from Robert Carver's "Systematic Trading"
+// Stop = X volatility units from extreme since entry
+// X=4 recommended: ~6.5 week avg hold, ~8 round trips/yr
+// Volatility = 25-day EWMA of daily std dev
+//
+// Long: stop at highest high since entry - (X × daily vol)
+// Short: stop at lowest low since entry + (X × daily vol)
+//
+// "Most markets exhibit trending behaviour, and a profit
+// target will get you out of trends too early."
+
+// === SETTINGS ===
+grpStop = "Trailing Stop"
+xParam = input.float(4.0, "X (Volatility Units)",
+     group=grpStop, minval=0.5, maxval=20.0, step=0.5,
+     tooltip="Carver recommends X=4 for spread bets. " +
+     "X=1: 4-day hold. X=2: 9-day. X=3: 17-day. " +
+     "X=4: 6.5 weeks. X=8: 13 weeks. X=10: 26 weeks.")
+
+grpDir = "Direction"
+dirChoice = input.string("Auto (EMA)",
+     "Trade Direction",
+     options=["Long Only", "Short Only",
+     "Auto (EMA)", "Auto (EWMAC)"],
+     group=grpDir,
+     tooltip="Auto uses EMA or EWMAC combined forecast " +
+     "to determine long vs short regime")
+autoEmaLen = input.int(50, "Auto EMA Length",
+     group=grpDir, minval=10, maxval=200)
+
+grpVol = "Volatility"
+volMethod = input.string("EWMA (Carver)",
+     "Volatility Method",
+     options=["EWMA (Carver)", "Simple StdDev"],
+     group=grpVol)
+volLen = input.int(25, "Lookback (days)",
+     group=grpVol, minval=5, maxval=100,
+     tooltip="Carver default: 25 business days. " +
+     "EWMA uses 36-day decay (equiv to 25-day SMA)")
+
+grpVis = "Visual"
+showCloud = input.bool(true, "Show Stop Cloud",
+     group=grpVis)
+showLabels = input.bool(true, "Show Stop-Hit Labels",
+     group=grpVis)
+
+// === DAILY VOLATILITY (in price points) ===
+dailyReturn = (close - close[1]) / close[1]
+
+// EWMA variance (Carver Appendix D)
+// Decay param A = 2/(L+1), L=36 gives A=0.054
+// Equivalent to 25-day simple MA of variance
+ewmaDecay = 2.0 / (36.0 + 1.0)
+var float ewmaVar = 0.0
+ewmaVar := ewmaDecay * math.pow(dailyReturn, 2) +
+     (1 - ewmaDecay) * nz(ewmaVar[1],
+     math.pow(dailyReturn, 2))
+ewmaVol = math.sqrt(ewmaVar)
+
+// Simple std dev alternative
+simpleVol = ta.stdev(dailyReturn, volLen)
+
+// Pick method — convert to price points
+pctVol = volMethod == "EWMA (Carver)" ?
+     ewmaVol : simpleVol
+dailyVolPrice = pctVol * close
+
+// Stop distance = X × daily volatility in price
+stopDist = xParam * dailyVolPrice
+
+// === DIRECTION DETECTION ===
+emaDir = ta.ema(close, autoEmaLen)
+
+// Simple EWMAC direction (16/64 crossover)
+ema16 = ta.ema(close, 16)
+ema64 = ta.ema(close, 64)
+
+isLong = switch dirChoice
+    "Long Only"     => true
+    "Short Only"    => false
+    "Auto (EMA)"    => close > emaDir
+    "Auto (EWMAC)"  => ema16 > ema64
+    => true
+
+// === TRAILING STOP TRACKING ===
+// Track extreme price since last direction change
+var float extremeHigh = high
+var float extremeLow  = low
+var bool  prevLong    = true
+var bool  stopHit     = false
+
+// Detect direction flip
+dirFlip = isLong != prevLong
+prevLong := isLong
+
+// Reset extremes on direction change
+if dirFlip
+    extremeHigh := high
+    extremeLow  := low
+    stopHit     := false
+
+// Update extremes
+if isLong
+    extremeHigh := math.max(extremeHigh, high)
+if not isLong
+    extremeLow := math.min(extremeLow, low)
+
+// Calculate stop levels
+longStop  = extremeHigh - stopDist
+shortStop = extremeLow  + stopDist
+
+// Active stop based on current direction
+activeStop = isLong ? longStop : shortStop
+
+// Detect stop hit
+longStopHit  = isLong and low <= longStop
+shortStopHit = not isLong and high >= shortStop
+newStopHit = (longStopHit or shortStopHit) and
+     not stopHit
+if newStopHit
+    stopHit := true
+
+// === PLOTS ===
+// Stop line
+stopColor = isLong ?
+     color.new(#00C853, 20) :
+     color.new(#FF1744, 20)
+plot(activeStop, "Trailing Stop", stopColor,
+     linewidth=2, style=plot.style_stepline)
+
+// Extreme tracking line (thin)
+plot(isLong ? extremeHigh : na,
+     "Extreme High", color.new(#00C853, 70),
+     linewidth=1, style=plot.style_stepline)
+plot(not isLong ? extremeLow : na,
+     "Extreme Low", color.new(#FF1744, 70),
+     linewidth=1, style=plot.style_stepline)
+
+// Stop cloud between price extreme and stop
+p1 = plot(isLong ? extremeHigh : extremeLow,
+     "Extreme", color.new(na, 100))
+p2 = plot(activeStop, "Stop",
+     color.new(na, 100))
+fill(p1, p2,
+     color=showCloud ?
+     (isLong ? color.new(#00C853, 90) :
+     color.new(#FF1744, 90)) : na)
+
+// Stop hit markers
+plotshape(showLabels and newStopHit and isLong ?
+     activeStop : na,
+     "Long Stop Hit", shape.xcross,
+     location.absolute, #FF1744,
+     size=size.small)
+plotshape(showLabels and newStopHit and not isLong ?
+     activeStop : na,
+     "Short Stop Hit", shape.xcross,
+     location.absolute, #00C853,
+     size=size.small)
+
+// === INFO TABLE ===
+var table info = table.new(position.top_right, 2, 5,
+     bgcolor=color.new(#1a1a2e, 10),
+     border_width=1,
+     border_color=color.new(#333355, 50))
+
+if barstate.islast
+    table.cell(info, 0, 0, "Direction",
+         text_color=#aaaacc, text_size=size.small)
+    table.cell(info, 1, 0,
+         isLong ? "LONG" : "SHORT",
+         text_color=isLong ? #00C853 : #FF1744,
+         text_size=size.small)
+
+    table.cell(info, 0, 1, "Stop",
+         text_color=#aaaacc, text_size=size.small)
+    table.cell(info, 1, 1,
+         str.tostring(activeStop, "#.##"),
+         text_color=stopColor, text_size=size.small)
+
+    // Distance to stop as % of price
+    stopPct = math.abs(close - activeStop) /
+         close * 100
+    table.cell(info, 0, 2, "Distance",
+         text_color=#aaaacc, text_size=size.small)
+    table.cell(info, 1, 2,
+         str.tostring(stopPct, "#.#") + "%",
+         text_color=#aaaacc, text_size=size.small)
+
+    table.cell(info, 0, 3, "Daily Vol",
+         text_color=#aaaacc, text_size=size.small)
+    table.cell(info, 1, 3,
+         str.tostring(pctVol * 100, "#.##") + "%",
+         text_color=#aaaacc, text_size=size.small)
+
+    table.cell(info, 0, 4, "X param",
+         text_color=#aaaacc, text_size=size.small)
+    table.cell(info, 1, 4,
+         str.tostring(xParam, "#.#"),
+         text_color=#aaaacc, text_size=size.small)
+
+// === ALERTS ===
+alertcondition(newStopHit and isLong,
+     "Long Stop Hit",
+     "Carver trailing stop hit on long position")
+alertcondition(newStopHit and not isLong,
+     "Short Stop Hit",
+     "Carver trailing stop hit on short position")
+alertcondition(dirFlip,
+     "Direction Flip",
+     "Trade direction changed (long/short)")

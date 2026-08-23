@@ -1,0 +1,250 @@
+//@version=6
+indicator("EWMAC Forecast — Carver System", overlay=false,
+     precision=2)
+
+// EWMAC (Exponentially Weighted Moving Average Crossover)
+// From Robert Carver's "Systematic Trading"
+// Fast/slow EMA pairs at fixed 4:1 ratio
+// Raw signal = (fast EMA - slow EMA) / price std dev
+// Scaled to expected absolute value of 10, capped ±20
+// Combined forecast = weighted average × diversification multiplier
+
+// === SETTINGS ===
+grpEW = "EWMAC Pairs"
+show1 = input.bool(true,  "EWMAC 2/8 (fastest)",
+     group=grpEW)
+show2 = input.bool(true,  "EWMAC 4/16",
+     group=grpEW)
+show3 = input.bool(true,  "EWMAC 8/32",
+     group=grpEW)
+show4 = input.bool(true,  "EWMAC 16/64",
+     group=grpEW)
+show5 = input.bool(true,  "EWMAC 32/128",
+     group=grpEW)
+show6 = input.bool(true,  "EWMAC 64/256 (slowest)",
+     group=grpEW)
+
+grpVol = "Volatility"
+volLen = input.int(25, "Std Dev Lookback (days)",
+     group=grpVol, minval=5, maxval=100,
+     tooltip="Carver default: 25 business days (5 weeks)")
+
+grpComb = "Combined Forecast"
+showCombined = input.bool(true, "Show Combined Forecast",
+     group=grpComb)
+divMultiplier = input.float(1.31, "Diversification Multiplier",
+     group=grpComb, minval=1.0, maxval=2.5, step=0.01,
+     tooltip="Carver default 1.31 for his 4-rule set. " +
+     "Max 2.5 to survive correlation spikes in crashes")
+
+grpWt = "Forecast Weights (must sum to 100)"
+w1 = input.float(10, "Weight: EWMAC 2/8",
+     group=grpWt, minval=0, maxval=100)
+w2 = input.float(15, "Weight: EWMAC 4/16",
+     group=grpWt, minval=0, maxval=100)
+w3 = input.float(15, "Weight: EWMAC 8/32",
+     group=grpWt, minval=0, maxval=100)
+w4 = input.float(21, "Weight: EWMAC 16/64",
+     group=grpWt, minval=0, maxval=100,
+     tooltip="Carver's own weight: 21%")
+w5 = input.float(8,  "Weight: EWMAC 32/128",
+     group=grpWt, minval=0, maxval=100,
+     tooltip="Carver's own weight: 8%")
+w6 = input.float(21, "Weight: EWMAC 64/256",
+     group=grpWt, minval=0, maxval=100,
+     tooltip="Carver's own weight: 21%")
+
+grpVis = "Visual"
+showIndividual = input.bool(false,
+     "Show Individual Forecasts",
+     group=grpVis)
+
+// === FORECAST SCALARS (from Appendix B, Table 49) ===
+// These normalize each timeframe so average |forecast| = 10
+scalar1 = 10.6   // EWMAC 2,8
+scalar2 = 7.5    // EWMAC 4,16
+scalar3 = 5.3    // EWMAC 8,32
+scalar4 = 3.75   // EWMAC 16,64
+scalar5 = 2.65   // EWMAC 32,128
+scalar6 = 1.87   // EWMAC 64,256
+
+// === PRICE VOLATILITY (25-day std dev of returns) ===
+returns = (close - close[1]) / close[1]
+priceVol = ta.stdev(returns, volLen)
+// Convert to price-point std dev for crossover division
+priceStdDev = priceVol * close
+
+// === EWMAC CALCULATION ===
+// Raw crossover = fast EMA - slow EMA
+// Divide by std dev of price changes (in price points)
+// Multiply by forecast scalar, cap at ±20
+
+ewmac(int fast, int slow, float scalar) =>
+    fastEma = ta.ema(close, fast)
+    slowEma = ta.ema(close, slow)
+    rawCross = fastEma - slowEma
+    // Avoid division by zero in dead markets
+    normalized = priceStdDev > 0 ?
+         rawCross / priceStdDev : 0.0
+    raw = normalized * scalar
+    // Cap at ±20 (Carver: only ~5% of forecasts affected)
+    math.max(-20.0, math.min(20.0, raw))
+
+// === INDIVIDUAL FORECASTS ===
+f1 = show1 ? ewmac(2,   8,   scalar1) : na
+f2 = show2 ? ewmac(4,   16,  scalar2) : na
+f3 = show3 ? ewmac(8,   32,  scalar3) : na
+f4 = show4 ? ewmac(16,  64,  scalar4) : na
+f5 = show5 ? ewmac(32,  128, scalar5) : na
+f6 = show6 ? ewmac(64,  256, scalar6) : na
+
+// === COMBINED FORECAST ===
+// Weighted average of active forecasts
+// Then multiply by diversification multiplier
+// Then cap again at ±20
+totalWeight = (show1 ? w1 : 0) + (show2 ? w2 : 0) +
+     (show3 ? w3 : 0) + (show4 ? w4 : 0) +
+     (show5 ? w5 : 0) + (show6 ? w6 : 0)
+
+weightedSum = (show1 ? f1 * w1 : 0) +
+     (show2 ? f2 * w2 : 0) +
+     (show3 ? f3 * w3 : 0) +
+     (show4 ? f4 * w4 : 0) +
+     (show5 ? f5 * w5 : 0) +
+     (show6 ? f6 * w6 : 0)
+
+rawCombined = totalWeight > 0 ?
+     weightedSum / totalWeight : 0.0
+scaledCombined = rawCombined * divMultiplier
+combined = math.max(-20.0,
+     math.min(20.0, scaledCombined))
+
+// === PLOT INDIVIDUAL FORECASTS ===
+plot(showIndividual and show1 ? f1 : na,
+     "EWMAC 2/8", color.new(#FF6B6B, 60),
+     linewidth=1)
+plot(showIndividual and show2 ? f2 : na,
+     "EWMAC 4/16", color.new(#FFA07A, 60),
+     linewidth=1)
+plot(showIndividual and show3 ? f3 : na,
+     "EWMAC 8/32", color.new(#FFD700, 60),
+     linewidth=1)
+plot(showIndividual and show4 ? f4 : na,
+     "EWMAC 16/64", color.new(#90EE90, 60),
+     linewidth=1)
+plot(showIndividual and show5 ? f5 : na,
+     "EWMAC 32/128", color.new(#87CEEB, 60),
+     linewidth=1)
+plot(showIndividual and show6 ? f6 : na,
+     "EWMAC 64/256", color.new(#DDA0DD, 60),
+     linewidth=1)
+
+// === PLOT COMBINED FORECAST ===
+combColor = combined > 10 ? #00C853 :
+     combined > 5  ? #69F0AE :
+     combined > 0  ? #B9F6CA :
+     combined > -5 ? #FFCDD2 :
+     combined > -10 ? #EF5350 :
+     #D50000
+
+plot(showCombined ? combined : na,
+     "Combined Forecast", combColor,
+     linewidth=3)
+
+// === REFERENCE LINES ===
+hline(20,  "Strong Buy Cap (+20)",
+     color.new(#00C853, 70), hline.style_dashed)
+hline(10,  "Average Buy (+10)",
+     color.new(#69F0AE, 70), hline.style_dotted)
+hline(0,   "Neutral",
+     color.new(#888888, 50), hline.style_solid)
+hline(-10, "Average Sell (-10)",
+     color.new(#EF5350, 70), hline.style_dotted)
+hline(-20, "Strong Sell Cap (-20)",
+     color.new(#D50000, 70), hline.style_dashed)
+
+// === BACKGROUND ZONES ===
+bgcolor(combined > 10 ? color.new(#00C853, 92) :
+     combined < -10 ? color.new(#D50000, 92) :
+     na)
+
+// === INFO TABLE ===
+var table info = table.new(position.top_right, 2, 8,
+     bgcolor=color.new(#1a1a2e, 10),
+     border_width=1,
+     border_color=color.new(#333355, 50))
+
+if barstate.islast
+    table.cell(info, 0, 0, "EWMAC",
+         text_color=#aaaacc, text_size=size.small)
+    table.cell(info, 1, 0, "Forecast",
+         text_color=#aaaacc, text_size=size.small)
+
+    row = 1
+    if show1
+        table.cell(info, 0, row, "2/8",
+             text_color=#FF6B6B, text_size=size.small)
+        table.cell(info, 1, row,
+             str.tostring(f1, "#.#"),
+             text_color=f1 > 0 ? #69F0AE : #EF5350,
+             text_size=size.small)
+        row += 1
+    if show2
+        table.cell(info, 0, row, "4/16",
+             text_color=#FFA07A, text_size=size.small)
+        table.cell(info, 1, row,
+             str.tostring(f2, "#.#"),
+             text_color=f2 > 0 ? #69F0AE : #EF5350,
+             text_size=size.small)
+        row += 1
+    if show3
+        table.cell(info, 0, row, "8/32",
+             text_color=#FFD700, text_size=size.small)
+        table.cell(info, 1, row,
+             str.tostring(f3, "#.#"),
+             text_color=f3 > 0 ? #69F0AE : #EF5350,
+             text_size=size.small)
+        row += 1
+    if show4
+        table.cell(info, 0, row, "16/64",
+             text_color=#90EE90, text_size=size.small)
+        table.cell(info, 1, row,
+             str.tostring(f4, "#.#"),
+             text_color=f4 > 0 ? #69F0AE : #EF5350,
+             text_size=size.small)
+        row += 1
+    if show5
+        table.cell(info, 0, row, "32/128",
+             text_color=#87CEEB, text_size=size.small)
+        table.cell(info, 1, row,
+             str.tostring(f5, "#.#"),
+             text_color=f5 > 0 ? #69F0AE : #EF5350,
+             text_size=size.small)
+        row += 1
+    if show6
+        table.cell(info, 0, row, "64/256",
+             text_color=#DDA0DD, text_size=size.small)
+        table.cell(info, 1, row,
+             str.tostring(f6, "#.#"),
+             text_color=f6 > 0 ? #69F0AE : #EF5350,
+             text_size=size.small)
+        row += 1
+
+    if showCombined
+        table.cell(info, 0, row, "COMBINED",
+             text_color=#ffffff, text_size=size.small)
+        table.cell(info, 1, row,
+             str.tostring(combined, "#.#"),
+             text_color=combined > 0 ? #00C853 : #D50000,
+             text_size=size.small)
+
+// === ALERTS ===
+alertcondition(ta.crossover(combined, 10),
+     "Strong Buy Signal",
+     "EWMAC combined forecast crossed above +10")
+alertcondition(ta.crossunder(combined, -10),
+     "Strong Sell Signal",
+     "EWMAC combined forecast crossed below -10")
+alertcondition(ta.cross(combined, 0.0),
+     "Neutral Crossover",
+     "EWMAC combined forecast crossed zero")

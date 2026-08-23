@@ -1,0 +1,242 @@
+//@version=6
+indicator("DSS Forecast MTF — Beta 1",
+     overlay=false, precision=2)
+
+// Cross-timeframe DSS Forecast
+// Runs all 6 DSS speeds on 4 timeframes
+// (4H, Daily, 3-Day, Weekly), combines with
+// Carver framework: weights, div multiplier,
+// cap ±20. Daily weighted heaviest.
+
+// === TIMEFRAME WEIGHTS ===
+grpTF = "Timeframe Weights (must sum to 100)"
+tf1 = input.timeframe("D", "TF 1", group=grpTF)
+tw1 = input.float(40, "Weight: TF 1 (Daily)",
+     group=grpTF, minval=0, maxval=100)
+tf2 = input.timeframe("3D", "TF 2", group=grpTF)
+tw2 = input.float(35, "Weight: TF 2 (3-Day)",
+     group=grpTF, minval=0, maxval=100)
+tf3 = input.timeframe("W", "TF 3", group=grpTF)
+tw3 = input.float(25, "Weight: TF 3 (Weekly)",
+     group=grpTF, minval=0, maxval=100)
+
+grpComb = "Combined Forecast"
+showCombined = input.bool(true,
+     "Show Combined Forecast", group=grpComb)
+divMultiplier = input.float(1.31,
+     "Diversification Multiplier",
+     group=grpComb, minval=1.0, maxval=2.5,
+     step=0.01)
+
+grpVis = "Visual"
+showTFlines = input.bool(false,
+     "Show Individual TF Forecasts",
+     group=grpVis)
+
+// === DSS BRESSERT ===
+dss_bressert(float src, int stochLen,
+     int emaLen) =>
+    hh = ta.highest(src, stochLen)
+    ll = ta.lowest(src, stochLen)
+    raw1 = hh != ll ?
+         (src - ll) / (hh - ll) * 100 : 50.0
+    smooth1 = ta.ema(raw1, emaLen)
+    hh2 = ta.highest(smooth1, stochLen)
+    ll2 = ta.lowest(smooth1, stochLen)
+    raw2 = hh2 != ll2 ?
+         (smooth1 - ll2) / (hh2 - ll2) * 100
+         : 50.0
+    ta.ema(raw2, emaLen)
+
+// === DSS FORECAST (0-100 → ±20) ===
+dss_fc(int stochLen, int emaLen) =>
+    dss = dss_bressert(close, stochLen, emaLen)
+    math.max(-20.0, math.min(20.0,
+         dss * 0.4 - 20.0))
+
+// === COMBINED FORECAST PER TIMEFRAME ===
+// Runs all 6 DSS speeds, weights them,
+// returns single combined value
+// Using same weights as v1:
+// 10/15/15/21/18/21
+combined_forecast() =>
+    f1 = dss_fc(5, 3)
+    f2 = dss_fc(8, 5)
+    f3 = dss_fc(13, 8)
+    f4 = dss_fc(21, 8)
+    f5 = dss_fc(34, 13)
+    f6 = dss_fc(55, 13)
+    ws = f1*10 + f2*15 + f3*15 +
+         f4*21 + f5*18 + f6*21
+    raw = ws / 100.0
+    math.max(-20.0, math.min(20.0, raw * 1.31))
+
+// === PULL FROM EACH TIMEFRAME ===
+c1 = request.security(syminfo.tickerid, tf1,
+     combined_forecast())
+c2 = request.security(syminfo.tickerid, tf2,
+     combined_forecast())
+c3 = request.security(syminfo.tickerid, tf3,
+     combined_forecast())
+
+// Smooth HTF staircases
+s1 = ta.ema(c1, 6)
+s2 = ta.ema(c2, 8)
+s3 = ta.ema(c3, 10)
+
+// === CROSS-TF COMBINED ===
+tfTotal = tw1 + tw2 + tw3
+tfWeighted = s1 * tw1 + s2 * tw2 +
+     s3 * tw3
+rawMTF = tfTotal > 0 ?
+     tfWeighted / tfTotal : 0.0
+mtfCombined = math.max(-20.0,
+     math.min(20.0, rawMTF * divMultiplier))
+
+// === PLOT INDIVIDUAL TF LINES ===
+plot(showTFlines ? s1 : na,
+     "Daily", color.new(#FFD700, 50),
+     linewidth=1)
+plot(showTFlines ? s2 : na,
+     "3-Day", color.new(#87CEEB, 50),
+     linewidth=1)
+plot(showTFlines ? s3 : na,
+     "Weekly", color.new(#DDA0DD, 50),
+     linewidth=1)
+
+// === PLOT COMBINED ===
+combColor = mtfCombined > 10 ? #D50000 :
+     mtfCombined > 5  ? #EF5350 :
+     mtfCombined > 0  ? #FFCDD2 :
+     mtfCombined > -5 ? #B9F6CA :
+     mtfCombined > -10 ? #69F0AE :
+     #00C853
+
+plot(showCombined ? mtfCombined : na,
+     "MTF Combined", combColor,
+     linewidth=3)
+
+// === REFERENCE LINES ===
+hline(20,  "Overbought Cap (+20)",
+     color.new(#D50000, 70), hline.style_dashed)
+hline(10,  "Overbought (+10)",
+     color.new(#EF5350, 70), hline.style_dotted)
+hline(0,   "Neutral",
+     color.new(#888888, 50), hline.style_solid)
+hline(-10, "Oversold (-10)",
+     color.new(#69F0AE, 70), hline.style_dotted)
+hline(-20, "Oversold Cap (-20)",
+     color.new(#00C853, 70), hline.style_dashed)
+
+// === BACKGROUND ZONES ===
+bgcolor(mtfCombined > 10 ?
+     color.new(#D50000, 92) :
+     mtfCombined < -10 ?
+     color.new(#00C853, 92) : na)
+
+// === AGREEMENT ===
+bullTF = (s1 > 0 ? 1 : 0) + (s2 > 0 ? 1 : 0) +
+     (s3 > 0 ? 1 : 0)
+bearTF = (s1 < 0 ? 1 : 0) + (s2 < 0 ? 1 : 0) +
+     (s3 < 0 ? 1 : 0)
+
+// === INFO TABLE ===
+var table info = table.new(position.top_right,
+     2, 7,
+     bgcolor=color.new(#1a1a2e, 10),
+     border_width=1,
+     border_color=color.new(#333355, 50))
+
+if barstate.islast
+    table.cell(info, 0, 0, "TF",
+         text_color=#aaaacc,
+         text_size=size.small)
+    table.cell(info, 1, 0, "Forecast",
+         text_color=#aaaacc,
+         text_size=size.small)
+
+    // Daily
+    table.cell(info, 0, 1, "Daily",
+         text_color=#FFD700,
+         text_size=size.small)
+    table.cell(info, 1, 1,
+         str.tostring(s1, "#.#"),
+         text_color=s1 > 0 ?
+         #69F0AE : #EF5350,
+         text_size=size.small)
+
+    // 3-Day
+    table.cell(info, 0, 2, "3-Day",
+         text_color=#87CEEB,
+         text_size=size.small)
+    table.cell(info, 1, 2,
+         str.tostring(s2, "#.#"),
+         text_color=s2 > 0 ?
+         #69F0AE : #EF5350,
+         text_size=size.small)
+
+    // Weekly
+    table.cell(info, 0, 3, "Weekly",
+         text_color=#DDA0DD,
+         text_size=size.small)
+    table.cell(info, 1, 3,
+         str.tostring(s3, "#.#"),
+         text_color=s3 > 0 ?
+         #69F0AE : #EF5350,
+         text_size=size.small)
+
+    // Combined
+    table.cell(info, 0, 4, "COMBINED",
+         text_color=#ffffff,
+         text_size=size.small)
+    table.cell(info, 1, 4,
+         str.tostring(mtfCombined, "#.#"),
+         text_color=mtfCombined > 0 ?
+         #00C853 : #D50000,
+         text_size=size.small)
+
+    // Agreement
+    table.cell(info, 0, 5, "Agreement",
+         text_color=#aaaacc,
+         text_size=size.small)
+    agreeStr = bullTF > bearTF ?
+         str.tostring(bullTF) + "/3 BULL" :
+         bearTF > bullTF ?
+         str.tostring(bearTF) + "/3 BEAR" :
+         "SPLIT"
+    agreeCol = bullTF == 3 ? #00C853 :
+         bearTF == 3 ? #D50000 :
+         bullTF > bearTF ? #69F0AE :
+         bearTF > bullTF ? #EF5350 :
+         #FFD700
+    table.cell(info, 1, 5, agreeStr,
+         text_color=agreeCol,
+         text_size=size.small)
+
+    // Weights reminder
+    table.cell(info, 0, 6, "Wt%",
+         text_color=#666666,
+         text_size=size.tiny)
+    table.cell(info, 1, 6,
+         str.tostring(tw1, "#") + "/" +
+         str.tostring(tw2, "#") + "/" +
+         str.tostring(tw3, "#"),
+         text_color=#666666,
+         text_size=size.tiny)
+
+// === ALERTS ===
+alertcondition(ta.crossover(mtfCombined, 10),
+     "Strong Buy",
+     "MTF forecast crossed above +10")
+alertcondition(ta.crossunder(mtfCombined, -10),
+     "Strong Sell",
+     "MTF forecast crossed below -10")
+alertcondition(ta.cross(mtfCombined, 0.0),
+     "Zero Cross",
+     "MTF forecast crossed zero")
+alertcondition(bullTF == 3,
+     "Full Bull",
+     "All 3 timeframes bullish")
+alertcondition(bearTF == 3,
+     "Full Bear",
+     "All 3 timeframes bearish")

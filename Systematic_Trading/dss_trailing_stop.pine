@@ -1,0 +1,259 @@
+//@version=6
+indicator("DSS Trailing Stop",
+     overlay=true, precision=2)
+
+// Both long & short trailing stops shown.
+// Stop distance adapts via DSS combined forecast:
+//   DSS extreme (±15-20) = tight stop (reversal likely)
+//   DSS near zero = wide stop (choppy, need room)
+// Base distance = X volatility units (Carver).
+
+// === STOP SETTINGS ===
+grpStop = "Trailing Stop"
+xBase = input.float(4.0, "X Base (Volatility Units)",
+     group=grpStop, minval=0.5, maxval=20.0,
+     step=0.5,
+     tooltip="Base distance. DSS will scale " +
+     "this down at extremes, up near zero.")
+xMin = input.float(2.5, "X Min (at DSS extreme)",
+     group=grpStop, minval=0.5, maxval=10.0,
+     step=0.5,
+     tooltip="Tightest stop when DSS is at " +
+     "±20 (max stretch)")
+xMax = input.float(5.5, "X Max (at DSS zero)",
+     group=grpStop, minval=1.0, maxval=20.0,
+     step=0.5,
+     tooltip="Widest stop when DSS is near " +
+     "zero (choppy, no conviction)")
+
+grpVol = "Volatility"
+volMethod = input.string("EWMA (Carver)",
+     "Volatility Method",
+     options=["EWMA (Carver)", "Simple StdDev"],
+     group=grpVol)
+volLookback = input.int(25, "Lookback (days)",
+     group=grpVol, minval=5, maxval=100)
+
+grpVis = "Visual"
+showLongStop = input.bool(true,
+     "Show Long Stop (below)", group=grpVis)
+showShortStop = input.bool(true,
+     "Show Short Stop (above)", group=grpVis)
+showCloud = input.bool(true,
+     "Show Stop Clouds", group=grpVis)
+showHitMarkers = input.bool(true,
+     "Show Stop-Hit Markers", group=grpVis)
+
+// === DSS SETTINGS ===
+grpDSS = "DSS Forecast"
+divMult = input.float(1.31,
+     "Diversification Multiplier",
+     group=grpDSS, minval=1.0, maxval=2.5,
+     step=0.01)
+w1 = input.float(10, "Wt 5/3",
+     group=grpDSS, minval=0, maxval=100)
+w2 = input.float(15, "Wt 8/5",
+     group=grpDSS, minval=0, maxval=100)
+w3 = input.float(15, "Wt 13/8",
+     group=grpDSS, minval=0, maxval=100)
+w4 = input.float(21, "Wt 21/8",
+     group=grpDSS, minval=0, maxval=100)
+w5 = input.float(18, "Wt 34/13",
+     group=grpDSS, minval=0, maxval=100)
+w6 = input.float(21, "Wt 55/13",
+     group=grpDSS, minval=0, maxval=100)
+
+// === DSS BRESSERT ===
+dss_bressert(float src, int stochLen,
+     int emaLen) =>
+    hh = ta.highest(src, stochLen)
+    ll = ta.lowest(src, stochLen)
+    raw1 = hh != ll ?
+         (src - ll) / (hh - ll) * 100 : 50.0
+    smooth1 = ta.ema(raw1, emaLen)
+    hh2 = ta.highest(smooth1, stochLen)
+    ll2 = ta.lowest(smooth1, stochLen)
+    raw2 = hh2 != ll2 ?
+         (smooth1 - ll2) / (hh2 - ll2) * 100
+         : 50.0
+    ta.ema(raw2, emaLen)
+
+dss_fc(int stochLen, int emaLen) =>
+    dss = dss_bressert(close, stochLen, emaLen)
+    math.max(-20.0, math.min(20.0,
+         dss * 0.4 - 20.0))
+
+f1 = dss_fc(5, 3)
+f2 = dss_fc(8, 5)
+f3 = dss_fc(13, 8)
+f4 = dss_fc(21, 8)
+f5 = dss_fc(34, 13)
+f6 = dss_fc(55, 13)
+
+totalWt = w1 + w2 + w3 + w4 + w5 + w6
+wSum = f1*w1 + f2*w2 + f3*w3 +
+     f4*w4 + f5*w5 + f6*w6
+rawComb = totalWt > 0 ? wSum / totalWt : 0.0
+combined = math.max(-20.0, math.min(20.0,
+     rawComb * divMult))
+
+// === DYNAMIC X FROM DSS ===
+// |combined| ranges 0 to 20
+// 0 = no conviction → xMax (wide stop)
+// 20 = max stretch → xMin (tight stop)
+dssAbs = math.abs(combined)
+xDynamic = xMax - (xMax - xMin) * (dssAbs / 20.0)
+
+// === DAILY VOLATILITY ===
+dailyReturn = (close - close[1]) / close[1]
+
+ewmaDecay = 2.0 / (36.0 + 1.0)
+var float ewmaVar = 0.0
+ewmaVar := ewmaDecay * math.pow(dailyReturn, 2) +
+     (1 - ewmaDecay) * nz(ewmaVar[1],
+     math.pow(dailyReturn, 2))
+ewmaVol = math.sqrt(ewmaVar)
+
+simpleVol = ta.stdev(dailyReturn, volLookback)
+
+pctVol = volMethod == "EWMA (Carver)" ?
+     ewmaVol : simpleVol
+dailyVolPrice = pctVol * close
+
+stopDist = xDynamic * dailyVolPrice
+
+// === LONG STOP (trails below price) ===
+var float longExtreme = high
+longExtreme := math.max(longExtreme, high)
+longStop = longExtreme - stopDist
+
+longHit = low <= longStop
+if longHit
+    longExtreme := high
+
+// === SHORT STOP (trails above price) ===
+var float shortExtreme = low
+shortExtreme := math.min(shortExtreme, low)
+shortStop = shortExtreme + stopDist
+
+shortHit = high >= shortStop
+if shortHit
+    shortExtreme := low
+
+// === PLOTS ===
+plot(showLongStop ? longStop : na,
+     "Long Stop", color.new(#00C853, 20),
+     linewidth=2, style=plot.style_stepline)
+
+plot(showShortStop ? shortStop : na,
+     "Short Stop", color.new(#FF1744, 20),
+     linewidth=2, style=plot.style_stepline)
+
+// Clouds
+pLongExt = plot(showLongStop and showCloud ?
+     longExtreme : na,
+     "Long Extreme", color.new(na, 100))
+pLongStop = plot(showLongStop and showCloud ?
+     longStop : na,
+     "Long Stop Fill", color.new(na, 100))
+fill(pLongExt, pLongStop,
+     color=showCloud ?
+     color.new(#00C853, 96) : na)
+
+pShortExt = plot(showShortStop and showCloud ?
+     shortExtreme : na,
+     "Short Extreme", color.new(na, 100))
+pShortStop = plot(showShortStop and showCloud ?
+     shortStop : na,
+     "Short Stop Fill", color.new(na, 100))
+fill(pShortExt, pShortStop,
+     color=showCloud ?
+     color.new(#FF1744, 96) : na)
+
+// Stop hit markers
+plotshape(showHitMarkers and longHit ?
+     longStop : na,
+     "Long Stop Hit", shape.xcross,
+     location.absolute, #FF1744,
+     size=size.small)
+plotshape(showHitMarkers and shortHit ?
+     shortStop : na,
+     "Short Stop Hit", shape.xcross,
+     location.absolute, #00C853,
+     size=size.small)
+
+// === INFO TABLE ===
+var table info = table.new(position.top_right,
+     2, 6,
+     bgcolor=color.new(#1a1a2e, 10),
+     border_width=1,
+     border_color=color.new(#333355, 50))
+
+if barstate.islast
+    longPct = math.abs(close - longStop) /
+         close * 100
+    shortPct = math.abs(shortStop - close) /
+         close * 100
+
+    table.cell(info, 0, 0, "Long SL",
+         text_color=#00C853,
+         text_size=size.small)
+    table.cell(info, 1, 0,
+         str.tostring(longStop, "#.##"),
+         text_color=#00C853,
+         text_size=size.small)
+
+    table.cell(info, 0, 1, "Short SL",
+         text_color=#FF1744,
+         text_size=size.small)
+    table.cell(info, 1, 1,
+         str.tostring(shortStop, "#.##"),
+         text_color=#FF1744,
+         text_size=size.small)
+
+    table.cell(info, 0, 2, "DSS FC",
+         text_color=#aaaacc,
+         text_size=size.small)
+    table.cell(info, 1, 2,
+         (combined > 0 ? "+" : "") +
+         str.tostring(combined, "#.#"),
+         text_color=combined > 0 ?
+         #EF5350 : #69F0AE,
+         text_size=size.small)
+
+    table.cell(info, 0, 3, "X now",
+         text_color=#aaaacc,
+         text_size=size.small)
+    table.cell(info, 1, 3,
+         str.tostring(xDynamic, "#.#"),
+         text_color=xDynamic <= xMin + 0.5 ?
+         #FFD740 :
+         xDynamic >= xMax - 0.5 ?
+         #69F0AE : #aaaacc,
+         text_size=size.small)
+
+    table.cell(info, 0, 4, "Daily Vol",
+         text_color=#aaaacc,
+         text_size=size.small)
+    table.cell(info, 1, 4,
+         str.tostring(pctVol * 100, "#.##") + "%",
+         text_color=#aaaacc,
+         text_size=size.small)
+
+    // Stop distances
+    table.cell(info, 0, 5, "Dist",
+         text_color=#aaaacc,
+         text_size=size.small)
+    table.cell(info, 1, 5,
+         str.tostring(longPct, "#.#") + "% / " +
+         str.tostring(shortPct, "#.#") + "%",
+         text_color=#aaaacc,
+         text_size=size.small)
+
+// === ALERTS ===
+alertcondition(longHit,
+     "Long Stop Hit",
+     "Price hit long trailing stop")
+alertcondition(shortHit,
+     "Short Stop Hit",
+     "Price hit short trailing stop")
