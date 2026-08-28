@@ -44,6 +44,40 @@
   font-size: 0.85rem;
   margin-right: 0.3rem;
   font-family: 'Courier New', monospace;
+  cursor: pointer;
+  position: relative;
+}
+.ticker:hover { background: #5a7e7a; }
+.ticker-tip {
+  position: fixed;
+  background: #2a1f14;
+  color: #e8dcc8;
+  border: 1px solid #c5a55a;
+  border-radius: 8px;
+  padding: 0.8rem 1rem;
+  font-size: 0.85rem;
+  font-family: Georgia, serif;
+  font-weight: 400;
+  line-height: 1.5;
+  max-width: 340px;
+  z-index: 9999;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+.ticker-tip.show { opacity: 1; }
+.ticker-tip .tip-name {
+  color: #c5a55a;
+  font-weight: 700;
+  font-size: 0.9rem;
+  margin-bottom: 0.3rem;
+}
+.ticker-tip .tip-meta {
+  color: #8a7a60;
+  font-size: 0.78rem;
+  font-style: italic;
+  margin-bottom: 0.3rem;
 }
 .asset-card {
   background: #e8e0d0;
@@ -3883,6 +3917,243 @@ ETF-Based, Numbers-First</p>
 
 <script>var BM_KEY = 'bm_portfolio_playbook';</script>
 <script src="../book.js"></script>
+<script>
+(function() {
+  var G = {
+    VTI: {
+      name: 'Vanguard Total Stock Market ETF',
+      meta: 'ER: 0.03% · ~4,000 holdings',
+      desc: 'The entire US stock market in one fund. Large, mid, and small cap. Market-cap weighted, so ~75% large cap. The default "own everything" equity position.'
+    },
+    VOO: {
+      name: 'Vanguard S&P 500 ETF',
+      meta: 'ER: 0.03% · ~503 holdings',
+      desc: 'Tracks the S&P 500 — 500 large-cap US companies. Nearly identical to SPY but cheaper. Missing mid and small caps that VTI includes.'
+    },
+    SPY: {
+      name: 'SPDR S&P 500 ETF Trust',
+      meta: 'ER: 0.0945% · ~503 holdings',
+      desc: 'The most traded ETF on Earth. Tracks the S&P 500. Higher expense ratio than VOO but deepest options market and tightest spreads.'
+    },
+    QQQ: {
+      name: 'Invesco QQQ Trust (Nasdaq-100)',
+      meta: 'ER: 0.20% · ~101 holdings',
+      desc: 'The 100 largest non-financial Nasdaq stocks. Heavily tech-weighted — Apple, Microsoft, Nvidia, Amazon, Meta dominate. A growth/tech bet.'
+    },
+    VBR: {
+      name: 'Vanguard Small-Cap Value ETF',
+      meta: 'ER: 0.07% · ~850 holdings',
+      desc: 'Small-cap US stocks with value characteristics. Targets the Fama-French small-cap value premium — historically the highest-returning equity segment at 13.6% annualized.'
+    },
+    AVUV: {
+      name: 'Avantis US Small Cap Value ETF',
+      meta: 'ER: 0.25% · ~750 holdings',
+      desc: 'Actively managed small-cap value fund by Avantis (Dimensional alumni). More aggressive value tilt than VBR. Higher expense ratio but potentially better factor capture.'
+    },
+    VXUS: {
+      name: 'Vanguard Total International Stock ETF',
+      meta: 'ER: 0.07% · ~8,500 holdings',
+      desc: 'Every non-US stock market in one fund. Developed + emerging markets. ~75% developed (Europe, Japan, UK), ~25% emerging (China, India, Taiwan).'
+    },
+    VEA: {
+      name: 'Vanguard FTSE Developed Markets ETF',
+      meta: 'ER: 0.05% · ~4,000 holdings',
+      desc: 'Developed international markets only — Europe, Japan, Australia, Canada. No emerging markets. Lower volatility than VXUS.'
+    },
+    VWO: {
+      name: 'Vanguard FTSE Emerging Markets ETF',
+      meta: 'ER: 0.08% · ~5,800 holdings',
+      desc: 'Emerging markets only — China, India, Taiwan, Brazil, South Africa. Higher growth potential but higher volatility and political risk. Max drawdown: -65%.'
+    },
+    BND: {
+      name: 'Vanguard Total Bond Market ETF',
+      meta: 'ER: 0.03% · Duration: ~6 years',
+      desc: 'The entire US investment-grade bond market. Treasuries, corporates, mortgage-backed. Intermediate duration. The default bond holding for most portfolios.'
+    },
+    AGG: {
+      name: 'iShares Core US Aggregate Bond ETF',
+      meta: 'ER: 0.03% · Duration: ~6 years',
+      desc: 'Nearly identical to BND — tracks the same Bloomberg US Aggregate index. Pick whichever your brokerage favors.'
+    },
+    IEF: {
+      name: 'iShares 7-10 Year Treasury Bond ETF',
+      meta: 'ER: 0.15% · Duration: ~7.5 years',
+      desc: 'Intermediate-term US Treasury bonds only. No corporate bonds. Pure government credit risk. Good recession hedge — rallies when the Fed cuts rates.'
+    },
+    IEI: {
+      name: 'iShares 3-7 Year Treasury Bond ETF',
+      meta: 'ER: 0.15% · Duration: ~4.5 years',
+      desc: 'Short-to-intermediate Treasury bonds. Less rate-sensitive than IEF. Used in the All-Weather portfolio for moderate duration exposure.'
+    },
+    TLT: {
+      name: 'iShares 20+ Year Treasury Bond ETF',
+      meta: 'ER: 0.15% · Duration: ~17 years',
+      desc: 'Long-term Treasury bonds. Extremely rate-sensitive — gains ~17% for every 1% rate cut, loses ~17% for every 1% rate hike. Lost 29% in 2022. Gained ~20% in 2008. High-octane recession hedge.'
+    },
+    VGIT: {
+      name: 'Vanguard Intermediate-Term Treasury ETF',
+      meta: 'ER: 0.04% · Duration: ~5.5 years',
+      desc: 'Intermediate Treasury bonds. Cheaper alternative to IEF. Same role — moderate rate sensitivity, pure government credit.'
+    },
+    VGLT: {
+      name: 'Vanguard Long-Term Treasury ETF',
+      meta: 'ER: 0.04% · Duration: ~16 years',
+      desc: 'Long-term Treasuries. Cheaper alternative to TLT. Same extreme rate sensitivity.'
+    },
+    VGSH: {
+      name: 'Vanguard Short-Term Treasury ETF',
+      meta: 'ER: 0.04% · Duration: ~2 years',
+      desc: 'Short-term Treasuries. Very low rate sensitivity. Cash-like stability with some yield. Near-zero price risk.'
+    },
+    EDV: {
+      name: 'Vanguard Extended Duration Treasury ETF',
+      meta: 'ER: 0.06% · Duration: ~24 years',
+      desc: 'Ultra-long Treasury STRIPS (zero-coupon). Even more rate-sensitive than TLT. Maximum duration bet — for aggressive barbell strategies only.'
+    },
+    SHY: {
+      name: 'iShares 1-3 Year Treasury Bond ETF',
+      meta: 'ER: 0.15% · Duration: ~1.8 years',
+      desc: 'Very short-term Treasuries. Barely moves with rate changes. Used in balanced portfolios (Golden Butterfly) as a stable cash-like anchor.'
+    },
+    SHV: {
+      name: 'iShares Short Treasury Bond ETF',
+      meta: 'ER: 0.15% · Duration: <1 year',
+      desc: 'Ultra-short Treasuries — essentially a parking lot for cash. Yields roughly the Fed funds rate. Zero meaningful price risk.'
+    },
+    SCHP: {
+      name: 'Schwab US TIPS ETF',
+      meta: 'ER: 0.03% · Inflation-linked',
+      desc: 'Treasury Inflation-Protected Securities. Principal adjusts with CPI, guaranteeing a real return. Protects against inflation but NOT against rate hikes (lost 12% in 2022). Best in tax-advantaged accounts due to phantom income.'
+    },
+    TIP: {
+      name: 'iShares TIPS Bond ETF',
+      meta: 'ER: 0.19% · Inflation-linked',
+      desc: 'Same as SCHP — TIPS exposure. Higher expense ratio. SCHP is the cheaper option.'
+    },
+    GLD: {
+      name: 'SPDR Gold Shares',
+      meta: 'ER: 0.40% · Physical gold-backed',
+      desc: 'Physically-backed gold ETF. Each share represents ~1/10 oz of gold held in vaults. Correlation with stocks: 0.004 (near zero). The original gold ETF — most liquid, but higher fee than IAU.'
+    },
+    IAU: {
+      name: 'iShares Gold Trust',
+      meta: 'ER: 0.25% · Physical gold-backed',
+      desc: 'Physically-backed gold ETF. Same exposure as GLD but cheaper expense ratio. Slightly less liquid than GLD. Preferred for long-term portfolio holdings.'
+    },
+    PDBC: {
+      name: 'Invesco Optimum Yield Diversified Commodity ETN',
+      meta: 'ER: 0.59% · 14 commodities',
+      desc: 'Actively managed broad commodity fund — oil, gas, gold, agriculture, metals. 10-year return: 9.16%. Correlation with stocks: -0.06. Correlation with bonds: -0.27. The best broad commodity option.'
+    },
+    DJP: {
+      name: 'iPath Bloomberg Commodity Index ETN',
+      meta: 'ER: 0.70% · Broad commodities',
+      desc: 'Passively managed broad commodity exposure. Similar to PDBC (correlation: 0.86) but slightly lower returns. Pick PDBC over DJP.'
+    },
+    VNQ: {
+      name: 'Vanguard Real Estate ETF',
+      meta: 'ER: 0.12% · ~160 REITs',
+      desc: 'US Real Estate Investment Trusts. Correlation with stocks: 0.56-0.75 — high, NOT a great diversifier. Max drawdown: -68%. Crashes harder than stocks in bad markets. Distributions taxed as ordinary income.'
+    },
+    SCHH: {
+      name: 'Schwab US REIT ETF',
+      meta: 'ER: 0.07% · ~120 REITs',
+      desc: 'Cheaper alternative to VNQ. Same high correlation with stocks, same drawdown risk. Slightly different index methodology.'
+    },
+    DBMF: {
+      name: 'iMGP DBi Managed Futures Strategy ETF',
+      meta: 'ER: 0.85% · Trend-following',
+      desc: 'Replicates the returns of top managed futures hedge funds using trend-following across stocks, bonds, currencies, and commodities. Correlation with stocks: -0.26. Returned +21.5% in 2022 when everything else fell. The best crisis alpha tool available to retail investors.'
+    },
+    CTA: {
+      name: 'Simplify Managed Futures Strategy ETF',
+      meta: 'ER: 0.75% · Trend-following',
+      desc: 'Alternative to DBMF — similar managed futures strategy. Systematically follows trends across multiple asset classes for crisis alpha.'
+    },
+    ITOT: {
+      name: 'iShares Core S&P Total US Stock Market ETF',
+      meta: 'ER: 0.03% · ~3,500 holdings',
+      desc: 'iShares version of VTI. Total US stock market. Nearly identical performance. Pick whichever your brokerage favors.'
+    },
+    IXUS: {
+      name: 'iShares Core MSCI Total Intl Stock ETF',
+      meta: 'ER: 0.07% · ~4,400 holdings',
+      desc: 'iShares version of VXUS. Total international stocks. Nearly identical performance.'
+    },
+    IEMG: {
+      name: 'iShares Core MSCI Emerging Markets ETF',
+      meta: 'ER: 0.09% · ~2,800 holdings',
+      desc: 'iShares version of VWO. Emerging markets. Slightly different index (includes South Korea, which VWO excludes).'
+    },
+    VTV: {
+      name: 'Vanguard Value ETF',
+      meta: 'ER: 0.04% · ~340 holdings',
+      desc: 'Large-cap US value stocks. Targets the value premium — cheap stocks by P/E, P/B, dividend yield. Value has outperformed growth by +2-5% annually long-term but had a brutal drought from 2008-2025.'
+    },
+    VLUE: {
+      name: 'iShares MSCI USA Value Factor ETF',
+      meta: 'ER: 0.15% · ~150 holdings',
+      desc: 'Factor-based value ETF. More concentrated value exposure than VTV. Uses MSCI enhanced value methodology.'
+    },
+    MTUM: {
+      name: 'iShares MSCI USA Momentum Factor ETF',
+      meta: 'ER: 0.15% · ~125 holdings',
+      desc: 'Momentum factor ETF — holds stocks with the strongest recent price trends. Momentum has the strongest historical premium (+7-8%) but suffers sudden crashes when trends reverse.'
+    },
+    QUAL: {
+      name: 'iShares MSCI USA Quality Factor ETF',
+      meta: 'ER: 0.15% · ~125 holdings',
+      desc: 'Quality factor ETF — high ROE, stable earnings, low debt. Quality premium: +3.1% with 24% less volatility than the market. The most stable factor.'
+    },
+    USMV: {
+      name: 'iShares MSCI USA Min Volatility Factor ETF',
+      meta: 'ER: 0.15% · ~175 holdings',
+      desc: 'Low-volatility factor ETF. Holds stocks with the lowest historical volatility. Lower beta, smaller drawdowns. Modest return premium of +1-2% with ~30% less risk.'
+    },
+    SWVXX: {
+      name: 'Schwab Value Advantage Money Fund',
+      meta: 'Money market fund',
+      desc: 'Schwab\'s prime money market fund. Yields roughly the Fed funds rate. Zero price risk. Park cash here instead of leaving it uninvested in your brokerage settlement account.'
+    },
+    VMFXX: {
+      name: 'Vanguard Federal Money Market Fund',
+      meta: 'Money market fund',
+      desc: 'Vanguard\'s default money market fund. Government-only holdings (no corporate paper). Yields close to Fed funds rate. The safe place for cash at Vanguard.'
+    }
+  };
+  var tip = document.createElement('div');
+  tip.className = 'ticker-tip';
+  document.body.appendChild(tip);
+  var showing = false;
+  document.addEventListener('click', function(e) {
+    var el = e.target.closest('.ticker');
+    if (!el) { tip.classList.remove('show'); showing = false; return; }
+    var sym = el.textContent.trim();
+    var d = G[sym];
+    if (!d) { tip.classList.remove('show'); showing = false; return; }
+    e.preventDefault();
+    e.stopPropagation();
+    tip.innerHTML =
+      '<div class="tip-name">' + sym + ' — ' + d.name + '</div>' +
+      '<div class="tip-meta">' + d.meta + '</div>' +
+      '<div>' + d.desc + '</div>';
+    tip.classList.add('show');
+    var r = el.getBoundingClientRect();
+    var tw = 340;
+    var left = r.left + r.width / 2 - tw / 2;
+    if (left < 8) left = 8;
+    if (left + tw > window.innerWidth - 8)
+      left = window.innerWidth - tw - 8;
+    var top = r.bottom + 8;
+    if (top + tip.offsetHeight > window.innerHeight - 8)
+      top = r.top - tip.offsetHeight - 8;
+    tip.style.left = left + 'px';
+    tip.style.top = top + 'px';
+    tip.style.width = tw + 'px';
+    showing = true;
+  });
+})();
+</script>
 
 </body>
 </html>
