@@ -1,0 +1,3458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"
+  content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style"
+  content="black-translucent">
+<meta name="theme-color" content="#f4efe8">
+<title>The Income Architect</title>
+<link rel="stylesheet" href="../book.css?v=8">
+<style>
+.alloc-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.2rem 0;
+  font-size: 0.92rem;
+}
+.alloc-table th {
+  background: #5a3e1a;
+  color: #f4efe8;
+  padding: 0.5rem 0.8rem;
+  text-align: left;
+  font-weight: 600;
+}
+.alloc-table td {
+  padding: 0.5rem 0.8rem;
+  border-bottom: 1px solid #d4c8b0;
+}
+.alloc-table tr:nth-child(even) td {
+  background: #ede7da;
+}
+.alloc-table tr:hover td {
+  background: #e0ece9;
+}
+.ticker {
+  display: inline-block;
+  background: #6b8f8b;
+  color: #fff;
+  font-weight: 700;
+  padding: 0.1rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  margin-right: 0.3rem;
+  font-family: 'Courier New', monospace;
+  cursor: pointer;
+  position: relative;
+}
+.ticker:hover { background: #5a7e7a; }
+.ticker-tip {
+  position: fixed;
+  background: #2a1f14;
+  color: #e8dcc8;
+  border: 1px solid #c5a55a;
+  border-radius: 8px;
+  padding: 0.8rem 1rem;
+  font-size: 0.85rem;
+  font-family: Georgia, serif;
+  font-weight: 400;
+  line-height: 1.5;
+  max-width: 340px;
+  z-index: 9999;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+.ticker-tip.show { opacity: 1; }
+.ticker-tip .tip-name {
+  color: #c5a55a;
+  font-weight: 700;
+  font-size: 0.9rem;
+  margin-bottom: 0.3rem;
+}
+.ticker-tip .tip-meta {
+  color: #8a7a60;
+  font-size: 0.78rem;
+  font-style: italic;
+  margin-bottom: 0.3rem;
+}
+.income-card {
+  background: #e8e0d0;
+  border: 1px solid #d4c8b0;
+  border-radius: 8px;
+  padding: 1.25rem 1.5rem;
+  margin: 1.5rem 0;
+}
+.income-card h4 {
+  margin-top: 0;
+  color: #5a3e1a;
+  font-size: 1.15rem;
+  margin-bottom: 0.4rem;
+}
+.income-card .meta-line {
+  font-size: 0.85rem;
+  color: #8a7a60;
+  margin-bottom: 0.6rem;
+  font-style: italic;
+}
+.income-card p { margin-bottom: 0.5rem; }
+.income-card p:last-child { margin-bottom: 0; }
+.yield-box {
+  background: #e0ece9;
+  border-left: 4px solid #6b8f8b;
+  padding: 1.25rem 1.5rem;
+  border-radius: 0 6px 6px 0;
+  margin: 1.5rem 0;
+}
+.yield-box p { margin-bottom: 0.5rem; }
+.yield-box p:last-child { margin-bottom: 0; }
+.trap-box {
+  background: #f0e0d0;
+  border-left: 4px solid #8b4513;
+  padding: 1.25rem 1.5rem;
+  border-radius: 0 6px 6px 0;
+  margin: 1.5rem 0;
+}
+.trap-box p { margin-bottom: 0.5rem; }
+.trap-box p:last-child { margin-bottom: 0; }
+.connection-box {
+  background: #ede7da;
+  border: 1px dashed #c5a55a;
+  padding: 1.25rem 1.5rem;
+  border-radius: 0 6px 6px 0;
+  margin: 1.5rem 0;
+}
+.connection-box p { margin-bottom: 0.5rem; }
+.connection-box p:last-child { margin-bottom: 0; }
+.connection-box strong { color: #7a6530; }
+.danger {
+  color: #8b4513;
+  font-weight: 600;
+}
+.safe {
+  color: #4a7872;
+  font-weight: 600;
+}
+.number {
+  color: #5a3e1a;
+  font-weight: 700;
+  font-family: 'Courier New', monospace;
+}
+</style>
+</head>
+<body>
+
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar"
+  style="display:none" onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+    onclick="event.stopPropagation();clearBookmark()">
+    Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+
+<h1>The Income Architect</h1>
+<p class="subtitle">
+How to Build a Portfolio That Pays You &mdash;
+Dividends, Bonds, REITs, Options Income,
+and the Art of Sustainable Cash Flow</p>
+
+<hr>
+
+<nav class="toc">
+<h2>Contents</h2>
+<ol>
+  <li><a href="#ch1">Why Income Investing</a>
+    &mdash; the psychology of cash flow
+    vs total return</li>
+  <li><a href="#ch2">The Income Menu</a>
+    &mdash; every source of portfolio income
+    at a glance
+    <ol>
+      <li><a href="#ch2-dividends">Dividends</a></li>
+      <li><a href="#ch2-bonds">Bond Interest</a></li>
+      <li><a href="#ch2-reits">REIT Distributions</a></li>
+      <li><a href="#ch2-mlps">MLP Distributions</a></li>
+      <li><a href="#ch2-preferreds">Preferred Dividends</a></li>
+      <li><a href="#ch2-options">Options Premiums</a></li>
+      <li><a href="#ch2-cefs">CEF Distributions</a></li>
+    </ol>
+  </li>
+  <li><a href="#ch3">Dividend Stocks</a>
+    &mdash; aristocrats, kings, yield traps,
+    payout ratios, and sector patterns</li>
+  <li><a href="#ch4">Bond Ladders &amp; Fixed Income</a>
+    &mdash; Treasuries, corporates, munis,
+    building a maturity ladder</li>
+  <li><a href="#ch5">REITs</a>
+    &mdash; property types, tax treatment,
+    the diversification myth</li>
+  <li><a href="#ch6">MLPs &amp; Energy Income</a>
+    &mdash; structure, K-1 headaches,
+    and when the yield is real</li>
+  <li><a href="#ch7">Preferred Shares</a>
+    &mdash; the bond-stock hybrid nobody
+    talks about</li>
+  <li><a href="#ch8">Covered Calls &amp; Options Income</a>
+    &mdash; selling volatility for cash,
+    JEPI, QYLD, and rolling your own</li>
+  <li><a href="#ch9">Closed-End Funds</a>
+    &mdash; leverage, discounts, return of capital,
+    and the hidden traps</li>
+  <li><a href="#ch10">Yield Traps</a>
+    &mdash; the 12 red flags that scream
+    &ldquo;this yield is a lie&rdquo;</li>
+  <li><a href="#ch11">The Tax Picture</a>
+    &mdash; qualified vs ordinary, where to hold what,
+    the K-1 burden, and REIT tax drag</li>
+  <li><a href="#ch12">Income in Every Regime</a>
+    &mdash; rising rates, falling rates,
+    inflation, recession</li>
+  <li><a href="#ch13">Building the Paycheck</a>
+    &mdash; monthly cash flow engineering,
+    staggering payments, covering expenses</li>
+  <li><a href="#ch14">The Model Income Portfolios</a>
+    &mdash; five portfolios from conservative
+    to aggressive, with real ETFs and numbers</li>
+  <li><a href="#ch15">The Withdrawal Question</a>
+    &mdash; 4% rule, guardrails, natural yield
+    vs selling shares, sequence risk</li>
+</ol>
+</nav>
+
+<hr>
+
+<!-- ============================================ -->
+<!-- CHAPTER 1: WHY INCOME INVESTING              -->
+<!-- ============================================ -->
+
+<h2 id="ch1">Chapter 1: Why Income Investing</h2>
+
+<p>
+There are two ways to make money from a portfolio.
+You can buy something and sell it later for more
+than you paid &mdash; capital gains. Or you can own
+something that sends you cash while you hold it
+&mdash; income. Every investor uses both, but the
+<strong>emphasis</strong> you place on each one
+changes everything about how you build your
+portfolio, how you sleep at night, and how you
+behave during a crash. Income investing is not
+just a strategy. It is a psychological framework
+that keeps you in the game when the game gets ugly.
+</p>
+
+<p>
+The academic argument against income investing is
+clean and correct: a dollar of dividends and a
+dollar of capital gains are economically identical.
+Selling <span class="number">$1,000</span> of
+shares produces the same cash as receiving
+<span class="number">$1,000</span> in dividends.
+<strong>Franco Modigliani</strong> and
+<strong>Merton Miller</strong> proved in 1961 that
+in a frictionless market, dividend policy is
+irrelevant to firm value. This is true. It is also
+useless in practice, because humans are not
+frictionless. They panic during drawdowns. They
+sell at bottoms. They check their portfolios too
+often and make decisions based on unrealized
+losses that exist only on a screen.
+</p>
+
+<p>
+Income investing solves this by giving you a
+<strong>behavioral anchor</strong>. When the market
+drops <span class="number">30%</span>, a total
+return investor sees a number that is
+<span class="number">30%</span> smaller than it
+was. An income investor sees the same drop but also
+sees that their quarterly dividend check arrived
+on schedule, same amount as last quarter, maybe even
+a little more. The price is an abstraction. The
+cash is real. It lands in your account. It pays
+your electric bill. It buys groceries. This
+distinction matters enormously when the S&amp;P 500
+is down <span class="number">35%</span> and every
+headline is screaming that the financial system is
+collapsing. The total return investor has to
+<em>decide</em> whether to sell shares into the
+panic. The income investor does nothing and gets
+paid anyway.
+</p>
+
+<p>
+This is why income investing has survived every
+academic critique for over a century. It is not
+because dividends are tax-efficient (they often
+are not). It is not because high-yield stocks
+outperform (they sometimes do not). It is because
+<strong>income investing aligns the portfolio
+with human psychology</strong> in a way that total
+return investing does not. The best strategy is
+the one you can actually follow. If receiving
+regular cash payments keeps you from selling at the
+bottom of a bear market, that behavioral advantage
+is worth more than any theoretical tax drag.
+</p>
+
+<p>
+There is a second, more practical reason to focus
+on income: <strong>cash flow matching</strong>. If
+you need <span class="number">$4,000</span> per
+month to cover expenses, you can either sell shares
+to generate that cash (hoping the market cooperates)
+or build a portfolio that generates
+<span class="number">$4,000</span> per month in
+dividends, interest, and distributions. The second
+approach means you never have to sell a single share
+during a downturn. Your principal stays intact. Your
+income stream continues. You are not dependent on
+market prices for your standard of living.
+This is the core promise of income investing:
+<strong>live off the yield, never touch the
+principal</strong>.
+</p>
+
+<p>
+The challenge is that yield is not free. Every
+source of portfolio income comes with tradeoffs
+&mdash; tax inefficiency, credit risk, interest
+rate sensitivity, sector concentration, capped
+upside, or outright traps where the yield is a
+mirage funded by destroying your own capital. This
+guide exists to map every income source available
+to you, explain exactly what you are getting and
+what you are giving up, identify the traps before
+you walk into them, and show you how to assemble
+income sources into a portfolio that actually works.
+Not a theoretical exercise &mdash; specific ETFs,
+specific yields, specific tax treatments, specific
+dollar amounts.
+</p>
+
+<p>
+One important distinction before we begin:
+<strong>income investing is not the same as
+high-yield investing</strong>. Chasing the highest
+yield is one of the most reliable ways to destroy
+capital in finance. The best income portfolios
+balance yield with safety, growth with stability,
+and tax efficiency with cash flow. A
+<span class="number">3.5%</span> yield that grows
+<span class="number">7%</span> per year and never
+gets cut is vastly superior to a
+<span class="number">9%</span> yield that gets
+slashed in half during the next recession.
+Understanding this distinction is the first step
+toward building income that lasts.
+</p>
+
+<!-- ============================================ -->
+<!-- CHAPTER 2: THE INCOME MENU                   -->
+<!-- ============================================ -->
+
+<h2 id="ch2">Chapter 2: The Income Menu</h2>
+
+<p>
+Before diving deep into any single income source,
+you need a map of the entire landscape. There are
+seven major ways a portfolio can generate cash.
+Each has a different yield range, different risk
+profile, different tax treatment, and different
+behavior during market stress. No single source
+is best in all environments. The art of income
+investing is combining them so that some part of
+your portfolio is always paying you well, regardless
+of what the economy or interest rates are doing.
+</p>
+
+<h3 id="ch2-dividends">Dividends</h3>
+
+<div class="income-card">
+<h4>Common Stock Dividends</h4>
+<p class="meta-line">Typical yield: 1.5&ndash;4.5%
+&middot; Tax: qualified (15&ndash;20%)
+&middot; Growth potential: high</p>
+<p>Companies distribute a portion of their
+earnings to shareholders as cash dividends,
+typically quarterly. The yield depends on the
+payout ratio (percentage of earnings paid out)
+and the stock price. A company earning
+<span class="number">$5</span> per share that
+pays <span class="number">$2</span> in dividends
+has a <span class="number">40%</span> payout ratio.
+The key advantage of stock dividends over every
+other income source is <strong>growth</strong>
+&mdash; a good dividend stock raises its payout
+every year, which means your yield on original
+cost compounds over time. Buy a stock yielding
+<span class="number">3%</span> that grows its
+dividend <span class="number">8%</span> annually,
+and in 10 years you are earning
+<span class="number">6.5%</span> on your original
+investment. No bond does this.</p>
+<p><span class="safe">Best for:</span> Long-term
+investors who want growing income. The classic
+retirement income backbone.</p>
+<p><span class="danger">Watch out for:</span>
+Dividends can be cut or suspended. They are not
+contractual obligations. Companies cut dividends
+when earnings fall, when they need cash for
+survival, or when management decides growth
+spending matters more.</p>
+</div>
+
+<h3 id="ch2-bonds">Bond Interest</h3>
+
+<div class="income-card">
+<h4>Fixed Income Coupons</h4>
+<p class="meta-line">Typical yield: 3.5&ndash;7%
+&middot; Tax: ordinary income (or tax-free for munis)
+&middot; Growth potential: none</p>
+<p>Bonds pay a fixed coupon &mdash; a
+contractual obligation, not a discretionary
+decision. A <span class="number">$1,000</span>
+bond with a <span class="number">5%</span> coupon
+pays <span class="number">$50</span> per year,
+period. The issuer cannot decide to pay less
+unless it defaults. This contractual certainty
+is the great advantage of bonds over dividends:
+you know exactly what you will receive and when.
+The tradeoff is that the payment never grows.
+Inflation erodes the purchasing power of a fixed
+coupon over time, which is why bonds alone cannot
+sustain a retirement portfolio across decades.</p>
+<p><span class="safe">Best for:</span> Near-term
+income needs, capital preservation, and
+dampening portfolio volatility.</p>
+<p><span class="danger">Watch out for:</span>
+Interest rate risk (bond prices fall when rates
+rise), credit risk (corporate bonds can default),
+and inflation erosion.</p>
+</div>
+
+<h3 id="ch2-reits">REIT Distributions</h3>
+
+<div class="income-card">
+<h4>Real Estate Investment Trust Income</h4>
+<p class="meta-line">Typical yield: 3&ndash;8%
+&middot; Tax: mostly ordinary income
+&middot; Growth potential: moderate</p>
+<p>REITs are required by law to distribute at
+least <span class="number">90%</span> of their
+taxable income to shareholders. This legal
+mandate creates high yields but also means REITs
+retain very little cash for growth &mdash; they
+fund expansion by issuing new shares or taking on
+debt. REIT distributions are a mix of ordinary
+income, capital gains, and return of capital,
+with the ordinary income portion taxed at your
+marginal rate (no qualified dividend treatment
+for most REIT income). The yields look generous
+but the after-tax yield is often
+<span class="number">15&ndash;25%</span> lower
+than it appears.</p>
+<p><span class="safe">Best for:</span>
+Tax-advantaged accounts (IRA, 401k) where the
+tax drag disappears. Real diversification into
+physical assets with inflation-linked rents.</p>
+<p><span class="danger">Watch out for:</span>
+High correlation with stocks (0.56&ndash;0.75),
+brutal drawdowns (&minus;68% in 2008&ndash;09),
+interest rate sensitivity, and tax inefficiency
+in taxable accounts.</p>
+</div>
+
+<h3 id="ch2-mlps">MLP Distributions</h3>
+
+<div class="income-card">
+<h4>Master Limited Partnership Income</h4>
+<p class="meta-line">Typical yield: 5&ndash;9%
+&middot; Tax: complex (K-1, deferred)
+&middot; Growth potential: low&ndash;moderate</p>
+<p>MLPs are publicly traded partnerships, mostly
+in energy infrastructure (pipelines, storage,
+processing). They pass income directly to
+unitholders (not shareholders &mdash; you own
+<em>units</em>, not shares). The yields are high
+because MLPs distribute most of their cash flow,
+and a large portion of the distribution is
+classified as <strong>return of capital</strong>,
+which is tax-deferred until you sell. This makes
+MLPs tax-efficient in taxable accounts but creates
+a paperwork nightmare: every MLP sends you a K-1
+form instead of a 1099, and K-1s arrive late,
+complicate your tax return, and can trigger
+state filing obligations in states where the
+partnership operates.</p>
+<p><span class="safe">Best for:</span>
+Taxable accounts (where the tax deferral helps),
+energy sector exposure with high current income.</p>
+<p><span class="danger">Watch out for:</span>
+K-1 complexity, commodity price exposure,
+distribution cuts during energy downturns
+(2015&ndash;16, 2020), and UBTI issues if held
+in IRAs above <span class="number">$1,000</span>.</p>
+</div>
+
+<h3 id="ch2-preferreds">Preferred Dividends</h3>
+
+<div class="income-card">
+<h4>Preferred Stock Income</h4>
+<p class="meta-line">Typical yield: 5&ndash;7%
+&middot; Tax: often qualified (15&ndash;20%)
+&middot; Growth potential: none</p>
+<p>Preferred shares are a hybrid between stocks
+and bonds. They pay a fixed dividend (like a
+bond coupon), trade on exchanges (like stocks),
+and sit ahead of common shareholders in the
+capital structure but behind bondholders. The
+dividend is typically fixed at issuance and never
+grows. If the company suspends dividends, it must
+pay preferred holders before common holders can
+receive anything (for cumulative preferreds,
+skipped payments accumulate and must eventually
+be paid). Many preferred dividends qualify for the
+lower <span class="number">15&ndash;20%</span>
+tax rate, making them more tax-efficient than
+bonds paying ordinary income at the same yield.</p>
+<p><span class="safe">Best for:</span>
+Taxable accounts where you want bond-like
+income with better tax treatment. Filling the
+gap between bonds and dividend stocks.</p>
+<p><span class="danger">Watch out for:</span>
+Call risk (issuers can redeem them, usually at par,
+wiping out any premium you paid), interest rate
+sensitivity (they behave like long-duration bonds),
+and limited upside.</p>
+</div>
+
+<h3 id="ch2-options">Options Premiums</h3>
+
+<div class="income-card">
+<h4>Selling Volatility for Cash</h4>
+<p class="meta-line">Typical yield: 6&ndash;12%
+&middot; Tax: short-term capital gains
+&middot; Growth potential: negative (caps upside)</p>
+<p>When you sell a covered call or a cash-secured
+put, you receive a premium upfront. That premium
+is yours to keep regardless of what happens next.
+Covered call strategies on the S&amp;P 500
+generate <span class="number">8&ndash;12%</span>
+annual income by selling away upside potential
+above a strike price. The income is high and
+consistent, but you are making a fundamental
+tradeoff: you cap your gains in exchange for
+current cash. In strong bull markets, a covered
+call strategy dramatically underperforms because
+the stocks get called away just as they are
+running. In flat or mildly declining markets, the
+strategy outperforms because the premiums cushion
+the downside.</p>
+<p><span class="safe">Best for:</span>
+Flat or range-bound markets, investors who
+prioritize current income over capital
+appreciation, and supplementing other income
+sources during retirement.</p>
+<p><span class="danger">Watch out for:</span>
+Capped upside in bull markets, tax inefficiency
+(premiums taxed as short-term gains), and
+the illusion that &ldquo;free money&rdquo;
+has no cost.</p>
+</div>
+
+<h3 id="ch2-cefs">CEF Distributions</h3>
+
+<div class="income-card">
+<h4>Closed-End Fund Income</h4>
+<p class="meta-line">Typical yield: 6&ndash;12%
+&middot; Tax: varies (ordinary, capital gains,
+ROC) &middot; Growth potential: depends on manager</p>
+<p>Closed-end funds issue a fixed number of shares
+at IPO and then trade on exchanges like stocks.
+Unlike open-end mutual funds, they can trade at
+a <strong>discount or premium</strong> to their
+net asset value (NAV). Many CEFs use leverage
+(borrowing <span class="number">25&ndash;40%</span>
+of assets) to boost yield. A CEF holding bonds
+yielding <span class="number">5%</span> with
+<span class="number">33%</span> leverage can pay
+<span class="number">7&ndash;8%</span> &mdash; but
+the leverage amplifies both gains and losses. Some
+CEFs sustain their high distributions through
+<strong>return of capital</strong> (ROC) &mdash;
+giving you back your own money and calling it
+income. Destructive ROC erodes NAV over time,
+meaning the fund is slowly liquidating itself to
+maintain the illusion of a high yield.</p>
+<p><span class="safe">Best for:</span>
+Experienced income investors who understand
+leverage and can identify CEFs trading at genuine
+discounts with sustainable distributions.</p>
+<p><span class="danger">Watch out for:</span>
+Destructive ROC, leverage amplifying losses,
+premium-to-NAV purchases, management fees
+on top of leverage costs, and the fact that
+most individual CEFs underperform their
+benchmarks over time.</p>
+</div>
+
+<div class="connection-box">
+<strong>The Income Spectrum:</strong> These seven
+sources form a spectrum from safest (Treasury
+bond coupons) to riskiest (leveraged CEF
+distributions). The safest yields are lowest.
+The highest yields carry the most traps. Your
+job as an income architect is not to maximize
+yield &mdash; it is to build a structure that
+delivers <em>enough</em> income with
+<em>acceptable</em> risk and
+<em>appropriate</em> tax treatment for
+your specific accounts. The rest of this guide
+shows you how to do exactly that.
+</div>
+
+<!-- ============================================ -->
+<!-- CHAPTER 3: DIVIDEND STOCKS                   -->
+<!-- ============================================ -->
+
+<h2 id="ch3">Chapter 3: Dividend Stocks</h2>
+
+<p>
+Dividend investing is the oldest and most intuitive
+form of income investing. You buy shares of a
+company that makes money, and the company sends
+you a portion of that money every quarter. The
+concept predates modern finance by centuries
+&mdash; the <strong>Dutch East India Company</strong>
+paid dividends to shareholders starting in 1602.
+What has changed is the sophistication of how we
+evaluate dividend stocks, the tools available to
+screen them, and the traps that have become more
+elaborate as yield-hungry investors have poured
+money into anything with a high payout.
+</p>
+
+<h3>The Aristocrats and Kings</h3>
+
+<p>
+The gold standard of dividend investing is the
+<strong>Dividend Aristocrat</strong> &mdash; an
+S&amp;P 500 company that has raised its dividend
+every year for at least
+<span class="number">25</span> consecutive years.
+There are roughly <span class="number">67</span>
+Aristocrats as of 2026. The even more elite
+<strong>Dividend Kings</strong> have raised their
+dividends for <span class="number">50+</span>
+consecutive years. These include names like
+<strong>Procter &amp; Gamble</strong> (68 years),
+<strong>Coca-Cola</strong> (62 years),
+<strong>Johnson &amp; Johnson</strong> (62 years),
+and <strong>3M</strong> (66 years, though its
+streak was broken in 2024 with the healthcare
+spinoff).
+</p>
+
+<p>
+The appeal is obvious: a company that has raised
+its dividend through every recession, financial
+crisis, pandemic, and war for a quarter century
+or more has demonstrated extraordinary financial
+discipline and competitive durability. These are
+not speculative bets. They are entrenched
+businesses with moats wide enough to sustain
+growing cash returns to shareholders through the
+worst economic environments. The
+<span class="ticker">NOBL</span> ETF tracks the
+Aristocrats and has outperformed the S&amp;P 500
+on a risk-adjusted basis (higher Sharpe ratio)
+since its 2013 inception, with notably lower
+drawdowns during corrections.
+</p>
+
+<p>
+But Aristocrat status is not a guarantee of
+safety. <strong>General Electric</strong> was a
+Dividend Aristocrat until 2009 when it slashed
+its dividend by <span class="number">68%</span>
+during the financial crisis. <strong>AT&amp;T</strong>
+was a beloved dividend stock yielding
+<span class="number">7%+</span> before it cut
+its dividend by <span class="number">47%</span>
+in 2022 to fund its
+<strong>Warner Bros. Discovery</strong> spinoff.
+The lesson is that past streak alone does not
+protect you &mdash; you must understand the
+payout ratio, the free cash flow trend, and
+the debt load underneath the dividend.
+</p>
+
+<h3>Payout Ratio: The Single Most Important Number</h3>
+
+<p>
+The <strong>payout ratio</strong> is the percentage
+of earnings (or free cash flow) paid out as
+dividends. A company earning
+<span class="number">$4</span> per share and paying
+<span class="number">$2</span> has a
+<span class="number">50%</span> payout ratio. This
+number tells you two things: how safe the dividend
+is and how much room exists for future growth.
+</p>
+
+<div class="yield-box">
+<p><strong>Payout Ratio Guidelines:</strong></p>
+<p><span class="number">&lt;40%</span> &mdash;
+Very safe. Plenty of room for raises and
+for absorbing an earnings downturn. Most
+tech dividend payers sit here
+(<strong>Apple</strong> at ~15%,
+<strong>Microsoft</strong> at ~25%).</p>
+<p><span class="number">40&ndash;60%</span> &mdash;
+Healthy. The sweet spot for most mature dividend
+stocks. Enough retained earnings for growth,
+enough payout to signal commitment.
+<strong>Coca-Cola</strong> and
+<strong>PepsiCo</strong> live here.</p>
+<p><span class="number">60&ndash;80%</span> &mdash;
+Elevated. Sustainable for utilities and staples
+with predictable earnings, but any earnings
+decline puts the dividend at risk. Watch
+carefully.</p>
+<p><span class="number">&gt;80%</span> &mdash;
+<span class="danger">Danger zone.</span> The
+company is paying out nearly everything it
+earns. One bad quarter and the dividend gets
+cut. REITs are the exception (required to pay
+90%+), but for normal companies, this is a red
+flag.</p>
+</div>
+
+<p>
+Always check the <strong>free cash flow payout
+ratio</strong>, not just the earnings payout
+ratio. Earnings can be manipulated with accounting
+choices. Free cash flow is harder to fake &mdash;
+it is the actual cash the business generates
+after all capital expenditures. A company can
+report healthy earnings while burning cash, making
+the earnings payout ratio look safe when the
+dividend is actually being funded by debt.
+<strong>AT&amp;T</strong> did exactly this for years:
+the earnings-based payout ratio looked manageable,
+but the free cash flow payout ratio exceeded
+<span class="number">100%</span> because of
+massive capital spending on 5G and content
+acquisitions. The dividend cut was inevitable.
+</p>
+
+<h3>Yield vs Growth: The Great Tradeoff</h3>
+
+<p>
+There are two philosophies in dividend investing,
+and they lead to very different portfolios.
+<strong>High current yield</strong> means buying
+stocks that pay <span class="number">4&ndash;7%</span>
+today &mdash; utilities, REITs, telecoms, tobacco,
+MLPs. You get big checks now but limited growth.
+<strong>Dividend growth</strong> means buying stocks
+that yield only <span class="number">1&ndash;3%</span>
+today but grow their dividends
+<span class="number">8&ndash;15%</span> per year
+&mdash; tech, industrials, healthcare. The checks
+start small but compound rapidly.
+</p>
+
+<p>
+The math favors dividend growth over time. A stock
+yielding <span class="number">2%</span> with
+<span class="number">12%</span> annual dividend
+growth will out-yield a stock paying
+<span class="number">5%</span> with
+<span class="number">2%</span> growth within
+<span class="number">8</span> years. By year 15,
+the growth stock is yielding
+<span class="number">10%+</span> on your original
+cost while the high-yield stock is still stuck
+around <span class="number">6.5%</span>.
+And the growth stock has almost certainly
+appreciated more in price, because dividend growth
+tracks earnings growth, which drives stock prices.
+</p>
+
+<p>
+The practical answer is that you need both.
+High-yield stocks provide immediate cash flow for
+current expenses. Growth stocks build the income
+stream that will fund your expenses 10 and 20 years
+from now. The blend depends on your time horizon:
+the further you are from needing the cash, the
+more you should weight growth. The closer you are,
+the more you need current yield. A 35-year-old
+building an income portfolio should lean
+<span class="number">70/30</span> growth to yield.
+A 65-year-old drawing from it should lean
+<span class="number">40/60</span>.
+</p>
+
+<h3>The Sector Map of Dividends</h3>
+
+<table class="alloc-table" role="presentation">
+<tr>
+  <th>Sector</th>
+  <th>Typical Yield</th>
+  <th>Growth Rate</th>
+  <th>Key Risks</th>
+</tr>
+<tr>
+  <td><strong>Utilities</strong></td>
+  <td><span class="number">3&ndash;5%</span></td>
+  <td><span class="number">3&ndash;5%</span></td>
+  <td>Rate sensitive, regulatory risk</td>
+</tr>
+<tr>
+  <td><strong>Consumer Staples</strong></td>
+  <td><span class="number">2.5&ndash;4%</span></td>
+  <td><span class="number">4&ndash;7%</span></td>
+  <td>Slow growth, private label competition</td>
+</tr>
+<tr>
+  <td><strong>Healthcare</strong></td>
+  <td><span class="number">1.5&ndash;3.5%</span></td>
+  <td><span class="number">6&ndash;10%</span></td>
+  <td>Patent cliffs, regulatory</td>
+</tr>
+<tr>
+  <td><strong>Financials</strong></td>
+  <td><span class="number">2&ndash;4%</span></td>
+  <td><span class="number">7&ndash;12%</span></td>
+  <td>Credit cycle, capital requirements</td>
+</tr>
+<tr>
+  <td><strong>Energy</strong></td>
+  <td><span class="number">3&ndash;7%</span></td>
+  <td><span class="number">0&ndash;5%</span></td>
+  <td>Commodity prices, transition risk</td>
+</tr>
+<tr>
+  <td><strong>Industrials</strong></td>
+  <td><span class="number">1.5&ndash;3%</span></td>
+  <td><span class="number">7&ndash;12%</span></td>
+  <td>Cyclical, capex heavy</td>
+</tr>
+<tr>
+  <td><strong>Technology</strong></td>
+  <td><span class="number">0.5&ndash;2%</span></td>
+  <td><span class="number">10&ndash;20%</span></td>
+  <td>Low current yield, disruption</td>
+</tr>
+<tr>
+  <td><strong>Telecom</strong></td>
+  <td><span class="number">4&ndash;7%</span></td>
+  <td><span class="number">0&ndash;3%</span></td>
+  <td>Debt-heavy, capex, dividend cuts</td>
+</tr>
+</table>
+
+<p>
+Notice the inverse relationship: the sectors with
+the highest current yields (telecom, energy,
+utilities) have the lowest growth rates. The
+sectors with the lowest current yields (tech,
+industrials) have the highest growth. This is not
+coincidence &mdash; companies with strong growth
+opportunities retain more earnings to fund that
+growth rather than paying them out. A mature
+utility with no growth projects left sends the
+cash to shareholders. A tech company building the
+next platform reinvests the cash. Both are rational
+behaviors, and both produce income &mdash; just on
+different timelines.
+</p>
+
+<h3>The Essential Dividend ETFs</h3>
+
+<div class="income-card">
+<h4><span class="ticker">SCHD</span>
+Schwab US Dividend Equity ETF</h4>
+<p class="meta-line">Yield: ~3.5% &middot;
+ER: 0.06% &middot; ~100 holdings</p>
+<p>The single best dividend ETF for most
+investors. Screens for quality (strong
+fundamentals, sustainable payouts) and
+yield, then weights by a composite score.
+Avoids yield traps by requiring 10-year
+dividend payment history, minimum financial
+health metrics, and reasonable payout ratios.
+The result is a portfolio tilted toward
+financials, industrials, healthcare, and
+consumer staples &mdash; the reliable middle
+of the dividend universe. Has outperformed
+most dividend ETFs since inception on both
+total return and risk-adjusted metrics.</p>
+</div>
+
+<div class="income-card">
+<h4><span class="ticker">VIG</span>
+Vanguard Dividend Appreciation ETF</h4>
+<p class="meta-line">Yield: ~1.8% &middot;
+ER: 0.06% &middot; ~315 holdings</p>
+<p>Pure dividend growth play. Holds companies
+that have raised dividends for at least
+10 consecutive years. Lower current yield
+but faster dividend growth and better
+total return during bull markets. Heavy in
+tech (Microsoft, Apple, Broadcom) and
+industrials. Think of VIG as the &ldquo;future
+income&rdquo; ETF &mdash; the yield is modest
+now but compounds rapidly.</p>
+</div>
+
+<div class="income-card">
+<h4><span class="ticker">NOBL</span>
+ProShares S&amp;P 500 Dividend Aristocrats ETF</h4>
+<p class="meta-line">Yield: ~2.3% &middot;
+ER: 0.35% &middot; ~67 holdings</p>
+<p>The Aristocrats index &mdash; only S&amp;P 500
+companies with 25+ years of consecutive dividend
+increases. Equal-weighted, which means no single
+stock dominates and you get more exposure to mid-cap
+aristocrats. Higher expense ratio than SCHD or VIG,
+but the strictest quality screen of any dividend
+ETF. Lower beta, lower drawdowns, and strong
+risk-adjusted returns.</p>
+</div>
+
+<div class="income-card">
+<h4><span class="ticker">HDV</span>
+iShares Core High Dividend ETF</h4>
+<p class="meta-line">Yield: ~4.0% &middot;
+ER: 0.08% &middot; ~75 holdings</p>
+<p>Higher current yield than SCHD, but more
+concentrated in energy and healthcare.
+Screens for economic moat and financial
+health, then selects the highest-yielding
+stocks that pass. Good complement to VIG
+when you need more current income. More
+volatile than SCHD due to energy exposure.</p>
+</div>
+
+<div class="income-card">
+<h4><span class="ticker">DGRO</span>
+iShares Core Dividend Growth ETF</h4>
+<p class="meta-line">Yield: ~2.3% &middot;
+ER: 0.08% &middot; ~420 holdings</p>
+<p>Broader than VIG with a similar philosophy
+&mdash; dividend growth over current yield.
+Requires 5+ years of dividend growth (less
+strict than VIG&rsquo;s 10). More diversified
+with over 400 holdings. Lower expense ratio
+than NOBL. A solid core holding for
+long-term dividend growth.</p>
+</div>
+
+<!-- ============================================ -->
+<!-- CHAPTER 4: BOND LADDERS & FIXED INCOME       -->
+<!-- ============================================ -->
+
+<h2 id="ch4">Chapter 4: Bond Ladders
+&amp; Fixed Income</h2>
+
+<p>
+Bonds are the original income instrument.
+Before stocks paid dividends, before REITs existed,
+before anyone had heard of covered calls, there
+were bonds: a loan you make to a government or
+corporation in exchange for regular interest
+payments and the return of your principal at
+maturity. The simplicity is the appeal. You lend
+<span class="number">$10,000</span> at
+<span class="number">5%</span> for 10 years, you
+receive <span class="number">$500</span> per year
+in interest, and you get your
+<span class="number">$10,000</span> back at
+the end. No board of directors can decide to
+skip the payment. No earnings miss can reduce it.
+The coupon is a contractual obligation, enforceable
+in court.
+</p>
+
+<p>
+The complication is that bond prices move
+inversely to interest rates, and this relationship
+is not intuitive. When the Fed raises rates, new
+bonds are issued at higher yields, which makes your
+existing lower-yielding bonds less attractive.
+Their price drops to compensate. A bond with a
+<span class="number">3%</span> coupon is not very
+appealing when new bonds pay
+<span class="number">5%</span>, so the market
+discounts the old bond until its yield-to-maturity
+matches the new environment. This is why 2022 was
+the worst year for bonds in modern history &mdash;
+rates rose from near zero to
+<span class="number">5%</span> in 18 months,
+and long-term bond funds like
+<span class="ticker">TLT</span> lost
+<span class="number">29%</span>. If you hold
+individual bonds to maturity, this price volatility
+does not matter &mdash; you still get par back.
+But if you hold bond funds, you are exposed to
+mark-to-market losses that can be severe.
+</p>
+
+<h3>The Bond Ladder: Solving the Rate Problem</h3>
+
+<p>
+A <strong>bond ladder</strong> is the elegant
+solution to interest rate uncertainty. Instead of
+buying one bond at one maturity, you spread your
+money across bonds maturing at regular intervals
+&mdash; one year, two years, three years, out to
+whatever horizon you choose. When the shortest
+bond matures, you reinvest the proceeds at the
+longest rung of the ladder. If rates have risen,
+you reinvest at higher yields. If rates have
+fallen, your longer-dated bonds locked in the
+old higher rates. The ladder smooths out rate
+risk over time, giving you a predictable income
+stream without betting on the direction of
+interest rates.
+</p>
+
+<div class="yield-box">
+<p><strong>Example: A 5-Year Treasury Ladder</strong>
+with <span class="number">$100,000</span></p>
+<p><span class="number">$20,000</span> in 1-year
+Treasuries at <span class="number">4.8%</span>
+= <span class="number">$960</span>/yr</p>
+<p><span class="number">$20,000</span> in 2-year
+Treasuries at <span class="number">4.5%</span>
+= <span class="number">$900</span>/yr</p>
+<p><span class="number">$20,000</span> in 3-year
+Treasuries at <span class="number">4.3%</span>
+= <span class="number">$860</span>/yr</p>
+<p><span class="number">$20,000</span> in 4-year
+Treasuries at <span class="number">4.2%</span>
+= <span class="number">$840</span>/yr</p>
+<p><span class="number">$20,000</span> in 5-year
+Treasuries at <span class="number">4.1%</span>
+= <span class="number">$820</span>/yr</p>
+<p><strong>Total annual income:
+<span class="number">$4,380</span></strong>
+(blended yield: <span class="number">4.38%</span>).
+Every year, $20,000 matures and gets reinvested
+at the 5-year rate. You always have money coming
+due within 12 months (liquidity) and money
+locked in at longer rates (yield).</p>
+</div>
+
+<p>
+The advantage over a bond fund is control. A bond
+fund constantly buys and sells, never holds to
+maturity, and subjects you to price volatility.
+A ladder holds to maturity. You never sell at a
+loss unless you choose to. Your principal comes
+back at par on schedule. For retirees who need
+predictable income, a Treasury ladder is the
+closest thing to a guarantee the financial
+system offers.
+</p>
+
+<h3>Treasury vs Corporate vs Municipal</h3>
+
+<p>
+<strong>Treasuries</strong> are the safest bonds
+in the world &mdash; backed by the US government&rsquo;s
+taxing authority. The yield is lower than
+corporates, but there is zero credit risk and the
+interest is exempt from state and local taxes. For
+investors in high-tax states like California or
+New York, the state tax exemption makes Treasury
+yields more competitive than they appear.
+A <span class="number">4.5%</span> Treasury in a
+state with <span class="number">10%</span> income
+tax is equivalent to a
+<span class="number">5.0%</span> corporate bond
+on an after-state-tax basis.
+</p>
+
+<p>
+<strong>Corporate bonds</strong> pay a credit
+spread above Treasuries to compensate for default
+risk. Investment-grade corporates (BBB and above)
+yield <span class="number">80&ndash;200</span>
+basis points more than comparable Treasuries.
+High-yield corporates (below BBB, also called
+&ldquo;junk bonds&rdquo;) yield
+<span class="number">300&ndash;600</span> basis
+points more. The risk is real: high-yield default
+rates average <span class="number">3&ndash;5%</span>
+per year and spike to
+<span class="number">10&ndash;15%</span> during
+recessions. For income portfolios, investment-grade
+corporates add meaningful yield without excessive
+risk. Junk bonds belong in small allocations, if
+at all, and should be accessed through diversified
+ETFs like <span class="ticker">HYG</span> or
+<span class="ticker">JNK</span> rather than
+individual bonds.
+</p>
+
+<p>
+<strong>Municipal bonds</strong> are issued by state
+and local governments and are exempt from federal
+income tax. If you buy munis from your own state,
+they are typically exempt from state tax as well
+(double tax-free). The yields look low
+(~<span class="number">3&ndash;4%</span>), but the
+<strong>tax-equivalent yield</strong> for someone in
+the <span class="number">37%</span> federal bracket
+is <span class="number">4.8&ndash;6.3%</span>. Munis
+are the single most tax-efficient fixed income
+option for high-income investors in taxable accounts.
+The <span class="ticker">MUB</span> ETF provides
+broad muni exposure; <span class="ticker">VTEB</span>
+is Vanguard&rsquo;s cheaper alternative.
+</p>
+
+<h3>The Essential Bond ETFs for Income</h3>
+
+<div class="income-card">
+<h4><span class="ticker">BND</span>
+Vanguard Total Bond Market ETF</h4>
+<p class="meta-line">Yield: ~4.3% &middot;
+ER: 0.03% &middot; Duration: ~6 years</p>
+<p>The default bond holding. Entire US
+investment-grade bond market: Treasuries,
+corporates, mortgage-backed. Intermediate
+duration. Not exciting, but the core bond
+position for most portfolios. Pairs well
+with everything.</p>
+</div>
+
+<div class="income-card">
+<h4><span class="ticker">VCIT</span>
+Vanguard Intermediate-Term Corporate Bond ETF</h4>
+<p class="meta-line">Yield: ~4.9% &middot;
+ER: 0.04% &middot; Duration: ~6.5 years</p>
+<p>Investment-grade corporate bonds only. Higher
+yield than BND because of the credit spread.
+Moderate credit risk. Good way to boost income
+above pure Treasuries without reaching for junk.
+The sweet spot between safety and yield in
+the bond world.</p>
+</div>
+
+<div class="income-card">
+<h4><span class="ticker">VCSH</span>
+Vanguard Short-Term Corporate Bond ETF</h4>
+<p class="meta-line">Yield: ~4.7% &middot;
+ER: 0.04% &middot; Duration: ~2.7 years</p>
+<p>Short-duration corporate bonds. Much less
+rate-sensitive than VCIT but surprisingly close
+in yield. When the yield curve is flat or
+inverted, short-term corporates are the best
+risk-reward in fixed income &mdash; you get
+nearly the same yield with a fraction of the
+price volatility.</p>
+</div>
+
+<div class="income-card">
+<h4><span class="ticker">VTEB</span>
+Vanguard Tax-Exempt Bond ETF</h4>
+<p class="meta-line">Yield: ~3.3% (tax-free) &middot;
+ER: 0.05% &middot; Duration: ~5.5 years</p>
+<p>National muni bond ETF. The yield looks low
+until you calculate the tax-equivalent yield:
+<span class="number">5.2%</span> for someone in
+the <span class="number">37%</span> bracket. In
+taxable accounts for high earners, VTEB beats
+most investment-grade corporate bond funds on an
+after-tax basis. The purest expression of
+tax-efficient fixed income.</p>
+</div>
+
+<div class="income-card">
+<h4><span class="ticker">SGOV</span>
+iShares 0&ndash;3 Month Treasury Bond ETF</h4>
+<p class="meta-line">Yield: ~5.0% &middot;
+ER: 0.05% &middot; Duration: ~0.1 years</p>
+<p>Cash equivalent. Holds T-bills maturing within
+3 months. Zero meaningful price risk. Yields the
+Fed funds rate (currently attractive). Park cash
+here instead of a savings account when you want
+state-tax-exempt income with zero duration risk.
+The safest income instrument that exists.</p>
+</div>
+
+<!-- ============================================ -->
+<!-- CHAPTER 5: REITs                              -->
+<!-- ============================================ -->
+
+<h2 id="ch5">Chapter 5: REITs</h2>
+
+<p>
+Real Estate Investment Trusts are publicly traded
+companies that own, operate, or finance
+income-producing real estate. Congress created the
+REIT structure in 1960 to give ordinary investors
+access to real estate income without buying
+physical property. The deal is straightforward:
+REITs get to avoid corporate income tax, but in
+exchange they must distribute at least
+<span class="number">90%</span> of their taxable
+income to shareholders. This legal mandate
+creates high yields &mdash; but it also creates
+limitations that most income investors do not
+fully appreciate.
+</p>
+
+<p>
+The first limitation is <strong>growth</strong>.
+Because REITs distribute almost everything they
+earn, they have very little retained capital for
+expansion. When a REIT wants to build a new
+property or acquire an existing one, it must either
+issue new shares (diluting existing shareholders)
+or take on debt. This external funding dependence
+makes REITs uniquely sensitive to interest rates.
+When rates are low, REITs can borrow cheaply and
+issue shares at high prices &mdash; growth is easy.
+When rates rise, borrowing costs jump and share
+prices fall (making new equity issuance dilutive),
+which chokes growth. This is why REITs
+underperformed dramatically in 2022&ndash;2023 as
+rates rose from zero to
+<span class="number">5%</span>.
+</p>
+
+<p>
+The second limitation is <strong>correlation</strong>.
+REITs are marketed as a diversifier &mdash;
+&ldquo;real assets&rdquo; that behave differently
+from stocks. The data tells a different story.
+The correlation between
+<span class="ticker">VNQ</span> (Vanguard REIT
+ETF) and <span class="ticker">VTI</span>
+(total stock market) is
+<span class="number">0.56&ndash;0.75</span>,
+depending on the time period. During the 2008
+financial crisis, when diversification mattered
+most, VNQ fell <span class="number">68%</span>
+&mdash; worse than the S&amp;P 500. REITs
+diversify your income sources (rent-based vs
+earnings-based), but they do not diversify your
+risk nearly as much as most investors believe.
+</p>
+
+<p>
+The third limitation is <strong>tax treatment</strong>.
+REIT distributions are mostly classified as ordinary
+income, not qualified dividends. If you are in the
+<span class="number">37%</span> bracket, you keep
+only <span class="number">63 cents</span> of every
+REIT dollar in a taxable account (before the
+<span class="number">20%</span> 199A deduction, which
+helps some). By contrast, qualified dividends from
+a regular stock are taxed at
+<span class="number">15&ndash;20%</span>. This tax
+drag means a REIT yielding
+<span class="number">5%</span> delivers the same
+after-tax income as a qualified-dividend stock
+yielding roughly <span class="number">3.5%</span>.
+The solution is simple: hold REITs in
+tax-advantaged accounts (IRA, 401k) where the
+tax treatment is irrelevant.
+</p>
+
+<h3>REIT Property Types</h3>
+
+<table class="alloc-table" role="presentation">
+<tr>
+  <th>Property Type</th>
+  <th>Typical Yield</th>
+  <th>Key Characteristics</th>
+</tr>
+<tr>
+  <td><strong>Cell Towers</strong></td>
+  <td><span class="number">2&ndash;3%</span></td>
+  <td>Low yield but highest growth. 99%+ tenant
+  retention. Near-monopoly positions.
+  <strong>AMT</strong>, <strong>CCI</strong>.</td>
+</tr>
+<tr>
+  <td><strong>Data Centers</strong></td>
+  <td><span class="number">2&ndash;4%</span></td>
+  <td>AI/cloud demand driving explosive growth.
+  Long-term contracts with tech giants.
+  <strong>EQIX</strong>, <strong>DLR</strong>.</td>
+</tr>
+<tr>
+  <td><strong>Industrial/Logistics</strong></td>
+  <td><span class="number">2.5&ndash;4%</span></td>
+  <td>E-commerce fulfillment, warehouses. High
+  occupancy, built-in rent escalators.
+  <strong>PLD</strong>.</td>
+</tr>
+<tr>
+  <td><strong>Healthcare</strong></td>
+  <td><span class="number">4&ndash;6%</span></td>
+  <td>Senior housing, medical offices, hospitals.
+  Aging demographics tailwind.
+  <strong>WELL</strong>, <strong>VTR</strong>.</td>
+</tr>
+<tr>
+  <td><strong>Residential/Apartments</strong></td>
+  <td><span class="number">3&ndash;5%</span></td>
+  <td>Steady demand, inflation-linked rents.
+  Housing shortage supports occupancy.
+  <strong>EQR</strong>, <strong>AVB</strong>.</td>
+</tr>
+<tr>
+  <td><strong>Net Lease</strong></td>
+  <td><span class="number">4.5&ndash;6%</span></td>
+  <td>Triple-net leases: tenant pays everything.
+  Predictable income, bond-like.
+  <strong>O</strong> (Realty Income),
+  <strong>NNN</strong>.</td>
+</tr>
+<tr>
+  <td><strong>Retail/Malls</strong></td>
+  <td><span class="number">4&ndash;7%</span></td>
+  <td>High yield but structural decline from
+  e-commerce. Only Class A malls survive.
+  <strong>SPG</strong>.</td>
+</tr>
+<tr>
+  <td><strong>Office</strong></td>
+  <td><span class="number">5&ndash;9%</span></td>
+  <td><span class="danger">Avoid.</span>
+  Work-from-home has permanently impaired
+  demand. Occupancy rates below 60% in many
+  markets. Dividend cuts widespread.</td>
+</tr>
+</table>
+
+<p>
+The best REIT investments for income combine
+<strong>structural demand growth</strong>
+(cell towers, data centers, logistics) with
+<strong>reasonable yields</strong> and
+<strong>strong balance sheets</strong>. The worst
+REIT investments are the ones with the highest
+yields &mdash; office and retail REITs yield
+<span class="number">6&ndash;9%</span> because the
+market is pricing in distribution cuts and
+permanent demand impairment. The yield is not a
+reward; it is a warning.
+</p>
+
+<div class="income-card">
+<h4><span class="ticker">VNQ</span>
+Vanguard Real Estate ETF</h4>
+<p class="meta-line">Yield: ~3.8% &middot;
+ER: 0.12% &middot; ~160 REITs</p>
+<p>Broad REIT exposure across all property types.
+Market-cap weighted, so the largest REITs
+(cell towers, data centers, industrials) dominate.
+The default REIT holding. Hold in tax-advantaged
+accounts.</p>
+</div>
+
+<div class="income-card">
+<h4><span class="ticker">O</span>
+Realty Income Corporation</h4>
+<p class="meta-line">Yield: ~5.5% &middot;
+Monthly dividend &middot; 30+ years of
+consecutive increases</p>
+<p>The most famous individual REIT. Pays
+<em>monthly</em> dividends (most pay quarterly),
+which makes it popular for income investors who
+want to match monthly expenses. Triple-net lease
+portfolio with 15,000+ properties: convenience
+stores, dollar stores, pharmacies, grocery.
+Predictable, bond-like income with modest growth.
+Self-branded &ldquo;The Monthly Dividend
+Company.&rdquo;</p>
+</div>
+
+<!-- ============================================ -->
+<!-- CHAPTER 6: MLPs & ENERGY INCOME              -->
+<!-- ============================================ -->
+
+<h2 id="ch6">Chapter 6: MLPs &amp;
+Energy Income</h2>
+
+<p>
+Master Limited Partnerships occupy a strange
+corner of the income universe: high yields,
+favorable tax treatment, and enough complexity
+to scare away most investors. That complexity is
+actually an advantage, because it suppresses
+demand and keeps yields higher than they would
+otherwise be. An MLP yielding
+<span class="number">7%</span> in a world where
+Treasury bonds pay <span class="number">4.5%</span>
+is getting a premium partly because many
+investors refuse to deal with K-1 forms. If you
+are willing to do the paperwork (or pay your
+accountant an extra <span class="number">$50</span>
+to handle it), you get paid for the inconvenience.
+</p>
+
+<p>
+The business model is straightforward.
+Most MLPs own <strong>midstream energy
+infrastructure</strong>: pipelines, processing
+plants, storage terminals, export facilities. They
+collect fees for transporting and processing oil,
+natural gas, and natural gas liquids. The key
+insight is that midstream MLPs are
+<strong>toll roads</strong>, not commodity bets.
+They charge per barrel transported, regardless of
+whether oil is at <span class="number">$40</span>
+or <span class="number">$100</span>. Revenue is
+driven by <em>volume</em> (how much stuff flows
+through the pipe), not by <em>price</em> (what
+the stuff is worth). This makes midstream cash
+flows far more stable than upstream producers or
+downstream refiners.
+</p>
+
+<p>
+The tax treatment is where MLPs get interesting
+&mdash; and complicated. MLPs are
+<strong>pass-through entities</strong>. They do
+not pay corporate tax. Instead, income and
+deductions flow through to unitholders via a K-1
+form. The distributions you receive are typically
+<span class="number">70&ndash;90%</span>
+<strong>return of capital</strong>, which means
+they are not currently taxable. Instead, they
+reduce your cost basis. You only pay tax when you
+eventually sell your units, and then it is taxed
+at capital gains rates. This deferral is powerful:
+you collect <span class="number">7%</span> yields
+for years, pay no tax on most of it, and defer
+the reckoning until sale. In a taxable account,
+this makes MLPs more tax-efficient than bonds,
+REIT distributions, or even many dividend stocks.
+</p>
+
+<div class="trap-box">
+<p><strong>The K-1 Problem:</strong> Every MLP
+sends you a K-1 form (Schedule K-1 of Form 1065)
+instead of a simple 1099. K-1s are late &mdash;
+they often arrive in March, sometimes after April
+15, forcing you to file an extension. K-1s are
+complex &mdash; they report income, deductions,
+and credits from the partnership&rsquo;s
+operations. And K-1s can trigger
+<strong>state filing obligations</strong> in
+every state where the partnership operates. If an
+MLP has operations in 15 states, you may
+technically owe tiny amounts of income tax in
+each of those states. Most investors ignore this
+(the amounts are negligible), but it is a
+compliance risk.</p>
+<p><strong>The UBTI Problem:</strong> Holding
+MLPs in an IRA creates
+<strong>Unrelated Business Taxable Income</strong>
+(UBTI). If UBTI exceeds
+<span class="number">$1,000</span> across all
+MLPs in the IRA, the IRA itself must file a
+tax return (Form 990-T) and pay tax. This
+defeats the purpose of the tax-advantaged account.
+The solution is to hold MLPs in
+<strong>taxable</strong> accounts (where the
+return of capital deferral works in your favor)
+or use MLP ETFs like <span class="ticker">AMLP</span>
+that are structured as C-corps to avoid K-1s
+(but at the cost of a corporate tax layer).</p>
+</div>
+
+<p>
+The 2015&ndash;16 energy downturn and the 2020
+COVID crash taught painful lessons about MLP risk.
+Dozens of MLPs cut their distributions when
+volumes collapsed. The Alerian MLP Index fell
+<span class="number">60%+</span> from 2014 to 2020.
+The survivors emerged with stronger balance sheets,
+lower payout ratios, and more conservative
+financial policies. Post-2020 MLPs are healthier
+than pre-2015 MLPs, but the history serves as a
+reminder: even toll roads suffer when traffic
+disappears.
+</p>
+
+<div class="income-card">
+<h4><span class="ticker">AMLP</span>
+Alerian MLP ETF</h4>
+<p class="meta-line">Yield: ~7.5% &middot;
+ER: 0.85% &middot; ~20 holdings
+&middot; No K-1 (issues 1099)</p>
+<p>The easiest way to own MLPs without K-1
+complexity. Structured as a C-corp, so it pays
+corporate tax at the fund level (reducing
+returns slightly) but issues a simple 1099
+instead of K-1s. Holdings include
+<strong>Enterprise Products</strong>,
+<strong>Energy Transfer</strong>,
+<strong>MPLX</strong>, and
+<strong>Western Midstream</strong>. The high
+expense ratio reflects the C-corp tax burden.
+Use this if you want MLP exposure without
+the paperwork.</p>
+</div>
+
+<div class="income-card">
+<h4><span class="ticker">MLPA</span>
+Global X MLP ETF</h4>
+<p class="meta-line">Yield: ~7.0% &middot;
+ER: 0.45% &middot; ~20 holdings
+&middot; No K-1</p>
+<p>Cheaper alternative to AMLP with similar
+holdings. Also structured to avoid K-1s.
+Lower expense ratio but slightly different
+index methodology. Either AMLP or MLPA
+works &mdash; pick whichever your brokerage
+offers commission-free.</p>
+</div>
+
+<div class="income-card">
+<h4><span class="ticker">EPD</span>
+Enterprise Products Partners</h4>
+<p class="meta-line">Yield: ~7.2% &middot;
+26 consecutive distribution increases
+&middot; K-1</p>
+<p>The blue chip of MLPs. Largest midstream
+company by enterprise value. Pipelines, storage,
+processing, and export facilities across the US.
+Conservative management with investment-grade
+credit rating. Has never cut its distribution,
+even during 2015&ndash;16 and 2020. If you are
+going to own a single individual MLP and deal
+with the K-1, EPD is the one.</p>
+</div>
+
+<!-- ============================================ -->
+<!-- CHAPTER 7: PREFERRED SHARES                  -->
+<!-- ============================================ -->
+
+<h2 id="ch7">Chapter 7: Preferred Shares</h2>
+
+<p>
+Preferred shares are the forgotten middle child
+of income investing. They sit between bonds and
+common stocks in the capital structure, paying
+fixed dividends like bonds but trading on stock
+exchanges like equities. Most retail investors
+have never bought one. Most financial advisors
+rarely recommend them. This neglect creates an
+opportunity, because preferreds often offer higher
+yields than investment-grade bonds with better
+tax treatment &mdash; and the inefficiency
+exists precisely because they are overlooked.
+</p>
+
+<p>
+The mechanics are simple. A company issues
+preferred shares at a <strong>par value</strong>
+(usually <span class="number">$25</span>) with
+a fixed dividend rate (say
+<span class="number">6%</span>, or
+<span class="number">$1.50</span> per year).
+The company pays this dividend before any
+dividend on common shares. If the company
+suspends all dividends, preferred holders must
+be made whole before common shareholders receive
+a penny. For <strong>cumulative</strong>
+preferreds, any skipped payments accumulate and
+must be paid in full before common dividends
+resume. For <strong>non-cumulative</strong>
+preferreds, skipped payments are lost forever
+&mdash; always prefer cumulative.
+</p>
+
+<p>
+The tax advantage is significant. Many preferred
+dividends qualify for the lower
+<span class="number">15&ndash;20%</span> tax rate
+because they are classified as qualified dividends
+(the company pays them from after-tax earnings).
+By contrast, bond interest is taxed as ordinary
+income at rates up to
+<span class="number">37%</span>. A preferred
+yielding <span class="number">6%</span> with
+qualified treatment delivers the same after-tax
+income as a bond yielding
+<span class="number">7.5%+</span> for someone
+in the <span class="number">37%</span> bracket.
+This tax advantage makes preferreds particularly
+attractive in taxable accounts.
+</p>
+
+<h3>Types of Preferred Shares</h3>
+
+<table class="alloc-table" role="presentation">
+<tr>
+  <th>Type</th>
+  <th>Key Feature</th>
+  <th>Best For</th>
+</tr>
+<tr>
+  <td><strong>Fixed-Rate</strong></td>
+  <td>Pays same dividend forever. Most common
+  type. Highly rate-sensitive.</td>
+  <td>Falling rate environments</td>
+</tr>
+<tr>
+  <td><strong>Fixed-to-Floating</strong></td>
+  <td>Pays fixed rate until a call date, then
+  switches to floating (benchmark + spread).</td>
+  <td>Rising rate protection</td>
+</tr>
+<tr>
+  <td><strong>Adjustable Rate</strong></td>
+  <td>Dividend resets periodically based on
+  a benchmark rate. Less price volatility.</td>
+  <td>Rate uncertainty</td>
+</tr>
+<tr>
+  <td><strong>Convertible</strong></td>
+  <td>Can be converted to common shares at a
+  set ratio. Lower yield but upside potential.</td>
+  <td>Growth + income blend</td>
+</tr>
+<tr>
+  <td><strong>Perpetual</strong></td>
+  <td>No maturity date. Pays forever (or until
+  called). Most rate-sensitive type.</td>
+  <td>Maximum current yield</td>
+</tr>
+</table>
+
+<div class="trap-box">
+<p><strong>Call Risk &mdash; The Hidden Trap:</strong>
+Most preferred shares are <strong>callable</strong>
+after 5 years, meaning the issuer can redeem them
+at par (<span class="number">$25</span>) regardless
+of what you paid. If you bought a preferred at
+<span class="number">$27</span> (a $2 premium)
+and it gets called at <span class="number">$25</span>,
+you lose <span class="number">$2</span> per share
+instantly. This happens most often when rates fall
+&mdash; the company can reissue new preferreds
+at a lower rate, so it calls your high-rate shares.
+<strong>Never pay more than
+<span class="number">$25.50</span> for a callable
+preferred</strong> unless you are certain it will
+not be called soon (check the first call date).</p>
+</div>
+
+<p>
+Preferred shares behave more like long-duration
+bonds than like stocks. When interest rates rise,
+preferred prices fall &mdash; sometimes
+dramatically. In 2022, preferred ETFs like
+<span class="ticker">PFF</span> fell
+<span class="number">18%</span> as rates surged.
+This rate sensitivity is the primary risk. If you
+buy preferreds at the wrong point in the rate
+cycle (just before a tightening campaign), you can
+sit in deep losses for years while collecting
+the dividend. The income cushions the blow, but
+the capital loss stings. Buy preferreds when rates
+are high and expected to fall &mdash; that is when
+you get the highest yields AND the potential for
+capital appreciation as rates decline.
+</p>
+
+<div class="income-card">
+<h4><span class="ticker">PFF</span>
+iShares Preferred &amp; Income Securities ETF</h4>
+<p class="meta-line">Yield: ~6.2% &middot;
+ER: 0.46% &middot; ~500 holdings</p>
+<p>The largest preferred ETF. Broad exposure
+across financial, utility, and REIT preferreds.
+Higher expense ratio than you would like, but
+the most liquid option. Heavy financial sector
+weighting (~60% banks and insurance). A decent
+one-stop preferred allocation.</p>
+</div>
+
+<div class="income-card">
+<h4><span class="ticker">PFFD</span>
+Global X US Preferred ETF</h4>
+<p class="meta-line">Yield: ~6.5% &middot;
+ER: 0.23% &middot; ~300 holdings</p>
+<p>Cheaper alternative to PFF with higher yield.
+Market-cap weighted. Similar sector composition
+but lower cost drag. If you want broad preferred
+exposure, PFFD is the better value.</p>
+</div>
+
+<!-- ============================================ -->
+<!-- CHAPTER 8: COVERED CALLS & OPTIONS INCOME    -->
+<!-- ============================================ -->
+
+<h2 id="ch8">Chapter 8: Covered Calls
+&amp; Options Income</h2>
+
+<p>
+Selling options for income is the most
+misunderstood strategy in the income investor&rsquo;s
+toolkit. The pitch is seductive: sell covered calls
+on stocks you already own and collect premium
+every month, generating
+<span class="number">8&ndash;12%</span> annual
+income on top of whatever dividends the stock pays.
+The ETF industry has built an entire product
+category around this idea, with funds like
+<span class="ticker">JEPI</span>,
+<span class="ticker">QYLD</span>, and
+<span class="ticker">XYLD</span> managing tens
+of billions of dollars. The strategy works. It
+does exactly what it promises. The question is
+whether you understand what you are giving up.
+</p>
+
+<p>
+The mechanics are straightforward. A
+<strong>covered call</strong> means you own 100
+shares of a stock and sell a call option against
+those shares. The call gives the buyer the right
+to purchase your shares at a set price (the strike)
+by a set date (expiration). In exchange, you
+receive a premium. If the stock stays below the
+strike, the option expires worthless, you keep
+the premium, and you keep your shares. If the
+stock rises above the strike, your shares get
+called away &mdash; you sell at the strike price
+and miss any gains beyond it. You kept the premium,
+but you missed the rally.
+</p>
+
+<p>
+This tradeoff is the fundamental bargain of
+covered call income: <strong>you are selling
+upside potential for current cash</strong>. In
+any given month, this looks like free money. Over
+years, the missed rallies compound. The S&amp;P
+500&rsquo;s total return since 2014 has been
+roughly <span class="number">14%</span> annualized.
+<span class="ticker">QYLD</span> (which writes
+at-the-money calls on the Nasdaq-100) has returned
+roughly <span class="number">5&ndash;7%</span>
+total during the same period, even after including
+all the premium income. The
+<span class="number">7&ndash;9%</span> annual
+gap is the cost of selling upside. Over a decade,
+that gap compounds into a massive total return
+difference.
+</p>
+
+<h3>The ETF Landscape</h3>
+
+<div class="income-card">
+<h4><span class="ticker">JEPI</span>
+JPMorgan Equity Premium Income ETF</h4>
+<p class="meta-line">Yield: ~7.5% &middot;
+ER: 0.35% &middot; ~130 holdings</p>
+<p>The best-designed covered call ETF on the
+market. JEPI does not write covered calls
+directly on stocks &mdash; it holds a portfolio
+of low-volatility S&amp;P 500 stocks and sells
+<strong>equity-linked notes</strong> (ELNs) that
+replicate a covered call on the S&amp;P 500
+index. This structure provides more tax
+efficiency (ELN premiums can be structured as
+capital gains rather than ordinary income) and
+more flexibility in managing strike prices. The
+equity portfolio itself is actively managed for
+quality and low volatility, which means JEPI
+holds up better in drawdowns than a pure
+S&amp;P 500 covered call strategy. In 2022,
+JEPI lost only <span class="number">3.5%</span>
+(total return) while the S&amp;P lost
+<span class="number">18%</span>. The tradeoff:
+JEPI captures only
+<span class="number">50&ndash;70%</span> of
+upside in strong rallies.</p>
+</div>
+
+<div class="income-card">
+<h4><span class="ticker">JEPQ</span>
+JPMorgan Nasdaq Equity Premium Income ETF</h4>
+<p class="meta-line">Yield: ~9.5% &middot;
+ER: 0.35% &middot; ~80 holdings</p>
+<p>Same ELN strategy as JEPI but applied to
+the Nasdaq-100. Higher yield because tech stocks
+have higher volatility (more premium to sell).
+More growth exposure but also more downside risk.
+If you want the JEPI approach with a tech tilt,
+this is it. Higher income but less
+capital stability.</p>
+</div>
+
+<div class="income-card">
+<h4><span class="ticker">QYLD</span>
+Global X Nasdaq 100 Covered Call ETF</h4>
+<p class="meta-line">Yield: ~11% &middot;
+ER: 0.60% &middot; Nasdaq-100</p>
+<p>Writes at-the-money monthly calls on the
+Nasdaq-100. The highest yield in the covered call
+space but also the most upside you sacrifice.
+QYLD caps virtually all capital appreciation
+because the at-the-money strikes get breached
+in most up months. The NAV has been in a steady
+long-term decline. You are essentially converting
+capital into income. QYLD is a tool for investors
+who need maximum current cash and accept that
+their principal will erode. Not a core holding
+&mdash; a supplement.</p>
+</div>
+
+<div class="income-card">
+<h4><span class="ticker">XYLD</span>
+Global X S&amp;P 500 Covered Call ETF</h4>
+<p class="meta-line">Yield: ~9.5% &middot;
+ER: 0.60% &middot; S&amp;P 500</p>
+<p>Same at-the-money strategy as QYLD but on
+the S&amp;P 500. Lower yield than QYLD (less
+volatility in the S&amp;P = less premium) but
+more stable underlying. Same NAV erosion
+problem. Same role: maximum income supplement,
+not core position.</p>
+</div>
+
+<div class="connection-box">
+<strong>The Right Way to Use Covered Call
+ETFs:</strong> Do not build a portfolio around
+them. Use them as a
+<span class="number">10&ndash;20%</span>
+allocation to boost overall portfolio yield
+while keeping the core in dividend growth stocks,
+bonds, and other assets that preserve or grow
+capital. A <span class="number">$500,000</span>
+portfolio with <span class="number">80%</span>
+in growth assets and
+<span class="number">20%</span>
+(<span class="number">$100,000</span>) in JEPI
+generates roughly
+<span class="number">$7,500</span> per year from
+the covered call sleeve alone, while the rest
+of the portfolio grows. This is far better than
+putting everything in QYLD and watching your
+principal shrink.
+</div>
+
+<!-- ============================================ -->
+<!-- CHAPTER 9: CLOSED-END FUNDS                  -->
+<!-- ============================================ -->
+
+<h2 id="ch9">Chapter 9: Closed-End Funds</h2>
+
+<p>
+Closed-end funds are the Wild West of income
+investing. They can offer genuinely attractive
+opportunities &mdash; buying a dollar of assets
+for 85 cents and collecting a leveraged yield
+of <span class="number">8&ndash;10%</span>. They
+can also be traps that slowly destroy your capital
+while making it look like you are earning great
+income. The difference between a good CEF and a
+bad one comes down to three things: the discount,
+the leverage, and the sustainability of the
+distribution.
+</p>
+
+<p>
+Unlike open-end mutual funds or ETFs, closed-end
+funds issue a fixed number of shares at IPO. After
+that, they trade on exchanges at whatever price
+buyers and sellers agree on. This price can be
+above the fund&rsquo;s net asset value
+(a <strong>premium</strong>) or below it
+(a <strong>discount</strong>). Most CEFs trade at
+discounts most of the time, typically
+<span class="number">5&ndash;15%</span> below NAV.
+When you buy a CEF at a
+<span class="number">10%</span> discount, you are
+paying <span class="number">$9</span> for
+<span class="number">$10</span> worth of assets.
+If the discount narrows to
+<span class="number">5%</span>, you gain
+<span class="number">5%</span> just from the
+discount compression &mdash; on top of whatever
+the underlying assets return.
+</p>
+
+<p>
+Most CEFs use <strong>leverage</strong> to boost
+yield. A fund holding bonds yielding
+<span class="number">5%</span> can borrow at
+<span class="number">3%</span> and invest the
+borrowed money at <span class="number">5%</span>,
+pocketing the <span class="number">2%</span>
+spread. With <span class="number">33%</span>
+leverage, that turns a <span class="number">5%</span>
+yield into roughly
+<span class="number">6.7%</span>. Leverage works
+beautifully when borrowing costs are below
+investment yields. It becomes toxic when borrowing
+costs rise (as they did in 2022&ndash;23), when
+investment yields fall, or when the underlying
+assets lose value (leverage amplifies losses).
+A CEF with <span class="number">33%</span>
+leverage that sees its portfolio drop
+<span class="number">15%</span> will drop roughly
+<span class="number">20%</span> at the NAV level,
+and the market price might drop
+<span class="number">25%+</span> as the discount
+widens too.
+</p>
+
+<h3>Return of Capital: Constructive vs Destructive</h3>
+
+<p>
+Many CEFs sustain their high distributions partly
+through <strong>return of capital</strong> (ROC).
+ROC means the fund is distributing money that
+it did not earn from investments &mdash; it is
+returning your own capital to you. Not all ROC is
+bad. <strong>Constructive ROC</strong> happens when
+unrealized gains in the portfolio support the
+distribution but have not been recognized as
+income yet. The NAV stays stable or grows even
+while ROC is being paid. <strong>Destructive
+ROC</strong> happens when the fund cannot earn
+enough to cover the distribution and is literally
+liquidating itself. The NAV steadily declines,
+and the high yield is an illusion funded by
+shrinking your principal.
+</p>
+
+<div class="trap-box">
+<p><strong>How to Spot Destructive ROC:</strong>
+Look at the fund&rsquo;s NAV over 3&ndash;5 years.
+If NAV is declining steadily while distributions
+stay constant or increase, the fund is paying
+more than it earns and destroying capital. A CEF
+with a <span class="number">10%</span>
+distribution rate and a
+<span class="number">5%</span> annual NAV decline
+is effectively earning
+<span class="number">5%</span> and giving you
+back <span class="number">5%</span> of your own
+money. Your total return is
+<span class="number">5%</span>, not
+<span class="number">10%</span>. The high
+distribution rate is a marketing tool, not a
+measure of investment performance.</p>
+</div>
+
+<p>
+The best CEF investments combine a genuine
+discount to NAV
+(<span class="number">8%+</span>), sustainable
+distributions covered by investment income (not
+ROC), moderate leverage
+(<span class="number">&lt;30%</span>), and
+experienced management with a long track record.
+<strong>PIMCO</strong> and <strong>Nuveen</strong>
+manage many of the highest-quality CEFs in the
+bond and muni space. The
+<strong>PIMCO Dynamic Income Fund</strong>
+(<span class="ticker">PDI</span>) and
+<strong>Nuveen Municipal Value Fund</strong>
+(<span class="ticker">NUV</span>) are examples
+of well-run CEFs with sustainable distributions
+and consistent NAV performance.
+</p>
+
+<p>
+For most investors, CEFs should be a small
+allocation
+(<span class="number">5&ndash;10%</span> of the
+income portfolio) used opportunistically when
+discounts are wide. They are not set-and-forget
+holdings. You need to monitor discounts, leverage
+levels, distribution coverage, and NAV trends.
+If that sounds like too much work, stick with
+ETFs and individual bonds.
+</p>
+
+<!-- ============================================ -->
+<!-- CHAPTER 10: YIELD TRAPS                      -->
+<!-- ============================================ -->
+
+<h2 id="ch10">Chapter 10: Yield Traps</h2>
+
+<p>
+A yield trap is any investment where the high
+yield is a sign of distress, not generosity. The
+stock or fund shows a fat yield because the price
+has collapsed, the distribution is about to be
+cut, or the payout is being funded by destroying
+capital. Yield traps are the most common way
+income investors lose money, and they are
+devastatingly effective because they exploit the
+exact instinct that draws people to income
+investing: the desire for high, reliable cash flow.
+A <span class="number">12%</span> yield is
+intoxicating. It takes discipline to ask
+<em>why</em> the yield is
+<span class="number">12%</span> when everything
+else yields <span class="number">4%</span>.
+</p>
+
+<h3>The 12 Red Flags</h3>
+
+<div class="yield-box">
+<p><strong>1. Yield is more than double the
+sector average.</strong> If utilities yield
+<span class="number">3.5%</span> and one utility
+yields <span class="number">8%</span>, the market
+is pricing in a dividend cut. The market is
+usually right.</p>
+<p><strong>2. Payout ratio exceeds
+<span class="number">100%</span>.</strong> The
+company is paying out more than it earns. It is
+borrowing or selling assets to fund the dividend.
+This is unsustainable by definition.</p>
+<p><strong>3. Free cash flow is negative.</strong>
+The company is not generating enough cash to
+fund operations, let alone dividends. The payout
+is funded by debt or asset sales.</p>
+<p><strong>4. Debt is increasing while the
+dividend stays flat.</strong> The company is
+borrowing to pay the dividend. This can go on
+for years but eventually the debt load becomes
+unsustainable.</p>
+<p><strong>5. The yield rose because the price
+cratered.</strong> A stock that was yielding
+<span class="number">3%</span> at
+<span class="number">$50</span> now yields
+<span class="number">6%</span> at
+<span class="number">$25</span>. The yield
+doubled because the stock lost half its value.
+The high yield is a reflection of distress,
+not a bargain.</p>
+<p><strong>6. Revenue has declined for 3+
+consecutive years.</strong> Shrinking revenue
+means shrinking earnings eventually. The
+dividend cannot grow from a shrinking base.</p>
+<p><strong>7. The company is in a structurally
+declining industry.</strong> Tobacco, legacy
+media, brick-and-mortar retail, office
+REITs &mdash; the high yield compensates for
+permanent capital impairment.</p>
+<p><strong>8. Management is issuing shares to
+fund the dividend.</strong> Some companies
+(especially REITs and MLPs) issue new equity
+to maintain distributions. Your yield is being
+funded by diluting your ownership.</p>
+<p><strong>9. The dividend has not been raised
+in 5+ years.</strong> A frozen dividend in an
+inflationary world is a declining dividend in
+real terms. If the company can&rsquo;t afford
+even a token increase, the payout is under
+stress.</p>
+<p><strong>10. Insider selling is heavy.</strong>
+If executives who know the business best are
+dumping shares while the yield is high, they
+are telling you something. Listen.</p>
+<p><strong>11. The distribution includes
+significant destructive ROC.</strong> (CEFs and
+some REITs.) The fund is returning your own
+capital to you and calling it income. Check
+NAV trends.</p>
+<p><strong>12. The yield is funded by an
+unsustainable financial structure.</strong>
+SPACs, BDCs, or mortgage REITs paying high
+yields from capital structures that blow up
+in credit downturns. The yield is a
+compensation for tail risk.</p>
+</div>
+
+<p>
+The simplest yield trap filter: if you cannot
+explain <em>why</em> the yield is high in one
+sentence that does not involve the word
+&ldquo;cheap,&rdquo; it is probably a trap.
+Legitimate high yields have clear explanations:
+&ldquo;MLPs yield <span class="number">7%</span>
+because K-1 complexity depresses demand.&rdquo;
+&ldquo;Munis yield less because they are
+tax-free.&rdquo;
+&ldquo;This REIT yields <span class="number">5.5%</span>
+because REITs must distribute
+<span class="number">90%</span> of income by
+law.&rdquo; If the explanation is just
+&ldquo;the stock went down a lot,&rdquo;
+walk away.
+</p>
+
+<!-- ============================================ -->
+<!-- CHAPTER 11: THE TAX PICTURE                  -->
+<!-- ============================================ -->
+
+<h2 id="ch11">Chapter 11: The Tax Picture</h2>
+
+<p>
+Tax efficiency is the difference between a good
+income portfolio and a great one. Two investors
+with identical yields can end up with dramatically
+different after-tax income depending on
+<em>what</em> they own and <em>where</em> they
+hold it. An investor earning
+<span class="number">$50,000</span> in income
+from the right assets in the right accounts might
+keep <span class="number">$42,000</span>. The same
+investor earning <span class="number">$50,000</span>
+from the wrong assets in the wrong accounts might
+keep only <span class="number">$33,000</span>.
+That <span class="number">$9,000</span> difference
+is pure tax drag &mdash; identical gross income,
+vastly different net income.
+</p>
+
+<h3>How Each Income Source Is Taxed</h3>
+
+<table class="alloc-table" role="presentation">
+<tr>
+  <th>Income Source</th>
+  <th>Tax Treatment</th>
+  <th>Top Rate</th>
+  <th>Best Account</th>
+</tr>
+<tr>
+  <td><strong>Qualified Dividends</strong></td>
+  <td>Preferential capital gains rates</td>
+  <td><span class="number">20%</span> + 3.8% NIIT</td>
+  <td>Taxable (already efficient)</td>
+</tr>
+<tr>
+  <td><strong>Bond Interest</strong></td>
+  <td>Ordinary income</td>
+  <td><span class="number">37%</span> + 3.8% NIIT</td>
+  <td>IRA / 401(k)</td>
+</tr>
+<tr>
+  <td><strong>Muni Bond Interest</strong></td>
+  <td>Federal tax-free (state-free
+  if same state)</td>
+  <td><span class="number">0%</span></td>
+  <td>Taxable (tax benefit wasted
+  in IRA)</td>
+</tr>
+<tr>
+  <td><strong>REIT Distributions</strong></td>
+  <td>Mostly ordinary income
+  (199A deduction may apply)</td>
+  <td><span class="number">29.6%</span> effective</td>
+  <td>IRA / 401(k)</td>
+</tr>
+<tr>
+  <td><strong>MLP Distributions</strong></td>
+  <td>Mostly return of capital
+  (tax-deferred)</td>
+  <td>Deferred until sale</td>
+  <td>Taxable (avoid IRA &mdash; UBTI)</td>
+</tr>
+<tr>
+  <td><strong>Preferred Dividends</strong></td>
+  <td>Often qualified (check each issue)</td>
+  <td><span class="number">20%</span> + 3.8% NIIT</td>
+  <td>Taxable (if qualified)</td>
+</tr>
+<tr>
+  <td><strong>Covered Call Premiums</strong></td>
+  <td>Short-term capital gains</td>
+  <td><span class="number">37%</span> + 3.8% NIIT</td>
+  <td>IRA / 401(k)</td>
+</tr>
+<tr>
+  <td><strong>CEF Distributions</strong></td>
+  <td>Mix (ordinary + gains + ROC)</td>
+  <td>Varies</td>
+  <td>Depends on composition</td>
+</tr>
+</table>
+
+<h3>The Placement Rule</h3>
+
+<p>
+The principle is simple: <strong>put tax-inefficient
+assets in tax-advantaged accounts and
+tax-efficient assets in taxable accounts.</strong>
+Bond funds, REIT ETFs, and covered call ETFs
+generate ordinary income taxed at up to
+<span class="number">40.8%</span>. Put them in
+your IRA or 401(k) where the tax is deferred
+(traditional) or eliminated (Roth). Dividend
+growth stocks, municipal bonds, and MLPs are
+already tax-efficient in taxable accounts &mdash;
+qualified dividends at
+<span class="number">15&ndash;20%</span>,
+munis at <span class="number">0%</span>,
+MLPs mostly deferred. Putting munis in an IRA
+wastes their tax-free status. Putting MLPs in
+an IRA creates UBTI problems. Match the
+asset to the account.
+</p>
+
+<div class="yield-box">
+<p><strong>Optimal Placement Order:</strong></p>
+<p><strong>In IRA / 401(k) / Roth:</strong>
+Bond funds (<span class="ticker">BND</span>,
+<span class="ticker">VCIT</span>),
+REIT ETFs (<span class="ticker">VNQ</span>),
+covered call ETFs (<span class="ticker">JEPI</span>,
+<span class="ticker">QYLD</span>),
+high-yield bond funds (<span class="ticker">HYG</span>),
+TIPS (<span class="ticker">SCHP</span>).</p>
+<p><strong>In Taxable:</strong>
+Dividend growth stocks
+(<span class="ticker">SCHD</span>,
+<span class="ticker">VIG</span>),
+municipal bonds
+(<span class="ticker">VTEB</span>,
+<span class="ticker">MUB</span>),
+individual MLPs or MLP ETFs
+(<span class="ticker">AMLP</span>),
+qualified preferred ETFs
+(<span class="ticker">PFFD</span>),
+US equity index funds
+(<span class="ticker">VTI</span>).</p>
+</div>
+
+<p>
+The <span class="number">199A deduction</span>
+deserves special mention. The Tax Cuts and Jobs
+Act of 2017 created a
+<span class="number">20%</span> deduction on
+qualified REIT dividends and MLP distributions.
+This effectively reduces the top tax rate on
+REIT income from
+<span class="number">37%</span> to
+<span class="number">29.6%</span>. The deduction
+is available in taxable accounts but not in IRAs
+(because IRA distributions are all taxed as
+ordinary income regardless of source). This is
+one reason REITs are not as tax-disadvantaged in
+taxable accounts as they used to be &mdash; but
+they are still less efficient than qualified
+dividends. The 199A deduction is currently set
+to expire after 2025 unless Congress extends it.
+</p>
+
+<!-- ============================================ -->
+<!-- CHAPTER 12: INCOME IN EVERY REGIME           -->
+<!-- ============================================ -->
+
+<h2 id="ch12">Chapter 12: Income
+in Every Regime</h2>
+
+<p>
+Income portfolios do not exist in a vacuum. They
+exist in an economy that cycles through distinct
+regimes, and each regime treats different income
+sources very differently. The portfolio that
+generates safe, growing income during an expansion
+may hemorrhage capital during a recession. The
+assets that thrive when rates are falling may
+suffer when rates are rising. Understanding which
+income sources perform best in each environment
+lets you build a portfolio that keeps paying you
+regardless of what the economy does.
+</p>
+
+<h3>Rising Interest Rates</h3>
+
+<div class="income-card">
+<h4>The Environment</h4>
+<p class="meta-line">Fed hiking, bond prices
+falling, credit tightening</p>
+<p><span class="danger">Hurts:</span> Long-duration
+bonds (TLT can lose <span class="number">15&ndash;25%</span>),
+REITs (borrowing costs spike, share prices fall),
+preferred shares (behave like long bonds), utilities
+(rate-sensitive, leveraged), leveraged CEFs
+(borrowing costs eat into spreads).</p>
+<p><span class="safe">Helps:</span> Short-duration
+bonds and T-bills (reinvest at higher rates),
+floating-rate loans (<span class="ticker">BKLN</span>),
+bank stocks (net interest margins expand),
+MLPs (energy often strong when rates rise due
+to inflation), dividend growth stocks with
+pricing power.</p>
+<p><strong>Best income plays:</strong>
+<span class="ticker">SGOV</span>,
+<span class="ticker">VCSH</span>,
+<span class="ticker">BKLN</span>,
+<span class="ticker">SCHD</span>,
+<span class="ticker">AMLP</span>. Keep duration
+short. Avoid anything that behaves like a
+long bond.</p>
+</div>
+
+<h3>Falling Interest Rates</h3>
+
+<div class="income-card">
+<h4>The Environment</h4>
+<p class="meta-line">Fed cutting, bond prices
+rising, credit loosening</p>
+<p><span class="danger">Hurts:</span> T-bills and
+money market funds (reinvestment rates fall),
+floating-rate loans (coupons decrease), bank
+stocks (margins compress).</p>
+<p><span class="safe">Helps:</span> Long-duration
+bonds (TLT can gain <span class="number">20&ndash;30%</span>),
+preferred shares (prices rise as rates fall), REITs
+(cheaper borrowing, higher property values),
+utilities (lower discount rate boosts valuations),
+investment-grade corporates.</p>
+<p><strong>Best income plays:</strong>
+<span class="ticker">TLT</span>,
+<span class="ticker">VCIT</span>,
+<span class="ticker">PFF</span>,
+<span class="ticker">VNQ</span>,
+<span class="ticker">O</span>. Extend duration.
+Lock in high rates before they fall further.</p>
+</div>
+
+<h3>Inflationary Environment</h3>
+
+<div class="income-card">
+<h4>The Environment</h4>
+<p class="meta-line">CPI elevated, real returns
+under pressure, purchasing power eroding</p>
+<p><span class="danger">Hurts:</span> Fixed-rate
+bonds (coupon loses real value), fixed-rate
+preferred shares, any fixed payment that does
+not adjust for inflation.</p>
+<p><span class="safe">Helps:</span> TIPS
+(<span class="ticker">SCHP</span> &mdash; principal
+adjusts with CPI), commodity producers and MLPs
+(revenue rises with commodity prices), dividend
+growth stocks with pricing power (they raise
+dividends above inflation), I-Bonds (up to
+$10,000/year, directly inflation-linked),
+real estate with short lease terms
+(apartment REITs can raise rents frequently).</p>
+<p><strong>Best income plays:</strong>
+<span class="ticker">SCHP</span>,
+<span class="ticker">SCHD</span>,
+<span class="ticker">AMLP</span>,
+<span class="ticker">VIG</span>,
+apartment REITs. Avoid long-duration
+fixed-rate anything.</p>
+</div>
+
+<h3>Recession</h3>
+
+<div class="income-card">
+<h4>The Environment</h4>
+<p class="meta-line">GDP contracting, earnings
+falling, credit stress rising</p>
+<p><span class="danger">Hurts:</span> High-yield
+bonds (defaults spike), cyclical dividend stocks
+(earnings collapse, dividends cut), REITs
+(occupancy falls), leveraged CEFs (losses
+amplified), MLPs (volumes can decline).</p>
+<p><span class="safe">Helps:</span> Treasury bonds
+(flight to safety, prices surge), consumer staples
+dividends (people still buy toothpaste and cereal),
+utility dividends (regulated returns, defensive),
+healthcare dividends (non-discretionary spending),
+money market funds (if rates are still high from
+prior tightening).</p>
+<p><strong>Best income plays:</strong>
+<span class="ticker">TLT</span>,
+<span class="ticker">BND</span>,
+consumer staples (<span class="ticker">XLP</span>),
+utilities (<span class="ticker">XLU</span>),
+healthcare (<span class="ticker">XLV</span>),
+<span class="ticker">NOBL</span>. Quality and
+safety over yield.</p>
+</div>
+
+<div class="connection-box">
+<strong>The Key Insight:</strong> No single income
+source works in all four regimes. Dividend growth
+stocks thrive in expansions and inflation but
+suffer in recessions. Long bonds shine in
+recessions and rate cuts but collapse during
+hikes. T-bills dominate during hikes but wither
+during cuts. The income architect builds a
+portfolio with exposure across all four quadrants
+so that something is always working. This is
+diversification applied to income &mdash; not
+just owning different assets, but owning assets
+that generate income under different conditions.
+</div>
+
+<!-- ============================================ -->
+<!-- CHAPTER 13: BUILDING THE PAYCHECK            -->
+<!-- ============================================ -->
+
+<h2 id="ch13">Chapter 13: Building
+the Paycheck</h2>
+
+<p>
+The ultimate goal of income investing is not to
+accumulate the highest yield number. It is to
+build a <strong>cash flow machine</strong> that
+deposits enough money into your account every
+month to cover your expenses without selling a
+single share. This chapter shows you how to
+engineer that machine, month by month, with
+real numbers.
+</p>
+
+<h3>Monthly Cash Flow Engineering</h3>
+
+<p>
+Most dividends and bond coupons pay quarterly,
+and different companies pay in different months.
+By deliberately choosing investments that pay in
+different months, you can create a portfolio that
+generates income every single month, even though
+each individual holding only pays quarterly. The
+three common quarterly payment schedules are:
+</p>
+
+<table class="alloc-table" role="presentation">
+<tr>
+  <th>Schedule</th>
+  <th>Months</th>
+  <th>Examples</th>
+</tr>
+<tr>
+  <td><strong>Jan/Apr/Jul/Oct</strong></td>
+  <td>Q1 start</td>
+  <td><strong>Apple</strong>,
+  <strong>JPMorgan</strong>,
+  <strong>Verizon</strong>,
+  <span class="ticker">SCHD</span></td>
+</tr>
+<tr>
+  <td><strong>Feb/May/Aug/Nov</strong></td>
+  <td>Q2 start</td>
+  <td><strong>Microsoft</strong>,
+  <strong>Home Depot</strong>,
+  <strong>Merck</strong></td>
+</tr>
+<tr>
+  <td><strong>Mar/Jun/Sep/Dec</strong></td>
+  <td>Q3 start</td>
+  <td><strong>Coca-Cola</strong>,
+  <strong>Procter &amp; Gamble</strong>,
+  <strong>Johnson &amp; Johnson</strong>,
+  <span class="ticker">VIG</span></td>
+</tr>
+</table>
+
+<p>
+By holding at least one investment from each
+schedule, you receive cash in every month of the
+year. Add a monthly dividend payer like
+<span class="ticker">O</span> (Realty Income),
+<span class="ticker">JEPI</span>, or
+<span class="ticker">STAG</span> (STAG Industrial
+REIT), and you have monthly cash flow on top of
+the quarterly diversification. Bond funds like
+<span class="ticker">BND</span> also distribute
+monthly.
+</p>
+
+<h3>The $4,000/Month Blueprint</h3>
+
+<p>
+Say you need <span class="number">$4,000</span>
+per month (<span class="number">$48,000</span>
+per year) in portfolio income. Here is how you
+engineer that from a
+<span class="number">$1,000,000</span> portfolio
+using a blended
+<span class="number">4.8%</span> yield:
+</p>
+
+<table class="alloc-table" role="presentation">
+<tr>
+  <th>Sleeve</th>
+  <th>Allocation</th>
+  <th>Amount</th>
+  <th>Yield</th>
+  <th>Annual Income</th>
+</tr>
+<tr>
+  <td>Dividend Growth
+  (<span class="ticker">SCHD</span> +
+  <span class="ticker">VIG</span>)</td>
+  <td><span class="number">35%</span></td>
+  <td>$350,000</td>
+  <td><span class="number">2.8%</span></td>
+  <td>$9,800</td>
+</tr>
+<tr>
+  <td>Investment-Grade Bonds
+  (<span class="ticker">VCIT</span> +
+  <span class="ticker">VCSH</span>)</td>
+  <td><span class="number">25%</span></td>
+  <td>$250,000</td>
+  <td><span class="number">4.8%</span></td>
+  <td>$12,000</td>
+</tr>
+<tr>
+  <td>REITs
+  (<span class="ticker">VNQ</span> +
+  <span class="ticker">O</span>)</td>
+  <td><span class="number">10%</span></td>
+  <td>$100,000</td>
+  <td><span class="number">4.5%</span></td>
+  <td>$4,500</td>
+</tr>
+<tr>
+  <td>Covered Call ETF
+  (<span class="ticker">JEPI</span>)</td>
+  <td><span class="number">10%</span></td>
+  <td>$100,000</td>
+  <td><span class="number">7.5%</span></td>
+  <td>$7,500</td>
+</tr>
+<tr>
+  <td>Preferreds
+  (<span class="ticker">PFFD</span>)</td>
+  <td><span class="number">8%</span></td>
+  <td>$80,000</td>
+  <td><span class="number">6.5%</span></td>
+  <td>$5,200</td>
+</tr>
+<tr>
+  <td>MLPs
+  (<span class="ticker">AMLP</span>)</td>
+  <td><span class="number">7%</span></td>
+  <td>$70,000</td>
+  <td><span class="number">7.5%</span></td>
+  <td>$5,250</td>
+</tr>
+<tr>
+  <td>Munis
+  (<span class="ticker">VTEB</span>)</td>
+  <td><span class="number">5%</span></td>
+  <td>$50,000</td>
+  <td><span class="number">3.3%</span></td>
+  <td>$1,650</td>
+</tr>
+<tr>
+  <td colspan="3"
+    style="text-align:right;font-weight:700;">
+    Total Annual Income:</td>
+  <td colspan="2" style="font-weight:700;">
+    <span class="number">$45,900</span>
+    (~<span class="number">$3,825</span>/mo)</td>
+</tr>
+</table>
+
+<p>
+That is <span class="number">$3,825</span> per
+month from a blended
+<span class="number">4.6%</span> yield &mdash;
+close to the target but not quite there. You have
+two levers to close the gap: (1) increase the
+allocation to higher-yield sleeves (more JEPI or
+AMLP), or (2) supplement with
+<span class="number">$175</span>/month of
+share sales from the dividend growth sleeve, which
+at <span class="number">0.6%</span> annual
+withdrawal represents negligible capital
+depletion. The dividend growth sleeve is also
+increasing its payout by
+<span class="number">6&ndash;8%</span> per year,
+which means the gap closes organically within
+2&ndash;3 years as dividend raises push total
+income past <span class="number">$48,000</span>.
+</p>
+
+<p>
+Notice the tax placement implied by this
+portfolio: the bonds, REITs, and JEPI go in the
+IRA (ordinary income sheltered). The dividend
+stocks, munis, MLPs, and preferreds go in the
+taxable account (already tax-efficient). The same
+<span class="number">$45,900</span> in gross
+income becomes roughly
+<span class="number">$39,000&ndash;$41,000</span>
+after tax when placed correctly versus
+<span class="number">$33,000&ndash;$35,000</span>
+when placed randomly. That is
+<span class="number">$6,000+</span> per year in
+pure tax-placement alpha.
+</p>
+
+<!-- ============================================ -->
+<!-- CHAPTER 14: MODEL INCOME PORTFOLIOS          -->
+<!-- ============================================ -->
+
+<h2 id="ch14">Chapter 14:
+The Model Income Portfolios</h2>
+
+<p>
+Five complete portfolios, from conservative to
+aggressive, each designed for a specific income
+investor profile. Every portfolio uses real ETFs
+with real yields, assumes a
+<span class="number">$500,000</span> starting
+balance, and shows expected annual income.
+Adjust proportionally for your actual balance.
+</p>
+
+<div class="income-card">
+<h4>Portfolio A: The Treasury Fortress</h4>
+<p class="meta-line">For: Capital preservation
+first, income second. The investor who cannot
+afford to lose principal.</p>
+<table class="alloc-table" role="presentation">
+<tr>
+  <th>ETF</th><th>Allocation</th><th>Amount</th>
+  <th>Yield</th><th>Income</th>
+</tr>
+<tr>
+  <td><span class="ticker">SGOV</span>
+  0&ndash;3 Mo Treasury</td>
+  <td><span class="number">30%</span></td>
+  <td>$150,000</td>
+  <td><span class="number">5.0%</span></td>
+  <td>$7,500</td>
+</tr>
+<tr>
+  <td><span class="ticker">VGSH</span>
+  Short-Term Treasury</td>
+  <td><span class="number">25%</span></td>
+  <td>$125,000</td>
+  <td><span class="number">4.5%</span></td>
+  <td>$5,625</td>
+</tr>
+<tr>
+  <td><span class="ticker">VGIT</span>
+  Intermediate Treasury</td>
+  <td><span class="number">25%</span></td>
+  <td>$125,000</td>
+  <td><span class="number">4.2%</span></td>
+  <td>$5,250</td>
+</tr>
+<tr>
+  <td><span class="ticker">SCHD</span>
+  Dividend Equity</td>
+  <td><span class="number">15%</span></td>
+  <td>$75,000</td>
+  <td><span class="number">3.5%</span></td>
+  <td>$2,625</td>
+</tr>
+<tr>
+  <td><span class="ticker">VTEB</span>
+  Muni Bonds</td>
+  <td><span class="number">5%</span></td>
+  <td>$25,000</td>
+  <td><span class="number">3.3%</span></td>
+  <td>$825</td>
+</tr>
+</table>
+<p><strong>Total annual income:
+<span class="number">$21,825</span></strong>
+(blended yield:
+<span class="number">4.37%</span>).
+Maximum drawdown: &lt;5%. This portfolio
+will never keep you up at night. The tradeoff
+is modest income and near-zero growth. Best
+for investors within 2&ndash;3 years of needing
+the money or those with very low risk tolerance.
+When rates eventually fall, reinvestment risk
+becomes the main concern &mdash; the SGOV and
+VGSH sleeves will reset lower.</p>
+</div>
+
+<div class="income-card">
+<h4>Portfolio B: The Balanced Builder</h4>
+<p class="meta-line">For: The investor who wants
+meaningful income today with some growth for
+tomorrow. The workhorse.</p>
+<table class="alloc-table" role="presentation">
+<tr>
+  <th>ETF</th><th>Allocation</th><th>Amount</th>
+  <th>Yield</th><th>Income</th>
+</tr>
+<tr>
+  <td><span class="ticker">SCHD</span>
+  Dividend Equity</td>
+  <td><span class="number">30%</span></td>
+  <td>$150,000</td>
+  <td><span class="number">3.5%</span></td>
+  <td>$5,250</td>
+</tr>
+<tr>
+  <td><span class="ticker">VCIT</span>
+  Corp Bonds</td>
+  <td><span class="number">20%</span></td>
+  <td>$100,000</td>
+  <td><span class="number">4.9%</span></td>
+  <td>$4,900</td>
+</tr>
+<tr>
+  <td><span class="ticker">VIG</span>
+  Dividend Growth</td>
+  <td><span class="number">15%</span></td>
+  <td>$75,000</td>
+  <td><span class="number">1.8%</span></td>
+  <td>$1,350</td>
+</tr>
+<tr>
+  <td><span class="ticker">JEPI</span>
+  Covered Call</td>
+  <td><span class="number">10%</span></td>
+  <td>$50,000</td>
+  <td><span class="number">7.5%</span></td>
+  <td>$3,750</td>
+</tr>
+<tr>
+  <td><span class="ticker">VNQ</span>
+  REITs</td>
+  <td><span class="number">10%</span></td>
+  <td>$50,000</td>
+  <td><span class="number">3.8%</span></td>
+  <td>$1,900</td>
+</tr>
+<tr>
+  <td><span class="ticker">PFFD</span>
+  Preferreds</td>
+  <td><span class="number">10%</span></td>
+  <td>$50,000</td>
+  <td><span class="number">6.5%</span></td>
+  <td>$3,250</td>
+</tr>
+<tr>
+  <td><span class="ticker">VTEB</span>
+  Munis</td>
+  <td><span class="number">5%</span></td>
+  <td>$25,000</td>
+  <td><span class="number">3.3%</span></td>
+  <td>$825</td>
+</tr>
+</table>
+<p><strong>Total annual income:
+<span class="number">$21,225</span></strong>
+(blended yield:
+<span class="number">4.25%</span>).
+Expected max drawdown: ~15&ndash;20%. The
+SCHD+VIG core provides dividend growth of
+<span class="number">6&ndash;8%</span> per year,
+so income grows faster than inflation. JEPI and
+PFFD provide yield boost. Bonds and munis
+provide stability. This is the portfolio for
+most retirees or near-retirees who want income
+that grows.</p>
+</div>
+
+<div class="income-card">
+<h4>Portfolio C: The Income Maximizer</h4>
+<p class="meta-line">For: The investor who needs
+maximum current income and accepts principal
+volatility. Retirees with pensions or other
+income sources who can stomach drawdowns.</p>
+<table class="alloc-table" role="presentation">
+<tr>
+  <th>ETF</th><th>Allocation</th><th>Amount</th>
+  <th>Yield</th><th>Income</th>
+</tr>
+<tr>
+  <td><span class="ticker">JEPI</span>
+  Covered Call</td>
+  <td><span class="number">20%</span></td>
+  <td>$100,000</td>
+  <td><span class="number">7.5%</span></td>
+  <td>$7,500</td>
+</tr>
+<tr>
+  <td><span class="ticker">SCHD</span>
+  Dividend Equity</td>
+  <td><span class="number">20%</span></td>
+  <td>$100,000</td>
+  <td><span class="number">3.5%</span></td>
+  <td>$3,500</td>
+</tr>
+<tr>
+  <td><span class="ticker">AMLP</span>
+  MLPs</td>
+  <td><span class="number">15%</span></td>
+  <td>$75,000</td>
+  <td><span class="number">7.5%</span></td>
+  <td>$5,625</td>
+</tr>
+<tr>
+  <td><span class="ticker">PFFD</span>
+  Preferreds</td>
+  <td><span class="number">15%</span></td>
+  <td>$75,000</td>
+  <td><span class="number">6.5%</span></td>
+  <td>$4,875</td>
+</tr>
+<tr>
+  <td><span class="ticker">O</span>
+  Realty Income</td>
+  <td><span class="number">10%</span></td>
+  <td>$50,000</td>
+  <td><span class="number">5.5%</span></td>
+  <td>$2,750</td>
+</tr>
+<tr>
+  <td><span class="ticker">VCIT</span>
+  Corp Bonds</td>
+  <td><span class="number">10%</span></td>
+  <td>$50,000</td>
+  <td><span class="number">4.9%</span></td>
+  <td>$2,450</td>
+</tr>
+<tr>
+  <td><span class="ticker">HDV</span>
+  High Dividend</td>
+  <td><span class="number">10%</span></td>
+  <td>$50,000</td>
+  <td><span class="number">4.0%</span></td>
+  <td>$2,000</td>
+</tr>
+</table>
+<p><strong>Total annual income:
+<span class="number">$28,700</span></strong>
+(blended yield:
+<span class="number">5.74%</span>).
+Expected max drawdown: ~25&ndash;30%. This
+portfolio generates nearly
+<span class="number">$2,400</span>/month from
+<span class="number">$500K</span>. The tradeoff
+is meaningful principal risk during bear markets
+and less growth potential. The SCHD sleeve
+provides some dividend growth, but the overall
+income growth rate is lower than Portfolio B
+because so much is allocated to fixed or
+capped-upside income sources.</p>
+</div>
+
+<div class="income-card">
+<h4>Portfolio D: The Growth-First Income Portfolio</h4>
+<p class="meta-line">For: The 30&ndash;45 year old
+who wants to build an income machine for the
+future. Low current yield but rapid compounding.</p>
+<table class="alloc-table" role="presentation">
+<tr>
+  <th>ETF</th><th>Allocation</th><th>Amount</th>
+  <th>Yield</th><th>Income</th>
+</tr>
+<tr>
+  <td><span class="ticker">VIG</span>
+  Dividend Growth</td>
+  <td><span class="number">35%</span></td>
+  <td>$175,000</td>
+  <td><span class="number">1.8%</span></td>
+  <td>$3,150</td>
+</tr>
+<tr>
+  <td><span class="ticker">SCHD</span>
+  Dividend Equity</td>
+  <td><span class="number">25%</span></td>
+  <td>$125,000</td>
+  <td><span class="number">3.5%</span></td>
+  <td>$4,375</td>
+</tr>
+<tr>
+  <td><span class="ticker">DGRO</span>
+  Dividend Growth</td>
+  <td><span class="number">20%</span></td>
+  <td>$100,000</td>
+  <td><span class="number">2.3%</span></td>
+  <td>$2,300</td>
+</tr>
+<tr>
+  <td><span class="ticker">VCSH</span>
+  Short Corp Bonds</td>
+  <td><span class="number">10%</span></td>
+  <td>$50,000</td>
+  <td><span class="number">4.7%</span></td>
+  <td>$2,350</td>
+</tr>
+<tr>
+  <td><span class="ticker">NOBL</span>
+  Aristocrats</td>
+  <td><span class="number">10%</span></td>
+  <td>$50,000</td>
+  <td><span class="number">2.3%</span></td>
+  <td>$1,150</td>
+</tr>
+</table>
+<p><strong>Total annual income:
+<span class="number">$13,325</span></strong>
+(blended yield:
+<span class="number">2.67%</span>).
+Expected max drawdown: ~20&ndash;25%. The yield
+looks low today, but the dividend growth rate is
+<span class="number">8&ndash;10%</span> annually.
+In 10 years, this portfolio will yield
+<span class="number">5.5&ndash;6.5%</span>
+on original cost with substantially higher
+capital appreciation than the higher-yield
+portfolios. In 20 years, it will likely
+generate more income AND more capital than
+any of the other portfolios. Time is the
+dividend growth investor&rsquo;s greatest
+asset.</p>
+</div>
+
+<div class="income-card">
+<h4>Portfolio E: The All-Weather Income Machine</h4>
+<p class="meta-line">For: The investor who wants
+income in any market environment. Regime-aware.
+No single point of failure.</p>
+<table class="alloc-table" role="presentation">
+<tr>
+  <th>ETF</th><th>Allocation</th><th>Amount</th>
+  <th>Yield</th><th>Income</th>
+</tr>
+<tr>
+  <td><span class="ticker">SCHD</span>
+  Dividend Equity</td>
+  <td><span class="number">20%</span></td>
+  <td>$100,000</td>
+  <td><span class="number">3.5%</span></td>
+  <td>$3,500</td>
+</tr>
+<tr>
+  <td><span class="ticker">VCIT</span>
+  Corp Bonds</td>
+  <td><span class="number">15%</span></td>
+  <td>$75,000</td>
+  <td><span class="number">4.9%</span></td>
+  <td>$3,675</td>
+</tr>
+<tr>
+  <td><span class="ticker">JEPI</span>
+  Covered Call</td>
+  <td><span class="number">10%</span></td>
+  <td>$50,000</td>
+  <td><span class="number">7.5%</span></td>
+  <td>$3,750</td>
+</tr>
+<tr>
+  <td><span class="ticker">SGOV</span>
+  T-Bills</td>
+  <td><span class="number">10%</span></td>
+  <td>$50,000</td>
+  <td><span class="number">5.0%</span></td>
+  <td>$2,500</td>
+</tr>
+<tr>
+  <td><span class="ticker">AMLP</span>
+  MLPs</td>
+  <td><span class="number">10%</span></td>
+  <td>$50,000</td>
+  <td><span class="number">7.5%</span></td>
+  <td>$3,750</td>
+</tr>
+<tr>
+  <td><span class="ticker">VTEB</span>
+  Munis</td>
+  <td><span class="number">10%</span></td>
+  <td>$50,000</td>
+  <td><span class="number">3.3%</span></td>
+  <td>$1,650</td>
+</tr>
+<tr>
+  <td><span class="ticker">PFFD</span>
+  Preferreds</td>
+  <td><span class="number">10%</span></td>
+  <td>$50,000</td>
+  <td><span class="number">6.5%</span></td>
+  <td>$3,250</td>
+</tr>
+<tr>
+  <td><span class="ticker">SCHP</span>
+  TIPS</td>
+  <td><span class="number">5%</span></td>
+  <td>$25,000</td>
+  <td><span class="number">4.0%</span></td>
+  <td>$1,000</td>
+</tr>
+<tr>
+  <td><span class="ticker">VNQ</span>
+  REITs</td>
+  <td><span class="number">5%</span></td>
+  <td>$50,000</td>
+  <td><span class="number">3.8%</span></td>
+  <td>$950</td>
+</tr>
+<tr>
+  <td><span class="ticker">VIG</span>
+  Dividend Growth</td>
+  <td><span class="number">5%</span></td>
+  <td>$25,000</td>
+  <td><span class="number">1.8%</span></td>
+  <td>$450</td>
+</tr>
+</table>
+<p><strong>Total annual income:
+<span class="number">$24,475</span></strong>
+(blended yield:
+<span class="number">4.90%</span>).
+Expected max drawdown: ~12&ndash;18%.
+This portfolio has something working in
+every regime. Rising rates? SGOV and AMLP.
+Falling rates? VCIT and PFFD. Inflation?
+SCHP and AMLP. Recession? SGOV and VCIT.
+Growth? SCHD and VIG. The yield is solid,
+the growth is moderate, and the risk is
+diversified across seven income sources.
+No single source exceeds
+<span class="number">20%</span> of the
+portfolio. This is the income architect&rsquo;s
+answer to an uncertain world.</p>
+</div>
+
+<!-- ============================================ -->
+<!-- CHAPTER 15: THE WITHDRAWAL QUESTION          -->
+<!-- ============================================ -->
+
+<h2 id="ch15">Chapter 15:
+The Withdrawal Question</h2>
+
+<p>
+The classic retirement question is: how much can
+you withdraw from a portfolio each year without
+running out of money? The famous answer is the
+<strong>4% rule</strong>, derived from
+<strong>William Bengen&rsquo;s</strong> 1994 study:
+withdraw <span class="number">4%</span> of your
+portfolio in year one, then adjust that dollar
+amount for inflation each subsequent year. Using
+historical US stock and bond returns, no 30-year
+retirement period since 1926 has run out of money
+at a <span class="number">4%</span> withdrawal
+rate.
+</p>
+
+<p>
+The 4% rule is a useful starting point but a poor
+ending point. It has several problems.
+First, it is based on a 50/50 stock-bond portfolio,
+not an income-optimized portfolio. An income
+portfolio with diversified yield sources may
+support a higher sustainable rate.
+Second, it assumes constant inflation-adjusted
+withdrawals regardless of market conditions, which
+is how nobody actually spends in retirement.
+Real people cut back when times are bad and
+spend more when times are good.
+Third, it is calibrated to 30-year periods. If
+you retire at 45, you need 50+ years, which drops
+the safe rate to roughly
+<span class="number">3.3&ndash;3.5%</span>.
+</p>
+
+<h3>Natural Yield vs Selling Shares</h3>
+
+<p>
+The income investor&rsquo;s alternative to the
+4% rule is the <strong>natural yield</strong>
+approach: spend whatever the portfolio generates
+in dividends, interest, and distributions, and
+never sell shares. If your portfolio yields
+<span class="number">4%</span>, you withdraw
+<span class="number">4%</span>. If it yields
+<span class="number">3%</span>, you withdraw
+<span class="number">3%</span>. You never touch
+principal. Your income rises as dividends grow
+and falls if dividends are cut.
+</p>
+
+<p>
+The advantage is psychological and mathematical:
+you never sell shares at depressed prices during
+a downturn (avoiding sequence-of-returns risk),
+and your principal stays intact to generate
+income indefinitely. The disadvantage is that
+your spending fluctuates with your income, which
+can be uncomfortable. A
+<span class="number">20%</span> dividend cut
+across your portfolio means a
+<span class="number">20%</span> pay cut. Building
+a cash reserve (6&ndash;12 months of expenses in
+<span class="ticker">SGOV</span> or money market)
+solves this by giving you a buffer to draw from
+when income temporarily dips.
+</p>
+
+<h3>The Guardrails Approach</h3>
+
+<p>
+The <strong>Guyton-Klinger guardrails</strong>
+method is the best compromise between rigid
+withdrawal rules and total flexibility. You set
+an initial withdrawal rate (say
+<span class="number">5%</span> for an income
+portfolio), then adjust based on portfolio
+performance:
+</p>
+
+<div class="yield-box">
+<p><strong>Upper Guardrail:</strong> If your
+current withdrawal rate drops below
+<span class="number">4%</span> (because the
+portfolio has grown), give yourself a
+<span class="number">10%</span> raise. The
+portfolio can support more spending.</p>
+<p><strong>Lower Guardrail:</strong> If your
+current withdrawal rate rises above
+<span class="number">6%</span> (because the
+portfolio has fallen), cut spending by
+<span class="number">10%</span>. The portfolio
+needs relief.</p>
+<p><strong>Prosperity Rule:</strong> Never
+increase withdrawals in a year when the portfolio
+lost value, even if the withdrawal rate is still
+below the upper guardrail.</p>
+<p><strong>Capital Preservation Rule:</strong>
+In years 1&ndash;5 of retirement, cut withdrawals
+by <span class="number">10%</span> if the
+portfolio falls below
+<span class="number">80%</span> of its starting
+value. Early drawdowns are the most dangerous
+due to sequence risk.</p>
+</div>
+
+<p>
+The guardrails approach has historically
+supported initial withdrawal rates of
+<span class="number">5.0&ndash;5.5%</span> while
+maintaining portfolio survival over 40+ years.
+The trade is flexibility: you must be willing
+to cut spending by <span class="number">10%</span>
+when markets are bad. For most retirees, this is
+far more natural than the rigid 4% rule, because
+it mirrors how people actually behave &mdash;
+spending less when things feel uncertain and
+more when things feel good.
+</p>
+
+<h3>Sequence-of-Returns Risk</h3>
+
+<p>
+The greatest threat to any withdrawal strategy
+is <strong>sequence-of-returns risk</strong>:
+getting bad returns early in retirement.
+Consider two investors, each starting with
+<span class="number">$1,000,000</span> and
+withdrawing <span class="number">$50,000</span>
+per year. Investor A gets
+<span class="number">+20%, +15%, -30%</span> in
+years 1&ndash;3. Investor B gets
+<span class="number">-30%, +15%, +20%</span>.
+Same average return, same withdrawals. But
+Investor B is in deep trouble because the
+<span class="number">-30%</span> hit when the
+portfolio was at its largest AND being
+withdrawn from. The early loss plus withdrawals
+permanently impairs the portfolio. By year 10,
+Investor B has
+<span class="number">$200,000</span> less than
+Investor A.
+</p>
+
+<p>
+Income investing naturally mitigates sequence
+risk because you are not selling shares during
+downturns. Your dividends and interest arrive
+regardless of market prices. If
+<span class="number">$40,000</span> of your
+<span class="number">$50,000</span> annual need
+comes from income and only
+<span class="number">$10,000</span> from share
+sales, you are selling
+<span class="number">80%</span> fewer shares
+during the downturn than a total-return investor.
+This is the single strongest practical argument
+for income investing in retirement: it breaks
+the link between market prices and your standard
+of living.
+</p>
+
+<div class="connection-box">
+<strong>The Income Architect&rsquo;s Golden
+Rule:</strong> Build the portfolio so that
+natural yield covers
+<span class="number">80&ndash;100%</span> of
+your expenses. Use the guardrails method for
+any gap. Maintain a 12-month cash reserve in
+<span class="ticker">SGOV</span> or money market
+for income disruptions. Never sell shares during
+a bear market if you can avoid it. Let
+dividend growth close the gap between income
+and expenses over time. This is not a withdrawal
+strategy &mdash; it is a
+<em>never-withdraw strategy</em> supplemented
+by one for the edge cases.
+</div>
+
+<!-- ============================================ -->
+<!-- ABOUT THIS GUIDE                             -->
+<!-- ============================================ -->
+
+<h2 id="about">About This Guide</h2>
+
+<p>
+The Income Architect was built from primary
+research including Vanguard and BlackRock fund
+data, Morningstar dividend and yield analytics,
+Alerian MLP index data, preferred stock research
+from Fidelity and Schwab, closed-end fund data
+from CEFConnect, William Bengen&rsquo;s original
+safe withdrawal rate research (1994), the
+Guyton-Klinger guardrails framework (2004),
+PIMCO income strategy papers, JPMorgan JEPI
+research materials, and historical performance
+data from Portfolio Visualizer. All yield figures
+reflect approximate yields as of mid-2026 and
+will fluctuate with market conditions.
+</p>
+
+<p>
+<em>This guide is for educational purposes only
+and does not constitute investment advice. Past
+performance does not guarantee future results. All
+investing involves risk, including the potential
+loss of principal. Consult a qualified financial
+advisor before making investment decisions.</em>
+</p>
+
+<hr>
+
+<div class="footer" style="text-align:center;
+  color:#8a7a60; font-size:0.9rem; margin-top:3rem;">
+<p><strong>The Income Architect</strong></p>
+<p>A Prescriptive Guide to Portfolio Income</p>
+<p>Built August 2026 &mdash; Yield-Aware,
+Tax-Efficient, Regime-Ready</p>
+</div>
+
+<script>var BM_KEY = 'bm_income_architect';</script>
+<script src="../book.js"></script>
+<script>
+(function() {
+  var G = {
+    SCHD: {
+      name: 'Schwab US Dividend Equity ETF',
+      meta: 'ER: 0.06% · ~100 holdings',
+      desc: 'The best all-around dividend ETF. Screens for quality fundamentals, sustainable payouts, and yield. Avoids yield traps with 10-year dividend history requirement. Tilted toward financials, industrials, healthcare, and staples.'
+    },
+    VIG: {
+      name: 'Vanguard Dividend Appreciation ETF',
+      meta: 'ER: 0.06% · ~315 holdings',
+      desc: 'Pure dividend growth. Holds companies with 10+ years of consecutive dividend increases. Lower current yield but faster growth. Heavy in tech and industrials.'
+    },
+    NOBL: {
+      name: 'ProShares S&P 500 Dividend Aristocrats ETF',
+      meta: 'ER: 0.35% · ~67 holdings',
+      desc: 'Only S&P 500 companies with 25+ years of consecutive dividend increases. Equal-weighted. Strictest quality screen of any dividend ETF. Lower beta, lower drawdowns.'
+    },
+    HDV: {
+      name: 'iShares Core High Dividend ETF',
+      meta: 'ER: 0.08% · ~75 holdings',
+      desc: 'Higher current yield, concentrated in energy and healthcare. Screens for economic moat and financial health. More volatile than SCHD due to energy exposure.'
+    },
+    DGRO: {
+      name: 'iShares Core Dividend Growth ETF',
+      meta: 'ER: 0.08% · ~420 holdings',
+      desc: 'Broad dividend growth exposure. 5+ years of growth required (less strict than VIG). Over 400 holdings for diversification.'
+    },
+    BND: {
+      name: 'Vanguard Total Bond Market ETF',
+      meta: 'ER: 0.03% · Duration: ~6 years',
+      desc: 'The entire US investment-grade bond market. Treasuries, corporates, mortgage-backed. The default bond position for most portfolios.'
+    },
+    VCIT: {
+      name: 'Vanguard Intermediate-Term Corporate Bond ETF',
+      meta: 'ER: 0.04% · Duration: ~6.5 years',
+      desc: 'Investment-grade corporate bonds. Higher yield than BND from the credit spread. The sweet spot between safety and yield in bonds.'
+    },
+    VCSH: {
+      name: 'Vanguard Short-Term Corporate Bond ETF',
+      meta: 'ER: 0.04% · Duration: ~2.7 years',
+      desc: 'Short-duration corporate bonds. Much less rate-sensitive than VCIT with surprisingly close yield. Best risk-reward when the curve is flat.'
+    },
+    VTEB: {
+      name: 'Vanguard Tax-Exempt Bond ETF',
+      meta: 'ER: 0.05% · Duration: ~5.5 years',
+      desc: 'National muni bonds. Tax-free yield. Tax-equivalent yield of ~5.2% for the 37% bracket. Best fixed income option for high earners in taxable accounts.'
+    },
+    SGOV: {
+      name: 'iShares 0-3 Month Treasury Bond ETF',
+      meta: 'ER: 0.05% · Duration: ~0.1 years',
+      desc: 'Cash equivalent. T-bills maturing within 3 months. Zero price risk. Yields the Fed funds rate. State-tax-exempt. The safest income instrument that exists.'
+    },
+    MUB: {
+      name: 'iShares National Muni Bond ETF',
+      meta: 'ER: 0.07% · Duration: ~6 years',
+      desc: 'Broad muni exposure. Tax-free federal income. Slightly higher yield than VTEB but higher expense ratio. Pick VTEB for cost efficiency.'
+    },
+    HYG: {
+      name: 'iShares iBoxx High Yield Corporate Bond ETF',
+      meta: 'ER: 0.49% · Duration: ~4 years',
+      desc: 'High-yield (junk) corporate bonds. Yields 300-600bp above Treasuries. Default risk is real — 3-5% annual average, spiking to 10-15% in recessions. Small allocation only.'
+    },
+    JNK: {
+      name: 'SPDR Bloomberg High Yield Bond ETF',
+      meta: 'ER: 0.40% · Duration: ~4 years',
+      desc: 'Alternative to HYG. Same high-yield exposure. Slightly different index methodology. Pick whichever is cheaper at your brokerage.'
+    },
+    TLT: {
+      name: 'iShares 20+ Year Treasury Bond ETF',
+      meta: 'ER: 0.15% · Duration: ~17 years',
+      desc: 'Long-term Treasuries. Extremely rate-sensitive. Gains ~17% per 1% rate cut, loses ~17% per 1% rate hike. The ultimate recession hedge and rate-cut play.'
+    },
+    VGIT: {
+      name: 'Vanguard Intermediate-Term Treasury ETF',
+      meta: 'ER: 0.04% · Duration: ~5.5 years',
+      desc: 'Intermediate Treasury bonds. Moderate rate sensitivity. Pure government credit risk. Good recession hedge.'
+    },
+    VGSH: {
+      name: 'Vanguard Short-Term Treasury ETF',
+      meta: 'ER: 0.04% · Duration: ~2 years',
+      desc: 'Short-term Treasuries. Very low rate sensitivity. Cash-like stability with some yield. Near-zero price risk.'
+    },
+    SCHP: {
+      name: 'Schwab US TIPS ETF',
+      meta: 'ER: 0.03% · Inflation-linked',
+      desc: 'Treasury Inflation-Protected Securities. Principal adjusts with CPI. Protects against inflation but NOT against rate hikes. Best in tax-advantaged accounts.'
+    },
+    VNQ: {
+      name: 'Vanguard Real Estate ETF',
+      meta: 'ER: 0.12% · ~160 REITs',
+      desc: 'Broad REIT exposure. Correlation with stocks: 0.56-0.75. Max drawdown: -68%. High yields but tax-inefficient. Hold in tax-advantaged accounts.'
+    },
+    O: {
+      name: 'Realty Income Corporation',
+      meta: 'Monthly dividend · 30+ year streak',
+      desc: 'The Monthly Dividend Company. Triple-net lease REIT with 15,000+ properties. Predictable, bond-like income. Monthly payments for cash flow matching.'
+    },
+    AMLP: {
+      name: 'Alerian MLP ETF',
+      meta: 'ER: 0.85% · ~20 MLPs · No K-1',
+      desc: 'Easiest MLP exposure — issues 1099 not K-1. C-corp structure means slight tax drag. Holdings include Enterprise Products, Energy Transfer, MPLX.'
+    },
+    MLPA: {
+      name: 'Global X MLP ETF',
+      meta: 'ER: 0.45% · ~20 MLPs · No K-1',
+      desc: 'Cheaper alternative to AMLP. Same K-1-free structure. Similar holdings and yield. Lower expense ratio.'
+    },
+    EPD: {
+      name: 'Enterprise Products Partners LP',
+      meta: 'Yield: ~7.2% · 26-year streak · K-1',
+      desc: 'The blue chip MLP. Largest midstream company. Never cut its distribution. Investment-grade credit. If you own one MLP, this is it.'
+    },
+    PFF: {
+      name: 'iShares Preferred & Income Securities ETF',
+      meta: 'ER: 0.46% · ~500 holdings',
+      desc: 'Largest preferred ETF. Broad exposure across financials, utilities, and REIT preferreds. ~60% bank/insurance. Most liquid preferred option.'
+    },
+    PFFD: {
+      name: 'Global X US Preferred ETF',
+      meta: 'ER: 0.23% · ~300 holdings',
+      desc: 'Cheaper alternative to PFF with higher yield. Market-cap weighted. Better value for broad preferred exposure.'
+    },
+    JEPI: {
+      name: 'JPMorgan Equity Premium Income ETF',
+      meta: 'ER: 0.35% · ~130 holdings',
+      desc: 'Best-designed covered call ETF. Uses ELNs (not direct calls) on S&P 500. Actively managed for quality/low vol. Lost only 3.5% in 2022 vs -18% for S&P. Captures 50-70% of upside.'
+    },
+    JEPQ: {
+      name: 'JPMorgan Nasdaq Equity Premium Income ETF',
+      meta: 'ER: 0.35% · ~80 holdings',
+      desc: 'JEPI strategy on Nasdaq-100. Higher yield (more tech volatility = more premium). More growth but more downside. Tech-tilted income.'
+    },
+    QYLD: {
+      name: 'Global X Nasdaq 100 Covered Call ETF',
+      meta: 'ER: 0.60% · Nasdaq-100',
+      desc: 'At-the-money monthly calls on Nasdaq-100. Highest yield but caps virtually all upside. NAV in steady decline. Converts capital to income. Supplement only, not core.'
+    },
+    XYLD: {
+      name: 'Global X S&P 500 Covered Call ETF',
+      meta: 'ER: 0.60% · S&P 500',
+      desc: 'Same at-the-money strategy as QYLD but on S&P 500. Lower yield than QYLD. Same NAV erosion. Same role: income supplement, not core.'
+    },
+    BKLN: {
+      name: 'Invesco Senior Loan ETF',
+      meta: 'ER: 0.65% · Floating rate',
+      desc: 'Senior secured floating-rate bank loans. Rate resets with SOFR, so income rises when rates rise. Near-zero duration risk. Credit risk is the main concern.'
+    },
+    PDI: {
+      name: 'PIMCO Dynamic Income Fund (CEF)',
+      meta: 'Yield: ~12% · Leveraged',
+      desc: 'High-yield bond CEF managed by PIMCO. Uses leverage to boost yield. Often trades at premium to NAV due to PIMCO brand. Check discount/premium before buying.'
+    },
+    XLP: {
+      name: 'Consumer Staples Select Sector SPDR',
+      meta: 'ER: 0.09% · ~35 holdings',
+      desc: 'Consumer staples sector ETF. P&G, Coca-Cola, Walmart, Costco. Defensive, recession-resistant. Reliable dividends but slow growth.'
+    },
+    XLU: {
+      name: 'Utilities Select Sector SPDR',
+      meta: 'ER: 0.09% · ~30 holdings',
+      desc: 'Utilities sector ETF. Regulated returns, high yields, bond-like behavior. Rate-sensitive. Classic defensive income play.'
+    },
+    XLV: {
+      name: 'Health Care Select Sector SPDR',
+      meta: 'ER: 0.09% · ~65 holdings',
+      desc: 'Healthcare sector ETF. UNH, JNJ, LLY, PFE, ABBV. Non-discretionary demand. Good dividend growth. Moderate yield.'
+    }
+  };
+  var tip = document.createElement('div');
+  tip.className = 'ticker-tip';
+  document.body.appendChild(tip);
+  document.addEventListener('click', function(e) {
+    var el = e.target.closest('.ticker');
+    if (!el) { tip.classList.remove('show'); return; }
+    var sym = el.textContent.trim();
+    var d = G[sym];
+    if (!d) { tip.classList.remove('show'); return; }
+    e.preventDefault();
+    e.stopPropagation();
+    tip.innerHTML =
+      '<div class="tip-name">' + sym +
+      ' \u2014 ' + d.name + '</div>' +
+      '<div class="tip-meta">' + d.meta + '</div>' +
+      '<div>' + d.desc + '</div>';
+    tip.classList.add('show');
+    var r = el.getBoundingClientRect();
+    var tw = 340;
+    var left = r.left + r.width / 2 - tw / 2;
+    if (left < 8) left = 8;
+    if (left + tw > window.innerWidth - 8)
+      left = window.innerWidth - tw - 8;
+    var top = r.bottom + 8;
+    if (top + tip.offsetHeight > window.innerHeight - 8)
+      top = r.top - tip.offsetHeight - 8;
+    tip.style.left = left + 'px';
+    tip.style.top = top + 'px';
+    tip.style.width = tw + 'px';
+  });
+})();
+</script>
+
+</body>
+</html>
