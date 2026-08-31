@@ -338,13 +338,20 @@ def rebuild_html(concepts):
                 )
                 for slug, c in week["concepts"]:
                     chapter_html = c.get("chapter_html", "")
-                    if chapter_html:
-                        chapters_html.append(chapter_html)
-                    else:
-                        chapters_html.append(
+                    if not chapter_html:
+                        chapter_html = (
                             f'<h4 id="{slug}">{c["title"]}</h4>\n'
                             f'<p>{c.get("summary", "")}</p>'
                         )
+                    chapters_html.append(
+                        f'<section class="concept-section"'
+                        f' data-slug="{slug}">'
+                        f'<button class="concept-done"'
+                        f' onclick="toggleDone(\'{slug}\')"'
+                        f' title="Mark as understood">'
+                        f'&#x2713;</button>'
+                        f'{chapter_html}</section>'
+                    )
 
     # Build category index
     cat_index = ['<h2 id="categories">Browse by Category</h2>',
@@ -446,6 +453,52 @@ def rebuild_html(concepts):
   margin-left: 0.4rem; vertical-align: middle;
   font-weight: bold;
 }}
+.concept-section {{
+  position: relative;
+  transition: opacity 0.3s;
+}}
+.concept-section.completed {{
+  opacity: 0.3;
+}}
+body.hide-completed .concept-section.completed {{
+  display: none;
+}}
+.concept-done {{
+  position: absolute; right: 0; top: 0;
+  background: none; border: 2px solid rgba(160,128,96,0.4);
+  border-radius: 50%; width: 28px; height: 28px;
+  cursor: pointer; display: flex;
+  align-items: center; justify-content: center;
+  color: transparent; font-size: 16px;
+  transition: all 0.2s;
+}}
+.concept-done:hover {{
+  border-color: #4ade80; color: #4ade80;
+}}
+.concept-section.completed .concept-done {{
+  border-color: #4ade80; background: #4ade80;
+  color: #1a1008;
+}}
+.filter-bar {{
+  display: flex; gap: 1rem; align-items: center;
+  margin: 0 0 1.5rem; padding: 0.7rem 1rem;
+  background: rgba(0,0,0,0.15); border-radius: 8px;
+  font-size: 0.85rem;
+}}
+.filter-btn {{
+  background: none; border: 1px solid rgba(160,128,96,0.4);
+  color: #e8dcc8; padding: 0.3rem 0.8rem;
+  border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}}
+.filter-btn:hover {{ border-color: #d4a574; }}
+.filter-btn.active {{
+  background: #d4a574; color: #1a1008;
+  border-color: #d4a574;
+}}
+.filter-count {{
+  color: #a08060; margin-left: auto;
+}}
 </style>
 </head>
 <body>
@@ -465,6 +518,12 @@ def rebuild_html(concepts):
  {total} concepts &middot;
  Built from YouTube &middot;
  Last updated {newest}</p>
+
+<div class="filter-bar">
+  <button class="filter-btn active" id="filterBtn"
+   onclick="toggleFilter()">Show Unread Only</button>
+  <span class="filter-count" id="filterCount"></span>
+</div>
 
 <div class="stats-bar">
   <div class="stat">
@@ -497,6 +556,48 @@ def rebuild_html(concepts):
 
 <script>var BM_KEY = 'finance_guide';</script>
 <script src="../book.js"></script>
+<script>
+(function() {{
+  var KEY = 'fg_done';
+  var done = JSON.parse(localStorage.getItem(KEY) || '{{}}');
+
+  function apply() {{
+    document.querySelectorAll('.concept-section').forEach(function(s) {{
+      if (done[s.dataset.slug]) s.classList.add('completed');
+      else s.classList.remove('completed');
+    }});
+    updateCount();
+  }}
+
+  function updateCount() {{
+    var total = document.querySelectorAll('.concept-section').length;
+    var read = Object.keys(done).length;
+    var el = document.getElementById('filterCount');
+    if (el) el.textContent = read + '/' + total + ' completed';
+  }}
+
+  window.toggleDone = function(slug) {{
+    if (done[slug]) delete done[slug];
+    else done[slug] = true;
+    localStorage.setItem(KEY, JSON.stringify(done));
+    apply();
+  }};
+
+  window.toggleFilter = function() {{
+    document.body.classList.toggle('hide-completed');
+    var btn = document.getElementById('filterBtn');
+    if (document.body.classList.contains('hide-completed')) {{
+      btn.textContent = 'Show All';
+      btn.classList.add('active');
+    }} else {{
+      btn.textContent = 'Show Unread Only';
+      btn.classList.remove('active');
+    }}
+  }};
+
+  apply();
+}})();
+</script>
 </body>
 </html>'''
 
