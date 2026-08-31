@@ -257,352 +257,381 @@ Structure:
         return None
 
 
-# === STEP 5: Rebuild HTML ===
-def rebuild_html(concepts):
-    """Rebuild index.html with all concepts organized by year/month/week."""
+# === STEP 5: Rebuild HTML (multi-page drill-down) ===
 
-    # Group concepts by week
-    by_week = {}
-    for slug, c in sorted(concepts.items(),
-                           key=lambda x: x[1].get("added", ""),
-                           reverse=True):
+# Shared CSS for all pages
+PAGE_CSS = '''
+.nav-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem; margin: 1.5rem 0;
+}
+.nav-card {
+  background: rgba(0,0,0,0.2); border-radius: 10px;
+  padding: 1.5rem; text-decoration: none; color: #e8dcc8;
+  border: 1px solid rgba(160,128,96,0.2);
+  transition: all 0.2s; position: relative;
+}
+.nav-card:hover {
+  border-color: #d4a574; background: rgba(0,0,0,0.3);
+  transform: translateY(-2px);
+}
+.nav-card h3 { margin: 0 0 0.3rem; color: #d4a574; font-size: 1.3rem; }
+.nav-card .card-sub { font-size: 0.85rem; color: #a08060; }
+.nav-card .card-count {
+  font-size: 0.75rem; color: #a08060;
+  margin-top: 0.5rem;
+}
+.nav-card.done { opacity: 0.25; }
+body.hide-done .nav-card.done { display: none; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+.concept-section { position: relative; transition: opacity 0.3s; }
+.concept-section.completed { opacity: 0.3; }
+body.hide-done .concept-section.completed { display: none; }
+.concept-done {
+  position: absolute; right: 0; top: 0;
+  background: none; border: 2px solid rgba(160,128,96,0.4);
+  border-radius: 50%; width: 28px; height: 28px;
+  cursor: pointer; display: flex;
+  align-items: center; justify-content: center;
+  color: transparent; font-size: 16px; transition: all 0.2s;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-section.completed .concept-done {
+  border-color: #4ade80; background: #4ade80; color: #1a1008;
+}
+.filter-bar {
+  display: flex; gap: 1rem; align-items: center;
+  margin: 0 0 1.5rem; padding: 0.7rem 1rem;
+  background: rgba(0,0,0,0.15); border-radius: 8px;
+  font-size: 0.85rem;
+}
+.filter-btn {
+  background: none; border: 1px solid rgba(160,128,96,0.4);
+  color: #e8dcc8; padding: 0.3rem 0.8rem;
+  border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.filter-btn:hover { border-color: #d4a574; }
+.filter-btn.active {
+  background: #d4a574; color: #1a1008; border-color: #d4a574;
+}
+.filter-count { color: #a08060; margin-left: auto; }
+.stats-bar {
+  display: flex; gap: 1.5rem; flex-wrap: wrap;
+  margin: 1rem 0 2rem; padding: 1rem;
+  background: rgba(0,0,0,0.15); border-radius: 8px;
+  font-size: 0.9rem;
+}
+.stats-bar .stat {
+  display: flex; flex-direction: column; align-items: center;
+}
+.stats-bar .stat-num {
+  font-size: 1.4rem; font-weight: bold; color: #d4a574;
+}
+'''
+
+# Shared JS for completion tracking (cascading hide)
+PAGE_JS = '''
+<script>
+(function() {
+  var KEY = 'fg_done';
+  var done = JSON.parse(localStorage.getItem(KEY) || '{}');
+
+  function apply() {
+    // Mark completed concepts
+    document.querySelectorAll('.concept-section').forEach(function(s) {
+      if (done[s.dataset.slug]) s.classList.add('completed');
+      else s.classList.remove('completed');
+    });
+    // Mark completed nav cards (all children done)
+    document.querySelectorAll('.nav-card[data-slugs]').forEach(function(card) {
+      var slugs = card.dataset.slugs.split(',');
+      var allDone = slugs.length > 0 && slugs.every(function(s) { return done[s]; });
+      if (allDone) card.classList.add('done');
+      else card.classList.remove('done');
+    });
+    updateCount();
+  }
+
+  function updateCount() {
+    var concepts = document.querySelectorAll('.concept-section');
+    var cards = document.querySelectorAll('.nav-card[data-slugs]');
+    var total = concepts.length || cards.length;
+    var read = concepts.length
+      ? [].filter.call(concepts, function(s) { return done[s.dataset.slug]; }).length
+      : [].filter.call(cards, function(c) { return c.classList.contains('done'); }).length;
+    var el = document.getElementById('filterCount');
+    if (el) el.textContent = read + '/' + total + ' completed';
+  }
+
+  window.toggleDone = function(slug) {
+    if (done[slug]) delete done[slug];
+    else done[slug] = true;
+    localStorage.setItem(KEY, JSON.stringify(done));
+    apply();
+  };
+
+  window.toggleFilter = function() {
+    document.body.classList.toggle('hide-done');
+    var btn = document.getElementById('filterBtn');
+    if (document.body.classList.contains('hide-done')) {
+      btn.textContent = 'Show All';
+      btn.classList.add('active');
+    } else {
+      btn.textContent = 'Hide Completed';
+      btn.classList.remove('active');
+    }
+  };
+
+  apply();
+})();
+</script>
+'''
+
+
+def _page_wrap(title, body, css_path="../book.css", back_href=None,
+               back_label=None, bm_key=None, extra_js=""):
+    """Wrap content in a full HTML page."""
+    back = ""
+    if back_href:
+        back = (f'<a class="back-link" href="{back_href}">'
+                f'&larr; {back_label or "Back"}</a>')
+    bm = ""
+    if bm_key:
+        bm = f'<script>var BM_KEY = \'{bm_key}\';</script>'
+    return f'''<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>{title} - Finance Guide</title>
+<link rel="stylesheet" href="{css_path}">
+<style>{PAGE_CSS}</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+{back}
+{body}
+{bm}
+<script src="{css_path.replace('book.css','book.js')}"></script>
+{extra_js}
+</body>
+</html>'''
+
+
+def rebuild_html(concepts):
+    """Rebuild multi-page drill-down: index → year → month → week pages."""
+
+    # Group concepts into hierarchy
+    hierarchy = {}  # year → month → week_key → [concepts]
+    for slug, c in concepts.items():
         added = c.get("added", "2026-01-01")
         dt = datetime.strptime(added, "%Y-%m-%d")
         year = dt.strftime("%Y")
-        month = dt.strftime("%B %Y")
-        # Week start (Monday)
+        month_key = dt.strftime("%m")
+        month_name = dt.strftime("%B")
         week_start = dt - timedelta(days=dt.weekday())
-        week_key = week_start.strftime("%Y-%m-%d")
+        week_key = week_start.strftime("%m-%d")
         week_label = f"Week of {week_start.strftime('%B %d')}"
 
-        if year not in by_week:
-            by_week[year] = {}
-        if month not in by_week[year]:
-            by_week[year][month] = {}
-        if week_key not in by_week[year][month]:
-            by_week[year][month][week_key] = {
+        if year not in hierarchy:
+            hierarchy[year] = {}
+        if month_key not in hierarchy[year]:
+            hierarchy[year][month_key] = {
+                "name": month_name, "weeks": {}
+            }
+        if week_key not in hierarchy[year][month_key]["weeks"]:
+            hierarchy[year][month_key]["weeks"][week_key] = {
                 "label": week_label, "concepts": []
             }
-        by_week[year][month][week_key]["concepts"].append((slug, c))
+        hierarchy[year][month_key]["weeks"][week_key][
+            "concepts"].append((slug, c))
 
-    # Group concepts by category for index
-    by_category = {}
-    for slug, c in concepts.items():
-        cat = c.get("category", "uncategorized")
-        if cat not in by_category:
-            by_category[cat] = []
-        by_category[cat].append((slug, c))
+    total = len(concepts)
+    videos = len(load_json(PROCESSED_FILE))
 
-    category_labels = {
-        "macro": "Macro Economics",
-        "technicals": "Technical Analysis",
-        "credit_bonds": "Credit & Bonds",
-        "derivatives": "Derivatives",
-        "market_structure": "Market Structure",
-        "sentiment_flows": "Sentiment & Flows",
-        "fiscal_policy": "Fiscal Policy",
-        "monetary_policy": "Monetary Policy",
-        "commodities": "Commodities",
-        "crypto": "Crypto",
-        "real_estate": "Real Estate",
-        "labor_economics": "Labor Economics",
-    }
+    # === MAIN INDEX (years) ===
+    cards = []
+    for year in sorted(hierarchy.keys(), reverse=True):
+        months = hierarchy[year]
+        concept_count = sum(
+            len(w["concepts"])
+            for m in months.values()
+            for w in m["weeks"].values()
+        )
+        all_slugs = ",".join(
+            slug for m in months.values()
+            for w in m["weeks"].values()
+            for slug, _ in w["concepts"]
+        )
+        cards.append(
+            f'<a class="nav-card" href="{year}/index.html"'
+            f' data-slugs="{all_slugs}">'
+            f'<h3>{year}</h3>'
+            f'<div class="card-sub">'
+            f'{len(months)} month{"s" if len(months) != 1 else ""}</div>'
+            f'<div class="card-count">'
+            f'{concept_count} concepts</div></a>'
+        )
 
-    # Build TOC
-    toc_items = []
-    for year in sorted(by_week.keys(), reverse=True):
-        for month in by_week[year]:
-            for week_key in sorted(by_week[year][month].keys(),
-                                    reverse=True):
-                week = by_week[year][month][week_key]
-                for slug, c in week["concepts"]:
-                    toc_items.append(
-                        f'  <li><a href="#{slug}">'
-                        f'{c["title"]}</a>'
-                        f' <span class="toc-cat">[{c.get("category", "")}]'
-                        f'</span></li>'
-                    )
+    body = f'''
+<h1>Finance Guide</h1>
+<p class="subtitle">A living book &middot; {total} concepts
+ &middot; {videos} videos processed</p>
+<div class="filter-bar">
+  <button class="filter-btn" id="filterBtn"
+   onclick="toggleFilter()">Hide Completed</button>
+  <span class="filter-count" id="filterCount"></span>
+</div>
+<div class="nav-grid">
+{"".join(cards)}
+</div>'''
 
-    # Build chapter content
-    chapters_html = []
-    for year in sorted(by_week.keys(), reverse=True):
-        chapters_html.append(f'<h2 id="y{year}">{year}</h2>')
-        for month in by_week[year]:
-            chapters_html.append(f'<h3 id="m{month.replace(" ", "")}">'
-                                  f'{month}</h3>')
-            for week_key in sorted(by_week[year][month].keys(),
-                                    reverse=True):
-                week = by_week[year][month][week_key]
-                chapters_html.append(
-                    f'<div class="week-header">{week["label"]}</div>'
+    index_html = _page_wrap("Finance Guide", body,
+                             css_path="../book.css",
+                             bm_key="finance_guide",
+                             extra_js=PAGE_JS)
+    HTML_FILE.write_text(index_html)
+
+    # === YEAR PAGES (months) ===
+    for year in hierarchy:
+        year_dir = BASE_DIR / year
+        year_dir.mkdir(exist_ok=True)
+        months = hierarchy[year]
+
+        cards = []
+        for mk in sorted(months.keys(), reverse=True):
+            m = months[mk]
+            concept_count = sum(
+                len(w["concepts"]) for w in m["weeks"].values()
+            )
+            all_slugs = ",".join(
+                slug for w in m["weeks"].values()
+                for slug, _ in w["concepts"]
+            )
+            cards.append(
+                f'<a class="nav-card" href="{mk}.html"'
+                f' data-slugs="{all_slugs}">'
+                f'<h3>{m["name"]}</h3>'
+                f'<div class="card-sub">'
+                f'{len(m["weeks"])} week'
+                f'{"s" if len(m["weeks"]) != 1 else ""}</div>'
+                f'<div class="card-count">'
+                f'{concept_count} concepts</div></a>'
+            )
+
+        body = f'''
+<h1>{year}</h1>
+<div class="filter-bar">
+  <button class="filter-btn" id="filterBtn"
+   onclick="toggleFilter()">Hide Completed</button>
+  <span class="filter-count" id="filterCount"></span>
+</div>
+<div class="nav-grid">
+{"".join(cards)}
+</div>'''
+
+        year_html = _page_wrap(year, body,
+                                css_path="../../book.css",
+                                back_href="../index.html",
+                                back_label="Finance Guide",
+                                bm_key=f"fg_{year}",
+                                extra_js=PAGE_JS)
+        (year_dir / "index.html").write_text(year_html)
+
+        # === MONTH PAGES (weeks) ===
+        for mk in months:
+            m = months[mk]
+            cards = []
+            for wk in sorted(m["weeks"].keys(), reverse=True):
+                w = m["weeks"][wk]
+                all_slugs = ",".join(
+                    slug for slug, _ in w["concepts"]
                 )
-                for slug, c in week["concepts"]:
-                    chapter_html = c.get("chapter_html", "")
-                    if not chapter_html:
-                        chapter_html = (
-                            f'<h4 id="{slug}">{c["title"]}</h4>\n'
-                            f'<p>{c.get("summary", "")}</p>'
-                        )
-                    chapters_html.append(
+                cards.append(
+                    f'<a class="nav-card" href="{mk}-{wk}.html"'
+                    f' data-slugs="{all_slugs}">'
+                    f'<h3>{w["label"]}</h3>'
+                    f'<div class="card-count">'
+                    f'{len(w["concepts"])} concepts</div></a>'
+                )
+
+            body = f'''
+<h1>{m["name"]} {year}</h1>
+<div class="filter-bar">
+  <button class="filter-btn" id="filterBtn"
+   onclick="toggleFilter()">Hide Completed</button>
+  <span class="filter-count" id="filterCount"></span>
+</div>
+<div class="nav-grid">
+{"".join(cards)}
+</div>'''
+
+            month_html = _page_wrap(
+                f'{m["name"]} {year}', body,
+                css_path="../../book.css",
+                back_href="index.html",
+                back_label=year,
+                bm_key=f"fg_{year}_{mk}",
+                extra_js=PAGE_JS)
+            (year_dir / f"{mk}.html").write_text(month_html)
+
+            # === WEEK PAGES (concepts) ===
+            for wk in m["weeks"]:
+                w = m["weeks"][wk]
+                sections = []
+                for slug, c in w["concepts"]:
+                    ch = c.get("chapter_html", "")
+                    if not ch:
+                        ch = (f'<h4 id="{slug}">{c["title"]}</h4>'
+                              f'\n<p>{c.get("summary", "")}</p>')
+                    sections.append(
                         f'<section class="concept-section"'
                         f' data-slug="{slug}">'
                         f'<button class="concept-done"'
                         f' onclick="toggleDone(\'{slug}\')"'
                         f' title="Mark as understood">'
                         f'&#x2713;</button>'
-                        f'{chapter_html}</section>'
+                        f'{ch}</section>'
                     )
 
-    # Build category index
-    cat_index = ['<h2 id="categories">Browse by Category</h2>',
-                 '<div class="cat-grid">']
-    for cat_key, cat_label in sorted(category_labels.items()):
-        items = by_category.get(cat_key, [])
-        if items:
-            cat_index.append(f'<div class="cat-card">')
-            cat_index.append(f'<h4>{cat_label}</h4>')
-            cat_index.append(f'<span class="cat-count">'
-                              f'{len(items)} concepts</span>')
-            cat_index.append('<ul>')
-            for slug, c in sorted(items, key=lambda x: x[1]["title"]):
-                cat_index.append(
-                    f'<li><a href="#{slug}">{c["title"]}</a></li>'
-                )
-            cat_index.append('</ul></div>')
-    cat_index.append('</div>')
-
-    # Count stats
-    total = len(concepts)
-    newest = ""
-    if concepts:
-        latest = max(concepts.values(),
-                      key=lambda x: x.get("added", ""))
-        newest = latest.get("added", "")
-
-    html = f'''<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport"
- content="width=device-width, initial-scale=1.0">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style"
- content="black-translucent">
-<meta name="theme-color" content="#f4efe8">
-<title>Finance Guide - Living Book</title>
-<link rel="stylesheet" href="../book.css?v=8">
-<style>
-.stats-bar {{
-  display: flex; gap: 1.5rem; flex-wrap: wrap;
-  margin: 1rem 0 2rem; padding: 1rem;
-  background: rgba(0,0,0,0.15); border-radius: 8px;
-  font-size: 0.9rem;
-}}
-.stats-bar .stat {{
-  display: flex; flex-direction: column;
-  align-items: center;
-}}
-.stats-bar .stat-num {{
-  font-size: 1.4rem; font-weight: bold;
-  color: #d4a574;
-}}
-.week-header {{
-  font-size: 0.85rem; text-transform: uppercase;
-  letter-spacing: 0.1em; color: #a08060;
-  margin: 2rem 0 0.5rem;
-  padding-bottom: 0.3rem;
-  border-bottom: 1px solid rgba(160,128,96,0.3);
-}}
-.toc-cat {{
-  font-size: 0.75rem; color: #a08060;
-  margin-left: 0.3rem;
-}}
-.cat-grid {{
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: 1rem; margin: 1rem 0 2rem;
-}}
-.cat-card {{
-  background: rgba(0,0,0,0.15);
-  border-radius: 8px; padding: 1rem;
-}}
-.cat-card h4 {{
-  margin: 0 0 0.3rem; color: #d4a574;
-}}
-.cat-count {{
-  font-size: 0.8rem; color: #a08060;
-}}
-.cat-card ul {{
-  list-style: none; padding: 0;
-  margin: 0.5rem 0 0;
-}}
-.cat-card li {{
-  font-size: 0.85rem; padding: 0.15rem 0;
-}}
-.cat-card a {{
-  color: inherit; text-decoration: none;
-  border-bottom: 1px dotted rgba(160,128,96,0.4);
-}}
-.cat-card a:hover {{
-  color: #d4a574;
-}}
-.new-badge {{
-  display: inline-block; font-size: 0.65rem;
-  background: #d4a574; color: #1a1008;
-  padding: 0.1rem 0.4rem; border-radius: 3px;
-  margin-left: 0.4rem; vertical-align: middle;
-  font-weight: bold;
-}}
-.concept-section {{
-  position: relative;
-  transition: opacity 0.3s;
-}}
-.concept-section.completed {{
-  opacity: 0.3;
-}}
-body.hide-completed .concept-section.completed {{
-  display: none;
-}}
-.concept-done {{
-  position: absolute; right: 0; top: 0;
-  background: none; border: 2px solid rgba(160,128,96,0.4);
-  border-radius: 50%; width: 28px; height: 28px;
-  cursor: pointer; display: flex;
-  align-items: center; justify-content: center;
-  color: transparent; font-size: 16px;
-  transition: all 0.2s;
-}}
-.concept-done:hover {{
-  border-color: #4ade80; color: #4ade80;
-}}
-.concept-section.completed .concept-done {{
-  border-color: #4ade80; background: #4ade80;
-  color: #1a1008;
-}}
-.filter-bar {{
-  display: flex; gap: 1rem; align-items: center;
-  margin: 0 0 1.5rem; padding: 0.7rem 1rem;
-  background: rgba(0,0,0,0.15); border-radius: 8px;
-  font-size: 0.85rem;
-}}
-.filter-btn {{
-  background: none; border: 1px solid rgba(160,128,96,0.4);
-  color: #e8dcc8; padding: 0.3rem 0.8rem;
-  border-radius: 4px; cursor: pointer;
-  font-size: 0.8rem; transition: all 0.2s;
-}}
-.filter-btn:hover {{ border-color: #d4a574; }}
-.filter-btn.active {{
-  background: #d4a574; color: #1a1008;
-  border-color: #d4a574;
-}}
-.filter-count {{
-  color: #a08060; margin-left: auto;
-}}
-</style>
-</head>
-<body>
-
-<div class="progress-bar" id="progressBar"></div>
-<div class="bookmark-bar" id="bookmarkBar"
- style="display:none" onclick="jumpToBookmark()">
-  <span class="bm-label" id="bmLabel"></span>
-  <button class="bm-clear"
-   onclick="event.stopPropagation();clearBookmark()">
-    Clear</button>
-</div>
-<div class="bm-toast" id="bmToast"></div>
-
-<h1>Finance Guide</h1>
-<p class="subtitle">A living book &middot;
- {total} concepts &middot;
- Built from YouTube &middot;
- Last updated {newest}</p>
-
+                body = f'''
+<h1>{w["label"]}</h1>
+<p class="subtitle">{m["name"]} {year}
+ &middot; {len(w["concepts"])} concepts</p>
 <div class="filter-bar">
-  <button class="filter-btn active" id="filterBtn"
-   onclick="toggleFilter()">Show Unread Only</button>
+  <button class="filter-btn" id="filterBtn"
+   onclick="toggleFilter()">Hide Completed</button>
   <span class="filter-count" id="filterCount"></span>
 </div>
+{"".join(sections)}'''
 
-<div class="stats-bar">
-  <div class="stat">
-    <span class="stat-num">{total}</span>
-    Concepts
-  </div>
-  <div class="stat">
-    <span class="stat-num">
-      {len(by_category)}</span>
-    Categories
-  </div>
-  <div class="stat">
-    <span class="stat-num">
-      {len(load_json(PROCESSED_FILE))}</span>
-    Videos Processed
-  </div>
-</div>
+                week_html = _page_wrap(
+                    w["label"], body,
+                    css_path="../../book.css",
+                    back_href=f"{mk}.html",
+                    back_label=f"{m['name']} {year}",
+                    bm_key=f"fg_{year}_{mk}_{wk}",
+                    extra_js=PAGE_JS)
+                (year_dir / f"{mk}-{wk}.html").write_text(
+                    week_html)
 
-<nav class="toc">
-<h2>Contents</h2>
-<ol>
-  <li><a href="#categories">Browse by Category</a></li>
-{chr(10).join(toc_items)}
-</ol>
-</nav>
-
-{chr(10).join(cat_index)}
-
-{chr(10).join(chapters_html)}
-
-<script>var BM_KEY = 'finance_guide';</script>
-<script src="../book.js"></script>
-<script>
-(function() {{
-  var KEY = 'fg_done';
-  var done = JSON.parse(localStorage.getItem(KEY) || '{{}}');
-
-  function apply() {{
-    document.querySelectorAll('.concept-section').forEach(function(s) {{
-      if (done[s.dataset.slug]) s.classList.add('completed');
-      else s.classList.remove('completed');
-    }});
-    updateCount();
-  }}
-
-  function updateCount() {{
-    var total = document.querySelectorAll('.concept-section').length;
-    var read = Object.keys(done).length;
-    var el = document.getElementById('filterCount');
-    if (el) el.textContent = read + '/' + total + ' completed';
-  }}
-
-  window.toggleDone = function(slug) {{
-    if (done[slug]) delete done[slug];
-    else done[slug] = true;
-    localStorage.setItem(KEY, JSON.stringify(done));
-    apply();
-  }};
-
-  window.toggleFilter = function() {{
-    document.body.classList.toggle('hide-completed');
-    var btn = document.getElementById('filterBtn');
-    if (document.body.classList.contains('hide-completed')) {{
-      btn.textContent = 'Show All';
-      btn.classList.add('active');
-    }} else {{
-      btn.textContent = 'Show Unread Only';
-      btn.classList.remove('active');
-    }}
-  }};
-
-  apply();
-}})();
-</script>
-</body>
-</html>'''
-
-    HTML_FILE.write_text(html)
-    log(f"  HTML rebuilt: {total} concepts, {len(html)} chars")
+    log(f"  HTML rebuilt: {total} concepts, "
+        f"{len(hierarchy)} years, multi-page")
 
 
 # === STEP 6: Git push ===
