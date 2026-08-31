@@ -267,16 +267,16 @@ PAGE_CSS = '''
   gap: 1rem; margin: 1.5rem 0;
 }
 .nav-card {
-  background: rgba(0,0,0,0.2); border-radius: 10px;
+  background: rgba(13,90,80,0.25); border-radius: 10px;
   padding: 1.5rem; text-decoration: none; color: #e8dcc8;
-  border: 1px solid rgba(160,128,96,0.2);
+  border: 1px solid rgba(13,120,110,0.35);
   transition: all 0.2s; position: relative;
 }
 .nav-card:hover {
-  border-color: #d4a574; background: rgba(0,0,0,0.3);
+  border-color: #2dd4bf; background: rgba(13,90,80,0.4);
   transform: translateY(-2px);
 }
-.nav-card h3 { margin: 0 0 0.3rem; color: #d4a574; font-size: 1.3rem; }
+.nav-card h3 { margin: 0 0 0.3rem; color: #2dd4bf; font-size: 1.3rem; }
 .nav-card .card-sub { font-size: 0.85rem; color: #a08060; }
 .nav-card .card-count {
   font-size: 0.75rem; color: #a08060;
@@ -307,18 +307,18 @@ body.hide-done .concept-section.completed { display: none; }
 .filter-bar {
   display: flex; gap: 1rem; align-items: center;
   margin: 0 0 1.5rem; padding: 0.7rem 1rem;
-  background: rgba(0,0,0,0.15); border-radius: 8px;
+  background: rgba(13,90,80,0.15); border-radius: 8px;
   font-size: 0.85rem;
 }
 .filter-btn {
-  background: none; border: 1px solid rgba(160,128,96,0.4);
+  background: none; border: 1px solid rgba(13,120,110,0.4);
   color: #e8dcc8; padding: 0.3rem 0.8rem;
   border-radius: 4px; cursor: pointer;
   font-size: 0.8rem; transition: all 0.2s;
 }
-.filter-btn:hover { border-color: #d4a574; }
+.filter-btn:hover { border-color: #2dd4bf; }
 .filter-btn.active {
-  background: #d4a574; color: #1a1008; border-color: #d4a574;
+  background: #0d7377; color: #e8dcc8; border-color: #2dd4bf;
 }
 .filter-count { color: #a08060; margin-left: auto; }
 .stats-bar {
@@ -386,6 +386,14 @@ PAGE_JS = '''
       btn.textContent = 'Hide Completed';
       btn.classList.remove('active');
     }
+  };
+
+  window.markAllDone = function() {
+    document.querySelectorAll('.concept-section').forEach(function(s) {
+      done[s.dataset.slug] = true;
+    });
+    localStorage.setItem(KEY, JSON.stringify(done));
+    apply();
   };
 
   apply();
@@ -616,6 +624,8 @@ def rebuild_html(concepts):
 <div class="filter-bar">
   <button class="filter-btn" id="filterBtn"
    onclick="toggleFilter()">Hide Completed</button>
+  <button class="filter-btn"
+   onclick="markAllDone()">Mark All Done</button>
   <span class="filter-count" id="filterCount"></span>
 </div>
 {"".join(sections)}'''
