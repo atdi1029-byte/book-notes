@@ -323,7 +323,7 @@ body.hide-done .concept-section.completed { display: none; }
 .stats-bar {
   display: flex; gap: 1.5rem; flex-wrap: wrap;
   margin: 1rem 0 2rem; padding: 1rem;
-  background: rgba(0,0,0,0.15); border-radius: 8px;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
   font-size: 0.9rem;
 }
 .stats-bar .stat {
