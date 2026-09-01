@@ -31,7 +31,7 @@ HTML_FILE = BASE_DIR / "index.html"
 LOG_FILE = BASE_DIR / "bot.log"
 
 CHECK_INTERVAL = 6 * 3600  # 6 hours between checks
-MAX_VIDEOS_PER_RUN = 1     # process 1 video per check cycle
+MAX_VIDEOS_PER_RUN = 0     # 0 = no limit, process all new videos
 BOOKS_DIR = BASE_DIR.parent
 
 TRANSCRIPTS_DIR.mkdir(exist_ok=True)
@@ -81,16 +81,39 @@ def get_channel_videos(channel_url, limit=30):
 
 
 def find_new_videos():
-    """Check all channels, return videos not yet processed."""
+    """Check all channels, return videos not yet processed.
+
+    First run for a channel: marks all existing videos as processed
+    (backlog skip) so only future uploads get picked up.
+    """
     channels = load_json(CHANNELS_FILE)
     if isinstance(channels, dict):
         channels = []
     processed = load_json(PROCESSED_FILE)
+    seen_channels = load_json(BASE_DIR / "seen_channels.json")
 
     new_videos = []
     for channel in channels:
         log(f"  Checking: {channel['name']}")
         videos = get_channel_videos(channel["url"])
+
+        # First time seeing this channel? Mark backlog as processed
+        if channel["name"] not in seen_channels:
+            log(f"  New channel — marking {len(videos)} existing videos as backlog")
+            for v in videos:
+                if v["id"] not in processed:
+                    processed[v["id"]] = {
+                        "title": v["title"],
+                        "channel": channel["name"],
+                        "processed": datetime.now().strftime("%Y-%m-%d %H:%M"),
+                        "concepts_extracted": 0,
+                        "skipped": "backlog_marked",
+                    }
+            seen_channels[channel["name"]] = datetime.now().strftime("%Y-%m-%d")
+            save_json(BASE_DIR / "seen_channels.json", seen_channels)
+            save_json(PROCESSED_FILE, processed)
+            continue
+
         for v in videos:
             if v["id"] not in processed:
                 v["channel"] = channel["name"]
@@ -98,7 +121,7 @@ def find_new_videos():
         log(f"  Found {len(videos)} total, "
             f"{sum(1 for v in videos if v['id'] not in processed)} new")
 
-    return new_videos[:MAX_VIDEOS_PER_RUN]
+    return new_videos if MAX_VIDEOS_PER_RUN == 0 else new_videos[:MAX_VIDEOS_PER_RUN]
 
 
 # === STEP 2: Download transcript ===
@@ -164,12 +187,15 @@ def extract_concepts(video_id, title, transcript, existing_concepts):
         for c in existing_concepts.values()
     )
 
+    # Truncate very long transcripts to avoid CLI timeout
+    trunc = transcript[:25000] if len(transcript) > 25000 else transcript
+
     prompt = f"""You are building a living finance education guide. Read this YouTube video transcript
 and extract every distinct finance/economics/market concept mentioned.
 
 VIDEO: "{title}"
 TRANSCRIPT:
-{transcript}
+{trunc}
 
 ALREADY COVERED CONCEPTS (do NOT re-extract these — skip them):
 {concept_list if concept_list else "(none yet)"}
@@ -196,7 +222,7 @@ Rules:
     try:
         result = subprocess.run(
             ["claude", "-p", prompt, "--model", "sonnet"],
-            capture_output=True, text=True, timeout=120
+            capture_output=True, text=True, timeout=300
         )
         output = result.stdout.strip()
 
@@ -249,7 +275,7 @@ Structure:
     try:
         result = subprocess.run(
             ["claude", "-p", prompt, "--model", "sonnet"],
-            capture_output=True, text=True, timeout=180
+            capture_output=True, text=True, timeout=300
         )
         return result.stdout.strip()
     except Exception as e:
