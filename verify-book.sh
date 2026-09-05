@@ -76,6 +76,7 @@ echo ""
 
 # === CHECK 2: Page markers in notes.md ===
 echo "--- Check 2: Page Markers in Notes ---"
+MISSING_MARKED=""
 # Look for <!-- pp. X-Y --> and <!-- p. X --> markers
 MARKERS=$(grep -oP '<!-- pp?\. \K[0-9]+(-[0-9]+)?' "$NOTES" 2>/dev/null || true)
 
@@ -167,13 +168,20 @@ echo "========================================"
 # === Combine all missing pages ===
 ALL_MISSING=""
 if [ "$MISSING_TRACKED" = "all" ]; then
-  # No tracking file — rely on markers if available
-  ALL_MISSING="$MISSING_MARKED"
+  if [ -n "$MARKERS" ]; then
+    # No tracking file — rely on markers
+    ALL_MISSING="$MISSING_MARKED"
+  else
+    # No tracking file AND no markers — nothing to verify against.
+    # Fail closed: treat every page in range as missing.
+    echo "WARNING: no .pages_done and no page markers — cannot verify coverage"
+    ALL_MISSING=$(seq "$START" "$END_PAGE" | tr '\n' ' ')
+  fi
 elif [ -n "$MISSING_TRACKED" ]; then
   ALL_MISSING="$MISSING_TRACKED"
 fi
 
-ALL_MISSING=$(echo "$ALL_MISSING" | tr ' ' '\n' | grep -v '^$' | sort -un)
+ALL_MISSING=$(echo "$ALL_MISSING" | tr ' ' '\n' | grep -v '^$' | sort -un || true)
 TOTAL_MISSING=$(echo "$ALL_MISSING" | grep -c . 2>/dev/null || true)
 
 if [ "$TOTAL_MISSING" -eq 0 ]; then

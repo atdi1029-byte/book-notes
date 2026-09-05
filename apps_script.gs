@@ -83,12 +83,21 @@ function doGet(e) {
         // Deep merge for reading_speed_data — merge books, keep highest maxScroll
         if (key === 'reading_speed_data' && all[key] && all[key].books) {
           var existing = all[key];
-          // Merge books — keep highest maxScroll per book
+          // Merge books — newest state wins (same rule as book.js, so resets propagate).
+          // Legacy records without timestamps fall back to highest maxScroll.
           if (incoming.books) {
             Object.keys(incoming.books).forEach(function(bk) {
-              if (!existing.books[bk] ||
-                  (incoming.books[bk].maxScroll || 0) > (existing.books[bk].maxScroll || 0)) {
-                existing.books[bk] = incoming.books[bk];
+              var inc = incoming.books[bk], ex = existing.books[bk];
+              if (!ex) { existing.books[bk] = inc; return; }
+              var incTime = inc.updatedAt || inc.resetAt || 0;
+              var exTime = ex.updatedAt || ex.resetAt || 0;
+              if (incTime || exTime) {
+                if (incTime > exTime) {
+                  inc.words = Math.max(inc.words || 0, ex.words || 0);
+                  existing.books[bk] = inc;
+                }
+              } else if ((inc.maxScroll || 0) > (ex.maxScroll || 0)) {
+                existing.books[bk] = inc;
               }
             });
           }

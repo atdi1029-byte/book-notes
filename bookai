@@ -552,9 +552,9 @@ process_batch() {
       if [ -f "$TEMP_FILE" ] && [ "$(wc -c < "$TEMP_FILE" | tr -d ' ')" -gt 50 ]; then
         local LINES=$(wc -l < "$TEMP_FILE" | tr -d ' ')
         local WORDS=$(wc -w < "$TEMP_FILE" | tr -d ' ')
-        local HAS_MARKERS=$(grep -c '<!-- pp' "$TEMP_FILE" 2>/dev/null || echo 0)
-        local HAS_HEADERS=$(grep -c '^##' "$TEMP_FILE" 2>/dev/null || echo 0)
-        local HAS_BULLETS=$(grep -c '^- ' "$TEMP_FILE" 2>/dev/null || echo 0)
+        local HAS_MARKERS=$(grep -c '<!-- pp' "$TEMP_FILE" 2>/dev/null || true)
+        local HAS_HEADERS=$(grep -c '^##' "$TEMP_FILE" 2>/dev/null || true)
+        local HAS_BULLETS=$(grep -c '^- ' "$TEMP_FILE" 2>/dev/null || true)
 
         # Quality gate — thresholds vary by book type
         local MIN_WORDS MIN_LINES MIN_BULLETS
@@ -566,9 +566,9 @@ process_batch() {
         esac
 
         # Check for priority tags with nugget IDs (e.g. [MUST KNOW][N042])
-        local HAS_TAGS=$(grep -cE '\[(MUST KNOW|SHOULD KNOW|NICE TO KNOW)\]\[N[0-9]+\]' "$TEMP_FILE" 2>/dev/null || echo 0)
+        local HAS_TAGS=$(grep -cE '\[(MUST KNOW|SHOULD KNOW|NICE TO KNOW)\]\[N[0-9]+\]' "$TEMP_FILE" 2>/dev/null || true)
         # Also accept tags without IDs (legacy format) but prefer with IDs
-        local HAS_TAGS_ANY=$(grep -cE '\[(MUST KNOW|SHOULD KNOW|NICE TO KNOW)\]' "$TEMP_FILE" 2>/dev/null || echo 0)
+        local HAS_TAGS_ANY=$(grep -cE '\[(MUST KNOW|SHOULD KNOW|NICE TO KNOW)\]' "$TEMP_FILE" 2>/dev/null || true)
 
         if [ "$WORDS" -ge "$MIN_WORDS" ] && [ "$LINES" -ge "$MIN_LINES" ] && [ "$((HAS_MARKERS + HAS_HEADERS))" -ge 1 ] && [ "$HAS_BULLETS" -ge "$MIN_BULLETS" ]; then
           # MANDATORY: Priority tags must be present for coverage audit to work
@@ -583,7 +583,7 @@ process_batch() {
             echo "  ID_WARNING — pp. $B_START-$B_END: tags present but missing nugget IDs [N###]" >> "$BATCH_LOG"
           fi
           # Check per-page acknowledgments (<!-- page NNN: ... -->)
-          local PAGE_ACKS=$(grep -cE '<!-- page [0-9]+:' "$TEMP_FILE" 2>/dev/null || echo 0)
+          local PAGE_ACKS=$(grep -cE '<!-- page [0-9]+:' "$TEMP_FILE" 2>/dev/null || true)
           local EXPECTED_PAGES=$(( B_END - B_START + 1 ))
           if [ "$PAGE_ACKS" -lt "$EXPECTED_PAGES" ]; then
             echo "  PAGE_ACK_WARNING — pp. $B_START-$B_END: $PAGE_ACKS/$EXPECTED_PAGES pages acknowledged" >> "$BATCH_LOG"
@@ -591,7 +591,7 @@ process_batch() {
           # For visual books: check PAGE IMAGE references exist when page images are present
           if [[ "$BOOK_TYPE" == "technical" || "$BOOK_TYPE" == "practical" || "$BOOK_TYPE" == "textbook" ]]; then
             local PAGE_IMGS=$(ls "$DIR/charts"/page_*.png 2>/dev/null | sed 's/.*page_\([0-9]*\).*/\1/' | sort -un | awk -v s="$B_START" -v e="$B_END" '$1>=s && $1<=e' | wc -l | tr -d ' ')
-            local IMG_REFS=$(grep -cE '\[PAGE IMAGE:|IMAGE NOT AVAILABLE:' "$TEMP_FILE" 2>/dev/null || echo 0)
+            local IMG_REFS=$(grep -cE '\[PAGE IMAGE:|IMAGE NOT AVAILABLE:' "$TEMP_FILE" 2>/dev/null || true)
             if [ "$PAGE_IMGS" -gt 3 ] && [ "$IMG_REFS" -eq 0 ]; then
               echo "  QUALITY_FAIL — pp. $B_START-$B_END ($MODEL): $PAGE_IMGS page images but 0 references" >> "$BATCH_LOG"
               rm -f "$TEMP_FILE"
@@ -1034,6 +1034,7 @@ print(f"  Chapters found: {sorted(chapters)}")
 print(f"  Chapter count: {len(chapters)}")
 
 # Check for gaps in chapter sequence
+missing_chs = []
 if chapters:
     max_ch = max(chapters)
     missing_chs = [c for c in range(1, max_ch + 1) if c not in chapters]
@@ -1106,8 +1107,8 @@ echo "========================================" | tee -a "$LOG"
 RUN_STATE="$DIR/.run_state.json"
 
 # Count nuggets for the state file
-MUST_COUNT=$(grep -cE '\[MUST KNOW\]' "$NOTES" 2>/dev/null || echo 0)
-SHOULD_COUNT=$(grep -cE '\[SHOULD KNOW\]' "$NOTES" 2>/dev/null || echo 0)
+MUST_COUNT=$(grep -cE '\[MUST KNOW\]' "$NOTES" 2>/dev/null || true)
+SHOULD_COUNT=$(grep -cE '\[SHOULD KNOW\]' "$NOTES" 2>/dev/null || true)
 NUGGET_COUNT=$(grep -oE '\[N[0-9]+\]' "$NOTES" 2>/dev/null | sort -u | wc -l | tr -d ' ')
 TOTAL_LINES=$(wc -l < "$NOTES" | tr -d ' ')
 

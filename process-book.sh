@@ -237,7 +237,7 @@ for ((P=START; P<=END_PAGE; P++)); do
   fi
 done
 
-MISSING_PAGES=$(echo "$MISSING_PAGES" | tr ' ' '\n' | grep -v '^$' | sort -un)
+MISSING_PAGES=$(echo "$MISSING_PAGES" | tr ' ' '\n' | grep -v '^$' | sort -un || true)
 MISS_COUNT=$(echo "$MISSING_PAGES" | grep -c . || true)
 
 if [ "$MISS_COUNT" -eq 0 ]; then
@@ -461,6 +461,7 @@ print(f"  Chapters found: {sorted(chapters)}")
 print(f"  Chapter count: {len(chapters)}")
 
 # Check for gaps in chapter sequence
+missing_chs = []
 if chapters:
     max_ch = max(chapters)
     missing_chs = [c for c in range(1, max_ch + 1) if c not in chapters]
