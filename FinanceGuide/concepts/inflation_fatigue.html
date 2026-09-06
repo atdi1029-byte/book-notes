@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Inflation Fatigue - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.tier .tier-desc { color: #a08060; font-size: 0.85rem; margin: 0.4rem 0 0.8rem; }
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../behavioral-finance-psychology.html">&larr; Behavioral Finance &amp; Psychology</a>
+
+<div class="concept-meta"><span>standard</span><span>Behavioral Finance &amp; Psychology</span><span>added 2026-09-01</span></div>
+<h4 id="inflation_fatigue">Inflation Fatigue</h4>
+
+<p><strong>Inflation fatigue</strong> is what happens when prices don't just spike once and recover — they keep climbing, month after month, year after year, across every essential category of life simultaneously. It's the slow-motion financial exhaustion that sets in when consumers absorb one price increase, adapt, absorb another, adapt again, and then find themselves running out of room to adapt. The word "fatigue" is deliberate: this isn't a single punch, it's the cumulative weight of dozens of smaller hits that individually seem manageable but together grind down a household's financial resilience until the buffers — savings, credit availability, family support — are simply gone. Understanding inflation fatigue means understanding why the official inflation rate dropping from 9% to 3% doesn't feel like relief to most working families.</p>
+
+<p>The reason inflation fatigue matters at a macro level is that it creates a divergence between what economic indicators report and what consumers actually experience. <strong>Headline CPI</strong> (the Consumer Price Index) is a snapshot of the current rate of price change. When it falls from 9% to 3%, economists say inflation is "cooling." But inflation fatigue tracks the accumulated damage — the total price level increase over three or four years. If groceries rose 15% in 2022, 8% in 2023, and 4% in 2024, the current rate looks mild, but that household is now spending 29% more on food than they were before the cycle began. That gap between the statistical story and the lived experience is where inflation fatigue lives, and it's where markets miss signals about consumer stress that are hiding in plain sight.</p>
+
+<p>The mechanism works through a sequential depletion of financial buffers. During the early phase of an inflation cycle, households draw down the <strong>excess savings</strong> they accumulated during prior periods of stability or stimulus. This keeps spending patterns largely intact even as prices rise — which is why consumer spending data often looks healthy in the early innings of an inflationary episode. As savings erode, households shift to credit cards to maintain their standard of living. Credit card balances grow, and at first this is manageable if interest rates remain low. But when central banks raise rates to fight inflation — as the Federal Reserve did aggressively starting in 2022 — those balances become expensive to carry. The final buffer is the credit limit itself. Once savings are gone and credit is maxed at high interest rates, the household has nowhere left to turn except the lender of last resort: the pawn shop.</p>
+
+<p>The real-world illustration of this process arrived in 2024 when <strong>First Cash Financial Services</strong>, America's largest pawn shop operator with over 3,300 retail locations across the United States and Latin America, disclosed that its consolidated <strong>pawn receivables</strong> — the total dollar value of loans extended against physical collateral — surged 63% year-over-year to nearly $900 million. This wasn't a small regional anomaly. A syndicate of commercial banks extended First Cash a credit facility exceeding <strong>$1.05 billion</strong> to fund continued expansion. Wall Street, in other words, placed a billion-dollar bet on the proposition that working-class Americans would continue pawning watches, tools, jewelry, and electronics to bridge gaps between paychecks. The banks didn't fund this because they misread the economy. They funded it because they read the inflation fatigue data correctly and saw a growth market in financial desperation.</p>
+
+<blockquote>"When you work in finance, you learn very quickly that you don't look at what Wall Street says, you look where Wall Street banks are quietly lending their capital."</blockquote>
+
+<p>For traders and investors, inflation fatigue generates several actionable signals. The pawn loan surge is a form of <strong>shadow credit data</strong> — lending activity that doesn't appear in mainstream consumer credit reports but reveals balance sheet stress with high accuracy. When pawn receivables grow at 63% annually, it tells you that the bottom two income quintiles have already exhausted their savings and conventional credit. This typically precedes deterioration in mainstream credit metrics by six to twelve months, as those consumers eventually stop paying credit cards, auto loans, and rent. Investors tracking consumer discretionary stocks, regional banks with high subprime exposure, and retailers serving middle-to-lower income demographics can use pawn industry earnings as a leading indicator for what's coming in their sectors.</p>
+
+<p>The most common misconception about inflation fatigue is conflating it with the current inflation rate. When the Fed successfully brings CPI down, commentary often declares that the inflation problem is "solved" and consumers should feel better. But inflation fatigue is about <strong>price levels</strong>, not price velocity. Prices don't fall when inflation cools — they simply stop rising as fast. A household that was spending $800 a month on groceries in 2021 and now spends $1,060 hasn't benefited from "lower inflation." The 3% annual increase rate is just adding to a burden that already grew by 32%. This is why consumer sentiment surveys consistently showed Americans feeling worse about the economy in 2023 and 2024 than GDP growth or unemployment rates would predict — the aggregate statistics masked cumulative price-level damage that individual families felt acutely every time they filled a gas tank or paid a utility bill.</p>
+
+<p>Inflation fatigue becomes particularly dangerous when it interacts with <strong>high-interest credit</strong>. During the 2022–2024 cycle, the Federal Reserve raised the federal funds rate from near zero to over 5%, which fed directly into credit card <strong>APRs</strong> that reached and exceeded 22% for many issuers. A household that had accumulated $8,000 in credit card debt while trying to absorb grocery and utility inflation now faced over $1,700 per year in interest charges alone — on top of still-elevated prices. This creates a debt trap: the household must choose between paying down high-interest debt (which leaves less money for necessities) or carrying the debt (which makes the total cost of living even higher). When both choices are unsustainable simultaneously, the pawn shop becomes the rational next step — it offers cash today against an asset, with no credit check and no ongoing interest compounding.</p>
+
+<p>Inflation fatigue connects most directly to the concepts of <strong>consumer balance sheet health</strong>, <strong>credit cycle dynamics</strong>, and what economists call the <strong>wealth effect in reverse</strong>. When asset prices rise, households feel richer and spend more. When the same households watch their savings depleted by persistent price increases while their asset prices (particularly home equity for renters, or retirement accounts for those who cashed out early) don't compensate, the reverse effect kicks in: contraction, defensive spending, and eventually financial triage. It also links to <strong>K-shaped recovery</strong> dynamics — the phenomenon where economic cycles benefit upper-income households (who own financial assets that rise with monetary stimulus) while leaving lower-income households exposed to price inflation with fewer assets to buffer against it. The billion-dollar pawn shop bet is, at its core, a financial institution pricing in the K-shape: betting that the bottom half of the income distribution has run out of options, and that bet pays when the inflation fatigue cycle reaches its terminal stage.</p>
+<div class="concept-side">Sources: THE $1B PAWN SHOP BOMBSHELL: Why Banks Are Funding Working-Class Despair!<br>Related in this category: <a href="good_news_bad_news_market_paradox.html">Good News / Bad News Market Paradox</a></div>
+<button class="concept-done" data-slug="inflation_fatigue" onclick="toggleDone('inflation_fatigue')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_inflation_fatigue';</script>
+<script src="../../book.js"></script>
+
+<script>
+(function() {
+  var DONE_KEY = 'fg_done', FILTER_KEY = 'fg_filter';
+  var done = JSON.parse(localStorage.getItem(DONE_KEY) || '{}');
+  var filter = localStorage.getItem(FILTER_KEY) || 'all';
+
+  function visible(flag) {
+    if (filter === 'star') return flag === 'star';
+    if (filter === 'nodeep') return flag !== 'deep';
+    return true;
+  }
+
+  function apply() {
+    var shown = 0, total = 0, hidden = 0;
+    document.querySelectorAll('.concept-row').forEach(function(r) {
+      var slug = r.dataset.slug, flag = r.dataset.flag;
+      total++;
+      if (done[slug]) r.classList.add('done'); else r.classList.remove('done');
+      if (visible(flag)) { r.classList.remove('fg-hidden'); shown++; }
+      else { r.classList.add('fg-hidden'); hidden++; }
+    });
+    document.querySelectorAll('.cat-card').forEach(function(card) {
+      var slugs = card.dataset.slugs ? card.dataset.slugs.split(',') : [];
+      var flags = card.dataset.flags ? card.dataset.flags.split(',') : [];
+      var vis = 0, allDone = slugs.length > 0;
+      slugs.forEach(function(sl, i) {
+        if (visible(flags[i])) vis++;
+        if (!done[sl]) allDone = false;
+      });
+      total += slugs.length; shown += vis;
+      var c = card.querySelector('.cat-count');
+      if (c) c.textContent = vis + (vis !== slugs.length ? ' of ' + slugs.length : '') + ' concepts' +
+        (card.dataset.stars ? ' \u00b7 ' + card.dataset.stars + ' \u2605' : '');
+      if (vis === 0) card.classList.add('fg-empty'); else card.classList.remove('fg-empty');
+      if (allDone) card.classList.add('done'); else card.classList.remove('done');
+    });
+    document.querySelectorAll('[data-filter]').forEach(function(b) {
+      b.classList.toggle('active', b.dataset.filter === filter);
+    });
+    var n = document.getElementById('fgCount');
+    if (n) n.textContent = shown + ' of ' + total + ' shown';
+    var h = document.getElementById('fgHiddenNote');
+    if (h) h.textContent = hidden ? hidden + ' hidden by the filter.' : '';
+    var btn = document.querySelector('.concept-done');
+    if (btn) {
+      var on = !!done[btn.dataset.slug];
+      btn.classList.toggle('on', on);
+      btn.textContent = on ? '\u2713 Completed' : '\u2713 Mark complete';
+    }
+  }
+
+  window.setFilter = function(f) {
+    filter = f; localStorage.setItem(FILTER_KEY, f); apply();
+  };
+  window.toggleDone = function(slug) {
+    if (done[slug]) delete done[slug]; else done[slug] = true;
+    localStorage.setItem(DONE_KEY, JSON.stringify(done));
+    apply();
+  };
+  window.toggleHideDone = function() {
+    document.body.classList.toggle('hide-done');
+  };
+  apply();
+})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Congressional Budget Office (CBO) Projections - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.tier .tier-desc { color: #a08060; font-size: 0.85rem; margin: 0.4rem 0 0.8rem; }
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../economic-indicators.html">&larr; Economic Indicators</a>
+
+<div class="concept-meta"><span>deep cut</span><span>Economic Indicators</span><span>added 2026-08-31</span></div>
+<h4 id="congressional_budget_office_projections">Congressional Budget Office (CBO) Projections</h4>
+
+<p>The <strong>Congressional Budget Office (CBO)</strong> is a nonpartisan federal agency created by Congress in 1974 to provide independent economic and budget analysis to lawmakers. Think of it as the government's official scorekeeper — it doesn't make policy, it measures what policies will cost and what the fiscal future looks like if current laws remain unchanged. When anyone in Washington debates a spending bill, a tax cut, or a debt ceiling increase, the CBO's number is the one that carries weight in the room. Its projections cover a <strong>10-year budget window</strong>, which is why you'll often hear the phrase "over the next decade" attached to CBO figures. The agency is deliberately shielded from political pressure, which gives its forecasts a credibility that partisan think tanks simply can't match.</p>
+
+<p>Why do CBO projections matter to markets and ordinary people? Because they define the trajectory of the <strong>federal deficit</strong>, the <strong>national debt</strong>, and — critically — <strong>debt service costs</strong>. When the CBO projects that interest payments on the national debt will more than double to over $2 trillion annually within ten years, that isn't an opinion or a political talking point. It's a structural calculation built from current debt levels, maturity schedules, and projected interest rates. That number matters because interest is a mandatory expenditure — it cannot be cut in a budget negotiation the way discretionary spending can. Every dollar going to interest is a dollar that cannot fund defense, infrastructure, Medicare, or anything else. Debt service crowds out choice.</p>
+
+<p>Mechanically, here's how the CBO builds its interest payment projections. It starts with the existing stock of debt — currently around $36 trillion in publicly held debt. It then models how much of that debt matures each year and at what interest rate it will need to be <strong>rolled over</strong> (refinanced). Debt issued in the near-zero rate era of 2020–2021 at 0.5% is now maturing and being replaced with bonds paying 4–5%. The CBO applies the <strong>Congressional Budget Act baseline</strong> — a rule that projections must assume current law continues — and runs forward the arithmetic of compounding interest at higher rates across an expanding debt load. The result is a projected interest bill that grows even without any new spending, simply because existing debt reprices upward at maturity.</p>
+
+<p>The video's reference to the CBO is grounded in a concrete and alarming number. As of recent CBO forecasts, annual <strong>net interest payments</strong> were already exceeding $1 trillion — having crossed that threshold in 2023 for the first time in U.S. history. The projection that this figure doubles to over $2 trillion within a decade assumes no dramatic fiscal tightening and interest rates remaining in a normalized range above the near-zero floor of the 2010s. To put that in context: $2 trillion in annual interest would make debt service the single largest line item in the federal budget, exceeding Social Security, Medicare, or the entire defense budget. No single Fed speech, no matter how hawkish, closes that structural gap.</p>
+
+<blockquote>"The real story underneath this sell-off is actually a $40 trillion debt problem that no speech on earth can actually fix."</blockquote>
+
+<p>Traders and investors use CBO projections primarily as a framework for understanding <strong>long-run Treasury supply</strong>. When the government must borrow $2 trillion per year just to pay interest — before funding a single new program — it must issue a massive and growing volume of Treasury bonds. More supply without proportional demand growth means prices fall and <strong>yields rise</strong>. This is why sophisticated fixed-income investors track CBO updates closely: revisions to the 10-year deficit path directly signal future Treasury supply, which feeds into yield forecasts. Equity investors care because rising long-term yields increase the <strong>discount rate</strong> applied to future corporate earnings, compressing valuations. Hard asset investors — gold and Bitcoin buyers — care because a deteriorating fiscal outlook theoretically weakens the dollar and erodes confidence in fiat money.</p>
+
+<p>The most important nuance traders miss is the difference between the <strong>primary deficit</strong> and the <strong>total deficit</strong>. The primary deficit measures spending minus revenue excluding interest payments. The total deficit adds interest on top. It's entirely possible for a government to balance its primary budget — spending no more than it takes in on everything except debt service — and still run a massive total deficit simply because the interest bill is so large. The United States is approaching this trap. That distinction matters because it reveals the limits of austerity: even if Congress cut every non-interest program to zero, the debt service bill would remain. This is why the video argues no speech fixes the underlying problem — it's a mathematical reality, not a policy choice.</p>
+
+<p>CBO projections can break in both optimistic and pessimistic directions. On the optimistic side, stronger-than-expected economic growth generates higher tax revenues, shrinking deficits faster than projected. The CBO consistently <strong>underestimated revenue growth</strong> during the 1990s tech boom, which is one reason the budget briefly reached surplus in 1998–2001. On the pessimistic side, a recession reduces revenues and triggers automatic stabilizer spending (unemployment insurance, Medicaid expansion), blowing out deficits relative to baseline. Interest rate surprises — if the Fed keeps rates higher for longer than the baseline assumes — accelerate the interest payment spiral dramatically. A one-percentage-point increase in average borrowing rates on $36 trillion of debt adds roughly $360 billion per year to the interest bill, compounding the problem with each new issuance cycle.</p>
+
+<p>The CBO's interest payment projections connect directly to the <strong>Jackson Hole framework</strong> described in the video. When Kevin Warsh signaled that rate cuts are off the table and a hike may be coming, he was implicitly worsening the CBO's interest trajectory. Higher rates for longer mean Treasury debt rolls over at higher coupon rates, accelerating the climb toward $2 trillion in annual interest. This is the structural chain: Fed policy → Treasury borrowing costs → CBO interest projections → fiscal sustainability fears → long-term yield pressure → hard asset repricing. Gold and Bitcoin dropped not merely because rates rose, but because higher rates expose how fragile the entire debt structure is. Ironically, the very monetary tightening meant to restore confidence can accelerate the fiscal deterioration that undermines it — a feedback loop no single central bank speech was ever designed to resolve.</p>
+<div class="concept-side">Sources: THE JACKSON HOLE TRAP: Why Kevin Warsh Just Crashed Gold &amp; Bitcoin!<br>Related in this category: <a href="inflation_breadth.html">Inflation Breadth</a>, <a href="financial_conditions_index.html">Financial Conditions Index</a>, <a href="core_pce.html">Core PCE (Personal Consumption Expenditures)</a>, <a href="consumer_credit_card_delinquency_rate.html">Consumer Credit Card Delinquency Rate</a>, <a href="total_consumer_debt.html">Total Household / Consumer Debt</a>, <a href="pawn_receivables_economic_indicator.html">Pawn Receivables as Shadow Economic Indicator</a></div>
+<button class="concept-done" data-slug="congressional_budget_office_projections" onclick="toggleDone('congressional_budget_office_projections')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_congressional_budget_office_projections';</script>
+<script src="../../book.js"></script>
+
+<script>
+(function() {
+  var DONE_KEY = 'fg_done', FILTER_KEY = 'fg_filter';
+  var done = JSON.parse(localStorage.getItem(DONE_KEY) || '{}');
+  var filter = localStorage.getItem(FILTER_KEY) || 'all';
+
+  function visible(flag) {
+    if (filter === 'star') return flag === 'star';
+    if (filter === 'nodeep') return flag !== 'deep';
+    return true;
+  }
+
+  function apply() {
+    var shown = 0, total = 0, hidden = 0;
+    document.querySelectorAll('.concept-row').forEach(function(r) {
+      var slug = r.dataset.slug, flag = r.dataset.flag;
+      total++;
+      if (done[slug]) r.classList.add('done'); else r.classList.remove('done');
+      if (visible(flag)) { r.classList.remove('fg-hidden'); shown++; }
+      else { r.classList.add('fg-hidden'); hidden++; }
+    });
+    document.querySelectorAll('.cat-card').forEach(function(card) {
+      var slugs = card.dataset.slugs ? card.dataset.slugs.split(',') : [];
+      var flags = card.dataset.flags ? card.dataset.flags.split(',') : [];
+      var vis = 0, allDone = slugs.length > 0;
+      slugs.forEach(function(sl, i) {
+        if (visible(flags[i])) vis++;
+        if (!done[sl]) allDone = false;
+      });
+      total += slugs.length; shown += vis;
+      var c = card.querySelector('.cat-count');
+      if (c) c.textContent = vis + (vis !== slugs.length ? ' of ' + slugs.length : '') + ' concepts' +
+        (card.dataset.stars ? ' \u00b7 ' + card.dataset.stars + ' \u2605' : '');
+      if (vis === 0) card.classList.add('fg-empty'); else card.classList.remove('fg-empty');
+      if (allDone) card.classList.add('done'); else card.classList.remove('done');
+    });
+    document.querySelectorAll('[data-filter]').forEach(function(b) {
+      b.classList.toggle('active', b.dataset.filter === filter);
+    });
+    var n = document.getElementById('fgCount');
+    if (n) n.textContent = shown + ' of ' + total + ' shown';
+    var h = document.getElementById('fgHiddenNote');
+    if (h) h.textContent = hidden ? hidden + ' hidden by the filter.' : '';
+    var btn = document.querySelector('.concept-done');
+    if (btn) {
+      var on = !!done[btn.dataset.slug];
+      btn.classList.toggle('on', on);
+      btn.textContent = on ? '\u2713 Completed' : '\u2713 Mark complete';
+    }
+  }
+
+  window.setFilter = function(f) {
+    filter = f; localStorage.setItem(FILTER_KEY, f); apply();
+  };
+  window.toggleDone = function(slug) {
+    if (done[slug]) delete done[slug]; else done[slug] = true;
+    localStorage.setItem(DONE_KEY, JSON.stringify(done));
+    apply();
+  };
+  window.toggleHideDone = function() {
+    document.body.classList.toggle('hide-done');
+  };
+  apply();
+})();
+</script>
+
+</body>
+</html>

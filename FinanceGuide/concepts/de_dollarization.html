@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>De-Dollarization - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.tier .tier-desc { color: #a08060; font-size: 0.85rem; margin: 0.4rem 0 0.8rem; }
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../macro-investing-geopolitics.html">&larr; Macro Investing &amp; Geopolitics</a>
+
+<div class="concept-meta"><span><span class="star">&#9733;</span> must-know</span><span>Macro Investing &amp; Geopolitics</span><span>added 2026-09-06</span></div>
+<h4 id="de_dollarization">De-Dollarization</h4>
+
+<p><strong>De-dollarization</strong> refers to the process by which countries, institutions, or markets reduce their reliance on the US dollar as the world's dominant reserve currency, trading currency, and store of value. Since the Bretton Woods agreement of 1944, the dollar has served as the planet's financial lingua franca — oil is priced in it, sovereign debt is issued in it, and central banks worldwide hold it as their primary reserve asset. De-dollarization describes any meaningful, sustained shift away from that arrangement. This could mean countries settling trade in their own currencies, central banks diversifying reserves into euros or gold, or sovereign wealth funds rotating out of dollar-denominated assets. The concept sits at the intersection of geopolitics, monetary policy, and global capital markets.</p>
+
+<p>The reason de-dollarization matters so profoundly is that <strong>dollar dominance</strong> is not merely a financial convenience — it is a structural subsidy for the United States economy. When the rest of the world demands dollars to conduct trade and hold reserves, the US can borrow more cheaply than any other nation on earth. Foreign governments park their savings in US Treasuries, which keeps American interest rates lower than they would otherwise be. This is what economists call the <strong>exorbitant privilege</strong>. If that demand were to erode meaningfully — if large sovereign holders began systematically dumping Treasuries — US borrowing costs would rise, mortgage rates would climb, corporate financing would become more expensive, and the federal government's interest burden would balloon. The downstream effects touch every American's wallet.</p>
+
+<p>Mechanically, de-dollarization works through the reserve management decisions of <strong>sovereign wealth funds</strong> and <strong>central banks</strong>. These institutions hold vast pools of foreign currency assets — often in the hundreds of billions — as a national savings buffer. When a country runs a trade surplus or, in Norway's case, extracts enormous natural resource wealth, those proceeds must be invested somewhere. Historically, the default choice has been US Treasuries, the deepest and most liquid bond market on earth. De-dollarization occurs when the portfolio mandate shifts: reduce the Treasury allocation, increase gold, buy euros, issue or receive trade invoices in local currency instead of dollars. Each of these individual decisions, multiplied across dozens of sovereign actors, adds up to a structural reduction in global dollar demand.</p>
+
+<p>The Norway case from 2025 is the perfect real-world laboratory to understand how quickly the media narrative can outrun the actual mechanics. <strong>Norges Bank Investment Management (NBIM)</strong>, which manages Norway's $2.3 trillion Government Pension Fund Global — the largest sovereign wealth fund on earth — submitted a formal proposal to cut the government bond share of its fixed income benchmark from 70% down to 50%. In dollar terms, that meant roughly $106 billion leaving sovereign debt broadly, with US Treasuries absorbing the largest single hit: the Treasury weight inside the government bond sleeve dropping from 34.1% to 21.9%, translating to somewhere between $75 billion and $85 billion of US government paper potentially leaving the portfolio.</p>
+
+<blockquote>"Within about 90 minutes, the financial media had the whole thing wrapped in a bow after the report came out. De-dollarization... capital flight... the foreign buyers are abandoning Washington. It is a clean, great, scary story that fits perfectly on a chyron on the bottom of a cable TV financial news station."</blockquote>
+
+<p>But here is the number buried in the actual proposal that demolished the de-dollarization narrative entirely: Norway's <strong>total US dollar exposure stays right around 50% — unchanged</strong>. The fund was not leaving the dollar. It was repositioning within dollar-denominated assets, rotating from US Treasuries into <strong>mortgage-backed securities (MBS)</strong> and investment-grade corporate credit. In other words, Norway stopped lending money to the US government and started lending money to American homeowners and corporations instead. The dollar footprint was identical. The counterparty changed. That is an entirely different story with entirely different implications — and almost no financial outlet reported it that way.</p>
+
+<p>For traders and investors, the practical lesson from this episode is about learning to read <strong>flow versus framing</strong>. The investable signal inside the Norway story was not "sell dollars" — it was "Treasuries face a marginal demand reduction while MBS and investment-grade credit gain a massive new buyer." A sophisticated fixed income trader watching this would look at spread compression opportunities in agency MBS, not a short on the dollar. More broadly, when tracking de-dollarization as a macro theme, the metric to watch is not headlines but actual <strong>IMF COFER data</strong> (Currency Composition of Official Foreign Exchange Reserves), which tracks the actual dollar share of global central bank reserves over time. That share has declined from roughly 71% in 2000 to around 57-58% today — a real, slow-moving structural trend, not the dramatic rupture media cycles suggest.</p>
+
+<p>The biggest gotcha with de-dollarization coverage is the conflation of <strong>asset class rotation</strong> with <strong>currency regime change</strong>. These are categorically different phenomena. A sovereign fund can sell Treasuries and buy dollar-denominated corporate bonds — that is a duration and credit risk decision, not a geopolitical statement. True de-dollarization requires a shift in the underlying currency of denomination: pricing oil in yuan, settling bilateral trade in rupees, holding reserves in euros rather than dollars. Slow-moving institutions like sovereign wealth funds — entities that, as the video notes, "write academic papers before changing a decimal point" — virtually never make political statements with their benchmarks. When they move, it is math, not anger. Confusing the two leads to badly mispriced risk.</p>
+
+<p>The edge case where de-dollarization becomes genuinely dangerous is a <strong>disorderly unwind</strong> — a scenario where sovereign holders don't gradually rotate but sell aggressively into a thin market, driving Treasury yields sharply higher in a self-reinforcing spiral. This has never happened at scale, partly because it would damage the very reserve holders doing the selling (their remaining dollar assets would fall in value). But the risk is asymmetric: the dollar's reserve status is stable until it suddenly isn't, and the tipping point is unknown in advance. A true de-dollarization shock would likely manifest as a simultaneous spike in Treasury yields, a collapse in the dollar index, and a surge in gold and commodity prices — the opposite of the typical safe-haven flight that accompanies most crises.</p>
+
+<p>De-dollarization connects directly to several adjacent macro concepts worth understanding together. <strong>Treasury market liquidity</strong> depends heavily on a stable base of long-term sovereign buyers; reduce that base and bid-ask spreads widen, making volatility episodes more severe. <strong>The carry trade</strong> — borrowing in low-rate currencies to invest in high-yield ones — is premised on dollar stability; genuine de-dollarization would scramble those dynamics unpredictably. And <strong>commodity pricing</strong> is deeply tied to dollar dominance: because oil, gold, and most agricultural products are priced in dollars, a weaker reserve role for the dollar would likely mean higher commodity prices expressed in dollars over time, functioning as a slow-burning inflation tax on dollar holders worldwide. Understanding de-dollarization means understanding that the dollar is not just a currency — it is a system, and systems change at the edges long before they change at the center.</p>
+<div class="concept-side">Sources: THE RISK-FREE TRAP: Norway Cuts US Treasuries to Lend to American Homeowners!<br>Related in this category: <a href="trade_carveout_vs_treaty_guarantee.html">Trade Carve-Out vs. Treaty Guarantee</a>, <a href="usmca_trade_agreement.html">USMCA Trade Agreement and Joint Review Mechanism</a>, <a href="retaliatory_tariffs.html">Retaliatory Tariffs</a>, <a href="maritime_choke_point.html">Maritime Choke Point</a>, <a href="nationalization_risk.html">Asset Nationalization Risk</a>, <a href="global_sovereign_yield_contagion.html">Global Sovereign Yield Contagion</a></div>
+<button class="concept-done" data-slug="de_dollarization" onclick="toggleDone('de_dollarization')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_de_dollarization';</script>
+<script src="../../book.js"></script>
+
+<script>
+(function() {
+  var DONE_KEY = 'fg_done', FILTER_KEY = 'fg_filter';
+  var done = JSON.parse(localStorage.getItem(DONE_KEY) || '{}');
+  var filter = localStorage.getItem(FILTER_KEY) || 'all';
+
+  function visible(flag) {
+    if (filter === 'star') return flag === 'star';
+    if (filter === 'nodeep') return flag !== 'deep';
+    return true;
+  }
+
+  function apply() {
+    var shown = 0, total = 0, hidden = 0;
+    document.querySelectorAll('.concept-row').forEach(function(r) {
+      var slug = r.dataset.slug, flag = r.dataset.flag;
+      total++;
+      if (done[slug]) r.classList.add('done'); else r.classList.remove('done');
+      if (visible(flag)) { r.classList.remove('fg-hidden'); shown++; }
+      else { r.classList.add('fg-hidden'); hidden++; }
+    });
+    document.querySelectorAll('.cat-card').forEach(function(card) {
+      var slugs = card.dataset.slugs ? card.dataset.slugs.split(',') : [];
+      var flags = card.dataset.flags ? card.dataset.flags.split(',') : [];
+      var vis = 0, allDone = slugs.length > 0;
+      slugs.forEach(function(sl, i) {
+        if (visible(flags[i])) vis++;
+        if (!done[sl]) allDone = false;
+      });
+      total += slugs.length; shown += vis;
+      var c = card.querySelector('.cat-count');
+      if (c) c.textContent = vis + (vis !== slugs.length ? ' of ' + slugs.length : '') + ' concepts' +
+        (card.dataset.stars ? ' \u00b7 ' + card.dataset.stars + ' \u2605' : '');
+      if (vis === 0) card.classList.add('fg-empty'); else card.classList.remove('fg-empty');
+      if (allDone) card.classList.add('done'); else card.classList.remove('done');
+    });
+    document.querySelectorAll('[data-filter]').forEach(function(b) {
+      b.classList.toggle('active', b.dataset.filter === filter);
+    });
+    var n = document.getElementById('fgCount');
+    if (n) n.textContent = shown + ' of ' + total + ' shown';
+    var h = document.getElementById('fgHiddenNote');
+    if (h) h.textContent = hidden ? hidden + ' hidden by the filter.' : '';
+    var btn = document.querySelector('.concept-done');
+    if (btn) {
+      var on = !!done[btn.dataset.slug];
+      btn.classList.toggle('on', on);
+      btn.textContent = on ? '\u2713 Completed' : '\u2713 Mark complete';
+    }
+  }
+
+  window.setFilter = function(f) {
+    filter = f; localStorage.setItem(FILTER_KEY, f); apply();
+  };
+  window.toggleDone = function(slug) {
+    if (done[slug]) delete done[slug]; else done[slug] = true;
+    localStorage.setItem(DONE_KEY, JSON.stringify(done));
+    apply();
+  };
+  window.toggleHideDone = function() {
+    document.body.classList.toggle('hide-done');
+  };
+  apply();
+})();
+</script>
+
+</body>
+</html>

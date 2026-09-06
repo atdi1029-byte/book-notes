@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>U6 Unemployment Rate (Broad Labor Underutilization) - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.tier .tier-desc { color: #a08060; font-size: 0.85rem; margin: 0.4rem 0 0.8rem; }
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../economic-indicators.html">&larr; Economic Indicators</a>
+
+<div class="concept-meta"><span>standard</span><span>Economic Indicators</span><span>added 2026-09-05</span></div>
+<h4 id="u6_unemployment_rate">U6 Unemployment Rate (Broad Labor Underutilization)</h4>
+
+<p>When most people hear "the unemployment rate," they're hearing about a number called <strong>U3</strong> — the official, headline figure the Bureau of Labor Statistics publishes every first Friday of the month. It counts people who don't have a job, have actively looked for work in the past four weeks, and are currently available to work. That definition sounds reasonable until you realize how much it leaves out. Enter the <strong>U6 unemployment rate</strong>, also called the <strong>broad labor underutilization rate</strong>. U6 is the government's own widest lens on labor market slack — it captures not just the officially unemployed, but also people who've given up looking and workers stuck in part-time jobs who desperately want full-time work. It is the most honest single number the BLS publishes about how well the labor market is actually serving American workers.</p>
+
+<p>The U6 rate matters because labor market health drives almost every major economic decision that touches your daily life. The Federal Reserve uses unemployment data to set interest rates. When the labor market looks tight, the Fed sees inflation risk and leans toward hiking — which raises your mortgage rate, your car loan, your credit card APR. When the labor market looks loose, the Fed sees room to cut, which eventually brings borrowing costs down. The problem is that if policymakers are reading U3 while the real story is in U6, they may be making rate decisions based on a fundamentally incomplete picture. A headline number that signals "all is well" can coexist with a U6 number showing millions of Americans severely underemployed — and the Fed may not flinch.</p>
+
+<p>Mechanically, U6 is built in layers. The BLS runs the <strong>Current Population Survey</strong> every month, interviewing roughly 60,000 households. From that, they construct six measures — U1 through U6 — each progressively broader. U3 is the headline. U6 adds two additional groups on top of U3. First, it adds <strong>marginally attached workers</strong>: people who aren't currently looking for work but have searched within the past year and want a job. Within this group are <strong>discouraged workers</strong> — people who've stopped looking specifically because they believe no jobs are available for them. Second, U6 adds <strong>involuntary part-time workers</strong>, formally called "part-time for economic reasons" — people working fewer hours than they want because their employer cut their hours or they couldn't find full-time work. Add all three groups together and you get U6.</p>
+
+<p>The real-world illustration from the video makes this concrete in a way that raw definitions never can. When the August jobs report dropped showing 162,000 nonfarm payrolls added — nearly triple Wall Street's 56,000 expectation — the headline U3 unemployment rate held steady at <strong>4.1%</strong>. Financial media immediately called it a blowout. But the U6 reading that same morning was <strong>7.7%</strong>. That gap — 4.1% versus 7.7% — represents a hidden mass of labor market pain invisible to the casual headline reader. The BLS data showed roughly <strong>7.0 million</strong> officially unemployed workers, but stacked on top of that were another <strong>4.4 million involuntary part-timers</strong>. Combined: over <strong>11.4 million underutilized workers</strong> on the very day markets were celebrating.</p>
+
+<blockquote>"If this were really the broad-based healthy labor market Washington would like you to believe, ask yourself why two industries did almost two-thirds of all the heavy lifting."</blockquote>
+
+<p>For traders and investors, the U6 rate is a signal-within-a-signal. When U3 looks strong but U6 remains elevated, it often means the job growth is concentrated in lower-wage, lower-hour, lower-productivity sectors — exactly what that August report showed, with food services and local government education accounting for 62.3% of all jobs added. Sophisticated fixed-income traders watch this spread between U3 and U6 as a <strong>labor market quality indicator</strong>. A narrowing spread (U6 falling toward U3) suggests genuine tightening — full-time, productive employment absorbing the underutilized. A stubbornly wide spread signals that the headline is flattering the reality, which has implications for consumer spending, wage growth, and ultimately inflation dynamics that the Fed cares deeply about.</p>
+
+<p>The most dangerous misconception about U6 is that it's some fringe alternative metric invented by critics of official data. It isn't. The BLS publishes it alongside U3 every single month — it's right there in the same report. The second misconception is that a low U3 automatically means U6 is low too. That's simply false. The two measures can diverge dramatically, especially in recoveries where employers hire people back at reduced hours before restoring them to full-time status, or in structural shifts where workers age out of their field and stop searching without retiring. A third misconception: some assume U6 always overstates distress. In reality, U6 still excludes people who haven't looked for work in over a year, so even U6 has a floor that can undercount true slack in prolonged downturns.</p>
+
+<p>U6 can also mislead in the opposite direction under specific edge cases. During economic booms, voluntary part-time work rises — students, caregivers, semi-retirees choosing reduced hours. These workers technically count toward U6's part-time component even though they aren't distressed. This means U6 can look elevated not because the economy is weak but because a healthy economy is giving people flexibility. Analysts handle this by looking at the <strong>involuntary part-time series</strong> (BLS Table A-8) in isolation rather than relying on U6 alone. Similarly, during a sudden shock like a pandemic, millions of workers can exit the labor force entirely within weeks — disappearing from both U3 and U6 simultaneously — making both measures temporarily look better than the underlying reality.</p>
+
+<p>U6 connects most directly to three other concepts worth understanding together. First, the <strong>labor force participation rate</strong> — which tracks what share of the working-age population is even trying to work. Participation falling while U3 holds steady often means the improvement is cosmetic: people leaving, not finding jobs. Second, <strong>wage growth data</strong> (Average Hourly Earnings): if U6 is elevated, workers have weak bargaining power, and wage growth tends to stay muted despite the headline looking fine. Third, and most immediately consequential for personal finance, is the <strong>Federal funds rate</strong>. As the video makes clear, a strong headline jobs number gives the Fed's inflation hawks the cover they need to keep rates higher for longer — directly translating into higher borrowing costs for anyone with a mortgage, car loan, student debt, or credit card balance. Understanding U6 is how you see that mechanism before the market does.</p>
+<div class="concept-side">Sources: THE 162K AMBUSH: Why the 'Blowout' Jobs Report Hands Hawks Cover to Hike!<br>Related in this category: <a href="inflation_breadth.html">Inflation Breadth</a>, <a href="congressional_budget_office_projections.html">Congressional Budget Office (CBO) Projections</a>, <a href="financial_conditions_index.html">Financial Conditions Index</a>, <a href="core_pce.html">Core PCE (Personal Consumption Expenditures)</a>, <a href="consumer_credit_card_delinquency_rate.html">Consumer Credit Card Delinquency Rate</a>, <a href="total_consumer_debt.html">Total Household / Consumer Debt</a></div>
+<button class="concept-done" data-slug="u6_unemployment_rate" onclick="toggleDone('u6_unemployment_rate')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_u6_unemployment_rate';</script>
+<script src="../../book.js"></script>
+
+<script>
+(function() {
+  var DONE_KEY = 'fg_done', FILTER_KEY = 'fg_filter';
+  var done = JSON.parse(localStorage.getItem(DONE_KEY) || '{}');
+  var filter = localStorage.getItem(FILTER_KEY) || 'all';
+
+  function visible(flag) {
+    if (filter === 'star') return flag === 'star';
+    if (filter === 'nodeep') return flag !== 'deep';
+    return true;
+  }
+
+  function apply() {
+    var shown = 0, total = 0, hidden = 0;
+    document.querySelectorAll('.concept-row').forEach(function(r) {
+      var slug = r.dataset.slug, flag = r.dataset.flag;
+      total++;
+      if (done[slug]) r.classList.add('done'); else r.classList.remove('done');
+      if (visible(flag)) { r.classList.remove('fg-hidden'); shown++; }
+      else { r.classList.add('fg-hidden'); hidden++; }
+    });
+    document.querySelectorAll('.cat-card').forEach(function(card) {
+      var slugs = card.dataset.slugs ? card.dataset.slugs.split(',') : [];
+      var flags = card.dataset.flags ? card.dataset.flags.split(',') : [];
+      var vis = 0, allDone = slugs.length > 0;
+      slugs.forEach(function(sl, i) {
+        if (visible(flags[i])) vis++;
+        if (!done[sl]) allDone = false;
+      });
+      total += slugs.length; shown += vis;
+      var c = card.querySelector('.cat-count');
+      if (c) c.textContent = vis + (vis !== slugs.length ? ' of ' + slugs.length : '') + ' concepts' +
+        (card.dataset.stars ? ' \u00b7 ' + card.dataset.stars + ' \u2605' : '');
+      if (vis === 0) card.classList.add('fg-empty'); else card.classList.remove('fg-empty');
+      if (allDone) card.classList.add('done'); else card.classList.remove('done');
+    });
+    document.querySelectorAll('[data-filter]').forEach(function(b) {
+      b.classList.toggle('active', b.dataset.filter === filter);
+    });
+    var n = document.getElementById('fgCount');
+    if (n) n.textContent = shown + ' of ' + total + ' shown';
+    var h = document.getElementById('fgHiddenNote');
+    if (h) h.textContent = hidden ? hidden + ' hidden by the filter.' : '';
+    var btn = document.querySelector('.concept-done');
+    if (btn) {
+      var on = !!done[btn.dataset.slug];
+      btn.classList.toggle('on', on);
+      btn.textContent = on ? '\u2713 Completed' : '\u2713 Mark complete';
+    }
+  }
+
+  window.setFilter = function(f) {
+    filter = f; localStorage.setItem(FILTER_KEY, f); apply();
+  };
+  window.toggleDone = function(slug) {
+    if (done[slug]) delete done[slug]; else done[slug] = true;
+    localStorage.setItem(DONE_KEY, JSON.stringify(done));
+    apply();
+  };
+  window.toggleHideDone = function() {
+    document.body.classList.toggle('hide-done');
+  };
+  apply();
+})();
+</script>
+
+</body>
+</html>

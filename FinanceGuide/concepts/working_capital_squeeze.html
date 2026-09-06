@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Working Capital Squeeze - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.tier .tier-desc { color: #a08060; font-size: 0.85rem; margin: 0.4rem 0 0.8rem; }
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../corporate-finance-investment-banking.html">&larr; Corporate Finance &amp; Investment Banking</a>
+
+<div class="concept-meta"><span>standard</span><span>Corporate Finance &amp; Investment Banking</span><span>added 2026-08-31</span></div>
+<h4 id="working_capital_squeeze">Working Capital Squeeze</h4>
+
+<p>A <strong>working capital squeeze</strong> is what happens when a business — or an entire industry — finds itself caught between rising short-term obligations and shrinking liquid resources to meet them. Working capital, at its most basic, is the difference between current assets (cash, receivables, inventory) and current liabilities (loans due soon, payables, interest payments). When that gap narrows dangerously, the business can't absorb shocks, can't seize opportunities, and often can't survive a bad quarter without outside help. It's not about being unprofitable on paper — a farm can have millions in land equity and still face a working capital squeeze if the cash isn't there when the bills arrive. Equity is illiquid; operating survival is a cash problem.</p>
+
+<p>Working capital matters far beyond the individual business because it functions as the nervous system of real economic activity. When working capital dries up across an entire sector — farming, trucking, manufacturing — the ripple effects reach everyone downstream. Farms that can't float their operating costs plant fewer acres, defer equipment maintenance, or skip inputs like fertilizer that directly affect yield. That translates into tighter commodity supply, higher food prices, and broken links in supply chains that grocery retailers and food processors depend on. A working capital squeeze in agriculture isn't a financial abstraction — it's a mechanism that eventually shows up as higher prices at your checkout line, sometimes with a six-to-twelve-month lag between the farm stress and the supermarket shelf.</p>
+
+<p>Mechanically, a working capital squeeze unfolds in stages. First, revenues soften — commodity prices fall, a drought cuts yields, or export markets close. Second, fixed costs remain: land rents, loan payments, fuel, and labor don't flex downward as fast as income does. Third, operators begin drawing down their cash reserves and short-term credit lines to bridge the gap. The <strong>current ratio</strong> (current assets divided by current liabilities) starts falling toward 1.0 — the danger threshold where what you owe in the next twelve months equals everything liquid you own. Below 1.0, you're technically insolvent on a short-term basis. Finally, refinancing becomes harder, lenders tighten terms, and what started as a liquidity problem can become a solvency crisis — the entity can't survive even if the underlying long-term assets still have value.</p>
+
+<p>The farm sector's current situation illustrates this sequence in real time with concrete numbers. Total U.S. farm sector debt is projected to hit <strong>$624.7 billion</strong> in 2026, a rise of more than 5% in a single year. The <strong>debt-to-asset ratio</strong> has climbed to 13.75% — its highest reading in over a decade — and the <strong>debt service ratio</strong>, measuring what fraction of gross farm income is consumed by loan payments before a single operating expense is paid, is forecast to match its 1987 peak. On top of that, farm working capital is projected to shrink roughly 9% in the same period. As one analyst framing put it, this is like a household taking on record-high debt while its emergency savings account simultaneously dissolves — the cash buffer that once absorbed a broken combine or a bad growing season is disappearing precisely when the debt load demands it most.</p>
+
+<blockquote>"American agriculture is currently carrying a heavier debt load relative to its actual ability to service that debt than at almost any point since the mid-1980s farm crisis. That is the crisis your grandfather's neighbor talked about in hushed tones. Foreclosures, forced auctions, an entire generation of family operations wiped out overnight."</blockquote>
+
+<p>For investors and traders, a working capital squeeze in a commodity-producing sector sends several actionable signals. Watch the spread between farm input costs (fertilizer, fuel, seed) and commodity output prices — when that spread compresses for multiple consecutive seasons, working capital erosion accelerates. Agricultural lenders like Farm Credit System institutions report delinquency data that leads broader commodity stress by one to two quarters. Futures markets in corn, soybeans, and wheat often begin pricing in supply risk before mainstream media covers the farm-level stress. Investors in food-processing equities should monitor <strong>gross margin pressure</strong> upstream, since input cost spikes caused by constrained farm supply eventually squeeze branded food companies' margins too. When entire farm belts show simultaneous working capital deterioration, it historically precedes commodity price spikes of 15–40%.</p>
+
+<p>The most common misconception about working capital squeezes is conflating them with insolvency in the traditional sense. A farmer with $3 million in land equity is not broke — but if their working capital turns negative, they may be unable to buy next season's seed without emergency credit. This distinction matters enormously: assets can be substantial while liquidity is critically impaired. Another misread is assuming that rising commodity prices automatically resolve the squeeze. If input costs (especially fertilizer, which can represent 30–40% of crop production costs) rise alongside output prices — as they did when natural gas prices spiked in 2021–2022 — the margin improvement is illusory and working capital can continue eroding even during nominal commodity bull markets. The squeeze is always about the <em>spread</em>, not the absolute price level.</p>
+
+<p>When a working capital squeeze progresses to a breaking point, the historical template is the 1980s farm crisis — referenced specifically in the video because the metrics now rhyme so closely with that period. In the early 1980s, a combination of high interest rates, falling land values, and collapsed export markets (particularly after the 1980 Soviet grain embargo) triggered a cascade of farm bankruptcies that wiped out an estimated 300,000 farm operations between 1981 and 1988. The failure wasn't just financial — rural communities lost banks, implement dealers, co-ops, and schools. Credit systems froze. The USDA and Farm Credit System required federal intervention. The modern analog risk is compounded by supply chain concentration: a handful of large operations now control far more of total U.S. food production than in 1987, meaning fewer but much larger failures could cause more acute disruption.</p>
+
+<p>The working capital squeeze connects directly to several adjacent concepts worth understanding together. <strong>Leverage cycles</strong> explain why debt accumulation during good years makes sectors fragile — farms borrowed aggressively when land values and commodity prices were elevated, and that debt remains fixed when conditions reverse. <strong>Liquidity risk</strong> is the technical term for the cash-timing problem at the heart of the squeeze. The <strong>fertilizer supply chain</strong> risk mentioned in the video — specifically, the dependence on Canadian potash under a trade treaty that may lapse — represents a cost shock that could accelerate existing working capital erosion by raising input prices sharply. Finally, <strong>credit contraction</strong> is the systemic amplifier: when agricultural lenders grow cautious simultaneously, credit becomes expensive or unavailable precisely when operators need it most, turning a sectoral squeeze into a potential systemic event with direct consequences for food inflation nationwide.</p>
+<div class="concept-side">Sources: THE 1987 FARM CRISIS IS BACK: The $624B Debt Bomb Under Your Food Supply!<br>Related in this category: <a href="margin_compression_manufacturing.html">Margin Compression in Equipment Manufacturing</a>, <a href="syndicated_revolving_credit_facility.html">Syndicated Revolving Credit Facility</a></div>
+<button class="concept-done" data-slug="working_capital_squeeze" onclick="toggleDone('working_capital_squeeze')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_working_capital_squeeze';</script>
+<script src="../../book.js"></script>
+
+<script>
+(function() {
+  var DONE_KEY = 'fg_done', FILTER_KEY = 'fg_filter';
+  var done = JSON.parse(localStorage.getItem(DONE_KEY) || '{}');
+  var filter = localStorage.getItem(FILTER_KEY) || 'all';
+
+  function visible(flag) {
+    if (filter === 'star') return flag === 'star';
+    if (filter === 'nodeep') return flag !== 'deep';
+    return true;
+  }
+
+  function apply() {
+    var shown = 0, total = 0, hidden = 0;
+    document.querySelectorAll('.concept-row').forEach(function(r) {
+      var slug = r.dataset.slug, flag = r.dataset.flag;
+      total++;
+      if (done[slug]) r.classList.add('done'); else r.classList.remove('done');
+      if (visible(flag)) { r.classList.remove('fg-hidden'); shown++; }
+      else { r.classList.add('fg-hidden'); hidden++; }
+    });
+    document.querySelectorAll('.cat-card').forEach(function(card) {
+      var slugs = card.dataset.slugs ? card.dataset.slugs.split(',') : [];
+      var flags = card.dataset.flags ? card.dataset.flags.split(',') : [];
+      var vis = 0, allDone = slugs.length > 0;
+      slugs.forEach(function(sl, i) {
+        if (visible(flags[i])) vis++;
+        if (!done[sl]) allDone = false;
+      });
+      total += slugs.length; shown += vis;
+      var c = card.querySelector('.cat-count');
+      if (c) c.textContent = vis + (vis !== slugs.length ? ' of ' + slugs.length : '') + ' concepts' +
+        (card.dataset.stars ? ' \u00b7 ' + card.dataset.stars + ' \u2605' : '');
+      if (vis === 0) card.classList.add('fg-empty'); else card.classList.remove('fg-empty');
+      if (allDone) card.classList.add('done'); else card.classList.remove('done');
+    });
+    document.querySelectorAll('[data-filter]').forEach(function(b) {
+      b.classList.toggle('active', b.dataset.filter === filter);
+    });
+    var n = document.getElementById('fgCount');
+    if (n) n.textContent = shown + ' of ' + total + ' shown';
+    var h = document.getElementById('fgHiddenNote');
+    if (h) h.textContent = hidden ? hidden + ' hidden by the filter.' : '';
+    var btn = document.querySelector('.concept-done');
+    if (btn) {
+      var on = !!done[btn.dataset.slug];
+      btn.classList.toggle('on', on);
+      btn.textContent = on ? '\u2713 Completed' : '\u2713 Mark complete';
+    }
+  }
+
+  window.setFilter = function(f) {
+    filter = f; localStorage.setItem(FILTER_KEY, f); apply();
+  };
+  window.toggleDone = function(slug) {
+    if (done[slug]) delete done[slug]; else done[slug] = true;
+    localStorage.setItem(DONE_KEY, JSON.stringify(done));
+    apply();
+  };
+  window.toggleHideDone = function() {
+    document.body.classList.toggle('hide-done');
+  };
+  apply();
+})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Debt-to-GDP Ratio - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.tier .tier-desc { color: #a08060; font-size: 0.85rem; margin: 0.4rem 0 0.8rem; }
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../economics-fundamentals.html">&larr; Economics Fundamentals</a>
+
+<div class="concept-meta"><span><span class="star">&#9733;</span> must-know</span><span>Economics Fundamentals</span><span>added 2026-09-03</span></div>
+<h4 id="debt_to_gdp_ratio">Debt-to-GDP Ratio</h4>
+
+<p>The <strong>Debt-to-GDP ratio</strong> is exactly what it sounds like: a country's total government debt divided by its annual economic output, expressed as a percentage. If a country owes $20 trillion and produces $20 trillion worth of goods and services in a year, its ratio is 100%. Think of it like a household: if you earn $100,000 a year and owe $150,000 on your mortgage, your personal debt-to-income ratio is 150%. The ratio doesn't tell you whether a country <em>can</em> pay its debts today — it tells you how large the debt burden is relative to the economy's capacity to generate tax revenue and grow its way out of trouble over time.</p>
+
+<p>Why does it matter? Because governments repay debt through taxation, and taxation is a function of economic activity. A country with a 40% debt-to-GDP ratio has enormous room to borrow more, raise taxes, or grow faster than its debt accumulates. A country at 200% has almost none of those options left. At extreme ratios, investors who lend governments money begin demanding higher <strong>yields</strong> — higher interest rates — to compensate for the risk that the government might inflate away the debt, restructure it, or simply default. Those higher yields ripple through every borrowing cost in the economy: mortgages, corporate bonds, car loans. The ratio is, at its core, a measure of fiscal breathing room.</p>
+
+<p>The mechanics work through a self-reinforcing loop. Governments fund spending by issuing <strong>sovereign bonds</strong> — essentially IOUs sold to investors. When the debt-to-GDP ratio climbs, bond investors get nervous. They demand higher interest rates to hold those bonds. Higher rates mean the government pays more in interest each year, which increases the deficit, which requires issuing even more bonds, which pushes the ratio higher still. Economists call this a <strong>debt spiral</strong>. The only ways out are: grow the economy faster than debt grows, run a <strong>primary surplus</strong> (collect more taxes than you spend, before interest), inflate the currency so the real value of debt falls, or restructure — which is a polite word for partial default.</p>
+
+<p>The clearest real-world example right now is Japan. Japan's national debt exceeds <strong>250% of GDP</strong> — the highest of any major developed economy in history. For decades, this looked manageable because the <strong>Bank of Japan (BOJ)</strong> kept interest rates at or near zero, meaning the government could roll over its enormous debt pile at near-zero cost. Japan's fiscal budget was built on an explicit assumption: borrowing costs would remain below 3%. That assumption worked fine at 0.5% rates. But when global bond yields began rising — driven partly by inflation, partly by structural forces — Japanese <strong>10-year government bond (JGB)</strong> yields started climbing toward and then past that 3% threshold. Suddenly a budget assumption became a structural crisis.</p>
+
+<p>Here is where the global connection becomes visceral. Japan is not just any debtor. Japanese institutions — pension funds, insurance companies, banks — are among the largest holders of US Treasury bonds and European sovereign debt on the planet. When JGB yields rise enough to become attractive at home, Japanese investors face a simple calculation: why hold a 4.5% US Treasury with currency risk when I can earn 3%+ in my own currency without that risk? The answer is: you don't. Japanese institutions begin selling foreign bonds and repatriating capital. That selling pressure pushes yields higher in the US, Germany, France, and Britain simultaneously. This is exactly what the video describes — four sovereign bond markets convulsing at the same time, with Tokyo as the hidden detonator.</p>
+
+<p>Traders and investors use debt-to-GDP as a long-horizon signal, not a short-term trigger. When a country crosses the rough threshold of <strong>90-100% debt-to-GDP</strong> — a figure associated with slower growth in research by economists Carmen Reinhart and Kenneth Rogoff — bond investors begin pricing in a <strong>term premium</strong>: extra yield demanded for the uncertainty of holding long-dated debt. Practical application: if you see a country's ratio climbing rapidly while its growth slows, that's a setup for a bond sell-off. Investors who saw Japan's fiscal math deteriorating could have anticipated that JGB yields would eventually have to rise — and that this rise would force capital flows that lift yields everywhere else.</p>
+
+<p>The biggest misconception is that a high debt-to-GDP ratio automatically means default or crisis. Japan has been at extreme ratios for two decades without defaulting. The nuance is who holds the debt and in what currency. Japan's debt is overwhelmingly held domestically, denominated in yen, and the BOJ can purchase bonds directly — a practice called <strong>yield curve control (YCC)</strong>. Countries that borrow in foreign currencies they can't print face a much more immediate crisis at lower ratios. Greece, for instance, hit a wall at roughly 170% of GDP partly because it borrows in euros it cannot create. The currency of denomination and the domestic versus foreign creditor split matter enormously — raw ratio alone is incomplete analysis.</p>
+
+<p>When the ratio framework breaks, it usually breaks through the interest rate channel. A country can sustain a very high debt load if rates stay low — the <strong>r vs. g</strong> relationship, where r is the interest rate on debt and g is nominal GDP growth, is what actually determines solvency. When r exceeds g, debt grows faster than the economy indefinitely, and the math becomes inescapable. Japan's BOJ made an explicit budget assumption that r would stay below 3%. The moment global forces pushed JGB yields toward that ceiling, the BOJ faced an impossible choice: defend the ceiling by buying unlimited bonds (printing yen, risking currency collapse) or let yields rise and trigger the fiscal spiral. Either path has severe consequences — and either path exports financial stress to every market where Japanese capital has been parked.</p>
+
+<p>The debt-to-GDP ratio connects directly to <strong>bond yields</strong>, <strong>currency valuation</strong>, <strong>monetary policy independence</strong>, and <strong>global capital flows</strong>. When Japan's fiscal position weakens, it doesn't stay in Tokyo. Capital that has been funding US Treasuries at suppressed yields repatriates, pushing the US 10-year toward 4.81%. That yield feeds directly into the <strong>30-year fixed mortgage rate</strong> — historically running about 170 basis points above the 10-year Treasury. At a 4.81% 10-year, a 7% mortgage rate is almost arithmetic. The homebuyer in Phoenix paying 7% on their mortgage is, in a very real sense, paying a tax on Japan's debt problem. Understanding debt-to-GDP is understanding why financial crises are never purely local — sovereign balance sheets are the hidden infrastructure underneath every price in the global economy.</p>
+<div class="concept-side">Sources: THE TOKYO TIME BOMB: The Hidden Catalyst Locking Mortgage Rates at 7%<br>Related in this category: <a href="national_debt_debt_ceiling.html">National Debt</a>, <a href="cost_passthrough_mechanism.html">Cost Pass-Through Mechanism (Farm to Consumer)</a>, <a href="structural_food_inflation_floor.html">Structural Food Price Floor</a>, <a href="structural_embedded_inflation.html">Structural (Embedded) Inflation</a>, <a href="k_shaped_two_speed_economy.html">K-Shaped / Two-Speed Economy</a>, <a href="nominal_vs_real_consumer_spending.html">Nominal vs. Real Consumer Spending</a></div>
+<button class="concept-done" data-slug="debt_to_gdp_ratio" onclick="toggleDone('debt_to_gdp_ratio')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_debt_to_gdp_ratio';</script>
+<script src="../../book.js"></script>
+
+<script>
+(function() {
+  var DONE_KEY = 'fg_done', FILTER_KEY = 'fg_filter';
+  var done = JSON.parse(localStorage.getItem(DONE_KEY) || '{}');
+  var filter = localStorage.getItem(FILTER_KEY) || 'all';
+
+  function visible(flag) {
+    if (filter === 'star') return flag === 'star';
+    if (filter === 'nodeep') return flag !== 'deep';
+    return true;
+  }
+
+  function apply() {
+    var shown = 0, total = 0, hidden = 0;
+    document.querySelectorAll('.concept-row').forEach(function(r) {
+      var slug = r.dataset.slug, flag = r.dataset.flag;
+      total++;
+      if (done[slug]) r.classList.add('done'); else r.classList.remove('done');
+      if (visible(flag)) { r.classList.remove('fg-hidden'); shown++; }
+      else { r.classList.add('fg-hidden'); hidden++; }
+    });
+    document.querySelectorAll('.cat-card').forEach(function(card) {
+      var slugs = card.dataset.slugs ? card.dataset.slugs.split(',') : [];
+      var flags = card.dataset.flags ? card.dataset.flags.split(',') : [];
+      var vis = 0, allDone = slugs.length > 0;
+      slugs.forEach(function(sl, i) {
+        if (visible(flags[i])) vis++;
+        if (!done[sl]) allDone = false;
+      });
+      total += slugs.length; shown += vis;
+      var c = card.querySelector('.cat-count');
+      if (c) c.textContent = vis + (vis !== slugs.length ? ' of ' + slugs.length : '') + ' concepts' +
+        (card.dataset.stars ? ' \u00b7 ' + card.dataset.stars + ' \u2605' : '');
+      if (vis === 0) card.classList.add('fg-empty'); else card.classList.remove('fg-empty');
+      if (allDone) card.classList.add('done'); else card.classList.remove('done');
+    });
+    document.querySelectorAll('[data-filter]').forEach(function(b) {
+      b.classList.toggle('active', b.dataset.filter === filter);
+    });
+    var n = document.getElementById('fgCount');
+    if (n) n.textContent = shown + ' of ' + total + ' shown';
+    var h = document.getElementById('fgHiddenNote');
+    if (h) h.textContent = hidden ? hidden + ' hidden by the filter.' : '';
+    var btn = document.querySelector('.concept-done');
+    if (btn) {
+      var on = !!done[btn.dataset.slug];
+      btn.classList.toggle('on', on);
+      btn.textContent = on ? '\u2713 Completed' : '\u2713 Mark complete';
+    }
+  }
+
+  window.setFilter = function(f) {
+    filter = f; localStorage.setItem(FILTER_KEY, f); apply();
+  };
+  window.toggleDone = function(slug) {
+    if (done[slug]) delete done[slug]; else done[slug] = true;
+    localStorage.setItem(DONE_KEY, JSON.stringify(done));
+    apply();
+  };
+  window.toggleHideDone = function() {
+    document.body.classList.toggle('hide-done');
+  };
+  apply();
+})();
+</script>
+
+</body>
+</html>

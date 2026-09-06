@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Farm Debt Service Ratio - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.tier .tier-desc { color: #a08060; font-size: 0.85rem; margin: 0.4rem 0 0.8rem; }
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../commodities-energy.html">&larr; Commodities &amp; Energy</a>
+
+<div class="concept-meta"><span>deep cut</span><span>Commodities &amp; Energy</span><span>added 2026-08-31</span></div>
+<h4 id="farm_debt_service_ratio">Farm Debt Service Ratio</h4>
+
+<p>The <strong>Farm Debt Service Ratio (DSR)</strong> measures the percentage of a farm's gross income that goes toward servicing debt — meaning paying principal and interest on loans — before any other expense is covered. Think of it as the agricultural equivalent of asking: out of every dollar this farm earns, how many cents are already spoken for before the farmer buys seed, pays a worker, or keeps the lights on? If a farm generates $100,000 in gross income and owes $15,000 in annual debt payments, its debt service ratio is 15%. The higher that number climbs, the less financial oxygen the farming operation has to breathe. It is one of the most honest indicators of stress in the farm economy because it measures cash flow reality, not just balance sheet size.</p>
+
+<p>The ratio matters because farming sits at the base of the entire food supply chain. When farms become financially strangled, the consequences don't stay on the farm — they ripple into every grocery aisle in America. A farm operating with a crushing DSR cannot invest in new equipment, weather a bad harvest, or absorb a sudden price drop in commodities. Marginal operations begin defaulting, which triggers bank losses in agricultural lending, reduces competition among producers, and ultimately concentrates food production among fewer, larger operators. Smaller family farms disappear. Regional food infrastructure atrophies. And because agriculture runs on tight seasonal margins with no ability to pause and regroup mid-cycle, financial stress in spring can translate into empty or more expensive shelves by fall.</p>
+
+<p>Mechanically, the debt service ratio works like this: start with a farm's <strong>gross farm income</strong> — all revenue from crops, livestock, government payments, and any ancillary farm-related sources. Then calculate total annual debt obligations, which include both <strong>interest expense</strong> on outstanding loans and any <strong>principal repayment</strong> due during the year. Divide the debt obligations by gross income, multiply by 100, and you have the ratio. The challenge is that both sides of this equation are volatile. Gross income swings with commodity prices, weather, and export demand — none of which farmers control. Meanwhile, debt obligations are relatively fixed once loans are originated, especially at variable rates that can reset upward when the Federal Reserve tightens monetary policy. This asymmetry is where the danger lives.</p>
+
+<p>The current situation makes this concrete. According to U.S. Department of Agriculture projections, total farm sector debt is on track to hit <strong>$624.7 billion</strong> in 2026, up more than 5% from the prior year. Of that, approximately $33 billion represents annual interest expense alone — which the video's host translated into a figure that is almost impossible to ignore:</p>
+
+<blockquote>"$33 billion in annual interest expense — roughly $90 million per day — eating into farm gross income before a single operating bill is paid."</blockquote>
+
+<p>That $90 million per day figure is not a dramatic flourish — it is arithmetic applied to a real USDA data series. The farm DSR is now forecast to tie its highest reading since <strong>1987</strong>, the peak year of the 1980s farm credit collapse. That crisis was not a footnote. It was a generational wipeout — foreclosures, forced auctions, and an entire wave of family farming operations that simply ceased to exist. The fact that 2026 projections are matching that benchmark is the core alarm embedded in this ratio.</p>
+
+<p>Traders and investors use the farm DSR in several practical ways. Agricultural lenders — including the <strong>Farm Credit System</strong>, regional banks with ag portfolios, and USDA-backed programs — monitor it to calibrate credit standards and loss reserves. Commodity traders watch it because a rising DSR signals that farmers may be forced to sell harvests quickly at whatever price is available, rather than storing and waiting for better prices. That forced selling can suppress commodity prices even when supply is tight. Equity investors in agricultural equipment manufacturers like Deere watch it as a leading indicator of capital expenditure cycles: when DSR climbs, farmers stop buying new equipment, and those companies' order books shrink quarters before the earnings reports reflect it.</p>
+
+<p>There are important nuances that make the DSR more complex than it first appears. The ratio is an aggregate — it blends the balance sheets of highly leveraged new operations with debt-free multi-generational farms, which can mask the true severity of stress at the margin. A 13.75% aggregate <strong>farm debt-to-asset ratio</strong> sounds manageable, but the distribution underneath it matters enormously. If most of the debt is concentrated in mid-size operations that also face the thinnest margins, the systemic risk is far higher than the headline number suggests. Additionally, the ratio does not distinguish between productive debt — borrowing to expand output — and distress debt, where farmers refinance operating losses into long-term loans, effectively hiding a cash flow problem inside the balance sheet.</p>
+
+<p>When the farm DSR breaks down historically, the sequence is fairly consistent and brutal. Rising ratios lead to delinquencies, which force lenders to tighten credit standards. Farms that rely on annual operating loans to plant the next season — which is most of them — suddenly cannot access the credit they need. Planting decisions are scaled back. Output drops. Then the remaining solvent farms face a paradox: commodity prices may rise due to reduced supply just as the credit crisis deepens for their neighbors, creating a bifurcation between survivors and the distressed. Suppliers to the farm sector — fertilizer companies, equipment dealers, crop insurance providers — all feel the contagion. This is exactly the dynamic that played out between 1982 and 1987 and is why analysts tracking the 2026 data are drawing explicit comparisons to that period rather than to 2008 or 2020.</p>
+
+<p>The farm DSR connects directly to several adjacent concepts that complete the picture. The <strong>farm debt-to-asset ratio</strong> tells you the stock problem — how leveraged farms are relative to what they own. The DSR tells you the flow problem — whether current income can service that leverage. Together they form a two-dimensional stress map. The ratio also links to <strong>monetary policy transmission</strong>: when the Federal Reserve raises rates, variable-rate agricultural loans reprice upward, lifting the numerator of the DSR without any change in farm productivity. And it connects to <strong>trade policy</strong> — as the video underscores, disruptions to fertilizer imports from Canada or export markets for grain can simultaneously crush the income side of the ratio while debt payments remain fixed. The DSR, in other words, is where macro policy meets kitchen-table reality in the American heartland.</p>
+<div class="concept-side">Sources: THE 1987 FARM CRISIS IS BACK: The $624B Debt Bomb Under Your Food Supply!<br>Related in this category: <a href="gold_futures.html">Gold Futures</a>, <a href="hard_assets_inflation_hedge.html">Hard Assets as Inflation Hedges</a>, <a href="farm_debt_to_asset_ratio.html">Farm Debt-to-Asset Ratio</a>, <a href="agricultural_direct_payment_subsidies.html">Agricultural Direct Payment Subsidies</a>, <a href="net_farm_income.html">Net Farm Income</a>, <a href="farm_operating_loans.html">Farm Operating Loans</a></div>
+<button class="concept-done" data-slug="farm_debt_service_ratio" onclick="toggleDone('farm_debt_service_ratio')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_farm_debt_service_ratio';</script>
+<script src="../../book.js"></script>
+
+<script>
+(function() {
+  var DONE_KEY = 'fg_done', FILTER_KEY = 'fg_filter';
+  var done = JSON.parse(localStorage.getItem(DONE_KEY) || '{}');
+  var filter = localStorage.getItem(FILTER_KEY) || 'all';
+
+  function visible(flag) {
+    if (filter === 'star') return flag === 'star';
+    if (filter === 'nodeep') return flag !== 'deep';
+    return true;
+  }
+
+  function apply() {
+    var shown = 0, total = 0, hidden = 0;
+    document.querySelectorAll('.concept-row').forEach(function(r) {
+      var slug = r.dataset.slug, flag = r.dataset.flag;
+      total++;
+      if (done[slug]) r.classList.add('done'); else r.classList.remove('done');
+      if (visible(flag)) { r.classList.remove('fg-hidden'); shown++; }
+      else { r.classList.add('fg-hidden'); hidden++; }
+    });
+    document.querySelectorAll('.cat-card').forEach(function(card) {
+      var slugs = card.dataset.slugs ? card.dataset.slugs.split(',') : [];
+      var flags = card.dataset.flags ? card.dataset.flags.split(',') : [];
+      var vis = 0, allDone = slugs.length > 0;
+      slugs.forEach(function(sl, i) {
+        if (visible(flags[i])) vis++;
+        if (!done[sl]) allDone = false;
+      });
+      total += slugs.length; shown += vis;
+      var c = card.querySelector('.cat-count');
+      if (c) c.textContent = vis + (vis !== slugs.length ? ' of ' + slugs.length : '') + ' concepts' +
+        (card.dataset.stars ? ' \u00b7 ' + card.dataset.stars + ' \u2605' : '');
+      if (vis === 0) card.classList.add('fg-empty'); else card.classList.remove('fg-empty');
+      if (allDone) card.classList.add('done'); else card.classList.remove('done');
+    });
+    document.querySelectorAll('[data-filter]').forEach(function(b) {
+      b.classList.toggle('active', b.dataset.filter === filter);
+    });
+    var n = document.getElementById('fgCount');
+    if (n) n.textContent = shown + ' of ' + total + ' shown';
+    var h = document.getElementById('fgHiddenNote');
+    if (h) h.textContent = hidden ? hidden + ' hidden by the filter.' : '';
+    var btn = document.querySelector('.concept-done');
+    if (btn) {
+      var on = !!done[btn.dataset.slug];
+      btn.classList.toggle('on', on);
+      btn.textContent = on ? '\u2713 Completed' : '\u2713 Mark complete';
+    }
+  }
+
+  window.setFilter = function(f) {
+    filter = f; localStorage.setItem(FILTER_KEY, f); apply();
+  };
+  window.toggleDone = function(slug) {
+    if (done[slug]) delete done[slug]; else done[slug] = true;
+    localStorage.setItem(DONE_KEY, JSON.stringify(done));
+    apply();
+  };
+  window.toggleHideDone = function() {
+    document.body.classList.toggle('hide-done');
+  };
+  apply();
+})();
+</script>
+
+</body>
+</html>

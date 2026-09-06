@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>PCE Inflation Basket - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.tier .tier-desc { color: #a08060; font-size: 0.85rem; margin: 0.4rem 0 0.8rem; }
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../monetary-policy-central-banking.html">&larr; Monetary Policy &amp; Central Banking</a>
+
+<div class="concept-meta"><span><span class="star">&#9733;</span> must-know</span><span>Monetary Policy &amp; Central Banking</span><span>added 2026-08-31</span></div>
+<h4 id="pce_inflation_basket">PCE Inflation Basket</h4>
+
+<p>The <strong>Personal Consumption Expenditures (PCE) price index</strong> is the Federal Reserve's preferred inflation gauge, and it works by tracking price changes across a carefully constructed basket of goods and services that American consumers actually buy. Unlike the more commonly cited <strong>Consumer Price Index (CPI)</strong>, which asks a fixed set of households what they spend money on, the PCE basket is derived from business-side data — what companies actually sold to consumers. This gives it a broader, more dynamically adjusted picture of spending. The basket covers everything from groceries and gasoline to healthcare copays, haircuts, and streaming subscriptions. The Fed targets 2% annual PCE inflation, making it the single most important inflation number in American monetary policy.</p>
+
+<p>The PCE basket contains <strong>199 individual component categories</strong>, each representing a distinct slice of consumer spending. These components are grouped into major buckets: goods (durable items like cars and appliances, and nondurable items like food and clothing) and services (housing, healthcare, financial services, recreation). Each component is weighted by its share of total consumer spending, and those weights update automatically as spending patterns shift — if consumers buy more of something, its weight rises. This <strong>substitution effect adjustment</strong> is one key reason the Fed prefers PCE over CPI: when beef prices spike and people switch to chicken, PCE captures that behavioral change while CPI largely doesn't. It paints a more realistic picture of the actual cost-of-living burden.</p>
+
+<p>Why does the PCE basket matter beyond the headline number? Because the headline — the single percentage printed in every news ticker — can mask dramatically different underlying realities. Imagine an economy where half the price categories are running at 5% inflation and the other half are deflating at 5%. The headline might read 0% inflation, suggesting perfect price stability, while households in sectors dominated by rising costs are being squeezed badly. This is why economists and serious Fed watchers track <strong>inflation breadth</strong>: the share of PCE components that are rising above some threshold rate. Breadth tells you whether inflation is broad and entrenched across the economy or narrow and contained to a few volatile sectors like energy. A narrow spike in energy is usually transitory; a wide surge across 150 categories is structurally dangerous.</p>
+
+<p>Mechanically, the Bureau of Economic Analysis compiles PCE data monthly using source data from the <strong>Bureau of Labor Statistics</strong>, the <strong>Census Bureau</strong>, and various business surveys. Each of the 199 components gets its own price change calculation, then those changes are aggregated using their spending weights to produce the overall index. The Fed then looks at both the headline PCE and <strong>core PCE</strong> (which strips out food and energy because those categories are volatile and often driven by supply shocks outside the Fed's control). Core PCE is the primary policy target. But when the Fed wants to understand whether inflation is truly cooling or just temporarily quiet, they dive into the breadth data — counting how many of those 199 components are running above 3%, above 2.5%, or any other threshold they care about at that moment.</p>
+
+<p>The real-world example that crystallized why breadth matters came at the <strong>Jackson Hole Economic Symposium</strong> in August 2026, when newly installed Fed Chair <strong>Kevin Warsh</strong> did something unusually transparent. Rather than simply citing the headline PCE number and calling it a day, he dismantled the entire basket in front of the assembled central bankers and market participants. His finding was stark: over the prior 12 months, <strong>54% of all 199 PCE components were still rising faster than 3% annually</strong>. Looking at just the most recent 6 months, that figure was 49%. For context, in the two decades before COVID, that breadth number averaged around 32%. The post-pandemic peak hit 77%. So while inflation had clearly cooled from its worst, it was still nearly double the historical norm in terms of how many categories were still running hot.</p>
+
+<blockquote>"Over the past 12 months, 54% of everything in that basket is still rising above 3% a year. Not the overall inflation rate, the breadth underneath it."</blockquote>
+
+<p>Traders and portfolio managers use PCE breadth as a leading signal for Fed policy duration — specifically, how long the Fed will hold rates elevated before cutting. When breadth is narrow and shrinking, it signals that inflation is burning itself out organically, and rate cuts can come sooner. When breadth is wide and sticky, it tells traders that the Fed has to stay restrictive because cutting too early would allow the remaining hot components to re-accelerate the overall index. This is why Warsh's 54% figure immediately moved the <strong>two-year Treasury yield</strong>, the bond market's purest real-time read on expected Fed policy, past 4.3% within minutes of his speech ending. Algorithms don't wait for analysis — they reprice the entire expected path of interest rates the moment new credible information arrives from a Fed chair's mouth.</p>
+
+<p>The most common misconception about PCE inflation is treating the headline number as the whole story. Investors repeatedly get caught by <strong>base effects</strong> — when a period of high inflation rolls off the 12-month comparison window, the headline rate drops even if prices are still rising. This creates artificial-looking disinflation that can tempt markets into pricing rate cuts prematurely. A second gotcha involves <strong>shelter inflation</strong>, which is one of the heaviest-weighted PCE components. Housing costs are measured with a significant lag because the index tracks rents across all leases, not just newly signed ones. New lease inflation can cool sharply while the measured PCE shelter component keeps rising for 12-18 more months, creating a persistent phantom inflation signal that the Fed has to mentally adjust for — and markets frequently misread.</p>
+
+<p>When PCE breadth data breaks from historical patterns — as it did dramatically after 2021 — it creates genuine policy dilemmas that no single speech can resolve. The Fed is ultimately a blunt instrument: it raises or lowers one interest rate that affects the entire economy equally. But when 54% of 199 categories are hot while 46% are already cool or deflating, rate hikes punish the cool sectors while trying to restrain the hot ones. This is connected directly to the <strong>debt sustainability problem</strong>: with roughly $40 trillion in U.S. federal debt outstanding, keeping rates high to beat broad inflation also means exploding interest expense on that debt. The PCE basket is the diagnostic tool; the rate is the medicine; and the debt is the patient who can't afford the full dose. Understanding all three layers — breadth, policy, and fiscal constraint — is what separates a complete read of events like the Jackson Hole sell-off from the one-sentence wire-service explanation.</p>
+<div class="concept-side">Sources: THE JACKSON HOLE TRAP: Why Kevin Warsh Just Crashed Gold &amp; Bitcoin!<br>Related in this category: <a href="jackson_hole_symposium.html">Jackson Hole Symposium</a>, <a href="hawkish_dovish_fed_signaling.html">Hawkish vs. Dovish Fed Signaling</a>, <a href="debt_servicing_cost.html">Debt Servicing Cost</a>, <a href="fiscal_monetary_policy_conflict.html">Fiscal-Monetary Policy Conflict</a>, <a href="central_bank_credibility.html">Central Bank Credibility</a>, <a href="forward_guidance.html">Forward Guidance</a></div>
+<button class="concept-done" data-slug="pce_inflation_basket" onclick="toggleDone('pce_inflation_basket')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_pce_inflation_basket';</script>
+<script src="../../book.js"></script>
+
+<script>
+(function() {
+  var DONE_KEY = 'fg_done', FILTER_KEY = 'fg_filter';
+  var done = JSON.parse(localStorage.getItem(DONE_KEY) || '{}');
+  var filter = localStorage.getItem(FILTER_KEY) || 'all';
+
+  function visible(flag) {
+    if (filter === 'star') return flag === 'star';
+    if (filter === 'nodeep') return flag !== 'deep';
+    return true;
+  }
+
+  function apply() {
+    var shown = 0, total = 0, hidden = 0;
+    document.querySelectorAll('.concept-row').forEach(function(r) {
+      var slug = r.dataset.slug, flag = r.dataset.flag;
+      total++;
+      if (done[slug]) r.classList.add('done'); else r.classList.remove('done');
+      if (visible(flag)) { r.classList.remove('fg-hidden'); shown++; }
+      else { r.classList.add('fg-hidden'); hidden++; }
+    });
+    document.querySelectorAll('.cat-card').forEach(function(card) {
+      var slugs = card.dataset.slugs ? card.dataset.slugs.split(',') : [];
+      var flags = card.dataset.flags ? card.dataset.flags.split(',') : [];
+      var vis = 0, allDone = slugs.length > 0;
+      slugs.forEach(function(sl, i) {
+        if (visible(flags[i])) vis++;
+        if (!done[sl]) allDone = false;
+      });
+      total += slugs.length; shown += vis;
+      var c = card.querySelector('.cat-count');
+      if (c) c.textContent = vis + (vis !== slugs.length ? ' of ' + slugs.length : '') + ' concepts' +
+        (card.dataset.stars ? ' \u00b7 ' + card.dataset.stars + ' \u2605' : '');
+      if (vis === 0) card.classList.add('fg-empty'); else card.classList.remove('fg-empty');
+      if (allDone) card.classList.add('done'); else card.classList.remove('done');
+    });
+    document.querySelectorAll('[data-filter]').forEach(function(b) {
+      b.classList.toggle('active', b.dataset.filter === filter);
+    });
+    var n = document.getElementById('fgCount');
+    if (n) n.textContent = shown + ' of ' + total + ' shown';
+    var h = document.getElementById('fgHiddenNote');
+    if (h) h.textContent = hidden ? hidden + ' hidden by the filter.' : '';
+    var btn = document.querySelector('.concept-done');
+    if (btn) {
+      var on = !!done[btn.dataset.slug];
+      btn.classList.toggle('on', on);
+      btn.textContent = on ? '\u2713 Completed' : '\u2713 Mark complete';
+    }
+  }
+
+  window.setFilter = function(f) {
+    filter = f; localStorage.setItem(FILTER_KEY, f); apply();
+  };
+  window.toggleDone = function(slug) {
+    if (done[slug]) delete done[slug]; else done[slug] = true;
+    localStorage.setItem(DONE_KEY, JSON.stringify(done));
+    apply();
+  };
+  window.toggleHideDone = function() {
+    document.body.classList.toggle('hide-done');
+  };
+  apply();
+})();
+</script>
+
+</body>
+</html>

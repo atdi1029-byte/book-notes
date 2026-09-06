@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Algorithmic Trading and Instant Repricing - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.tier .tier-desc { color: #a08060; font-size: 0.85rem; margin: 0.4rem 0 0.8rem; }
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../quantitative-algorithmic-trading.html">&larr; Quantitative &amp; Algorithmic Trading</a>
+
+<div class="concept-meta"><span>standard</span><span>Quantitative &amp; Algorithmic Trading</span><span>added 2026-08-31</span></div>
+<h4 id="algorithmic_trading_repricing">Algorithmic Trading and Instant Repricing</h4>
+
+<p>
+<strong>Algorithmic trading</strong> — often called "algo trading" — refers to
+the use of computer programs that automatically buy and sell financial assets
+based on pre-set rules, without any human making a decision in the moment.
+These algorithms can monitor dozens of data feeds simultaneously: Federal
+Reserve speeches, economic data releases, yield movements, price ratios,
+volume patterns, and dozens of other signals. When a trigger condition is met,
+the algorithm fires an order in microseconds. No hesitation, no second-guessing,
+no reading between the lines. This is what the video means when it says
+"algorithms don't wait around for nuance — they reprice instantly." The algo
+doesn't care about context. It cares about what the data says right now.
+</p>
+
+<p>
+Why does this matter? Because <strong>instant repricing</strong> means that
+markets no longer absorb news gradually, the way they did when human traders
+processed headlines over minutes or hours. Today, a single sentence from a Fed
+chair can move trillions of dollars in asset values before most retail investors
+even finish reading the first news alert. The speed creates violent, seemingly
+disproportionate moves that confuse ordinary investors who assume markets digest
+information rationally and slowly. When you see gold drop three percent in
+twenty minutes during a speech, that is not panic — that is algorithmic
+repricing executing a logical chain of conclusions faster than any human mind
+can process. Understanding this changes how you interpret almost every major
+market event.
+</p>
+
+<p>
+The mechanical sequence works like this. Step one: an <strong>event trigger</strong>
+fires — in this case, Fed Chair Kevin Warsh's words at Jackson Hole. Step two:
+<strong>natural language processing</strong> algorithms parse the speech text
+in real time, flagging hawkish keywords ("work to do," "inflation breadth,"
+"above target"). Step three: <strong>macro algorithms</strong> detect a shift
+in implied rate expectations and immediately sell interest-rate-sensitive
+assets — bonds rally in yield, equities with high debt loads sell off, and
+currency pairs adjust. Step four: <strong>cross-asset correlation algorithms</strong>
+detect the two-year Treasury yield spike and automatically sell gold and Bitcoin,
+because those assets historically sell off when real yields rise. Each step
+triggers the next in a cascade that completes in minutes, not days.
+</p>
+
+<p>
+The Jackson Hole speech from Warsh in August 2026 is a textbook example.
+Warsh revealed that 54% of the 199 individual components in the <strong>PCE
+inflation basket</strong> — the Fed's preferred inflation measure — were still
+rising above 3% annually. Within minutes of him finishing his remarks, the
+<strong>two-year Treasury yield</strong> jumped past 4.3%. That move in the
+two-year is the critical signal. The two-year yield is the market's best
+real-time estimate of where the Fed funds rate will be over the next
+twenty-four months. When it spikes, algorithms across every asset class
+immediately recalculate: if rates stay higher for longer, the present value
+of future cash flows falls, risk assets become less attractive, and hard
+assets that benefit from loose monetary policy reprice lower. Gold and Bitcoin
+sold off simultaneously, not because anyone decided to sell them, but because
+the rate signal triggered automatic cross-asset position adjustments.
+</p>
+
+<blockquote>
+"Algorithms don't wait around for nuance — they reprice instantly."
+</blockquote>
+
+<p>
+How do experienced traders use this knowledge practically? The most important
+application is understanding <strong>event risk</strong> — the asymmetric danger
+that surrounds scheduled data releases and Fed speeches. Professionals either
+reduce position size before major events (to avoid being caught in the initial
+algorithmic wave) or they deliberately wait for the first violent move to
+exhaust itself before taking a position. This is called <strong>fading the
+algo spike</strong>: letting the machines overcorrect, then buying or selling
+into the reversal once humans re-enter the market and push price back toward
+fair value. The two-year yield is one of the clearest signals to watch — if
+you see it move sharply, expect gold, Bitcoin, and growth equities to follow
+within minutes, often before human analysis catches up.
+</p>
+
+<p>
+The biggest misconception retail investors carry is that large, fast price moves
+reflect true changes in fundamental value. They often don't — at least not
+initially. When algorithms reprice gold down 2% in fifteen minutes because a
+yield moved ten basis points, they are executing a mechanical correlation, not
+a considered valuation. <strong>Ten basis points</strong> (0.10%) on the
+two-year yield does not mathematically justify a multi-percent swing in gold
+prices by fundamentals alone. What it reflects is the weight of algorithmic
+positioning: trillions of dollars sitting in strategies that are programmed to
+reduce gold and Bitcoin exposure when rate expectations tighten. The move is
+real, the money is real, but the cause is mechanical — and mechanically driven
+moves can reverse just as fast.
+</p>
+
+<p>
+Algorithmic repricing breaks down — and becomes genuinely dangerous — during
+<strong>liquidity crises</strong>. Algorithms assume they can execute their
+orders at or near the current price. When every algo fires in the same direction
+simultaneously, market depth evaporates. <strong>Bid-ask spreads</strong> widen
+dramatically, and the algorithms themselves accelerate the very crash they were
+trying to hedge against. This is what happened during the 2010 <strong>Flash
+Crash</strong>, when the Dow dropped nearly 1,000 points in minutes and
+temporarily erased roughly $1 trillion in market value before recovering.
+Similarly, in the August 2026 Warsh repricing, the simultaneous selling of
+gold and Bitcoin reflected exactly this dynamic: correlated algorithms all
+reducing exposure at once, with no buyers stepping in during the initial
+seconds of the move.
+</p>
+
+<p>
+This concept connects directly to <strong>real yields</strong>, the
+<strong>dollar index</strong>, and the broader relationship between monetary
+policy expectations and hard asset pricing. Gold and Bitcoin are often described
+as inflation hedges, but they are more precisely described as
+<strong>loose monetary policy hedges</strong>. They perform well when real
+interest rates are negative or falling — when holding cash earns you nothing
+after inflation. The moment rate expectations shift upward, algorithms that
+hold gold and Bitcoin as a hedge against easy money mechanically unwind those
+positions. Understanding algorithmic repricing means understanding that in the
+short run, even the most compelling long-term thesis can be steamrolled by a
+few basis points in the two-year yield — and that the players doing the
+steamrolling are not making a judgment call, they are executing a rule.
+</p>
+<div class="concept-side">Sources: THE JACKSON HOLE TRAP: Why Kevin Warsh Just Crashed Gold &amp; Bitcoin!</div>
+<button class="concept-done" data-slug="algorithmic_trading_repricing" onclick="toggleDone('algorithmic_trading_repricing')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_algorithmic_trading_repricing';</script>
+<script src="../../book.js"></script>
+
+<script>
+(function() {
+  var DONE_KEY = 'fg_done', FILTER_KEY = 'fg_filter';
+  var done = JSON.parse(localStorage.getItem(DONE_KEY) || '{}');
+  var filter = localStorage.getItem(FILTER_KEY) || 'all';
+
+  function visible(flag) {
+    if (filter === 'star') return flag === 'star';
+    if (filter === 'nodeep') return flag !== 'deep';
+    return true;
+  }
+
+  function apply() {
+    var shown = 0, total = 0, hidden = 0;
+    document.querySelectorAll('.concept-row').forEach(function(r) {
+      var slug = r.dataset.slug, flag = r.dataset.flag;
+      total++;
+      if (done[slug]) r.classList.add('done'); else r.classList.remove('done');
+      if (visible(flag)) { r.classList.remove('fg-hidden'); shown++; }
+      else { r.classList.add('fg-hidden'); hidden++; }
+    });
+    document.querySelectorAll('.cat-card').forEach(function(card) {
+      var slugs = card.dataset.slugs ? card.dataset.slugs.split(',') : [];
+      var flags = card.dataset.flags ? card.dataset.flags.split(',') : [];
+      var vis = 0, allDone = slugs.length > 0;
+      slugs.forEach(function(sl, i) {
+        if (visible(flags[i])) vis++;
+        if (!done[sl]) allDone = false;
+      });
+      total += slugs.length; shown += vis;
+      var c = card.querySelector('.cat-count');
+      if (c) c.textContent = vis + (vis !== slugs.length ? ' of ' + slugs.length : '') + ' concepts' +
+        (card.dataset.stars ? ' \u00b7 ' + card.dataset.stars + ' \u2605' : '');
+      if (vis === 0) card.classList.add('fg-empty'); else card.classList.remove('fg-empty');
+      if (allDone) card.classList.add('done'); else card.classList.remove('done');
+    });
+    document.querySelectorAll('[data-filter]').forEach(function(b) {
+      b.classList.toggle('active', b.dataset.filter === filter);
+    });
+    var n = document.getElementById('fgCount');
+    if (n) n.textContent = shown + ' of ' + total + ' shown';
+    var h = document.getElementById('fgHiddenNote');
+    if (h) h.textContent = hidden ? hidden + ' hidden by the filter.' : '';
+    var btn = document.querySelector('.concept-done');
+    if (btn) {
+      var on = !!done[btn.dataset.slug];
+      btn.classList.toggle('on', on);
+      btn.textContent = on ? '\u2713 Completed' : '\u2713 Mark complete';
+    }
+  }
+
+  window.setFilter = function(f) {
+    filter = f; localStorage.setItem(FILTER_KEY, f); apply();
+  };
+  window.toggleDone = function(slug) {
+    if (done[slug]) delete done[slug]; else done[slug] = true;
+    localStorage.setItem(DONE_KEY, JSON.stringify(done));
+    apply();
+  };
+  window.toggleHideDone = function() {
+    document.body.classList.toggle('hide-done');
+  };
+  apply();
+})();
+</script>
+
+</body>
+</html>

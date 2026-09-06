@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>ISM Purchasing Managers' Index (PMI) - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.tier .tier-desc { color: #a08060; font-size: 0.85rem; margin: 0.4rem 0 0.8rem; }
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../economic-indicators.html">&larr; Economic Indicators</a>
+
+<div class="concept-meta"><span>standard</span><span>Economic Indicators</span><span>added 2026-09-06</span></div>
+<h4 id="ism_pmi">ISM Purchasing Managers' Index (PMI)</h4>
+
+<p>The <strong>ISM Purchasing Managers' Index (PMI)</strong> is a monthly survey of business executives — specifically the people who decide what their companies buy — that measures the health of a given sector of the economy. The <strong>Institute for Supply Management (ISM)</strong> publishes two flagship versions: one covering <strong>manufacturing</strong> and one covering <strong>services</strong>. Each month, hundreds of purchasing managers at private companies answer questions about new orders, production, employment, supplier deliveries, and inventories. Their responses get distilled into a single index number. That number is the PMI. It's one of the earliest major economic readings released each month, which is precisely why markets move on it — it arrives before GDP, before the full jobs picture is clear, and before most corporate earnings land.</p>
+
+<p>The foundational rule of PMI is elegantly simple: <strong>a reading above 50 signals expansion</strong>, and a reading below 50 signals contraction. If the ISM Manufacturing PMI prints at 54, manufacturers are, on balance, seeing conditions improve — more new orders, more hiring, more production. If it prints at 47, things are shrinking. The further from 50 in either direction, the more forceful the signal. This above-or-below-50 framework applies to every sub-component as well, not just the headline number. The simplicity is a feature, not a limitation — it allows instant comparison across months and across industries without needing to translate raw volume numbers that change size as the economy grows.</p>
+
+<p>The PMI is built from five equally weighted <strong>sub-indexes</strong>: new orders, production, employment, supplier deliveries, and raw material inventories. Each purchasing manager answers whether conditions are "better," "same," or "worse" compared to the prior month. Responses are converted into a <strong>diffusion index</strong> — the percentage reporting better conditions, plus half the percentage reporting no change. That formula always yields a number between 0 and 100, with 50 as the neutral midpoint. The headline PMI is the average of all five components. But analysts rarely stop at the headline — they tear apart the sub-indexes, because a strong headline can mask dangerous internals, and a weak headline can hide a firming underlying trend.</p>
+
+<p>Among all the sub-indexes, the <strong>prices paid component</strong> deserves special attention, because it tells you something the headline doesn't: what companies are paying for the inputs they need to operate. This is upstream inflation — costs entering the production pipeline before they reach consumers. A prices-paid reading of 60 means the majority of purchasing managers are paying more than last month. A reading of 72 means the pressure is intense and broad. This component doesn't perfectly track CPI, but it leads it. When purchasing managers start paying more for steel, diesel, packaging, and labor, those costs eventually flow through to the products and services consumers buy. Prices paid is the canary that sings before inflation shows up in your grocery receipt.</p>
+
+<p>The video provides a textbook real-world example of why this matters. During the week Mark Malik covered, <strong>ISM Services prices climbed to 72.6 from 70.3</strong>, and <strong>ISM Manufacturing prices held at 71.1</strong>. Both readings were dramatically above 50 — they were above 70. That's not a warm economy. That's an economy where businesses across services and manufacturing are uniformly screaming that input costs are rising fast. Malik put it plainly:</p>
+
+<blockquote>"Input costs, my friends, are not cooling."</blockquote>
+
+<p>Those numbers arrived in the same week a blowout jobs report showed 162,000 payroll additions against a consensus of 53,000. The combination — strong labor market, persistently hot input costs — handed the Federal Reserve exactly the ammunition it needed to justify keeping rates elevated or even hiking further. Market pricing for a September rate hike jumped to roughly 62%. The PMI data wasn't the only input, but it reinforced every other piece of the hawkish puzzle that week.</p>
+
+<p>Traders and investors use PMI readings as a <strong>leading indicator</strong> — a forward-looking signal that arrives early in the month, before lagging data like GDP or industrial production. A rising PMI tends to be bullish for cyclical stocks (industrials, materials, energy) and bearish for bonds, since it implies stronger growth and potential inflation. A falling PMI does the reverse. The prices-paid sub-index specifically functions as an early warning system for <strong>margin pressure</strong> in corporate earnings — when purchasing managers are paying more, companies either absorb the cost (hurting profits) or pass it through to customers (risking demand). Either way, it's worth knowing before earnings season hits. Fixed-income traders watch PMI closely too, because hot readings can move the Fed's calculus on rates, which directly reprices bonds and rate-sensitive equities like tech.</p>
+
+<p>The most important gotcha is <strong>distinguishing between the headline and the components</strong>. A headline PMI above 50 can coexist with a cratering new-orders component, which would signal that current conditions look okay but the pipeline is emptying. Conversely, a headline below 50 can have a surging new-orders component — an early sign that the contraction is about to reverse. The prices-paid sub-index is particularly prone to misreading: a high prices-paid reading is inflationary when demand is strong, but can be a red flag when it stays high despite falling new orders — that combination suggests stagflation, where costs are rising even as growth cools. Reading only the headline number is like reading only the subject line of a legal document.</p>
+
+<p>PMI can also generate <strong>false signals</strong> in specific conditions. The Services PMI covers a massive, diverse sector — healthcare, finance, hospitality, tech services — so a surge in one industry can mask weakness in another. During supply chain disruptions, the supplier deliveries component gets distorted: slower deliveries technically read as "bullish" in the index construction, even when the slowness reflects shortages rather than strong demand. The survey is also sentiment-based, which means it captures perception more than hard data — purchasing managers can feel worse than reality during uncertainty, and feel better than reality during optimism. Finally, the ISM PMI measures direction of change, not magnitude. An economy that was growing explosively and is now growing modestly will still print above 50, even though the deceleration may be economically meaningful. Always pair PMI with hard data like industrial output, retail sales, and payrolls for the full picture.</p>
+
+<p>PMI connects naturally to several other economic concepts. It feeds directly into <strong>Federal Reserve policy expectations</strong>, since the Fed watches both inflation and economic activity — and PMI provides early readings on both through prices-paid and activity sub-indexes. It links to the <strong>yield curve</strong>, because a strong PMI typically pushes up short-term rate expectations, flattening or inverting the curve. It connects to <strong>corporate earnings forecasting</strong>, especially for industrial and consumer goods companies, since purchasing managers are essentially the supply chain of every manufactured product. And in the context of the week Malik covered, it directly reinforced the <strong>discount rate narrative</strong>: the market didn't sell off because the economy was weak — it sold off because the economy was too strong, keeping rates high, compressing the multiples on everything priced for a dovish Fed. PMI was one more brick in that wall.</p>
+<div class="concept-side">Sources: THE JOBS GUT PUNCH: Why Good News Sold Off Wall Street &amp; Crushed Tech!<br>Related in this category: <a href="inflation_breadth.html">Inflation Breadth</a>, <a href="congressional_budget_office_projections.html">Congressional Budget Office (CBO) Projections</a>, <a href="financial_conditions_index.html">Financial Conditions Index</a>, <a href="core_pce.html">Core PCE (Personal Consumption Expenditures)</a>, <a href="consumer_credit_card_delinquency_rate.html">Consumer Credit Card Delinquency Rate</a>, <a href="total_consumer_debt.html">Total Household / Consumer Debt</a></div>
+<button class="concept-done" data-slug="ism_pmi" onclick="toggleDone('ism_pmi')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_ism_pmi';</script>
+<script src="../../book.js"></script>
+
+<script>
+(function() {
+  var DONE_KEY = 'fg_done', FILTER_KEY = 'fg_filter';
+  var done = JSON.parse(localStorage.getItem(DONE_KEY) || '{}');
+  var filter = localStorage.getItem(FILTER_KEY) || 'all';
+
+  function visible(flag) {
+    if (filter === 'star') return flag === 'star';
+    if (filter === 'nodeep') return flag !== 'deep';
+    return true;
+  }
+
+  function apply() {
+    var shown = 0, total = 0, hidden = 0;
+    document.querySelectorAll('.concept-row').forEach(function(r) {
+      var slug = r.dataset.slug, flag = r.dataset.flag;
+      total++;
+      if (done[slug]) r.classList.add('done'); else r.classList.remove('done');
+      if (visible(flag)) { r.classList.remove('fg-hidden'); shown++; }
+      else { r.classList.add('fg-hidden'); hidden++; }
+    });
+    document.querySelectorAll('.cat-card').forEach(function(card) {
+      var slugs = card.dataset.slugs ? card.dataset.slugs.split(',') : [];
+      var flags = card.dataset.flags ? card.dataset.flags.split(',') : [];
+      var vis = 0, allDone = slugs.length > 0;
+      slugs.forEach(function(sl, i) {
+        if (visible(flags[i])) vis++;
+        if (!done[sl]) allDone = false;
+      });
+      total += slugs.length; shown += vis;
+      var c = card.querySelector('.cat-count');
+      if (c) c.textContent = vis + (vis !== slugs.length ? ' of ' + slugs.length : '') + ' concepts' +
+        (card.dataset.stars ? ' \u00b7 ' + card.dataset.stars + ' \u2605' : '');
+      if (vis === 0) card.classList.add('fg-empty'); else card.classList.remove('fg-empty');
+      if (allDone) card.classList.add('done'); else card.classList.remove('done');
+    });
+    document.querySelectorAll('[data-filter]').forEach(function(b) {
+      b.classList.toggle('active', b.dataset.filter === filter);
+    });
+    var n = document.getElementById('fgCount');
+    if (n) n.textContent = shown + ' of ' + total + ' shown';
+    var h = document.getElementById('fgHiddenNote');
+    if (h) h.textContent = hidden ? hidden + ' hidden by the filter.' : '';
+    var btn = document.querySelector('.concept-done');
+    if (btn) {
+      var on = !!done[btn.dataset.slug];
+      btn.classList.toggle('on', on);
+      btn.textContent = on ? '\u2713 Completed' : '\u2713 Mark complete';
+    }
+  }
+
+  window.setFilter = function(f) {
+    filter = f; localStorage.setItem(FILTER_KEY, f); apply();
+  };
+  window.toggleDone = function(slug) {
+    if (done[slug]) delete done[slug]; else done[slug] = true;
+    localStorage.setItem(DONE_KEY, JSON.stringify(done));
+    apply();
+  };
+  window.toggleHideDone = function() {
+    document.body.classList.toggle('hide-done');
+  };
+  apply();
+})();
+</script>
+
+</body>
+</html>

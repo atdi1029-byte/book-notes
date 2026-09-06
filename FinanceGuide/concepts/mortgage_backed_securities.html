@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Mortgage-Backed Securities (MBS) - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.tier .tier-desc { color: #a08060; font-size: 0.85rem; margin: 0.4rem 0 0.8rem; }
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../fixed-income-bonds.html">&larr; Fixed Income &amp; Bonds</a>
+
+<div class="concept-meta"><span><span class="star">&#9733;</span> must-know</span><span>Fixed Income &amp; Bonds</span><span>added 2026-09-06</span></div>
+<h4 id="mortgage_backed_securities">Mortgage-Backed Securities (MBS)</h4>
+
+<p>A <strong>mortgage-backed security (MBS)</strong> is a bond created by pooling together thousands of individual home loans and selling slices of that pool to investors. When you take out a mortgage to buy a house, your bank doesn't necessarily hold that loan for 30 years — it sells it into the financial system, where it gets bundled with hundreds or thousands of other mortgages. Those bundles are then packaged into securities that trade on markets just like government bonds or corporate debt. The investors who buy MBS receive the monthly principal and interest payments that homeowners make, passed through the structure proportionally. In essence, buying an MBS means you become a lender to American homeowners — collectively, indirectly, but meaningfully.</p>
+
+<p>MBS matter enormously to the real economy because they determine how cheap or expensive it is to buy a home in America. When investors around the world are eager to buy MBS, they drive up prices and push down yields on those securities. Lower MBS yields translate directly into lower mortgage rates for ordinary homebuyers. When demand for MBS drops, yields rise, and mortgage rates follow upward. This is why global capital flows — decisions made in Oslo, Tokyo, or Singapore — end up affecting whether a family in Ohio can afford a monthly payment. The MBS market is one of the largest fixed-income markets in the world, larger than the entire US corporate bond market, and its health is tightly linked to housing prices, consumer spending, and the broader economy.</p>
+
+<p>The mechanical process works in a well-defined chain. A homebuyer borrows from a bank. The bank originates the loan, collects some fees, then sells it to a government-sponsored enterprise like <strong>Fannie Mae</strong> or <strong>Freddie Mac</strong> — or to a private conduit. Fannie and Freddie pool thousands of these mortgages and issue <strong>agency MBS</strong>, stamping a guarantee on them: if homeowners default, Fannie or Freddie covers the investors' losses. This guarantee is backed implicitly by the US government, making agency MBS nearly as creditworthy as Treasuries but yielding slightly more. The securities are then sold into the open market, where pension funds, insurance companies, sovereign wealth funds, and central banks buy them as core fixed-income holdings. Homeowners' monthly payments flow through a <strong>servicer</strong> — often the original bank — who passes the cash to investors.</p>
+
+<p>The real-world example embedded in this story is striking. Norway's <strong>Norges Bank Investment Management (NBIM)</strong>, which manages the world's largest sovereign wealth fund at $2.3 trillion, submitted a formal proposal to shift its fixed-income benchmark. They proposed cutting government bond exposure from 70% to 50% of the fixed-income sleeve — roughly $106 billion coming out of sovereign debt. US Treasuries take the largest single hit, dropping from 34.1% to 21.9% of the government bond allocation. But the money isn't leaving America. Norway's total US dollar exposure stays unchanged at roughly 50%. What's changing is the type of American debt they hold: less lending to the US government, more lending to American homeowners through MBS, which rises to approximately 13% of Norway's new fixed-income index. Translated to dollars, that's roughly $80 billion moving from Treasuries into MBS.</p>
+
+<blockquote>"The headline you read this morning got this story completely backwards. This is not Norway walking away from America, it's something stranger than that, and frankly, it's far worse."</blockquote>
+
+<p>For investors and traders, MBS serve as a yield-enhancement tool relative to Treasuries with comparable credit quality. Agency MBS typically yield 50 to 150 basis points more than equivalent-duration Treasuries — a spread called the <strong>option-adjusted spread (OAS)</strong>. Traders watch this spread carefully; a widening spread signals stress or reduced demand for MBS, while a tightening spread signals strong appetite. Sophisticated investors also grapple with <strong>prepayment risk</strong> — when interest rates fall, homeowners refinance, paying off their mortgages early and returning principal to investors at the worst time (when reinvestment rates are low). This embedded optionality makes MBS pricing more complex than straight bonds, requiring models that forecast homeowner behavior across rate scenarios.</p>
+
+<p>One of the most important nuances is distinguishing agency MBS from <strong>non-agency MBS</strong> (also called <strong>private-label MBS</strong>). Agency MBS carry the implicit government guarantee through Fannie Mae, Freddie Mac, or Ginnie Mae — the credit risk is essentially negligible, and the main risk is prepayment. Non-agency MBS carry no such guarantee; the credit quality depends entirely on the underlying borrowers. This distinction collapsed catastrophically in public understanding during the 2000s, when subprime mortgages were packaged into non-agency structures that rating agencies mispriced. Many investors thought they owned something close to a government bond and discovered they owned exposure to borrowers who couldn't afford their loans. Norway's proposal almost certainly refers to agency MBS — the conservative, government-backed variety — not the subprime structures of the financial crisis.</p>
+
+<p>When MBS markets break, the consequences cascade across the entire economy. The 2008 financial crisis is the canonical example. Non-agency MBS built from subprime mortgages — loans made to borrowers with weak credit, often with adjustable rates and minimal documentation — began defaulting at unprecedented rates. The complexity of the structures, layered through instruments called <strong>collateralized debt obligations (CDOs)</strong>, meant that losses were impossible to localize. Banks held these instruments on and off balance sheet; when values collapsed, trust evaporated, interbank lending froze, and the global financial system faced a liquidity crisis. Even agency MBS markets seized temporarily. The Federal Reserve ultimately purchased over $1.7 trillion in agency MBS to stabilize the market — one of the largest interventions in central bank history.</p>
+
+<p>MBS connect directly to several other major concepts in fixed income. They sit alongside <strong>US Treasuries</strong> and <strong>corporate bonds</strong> in the fixed-income universe, with agency MBS occupying a middle position: higher yield than Treasuries, lower credit risk than most corporates. They are also central to understanding <strong>Federal Reserve monetary policy</strong> — the Fed's quantitative easing programs specifically targeted MBS purchases to push down mortgage rates and stimulate housing. When Norway makes the deliberate choice to hold MBS instead of Treasuries, it is accepting prepayment complexity in exchange for extra yield while keeping its dollar exposure and credit quality essentially unchanged. That's not a political statement — as the video notes, sovereign wealth funds don't make those. It's a yield optimization within tight risk parameters, and understanding MBS is understanding exactly why that trade makes sense.</p>
+<div class="concept-side">Sources: THE RISK-FREE TRAP: Norway Cuts US Treasuries to Lend to American Homeowners!<br>Related in this category: <a href="two_year_treasury_yield.html">Two-Year Treasury Yield</a>, <a href="treasury_bond_buyback_program.html">Treasury Bond Buyback Program</a>, <a href="thirty_year_treasury_bond.html">30-Year Treasury Bond</a>, <a href="debt_rollover_risk.html">Debt Rollover Risk</a>, <a href="corporate_refinancing_cliff.html">Corporate Refinancing Cliff</a>, <a href="duration_risk.html">Duration Risk</a></div>
+<button class="concept-done" data-slug="mortgage_backed_securities" onclick="toggleDone('mortgage_backed_securities')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_mortgage_backed_securities';</script>
+<script src="../../book.js"></script>
+
+<script>
+(function() {
+  var DONE_KEY = 'fg_done', FILTER_KEY = 'fg_filter';
+  var done = JSON.parse(localStorage.getItem(DONE_KEY) || '{}');
+  var filter = localStorage.getItem(FILTER_KEY) || 'all';
+
+  function visible(flag) {
+    if (filter === 'star') return flag === 'star';
+    if (filter === 'nodeep') return flag !== 'deep';
+    return true;
+  }
+
+  function apply() {
+    var shown = 0, total = 0, hidden = 0;
+    document.querySelectorAll('.concept-row').forEach(function(r) {
+      var slug = r.dataset.slug, flag = r.dataset.flag;
+      total++;
+      if (done[slug]) r.classList.add('done'); else r.classList.remove('done');
+      if (visible(flag)) { r.classList.remove('fg-hidden'); shown++; }
+      else { r.classList.add('fg-hidden'); hidden++; }
+    });
+    document.querySelectorAll('.cat-card').forEach(function(card) {
+      var slugs = card.dataset.slugs ? card.dataset.slugs.split(',') : [];
+      var flags = card.dataset.flags ? card.dataset.flags.split(',') : [];
+      var vis = 0, allDone = slugs.length > 0;
+      slugs.forEach(function(sl, i) {
+        if (visible(flags[i])) vis++;
+        if (!done[sl]) allDone = false;
+      });
+      total += slugs.length; shown += vis;
+      var c = card.querySelector('.cat-count');
+      if (c) c.textContent = vis + (vis !== slugs.length ? ' of ' + slugs.length : '') + ' concepts' +
+        (card.dataset.stars ? ' \u00b7 ' + card.dataset.stars + ' \u2605' : '');
+      if (vis === 0) card.classList.add('fg-empty'); else card.classList.remove('fg-empty');
+      if (allDone) card.classList.add('done'); else card.classList.remove('done');
+    });
+    document.querySelectorAll('[data-filter]').forEach(function(b) {
+      b.classList.toggle('active', b.dataset.filter === filter);
+    });
+    var n = document.getElementById('fgCount');
+    if (n) n.textContent = shown + ' of ' + total + ' shown';
+    var h = document.getElementById('fgHiddenNote');
+    if (h) h.textContent = hidden ? hidden + ' hidden by the filter.' : '';
+    var btn = document.querySelector('.concept-done');
+    if (btn) {
+      var on = !!done[btn.dataset.slug];
+      btn.classList.toggle('on', on);
+      btn.textContent = on ? '\u2713 Completed' : '\u2713 Mark complete';
+    }
+  }
+
+  window.setFilter = function(f) {
+    filter = f; localStorage.setItem(FILTER_KEY, f); apply();
+  };
+  window.toggleDone = function(slug) {
+    if (done[slug]) delete done[slug]; else done[slug] = true;
+    localStorage.setItem(DONE_KEY, JSON.stringify(done));
+    apply();
+  };
+  window.toggleHideDone = function() {
+    document.body.classList.toggle('hide-done');
+  };
+  apply();
+})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Labor Market Breadth (Sector Concentration in Hiring) - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.tier .tier-desc { color: #a08060; font-size: 0.85rem; margin: 0.4rem 0 0.8rem; }
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../economic-indicators.html">&larr; Economic Indicators</a>
+
+<div class="concept-meta"><span>deep cut</span><span>Economic Indicators</span><span>added 2026-09-05</span></div>
+<h4 id="labor_market_breadth">Labor Market Breadth (Sector Concentration in Hiring)</h4>
+
+<p>When economists and market analysts talk about the health of the labor market, they rarely stop at the headline number. That top-line figure — the total jobs added in a given month — is what makes the news ticker scroll and the financial anchors nod approvingly. But sophisticated readers know to look one level deeper, at a concept called <strong>labor market breadth</strong>. Breadth refers to how widely job creation is distributed across different sectors of the economy. A report with strong breadth shows hiring spread across manufacturing, technology, healthcare, finance, construction, and services simultaneously. A report with poor breadth shows the same headline number built almost entirely on one or two categories — a red flag hiding behind a green number.</p>
+
+<p>Why does breadth matter? Because a job is not just a job in economic terms. Where hiring happens tells you whether growth is sustainable, productive, and self-reinforcing, or narrow, fragile, and likely to reverse. <strong>Sector concentration in hiring</strong> — when a disproportionate share of new jobs clusters in just one or two industries — signals that the economy's engine may be misfiring on some cylinders while appearing to run fine from the outside. Policymakers, central bankers, and investors pay close attention to this because concentrated hiring can produce misleading unemployment and payroll numbers that overstate economic momentum and lead to policy mistakes with real consequences for borrowers, renters, and everyday consumers.</p>
+
+<p>The mechanism works like this: the Bureau of Labor Statistics releases the monthly <strong>Non-Farm Payroll (NFP)</strong> report, which breaks down job creation by industry category — private goods-producing sectors like manufacturing and construction, private service sectors like food services and healthcare, and government sectors like federal, state, and local employment. Analysts then calculate what percentage of total job gains came from each bucket. If one or two categories account for a dramatically outsized share of the total — say, more than 40–50% of a month's gains — that raises a breadth concern. The test of a genuinely healthy report is whether growth is appearing organically across many sectors at once, reflecting broad demand for labor throughout the economy, rather than a statistical surge in one corner.</p>
+
+<p>The August jobs report discussed in the video is a textbook case study. The headline print was 162,000 new jobs — nearly triple Wall Street's consensus expectation of roughly 56,000. Financial media immediately called it a blowout. But when analysts opened the underlying data, two categories dominated: <strong>food services and drinking places</strong> added 59,000 jobs, and <strong>local government education</strong> added 42,000. Combined, those two sectors contributed 101,000 of the 162,000 total — exactly 62.3% of the entire report. The remaining 37.7% was spread across everything else: manufacturing, construction, finance, technology, healthcare, and all other private-sector employers combined. One blowout headline. Two categories. A very different story underneath.</p>
+
+<blockquote>"If this were really the broad-based healthy labor market Washington would like you to believe, ask yourself why two industries did almost two-thirds of all the heavy lifting."</blockquote>
+
+<p>The two sectors driving August's number deserve scrutiny precisely because of what they represent. Restaurant and bar hiring is highly cyclical, low-wage, and directly tied to consumer discretionary spending — which itself is sensitive to interest rates and credit conditions. <strong>Local government education</strong> hiring is driven by school-year staffing calendars, not underlying economic expansion. Public school payrolls swell in August and September as the academic year begins, then contract again. Neither category is what economists call <strong>high-productivity private-sector growth</strong> — the kind generated by businesses that invest capital, build products, drive innovation, and generate compounding returns. A genuine economic acceleration shows up in manufacturing orders, capital goods shipments, and hiring in technology and professional services, not primarily in seasonal restaurant and school staffing.</p>
+
+<p>Traders and investors use breadth analysis as a filter when interpreting jobs reports. A high headline number with narrow breadth tends to produce a counterintuitive market reaction: bond yields rise (prices fall), interest rate futures reprice toward fewer Fed cuts, and mortgage rates tick up — even though the underlying data is weaker than it appears. This is because the Federal Reserve also reads breadth. If the Fed sees a blowout NFP and interprets it as confirmation that the labor market is too strong to justify rate cuts, it maintains or raises rates regardless of the quality of the underlying sectoral mix. The video's central argument is exactly this: the 162,000 print gave <strong>hawks</strong> — Fed officials who favor keeping rates high to fight inflation — the political cover they needed to delay rate cuts, even if a closer look at the data wouldn't fully support that stance.</p>
+
+<p>The most common misconception about labor market breadth is that a big number is always good news for consumers. It feels intuitive — more jobs should mean more economic confidence, lower rates, and better conditions for borrowers. But the transmission mechanism runs in reverse when the number is large enough to shift Fed expectations. A blowout jobs report reduces the probability the Fed cuts rates at its next meeting, which keeps borrowing costs elevated for mortgages, auto loans, credit cards, and small business credit lines. For someone sitting on the sideline waiting to buy a home or refinance, a "good" jobs number can mean waiting longer and paying more. The quality and breadth of the number matters enormously to whether that headline figure is actually good news for you personally.</p>
+
+<p>Breadth analysis connects directly to several adjacent concepts worth understanding together. <strong>Diffusion indexes</strong> measure exactly this — the share of industries showing employment gains versus losses in a given month, giving a single-number read on breadth. The <strong>ADP National Employment Report</strong>, which showed only 38,000 jobs added just two days before the August NFP blowout, tends to track private-sector hiring more directly and can sometimes signal breadth problems before the official data arrives. <strong>Wage growth by sector</strong> adds another dimension: concentrated hiring in low-wage sectors like food services can suppress average hourly earnings even when total employment rises, making the labor market look simultaneously tight and loose depending on which metric you're reading. Together, these tools help build a three-dimensional picture of what the headline number alone can never show.</p>
+<div class="concept-side">Sources: THE 162K AMBUSH: Why the 'Blowout' Jobs Report Hands Hawks Cover to Hike!<br>Related in this category: <a href="inflation_breadth.html">Inflation Breadth</a>, <a href="congressional_budget_office_projections.html">Congressional Budget Office (CBO) Projections</a>, <a href="financial_conditions_index.html">Financial Conditions Index</a>, <a href="core_pce.html">Core PCE (Personal Consumption Expenditures)</a>, <a href="consumer_credit_card_delinquency_rate.html">Consumer Credit Card Delinquency Rate</a>, <a href="total_consumer_debt.html">Total Household / Consumer Debt</a></div>
+<button class="concept-done" data-slug="labor_market_breadth" onclick="toggleDone('labor_market_breadth')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_labor_market_breadth';</script>
+<script src="../../book.js"></script>
+
+<script>
+(function() {
+  var DONE_KEY = 'fg_done', FILTER_KEY = 'fg_filter';
+  var done = JSON.parse(localStorage.getItem(DONE_KEY) || '{}');
+  var filter = localStorage.getItem(FILTER_KEY) || 'all';
+
+  function visible(flag) {
+    if (filter === 'star') return flag === 'star';
+    if (filter === 'nodeep') return flag !== 'deep';
+    return true;
+  }
+
+  function apply() {
+    var shown = 0, total = 0, hidden = 0;
+    document.querySelectorAll('.concept-row').forEach(function(r) {
+      var slug = r.dataset.slug, flag = r.dataset.flag;
+      total++;
+      if (done[slug]) r.classList.add('done'); else r.classList.remove('done');
+      if (visible(flag)) { r.classList.remove('fg-hidden'); shown++; }
+      else { r.classList.add('fg-hidden'); hidden++; }
+    });
+    document.querySelectorAll('.cat-card').forEach(function(card) {
+      var slugs = card.dataset.slugs ? card.dataset.slugs.split(',') : [];
+      var flags = card.dataset.flags ? card.dataset.flags.split(',') : [];
+      var vis = 0, allDone = slugs.length > 0;
+      slugs.forEach(function(sl, i) {
+        if (visible(flags[i])) vis++;
+        if (!done[sl]) allDone = false;
+      });
+      total += slugs.length; shown += vis;
+      var c = card.querySelector('.cat-count');
+      if (c) c.textContent = vis + (vis !== slugs.length ? ' of ' + slugs.length : '') + ' concepts' +
+        (card.dataset.stars ? ' \u00b7 ' + card.dataset.stars + ' \u2605' : '');
+      if (vis === 0) card.classList.add('fg-empty'); else card.classList.remove('fg-empty');
+      if (allDone) card.classList.add('done'); else card.classList.remove('done');
+    });
+    document.querySelectorAll('[data-filter]').forEach(function(b) {
+      b.classList.toggle('active', b.dataset.filter === filter);
+    });
+    var n = document.getElementById('fgCount');
+    if (n) n.textContent = shown + ' of ' + total + ' shown';
+    var h = document.getElementById('fgHiddenNote');
+    if (h) h.textContent = hidden ? hidden + ' hidden by the filter.' : '';
+    var btn = document.querySelector('.concept-done');
+    if (btn) {
+      var on = !!done[btn.dataset.slug];
+      btn.classList.toggle('on', on);
+      btn.textContent = on ? '\u2713 Completed' : '\u2713 Mark complete';
+    }
+  }
+
+  window.setFilter = function(f) {
+    filter = f; localStorage.setItem(FILTER_KEY, f); apply();
+  };
+  window.toggleDone = function(slug) {
+    if (done[slug]) delete done[slug]; else done[slug] = true;
+    localStorage.setItem(DONE_KEY, JSON.stringify(done));
+    apply();
+  };
+  window.toggleHideDone = function() {
+    document.body.classList.toggle('hide-done');
+  };
+  apply();
+})();
+</script>
+
+</body>
+</html>

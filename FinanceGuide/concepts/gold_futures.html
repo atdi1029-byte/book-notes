@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Gold Futures - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.tier .tier-desc { color: #a08060; font-size: 0.85rem; margin: 0.4rem 0 0.8rem; }
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../commodities-energy.html">&larr; Commodities &amp; Energy</a>
+
+<div class="concept-meta"><span>standard</span><span>Commodities &amp; Energy</span><span>added 2026-08-31</span></div>
+<h4 id="gold_futures">Gold Futures</h4>
+
+<p>A <strong>futures contract</strong> is a legally binding agreement to buy or sell an asset at a predetermined price on a specific future date. <strong>Gold futures</strong> are the most actively traded version of this arrangement — they let buyers and sellers lock in today's price for gold that will change hands weeks or months from now. The benchmark contract on the <strong>COMEX exchange</strong> (part of the CME Group) covers 100 troy ounces of gold and trades nearly around the clock. When you see "gold at $4,695 an ounce" on a financial terminal, that number almost certainly refers to the front-month futures price, not someone walking into a coin shop and handing over cash. Futures are how Wall Street talks about gold.</p>
+
+<p>Gold futures matter because they set the price signal that ripples through every other form of gold — jewelry, mining stocks, ETFs like <strong>GLD</strong>, central bank reserves, and physical bullion dealers. When a futures trader in Chicago sells gold contracts at 2:00 PM, a gold miner in Nevada revising their hedging book feels it within seconds. The futures market also functions as the world's primary mechanism for hedging gold exposure. A mining company that knows it will produce 50,000 ounces next quarter can sell futures today and lock in revenue regardless of where the spot price lands. A jeweler worried about rising input costs can buy futures to cap what they'll pay. The price discovery that happens in this market is genuinely global and nearly instantaneous.</p>
+
+<p>The mechanical heart of gold futures is <strong>margin</strong>, and this is where most newcomers get a dangerous surprise. To control a 100-ounce contract worth roughly $450,000 at recent prices, a trader does not put up $450,000. They post an <strong>initial margin</strong> — typically $8,000 to $12,000, depending on the broker and market conditions. That means you are controlling nearly half a million dollars of gold with less than 3% down. This ratio is called <strong>leverage</strong>, and it cuts both ways with brutal symmetry. If gold rises 1%, your contract gains $4,500 — a 40%+ return on your margin. If gold falls 1%, you lose the same $4,500, wiping out nearly half your posted margin in a single session. A <strong>margin call</strong> forces you to deposit more cash immediately or the position is liquidated at whatever price the market offers.</p>
+
+<p>The real-world episode from the Jackson Hole speech in late August 2026 is a clean illustration of leverage in action. Gold futures had been trading near <strong>$4,695 an ounce</strong> — a three-month high — when Fed Chair <strong>Kevin Warsh</strong> stepped to the podium and signaled that rate cuts were not coming, and that a September hike was plausible. Within the same trading session, gold slid to around <strong>$4,500 an ounce</strong> — a drop of roughly $195, or more than 3%. On a single 100-ounce contract, that swing represents a loss of $19,500. A trader who posted $10,000 in margin would have lost nearly twice their entire stake in one afternoon. Multiply that across the thousands of open contracts in the market and you begin to understand how a single speech can liquidate billions of dollars in minutes.</p>
+
+<blockquote>"When a sitting Fed chair stands up and tells traders that more than half the economy is still inflating above target, algorithms don't wait around for nuance. They reprice instantly." <cite>— Jackson Hole video</cite></blockquote>
+
+<p>Traders use gold futures to express two very different kinds of views. The first is a <strong>directional bet</strong> — you believe gold is going higher, so you buy contracts (go long), or you believe it's going lower, so you sell contracts (go short). The second is a <strong>hedge</strong> — you already own physical gold or gold-linked assets and want to protect against a price decline without actually selling. Sophisticated traders also watch the <strong>gold/Treasury yield relationship</strong> obsessively. Gold pays no interest, so when <strong>real yields</strong> (the yield on Treasury bonds minus expected inflation) rise, the opportunity cost of holding gold increases and prices typically fall. When the <strong>two-year Treasury yield</strong> jumped past 4.3% in minutes after Warsh's remarks, algorithmic systems read that as a signal to dump gold positions automatically.</p>
+
+<p>The most dangerous misconception about gold futures is that they are simply a way to bet on gold prices. In practice, the vast majority of futures contracts never result in physical delivery. Participants <strong>roll</strong> their positions — closing the expiring contract and opening a new one in the next month — indefinitely. This creates a structural feature called the <strong>futures curve</strong>. When near-term contracts trade below future-dated contracts, the market is in <strong>contango</strong>, meaning it costs something to carry gold forward in time. When near-term prices exceed far-dated prices, the market is in <strong>backwardation</strong>, which often signals acute near-term demand. Ignoring the shape of the curve while trading futures is like driving without checking the road conditions.</p>
+
+<p>Gold futures can become destabilizing when leverage and liquidity interact badly. During a fast-moving selloff — like the post-Jackson Hole session — margin calls cascade. A trader who gets called and cannot meet it immediately faces forced liquidation. That forced selling pushes prices down further, triggering margin calls on the next tier of leveraged holders. This is a <strong>margin cascade</strong>, and it's why a 3% move in underlying gold prices can feel like a 30% event to anyone holding leveraged futures. The risk is compounded during periods of low liquidity — late Friday afternoons, overnight sessions, or holiday-thinned markets — when the bid-ask spread widens and exits become expensive. The phrase "markets can remain irrational longer than you can remain solvent" was essentially written about levered futures positions.</p>
+
+<p>Gold futures connect tightly to several other concepts that matter for understanding what happened at Jackson Hole. The mechanism runs through <strong>real interest rates</strong>: Warsh's speech pushed up nominal yields without simultaneously raising inflation expectations, so real yields jumped — and higher real yields make yield-bearing bonds more attractive relative to non-yielding gold. The selloff also involved <strong>correlation risk</strong>: Bitcoin fell alongside gold in the same session, suggesting both were being treated as inflation hedges by the same pool of capital. When that thesis cracked, both assets were sold together. Understanding gold futures ultimately means understanding that gold is not simply a commodity — it is a <em>monetary asset</em> whose price is an implicit vote on the credibility of central banks and the direction of real borrowing costs across the entire economy.</p>
+<div class="concept-side">Sources: THE JACKSON HOLE TRAP: Why Kevin Warsh Just Crashed Gold &amp; Bitcoin!<br>Related in this category: <a href="hard_assets_inflation_hedge.html">Hard Assets as Inflation Hedges</a>, <a href="farm_debt_to_asset_ratio.html">Farm Debt-to-Asset Ratio</a>, <a href="farm_debt_service_ratio.html">Farm Debt Service Ratio</a>, <a href="agricultural_direct_payment_subsidies.html">Agricultural Direct Payment Subsidies</a>, <a href="net_farm_income.html">Net Farm Income</a>, <a href="farm_operating_loans.html">Farm Operating Loans</a></div>
+<button class="concept-done" data-slug="gold_futures" onclick="toggleDone('gold_futures')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_gold_futures';</script>
+<script src="../../book.js"></script>
+
+<script>
+(function() {
+  var DONE_KEY = 'fg_done', FILTER_KEY = 'fg_filter';
+  var done = JSON.parse(localStorage.getItem(DONE_KEY) || '{}');
+  var filter = localStorage.getItem(FILTER_KEY) || 'all';
+
+  function visible(flag) {
+    if (filter === 'star') return flag === 'star';
+    if (filter === 'nodeep') return flag !== 'deep';
+    return true;
+  }
+
+  function apply() {
+    var shown = 0, total = 0, hidden = 0;
+    document.querySelectorAll('.concept-row').forEach(function(r) {
+      var slug = r.dataset.slug, flag = r.dataset.flag;
+      total++;
+      if (done[slug]) r.classList.add('done'); else r.classList.remove('done');
+      if (visible(flag)) { r.classList.remove('fg-hidden'); shown++; }
+      else { r.classList.add('fg-hidden'); hidden++; }
+    });
+    document.querySelectorAll('.cat-card').forEach(function(card) {
+      var slugs = card.dataset.slugs ? card.dataset.slugs.split(',') : [];
+      var flags = card.dataset.flags ? card.dataset.flags.split(',') : [];
+      var vis = 0, allDone = slugs.length > 0;
+      slugs.forEach(function(sl, i) {
+        if (visible(flags[i])) vis++;
+        if (!done[sl]) allDone = false;
+      });
+      total += slugs.length; shown += vis;
+      var c = card.querySelector('.cat-count');
+      if (c) c.textContent = vis + (vis !== slugs.length ? ' of ' + slugs.length : '') + ' concepts' +
+        (card.dataset.stars ? ' \u00b7 ' + card.dataset.stars + ' \u2605' : '');
+      if (vis === 0) card.classList.add('fg-empty'); else card.classList.remove('fg-empty');
+      if (allDone) card.classList.add('done'); else card.classList.remove('done');
+    });
+    document.querySelectorAll('[data-filter]').forEach(function(b) {
+      b.classList.toggle('active', b.dataset.filter === filter);
+    });
+    var n = document.getElementById('fgCount');
+    if (n) n.textContent = shown + ' of ' + total + ' shown';
+    var h = document.getElementById('fgHiddenNote');
+    if (h) h.textContent = hidden ? hidden + ' hidden by the filter.' : '';
+    var btn = document.querySelector('.concept-done');
+    if (btn) {
+      var on = !!done[btn.dataset.slug];
+      btn.classList.toggle('on', on);
+      btn.textContent = on ? '\u2713 Completed' : '\u2713 Mark complete';
+    }
+  }
+
+  window.setFilter = function(f) {
+    filter = f; localStorage.setItem(FILTER_KEY, f); apply();
+  };
+  window.toggleDone = function(slug) {
+    if (done[slug]) delete done[slug]; else done[slug] = true;
+    localStorage.setItem(DONE_KEY, JSON.stringify(done));
+    apply();
+  };
+  window.toggleHideDone = function() {
+    document.body.classList.toggle('hide-done');
+  };
+  apply();
+})();
+</script>
+
+</body>
+</html>

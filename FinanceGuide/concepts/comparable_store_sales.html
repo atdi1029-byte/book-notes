@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Comparable Store Sales (Comp Sales / Same-Store Sales) - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.tier .tier-desc { color: #a08060; font-size: 0.85rem; margin: 0.4rem 0 0.8rem; }
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../accounting-financial-statements.html">&larr; Accounting &amp; Financial Statements</a>
+
+<div class="concept-meta"><span>standard</span><span>Accounting &amp; Financial Statements</span><span>added 2026-09-06</span></div>
+<h4 id="comparable_store_sales">Comparable Store Sales (Comp Sales / Same-Store Sales)</h4>
+
+<p><strong>Comparable store sales</strong> — also called <strong>comp sales</strong>, <strong>same-store sales</strong>, or simply <strong>comps</strong> — measure revenue growth (or decline) at retail locations that have been open for at least one full year, comparing the current period directly against the same period in the prior year. The key word is <em>same</em>: you are looking at identical stores, not the total company. This isolates organic growth from expansion-driven growth. A retailer can always boost total revenue by opening new locations, but comps strip that away and ask a harder question: are the existing stores actually doing better? It is one of the most honest metrics available for judging the health of a brick-and-mortar retail business.</p>
+
+<p>The metric matters because <strong>new store openings</strong> cost capital, take time to ramp, and often cannibalize nearby locations. A company that grows total sales 10% purely by adding stores is not necessarily healthier — it may simply be spreading the same customer demand across more square footage. Comp sales answer whether the underlying business has real momentum. Positive comps signal that customers are coming back more often, spending more per visit, or both. Negative comps signal erosion of demand, pricing power, or brand relevance — problems that no amount of ribbon-cutting can fix. Investors watch comps closely because they are a leading indicator of whether a retailer's concept is working or wearing out.</p>
+
+<p>Mechanically, the calculation is straightforward. Take the revenue of all stores that were open for the full comparison period in both the current year and the prior year. Divide the current-year figure by the prior-year figure, subtract one, and express it as a percentage. If a store did $1 million last August and $910,000 this August, that location's comp is negative 9%. Aggregate that across hundreds or thousands of stores and you get the company-wide comp. Stores opened within the past twelve months are typically excluded from the calculation — they lack a full prior-year baseline. Some companies also exclude recently renovated stores or those temporarily closed for construction, so always check the footnotes for what is and is not included.</p>
+
+<p>The clearest real-world illustration from this week came from <strong>Lululemon Athletica</strong>. When Lululemon reported its second-quarter fiscal 2026 results, total revenue came in at $2.44 billion — down 4% year-over-year. But the comp sales number told a sharper story: down 9% overall, and down 12% specifically in the Americas. That means Lululemon's existing stores, the ones it had been running for at least a year, were generating meaningfully less revenue than they did in the same quarter a year earlier. The stock fell 17% on Friday. The revenue decline alone would have been concerning; the comp number confirmed that the deterioration was not a math artifact of store closures — it was customers choosing to spend less, or choosing to go elsewhere entirely.</p>
+
+<blockquote>
+"Comparable sales compares the same amount of stores as you had last year — so you can't just grow by adding stores. That's why we watch that carefully, especially with bricks and mortar retailers."
+<cite>— Mark Malik, Wall Street Truth Bombs</cite>
+</blockquote>
+
+<p>For traders and investors, comp sales function as a <strong>real-time brand health gauge</strong>. Accelerating comps often justify multiple expansion — investors will pay more per dollar of earnings for a retailer whose core business is gaining momentum. Decelerating or negative comps compress multiples, sometimes violently, because they suggest the growth story is broken and expansion capital may be wasted. Professionals also watch comps relative to management guidance: a company that guided for flat comps and delivered negative 9% has a credibility problem on top of an operational one. The sequential trend matters too — is the comp getting worse each quarter, stabilizing, or inflecting? A retailer going from negative 12% to negative 5% is a very different investment than one going from flat to negative 9%.</p>
+
+<p>A critical <strong>gotcha</strong> is that comp sales can be manipulated or distorted in subtle ways. Heavy discounting improves traffic and units sold but destroys margin — a retailer can post positive comps by running constant promotions, which flatters the headline but erodes the business underneath. <strong>Average transaction value</strong> and <strong>traffic count</strong> are the two components of any comp: price times volume. Understanding which one is driving the number matters enormously. Lululemon's comp decline could reflect fewer customers walking in (a traffic problem) or customers buying fewer or cheaper items per visit (a conversion and ticket problem) — each has a different fix. Management presentations often break comps into these components, and analysts always ask for that split.</p>
+
+<p>Comps also break down in edge cases that can mislead. A natural disaster, a competitor closing nearby locations, a major store renovation, or a one-time external shock can all distort the comparison. During the pandemic, retailers that had closed stores in one quarter faced easy comparisons a year later and posted spectacular comps simply because the prior period was catastrophically low — the so-called <strong>base effect</strong>. Conversely, a retailer that had a viral moment a year ago faces a brutally hard comparison this year even if business is fundamentally stable. Always ask what the comparison period looked like before celebrating or panicking over a single comp print. A multi-year average comp tells a far more reliable story than any single quarter.</p>
+
+<p>Comp sales connect directly to several broader financial concepts. <strong>Operating leverage</strong> is one: a retailer with high fixed costs (leases, staff, utilities) sees margins collapse rapidly when comps turn negative because those costs don't shrink with revenue. <strong>Brand equity</strong> is another — Lululemon's comp deterioration is, as the video noted, fundamentally a brand problem, not an accounting problem. Comps also link to <strong>inventory management</strong>: falling comps usually mean merchandise is piling up, leading to markdowns that further pressure margins. And they connect to <strong>return on invested capital</strong> — if a company keeps opening stores while existing ones shrink, it is destroying capital with every shovel in the ground. Comp sales are the metric that holds management accountable for what they already built before anyone asks whether they should build more.</p>
+<div class="concept-side">Sources: THE JOBS GUT PUNCH: Why Good News Sold Off Wall Street &amp; Crushed Tech!<br>Related in this category: <a href="interest_coverage_ratio.html">Interest Coverage Ratio</a>, <a href="loan_loss_provisions.html">Loan Loss Provisions (Agricultural)</a>, <a href="earnings_quality.html">Earnings Quality (Adjusted vs. Reported Earnings)</a>, <a href="gross_margin.html">Gross Margin</a></div>
+<button class="concept-done" data-slug="comparable_store_sales" onclick="toggleDone('comparable_store_sales')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_comparable_store_sales';</script>
+<script src="../../book.js"></script>
+
+<script>
+(function() {
+  var DONE_KEY = 'fg_done', FILTER_KEY = 'fg_filter';
+  var done = JSON.parse(localStorage.getItem(DONE_KEY) || '{}');
+  var filter = localStorage.getItem(FILTER_KEY) || 'all';
+
+  function visible(flag) {
+    if (filter === 'star') return flag === 'star';
+    if (filter === 'nodeep') return flag !== 'deep';
+    return true;
+  }
+
+  function apply() {
+    var shown = 0, total = 0, hidden = 0;
+    document.querySelectorAll('.concept-row').forEach(function(r) {
+      var slug = r.dataset.slug, flag = r.dataset.flag;
+      total++;
+      if (done[slug]) r.classList.add('done'); else r.classList.remove('done');
+      if (visible(flag)) { r.classList.remove('fg-hidden'); shown++; }
+      else { r.classList.add('fg-hidden'); hidden++; }
+    });
+    document.querySelectorAll('.cat-card').forEach(function(card) {
+      var slugs = card.dataset.slugs ? card.dataset.slugs.split(',') : [];
+      var flags = card.dataset.flags ? card.dataset.flags.split(',') : [];
+      var vis = 0, allDone = slugs.length > 0;
+      slugs.forEach(function(sl, i) {
+        if (visible(flags[i])) vis++;
+        if (!done[sl]) allDone = false;
+      });
+      total += slugs.length; shown += vis;
+      var c = card.querySelector('.cat-count');
+      if (c) c.textContent = vis + (vis !== slugs.length ? ' of ' + slugs.length : '') + ' concepts' +
+        (card.dataset.stars ? ' \u00b7 ' + card.dataset.stars + ' \u2605' : '');
+      if (vis === 0) card.classList.add('fg-empty'); else card.classList.remove('fg-empty');
+      if (allDone) card.classList.add('done'); else card.classList.remove('done');
+    });
+    document.querySelectorAll('[data-filter]').forEach(function(b) {
+      b.classList.toggle('active', b.dataset.filter === filter);
+    });
+    var n = document.getElementById('fgCount');
+    if (n) n.textContent = shown + ' of ' + total + ' shown';
+    var h = document.getElementById('fgHiddenNote');
+    if (h) h.textContent = hidden ? hidden + ' hidden by the filter.' : '';
+    var btn = document.querySelector('.concept-done');
+    if (btn) {
+      var on = !!done[btn.dataset.slug];
+      btn.classList.toggle('on', on);
+      btn.textContent = on ? '\u2713 Completed' : '\u2713 Mark complete';
+    }
+  }
+
+  window.setFilter = function(f) {
+    filter = f; localStorage.setItem(FILTER_KEY, f); apply();
+  };
+  window.toggleDone = function(slug) {
+    if (done[slug]) delete done[slug]; else done[slug] = true;
+    localStorage.setItem(DONE_KEY, JSON.stringify(done));
+    apply();
+  };
+  window.toggleHideDone = function() {
+    document.body.classList.toggle('hide-done');
+  };
+  apply();
+})();
+</script>
+
+</body>
+</html>

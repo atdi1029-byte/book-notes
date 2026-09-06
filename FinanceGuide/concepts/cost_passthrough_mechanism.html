@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Cost Pass-Through Mechanism (Farm to Consumer) - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.tier .tier-desc { color: #a08060; font-size: 0.85rem; margin: 0.4rem 0 0.8rem; }
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../economics-fundamentals.html">&larr; Economics Fundamentals</a>
+
+<div class="concept-meta"><span>standard</span><span>Economics Fundamentals</span><span>added 2026-08-31</span></div>
+<h4 id="cost_passthrough_mechanism">Cost Pass-Through Mechanism (Farm to Consumer)</h4>
+
+<p>The <strong>cost pass-through mechanism</strong> is the process by which rising costs at one stage of a supply chain get transferred — "passed through" — to the next stage, ultimately landing on the end consumer as higher prices. In agriculture, this chain runs from the farmer who plants and harvests, through processors, distributors, and retailers, before finally reaching your shopping cart. Each link in that chain has a break-even point: a minimum price below which producing or moving the product becomes economically irrational. When input costs — seeds, fertilizer, fuel, equipment financing — rise faster than the farmer can absorb, those costs don't disappear. They either compress margins until the farmer stops producing, or they get baked into the price charged to the next buyer downstream.</p>
+
+<p>Understanding this mechanism matters because it explains why food inflation can be <strong>sticky</strong> — meaning it resists falling back down even after the original shock has passed. Most people assume that when interest rates rise and then fall, or when a commodity spike reverses, grocery prices should follow. But that's not how supply chains behave. Once a farmer has restructured their operation around higher input costs, or once a processor has repriced their contracts with distributors, that new price level becomes the baseline. The mechanism also matters for investors, policymakers, and anyone trying to forecast inflation, because it means food price pressures can persist long after the headline event that caused them has faded from the news cycle.</p>
+
+<p>Mechanically, the process works in stages. First, a farmer's <strong>input costs</strong> rise — fertilizer, diesel, seed, and most critically, the cost of servicing debt on land and equipment loans. Second, the farmer runs the numbers on whether planting a given crop at current market prices will cover those costs. If the math doesn't work, one of two things happens: the farmer plants fewer acres, reducing supply; or the farmer demands a higher price from their grain elevator, processor, or buyer. Third, that processor — a meatpacker, a flour mill, a dairy cooperative — now faces higher raw material costs and passes a portion of those through in the price they charge to food manufacturers and distributors. Fourth, retailers, facing higher wholesale prices, adjust shelf prices. Each handoff amplifies the original shock slightly, because each intermediary also protects their own margin.</p>
+
+<p>The video's core example makes this concrete. The USDA projects that total U.S. farm sector debt will reach a record <strong>$624.7 billion</strong> in the current year — up more than 5% from 2025 — pushing the <strong>farm debt-to-asset ratio</strong> to 13.75%, its highest level in over a decade. More alarming, the sector's <strong>debt service ratio</strong> — the share of gross farm income consumed by loan payments before a single operating bill is paid — is forecast to match its highest level since 1987, the peak of the last great farm credit collapse. At that debt load, a farmer earning, say, $300,000 in gross revenue might owe $60,000–$80,000 in annual debt service before buying a single bag of seed. That math forces the pass-through: either prices go up or acres go unplanted.</p>
+
+<p>Investors and traders use awareness of the cost pass-through mechanism to anticipate <strong>food sector inflation</strong> before it shows up in official CPI readings. The lead indicators are upstream: watch fertilizer prices (particularly potash and nitrogen), farm credit delinquency rates published by the USDA and the Farm Credit System, and planted-acreage reports from the USDA's National Agricultural Statistics Service. When those upstream signals deteriorate simultaneously — debt rising, input costs elevated, cash buffers thin — a trader paying attention knows that beef, poultry, dairy, and grain-derived products like bread and pasta are likely to see price floors set six to eighteen months out. Commodity futures markets for corn, soybeans, and wheat often price this in before grocery shelves catch up.</p>
+
+<blockquote>"While the entire country is debating tariffs on consumer electronics and sneakers of all things, a farm state time bomb is sitting quietly under the entire American food supply chain."</blockquote>
+
+<p>The biggest misconception about cost pass-through is that <strong>central bank rate cuts</strong> can dissolve it. This is the key gotcha. When the Federal Reserve cuts interest rates, the conventional narrative is that borrowing becomes cheaper, financial stress eases, and price pressures moderate. But a farmer carrying $624 billion in aggregate sector debt — much of it locked into multi-year land loans or equipment financing — doesn't immediately benefit from a rate cut. Their existing debt service obligations don't reprice overnight. Meanwhile, if fertilizer supply is constrained (the video flags a lapsed U.S.-Canada trade treaty threatening 90% of fertilizer supply), those input costs don't respond to monetary policy at all. Rate cuts address demand-side inflation; agricultural supply-side cost pass-through is a structural phenomenon that monetary tools can't reach.</p>
+
+<p>The mechanism fails — or breaks down — in a specific and painful way: when farmers cannot pass costs through because consumer demand is too price-sensitive or retail competition is too intense, the squeeze stays on the farm. This is what happened in 1987. Costs rose, prices couldn't follow fast enough, and the result wasn't lower grocery bills — it was mass farm foreclosure. Forced auctions, consolidation of family operations into large corporate agricultural entities, and a permanent structural change in who controls American food production. When pass-through fails at the farm level, the downstream consequence is eventually <strong>supply destruction</strong> — fewer farms, fewer acres planted, and an even tighter supply situation that ultimately forces prices higher anyway, just on a longer and more damaging timeline.</p>
+
+<p>The cost pass-through mechanism connects directly to several related concepts. It is a key driver of <strong>core services inflation</strong> stickiness, and it interacts with <strong>supply chain concentration risk</strong> — the fact that a small number of large processors now handle the majority of U.S. beef, pork, and poultry means a shock at the farm level moves through fewer, larger bottlenecks with less competitive friction to dampen it. It also links to <strong>trade policy risk</strong>: when input supply chains like fertilizer are dependent on a single trading partner and that relationship is disrupted, the cost shock is imported into the pass-through chain immediately. Understanding how costs travel from a farmer's balance sheet to your grocery receipt is, at its core, understanding how the real economy connects to the prices that shape household budgets every single week.</p>
+<div class="concept-side">Sources: THE 1987 FARM CRISIS IS BACK: The $624B Debt Bomb Under Your Food Supply!<br>Related in this category: <a href="national_debt_debt_ceiling.html">National Debt</a>, <a href="structural_food_inflation_floor.html">Structural Food Price Floor</a>, <a href="structural_embedded_inflation.html">Structural (Embedded) Inflation</a>, <a href="k_shaped_two_speed_economy.html">K-Shaped / Two-Speed Economy</a>, <a href="nominal_vs_real_consumer_spending.html">Nominal vs. Real Consumer Spending</a>, <a href="debt_to_gdp_ratio.html">Debt-to-GDP Ratio</a></div>
+<button class="concept-done" data-slug="cost_passthrough_mechanism" onclick="toggleDone('cost_passthrough_mechanism')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_cost_passthrough_mechanism';</script>
+<script src="../../book.js"></script>
+
+<script>
+(function() {
+  var DONE_KEY = 'fg_done', FILTER_KEY = 'fg_filter';
+  var done = JSON.parse(localStorage.getItem(DONE_KEY) || '{}');
+  var filter = localStorage.getItem(FILTER_KEY) || 'all';
+
+  function visible(flag) {
+    if (filter === 'star') return flag === 'star';
+    if (filter === 'nodeep') return flag !== 'deep';
+    return true;
+  }
+
+  function apply() {
+    var shown = 0, total = 0, hidden = 0;
+    document.querySelectorAll('.concept-row').forEach(function(r) {
+      var slug = r.dataset.slug, flag = r.dataset.flag;
+      total++;
+      if (done[slug]) r.classList.add('done'); else r.classList.remove('done');
+      if (visible(flag)) { r.classList.remove('fg-hidden'); shown++; }
+      else { r.classList.add('fg-hidden'); hidden++; }
+    });
+    document.querySelectorAll('.cat-card').forEach(function(card) {
+      var slugs = card.dataset.slugs ? card.dataset.slugs.split(',') : [];
+      var flags = card.dataset.flags ? card.dataset.flags.split(',') : [];
+      var vis = 0, allDone = slugs.length > 0;
+      slugs.forEach(function(sl, i) {
+        if (visible(flags[i])) vis++;
+        if (!done[sl]) allDone = false;
+      });
+      total += slugs.length; shown += vis;
+      var c = card.querySelector('.cat-count');
+      if (c) c.textContent = vis + (vis !== slugs.length ? ' of ' + slugs.length : '') + ' concepts' +
+        (card.dataset.stars ? ' \u00b7 ' + card.dataset.stars + ' \u2605' : '');
+      if (vis === 0) card.classList.add('fg-empty'); else card.classList.remove('fg-empty');
+      if (allDone) card.classList.add('done'); else card.classList.remove('done');
+    });
+    document.querySelectorAll('[data-filter]').forEach(function(b) {
+      b.classList.toggle('active', b.dataset.filter === filter);
+    });
+    var n = document.getElementById('fgCount');
+    if (n) n.textContent = shown + ' of ' + total + ' shown';
+    var h = document.getElementById('fgHiddenNote');
+    if (h) h.textContent = hidden ? hidden + ' hidden by the filter.' : '';
+    var btn = document.querySelector('.concept-done');
+    if (btn) {
+      var on = !!done[btn.dataset.slug];
+      btn.classList.toggle('on', on);
+      btn.textContent = on ? '\u2713 Completed' : '\u2713 Mark complete';
+    }
+  }
+
+  window.setFilter = function(f) {
+    filter = f; localStorage.setItem(FILTER_KEY, f); apply();
+  };
+  window.toggleDone = function(slug) {
+    if (done[slug]) delete done[slug]; else done[slug] = true;
+    localStorage.setItem(DONE_KEY, JSON.stringify(done));
+    apply();
+  };
+  window.toggleHideDone = function() {
+    document.body.classList.toggle('hide-done');
+  };
+  apply();
+})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Risk-Free Asset (Concept and Repricing) - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.tier .tier-desc { color: #a08060; font-size: 0.85rem; margin: 0.4rem 0 0.8rem; }
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../fixed-income-bonds.html">&larr; Fixed Income &amp; Bonds</a>
+
+<div class="concept-meta"><span>standard</span><span>Fixed Income &amp; Bonds</span><span>added 2026-09-06</span></div>
+<h4 id="risk_free_asset_repricing">Risk-Free Asset (Concept and Repricing)</h4>
+
+<p>The entire architecture of modern finance rests on a single assumption: that some assets carry essentially zero risk of default. A <strong>risk-free asset</strong> is a financial instrument where the probability of not getting your money back — principal plus promised interest — is considered so close to zero that markets treat it as a baseline. Every other investment in the world gets priced relative to this baseline. When you hear that a corporate bond yields "200 basis points over Treasuries," that spread is the market's estimate of additional risk beyond the risk-free rate. Strip away the risk-free asset and you lose the yardstick. You can't price anything coherently without it, which is why this concept sits at the foundation of every valuation model, every portfolio construction framework, and every central bank's monetary policy toolkit.</p>
+
+<p>In practice, <strong>US Treasury bonds</strong> have served as the world's risk-free asset since the end of World War II. The logic was airtight for decades: the United States government controls the dollar, the dollar is the world's reserve currency, and the US has never defaulted on its debt obligations in the modern era. A country that can print the currency its debts are denominated in cannot technically be forced to default — it can always create more dollars. This made Treasuries the ultimate safe harbor. When markets panic, money floods into Treasuries. When insurance companies need to match long-term liabilities, they buy Treasuries. When sovereign wealth funds need to park a nation's oil revenue safely, they buy Treasuries. The entire system was self-reinforcing: everyone believed it was safe, so everyone held it, so it stayed liquid and stable, which confirmed the belief.</p>
+
+<p>The mechanical role of the risk-free rate in markets is worth understanding precisely. The <strong>risk-free rate</strong> — typically the yield on short-dated Treasuries — functions as the floor beneath all asset pricing. In the discounted cash flow models that underpin stock valuations, future earnings get discounted back to present value using a rate that incorporates the risk-free rate plus a risk premium. When the risk-free rate rises, every future cash flow becomes worth less today, which is why rising Treasury yields tend to compress equity valuations. In the <strong>capital asset pricing model (CAPM)</strong>, the expected return on any investment equals the risk-free rate plus the asset's beta multiplied by the equity risk premium. Change the risk-free rate — or, more profoundly, change what counts as the risk-free asset itself — and you shift the pricing of everything simultaneously.</p>
+
+<p>The Norway story that broke in 2025 is the real-world stress test of this assumption. <strong>Norges Bank Investment Management (NBIM)</strong>, which manages Norway's $2.3 trillion sovereign wealth fund — the largest in the world — formally proposed cutting the government bond share of its fixed income benchmark from 70% down to 50%. In raw dollar terms, that means roughly $106 billion rotating out of sovereign debt globally, with the US taking the largest single hit: the Treasury weight inside that government slice would drop from 34.1% to 21.9%. Against Norway's roughly $215 billion in Treasury holdings at the time, that represents approximately $75–85 billion of US government paper being repositioned. Financial media immediately framed this as de-dollarization, a political statement, capital flight. They were wrong about the cause, which made them wrong about the implication.</p>
+
+<blockquote>"Norway did not downgrade America. It downgraded the entire idea of the risk-free asset."</blockquote>
+
+<p>Here is what the actual proposal contained that nobody reported: Norway's total US dollar exposure stayed at roughly 50% — unchanged. They are not leaving American assets. They are leaving American <em>government</em> assets in favor of American <em>private</em> assets — specifically mortgage-backed securities and corporate bonds. This is the detail buried in the technical section of the submission that reframes everything. NBIM, the most conservative, most committee-bound, most academically rigorous large capital allocator on the planet, ran the math and concluded that lending to American homeowners and corporations is marginally safer on a <strong>risk-adjusted return</strong> basis than lending to the American government. That is an institutional statement about relative safety, not political sentiment — and that distinction is what makes it historically significant.</p>
+
+<p>Traders and institutional investors watch the risk-free rate and the demand for risk-free assets through several practical signals. <strong>Treasury auction demand</strong> — specifically the bid-to-cover ratio and the percentage taken by foreign central banks versus primary dealers — tells you whether global appetite for sovereign debt is healthy. <strong>The TED spread</strong> (the difference between the 3-month LIBOR rate and the 3-month Treasury yield) historically measured how much extra yield banks demanded over Treasuries, a proxy for systemic stress. More broadly, investors watch the <strong>term premium</strong> — the extra yield investors demand to hold longer-dated Treasuries rather than rolling short-term paper. When the term premium rises, it suggests investors are less confident about holding long-duration government debt, either because of inflation uncertainty or, increasingly, concerns about fiscal sustainability and sovereign creditworthiness itself.</p>
+
+<p>The most common misconception about risk-free assets is conflating "risk-free" with "no volatility." US Treasuries absolutely move in price — a 30-year Treasury can lose 20–30% of its market value when interest rates rise sharply, as happened in 2022. Risk-free refers specifically to <strong>default risk</strong> — the probability you won't receive promised cash flows — not price volatility or <strong>inflation risk</strong>. A second misconception is that the designation is permanent and objective. It isn't. It's a collective belief enforced by behavior. The risk-free status of Treasuries exists because the overwhelming majority of the world's financial institutions act as if it's true. That collective belief is self-fulfilling right up until the moment it isn't — and the warning signs of a shift tend to be quiet institutional moves, not dramatic headlines.</p>
+
+<p>When the risk-free asset is repriced — when markets begin demanding higher yields to hold sovereign debt, not because of inflation expectations but because of genuine credit concern — the damage radiates outward through every asset class simultaneously. This is the <strong>repricing cascade</strong>. Equity discount rates rise, compressing valuations. Mortgage rates rise, cooling housing. Corporate borrowing costs rise, squeezing margins and investment. Bank balance sheets, which hold Treasuries as Tier 1 capital, come under pressure. Central banks lose some of their crisis toolkit because flooding markets with government bonds during panics only works if those bonds are unambiguously desirable. The Norway move, taken alone, is a rounding error in a $28 trillion Treasury market. But Norway is not alone — it is simply the most transparent, because sovereign wealth funds must disclose. The question the proposal forces into the open is: how many other of the world's most conservative allocators are doing the same math quietly, and arriving at the same answer?</p>
+
+<p>This concept connects directly to <strong>sovereign credit risk</strong>, <strong>the dollar's reserve currency status</strong>, and <strong>fiscal dominance</strong> — the condition where a government's debt burden becomes large enough that monetary policy starts being shaped by the need to keep borrowing costs manageable rather than by inflation or employment targets. It also connects to the <strong>duration risk</strong> discussion in fixed income: in a world where even the risk-free asset carries repricing risk, the reward for extending duration — holding 10- or 30-year bonds rather than short-term bills — needs to be substantially higher. Historically, the US has benefited from an "exorbitant privilege," borrowing more cheaply than any other country because of Treasury's risk-free status. If that privilege is incrementally repriced away — not through a dramatic crisis but through quiet benchmark shifts by institutions that write academic papers before moving a decimal point — the cost compounds across every corner of the American and global economy for decades.</p>
+<div class="concept-side">Sources: THE RISK-FREE TRAP: Norway Cuts US Treasuries to Lend to American Homeowners!<br>Related in this category: <a href="two_year_treasury_yield.html">Two-Year Treasury Yield</a>, <a href="treasury_bond_buyback_program.html">Treasury Bond Buyback Program</a>, <a href="thirty_year_treasury_bond.html">30-Year Treasury Bond</a>, <a href="debt_rollover_risk.html">Debt Rollover Risk</a>, <a href="corporate_refinancing_cliff.html">Corporate Refinancing Cliff</a>, <a href="duration_risk.html">Duration Risk</a></div>
+<button class="concept-done" data-slug="risk_free_asset_repricing" onclick="toggleDone('risk_free_asset_repricing')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_risk_free_asset_repricing';</script>
+<script src="../../book.js"></script>
+
+<script>
+(function() {
+  var DONE_KEY = 'fg_done', FILTER_KEY = 'fg_filter';
+  var done = JSON.parse(localStorage.getItem(DONE_KEY) || '{}');
+  var filter = localStorage.getItem(FILTER_KEY) || 'all';
+
+  function visible(flag) {
+    if (filter === 'star') return flag === 'star';
+    if (filter === 'nodeep') return flag !== 'deep';
+    return true;
+  }
+
+  function apply() {
+    var shown = 0, total = 0, hidden = 0;
+    document.querySelectorAll('.concept-row').forEach(function(r) {
+      var slug = r.dataset.slug, flag = r.dataset.flag;
+      total++;
+      if (done[slug]) r.classList.add('done'); else r.classList.remove('done');
+      if (visible(flag)) { r.classList.remove('fg-hidden'); shown++; }
+      else { r.classList.add('fg-hidden'); hidden++; }
+    });
+    document.querySelectorAll('.cat-card').forEach(function(card) {
+      var slugs = card.dataset.slugs ? card.dataset.slugs.split(',') : [];
+      var flags = card.dataset.flags ? card.dataset.flags.split(',') : [];
+      var vis = 0, allDone = slugs.length > 0;
+      slugs.forEach(function(sl, i) {
+        if (visible(flags[i])) vis++;
+        if (!done[sl]) allDone = false;
+      });
+      total += slugs.length; shown += vis;
+      var c = card.querySelector('.cat-count');
+      if (c) c.textContent = vis + (vis !== slugs.length ? ' of ' + slugs.length : '') + ' concepts' +
+        (card.dataset.stars ? ' \u00b7 ' + card.dataset.stars + ' \u2605' : '');
+      if (vis === 0) card.classList.add('fg-empty'); else card.classList.remove('fg-empty');
+      if (allDone) card.classList.add('done'); else card.classList.remove('done');
+    });
+    document.querySelectorAll('[data-filter]').forEach(function(b) {
+      b.classList.toggle('active', b.dataset.filter === filter);
+    });
+    var n = document.getElementById('fgCount');
+    if (n) n.textContent = shown + ' of ' + total + ' shown';
+    var h = document.getElementById('fgHiddenNote');
+    if (h) h.textContent = hidden ? hidden + ' hidden by the filter.' : '';
+    var btn = document.querySelector('.concept-done');
+    if (btn) {
+      var on = !!done[btn.dataset.slug];
+      btn.classList.toggle('on', on);
+      btn.textContent = on ? '\u2713 Completed' : '\u2713 Mark complete';
+    }
+  }
+
+  window.setFilter = function(f) {
+    filter = f; localStorage.setItem(FILTER_KEY, f); apply();
+  };
+  window.toggleDone = function(slug) {
+    if (done[slug]) delete done[slug]; else done[slug] = true;
+    localStorage.setItem(DONE_KEY, JSON.stringify(done));
+    apply();
+  };
+  window.toggleHideDone = function() {
+    document.body.classList.toggle('hide-done');
+  };
+  apply();
+})();
+</script>
+
+</body>
+</html>

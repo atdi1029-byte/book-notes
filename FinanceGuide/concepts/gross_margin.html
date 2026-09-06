@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Gross Margin - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.tier .tier-desc { color: #a08060; font-size: 0.85rem; margin: 0.4rem 0 0.8rem; }
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../accounting-financial-statements.html">&larr; Accounting &amp; Financial Statements</a>
+
+<div class="concept-meta"><span><span class="star">&#9733;</span> must-know</span><span>Accounting &amp; Financial Statements</span><span>added 2026-09-06</span></div>
+<h4 id="gross_margin">Gross Margin</h4>
+
+<p><strong>Gross margin</strong> is the percentage of revenue a company keeps after paying the direct costs of making its product or delivering its service. It is calculated as <strong>gross profit</strong> divided by revenue, expressed as a percentage. Gross profit itself is simply revenue minus <strong>cost of goods sold (COGS)</strong> — the raw materials, manufacturing labor, and direct production expenses tied to each unit sold. If a company sells $100 worth of product and it cost $27 to make, the gross profit is $73 and the gross margin is 73%. Everything above the gross margin line is what the business has left to pay salaries, marketing, rent, interest, taxes, and — after all of that — deliver actual profit to shareholders.</p>
+
+<p>Gross margin matters because it reveals the fundamental economics of a business before management decisions, accounting choices, or financial engineering enter the picture. A company can dress up its net income with tax maneuvers or cut operating costs temporarily, but gross margin tells you whether the core product itself is worth making. A high gross margin means the company captures significant value from each sale — it has pricing power, low commodity dependence, or a structurally advantaged product. A low or falling gross margin means the opposite: the company is working hard and growing fast, but something — competition, input costs, customer mix, or product pricing — is eating the value before it ever reaches investors.</p>
+
+<p>Mechanically, gross margin flows directly from two variables: the price you charge and the cost to deliver. To improve gross margin, a company must either raise prices without losing customers, reduce production costs, or shift its revenue mix toward higher-margin products. Each of these has limits. Raising prices risks volume loss. Cutting COGS requires supply chain leverage or process innovation. Mix shift requires that the higher-margin segment actually grows faster. When all three move in the right direction simultaneously — prices hold, costs fall, and premium products take share — gross margins expand. When any one of those reverses, margins compress. That compression is what the market watches closely, because it tells you whether a company's growth is creating real wealth or merely generating activity.</p>
+
+<p>The Broadcom story from the week of September 6, 2026, illustrates exactly why gross margin can overshadow almost every other number. Broadcom reported third-quarter revenue of $29.6 billion, up 86% year-over-year. Its AI semiconductor revenue hit $16.7 billion — up 221% year-over-year and 54% from the prior quarter. CEO Hock Tan announced the company expected to ship $350 billion worth of AI semiconductors over two years to six hyperscaler customers. By almost any conventional measure, those are extraordinary results. Yet the stock fell 6% the following day. The reason: fourth-quarter gross margin was guided to 73%, against Wall Street's expectation of 78%. Five percentage points on a company doing roughly $35 billion in quarterly revenue represents roughly $1.75 billion in quarterly gross profit that the market had been counting on and suddenly could not.</p>
+
+<blockquote>"Growing 86% into a shrinking margin is a different investment case than growing 86% into an expanding one." <cite>— Mark Malik, Wall Street Truth Bombs</cite></blockquote>
+
+<p>Investors use gross margin as a signal for what kind of business they are actually buying. A company with expanding gross margins as it scales is demonstrating <strong>operating leverage</strong> — each new dollar of revenue is more profitable than the last, suggesting a durable competitive advantage. A company with compressing margins as it grows is raising a different question: is this business winning customers by delivering genuine value, or by underpricing? In Broadcom's case, the concern was specific — the AI revenue mix was shifting toward custom chip work for hyperscalers, which carries lower margins than Broadcom's legacy networking and broadband businesses. Fast growth into a lower-margin product category changes the long-term earnings picture even if the top-line numbers look spectacular.</p>
+
+<p>The most common misconception about gross margin is that a high number is always good and a low number is always bad. Context is everything. Grocery chains like Walmart operate at gross margins of 24–25% and generate enormous shareholder value at scale. Software-as-a-service companies often run at 70–80% gross margins and still destroy capital if their sales costs are too high. The useful comparison is always margin versus industry peers, margin versus the company's own history, and margin trajectory — is it expanding, stable, or compressing? A 73% gross margin at Broadcom would be the envy of nearly any manufacturer on earth. The problem was not the absolute level but the direction: Wall Street had modeled 78%, and the 500-basis-point gap told analysts that something in the pricing or cost structure had changed. Direction matters as much as level.</p>
+
+<p>Gross margin can mislead when companies change how they classify costs. Some expenses can be reported either as COGS or as <strong>operating expenses</strong>, depending on management's accounting choices. A company that shifts depreciation or certain labor costs below the gross margin line will appear to have better gross margins without any underlying improvement in the business. Similarly, <strong>revenue mix shifts</strong> can move gross margin significantly without any change in individual product economics — if a high-margin product line slows while a low-margin one accelerates, reported gross margin falls even if the company is executing perfectly on each individual product. This is precisely what analysts suspected was happening with Broadcom: the surge in AI revenue was real, but it was pulling the blended margin down because custom silicon carries inherently tighter economics than switching infrastructure.</p>
+
+<p>Gross margin connects directly to <strong>pricing power</strong>, <strong>competitive moats</strong>, and the broader question of who captures value in a supply chain. The FICO story from the same week is a useful counterpoint. FICO's entire business model rested on charging $10 or more per credit score pull in a market where it was effectively the only accepted option. That pricing power — reflected in extraordinary margins — looked permanent until a regulator directed Fannie Mae and Freddie Mac to accept the competing VantageScore, which charges roughly $0.99. The moat was not technology or switching costs; it was regulatory incumbency. The moment that changed, FICO lost 17.5% in a single session. What the market was really repricing was the gross margin outlook: if lenders migrate to VantageScore, FICO's revenue per transaction collapses by roughly 90%, taking gross profit with it. Gross margin, in other words, is not just an accounting line — it is a measure of how defensible a business truly is.</p>
+
+<blockquote>"This market is not rejecting AI. It's repricing who keeps the money." <cite>— Mark Malik, Wall Street Truth Bombs</cite></blockquote>
+
+<p>When gross margins break down at scale, the consequences compound through every line below. A five-point margin compression on $35 billion in quarterly revenue is roughly $1.75 billion in gross profit — and that shortfall flows directly into <strong>operating income</strong>, <strong>EBITDA</strong>, and ultimately <strong>earnings per share</strong>. Analysts who model discounted cash flows then revise their estimates downward, which raises the implied <strong>discount rate</strong> needed to justify the current stock price, which compresses the valuation multiple the market is willing to pay. This is why Mark Malik described Friday's sell-off as a discount rate problem rather than a growth problem: the economy was strong, AI demand was surging, but the market was recalculating how much of that growth would actually land in shareholders' pockets. Gross margin is where that calculation begins — and in a high-rate environment where capital is expensive, how much you keep matters more than how fast you grow.</p>
+<div class="concept-side">Sources: THE JOBS GUT PUNCH: Why Good News Sold Off Wall Street &amp; Crushed Tech!<br>Related in this category: <a href="interest_coverage_ratio.html">Interest Coverage Ratio</a>, <a href="loan_loss_provisions.html">Loan Loss Provisions (Agricultural)</a>, <a href="comparable_store_sales.html">Comparable Store Sales (Comp Sales / Same-Store Sales)</a>, <a href="earnings_quality.html">Earnings Quality (Adjusted vs. Reported Earnings)</a></div>
+<button class="concept-done" data-slug="gross_margin" onclick="toggleDone('gross_margin')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_gross_margin';</script>
+<script src="../../book.js"></script>
+
+<script>
+(function() {
+  var DONE_KEY = 'fg_done', FILTER_KEY = 'fg_filter';
+  var done = JSON.parse(localStorage.getItem(DONE_KEY) || '{}');
+  var filter = localStorage.getItem(FILTER_KEY) || 'all';
+
+  function visible(flag) {
+    if (filter === 'star') return flag === 'star';
+    if (filter === 'nodeep') return flag !== 'deep';
+    return true;
+  }
+
+  function apply() {
+    var shown = 0, total = 0, hidden = 0;
+    document.querySelectorAll('.concept-row').forEach(function(r) {
+      var slug = r.dataset.slug, flag = r.dataset.flag;
+      total++;
+      if (done[slug]) r.classList.add('done'); else r.classList.remove('done');
+      if (visible(flag)) { r.classList.remove('fg-hidden'); shown++; }
+      else { r.classList.add('fg-hidden'); hidden++; }
+    });
+    document.querySelectorAll('.cat-card').forEach(function(card) {
+      var slugs = card.dataset.slugs ? card.dataset.slugs.split(',') : [];
+      var flags = card.dataset.flags ? card.dataset.flags.split(',') : [];
+      var vis = 0, allDone = slugs.length > 0;
+      slugs.forEach(function(sl, i) {
+        if (visible(flags[i])) vis++;
+        if (!done[sl]) allDone = false;
+      });
+      total += slugs.length; shown += vis;
+      var c = card.querySelector('.cat-count');
+      if (c) c.textContent = vis + (vis !== slugs.length ? ' of ' + slugs.length : '') + ' concepts' +
+        (card.dataset.stars ? ' \u00b7 ' + card.dataset.stars + ' \u2605' : '');
+      if (vis === 0) card.classList.add('fg-empty'); else card.classList.remove('fg-empty');
+      if (allDone) card.classList.add('done'); else card.classList.remove('done');
+    });
+    document.querySelectorAll('[data-filter]').forEach(function(b) {
+      b.classList.toggle('active', b.dataset.filter === filter);
+    });
+    var n = document.getElementById('fgCount');
+    if (n) n.textContent = shown + ' of ' + total + ' shown';
+    var h = document.getElementById('fgHiddenNote');
+    if (h) h.textContent = hidden ? hidden + ' hidden by the filter.' : '';
+    var btn = document.querySelector('.concept-done');
+    if (btn) {
+      var on = !!done[btn.dataset.slug];
+      btn.classList.toggle('on', on);
+      btn.textContent = on ? '\u2713 Completed' : '\u2713 Mark complete';
+    }
+  }
+
+  window.setFilter = function(f) {
+    filter = f; localStorage.setItem(FILTER_KEY, f); apply();
+  };
+  window.toggleDone = function(slug) {
+    if (done[slug]) delete done[slug]; else done[slug] = true;
+    localStorage.setItem(DONE_KEY, JSON.stringify(done));
+    apply();
+  };
+  window.toggleHideDone = function() {
+    document.body.classList.toggle('hide-done');
+  };
+  apply();
+})();
+</script>
+
+</body>
+</html>

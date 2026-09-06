@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Real Yields (Inflation-Adjusted Treasury Returns) - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.tier .tier-desc { color: #a08060; font-size: 0.85rem; margin: 0.4rem 0 0.8rem; }
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../fixed-income-bonds.html">&larr; Fixed Income &amp; Bonds</a>
+
+<div class="concept-meta"><span><span class="star">&#9733;</span> must-know</span><span>Fixed Income &amp; Bonds</span><span>added 2026-09-04</span></div>
+<h4 id="real_yields">Real Yields (Inflation-Adjusted Treasury Returns)</h4>
+
+<p>When you hear that a Treasury bond pays 4.5%, that number is hiding something important. That figure is the <strong>nominal yield</strong> — the raw interest rate printed on the bond before inflation takes its cut. The number that actually matters to your purchasing power is the <strong>real yield</strong>, which subtracts the expected inflation rate from that nominal figure. If a 10-year Treasury yields 4.5% and inflation is running at 3%, your real yield is roughly 1.5%. That 1.5% is what you're actually earning in terms of goods and services you can buy with the proceeds. Real yields answer the only question that matters to a rational investor: after the dollar loses value over time, am I actually getting richer by lending to the government?</p>
+
+<p>Real yields matter because they set the true cost of money across the entire economy. When real yields rise, every alternative investment gets measured against a higher bar. Stocks, commodities, real estate, and gold all compete with Treasuries for capital — but they compete on <em>real</em> terms, not nominal ones. A stock trading at 25x earnings looks more expensive when safe government debt pays 2% in real terms than when it pays negative 1%. Corporate borrowing costs rise in real terms, which slows investment and hiring. Mortgage rates feel heavier. The whole economy tightens not because nominal rates moved, but because the inflation-adjusted cost of capital increased. This is why central bank watchers spend more time studying real yields than the headline Fed funds rate.</p>
+
+<p>The mechanism works through two levers pulled simultaneously. The <strong>nominal Treasury yield</strong> responds to Fed policy, bond supply and demand, and growth expectations. <strong>Inflation expectations</strong> — usually measured by the breakeven rate embedded in <strong>Treasury Inflation-Protected Securities (TIPS)</strong> — respond to commodity prices, wage data, and monetary policy credibility. Real yield is simply the difference: nominal yield minus breakeven inflation. When the Fed raises rates aggressively and inflation expectations remain anchored, real yields surge. When inflation expectations spike faster than nominal yields rise, real yields fall or go negative. The Fed controls one input directly; the market sets the other. Real yields are where those two forces meet.</p>
+
+<p>The most vivid recent demonstration came during the 2022 rate-hiking cycle. At the start of 2022, the 10-year real yield was deeply negative — around <strong>-1%</strong> — because inflation had surged to 8% while nominal yields were still near 2%. Gold was near $2,000. Then the Fed embarked on the fastest tightening cycle in four decades. By late 2023, 10-year real yields had climbed above <strong>+2.5%</strong>, their highest level in fifteen years. Gold fell from its highs and spent months struggling to gain traction. Every percentage point gained in real yield represented genuine competition: investors could now earn a meaningful after-inflation return from the safest instrument on earth, without holding any commodity that pays zero yield and costs money to store.</p>
+
+<p>Traders watch real yields through the <strong>TIPS market</strong> directly. The 10-year TIPS yield is quoted in real terms — it already strips out inflation — so you can read the real yield straight off the screen without doing math. When 10-year TIPS yields move from 0.5% to 1.5%, that 100 basis point move is purely in real purchasing-power terms. Active investors also track the spread between nominal Treasuries and TIPS of the same maturity, called the <strong>breakeven inflation rate</strong>, to gauge where the market thinks inflation is heading. A rising breakeven with stable nominal yields means real yields are falling — bullish for gold and risk assets. Rising nominal yields with a flat breakeven means real yields are rising — bearish for zero-yield assets and growth stocks.</p>
+
+<p>The video frames this precisely: real yields are "the true competition gold is losing to right now." Gold pays no interest, no dividend, no coupon. Its entire investment case rests on being a store of value when paper money is being debased. But when a government bond — backed by the full faith and credit of the U.S. — pays you a positive real return, gold's zero-yield profile becomes a genuine disadvantage. You're not just giving up nominal interest by holding gold; you're giving up real purchasing-power growth. The higher real yields climb, the more you're sacrificing to hold an ounce of metal. This relationship is so reliable that the inverse correlation between gold prices and real yields has been one of the most consistent relationships in macro markets for decades.</p>
+
+<blockquote>"Real yields — not the headline Fed funds rate — as 'the true competition gold is losing to right now.' Watch real yields because a rising real yield makes gold's zero-yield profile increasingly unattractive relative to inflation-protected treasuries."</blockquote>
+
+<p>The most common misconception about real yields is conflating them with nominal yields. In 2020 and 2021, the Fed cut nominal rates to near zero — which looked accommodative — but inflation collapsed too, briefly, then surged. Gold's extraordinary rally during those years wasn't caused by low nominal rates alone; it was caused by deeply <em>negative</em> real yields. Investors holding TIPS were effectively paying the government to keep their money safe in real terms. In that environment, gold's zero yield looked competitive. The trap investors fall into is watching the Fed's headline rate announcements and extrapolating directly to gold or bond prices without doing the inflation adjustment. A 5% Fed funds rate in a 5% inflation environment is actually more accommodative in real terms than a 2% rate in a 0.5% inflation environment.</p>
+
+<p>Real yields can break down or send false signals in a few important ways. First, TIPS breakeven rates are market prices, not actual future inflation — they reflect what bond investors expect and are willing to pay for, which can diverge sharply from realized inflation during supply shocks or geopolitical crises. Second, when real yields go deeply negative (as they did in 2020-2021), the relationship with gold becomes less precise because gold stops competing with bonds and starts trading as a fear asset or currency hedge. Third, very high real yields can signal recession risk rather than opportunity — if nominal yields are rising because credit quality fears are building, the real yield calculation gives a misleading picture of investor confidence. The number is a useful compass, not a trading algorithm. Always ask <em>why</em> real yields are moving before acting on the direction of the move.</p>
+
+<p>Real yields connect directly to several other core concepts in macro investing. They are the denominator in equity valuation models — higher real discount rates compress the present value of future earnings, which is why growth stocks with earnings far in the future are particularly sensitive to real yield moves. They drive the <strong>dollar</strong>, because rising U.S. real yields attract capital from around the world seeking better inflation-adjusted returns, increasing demand for dollars to buy U.S. assets. They affect <strong>emerging market debt</strong> dramatically, because many EM countries borrow in dollars and service those debts while their own currencies compete with rising U.S. real yields. And they explain the gold-silver divergence the video describes: silver's industrial demand creates a floor that gold — purely monetary, purely yield-sensitive — doesn't have. Understanding real yields is understanding the water table beneath almost every asset price in modern markets.</p>
+<div class="concept-side">Sources: THE GREAT METALS DIVIDE: Why Gold Crashed 20% While Silver Exploded 60%!<br>Related in this category: <a href="two_year_treasury_yield.html">Two-Year Treasury Yield</a>, <a href="treasury_bond_buyback_program.html">Treasury Bond Buyback Program</a>, <a href="thirty_year_treasury_bond.html">30-Year Treasury Bond</a>, <a href="debt_rollover_risk.html">Debt Rollover Risk</a>, <a href="corporate_refinancing_cliff.html">Corporate Refinancing Cliff</a>, <a href="duration_risk.html">Duration Risk</a></div>
+<button class="concept-done" data-slug="real_yields" onclick="toggleDone('real_yields')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_real_yields';</script>
+<script src="../../book.js"></script>
+
+<script>
+(function() {
+  var DONE_KEY = 'fg_done', FILTER_KEY = 'fg_filter';
+  var done = JSON.parse(localStorage.getItem(DONE_KEY) || '{}');
+  var filter = localStorage.getItem(FILTER_KEY) || 'all';
+
+  function visible(flag) {
+    if (filter === 'star') return flag === 'star';
+    if (filter === 'nodeep') return flag !== 'deep';
+    return true;
+  }
+
+  function apply() {
+    var shown = 0, total = 0, hidden = 0;
+    document.querySelectorAll('.concept-row').forEach(function(r) {
+      var slug = r.dataset.slug, flag = r.dataset.flag;
+      total++;
+      if (done[slug]) r.classList.add('done'); else r.classList.remove('done');
+      if (visible(flag)) { r.classList.remove('fg-hidden'); shown++; }
+      else { r.classList.add('fg-hidden'); hidden++; }
+    });
+    document.querySelectorAll('.cat-card').forEach(function(card) {
+      var slugs = card.dataset.slugs ? card.dataset.slugs.split(',') : [];
+      var flags = card.dataset.flags ? card.dataset.flags.split(',') : [];
+      var vis = 0, allDone = slugs.length > 0;
+      slugs.forEach(function(sl, i) {
+        if (visible(flags[i])) vis++;
+        if (!done[sl]) allDone = false;
+      });
+      total += slugs.length; shown += vis;
+      var c = card.querySelector('.cat-count');
+      if (c) c.textContent = vis + (vis !== slugs.length ? ' of ' + slugs.length : '') + ' concepts' +
+        (card.dataset.stars ? ' \u00b7 ' + card.dataset.stars + ' \u2605' : '');
+      if (vis === 0) card.classList.add('fg-empty'); else card.classList.remove('fg-empty');
+      if (allDone) card.classList.add('done'); else card.classList.remove('done');
+    });
+    document.querySelectorAll('[data-filter]').forEach(function(b) {
+      b.classList.toggle('active', b.dataset.filter === filter);
+    });
+    var n = document.getElementById('fgCount');
+    if (n) n.textContent = shown + ' of ' + total + ' shown';
+    var h = document.getElementById('fgHiddenNote');
+    if (h) h.textContent = hidden ? hidden + ' hidden by the filter.' : '';
+    var btn = document.querySelector('.concept-done');
+    if (btn) {
+      var on = !!done[btn.dataset.slug];
+      btn.classList.toggle('on', on);
+      btn.textContent = on ? '\u2713 Completed' : '\u2713 Mark complete';
+    }
+  }
+
+  window.setFilter = function(f) {
+    filter = f; localStorage.setItem(FILTER_KEY, f); apply();
+  };
+  window.toggleDone = function(slug) {
+    if (done[slug]) delete done[slug]; else done[slug] = true;
+    localStorage.setItem(DONE_KEY, JSON.stringify(done));
+    apply();
+  };
+  window.toggleHideDone = function() {
+    document.body.classList.toggle('hide-done');
+  };
+  apply();
+})();
+</script>
+
+</body>
+</html>

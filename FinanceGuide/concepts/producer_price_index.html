@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Producer Price Index (PPI) - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.tier .tier-desc { color: #a08060; font-size: 0.85rem; margin: 0.4rem 0 0.8rem; }
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../economic-indicators.html">&larr; Economic Indicators</a>
+
+<div class="concept-meta"><span><span class="star">&#9733;</span> must-know</span><span>Economic Indicators</span><span>added 2026-09-06</span></div>
+<h4 id="producer_price_index">Producer Price Index (PPI)</h4>
+
+<p>The <strong>Producer Price Index (PPI)</strong> measures the average change in prices that domestic producers receive for their output — the prices at the factory gate, warehouse dock, or farm before goods reach the consumer. Think of it as inflation measured from the seller's side rather than the buyer's side. The U.S. <strong>Bureau of Labor Statistics (BLS)</strong> publishes it monthly, tracking thousands of goods and services across industries including agriculture, mining, manufacturing, and construction. While most people have heard of the <strong>Consumer Price Index (CPI)</strong>, PPI is the earlier read — it captures price pressure before it moves downstream to store shelves and restaurant menus. When producers pay more to make things, they eventually charge more to sell them.</p>
+
+<p>PPI matters because it functions as a leading indicator of consumer inflation. There is a transmission lag — typically weeks to a few months — between rising producer costs and rising retail prices. A jump in PPI today is a warning that CPI may climb tomorrow. For the <strong>Federal Reserve</strong>, which sets monetary policy with one eye on inflation, PPI data is an early advisory signal. For bond markets, it influences expectations about future rate hikes. For equity markets, it shapes earnings forecasts: companies that cannot pass higher input costs to customers see their profit margins compressed. PPI is not just an economic statistic — it is a forward-looking pressure gauge that smart market participants read before the more widely watched CPI arrives.</p>
+
+<p>Mechanically, the BLS collects price data from roughly 100,000 monthly reports covering about 25,000 establishments. The index is organized in three tiers. <strong>Finished goods PPI</strong> covers products ready for sale to end users. <strong>Intermediate goods PPI</strong> tracks partially processed materials that require further work. <strong>Crude goods PPI</strong> (also called raw materials) captures commodities like oil, grain, and lumber at their rawest stage. Price shocks typically enter at the crude level and ripple upward through intermediate processing before landing in finished goods prices. This pipeline structure is why energy prices — crude oil especially — are so closely watched within PPI. They hit the crude tier first, then compress or expand margins at every subsequent stage of production.</p>
+
+<p>The week covered in the video illustrates this pipeline perfectly. <strong>West Texas Intermediate crude oil</strong> had closed at $89.38, up 7% in a single week — its best performance since July. <strong>Diesel prices hit a record high.</strong> Diesel is not a niche commodity. Every truck on every highway burns it. Every freight shipment, every grocery pallet, every manufactured component that moves between a factory and a distribution center carries a diesel cost embedded in its price. When diesel spikes, freight costs rise almost immediately. Those freight costs land on producers' income statements within days. The August PPI report, due the following Thursday, would be the first official government data to show whether those energy and freight shocks had begun feeding into the broader price level — or whether producers were absorbing the hit in their own margins.</p>
+
+<blockquote>"This is the first inflation print that can capture what $89 oil and record diesel prices are doing to our wallets." <cite>— Mark Malik, Wall Street Truth Bombs</cite></blockquote>
+
+<p>Traders and investors use PPI in two primary ways: as a directional signal for CPI and as a margin signal for corporate earnings. On the inflation signal side, a hot PPI print increases the probability that CPI will come in elevated, which raises the odds of a <strong>Fed rate hike</strong> — or, in a hiking cycle, delays any pivot toward cuts. In the week described, <strong>September rate hike odds</strong> had already jumped to roughly 62% after the strong jobs report. A PPI print confirming energy pass-through would have reinforced those odds further, likely pushing yields higher and repricing risk assets downward. On the earnings side, sector analysts compare PPI sub-indexes to what companies report as their <strong>cost of goods sold (COGS)</strong>. If the PPI for industrial metals rises 5% and a manufacturer's input costs rise similarly, margin compression is already baked in before the earnings report arrives.</p>
+
+<p>The most important nuance about PPI is that it measures what producers <em>receive</em>, not what they <em>spend</em>. A company that buys steel is watching a different index than a company that sells it. Investors should also separate <strong>headline PPI</strong> from <strong>core PPI</strong>, which strips out food and energy — the same distinction made with CPI. Because energy is so volatile, headline PPI can swing sharply in a single month on crude oil moves alone, then reverse just as quickly. The Fed and most sophisticated analysts pay closer attention to core PPI and to the <strong>PPI for final demand services</strong>, which has become increasingly important as the U.S. economy has shifted toward services. A services-heavy PPI increase is stickier and harder to reverse than an energy-driven spike.</p>
+
+<p>PPI can break down as a leading indicator in a few important scenarios. The most common failure mode is <strong>margin compression</strong> — producers absorb rising input costs rather than passing them through, so PPI rises but CPI does not. This happens in highly competitive industries where no single producer has pricing power. The reverse is also possible: producers raise prices even when input costs fall, pocketing wider margins. Either scenario severs the predictive link between PPI and CPI. A second failure mode occurs during <strong>demand shocks</strong>. If consumer demand collapses suddenly, producers cannot pass through higher costs regardless of what their inputs do — PPI can signal inflation while the economy is actually tipping toward recession. Reading PPI in isolation, without cross-referencing demand data like retail sales and consumer sentiment, produces false signals.</p>
+
+<p>PPI sits in a web of interconnected indicators. <strong>ISM Manufacturing Prices Paid</strong> and <strong>ISM Services Prices Paid</strong> are surveyed indexes that provide early monthly reads on the same pipeline — in the video, manufacturing prices held at 71.1 and services prices climbed to 72.6, both pointing to sustained input cost pressure. <strong>Import price indexes</strong> capture a related channel: goods arriving from abroad. <strong>Employment Cost Index (ECI)</strong> feeds into services PPI through labor costs. And at the top of the chain, <strong>commodity indexes</strong> — oil, natural gas, copper, agricultural inputs — lead PPI itself. Understanding PPI means understanding it as one relay station in a longer transmission chain that starts with raw commodity prices and ends, eventually, in what consumers pay at checkout. Watch where the pressure is entering the chain, and you can anticipate where it will arrive next.</p>
+<div class="concept-side">Sources: THE JOBS GUT PUNCH: Why Good News Sold Off Wall Street &amp; Crushed Tech!<br>Related in this category: <a href="inflation_breadth.html">Inflation Breadth</a>, <a href="congressional_budget_office_projections.html">Congressional Budget Office (CBO) Projections</a>, <a href="financial_conditions_index.html">Financial Conditions Index</a>, <a href="core_pce.html">Core PCE (Personal Consumption Expenditures)</a>, <a href="consumer_credit_card_delinquency_rate.html">Consumer Credit Card Delinquency Rate</a>, <a href="total_consumer_debt.html">Total Household / Consumer Debt</a></div>
+<button class="concept-done" data-slug="producer_price_index" onclick="toggleDone('producer_price_index')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_producer_price_index';</script>
+<script src="../../book.js"></script>
+
+<script>
+(function() {
+  var DONE_KEY = 'fg_done', FILTER_KEY = 'fg_filter';
+  var done = JSON.parse(localStorage.getItem(DONE_KEY) || '{}');
+  var filter = localStorage.getItem(FILTER_KEY) || 'all';
+
+  function visible(flag) {
+    if (filter === 'star') return flag === 'star';
+    if (filter === 'nodeep') return flag !== 'deep';
+    return true;
+  }
+
+  function apply() {
+    var shown = 0, total = 0, hidden = 0;
+    document.querySelectorAll('.concept-row').forEach(function(r) {
+      var slug = r.dataset.slug, flag = r.dataset.flag;
+      total++;
+      if (done[slug]) r.classList.add('done'); else r.classList.remove('done');
+      if (visible(flag)) { r.classList.remove('fg-hidden'); shown++; }
+      else { r.classList.add('fg-hidden'); hidden++; }
+    });
+    document.querySelectorAll('.cat-card').forEach(function(card) {
+      var slugs = card.dataset.slugs ? card.dataset.slugs.split(',') : [];
+      var flags = card.dataset.flags ? card.dataset.flags.split(',') : [];
+      var vis = 0, allDone = slugs.length > 0;
+      slugs.forEach(function(sl, i) {
+        if (visible(flags[i])) vis++;
+        if (!done[sl]) allDone = false;
+      });
+      total += slugs.length; shown += vis;
+      var c = card.querySelector('.cat-count');
+      if (c) c.textContent = vis + (vis !== slugs.length ? ' of ' + slugs.length : '') + ' concepts' +
+        (card.dataset.stars ? ' \u00b7 ' + card.dataset.stars + ' \u2605' : '');
+      if (vis === 0) card.classList.add('fg-empty'); else card.classList.remove('fg-empty');
+      if (allDone) card.classList.add('done'); else card.classList.remove('done');
+    });
+    document.querySelectorAll('[data-filter]').forEach(function(b) {
+      b.classList.toggle('active', b.dataset.filter === filter);
+    });
+    var n = document.getElementById('fgCount');
+    if (n) n.textContent = shown + ' of ' + total + ' shown';
+    var h = document.getElementById('fgHiddenNote');
+    if (h) h.textContent = hidden ? hidden + ' hidden by the filter.' : '';
+    var btn = document.querySelector('.concept-done');
+    if (btn) {
+      var on = !!done[btn.dataset.slug];
+      btn.classList.toggle('on', on);
+      btn.textContent = on ? '\u2713 Completed' : '\u2713 Mark complete';
+    }
+  }
+
+  window.setFilter = function(f) {
+    filter = f; localStorage.setItem(FILTER_KEY, f); apply();
+  };
+  window.toggleDone = function(slug) {
+    if (done[slug]) delete done[slug]; else done[slug] = true;
+    localStorage.setItem(DONE_KEY, JSON.stringify(done));
+    apply();
+  };
+  window.toggleHideDone = function() {
+    document.body.classList.toggle('hide-done');
+  };
+  apply();
+})();
+</script>
+
+</body>
+</html>

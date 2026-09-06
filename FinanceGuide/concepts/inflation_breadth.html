@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Inflation Breadth - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.tier .tier-desc { color: #a08060; font-size: 0.85rem; margin: 0.4rem 0 0.8rem; }
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../economic-indicators.html">&larr; Economic Indicators</a>
+
+<div class="concept-meta"><span>deep cut</span><span>Economic Indicators</span><span>added 2026-08-31</span></div>
+<h4 id="inflation_breadth">Inflation Breadth</h4>
+
+<p>Most people track inflation by watching a single number — the headline rate. When the Consumer Price Index or <strong>Personal Consumption Expenditures (PCE)</strong> index comes in at 2.7%, that's the figure that makes headlines, gets quoted by politicians, and drives cocktail party arguments. But that single number hides something crucial: it's an average, and averages can lie. <strong>Inflation breadth</strong> measures not how much prices are rising on average, but how widely price increases are spread across the economy. It asks a different question entirely — not "how hot is inflation?" but "how many things are still inflating?" The distinction sounds subtle. The market implications are enormous.</p>
+
+<p>To understand why breadth matters, imagine two economies with identical 2.7% headline inflation. In the first, a handful of volatile categories — gasoline, airfares, used cars — are screaming higher while everything else is flat or falling. In the second, prices are rising moderately in nearly every category across the board. The headline number looks the same. The underlying reality is completely different. The first economy probably has a supply shock that will resolve on its own. The second has embedded, systemic inflation baked into wages, services, and consumer habits. Central banks treat these two situations very differently, and so should investors. Breadth tells you which world you're living in.</p>
+
+<p>The mechanics work through the PCE basket, which the Federal Reserve prefers over CPI because it better captures how consumers actually substitute between goods. The government tracks <strong>199 individual components</strong> within that basket — everything from physician services and rent to pet food and car insurance. <strong>Inflation breadth</strong> is simply the percentage of those 199 components currently rising above a given threshold, typically 3% annualized. When that percentage is high, inflation is broad-based and sticky. When it's low, inflation is narrow and likely temporary. The Fed watches this metric alongside the headline because it distinguishes between inflation that monetary policy can kill and inflation that will die on its own.</p>
+
+<p>At the Jackson Hole conference in 2026, Fed Chairman <strong>Kevin Warsh</strong> did something unusual for a sitting Fed chair: he opened the hood and showed the market the engine. He revealed that over the prior 12 months, <strong>54% of the 199 PCE components</strong> were still rising above 3% annually. Looking at just the most recent 6 months, the figure was still 49%. For context, the pre-COVID norm — the two-decade baseline before the pandemic distorted everything — was roughly <strong>32%</strong>. The post-pandemic peak had hit 77%. So while breadth had come down substantially from crisis levels, it remained nearly double what the Fed considers normal. That wasn't a victory lap. That was a warning.</p>
+
+<blockquote>"When a sitting Fed chair stands up and tells traders that more than half the economy is still inflating above target, algorithms don't wait around for nuance. They reprice instantly." <cite>— The Jackson Hole Trap</cite></blockquote>
+
+<p>The market reaction was swift and mechanical. The <strong>two-year Treasury yield</strong> — the bond market's most direct pricing mechanism for Fed policy expectations — jumped past 4.3% within minutes of Warsh finishing his remarks. Gold sold off. Bitcoin dropped. Risk assets across the board repriced lower. Why? Because algorithmic trading systems are built to scan central bank language for policy signals and execute in milliseconds. When breadth data showed that inflation wasn't a narrow statistical artifact — it was a majority-of-the-economy phenomenon — those systems concluded that rate cuts were not coming soon, a hike was possible, and the cost of capital was going higher. Every asset priced against future money flows felt that instantly.</p>
+
+<p>Traders use inflation breadth as a <strong>leading indicator for Fed policy duration</strong> — meaning how long rates stay elevated, not just how high they go. Narrow inflation (low breadth) suggests the Fed can cut once a few volatile categories cool. Broad inflation (high breadth) means the Fed has to stay restrictive until wage growth slows, services prices normalize, and consumer habits reset — a much longer process. Professional money managers watch the <strong>trimmed mean PCE</strong> and the <strong>sticky CPI</strong> (components that change prices infrequently) alongside breadth figures precisely because these measures strip out noise and reveal the underlying inflation persistence. When breadth is high, duration risk in bond portfolios rises, growth stocks get hit harder, and commodities-as-inflation-hedge narratives get complicated.</p>
+
+<p>The most common misconception about inflation breadth is confusing it with inflation severity. A 54% breadth reading doesn't mean most things are rising 5% or 10% — it means most things are rising above 3%, which could be 3.1%. The economy can have high breadth and moderate severity simultaneously, which is actually the most dangerous configuration for central banks. It's too broad to ignore, too mild to justify aggressive action, and too sticky to resolve quickly. The Fed is caught between credibility (it must hit 2%) and pragmatism (hiking too hard causes a recession). Warsh's speech was a signal that the Fed was choosing credibility. Markets understood that immediately even if the financial press reduced it to the word "hawkish."</p>
+
+<p>Inflation breadth can also mislead when the composition of the basket shifts. If the government reweights the PCE basket — which it does periodically — the breadth calculation changes without inflation itself changing. Similarly, breadth can fall rapidly if a few large categories (like housing, which carries outsized weight) cool quickly, dragging the headline lower even as dozens of smaller categories remain hot. The breadth figure from component counts treats a category weighted at 0.1% the same as one weighted at 15%, so a sharp drop in breadth doesn't always mean monetary conditions are genuinely improving. Sophisticated analysts cross-check breadth against <strong>weighted breadth</strong> — where components are weighted by their share of total consumer spending — to get a more accurate picture.</p>
+
+<p>Inflation breadth connects directly to several concepts that together form the architecture of monetary policy decisions: the <strong>neutral rate</strong> (the theoretical rate that neither stimulates nor restricts growth), <strong>real yields</strong> (nominal rates minus inflation expectations), and <strong>term premium</strong> (the extra yield investors demand for holding long-dated bonds). When breadth is high, the neutral rate itself may be higher than pre-pandemic models assumed, meaning the Fed isn't actually restricting as much as the headline rate implies. That insight — that 4.3% might not even be tight in a 54%-breadth world — is what sophisticated bond traders were pricing in the afternoon of Warsh's speech. It's also why the video argues this wasn't a story about one speech. It was a story about the structural $40 trillion debt problem underneath, which no amount of hawkish language can actually resolve.</p>
+<div class="concept-side">Sources: THE JACKSON HOLE TRAP: Why Kevin Warsh Just Crashed Gold &amp; Bitcoin!<br>Related in this category: <a href="congressional_budget_office_projections.html">Congressional Budget Office (CBO) Projections</a>, <a href="financial_conditions_index.html">Financial Conditions Index</a>, <a href="core_pce.html">Core PCE (Personal Consumption Expenditures)</a>, <a href="consumer_credit_card_delinquency_rate.html">Consumer Credit Card Delinquency Rate</a>, <a href="total_consumer_debt.html">Total Household / Consumer Debt</a>, <a href="pawn_receivables_economic_indicator.html">Pawn Receivables as Shadow Economic Indicator</a></div>
+<button class="concept-done" data-slug="inflation_breadth" onclick="toggleDone('inflation_breadth')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_inflation_breadth';</script>
+<script src="../../book.js"></script>
+
+<script>
+(function() {
+  var DONE_KEY = 'fg_done', FILTER_KEY = 'fg_filter';
+  var done = JSON.parse(localStorage.getItem(DONE_KEY) || '{}');
+  var filter = localStorage.getItem(FILTER_KEY) || 'all';
+
+  function visible(flag) {
+    if (filter === 'star') return flag === 'star';
+    if (filter === 'nodeep') return flag !== 'deep';
+    return true;
+  }
+
+  function apply() {
+    var shown = 0, total = 0, hidden = 0;
+    document.querySelectorAll('.concept-row').forEach(function(r) {
+      var slug = r.dataset.slug, flag = r.dataset.flag;
+      total++;
+      if (done[slug]) r.classList.add('done'); else r.classList.remove('done');
+      if (visible(flag)) { r.classList.remove('fg-hidden'); shown++; }
+      else { r.classList.add('fg-hidden'); hidden++; }
+    });
+    document.querySelectorAll('.cat-card').forEach(function(card) {
+      var slugs = card.dataset.slugs ? card.dataset.slugs.split(',') : [];
+      var flags = card.dataset.flags ? card.dataset.flags.split(',') : [];
+      var vis = 0, allDone = slugs.length > 0;
+      slugs.forEach(function(sl, i) {
+        if (visible(flags[i])) vis++;
+        if (!done[sl]) allDone = false;
+      });
+      total += slugs.length; shown += vis;
+      var c = card.querySelector('.cat-count');
+      if (c) c.textContent = vis + (vis !== slugs.length ? ' of ' + slugs.length : '') + ' concepts' +
+        (card.dataset.stars ? ' \u00b7 ' + card.dataset.stars + ' \u2605' : '');
+      if (vis === 0) card.classList.add('fg-empty'); else card.classList.remove('fg-empty');
+      if (allDone) card.classList.add('done'); else card.classList.remove('done');
+    });
+    document.querySelectorAll('[data-filter]').forEach(function(b) {
+      b.classList.toggle('active', b.dataset.filter === filter);
+    });
+    var n = document.getElementById('fgCount');
+    if (n) n.textContent = shown + ' of ' + total + ' shown';
+    var h = document.getElementById('fgHiddenNote');
+    if (h) h.textContent = hidden ? hidden + ' hidden by the filter.' : '';
+    var btn = document.querySelector('.concept-done');
+    if (btn) {
+      var on = !!done[btn.dataset.slug];
+      btn.classList.toggle('on', on);
+      btn.textContent = on ? '\u2713 Completed' : '\u2713 Mark complete';
+    }
+  }
+
+  window.setFilter = function(f) {
+    filter = f; localStorage.setItem(FILTER_KEY, f); apply();
+  };
+  window.toggleDone = function(slug) {
+    if (done[slug]) delete done[slug]; else done[slug] = true;
+    localStorage.setItem(DONE_KEY, JSON.stringify(done));
+    apply();
+  };
+  window.toggleHideDone = function() {
+    document.body.classList.toggle('hide-done');
+  };
+  apply();
+})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Duration Risk - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.tier .tier-desc { color: #a08060; font-size: 0.85rem; margin: 0.4rem 0 0.8rem; }
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../fixed-income-bonds.html">&larr; Fixed Income &amp; Bonds</a>
+
+<div class="concept-meta"><span><span class="star">&#9733;</span> must-know</span><span>Fixed Income &amp; Bonds</span><span>added 2026-08-31</span></div>
+<h4 id="duration_risk">Duration Risk</h4>
+
+<p><strong>Duration risk</strong> is the danger that the value of a bond or bond fund will fall when interest rates rise. It sounds simple, but most investors dramatically underestimate how severe that fall can be — and how much the length of a bond's term amplifies the damage. When you buy a bond, you're locking in a fixed stream of payments at a fixed rate. If rates in the broader market move higher after you buy, your bond suddenly looks less attractive than new bonds being issued at the higher rate. Nobody wants to pay full price for your old, lower-yielding bond. So its market price drops. The longer the bond's maturity, the more future payments are affected, and the larger the price drop. That's duration risk in a sentence: time amplifies rate sensitivity.</p>
+
+<p>Duration risk matters because the bond market is enormous — larger than the stock market — and it sits underneath nearly every corner of the financial system. Pension funds, insurance companies, bank balance sheets, and millions of retirement accounts hold long-term bonds as their "safe" allocation. When rates rise sharply, what felt like a conservative position turns into a significant loss. The 2022 rate-hike cycle was a brutal reminder: the Bloomberg U.S. Aggregate Bond Index fell roughly 13% that year, its worst calendar-year performance in decades. Long-duration Treasury funds fell 30% or more. People who thought they owned the "safe" part of their portfolio watched it decline as steeply as the stock market did in a mild correction.</p>
+
+<p>The mechanics work through a concept called the <strong>price-yield inverse relationship</strong>. Every bond has a fixed coupon — say 3% annually on a $1,000 face value. If market rates rise to 5%, new bonds pay $50 per year while yours pays only $30. For someone to buy your bond, they need a discount deep enough that the lower coupon still delivers a competitive return over the remaining life of the bond. The longer the bond runs, the more years of that below-market coupon accumulate, and the steeper the discount required. A rough rule: for every 1 percentage point rise in rates, a bond loses approximately its <strong>duration number</strong> in percentage terms. A 2-year bond loses about 2%. A 20-year bond loses about 20%. Same rate move, ten times the damage.</p>
+
+<p>The formal measure, called <strong>modified duration</strong>, is expressed in years and tells you exactly how sensitive a bond's price is to a 1% change in rates. A fund with a modified duration of 7 will lose roughly 7% of its value for every 1 percentage point increase in rates. The iShares 20+ Year Treasury ETF (TLT) has historically carried a duration above 17. In 2022, when the Fed raised rates by roughly 4.25 percentage points, the math was brutal: 17 times 4.25 gives you a theoretical loss of over 70%, though actual losses were cushioned somewhat by incoming coupon payments. TLT still fell roughly 33% in 2022 — a loss many retirees holding it as "safe income" never anticipated.</p>
+
+<p>The video's context makes duration risk acutely relevant. When Kevin Warsh stood at Jackson Hole and said he would be <em>hard pressed to describe broad financial conditions as restrictive right now</em>, he was signaling that the Fed may need to hike rates further — or at minimum, hold them higher for longer. Either outcome is negative for long-duration bonds. The market had been pricing in rate cuts; Warsh's remarks forced a repricing toward rates staying elevated or moving higher. Investors sitting in long-term bond funds expecting a bond rally from rate cuts suddenly faced the opposite scenario: more duration risk exposure, not less, just as the policy calculus was reversing.</p>
+
+<blockquote>"He warned that this summer's better than expected inflation prints do not mean underlying inflation trends have meaningfully improved." <cite>— Video narration on Warsh's Jackson Hole remarks</cite></blockquote>
+
+<p>Traders and investors use duration as a dial they consciously adjust based on their interest rate outlook. When you expect rates to fall, you want <strong>long duration</strong> — your bonds gain value as yields drop. When you expect rates to rise, you want <strong>short duration</strong> to minimize losses. The video's recommendation of short-dated two-year Treasuries over long-term bond funds is a direct application of this logic: two-year Treasuries carry a duration of roughly 1.9 years, meaning a 1% rate hike costs only about 1.9% in price. That's manageable. A long-term bond fund might carry 15-year duration — the same rate hike costs 15%. Active portfolio managers constantly shift their duration exposure based on their Fed outlook, moving down the yield curve when hikes are expected and extending duration when cuts are anticipated.</p>
+
+<p>The most common misconception is that bonds are simply "safe." They are safe from <strong>default risk</strong> when issued by the U.S. government — you will get your principal back at maturity. But they are not safe from <strong>price risk</strong> if you need to sell before maturity, or if you hold a bond fund (which never matures). A bond fund doesn't have a maturity date the way an individual bond does. It perpetually rolls over its holdings, which means it is always exposed to current market prices. This distinction trips up millions of investors who put money into a "bond fund" expecting stability, not realizing they own a vehicle whose price fluctuates daily based on where rates go — sometimes dramatically.</p>
+
+<p>Duration risk can intersect dangerously with <strong>inflation risk</strong>, <strong>liquidity risk</strong>, and systemic fragility. The 2023 collapse of Silicon Valley Bank illustrated this: SVB had parked billions in long-duration Treasuries and mortgage-backed securities during the low-rate era. When rates rose, those holdings lost significant market value. When depositors demanded cash, SVB had to sell those depressed bonds at a loss, crystallizing paper losses into real ones and triggering a bank run. The bonds were not defaulting — they were still U.S. government-backed instruments — but duration risk transformed a theoretically safe asset into a solvency crisis. Duration risk doesn't just affect individual investors; it can ripple through institutions and become a systemic event when enough balance sheets are similarly positioned.</p>
+
+<p>Duration risk connects directly to <strong>yield curve</strong> dynamics, <strong>monetary policy</strong> signals, and the concept of <strong>real vs. nominal rates</strong>. When inflation runs above the bond's coupon, the real return is negative even before accounting for price losses — doubling the punishment for long-duration holders in an inflationary environment. The Fed's tool of raising the <strong>federal funds rate</strong> works partly by transmitting through the bond market: higher short-term rates drag up yields across maturities, compressing the prices of existing bonds and tightening financial conditions broadly. Understanding duration risk means understanding that every Federal Reserve rate decision is simultaneously a repricing event for trillions of dollars in fixed-income assets — and that the direction and magnitude of that repricing depends critically on how long those bonds run.</p>
+<div class="concept-side">Sources: KEVIN WARSH DROPS THE HAMMER: Why a Fed Rate Hike Is Back on the Table!<br>Related in this category: <a href="two_year_treasury_yield.html">Two-Year Treasury Yield</a>, <a href="treasury_bond_buyback_program.html">Treasury Bond Buyback Program</a>, <a href="thirty_year_treasury_bond.html">30-Year Treasury Bond</a>, <a href="debt_rollover_risk.html">Debt Rollover Risk</a>, <a href="corporate_refinancing_cliff.html">Corporate Refinancing Cliff</a>, <a href="ten_year_treasury_yield_benchmark.html">10-Year Treasury Yield as Real Economy Benchmark</a></div>
+<button class="concept-done" data-slug="duration_risk" onclick="toggleDone('duration_risk')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_duration_risk';</script>
+<script src="../../book.js"></script>
+
+<script>
+(function() {
+  var DONE_KEY = 'fg_done', FILTER_KEY = 'fg_filter';
+  var done = JSON.parse(localStorage.getItem(DONE_KEY) || '{}');
+  var filter = localStorage.getItem(FILTER_KEY) || 'all';
+
+  function visible(flag) {
+    if (filter === 'star') return flag === 'star';
+    if (filter === 'nodeep') return flag !== 'deep';
+    return true;
+  }
+
+  function apply() {
+    var shown = 0, total = 0, hidden = 0;
+    document.querySelectorAll('.concept-row').forEach(function(r) {
+      var slug = r.dataset.slug, flag = r.dataset.flag;
+      total++;
+      if (done[slug]) r.classList.add('done'); else r.classList.remove('done');
+      if (visible(flag)) { r.classList.remove('fg-hidden'); shown++; }
+      else { r.classList.add('fg-hidden'); hidden++; }
+    });
+    document.querySelectorAll('.cat-card').forEach(function(card) {
+      var slugs = card.dataset.slugs ? card.dataset.slugs.split(',') : [];
+      var flags = card.dataset.flags ? card.dataset.flags.split(',') : [];
+      var vis = 0, allDone = slugs.length > 0;
+      slugs.forEach(function(sl, i) {
+        if (visible(flags[i])) vis++;
+        if (!done[sl]) allDone = false;
+      });
+      total += slugs.length; shown += vis;
+      var c = card.querySelector('.cat-count');
+      if (c) c.textContent = vis + (vis !== slugs.length ? ' of ' + slugs.length : '') + ' concepts' +
+        (card.dataset.stars ? ' \u00b7 ' + card.dataset.stars + ' \u2605' : '');
+      if (vis === 0) card.classList.add('fg-empty'); else card.classList.remove('fg-empty');
+      if (allDone) card.classList.add('done'); else card.classList.remove('done');
+    });
+    document.querySelectorAll('[data-filter]').forEach(function(b) {
+      b.classList.toggle('active', b.dataset.filter === filter);
+    });
+    var n = document.getElementById('fgCount');
+    if (n) n.textContent = shown + ' of ' + total + ' shown';
+    var h = document.getElementById('fgHiddenNote');
+    if (h) h.textContent = hidden ? hidden + ' hidden by the filter.' : '';
+    var btn = document.querySelector('.concept-done');
+    if (btn) {
+      var on = !!done[btn.dataset.slug];
+      btn.classList.toggle('on', on);
+      btn.textContent = on ? '\u2713 Completed' : '\u2713 Mark complete';
+    }
+  }
+
+  window.setFilter = function(f) {
+    filter = f; localStorage.setItem(FILTER_KEY, f); apply();
+  };
+  window.toggleDone = function(slug) {
+    if (done[slug]) delete done[slug]; else done[slug] = true;
+    localStorage.setItem(DONE_KEY, JSON.stringify(done));
+    apply();
+  };
+  window.toggleHideDone = function() {
+    document.body.classList.toggle('hide-done');
+  };
+  apply();
+})();
+</script>
+
+</body>
+</html>

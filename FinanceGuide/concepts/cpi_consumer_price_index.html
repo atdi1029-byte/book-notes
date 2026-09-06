@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>CPI (Consumer Price Index) - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.tier .tier-desc { color: #a08060; font-size: 0.85rem; margin: 0.4rem 0 0.8rem; }
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../economic-indicators.html">&larr; Economic Indicators</a>
+
+<div class="concept-meta"><span><span class="star">&#9733;</span> must-know</span><span>Economic Indicators</span><span>added 2026-09-05</span></div>
+<h4 id="cpi_consumer_price_index">CPI (Consumer Price Index)</h4>
+
+<p>The <strong>Consumer Price Index (CPI)</strong> is the most widely watched measure of inflation in the United States. Published monthly by the Bureau of Labor Statistics (BLS), it tracks how much a fixed "basket" of goods and services costs over time. That basket includes everyday purchases: groceries, rent, gasoline, medical care, clothing, and hundreds of other items that typical American households buy. When the CPI rises, it means prices in aggregate are going up — your dollar buys less than it did before. When it falls, prices are declining. For most people, CPI is just a number on the news. But for the Federal Reserve, financial markets, and anyone with a mortgage, it is one of the most consequential data releases in the entire economic calendar.</p>
+
+<p>CPI matters because it sits at the center of nearly every major financial decision in the economy. The <strong>Federal Reserve</strong> uses it as a primary input when deciding whether to raise, lower, or hold interest rates. When inflation runs hot — when CPI prints above the Fed's target of roughly 2% — the Fed tends to raise rates to cool spending and borrowing. When inflation is tame or falling, it has room to cut rates, which lowers the cost of mortgages, car loans, and business credit. This is why a single CPI release can move bond yields, stock markets, and currency values within seconds of publication. If you are renting, buying a home, carrying credit card debt, or investing in stocks, the CPI number affects your real financial life directly and immediately.</p>
+
+<p>Mechanically, the BLS constructs CPI by surveying prices on roughly 80,000 items each month across dozens of urban areas. These items are grouped into eight major categories: food, energy, shelter, apparel, transportation, medical care, recreation, and education. Each category is weighted by how much of a typical household's budget it consumes. Shelter, for instance, carries enormous weight — over one-third of the total index — because rent and equivalent housing costs dominate most budgets. The BLS then compares this month's prices to a historical baseline (currently 1982–1984 = 100) and calculates a percentage change. The <strong>year-over-year change</strong> is the headline number you hear reported: "CPI rose 3.2% in August." That means the same basket costs 3.2% more than it did twelve months ago.</p>
+
+<p>There are actually several flavors of CPI worth knowing. The <strong>headline CPI</strong> captures everything, including food and energy, which are notoriously volatile — a hurricane can spike gas prices in a single week. <strong>Core CPI</strong> strips out food and energy to reveal the underlying trend in price pressures, which is why economists and the Fed often focus on it more heavily. There is also <strong>CPI-W</strong>, used to calculate Social Security cost-of-living adjustments, and <strong>PCE (Personal Consumption Expenditures)</strong>, a separate inflation gauge that the Fed officially targets. Core PCE and core CPI tell similar stories but with slightly different weightings — PCE gives less weight to shelter, which is part of why the two numbers often diverge during housing booms or busts.</p>
+
+<p>The video makes the stakes of the CPI release vivid and immediate. Fed Governor Christopher Waller explicitly flagged the upcoming CPI print as <em>"the real decider"</em> for the September rate decision — meaning the jobs data alone, as dramatic as it was, could not settle the question. The 162,000 jobs print gave hawkish Fed members political cover to argue against rate cuts. But the inflation data was the confirmation they still needed. As the host framed it:</p>
+
+<blockquote>"By the end of this video, you're going to understand why the best jobs report in months is actually bad news for anyone renting, borrowing, or waiting on the Fed to finally cut rates."</blockquote>
+
+<p>The logic is direct: strong jobs data suggests the economy is running hot, which means consumers have money to spend, which means businesses can raise prices, which means inflation has less reason to fall. If CPI then confirms that inflation remains sticky, the Fed has both the justification and the political pressure to hold rates high — or even hike. That is the <strong>hawk-dove dynamic</strong> in concrete terms. Hawks want to keep rates high to kill inflation. Doves want to cut rates to protect jobs and growth. CPI is often the tiebreaker between them.</p>
+
+<p>Traders and investors use CPI releases as tactical signals with precision timing. In the hours before a CPI print, options markets price in expected volatility — traders buy or sell contracts on <strong>Treasury bonds</strong>, the S&amp;P 500, and the dollar based on their inflation forecasts. A hotter-than-expected CPI (above consensus) typically triggers a sell-off in bonds (driving yields up), a drop in growth stocks, and a rally in the dollar. A cooler-than-expected print does the opposite — bonds rally, rate-sensitive sectors like real estate and utilities surge, and the dollar weakens. The <strong>two-year Treasury yield</strong> is particularly sensitive to CPI because it most directly reflects where traders expect the Fed Funds Rate to go over the next 24 months. Watch it move in the seconds after a CPI release and you are watching markets reprice the future cost of money in real time.</p>
+
+<p>The most important nuance about CPI is its <strong>lag problem</strong>, particularly around shelter costs. The BLS measures rent inflation using a concept called <strong>Owners' Equivalent Rent (OER)</strong> — what homeowners estimate they would pay to rent their own home. This is a slow-moving survey-based measure that badly lags real-time market rents. When the private rental market was surging in 2021–2022, OER was still showing modest increases. When actual market rents started falling in 2023, OER kept pushing CPI higher for months afterward. This means CPI can significantly overstate or understate current inflation depending on where you are in the housing cycle. Critics argue this makes CPI a rearview mirror when policymakers need a windshield — they may be raising rates to fight inflation that the real economy has already corrected.</p>
+
+<p>CPI can also fail or mislead in ways that matter enormously for policy. <strong>Substitution bias</strong> is one known flaw: the fixed basket assumes people keep buying the same things even as prices change, but in reality consumers substitute cheaper alternatives when prices rise (ground beef instead of steak, for instance). CPI therefore can overstate inflation because it does not fully capture this adaptive behavior. Conversely, it can understate inflation for households whose spending patterns differ significantly from the national average — retirees spend more on healthcare and housing, young renters spend more on rent, rural households spend more on gasoline. A single national CPI number obscures these distributional realities. When policymakers use it bluntly, they risk crushing one group of Americans to solve an inflation problem being driven by a completely different sector of the economy.</p>
+
+<p>CPI connects directly to several other concepts that anyone following markets should understand together. <strong>Federal Funds Rate</strong> decisions are downstream of CPI — the rate path almost always follows the inflation trend with a lag. <strong>Real wages</strong> (what workers actually earn after adjusting for inflation) are calculated by subtracting CPI from nominal wage growth; a "blowout" jobs report with strong nominal wage gains can still mean workers are falling behind if CPI is rising faster. <strong>Bond yields</strong>, especially on 10-year Treasuries, embed inflation expectations — if markets believe CPI will average 3% over the next decade, they demand at least that much yield just to break even. And <strong>TIPS (Treasury Inflation-Protected Securities)</strong> are literally indexed to CPI, paying higher returns when inflation rises. Understanding CPI is not just about one data point — it is the thread that connects employment data, monetary policy, bond markets, and your personal cost of living into a single coherent picture of where the economy actually stands.</p>
+<div class="concept-side">Sources: THE 162K AMBUSH: Why the 'Blowout' Jobs Report Hands Hawks Cover to Hike!; THE JOBS GUT PUNCH: Why Good News Sold Off Wall Street &amp; Crushed Tech!<br>Related in this category: <a href="inflation_breadth.html">Inflation Breadth</a>, <a href="congressional_budget_office_projections.html">Congressional Budget Office (CBO) Projections</a>, <a href="financial_conditions_index.html">Financial Conditions Index</a>, <a href="core_pce.html">Core PCE (Personal Consumption Expenditures)</a>, <a href="consumer_credit_card_delinquency_rate.html">Consumer Credit Card Delinquency Rate</a>, <a href="total_consumer_debt.html">Total Household / Consumer Debt</a></div>
+<button class="concept-done" data-slug="cpi_consumer_price_index" onclick="toggleDone('cpi_consumer_price_index')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_cpi_consumer_price_index';</script>
+<script src="../../book.js"></script>
+
+<script>
+(function() {
+  var DONE_KEY = 'fg_done', FILTER_KEY = 'fg_filter';
+  var done = JSON.parse(localStorage.getItem(DONE_KEY) || '{}');
+  var filter = localStorage.getItem(FILTER_KEY) || 'all';
+
+  function visible(flag) {
+    if (filter === 'star') return flag === 'star';
+    if (filter === 'nodeep') return flag !== 'deep';
+    return true;
+  }
+
+  function apply() {
+    var shown = 0, total = 0, hidden = 0;
+    document.querySelectorAll('.concept-row').forEach(function(r) {
+      var slug = r.dataset.slug, flag = r.dataset.flag;
+      total++;
+      if (done[slug]) r.classList.add('done'); else r.classList.remove('done');
+      if (visible(flag)) { r.classList.remove('fg-hidden'); shown++; }
+      else { r.classList.add('fg-hidden'); hidden++; }
+    });
+    document.querySelectorAll('.cat-card').forEach(function(card) {
+      var slugs = card.dataset.slugs ? card.dataset.slugs.split(',') : [];
+      var flags = card.dataset.flags ? card.dataset.flags.split(',') : [];
+      var vis = 0, allDone = slugs.length > 0;
+      slugs.forEach(function(sl, i) {
+        if (visible(flags[i])) vis++;
+        if (!done[sl]) allDone = false;
+      });
+      total += slugs.length; shown += vis;
+      var c = card.querySelector('.cat-count');
+      if (c) c.textContent = vis + (vis !== slugs.length ? ' of ' + slugs.length : '') + ' concepts' +
+        (card.dataset.stars ? ' \u00b7 ' + card.dataset.stars + ' \u2605' : '');
+      if (vis === 0) card.classList.add('fg-empty'); else card.classList.remove('fg-empty');
+      if (allDone) card.classList.add('done'); else card.classList.remove('done');
+    });
+    document.querySelectorAll('[data-filter]').forEach(function(b) {
+      b.classList.toggle('active', b.dataset.filter === filter);
+    });
+    var n = document.getElementById('fgCount');
+    if (n) n.textContent = shown + ' of ' + total + ' shown';
+    var h = document.getElementById('fgHiddenNote');
+    if (h) h.textContent = hidden ? hidden + ' hidden by the filter.' : '';
+    var btn = document.querySelector('.concept-done');
+    if (btn) {
+      var on = !!done[btn.dataset.slug];
+      btn.classList.toggle('on', on);
+      btn.textContent = on ? '\u2713 Completed' : '\u2713 Mark complete';
+    }
+  }
+
+  window.setFilter = function(f) {
+    filter = f; localStorage.setItem(FILTER_KEY, f); apply();
+  };
+  window.toggleDone = function(slug) {
+    if (done[slug]) delete done[slug]; else done[slug] = true;
+    localStorage.setItem(DONE_KEY, JSON.stringify(done));
+    apply();
+  };
+  window.toggleHideDone = function() {
+    document.body.classList.toggle('hide-done');
+  };
+  apply();
+})();
+</script>
+
+</body>
+</html>

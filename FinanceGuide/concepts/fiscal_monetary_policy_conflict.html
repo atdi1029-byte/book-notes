@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Fiscal-Monetary Policy Conflict - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.tier .tier-desc { color: #a08060; font-size: 0.85rem; margin: 0.4rem 0 0.8rem; }
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../monetary-policy-central-banking.html">&larr; Monetary Policy &amp; Central Banking</a>
+
+<div class="concept-meta"><span>standard</span><span>Monetary Policy &amp; Central Banking</span><span>added 2026-08-31</span></div>
+<h4 id="fiscal_monetary_policy_conflict">Fiscal-Monetary Policy Conflict</h4>
+
+<p>
+<strong>Fiscal-monetary policy conflict</strong> is the tension that emerges
+when a government's spending and debt management goals pull in the opposite
+direction from a central bank's inflation-fighting mandate. To understand why
+this matters, you need to know what each side is actually doing. <strong>Fiscal
+policy</strong> is controlled by the Treasury and Congress — it covers
+government spending, taxation, and borrowing. <strong>Monetary policy</strong>
+is controlled by the Federal Reserve — it sets interest rates and controls the
+money supply. In a well-functioning economy, these two levers work in harmony.
+But when a government has borrowed an enormous amount of money and a central
+bank wants to raise rates to fight inflation, the two institutions end up working
+directly against each other, and the consequences ripple through every asset
+class on earth.
+</p>
+
+<p>
+The reason this conflict matters is that it creates a structural trap — a
+situation where every available policy choice makes something worse. When the
+Fed raises rates to cool inflation, it simultaneously raises the cost of
+carrying the national debt. The United States currently carries roughly
+<strong>$40 trillion in outstanding debt</strong>. At low rates, that debt is
+manageable. But as rates climb, the Treasury must roll over maturing bonds at
+higher yields, and the annual interest bill balloons. That interest payment
+competes with every other government priority — defense, entitlements,
+infrastructure — and eventually becomes a ceiling on what fiscal policy can
+accomplish. The Fed's medicine for inflation becomes the Treasury's poison for
+the budget.
+</p>
+
+<p>
+Here is how the mechanism works, step by step. The Fed raises its benchmark
+rate, the <strong>federal funds rate</strong>. This pushes up yields across the
+entire Treasury curve, but especially on short-duration bonds like the
+<strong>two-year Treasury</strong>, which most directly prices near-term Fed
+expectations. When yields rise, the Treasury must offer those higher yields to
+attract buyers for new debt issuance. Existing debt that matures gets
+refinanced at the new, higher rate. Because the U.S. issues debt continuously —
+roughly $1–2 trillion in new issuance per quarter — even a modest rate increase
+compounds into hundreds of billions of additional annual interest expense within
+a few years. That spending is non-discretionary; the government legally must pay
+its creditors. So the Fed's inflation cure creates a fiscal wound that demands
+more government borrowing to close, which can itself become inflationary — a
+loop with no clean exit.
+</p>
+
+<p>
+The Jackson Hole speech by <strong>Kevin Warsh</strong> in August 2026
+crystallized this conflict in real time. Warsh stood at the podium and told
+markets the Fed still had "work to do" on inflation, signaling that rate cuts
+were off the table and a September hike was plausible. Within minutes of his
+remarks, the two-year Treasury yield jumped past <strong>4.3%</strong>. That
+single move — a few basis points on a short-duration bond — triggered an
+immediate repricing of gold, Bitcoin, and risk assets broadly. But the deeper
+signal was what Warsh revealed about inflation's internal structure: across the
+199 components of the <strong>PCE inflation basket</strong>, 54% were still
+rising above 3% annually. Nearly half the economy was still running hot. The
+breadth of inflation, not just its headline number, was the real story — and
+that breadth made it impossible for the Fed to pivot without abandoning its
+mandate.
+</p>
+
+<blockquote>
+"When every single outlet agrees on the same tidy one-sentence explanation for
+a market move, that is exactly when you should go look somewhere else."
+</blockquote>
+
+<p>
+Traders and investors use fiscal-monetary conflict as a framework for
+positioning across multiple asset classes simultaneously. When the conflict is
+acute — high debt, hawkish Fed, rising yields — the playbook historically
+involves shorting long-duration bonds (which fall in price as yields rise),
+reducing exposure to gold and Bitcoin (which lose their inflation-hedge premium
+when real rates climb), and rotating toward short-duration Treasuries and
+cash-equivalent instruments that actually benefit from higher rates.
+<strong>Real yields</strong> — the nominal yield minus expected inflation — are
+the key signal. When real yields rise sharply, assets that don't produce cash
+flow (gold, crypto, long-duration growth stocks) get repriced down almost
+mechanically, because the opportunity cost of holding them has increased.
+</p>
+
+<p>
+The biggest misconception investors carry into this framework is that gold and
+Bitcoin are always inflation hedges. They are not — they are
+<strong>negative-real-rate hedges</strong>. Gold thrives when inflation is
+running above nominal yields, meaning money in a savings account is losing
+purchasing power in real terms. The moment a hawkish Fed pushes nominal yields
+above the inflation rate, real yields turn positive, and the case for holding
+zero-yield assets collapses. This is precisely what happened in the Warsh
+speech. The market had been pricing in rate cuts; Warsh's inflation breadth data
+killed that narrative instantly. Real yields re-rated higher, and gold and
+Bitcoin sold off — not because inflation disappeared, but because the Fed
+credibly signaled it would fight inflation even at the cost of making the
+Treasury's debt burden worse.
+</p>
+
+<p>
+The conflict breaks down into genuine crisis territory when <strong>fiscal
+dominance</strong> takes hold — the point at which a government's debt burden
+becomes so large that the central bank effectively loses its independence and
+begins prioritizing debt manageability over price stability. History offers
+examples: post-WWII America, where the Fed was explicitly required to keep rates
+low to manage war debt; 1970s stagflation, where political pressure kept rates
+below what inflation required; and several emerging market episodes where central
+banks printed money to service debt, destroying the currency. The risk with a
+$40 trillion U.S. debt pile is not that fiscal dominance is imminent, but that
+the political pressure on the Fed to blink — to cut rates before inflation is
+fully defeated — becomes almost irresistible as interest expense crowds out
+everything else in the federal budget.
+</p>
+
+<p>
+This concept connects directly to <strong>yield curve control</strong>,
+<strong>debt monetization</strong>, and the broader theory of
+<strong>financial repression</strong> — the practice of holding interest rates
+artificially below inflation to gradually erode the real value of outstanding
+debt. It also connects to <strong>currency debasement</strong>: if the Fed
+eventually capitulates and cuts rates while inflation remains elevated, the
+dollar weakens, import prices rise, and inflation gets a second wind. The
+fiscal-monetary conflict is therefore not a single event but a persistent
+structural condition that shapes the background radiation of every macro trade
+for years at a time. Understanding it means understanding that central bank
+speeches are not just about interest rates — they are proxy battles in a much
+larger war between the government's need to borrow cheaply and the economy's
+need for sound money.
+</p>
+<div class="concept-side">Sources: THE JACKSON HOLE TRAP: Why Kevin Warsh Just Crashed Gold &amp; Bitcoin!<br>Related in this category: <a href="pce_inflation_basket.html">PCE Inflation Basket</a>, <a href="jackson_hole_symposium.html">Jackson Hole Symposium</a>, <a href="hawkish_dovish_fed_signaling.html">Hawkish vs. Dovish Fed Signaling</a>, <a href="debt_servicing_cost.html">Debt Servicing Cost</a>, <a href="central_bank_credibility.html">Central Bank Credibility</a>, <a href="forward_guidance.html">Forward Guidance</a></div>
+<button class="concept-done" data-slug="fiscal_monetary_policy_conflict" onclick="toggleDone('fiscal_monetary_policy_conflict')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_fiscal_monetary_policy_conflict';</script>
+<script src="../../book.js"></script>
+
+<script>
+(function() {
+  var DONE_KEY = 'fg_done', FILTER_KEY = 'fg_filter';
+  var done = JSON.parse(localStorage.getItem(DONE_KEY) || '{}');
+  var filter = localStorage.getItem(FILTER_KEY) || 'all';
+
+  function visible(flag) {
+    if (filter === 'star') return flag === 'star';
+    if (filter === 'nodeep') return flag !== 'deep';
+    return true;
+  }
+
+  function apply() {
+    var shown = 0, total = 0, hidden = 0;
+    document.querySelectorAll('.concept-row').forEach(function(r) {
+      var slug = r.dataset.slug, flag = r.dataset.flag;
+      total++;
+      if (done[slug]) r.classList.add('done'); else r.classList.remove('done');
+      if (visible(flag)) { r.classList.remove('fg-hidden'); shown++; }
+      else { r.classList.add('fg-hidden'); hidden++; }
+    });
+    document.querySelectorAll('.cat-card').forEach(function(card) {
+      var slugs = card.dataset.slugs ? card.dataset.slugs.split(',') : [];
+      var flags = card.dataset.flags ? card.dataset.flags.split(',') : [];
+      var vis = 0, allDone = slugs.length > 0;
+      slugs.forEach(function(sl, i) {
+        if (visible(flags[i])) vis++;
+        if (!done[sl]) allDone = false;
+      });
+      total += slugs.length; shown += vis;
+      var c = card.querySelector('.cat-count');
+      if (c) c.textContent = vis + (vis !== slugs.length ? ' of ' + slugs.length : '') + ' concepts' +
+        (card.dataset.stars ? ' \u00b7 ' + card.dataset.stars + ' \u2605' : '');
+      if (vis === 0) card.classList.add('fg-empty'); else card.classList.remove('fg-empty');
+      if (allDone) card.classList.add('done'); else card.classList.remove('done');
+    });
+    document.querySelectorAll('[data-filter]').forEach(function(b) {
+      b.classList.toggle('active', b.dataset.filter === filter);
+    });
+    var n = document.getElementById('fgCount');
+    if (n) n.textContent = shown + ' of ' + total + ' shown';
+    var h = document.getElementById('fgHiddenNote');
+    if (h) h.textContent = hidden ? hidden + ' hidden by the filter.' : '';
+    var btn = document.querySelector('.concept-done');
+    if (btn) {
+      var on = !!done[btn.dataset.slug];
+      btn.classList.toggle('on', on);
+      btn.textContent = on ? '\u2713 Completed' : '\u2713 Mark complete';
+    }
+  }
+
+  window.setFilter = function(f) {
+    filter = f; localStorage.setItem(FILTER_KEY, f); apply();
+  };
+  window.toggleDone = function(slug) {
+    if (done[slug]) delete done[slug]; else done[slug] = true;
+    localStorage.setItem(DONE_KEY, JSON.stringify(done));
+    apply();
+  };
+  window.toggleHideDone = function() {
+    document.body.classList.toggle('hide-done');
+  };
+  apply();
+})();
+</script>
+
+</body>
+</html>

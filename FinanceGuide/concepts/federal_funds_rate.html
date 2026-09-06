@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Federal Funds Rate - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.tier .tier-desc { color: #a08060; font-size: 0.85rem; margin: 0.4rem 0 0.8rem; }
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../monetary-policy-central-banking.html">&larr; Monetary Policy &amp; Central Banking</a>
+
+<div class="concept-meta"><span><span class="star">&#9733;</span> must-know</span><span>Monetary Policy &amp; Central Banking</span><span>added 2026-08-31</span></div>
+<h4 id="federal_funds_rate">Federal Funds Rate</h4>
+
+<p>The <strong>federal funds rate</strong> is the interest rate at which banks lend money to each other overnight. Every night, banks must balance their books — some have more reserves than required, others have less. Those with excess reserves lend to those running short, and the price of that overnight borrowing is the federal funds rate. The <strong>Federal Open Market Committee (FOMC)</strong>, the policy-setting body of the Federal Reserve, sets a target range for this rate — not by decree, but by using its tools to push the actual rate toward that target. This single number, updated roughly eight times per year, radiates outward and influences nearly every financial decision made in the United States economy.</p>
+
+<p>Why does this matter to you personally? Because the federal funds rate is the foundation upon which nearly all other borrowing costs are built. Your mortgage rate, your car loan APR, your credit card interest, and the yield on your savings account all trace back — with varying degrees of directness — to where the Fed has set this rate. When the Fed raises it, borrowing becomes more expensive across the economy, which cools demand and (theoretically) brings inflation down. When the Fed cuts it, credit becomes cheaper, businesses invest more, consumers spend more freely, and the economy tends to heat up. If you own stocks, hold a 401(k), or are planning to buy a home, the federal funds rate is the single most important number shaping the financial environment around those decisions.</p>
+
+<p>Here is the mechanical reality of how it works. The Fed does not literally set a fixed rate — it sets a <strong>target range</strong>, typically expressed as a quarter-point band (for example, 5.25%–5.50%). To keep the actual market rate within that band, the Fed uses two primary tools: <strong>interest on reserve balances (IORB)</strong>, which it pays banks for keeping money at the Fed, and the <strong>overnight reverse repurchase agreement (ON RRP)</strong> rate, which acts as a floor. If rates drift below target, the Fed can absorb excess liquidity through reverse repos. If rates drift above target, it can inject liquidity. These mechanisms mean the market rate almost never strays far from the target — the system is designed to make the Fed's policy intention felt in real time, every single trading day.</p>
+
+<p>The transmission from the federal funds rate to the broader economy runs through several channels. First, banks use the federal funds rate as their baseline cost of capital, which feeds directly into the <strong>prime rate</strong> — the rate banks charge their best commercial customers — and from there into consumer loans. Second, the rate affects bond yields: when the Fed raises rates, newly issued bonds offer higher yields, which pushes down prices on existing bonds. Third, it affects the <strong>discount rate</strong> used to value future corporate earnings — higher rates mean future profits are worth less today, which is why rate hike cycles tend to compress stock valuations, especially for high-growth companies whose value is concentrated in distant future earnings.</p>
+
+<p>For a concrete, current example, consider the moment at the center of this video. When <strong>Kevin Warsh</strong>, the new Fed chair, delivered remarks at the <strong>Jackson Hole Economic Symposium</strong> — the annual gathering of global central bankers in Wyoming — he flatly refused to endorse the market's comfortable narrative that rate cuts were imminent. He stated that he would be hard-pressed to describe current financial conditions as restrictive. That single phrase moved markets immediately. On the <strong>CME FedWatch Tool</strong>, which aggregates options market bets on Fed policy, the probability of a September rate <em>hike</em> jumped from roughly 30% to over 50% within hours of his remarks. That is the federal funds rate in action — not just as a number, but as a live, market-moving expectation machine.</p>
+
+<blockquote>"He said that he would be hard pressed to describe broad financial conditions as restrictive right now. The Central Bank does not believe its current policy is squeezing the economy hard enough to finish the inflation job."</blockquote>
+
+<p>Traders and investors use the federal funds rate — and more precisely, <em>expectations</em> about where it is heading — to position portfolios across every asset class. The primary tool for tracking these expectations is the <strong>fed funds futures market</strong>, which the CME Group synthesizes into its FedWatch tool. Investors watch these probabilities obsessively because rate expectations move bond prices, currency values, and equity multiples in real time, often before the Fed actually does anything. A seasoned investor is not just watching the current rate — they are watching the <strong>rate trajectory</strong>, the so-called <strong>dot plot</strong> from FOMC projections, and the language in Fed speeches for signals about whether the next move is a hike, a cut, or a hold. The Jackson Hole moment described here is a perfect case study: nothing changed in official policy, but expectations shifted dramatically, and markets repriced accordingly.</p>
+
+<p>One of the most persistent misconceptions is that the Fed directly controls your mortgage rate or that rate changes take effect immediately on the economy. Neither is precisely true. The federal funds rate is an overnight rate; mortgage rates are priced off longer-term <strong>Treasury yields</strong>, particularly the 10-year Treasury, which the Fed influences but does not control directly. Longer-term yields reflect the market's view of inflation and growth over years, not just tonight's borrowing cost. Another misconception is that a single hike or cut solves problems quickly. In reality, Fed policy works with <strong>long and variable lags</strong> — a phrase famously associated with economist Milton Friedman — meaning rate changes can take 12 to 18 months to fully ripple through the economy. This is precisely why Warsh's warning about lingering inflation above 3% in services is so serious: the Fed may have thought its prior hikes were enough, only to find the job unfinished.</p>
+
+<p>The federal funds rate can also fail or produce paradoxical outcomes at the extremes. During the <strong>zero lower bound</strong> crisis of 2008–2015 and again in 2020, the Fed cut rates to near zero and found that conventional rate policy was exhausted — it could not go meaningfully negative. This forced the introduction of unconventional tools like <strong>quantitative easing (QE)</strong>, where the Fed purchases Treasury and mortgage-backed securities to inject money directly into financial markets. At the other extreme — a scenario the current video raises as a real possibility — the Fed can find itself forced to hike rates into a slowing economy, creating the dreaded combination of stagnant growth and persistent inflation known as <strong>stagflation</strong>. When inflation is embedded in services (healthcare, housing, insurance) rather than goods, rate hikes are a blunt instrument: they can destroy demand and jobs without necessarily addressing the structural costs driving prices upward.</p>
+
+<p>Finally, the federal funds rate connects directly to several other concepts essential to understanding markets. It is the linchpin of the <strong>yield curve</strong> — the relationship between short-term and long-term interest rates. When the Fed hikes aggressively, short-term yields often rise faster than long-term yields, creating an <strong>inverted yield curve</strong>, which has historically been one of the most reliable recession predictors. It also drives <strong>currency valuation</strong>: higher U.S. rates attract foreign capital seeking better returns, which bids up the dollar and creates headwinds for American exporters. Understanding the federal funds rate is not optional background knowledge — it is the master key to reading nearly every significant move in global financial markets, and the reason a single speech beneath elk antler chandeliers in Wyoming can send traders scrambling on a Monday morning.</p>
+<div class="concept-side">Sources: KEVIN WARSH DROPS THE HAMMER: Why a Fed Rate Hike Is Back on the Table!<br>Related in this category: <a href="pce_inflation_basket.html">PCE Inflation Basket</a>, <a href="jackson_hole_symposium.html">Jackson Hole Symposium</a>, <a href="hawkish_dovish_fed_signaling.html">Hawkish vs. Dovish Fed Signaling</a>, <a href="debt_servicing_cost.html">Debt Servicing Cost</a>, <a href="fiscal_monetary_policy_conflict.html">Fiscal-Monetary Policy Conflict</a>, <a href="central_bank_credibility.html">Central Bank Credibility</a></div>
+<button class="concept-done" data-slug="federal_funds_rate" onclick="toggleDone('federal_funds_rate')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_federal_funds_rate';</script>
+<script src="../../book.js"></script>
+
+<script>
+(function() {
+  var DONE_KEY = 'fg_done', FILTER_KEY = 'fg_filter';
+  var done = JSON.parse(localStorage.getItem(DONE_KEY) || '{}');
+  var filter = localStorage.getItem(FILTER_KEY) || 'all';
+
+  function visible(flag) {
+    if (filter === 'star') return flag === 'star';
+    if (filter === 'nodeep') return flag !== 'deep';
+    return true;
+  }
+
+  function apply() {
+    var shown = 0, total = 0, hidden = 0;
+    document.querySelectorAll('.concept-row').forEach(function(r) {
+      var slug = r.dataset.slug, flag = r.dataset.flag;
+      total++;
+      if (done[slug]) r.classList.add('done'); else r.classList.remove('done');
+      if (visible(flag)) { r.classList.remove('fg-hidden'); shown++; }
+      else { r.classList.add('fg-hidden'); hidden++; }
+    });
+    document.querySelectorAll('.cat-card').forEach(function(card) {
+      var slugs = card.dataset.slugs ? card.dataset.slugs.split(',') : [];
+      var flags = card.dataset.flags ? card.dataset.flags.split(',') : [];
+      var vis = 0, allDone = slugs.length > 0;
+      slugs.forEach(function(sl, i) {
+        if (visible(flags[i])) vis++;
+        if (!done[sl]) allDone = false;
+      });
+      total += slugs.length; shown += vis;
+      var c = card.querySelector('.cat-count');
+      if (c) c.textContent = vis + (vis !== slugs.length ? ' of ' + slugs.length : '') + ' concepts' +
+        (card.dataset.stars ? ' \u00b7 ' + card.dataset.stars + ' \u2605' : '');
+      if (vis === 0) card.classList.add('fg-empty'); else card.classList.remove('fg-empty');
+      if (allDone) card.classList.add('done'); else card.classList.remove('done');
+    });
+    document.querySelectorAll('[data-filter]').forEach(function(b) {
+      b.classList.toggle('active', b.dataset.filter === filter);
+    });
+    var n = document.getElementById('fgCount');
+    if (n) n.textContent = shown + ' of ' + total + ' shown';
+    var h = document.getElementById('fgHiddenNote');
+    if (h) h.textContent = hidden ? hidden + ' hidden by the filter.' : '';
+    var btn = document.querySelector('.concept-done');
+    if (btn) {
+      var on = !!done[btn.dataset.slug];
+      btn.classList.toggle('on', on);
+      btn.textContent = on ? '\u2713 Completed' : '\u2713 Mark complete';
+    }
+  }
+
+  window.setFilter = function(f) {
+    filter = f; localStorage.setItem(FILTER_KEY, f); apply();
+  };
+  window.toggleDone = function(slug) {
+    if (done[slug]) delete done[slug]; else done[slug] = true;
+    localStorage.setItem(DONE_KEY, JSON.stringify(done));
+    apply();
+  };
+  window.toggleHideDone = function() {
+    document.body.classList.toggle('hide-done');
+  };
+  apply();
+})();
+</script>
+
+</body>
+</html>

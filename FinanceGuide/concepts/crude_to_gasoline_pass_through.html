@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Crude-to-Gasoline Price Pass-Through - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.tier .tier-desc { color: #a08060; font-size: 0.85rem; margin: 0.4rem 0 0.8rem; }
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../commodities-energy.html">&larr; Commodities &amp; Energy</a>
+
+<div class="concept-meta"><span>deep cut</span><span>Commodities &amp; Energy</span><span>added 2026-09-02</span></div>
+<h4 id="crude_to_gasoline_pass_through">Crude-to-Gasoline Price Pass-Through</h4>
+
+<p><strong>Crude-to-gasoline price pass-through</strong> describes the speed and degree to which a change in the price of raw crude oil translates into a change in the price consumers pay at the gas pump. It sounds mechanical, and it is — but most people underestimate how fast and how direct the link really is. When crude oil prices move, retail gasoline prices do not simply follow eventually; they follow almost immediately, often within days. The pass-through is not complete — refining margins, taxes, and distribution costs all sit between the barrel and the nozzle — but the crude oil price is by far the dominant variable, typically explaining 60–70% of the retail price of a gallon of gasoline.</p>
+
+<p>This concept matters because energy is woven into the cost of nearly everything in a modern economy. Gasoline prices affect what households pay to commute, what truckers charge to move freight, and what airlines pay to fly passengers. When pass-through is fast and large, a geopolitical shock halfway around the world becomes a cost-of-living shock for American families within a week. That is not a theoretical risk — it is how the energy market actually works. For policymakers, the pass-through rate determines whether emergency oil releases or new supply deals can meaningfully blunt a price spike. For investors and traders, it sets the timeline for how quickly commodity inflation bleeds into consumer inflation data like CPI.</p>
+
+<p>The mechanism works in stages, but each stage moves quickly. First, crude oil trades on global futures markets around the clock. A geopolitical event — a strike near the Strait of Hormuz, a hurricane in the Gulf of Mexico, a supply cut from OPEC — moves the <strong>West Texas Intermediate (WTI)</strong> or <strong>Brent crude</strong> futures price within minutes. Second, refiners who buy crude to convert it into gasoline immediately reprice their expected input costs. Their profit margins, called the <strong>crack spread</strong>, shift accordingly. Third, wholesale gasoline prices adjust on the <strong>NYMEX gasoline futures market</strong>, and retail fuel distributors who supply gas stations update their rack prices — the prices stations pay per gallon — within one to three days. Stations then pass those costs forward at the pump.</p>
+
+<p>The rule of thumb that commodities traders use: <strong>every $5 increase in the price of a barrel of crude oil adds roughly 12 to 15 cents to the retail price of a gallon of gasoline</strong>. That relationship is stable enough to use as a first estimate in almost any scenario. It is derived from the fact that a barrel of crude yields roughly 19–20 gallons of gasoline (along with diesel, jet fuel, and other products), so a $5 per barrel move divided across those gallons works out to roughly $0.25 per gallon before refining and distribution costs are factored in. After those costs absorb some of the move, the net pass-through lands in the 12–15 cent range. It is not exact, but it is close enough to make fast, back-of-the-envelope calculations in a live market.</p>
+
+<blockquote>
+  "When tanker ships are targeted or insurance costs spike in that region, well, global oil prices react in seconds, not in months. Every $5 move higher in a barrel of crude adds roughly 12 to 15 cents to a gallon of gasoline at your local pump."
+  <cite>— The Gas Price Lie video</cite>
+</blockquote>
+
+<p>The real-world example from this video is precise and instructive. On a Friday, Washington announced a deal granting the United States access to over 65 billion barrels of Venezuelan oil reserves — a supply story that, in theory, should push prices lower. By Monday morning, military strikes near the <strong>Strait of Hormuz</strong> had pushed crude above $85 a barrel, a gain of more than 2% over the weekend. Applying the pass-through rule: a $5-per-barrel move adds 12–15 cents to a gallon. Crude was already elevated, and by Monday the national average hit $4.08 per gallon — on pace for the most expensive Labor Day weekend on record. The Venezuela announcement did nothing to stop that move because the crude market does not wait for supply agreements to be operationalized before pricing in current disruptions.</p>
+
+<p>Traders and investors use the pass-through relationship as a real-time signal in several ways. Energy analysts watch crude futures as a leading indicator for gasoline prices and, by extension, for <strong>headline CPI</strong> (since gasoline has a meaningful weight in the consumer price index). When crude spikes, bond traders anticipate hotter inflation prints and may sell Treasuries; equity traders rotate out of consumer discretionary stocks, which suffer when households spend more on fuel. Options traders in energy ETFs like <strong>USO</strong> or in refining stocks like <strong>VLO</strong> and <strong>PSX</strong> use the crack spread as a signal for refiner profitability — if crude rises but gasoline lags, refiner margins compress. If gasoline leads crude higher, refiners benefit.</p>
+
+<p>The most common misconception is that new supply agreements — whether from Venezuela, Saudi Arabia, or the <strong>Strategic Petroleum Reserve (SPR)</strong> — can quickly offset a demand or disruption shock. They cannot, for two reasons. First, physical crude takes weeks to months to move from a new source through pipelines, tankers, and refineries before it becomes retail gasoline. Second, crude oil is priced on a global market. Even if the U.S. secures Venezuelan barrels, those barrels replace other barrels rather than adding net new supply to the world — unless Venezuelan output has been growing significantly. A disruption in the Strait of Hormuz removes barrels from global circulation immediately, while new deals add barrels to circulation on a delayed schedule measured in quarters, not days.</p>
+
+<p>The pass-through can also break down or become asymmetric in ways that frustrate consumers and confuse analysts. A well-documented pattern called <strong>"rockets and feathers"</strong> describes how gasoline prices rise faster when crude rises than they fall when crude drops. Retailers pass cost increases through quickly because their inventory replacement cost is already higher, but they are slower to cut prices because doing so reduces margin on existing inventory. The SPR dynamic adds another wrinkle: when the reserve is full, the U.S. government can release millions of barrels per day to artificially suppress domestic crude prices and slow the pass-through. But as the video notes, the SPR has been drained to its lowest level in over 40 years — below 300 million barrels — stripping Washington of that cushion precisely when a Middle East disruption hits.</p>
+
+<p>Crude-to-gasoline pass-through connects directly to several adjacent concepts worth understanding together. <strong>Refinery utilization rates</strong> affect the speed of pass-through — when refineries are running near capacity, as they often are after years of underinvestment in U.S. refining infrastructure, even modest crude increases produce larger gasoline price moves because there is no slack to absorb them. <strong>Geopolitical risk premiums</strong> in crude pricing mean that markets often price in disruptions before they happen, so the full pass-through may arrive in advance of the actual supply cut. And <strong>energy's weight in inflation indices</strong> creates a feedback loop: higher gasoline prices lift CPI, which pressures the Federal Reserve toward tighter policy, which raises borrowing costs across the economy — amplifying the initial commodity shock far beyond the gas station.</p>
+<div class="concept-side">Sources: THE GAS PRICE LIE: Why the Venezuela Oil Deal Won't Save You!<br>Related in this category: <a href="gold_futures.html">Gold Futures</a>, <a href="hard_assets_inflation_hedge.html">Hard Assets as Inflation Hedges</a>, <a href="farm_debt_to_asset_ratio.html">Farm Debt-to-Asset Ratio</a>, <a href="farm_debt_service_ratio.html">Farm Debt Service Ratio</a>, <a href="agricultural_direct_payment_subsidies.html">Agricultural Direct Payment Subsidies</a>, <a href="net_farm_income.html">Net Farm Income</a></div>
+<button class="concept-done" data-slug="crude_to_gasoline_pass_through" onclick="toggleDone('crude_to_gasoline_pass_through')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_crude_to_gasoline_pass_through';</script>
+<script src="../../book.js"></script>
+
+<script>
+(function() {
+  var DONE_KEY = 'fg_done', FILTER_KEY = 'fg_filter';
+  var done = JSON.parse(localStorage.getItem(DONE_KEY) || '{}');
+  var filter = localStorage.getItem(FILTER_KEY) || 'all';
+
+  function visible(flag) {
+    if (filter === 'star') return flag === 'star';
+    if (filter === 'nodeep') return flag !== 'deep';
+    return true;
+  }
+
+  function apply() {
+    var shown = 0, total = 0, hidden = 0;
+    document.querySelectorAll('.concept-row').forEach(function(r) {
+      var slug = r.dataset.slug, flag = r.dataset.flag;
+      total++;
+      if (done[slug]) r.classList.add('done'); else r.classList.remove('done');
+      if (visible(flag)) { r.classList.remove('fg-hidden'); shown++; }
+      else { r.classList.add('fg-hidden'); hidden++; }
+    });
+    document.querySelectorAll('.cat-card').forEach(function(card) {
+      var slugs = card.dataset.slugs ? card.dataset.slugs.split(',') : [];
+      var flags = card.dataset.flags ? card.dataset.flags.split(',') : [];
+      var vis = 0, allDone = slugs.length > 0;
+      slugs.forEach(function(sl, i) {
+        if (visible(flags[i])) vis++;
+        if (!done[sl]) allDone = false;
+      });
+      total += slugs.length; shown += vis;
+      var c = card.querySelector('.cat-count');
+      if (c) c.textContent = vis + (vis !== slugs.length ? ' of ' + slugs.length : '') + ' concepts' +
+        (card.dataset.stars ? ' \u00b7 ' + card.dataset.stars + ' \u2605' : '');
+      if (vis === 0) card.classList.add('fg-empty'); else card.classList.remove('fg-empty');
+      if (allDone) card.classList.add('done'); else card.classList.remove('done');
+    });
+    document.querySelectorAll('[data-filter]').forEach(function(b) {
+      b.classList.toggle('active', b.dataset.filter === filter);
+    });
+    var n = document.getElementById('fgCount');
+    if (n) n.textContent = shown + ' of ' + total + ' shown';
+    var h = document.getElementById('fgHiddenNote');
+    if (h) h.textContent = hidden ? hidden + ' hidden by the filter.' : '';
+    var btn = document.querySelector('.concept-done');
+    if (btn) {
+      var on = !!done[btn.dataset.slug];
+      btn.classList.toggle('on', on);
+      btn.textContent = on ? '\u2713 Completed' : '\u2713 Mark complete';
+    }
+  }
+
+  window.setFilter = function(f) {
+    filter = f; localStorage.setItem(FILTER_KEY, f); apply();
+  };
+  window.toggleDone = function(slug) {
+    if (done[slug]) delete done[slug]; else done[slug] = true;
+    localStorage.setItem(DONE_KEY, JSON.stringify(done));
+    apply();
+  };
+  window.toggleHideDone = function() {
+    document.body.classList.toggle('hide-done');
+  };
+  apply();
+})();
+</script>
+
+</body>
+</html>

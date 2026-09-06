@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Core PCE (Personal Consumption Expenditures) - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.tier .tier-desc { color: #a08060; font-size: 0.85rem; margin: 0.4rem 0 0.8rem; }
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../economic-indicators.html">&larr; Economic Indicators</a>
+
+<div class="concept-meta"><span><span class="star">&#9733;</span> must-know</span><span>Economic Indicators</span><span>added 2026-08-31</span></div>
+<h4 id="core_pce">Core PCE (Personal Consumption Expenditures)</h4>
+
+<p>
+  <strong>Core PCE</strong>, or Core Personal Consumption Expenditures, is the
+  Federal Reserve's preferred measure of inflation in the United States. Unlike
+  the more famous Consumer Price Index (CPI), which tracks what consumers pay
+  for a fixed basket of goods, PCE measures what businesses actually charge
+  across the entire economy — covering everything households spend money on,
+  from groceries to haircuts to hospital bills. The "core" part means it strips
+  out <strong>food and energy prices</strong>, which swing wildly month to month
+  based on weather, geopolitics, and commodity cycles. What remains is a cleaner
+  signal of the underlying, persistent inflation that the Fed actually tries to
+  control. When the Fed says its inflation target is 2%, it means core PCE
+  specifically — not CPI, not headline PCE.
+</p>
+
+<p>
+  Why does this one number carry so much weight? Because it directly drives
+  Federal Reserve interest rate decisions, and interest rates are the price of
+  money itself. When core PCE runs above the 2% target, the Fed feels pressure
+  to raise the <strong>federal funds rate</strong> — the benchmark rate that
+  cascades through every corner of the financial system. Higher rates mean more
+  expensive mortgages, costlier business loans, tighter credit card terms, and
+  lower valuations for stocks. When core PCE cools toward 2%, the Fed gains room
+  to cut rates, loosening financial conditions and stimulating growth. Every
+  asset class — equities, bonds, real estate, commodities — prices itself
+  relative to where the Fed is expected to move next, and core PCE is the
+  single most important input into that expectation.
+</p>
+
+<p>
+  The mechanical difference between PCE and CPI matters more than most people
+  realize. CPI uses a <strong>fixed basket</strong>: the Bureau of Labor
+  Statistics decides what an average household buys and tracks those same items
+  over time. PCE uses a <strong>chain-weighted formula</strong> that adjusts for
+  substitution — if beef gets expensive and consumers switch to chicken, PCE
+  captures that behavioral shift automatically. PCE also covers a broader scope,
+  including healthcare costs paid by employers and the government on consumers'
+  behalf, which CPI ignores. The result is that PCE typically runs about 0.3 to
+  0.5 percentage points lower than CPI. The Fed chose PCE precisely because it's
+  considered a more realistic picture of actual spending behavior rather than a
+  theoretical basket frozen in time.
+</p>
+
+<p>
+  To see why this matters in practice, consider the situation Kevin Warsh
+  described at the <strong>Jackson Hole Economic Symposium</strong> in 2026.
+  The mainstream narrative all summer had been that inflation was essentially
+  defeated — monthly prints had softened, and markets were pricing in imminent
+  rate cuts. But Warsh pointed to the annual numbers: <strong>headline PCE at
+  3.7%</strong> and <strong>core PCE at 3.3%</strong>, both dramatically above
+  the 2% target. A single soft monthly reading might drop the annualized rate
+  briefly, but 3.3% core PCE means that over the past year, the prices of
+  everything except food and energy rose by 3.3% — nearly 65% faster than the
+  Fed's stated goal. Warsh's point was that monthly noise was being used to
+  obscure an annual reality that hadn't changed.
+</p>
+
+<blockquote>
+  "This summer's better than expected inflation prints do not mean underlying
+  inflation trends have meaningfully improved."
+  <cite>— Kevin Warsh, Jackson Hole, 2026</cite>
+</blockquote>
+
+<p>
+  Traders and portfolio managers treat core PCE releases as among the most
+  market-moving data events on the calendar. The report is released by the
+  <strong>Bureau of Economic Analysis (BEA)</strong> monthly, typically near the
+  end of each month. A reading that comes in hotter than expected tends to push
+  <strong>Treasury yields higher</strong> (as markets price in fewer rate cuts or
+  more hikes), which drags down bond prices and often pressures equities —
+  especially growth stocks and REITs that are highly sensitive to discount rates.
+  A cooler-than-expected reading does the opposite. Sophisticated traders also
+  watch the <strong>month-over-month change</strong> versus the
+  year-over-year figure: a string of soft monthly prints can eventually pull the
+  annual number down, but only if those soft prints are sustained and not revised
+  upward later.
+</p>
+
+<p>
+  One of the most common misconceptions is confusing a declining rate of
+  inflation with actual price decreases. When core PCE falls from 3.3% to 2.8%,
+  prices are still rising — just slightly slower. This is called
+  <strong>disinflation</strong>, not deflation. Actual price decreases require
+  negative PCE readings, which are rare and often signal dangerous economic
+  contraction. Another gotcha: the Fed targets 2% inflation <em>on average over
+  time</em>, which is why a few months of good data don't automatically trigger
+  rate cuts. After the post-COVID inflation surge, the Fed was acutely aware that
+  declaring victory prematurely — as it arguably did in the 1970s under
+  <strong>Arthur Burns</strong> — could allow inflation to re-accelerate,
+  requiring even more painful tightening later.
+</p>
+
+<p>
+  The scenario where core PCE "breaks" as a signal is when it diverges sharply
+  from other inflation measures, creating confusion about what's real. During
+  the 2021–2023 inflation surge, critics pointed out that shelter costs (rent
+  and <strong>owners' equivalent rent</strong>) were lagging in PCE because the
+  methodology uses smoothed, backward-looking lease data rather than current
+  market rents. This meant PCE was understating the real cost of housing for
+  months. Similarly, if supply chain disruptions cause a temporary spike in
+  goods prices that then reverses, a single month's core PCE can swing
+  dramatically and mislead policy. The Fed explicitly says it looks at
+  <strong>supercore PCE</strong> — services inflation excluding housing — to cut
+  through these distortions, adding yet another layer of complexity to the
+  interpretation.
+</p>
+
+<p>
+  Core PCE connects directly to the broader concept of <strong>financial
+  conditions</strong>, which is why Warsh's Jackson Hole statement was so
+  significant. When he said he would be "hard pressed to describe broad financial
+  conditions as restrictive," he was making a precise claim: despite elevated
+  interest rates on paper, credit was still flowing freely, stock markets were
+  near record highs, and spreads were tight. This matters because the Fed's rate
+  hikes only work to cool inflation if they actually tighten conditions — if
+  markets price in imminent cuts, long-term rates don't rise much and the
+  tightening has little bite. Core PCE sitting at 3.3% while financial conditions
+  remain loose means the Fed's inflation-fighting medicine hasn't been absorbed.
+  That's the chain: core PCE elevated → Fed signals longer-for-higher → financial
+  conditions tighten → borrowing slows → demand cools → inflation falls. Break
+  any link, and the whole mechanism fails.
+</p>
+<div class="concept-side">Sources: KEVIN WARSH DROPS THE HAMMER: Why a Fed Rate Hike Is Back on the Table!<br>Related in this category: <a href="inflation_breadth.html">Inflation Breadth</a>, <a href="congressional_budget_office_projections.html">Congressional Budget Office (CBO) Projections</a>, <a href="financial_conditions_index.html">Financial Conditions Index</a>, <a href="consumer_credit_card_delinquency_rate.html">Consumer Credit Card Delinquency Rate</a>, <a href="total_consumer_debt.html">Total Household / Consumer Debt</a>, <a href="pawn_receivables_economic_indicator.html">Pawn Receivables as Shadow Economic Indicator</a></div>
+<button class="concept-done" data-slug="core_pce" onclick="toggleDone('core_pce')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_core_pce';</script>
+<script src="../../book.js"></script>
+
+<script>
+(function() {
+  var DONE_KEY = 'fg_done', FILTER_KEY = 'fg_filter';
+  var done = JSON.parse(localStorage.getItem(DONE_KEY) || '{}');
+  var filter = localStorage.getItem(FILTER_KEY) || 'all';
+
+  function visible(flag) {
+    if (filter === 'star') return flag === 'star';
+    if (filter === 'nodeep') return flag !== 'deep';
+    return true;
+  }
+
+  function apply() {
+    var shown = 0, total = 0, hidden = 0;
+    document.querySelectorAll('.concept-row').forEach(function(r) {
+      var slug = r.dataset.slug, flag = r.dataset.flag;
+      total++;
+      if (done[slug]) r.classList.add('done'); else r.classList.remove('done');
+      if (visible(flag)) { r.classList.remove('fg-hidden'); shown++; }
+      else { r.classList.add('fg-hidden'); hidden++; }
+    });
+    document.querySelectorAll('.cat-card').forEach(function(card) {
+      var slugs = card.dataset.slugs ? card.dataset.slugs.split(',') : [];
+      var flags = card.dataset.flags ? card.dataset.flags.split(',') : [];
+      var vis = 0, allDone = slugs.length > 0;
+      slugs.forEach(function(sl, i) {
+        if (visible(flags[i])) vis++;
+        if (!done[sl]) allDone = false;
+      });
+      total += slugs.length; shown += vis;
+      var c = card.querySelector('.cat-count');
+      if (c) c.textContent = vis + (vis !== slugs.length ? ' of ' + slugs.length : '') + ' concepts' +
+        (card.dataset.stars ? ' \u00b7 ' + card.dataset.stars + ' \u2605' : '');
+      if (vis === 0) card.classList.add('fg-empty'); else card.classList.remove('fg-empty');
+      if (allDone) card.classList.add('done'); else card.classList.remove('done');
+    });
+    document.querySelectorAll('[data-filter]').forEach(function(b) {
+      b.classList.toggle('active', b.dataset.filter === filter);
+    });
+    var n = document.getElementById('fgCount');
+    if (n) n.textContent = shown + ' of ' + total + ' shown';
+    var h = document.getElementById('fgHiddenNote');
+    if (h) h.textContent = hidden ? hidden + ' hidden by the filter.' : '';
+    var btn = document.querySelector('.concept-done');
+    if (btn) {
+      var on = !!done[btn.dataset.slug];
+      btn.classList.toggle('on', on);
+      btn.textContent = on ? '\u2713 Completed' : '\u2713 Mark complete';
+    }
+  }
+
+  window.setFilter = function(f) {
+    filter = f; localStorage.setItem(FILTER_KEY, f); apply();
+  };
+  window.toggleDone = function(slug) {
+    if (done[slug]) delete done[slug]; else done[slug] = true;
+    localStorage.setItem(DONE_KEY, JSON.stringify(done));
+    apply();
+  };
+  window.toggleHideDone = function() {
+    document.body.classList.toggle('hide-done');
+  };
+  apply();
+})();
+</script>
+
+</body>
+</html>

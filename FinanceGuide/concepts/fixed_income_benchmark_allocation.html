@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Fixed-Income Benchmark Allocation (Government vs. Non-Government Split) - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.tier .tier-desc { color: #a08060; font-size: 0.85rem; margin: 0.4rem 0 0.8rem; }
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../portfolio-management-asset-allocation.html">&larr; Portfolio Management &amp; Asset Allocation</a>
+
+<div class="concept-meta"><span>standard</span><span>Portfolio Management &amp; Asset Allocation</span><span>added 2026-09-06</span></div>
+<h4 id="fixed_income_benchmark_allocation">Fixed-Income Benchmark Allocation (Government vs. Non-Government Split)</h4>
+
+<p>When large institutions invest in bonds, they don't just buy bonds at random. They operate against a <strong>fixed-income benchmark</strong> — a formal target that specifies exactly what percentage of their bond portfolio should sit in each category of debt. The most fundamental split within that benchmark is between <strong>government bonds</strong> (debt issued by national governments, like US Treasuries or German Bunds) and <strong>non-government bonds</strong> (debt issued by corporations, mortgage-backed securities, supranational agencies, and other non-sovereign borrowers). This split isn't a preference — it's a constitutional document for how the portfolio is structured. Every dollar in the fund gravitates toward that target, and changing it triggers billions in real transactions.</p>
+
+<p>This allocation matters because it determines the basic risk profile of the entire portfolio and sends ripple effects through global credit markets. Government bonds are traditionally considered <strong>risk-free assets</strong> — the baseline against which all other debt is priced. When a massive fund shifts its benchmark away from government bonds toward non-government bonds, it is explicitly redefining what "safe" means. That redefinition has consequences: it changes the demand profile for sovereign debt (governments must offer better rates to attract buyers), it floods corporate and mortgage markets with new institutional capital (pushing yields down and borrowing costs lower for companies and homeowners), and it signals to other large investors that the old hierarchy of safety may be shifting.</p>
+
+<p>Mechanically, here's how a benchmark shift actually works. The fund's governing body sets a <strong>strategic asset allocation</strong> — for example, "70% of our bond portfolio will be government bonds." Every bond the fund holds is categorized, weighted by market value, and compared to that target. <strong>Portfolio managers</strong> then buy and sell continuously to keep the actual portfolio aligned with the benchmark within a narrow tolerance band. When the benchmark itself changes — say, from 70% government to 50% government — the managers must sell government bonds and buy non-government bonds in sufficient quantity to re-anchor the portfolio to the new target. For a $2.3 trillion fund, even a 1% shift represents roughly $23 billion in transactions.</p>
+
+<p>The real-world example at the center of this concept is Norway's <strong>Norges Bank Investment Management (NBIM)</strong>, which manages Norway's Government Pension Fund Global — the world's largest sovereign wealth fund at approximately $2.3 trillion. In 2025, NBIM submitted a formal proposal to Norway's finance ministry to cut the government bond share of its fixed-income benchmark from 70% to 50%. The US Treasury weight within the government slice drops from 34.1% to 21.9%, translating to roughly $75–85 billion leaving US sovereign debt. Simultaneously, the non-government US allocation rises from 16.2% to 27.6% — meaning Norway is actually increasing its exposure to American mortgage-backed securities and corporate bonds, even as it reduces Treasury holdings.</p>
+
+<p>The critical nuance in Norway's move — and what makes it instructive for investors — is that total US dollar exposure remains unchanged at approximately 50%. This is not capital flight from America. It's a <strong>within-currency reallocation</strong>, shifting from lending to the US government to lending to American homeowners and corporations. For traders, this distinction matters enormously. It means demand for US Treasuries weakens at the margin (potentially nudging yields slightly higher), while demand for <strong>agency mortgage-backed securities</strong> and investment-grade corporate bonds strengthens. A sophisticated investor watching this move would not short the dollar — they would look at the spread between Treasuries and mortgage securities as a potential signal of where large institutional money is flowing.</p>
+
+<p>One of the most common misconceptions around benchmark allocations is conflating them with political statements. When Norway adjusts its government bond target, financial media reached for the <strong>de-dollarization</strong> narrative — the idea that foreign powers are abandoning US assets as a geopolitical rebuke. But sovereign wealth funds are structurally incapable of making emotional portfolio decisions. They operate through multi-year academic review processes, formal proposals to finance ministries, and committee approval chains. The actual driver of Norway's shift is almost certainly a mathematical one: in a world where government bond yields have risen significantly since the near-zero rate era, the <em>relative</em> risk-adjusted return between government and non-government bonds has changed. The benchmark is catching up to new math, not new politics.</p>
+
+<blockquote>"This is a fund that writes academic papers before it changes a decimal point. So when money this slow moves, it's not angry. It's doing, oh, maybe a little bit of math. And the math it just did should bother you a lot more than the anger ever could."</blockquote>
+
+<p>Where this framework breaks down is in periods of acute market stress. Non-government bonds — even highly-rated <strong>mortgage-backed securities</strong> — can experience <strong>liquidity crunches</strong> that government bonds historically do not. In March 2020, even agency MBS saw dramatic spread widening and liquidity evaporation until the Federal Reserve intervened. A fund with a 50% non-government benchmark is structurally more exposed to these episodes. The deeper risk is <strong>correlation collapse</strong>: in normal markets, non-government bonds offer diversification and yield pickup. In a financial crisis, they can correlate strongly with equities, undermining the entire premise of holding bonds as portfolio ballast. The shift toward non-government exposure buys higher expected return at the cost of worse behavior precisely when you most need stability.</p>
+
+<p>This concept connects directly to several other foundational market ideas. The government vs. non-government split is essentially an expression of the <strong>credit risk premium</strong> — the extra yield investors demand for lending to non-sovereign borrowers. It ties into <strong>duration management</strong>, since government and non-government bonds often have different average maturities. It intersects with <strong>currency allocation</strong>, as Norway's case shows: you can hold US-denominated non-government bonds without increasing dollar risk. Most importantly, it speaks to the evolving definition of the <strong>risk-free rate</strong>. If the world's most conservative, most studied, most deliberate institutional investor is formally reassigning what counts as "safe" in its own benchmark, that is a structural signal worth understanding long before it becomes a headline.</p>
+<div class="concept-side">Sources: THE RISK-FREE TRAP: Norway Cuts US Treasuries to Lend to American Homeowners!<br>Related in this category: <a href="etf_fund_flows.html">ETF Fund Flows</a>, <a href="consumer_discretionary_vs_staples_portfolio_strategy.html">Consumer Discretionary vs. Consumer Staples (Sector Rotation)</a>, <a href="energy_as_inflation_hedge.html">Energy and Raw Commodities as Inflation Hedge</a>, <a href="price_insensitive_buyer.html">Price-Insensitive (Benchmark-Driven) Buyer</a>, <a href="benchmark_contagion.html">Benchmark Contagion (Index Methodology Copying)</a>, <a href="sector_rotation.html">Sector Rotation</a></div>
+<button class="concept-done" data-slug="fixed_income_benchmark_allocation" onclick="toggleDone('fixed_income_benchmark_allocation')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_fixed_income_benchmark_allocation';</script>
+<script src="../../book.js"></script>
+
+<script>
+(function() {
+  var DONE_KEY = 'fg_done', FILTER_KEY = 'fg_filter';
+  var done = JSON.parse(localStorage.getItem(DONE_KEY) || '{}');
+  var filter = localStorage.getItem(FILTER_KEY) || 'all';
+
+  function visible(flag) {
+    if (filter === 'star') return flag === 'star';
+    if (filter === 'nodeep') return flag !== 'deep';
+    return true;
+  }
+
+  function apply() {
+    var shown = 0, total = 0, hidden = 0;
+    document.querySelectorAll('.concept-row').forEach(function(r) {
+      var slug = r.dataset.slug, flag = r.dataset.flag;
+      total++;
+      if (done[slug]) r.classList.add('done'); else r.classList.remove('done');
+      if (visible(flag)) { r.classList.remove('fg-hidden'); shown++; }
+      else { r.classList.add('fg-hidden'); hidden++; }
+    });
+    document.querySelectorAll('.cat-card').forEach(function(card) {
+      var slugs = card.dataset.slugs ? card.dataset.slugs.split(',') : [];
+      var flags = card.dataset.flags ? card.dataset.flags.split(',') : [];
+      var vis = 0, allDone = slugs.length > 0;
+      slugs.forEach(function(sl, i) {
+        if (visible(flags[i])) vis++;
+        if (!done[sl]) allDone = false;
+      });
+      total += slugs.length; shown += vis;
+      var c = card.querySelector('.cat-count');
+      if (c) c.textContent = vis + (vis !== slugs.length ? ' of ' + slugs.length : '') + ' concepts' +
+        (card.dataset.stars ? ' \u00b7 ' + card.dataset.stars + ' \u2605' : '');
+      if (vis === 0) card.classList.add('fg-empty'); else card.classList.remove('fg-empty');
+      if (allDone) card.classList.add('done'); else card.classList.remove('done');
+    });
+    document.querySelectorAll('[data-filter]').forEach(function(b) {
+      b.classList.toggle('active', b.dataset.filter === filter);
+    });
+    var n = document.getElementById('fgCount');
+    if (n) n.textContent = shown + ' of ' + total + ' shown';
+    var h = document.getElementById('fgHiddenNote');
+    if (h) h.textContent = hidden ? hidden + ' hidden by the filter.' : '';
+    var btn = document.querySelector('.concept-done');
+    if (btn) {
+      var on = !!done[btn.dataset.slug];
+      btn.classList.toggle('on', on);
+      btn.textContent = on ? '\u2713 Completed' : '\u2713 Mark complete';
+    }
+  }
+
+  window.setFilter = function(f) {
+    filter = f; localStorage.setItem(FILTER_KEY, f); apply();
+  };
+  window.toggleDone = function(slug) {
+    if (done[slug]) delete done[slug]; else done[slug] = true;
+    localStorage.setItem(DONE_KEY, JSON.stringify(done));
+    apply();
+  };
+  window.toggleHideDone = function() {
+    document.body.classList.toggle('hide-done');
+  };
+  apply();
+})();
+</script>
+
+</body>
+</html>

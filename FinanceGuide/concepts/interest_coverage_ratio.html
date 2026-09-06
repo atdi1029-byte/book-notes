@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Interest Coverage Ratio - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.tier .tier-desc { color: #a08060; font-size: 0.85rem; margin: 0.4rem 0 0.8rem; }
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../accounting-financial-statements.html">&larr; Accounting &amp; Financial Statements</a>
+
+<div class="concept-meta"><span>standard</span><span>Accounting &amp; Financial Statements</span><span>added 2026-08-31</span></div>
+<h4 id="interest_coverage_ratio">Interest Coverage Ratio</h4>
+
+<p>The <strong>interest coverage ratio (ICR)</strong> is one of the most direct measures of a company's financial health: it tells you how many times over a business can pay its interest bill using the money it earns from operations. The formula is straightforward — take <strong>earnings before interest and taxes (EBIT)</strong>, then divide by the company's total interest expense for the same period. A ratio of 3.0 means the company earns three dollars of operating profit for every dollar it owes in interest. A ratio of 1.0 means it's running on fumes — every cent of operating income goes straight to lenders, with nothing left for growth, dividends, or unexpected costs. Below 1.0, the company cannot cover its interest from operations at all.</p>
+
+<p>Why should anyone outside a credit analyst's office care about this number? Because interest coverage is the canary in the coal mine for debt-driven economic stress. When the <strong>Federal Reserve</strong> raises interest rates, it doesn't just make mortgages more expensive — it raises the cost of every floating-rate loan, every refinanced bond, every revolving credit facility that corporations depend on to fund daily operations. A company that comfortably covered its interest at 2% rates may suddenly struggle to do so at 5%. Multiply that stress across thousands of companies and you get a systemic vulnerability — not a single bankruptcy, but a slow-motion squeeze that drags down earnings, hiring, and capital investment across the entire economy simultaneously.</p>
+
+<p>The mechanical chain works like this. A company borrows money by issuing bonds or taking bank loans, and in exchange it makes regular <strong>interest payments</strong> — fixed obligations that don't shrink just because revenues disappoint. Operating profits, by contrast, fluctuate with business conditions. When revenues fall or costs rise, EBIT compresses. When interest rates rise and the company needs to refinance existing debt at higher rates, the denominator of the ratio grows. Both forces squeeze the ratio from both ends at once. A company with a ratio of 2.5x that sees a 20% revenue decline and a 30% jump in interest costs — because its debt just rolled over at a higher rate — can find itself sitting at 1.4x almost overnight, well inside the distress zone that credit analysts watch closely.</p>
+
+<p>The video's central data point makes this concrete in a jarring way. The presenter cites estimates that <strong>40–46% of Russell 2000 companies</strong> — the index tracking small-cap American businesses — cannot cover their interest expenses from operating profits. Nearly half of small American companies are already technically insolvent on a cash-flow basis before they pay a dollar toward principal, taxes, or growth investment. These aren't startup moonshots burning capital deliberately; many are established operating businesses — manufacturers, retailers, regional service firms — that borrowed heavily during the near-zero rate era of 2010–2021 and are now trapped. When <strong>Kevin Warsh</strong> stepped to the podium at Jackson Hole and signaled that rates would stay elevated, he was telling these companies that the lifeline they were waiting for — rate cuts — wasn't coming soon.</p>
+
+<p>Traders and credit investors use interest coverage ratios to price risk and time positions. <strong>High-yield bond</strong> analysts build coverage ratio thresholds into their covenant models — a ratio falling below 1.5x often triggers a covenant violation, forcing renegotiation or accelerated repayment. <strong>Equity investors</strong> use declining ICR trends as an early warning to reduce exposure before a formal credit event. In the leveraged loan market, <strong>collateralized loan obligation (CLO)</strong> managers track aggregate coverage ratios across their portfolios because a wave of simultaneous covenant violations can force asset sales that cascade into broader market dislocations. When a Jackson Hole speech reprices the two-year Treasury sharply upward — as Warsh's remarks did, pushing it past <strong>4.3%</strong> within minutes — experienced traders immediately think about which corners of the credit market are closest to their ICR tripwires.</p>
+
+<p>The most important nuance is the difference between <strong>fixed-rate and floating-rate debt</strong>. A company with long-dated fixed-rate bonds is insulated from near-term rate moves — its interest expense is locked in. A company with floating-rate bank loans or short-dated bonds that need refinancing is fully exposed. The Russell 2000, dominated by smaller companies that rely heavily on bank credit and floating-rate facilities rather than bond markets, skews dramatically toward the vulnerable side of this divide. This is why the small-cap index carries a qualitatively different kind of rate risk than the S&amp;P 500, where large multinationals often locked in decades of cheap fixed-rate debt during the 2020–2021 zero-rate window. Treating all equities as equivalently rate-sensitive is a beginner's mistake.</p>
+
+<p>When interest coverage ratios deteriorate at scale, the failure modes are messy and nonlinear. Individual companies don't just quietly go bankrupt — they cut capital expenditures first, then freeze hiring, then slash dividends, then sell assets at distressed prices, and only then formally default. Each of these steps ripples outward: capex cuts hit equipment manufacturers, hiring freezes reduce consumer spending, asset sales compress valuations across sectors. The aggregate effect is a <strong>credit crunch</strong> that arrives not with a single dramatic collapse but as a grinding slowdown that takes quarters to fully register in economic data. The video frames this as the real story beneath the Jackson Hole headlines — not the day's market move, but the underlying $40 trillion debt structure that makes every "rates higher for longer" signal incrementally more dangerous.</p>
+
+<p>Interest coverage connects directly to several other concepts worth understanding together. <strong>Debt service coverage ratio (DSCR)</strong> extends the idea by including principal repayment in the denominator — stricter, and especially relevant in real estate lending. <strong>Free cash flow yield</strong> approaches the same question from a different angle, measuring how much cash is actually left after all obligations. In bond markets, ICR trends feed directly into <strong>credit ratings</strong>: sustained coverage below 1.5x is often enough to trigger a downgrade from investment grade to high yield, forcing institutional holders who can only own investment-grade paper to sell — a mechanical forced-selling dynamic that has nothing to do with the company's underlying business prospects. Understanding interest coverage means understanding why monetary policy is never just about inflation; it's about the entire architecture of corporate debt that was built when money was cheap.</p>
+<div class="concept-side">Sources: THE JACKSON HOLE TRAP: Why Kevin Warsh Just Crashed Gold &amp; Bitcoin!<br>Related in this category: <a href="loan_loss_provisions.html">Loan Loss Provisions (Agricultural)</a>, <a href="comparable_store_sales.html">Comparable Store Sales (Comp Sales / Same-Store Sales)</a>, <a href="earnings_quality.html">Earnings Quality (Adjusted vs. Reported Earnings)</a>, <a href="gross_margin.html">Gross Margin</a></div>
+<button class="concept-done" data-slug="interest_coverage_ratio" onclick="toggleDone('interest_coverage_ratio')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_interest_coverage_ratio';</script>
+<script src="../../book.js"></script>
+
+<script>
+(function() {
+  var DONE_KEY = 'fg_done', FILTER_KEY = 'fg_filter';
+  var done = JSON.parse(localStorage.getItem(DONE_KEY) || '{}');
+  var filter = localStorage.getItem(FILTER_KEY) || 'all';
+
+  function visible(flag) {
+    if (filter === 'star') return flag === 'star';
+    if (filter === 'nodeep') return flag !== 'deep';
+    return true;
+  }
+
+  function apply() {
+    var shown = 0, total = 0, hidden = 0;
+    document.querySelectorAll('.concept-row').forEach(function(r) {
+      var slug = r.dataset.slug, flag = r.dataset.flag;
+      total++;
+      if (done[slug]) r.classList.add('done'); else r.classList.remove('done');
+      if (visible(flag)) { r.classList.remove('fg-hidden'); shown++; }
+      else { r.classList.add('fg-hidden'); hidden++; }
+    });
+    document.querySelectorAll('.cat-card').forEach(function(card) {
+      var slugs = card.dataset.slugs ? card.dataset.slugs.split(',') : [];
+      var flags = card.dataset.flags ? card.dataset.flags.split(',') : [];
+      var vis = 0, allDone = slugs.length > 0;
+      slugs.forEach(function(sl, i) {
+        if (visible(flags[i])) vis++;
+        if (!done[sl]) allDone = false;
+      });
+      total += slugs.length; shown += vis;
+      var c = card.querySelector('.cat-count');
+      if (c) c.textContent = vis + (vis !== slugs.length ? ' of ' + slugs.length : '') + ' concepts' +
+        (card.dataset.stars ? ' \u00b7 ' + card.dataset.stars + ' \u2605' : '');
+      if (vis === 0) card.classList.add('fg-empty'); else card.classList.remove('fg-empty');
+      if (allDone) card.classList.add('done'); else card.classList.remove('done');
+    });
+    document.querySelectorAll('[data-filter]').forEach(function(b) {
+      b.classList.toggle('active', b.dataset.filter === filter);
+    });
+    var n = document.getElementById('fgCount');
+    if (n) n.textContent = shown + ' of ' + total + ' shown';
+    var h = document.getElementById('fgHiddenNote');
+    if (h) h.textContent = hidden ? hidden + ' hidden by the filter.' : '';
+    var btn = document.querySelector('.concept-done');
+    if (btn) {
+      var on = !!done[btn.dataset.slug];
+      btn.classList.toggle('on', on);
+      btn.textContent = on ? '\u2713 Completed' : '\u2713 Mark complete';
+    }
+  }
+
+  window.setFilter = function(f) {
+    filter = f; localStorage.setItem(FILTER_KEY, f); apply();
+  };
+  window.toggleDone = function(slug) {
+    if (done[slug]) delete done[slug]; else done[slug] = true;
+    localStorage.setItem(DONE_KEY, JSON.stringify(done));
+    apply();
+  };
+  window.toggleHideDone = function() {
+    document.body.classList.toggle('hide-done');
+  };
+  apply();
+})();
+</script>
+
+</body>
+</html>

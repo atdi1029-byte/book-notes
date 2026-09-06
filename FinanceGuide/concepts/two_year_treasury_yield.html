@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Two-Year Treasury Yield - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.tier .tier-desc { color: #a08060; font-size: 0.85rem; margin: 0.4rem 0 0.8rem; }
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../fixed-income-bonds.html">&larr; Fixed Income &amp; Bonds</a>
+
+<div class="concept-meta"><span><span class="star">&#9733;</span> must-know</span><span>Fixed Income &amp; Bonds</span><span>added 2026-08-31</span></div>
+<h4 id="two_year_treasury_yield">Two-Year Treasury Yield</h4>
+
+<p>The <strong>two-year Treasury yield</strong> is the annualized return an investor earns by lending money to the U.S. government for exactly two years. When you buy a <strong>Treasury note</strong> with a two-year maturity, you are essentially making a two-year loan to the federal government. The yield on that loan moves inversely with price — when more investors want to own the note, its price rises and its yield falls; when investors sell, prices fall and yields rise. On any given trading day, the two-year yield is one of the most actively watched numbers in global finance, because it does something no other market instrument does quite as cleanly: it tells you what professional bond traders collectively believe the Federal Reserve will do with short-term interest rates over the next two years.</p>
+
+<p>The reason the two-year yield is so sensitive to <strong>Fed policy expectations</strong> comes down to a simple arbitrage logic. If the Fed is expected to hold its benchmark rate — the <strong>federal funds rate</strong> — at 5% for the next eighteen months and then cut once, professional investors will price the two-year Treasury to yield something close to that average expected path. There is no mystery or magic here: bond traders are constantly comparing what they can earn on a two-year government note versus what they could earn by rolling a series of overnight loans at whatever rate the Fed sets. When those two paths diverge, capital flows immediately to close the gap. This is why the two-year yield is often called a <strong>shadow forecast</strong> of Fed policy — it aggregates the bets of thousands of institutional traders into a single number you can watch in real time.</p>
+
+<p>Mechanically, here is how a Fed speech moves the two-year yield step by step. First, a Fed official signals that rates will stay higher for longer — or hints that a rate hike is coming. Second, traders update their models: if the Fed funds rate stays elevated, rolling short-term cash earns more than a two-year note currently yields. Third, traders sell the two-year note to capture that better return in cash or short-duration instruments. Fourth, as selling pressure increases, the price of the two-year note falls. Fifth, because yield moves opposite to price, the yield rises — sometimes within seconds. The whole chain happens algorithmically now, with trading systems parsing Fed language in milliseconds and executing before a human analyst has finished reading the first paragraph of the speech. The speed is not an accident; it is the mechanism itself, operating at machine velocity.</p>
+
+<p>The Jackson Hole episode in this video is a textbook illustration. When Fed Chair <strong>Kevin Warsh</strong> stepped to the podium and told markets the Fed still had "work to do on inflation," the <strong>two-year Treasury yield jumped past 4.3% within minutes</strong>. What powered that specific move was not the word "hawkish" alone — it was the inflation breadth data Warsh presented underneath the headline. He showed that 54% of the 199 components in the <strong>PCE inflation basket</strong> were still rising above 3% annually. When traders saw that statistic, their models concluded that rate cuts were off the table and a September hike was possible. Algorithms repriced the two-year yield instantly, and because that yield sets the opportunity cost of holding every other asset — gold, Bitcoin, equities, real estate — the sell-off cascaded outward from that single number within the same afternoon.</p>
+
+<blockquote>"The two-year Treasury yield, the part of the bond market that prices Fed policy most directly, jumped past 4.3% within minutes of Warsh finishing his remarks."</blockquote>
+
+<p>Traders and investors use the two-year yield as a <strong>real-time policy barometer</strong>. When the yield is rising sharply, the market is telling you it expects the Fed to tighten — which tightens financial conditions everywhere. Mortgage rates move up. Corporate borrowing costs increase. The dollar typically strengthens as higher U.S. yields attract foreign capital. Conversely, when the two-year yield falls rapidly, the market is pricing in cuts — which generally loosens financial conditions, weakens the dollar, and often provides a tailwind for risk assets. Professional traders also watch the <strong>spread between the two-year and the ten-year yield</strong>, known as the <strong>yield curve</strong>. When the two-year yield rises above the ten-year yield, the curve <strong>inverts</strong> — historically one of the most reliable recession warning signals in modern finance, because it suggests the market expects tight policy today will eventually force the Fed to cut aggressively in the future.</p>
+
+<p>The most common misconception about the two-year yield is that it is simply a measure of inflation expectations. It is not — that is primarily the role of the <strong>ten-year yield</strong> and the <strong>breakeven inflation rate</strong> derived from <strong>Treasury Inflation-Protected Securities (TIPS)</strong>. The two-year is almost purely a Fed policy instrument. A second misconception is that a rising two-year yield is automatically bad for all assets. In a healthy economy, a rising two-year yield alongside a steepening curve can actually signal growth optimism — the Fed is raising rates because the economy is running hot, not because it is desperate to fight inflation. Context matters enormously. The same number — say, 4.3% — can be bullish or bearish depending on whether it is rising because growth is strong or because inflation is stubbornly sticky despite weak growth, which is the far more dangerous scenario known as <strong>stagflation</strong>.</p>
+
+<p>The two-year yield breaks down as a signal in a specific and dangerous way: when the Federal Reserve loses credibility. Under normal conditions, the two-year yield reflects rational expectations about where the Fed funds rate will average over the next two years. But if markets begin to doubt that the Fed will actually follow through — either because political pressure is forcing premature cuts, or because the debt burden makes rate hikes economically unsustainable — the two-year yield can decouple from true policy expectations. This is the deeper story the video gestures toward: the <strong>$40 trillion debt problem</strong>. At some level of national debt, the government's own interest expense becomes so large that the Fed cannot raise rates without triggering a fiscal crisis. When markets start to price that constraint in, the two-year yield stops being a clean Fed policy signal and starts becoming something murkier — a bet on whether the Fed can remain independent, which is a very different and far more unsettling wager.</p>
+
+<p>The two-year yield connects directly to <strong>opportunity cost</strong>, which is the core mechanism behind the gold and Bitcoin sell-off described in the video. Hard assets like gold pay no yield. Bitcoin pays no yield. When the two-year Treasury yields 4.3%, every dollar sitting in gold is a dollar that could instead be earning 4.3% risk-free, guaranteed by the U.S. government. As the two-year yield rises, the opportunity cost of holding zero-yield assets rises with it — making gold and Bitcoin progressively less attractive relative to simply owning Treasuries. When that threshold crossed 4.3% in minutes on the day of Warsh's speech, the math flipped decisively for enough algorithmic strategies simultaneously that billions in gold and crypto were liquidated in a single afternoon. Understanding the two-year yield is not optional for anyone who owns hard assets — it is the single number most likely to trigger the next major sell-off, or the next major rally, in those markets.</p>
+<div class="concept-side">Sources: THE JACKSON HOLE TRAP: Why Kevin Warsh Just Crashed Gold &amp; Bitcoin!; THE JOBS GUT PUNCH: Why Good News Sold Off Wall Street &amp; Crushed Tech!<br>Related in this category: <a href="treasury_bond_buyback_program.html">Treasury Bond Buyback Program</a>, <a href="thirty_year_treasury_bond.html">30-Year Treasury Bond</a>, <a href="debt_rollover_risk.html">Debt Rollover Risk</a>, <a href="corporate_refinancing_cliff.html">Corporate Refinancing Cliff</a>, <a href="duration_risk.html">Duration Risk</a>, <a href="ten_year_treasury_yield_benchmark.html">10-Year Treasury Yield as Real Economy Benchmark</a></div>
+<button class="concept-done" data-slug="two_year_treasury_yield" onclick="toggleDone('two_year_treasury_yield')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_two_year_treasury_yield';</script>
+<script src="../../book.js"></script>
+
+<script>
+(function() {
+  var DONE_KEY = 'fg_done', FILTER_KEY = 'fg_filter';
+  var done = JSON.parse(localStorage.getItem(DONE_KEY) || '{}');
+  var filter = localStorage.getItem(FILTER_KEY) || 'all';
+
+  function visible(flag) {
+    if (filter === 'star') return flag === 'star';
+    if (filter === 'nodeep') return flag !== 'deep';
+    return true;
+  }
+
+  function apply() {
+    var shown = 0, total = 0, hidden = 0;
+    document.querySelectorAll('.concept-row').forEach(function(r) {
+      var slug = r.dataset.slug, flag = r.dataset.flag;
+      total++;
+      if (done[slug]) r.classList.add('done'); else r.classList.remove('done');
+      if (visible(flag)) { r.classList.remove('fg-hidden'); shown++; }
+      else { r.classList.add('fg-hidden'); hidden++; }
+    });
+    document.querySelectorAll('.cat-card').forEach(function(card) {
+      var slugs = card.dataset.slugs ? card.dataset.slugs.split(',') : [];
+      var flags = card.dataset.flags ? card.dataset.flags.split(',') : [];
+      var vis = 0, allDone = slugs.length > 0;
+      slugs.forEach(function(sl, i) {
+        if (visible(flags[i])) vis++;
+        if (!done[sl]) allDone = false;
+      });
+      total += slugs.length; shown += vis;
+      var c = card.querySelector('.cat-count');
+      if (c) c.textContent = vis + (vis !== slugs.length ? ' of ' + slugs.length : '') + ' concepts' +
+        (card.dataset.stars ? ' \u00b7 ' + card.dataset.stars + ' \u2605' : '');
+      if (vis === 0) card.classList.add('fg-empty'); else card.classList.remove('fg-empty');
+      if (allDone) card.classList.add('done'); else card.classList.remove('done');
+    });
+    document.querySelectorAll('[data-filter]').forEach(function(b) {
+      b.classList.toggle('active', b.dataset.filter === filter);
+    });
+    var n = document.getElementById('fgCount');
+    if (n) n.textContent = shown + ' of ' + total + ' shown';
+    var h = document.getElementById('fgHiddenNote');
+    if (h) h.textContent = hidden ? hidden + ' hidden by the filter.' : '';
+    var btn = document.querySelector('.concept-done');
+    if (btn) {
+      var on = !!done[btn.dataset.slug];
+      btn.classList.toggle('on', on);
+      btn.textContent = on ? '\u2713 Completed' : '\u2713 Mark complete';
+    }
+  }
+
+  window.setFilter = function(f) {
+    filter = f; localStorage.setItem(FILTER_KEY, f); apply();
+  };
+  window.toggleDone = function(slug) {
+    if (done[slug]) delete done[slug]; else done[slug] = true;
+    localStorage.setItem(DONE_KEY, JSON.stringify(done));
+    apply();
+  };
+  window.toggleHideDone = function() {
+    document.body.classList.toggle('hide-done');
+  };
+  apply();
+})();
+</script>
+
+</body>
+</html>

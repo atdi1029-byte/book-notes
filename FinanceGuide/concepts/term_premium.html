@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Term Premium - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.tier .tier-desc { color: #a08060; font-size: 0.85rem; margin: 0.4rem 0 0.8rem; }
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../fixed-income-bonds.html">&larr; Fixed Income &amp; Bonds</a>
+
+<div class="concept-meta"><span><span class="star">&#9733;</span> must-know</span><span>Fixed Income &amp; Bonds</span><span>added 2026-09-06</span></div>
+<h4 id="term_premium">Term Premium</h4>
+
+<p>When you lend money to someone, you expect to be paid back with interest. But when you lend for a long time — ten years, twenty years, thirty years — you face risks that a short-term lender simply does not. Anything can happen in three decades: inflation can spike, governments can change, economies can collapse, better investment opportunities can emerge, and you're stuck holding a bond paying yesterday's rate. The extra compensation that investors demand for accepting all of those long-horizon risks is called the <strong>term premium</strong>. It is not the base interest rate — that's set by the central bank's expectations for short-term rates. Term premium is the additional yield layered on top, the price tag attached specifically to time itself and the uncertainty that comes with it.</p>
+
+<p>Term premium matters enormously because it is effectively the price of long-term capital in the economy. When term premium is low, borrowing for thirty years is cheap — corporations can finance factories, homeowners can lock in low mortgage rates, and governments can roll over debt at manageable costs. When term premium rises, all of that gets more expensive. A one percentage point rise in the term premium embedded in 30-year Treasury yields can add hundreds of dollars per month to a typical mortgage payment. It can push corporate project hurdle rates above profitability thresholds. It can dramatically increase the interest burden on the national debt. This is not an abstract number that lives in spreadsheets — it flows directly into monthly payments, hiring decisions, and government budgets.</p>
+
+<p>Mechanically, here is how term premium works. The yield on a long-term bond can be decomposed into two pieces. The first piece is the market's expectation of what short-term interest rates will average over the bond's life — if the Fed funds rate averages 3% over the next ten years, a 10-year Treasury should yield at least that much just to keep pace. The second piece is the term premium: additional compensation for the fact that those expectations could be wrong, that inflation could surprise, that liquidity might dry up before the bond matures, or that you might simply need your money back before the bond pays off. Economists at the Federal Reserve Bank of New York produce a model-based estimate of this decomposition called the <strong>ACM model</strong>, which shows term premium can swing from deeply negative to several percentage points depending on market conditions.</p>
+
+<p>For most of the period between 2010 and 2021, term premium was actually <em>negative</em> — meaning investors were so desperate for safe, long-dated assets that they accepted yields below what short-term rate expectations alone would justify. Why? Because sovereign wealth funds, central banks, and pension funds were buying Treasuries not because of careful risk/return analysis, but because of mandates. They had rules requiring a certain percentage of government bonds, and they bought regardless of price. This created what the video describes as <strong>price-insensitive buyers</strong> — institutions that do not ask "is this a good deal?" before purchasing. Their demand structurally suppressed term premium, giving the US government and American borrowers a hidden subsidy for years.</p>
+
+<p>The Norway story is the term premium story in live action. Norges Bank Investment Management held roughly $215 billion in US Treasuries — a massive, price-insensitive presence in the market. When it formally proposed cutting its government bond benchmark weight from 70% down to 50%, it wasn't saying Treasuries are bad investments. It was saying it no longer needs to hold them purely by mandate. The money that exits sovereign bonds — roughly $75 to $85 billion of US paper — will be reallocated into corporate bonds and mortgage-backed securities, including US agency MBS. The dollar exposure stays the same, around 50%. Norway is not leaving America. It is leaving the price-insensitive buyer club and becoming a credit risk buyer instead, demanding to be paid for the specific risks it takes.</p>
+
+<blockquote>"The world's most conservative investor just decided that lending money to the United States government is no longer the safest place to park a nation's savings."</blockquote>
+
+<p>When price-insensitive buyers exit, they get replaced by <strong>price-sensitive buyers</strong> — primarily hedge funds, primary dealers, and asset managers who run genuine risk/return analysis on every position. These buyers will absorb the Treasury supply that Norway and similar funds no longer take, but they will not do it for free. As the video puts it, they "want to be paid for that trouble and that risk." In practice, this means they demand higher yields on long-dated Treasuries, which mechanically means lower prices for existing bonds. The rise in yields reflects rising term premium — the market pricing the risk that fewer guaranteed buyers will show up for future auctions. Fewer mandated buyers means more genuine risk, and genuine risk commands genuine compensation.</p>
+
+<p>Traders use term premium as a signal in several ways. A rising term premium in isolation — particularly when short-term rate expectations are stable — tells you that the market is growing uncomfortable with duration risk, often for structural reasons like changing buyer composition, rising fiscal deficits, or deteriorating inflation credibility. Portfolio managers watch the ACM model and similar decompositions to decide whether to overweight or underweight long bonds relative to short ones. When term premium is compressing, the <strong>yield curve</strong> tends to flatten or invert. When it expands, the curve steepens — long rates rise faster than short rates — and that steepening is often a headwind for equity valuations, mortgage demand, and highly leveraged balance sheets. The Norway reallocation is a structural steepening catalyst precisely because it removes a buyer who never cared about steepness.</p>
+
+<p>A common misconception is that term premium is stable or predictable. It is neither. It is driven by the composition of the buyer base, the credibility of monetary policy, the supply of long-duration bonds, and the global demand for safe assets — all of which can shift suddenly. Another misconception is that a higher term premium is always bad. For savers and new investors in Treasuries, higher yields are a gift. The damage falls on existing bondholders (whose prices fall), leveraged borrowers, and governments carrying large debt loads that must be refinanced at higher rates. The beneficiary and the victim of rising term premium depend entirely on which side of the transaction you are on and when you entered it.</p>
+
+<p>Term premium connects directly to concepts like <strong>duration risk</strong>, the <strong>yield curve</strong>, <strong>quantitative easing</strong>, and <strong>sovereign buyer composition</strong>. QE programs by central banks were, in part, deliberate attempts to compress term premium by making the central bank itself a price-insensitive buyer of long bonds. When QE ends and balance sheets shrink — <strong>quantitative tightening</strong> — the central bank joins Norway in the exit queue, removing another guaranteed buyer and allowing term premium to normalize upward. What is happening with Norway is a private-sector version of the same dynamic: the slow withdrawal of mandated, indifferent capital from the long end of the Treasury market, leaving prices to be set by people who genuinely care about compensation for risk. That is not de-dollarization. That is re-pricing. And re-pricing long-duration debt affects every borrower in the economy who takes their cue from the 10-year or 30-year Treasury yield — which is almost all of them.</p>
+<div class="concept-side">Sources: THE RISK-FREE TRAP: Norway Cuts US Treasuries to Lend to American Homeowners!<br>Related in this category: <a href="two_year_treasury_yield.html">Two-Year Treasury Yield</a>, <a href="treasury_bond_buyback_program.html">Treasury Bond Buyback Program</a>, <a href="thirty_year_treasury_bond.html">30-Year Treasury Bond</a>, <a href="debt_rollover_risk.html">Debt Rollover Risk</a>, <a href="corporate_refinancing_cliff.html">Corporate Refinancing Cliff</a>, <a href="duration_risk.html">Duration Risk</a></div>
+<button class="concept-done" data-slug="term_premium" onclick="toggleDone('term_premium')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_term_premium';</script>
+<script src="../../book.js"></script>
+
+<script>
+(function() {
+  var DONE_KEY = 'fg_done', FILTER_KEY = 'fg_filter';
+  var done = JSON.parse(localStorage.getItem(DONE_KEY) || '{}');
+  var filter = localStorage.getItem(FILTER_KEY) || 'all';
+
+  function visible(flag) {
+    if (filter === 'star') return flag === 'star';
+    if (filter === 'nodeep') return flag !== 'deep';
+    return true;
+  }
+
+  function apply() {
+    var shown = 0, total = 0, hidden = 0;
+    document.querySelectorAll('.concept-row').forEach(function(r) {
+      var slug = r.dataset.slug, flag = r.dataset.flag;
+      total++;
+      if (done[slug]) r.classList.add('done'); else r.classList.remove('done');
+      if (visible(flag)) { r.classList.remove('fg-hidden'); shown++; }
+      else { r.classList.add('fg-hidden'); hidden++; }
+    });
+    document.querySelectorAll('.cat-card').forEach(function(card) {
+      var slugs = card.dataset.slugs ? card.dataset.slugs.split(',') : [];
+      var flags = card.dataset.flags ? card.dataset.flags.split(',') : [];
+      var vis = 0, allDone = slugs.length > 0;
+      slugs.forEach(function(sl, i) {
+        if (visible(flags[i])) vis++;
+        if (!done[sl]) allDone = false;
+      });
+      total += slugs.length; shown += vis;
+      var c = card.querySelector('.cat-count');
+      if (c) c.textContent = vis + (vis !== slugs.length ? ' of ' + slugs.length : '') + ' concepts' +
+        (card.dataset.stars ? ' \u00b7 ' + card.dataset.stars + ' \u2605' : '');
+      if (vis === 0) card.classList.add('fg-empty'); else card.classList.remove('fg-empty');
+      if (allDone) card.classList.add('done'); else card.classList.remove('done');
+    });
+    document.querySelectorAll('[data-filter]').forEach(function(b) {
+      b.classList.toggle('active', b.dataset.filter === filter);
+    });
+    var n = document.getElementById('fgCount');
+    if (n) n.textContent = shown + ' of ' + total + ' shown';
+    var h = document.getElementById('fgHiddenNote');
+    if (h) h.textContent = hidden ? hidden + ' hidden by the filter.' : '';
+    var btn = document.querySelector('.concept-done');
+    if (btn) {
+      var on = !!done[btn.dataset.slug];
+      btn.classList.toggle('on', on);
+      btn.textContent = on ? '\u2713 Completed' : '\u2713 Mark complete';
+    }
+  }
+
+  window.setFilter = function(f) {
+    filter = f; localStorage.setItem(FILTER_KEY, f); apply();
+  };
+  window.toggleDone = function(slug) {
+    if (done[slug]) delete done[slug]; else done[slug] = true;
+    localStorage.setItem(DONE_KEY, JSON.stringify(done));
+    apply();
+  };
+  window.toggleHideDone = function() {
+    document.body.classList.toggle('hide-done');
+  };
+  apply();
+})();
+</script>
+
+</body>
+</html>

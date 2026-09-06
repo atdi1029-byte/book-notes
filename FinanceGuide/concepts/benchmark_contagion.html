@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Benchmark Contagion (Index Methodology Copying) - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.tier .tier-desc { color: #a08060; font-size: 0.85rem; margin: 0.4rem 0 0.8rem; }
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../portfolio-management-asset-allocation.html">&larr; Portfolio Management &amp; Asset Allocation</a>
+
+<div class="concept-meta"><span>deep cut</span><span>Portfolio Management &amp; Asset Allocation</span><span>added 2026-09-06</span></div>
+<h4 id="benchmark_contagion">Benchmark Contagion (Index Methodology Copying)</h4>
+
+<p><strong>Benchmark contagion</strong> is the process by which a portfolio construction decision made by one major institution spreads across the financial system — not because other institutions copy the specific trades, but because they copy the underlying <strong>index methodology</strong> or <strong>benchmark framework</strong> that produced those trades. Think of a benchmark as a recipe. If Norway's sovereign wealth fund publishes a new recipe — say, "reduce government bonds from 70% to 50% of fixed income, replace with spread products weighted by market value" — and a dozen other funds adopt the same recipe, they will all end up buying and selling nearly identical securities, in nearly identical proportions, at nearly identical times, even without ever speaking to each other. The contagion is in the template, not the transaction.</p>
+
+<p>This matters enormously because modern finance is built on benchmarks. Pension funds, sovereign wealth funds, insurance companies, and large asset managers almost never construct portfolios from scratch using their own independent judgment. Instead, they hire consultants and investment committees that evaluate performance <em>relative to a standard index</em>. The <strong>benchmark</strong> is simultaneously a performance measurement tool and a portfolio construction guide. When a prestigious, deeply researched institution like Norway's Norges Bank Investment Management publicly revises its benchmark methodology — complete with academic backing and formal government submissions — it hands every other institution a pre-approved justification for making the same shift. The decision spreads through the institutional ecosystem like a virus moving through a population with no immunity.</p>
+
+<p>Here is the mechanical sequence. Step one: a flagship institution revises its <strong>fixed income benchmark</strong>, shifting weight away from one asset class (say, GDP-weighted government bonds) toward another (market-value-weighted <strong>spread products</strong> like mortgage-backed securities or corporate bonds). Step two: the revision is formal and public — it goes through a finance ministry, gets published in a technical proposal, and generates press coverage. Step three: other sovereign wealth funds, pension managers, and institutional allocators read the proposal. Their investment committees note that Norway — the most conservative, most systematically rigorous sovereign fund in the world — has done the analytical work and reached a conclusion. Step four: those institutions run their own internal reviews, which tend to confirm the same math because they are looking at the same markets. Step five: they each individually update their benchmarks, and the aggregate demand shift begins.</p>
+
+<p>The real-world example is the Norway situation itself, which unfolded publicly in mid-2025. Norges Bank Investment Management proposed cutting the government bond share of its fixed income benchmark from 70% to 50%. The US Treasury weight inside that government slice was set to drop from 34.1% to 21.9% — translating to roughly $75–85 billion in Treasury paper being displaced. The financial media framed this as an $80 billion story about de-dollarization. But the video's key insight is that Norway's total US dollar exposure stays at approximately 50% — they are not leaving America, they are shifting <em>within</em> the dollar universe, from Treasuries to dollar-denominated mortgage-backed securities. The contagion risk is not the $80 billion itself. It is what happens when the next ten sovereign funds read the same proposal and reach the same conclusion.</p>
+
+<blockquote>"Institutions don't copy each other's trades, they copy each other's benchmarks."</blockquote>
+
+<p>This distinction — trades versus benchmarks — is the entire point. If ten funds simultaneously sold $80 billion in Treasuries because they all read the same market signal, that would be a <strong>correlated trade</strong>, which regulators and market participants know how to identify and partially offset. But when ten funds each independently revise their benchmark methodology to structurally underweight long-dated government bonds in favor of <strong>market-value-weighted spread products</strong>, the selling is slow, institutionally sanctioned, and nearly invisible as a systemic phenomenon. No single institution appears to be making a bold call. Each appears to be doing routine portfolio maintenance. The aggregate effect on Treasury demand, however, is massive and self-reinforcing — and because it is embedded in benchmarks rather than short-term trades, it is sticky. Benchmarks do not reverse overnight.</p>
+
+<p>Traders and sophisticated investors use benchmark contagion as a forward-looking signal in several ways. First, they watch for <strong>benchmark methodology proposals</strong> from flagship institutions — these are often published months before implementation and telegraph demand shifts well in advance. Second, they track the <strong>consultant ecosystem</strong>: firms like Mercer, Aon, and Willis Towers Watson advise hundreds of pension funds simultaneously, and when they update their model portfolio recommendations to reflect a new benchmark approach, the downstream effect reaches trillions in assets. Third, they monitor <strong>spread compression</strong> in the sectors receiving the new benchmark weight — when mortgage-backed securities or investment-grade corporates start richening (yields falling, prices rising) without an obvious catalyst, institutional benchmark rebalancing is often the quiet engine. The signal is slow but powerful.</p>
+
+<p>The most important gotcha is confusing the <em>headline number</em> with the <em>systemic number</em>. Norway's $80 billion grab all the attention. But $80 billion in a $27 trillion Treasury market is a rounding error — the market absorbs that in weeks. The systemic risk is the <strong>cumulative demand destruction</strong> if the Norway benchmark shift becomes a template for the sovereign wealth fund peer group. The combined assets under management of the top twenty sovereign wealth funds exceed $10 trillion. If even a fraction of that cohort shifts from GDP-weighted government bonds to market-value-weighted spread products, the long-dated Treasury market faces a structural reduction in its natural buyer base — not a one-time shock, but a permanent repricing of who holds these bonds and at what yield. That is an entirely different order of magnitude from the headline figure.</p>
+
+<p>Benchmark contagion can fail or misfire in several ways. The most common failure mode is <strong>regulatory divergence</strong> — different sovereign funds operate under different mandates, and what Norway's finance ministry approves may be legally off-limits for a Gulf state fund or a Japanese pension. The contagion stops wherever regulatory frameworks differ sharply. A second failure mode is <strong>market saturation</strong>: if enough institutions simultaneously increase exposure to the same spread products, those products richen so quickly that the mathematical case for the shift evaporates. The benchmark update that looked smart at Norway's entry price looks terrible at the price created by everyone else copying Norway. This is the classic <strong>crowded trade problem</strong> applied to benchmark methodology rather than individual positions — the act of widespread adoption destroys the return thesis that motivated adoption.</p>
+
+<p>Benchmark contagion connects directly to several adjacent concepts. It is a cousin of <strong>index rebalancing effects</strong>, where stocks added to the S&P 500 surge in price as every index fund mechanically purchases them. It relates to <strong>liability-driven investing</strong>, because changes in how institutions match liabilities to assets often drive benchmark shifts in the first place. It is deeply tied to <strong>duration risk</strong> — Norway's shift is partly a shift away from long-duration government bonds, and if the peer group follows, the demand curve for thirty-year Treasuries shifts left structurally, pushing yields higher and tightening financial conditions broadly. And it connects to <strong>dollar hegemony</strong> debates: not because institutions are abandoning the dollar, but because they may increasingly prefer dollar-denominated private credit over dollar-denominated public debt — a subtle but consequential distinction for how the US government funds itself.</p>
+<div class="concept-side">Sources: THE RISK-FREE TRAP: Norway Cuts US Treasuries to Lend to American Homeowners!<br>Related in this category: <a href="etf_fund_flows.html">ETF Fund Flows</a>, <a href="consumer_discretionary_vs_staples_portfolio_strategy.html">Consumer Discretionary vs. Consumer Staples (Sector Rotation)</a>, <a href="energy_as_inflation_hedge.html">Energy and Raw Commodities as Inflation Hedge</a>, <a href="price_insensitive_buyer.html">Price-Insensitive (Benchmark-Driven) Buyer</a>, <a href="fixed_income_benchmark_allocation.html">Fixed-Income Benchmark Allocation (Government vs. Non-Government Split)</a>, <a href="sector_rotation.html">Sector Rotation</a></div>
+<button class="concept-done" data-slug="benchmark_contagion" onclick="toggleDone('benchmark_contagion')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_benchmark_contagion';</script>
+<script src="../../book.js"></script>
+
+<script>
+(function() {
+  var DONE_KEY = 'fg_done', FILTER_KEY = 'fg_filter';
+  var done = JSON.parse(localStorage.getItem(DONE_KEY) || '{}');
+  var filter = localStorage.getItem(FILTER_KEY) || 'all';
+
+  function visible(flag) {
+    if (filter === 'star') return flag === 'star';
+    if (filter === 'nodeep') return flag !== 'deep';
+    return true;
+  }
+
+  function apply() {
+    var shown = 0, total = 0, hidden = 0;
+    document.querySelectorAll('.concept-row').forEach(function(r) {
+      var slug = r.dataset.slug, flag = r.dataset.flag;
+      total++;
+      if (done[slug]) r.classList.add('done'); else r.classList.remove('done');
+      if (visible(flag)) { r.classList.remove('fg-hidden'); shown++; }
+      else { r.classList.add('fg-hidden'); hidden++; }
+    });
+    document.querySelectorAll('.cat-card').forEach(function(card) {
+      var slugs = card.dataset.slugs ? card.dataset.slugs.split(',') : [];
+      var flags = card.dataset.flags ? card.dataset.flags.split(',') : [];
+      var vis = 0, allDone = slugs.length > 0;
+      slugs.forEach(function(sl, i) {
+        if (visible(flags[i])) vis++;
+        if (!done[sl]) allDone = false;
+      });
+      total += slugs.length; shown += vis;
+      var c = card.querySelector('.cat-count');
+      if (c) c.textContent = vis + (vis !== slugs.length ? ' of ' + slugs.length : '') + ' concepts' +
+        (card.dataset.stars ? ' \u00b7 ' + card.dataset.stars + ' \u2605' : '');
+      if (vis === 0) card.classList.add('fg-empty'); else card.classList.remove('fg-empty');
+      if (allDone) card.classList.add('done'); else card.classList.remove('done');
+    });
+    document.querySelectorAll('[data-filter]').forEach(function(b) {
+      b.classList.toggle('active', b.dataset.filter === filter);
+    });
+    var n = document.getElementById('fgCount');
+    if (n) n.textContent = shown + ' of ' + total + ' shown';
+    var h = document.getElementById('fgHiddenNote');
+    if (h) h.textContent = hidden ? hidden + ' hidden by the filter.' : '';
+    var btn = document.querySelector('.concept-done');
+    if (btn) {
+      var on = !!done[btn.dataset.slug];
+      btn.classList.toggle('on', on);
+      btn.textContent = on ? '\u2713 Completed' : '\u2713 Mark complete';
+    }
+  }
+
+  window.setFilter = function(f) {
+    filter = f; localStorage.setItem(FILTER_KEY, f); apply();
+  };
+  window.toggleDone = function(slug) {
+    if (done[slug]) delete done[slug]; else done[slug] = true;
+    localStorage.setItem(DONE_KEY, JSON.stringify(done));
+    apply();
+  };
+  window.toggleHideDone = function() {
+    document.body.classList.toggle('hide-done');
+  };
+  apply();
+})();
+</script>
+
+</body>
+</html>

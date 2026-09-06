@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Japanese Government Bond (JGB) and Yield Curve Dynamics - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.tier .tier-desc { color: #a08060; font-size: 0.85rem; margin: 0.4rem 0 0.8rem; }
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../fixed-income-bonds.html">&larr; Fixed Income &amp; Bonds</a>
+
+<div class="concept-meta"><span>standard</span><span>Fixed Income &amp; Bonds</span><span>added 2026-09-03</span></div>
+<h4 id="japanese_government_bond_jgb">Japanese Government Bond (JGB) and Yield Curve Dynamics</h4>
+
+<p>A <strong>Japanese Government Bond (JGB)</strong> is a debt security issued by Japan's Ministry of Finance to fund government spending — functionally identical to a US Treasury bond, except it is denominated in yen and backed by the Japanese government. When Japan needs to borrow money, it sells these bonds to investors in exchange for regular interest payments (the <strong>coupon</strong>) and a promise to return the full principal at maturity. JGBs come in maturities ranging from a few months to 40 years, with the 2-year, 5-year, 10-year, and 30-year maturities being the most closely watched. The 10-year JGB is the benchmark — the number traders watch the way meteorologists watch barometric pressure. It tells you the foundational cost of money in the world's third-largest economy.</p>
+
+<p>Why should an American with a mortgage care what happens to a Japanese government bond? Because capital is global and interest rates are its price. Japan has spent three decades as the world's single largest creditor nation — Japanese institutions, pension funds, life insurers, and individual households collectively hold an estimated $3–4 trillion in foreign bonds, many of them US Treasuries. For most of those three decades, Japanese yields were pinned near zero or even negative, making foreign assets — especially higher-yielding US Treasuries — extraordinarily attractive by comparison. That <strong>yield differential</strong>, the gap between what you earn in Japan versus abroad, was the engine driving a massive, sustained flow of Japanese capital into global bond markets. When that differential shrinks — when JGB yields rise — Japanese investors have less reason to park money overseas, and they start repatriating it. Every dollar of capital that flows home from US Treasuries is a dollar of selling pressure on those bonds, which pushes their yields higher, which raises mortgage rates, corporate borrowing costs, and the discount rate on every asset you own.</p>
+
+<p>The mechanism operates through a concept called the <strong>carry trade</strong>. Here is how it worked for decades: a Japanese institution borrows yen cheaply at near-zero domestic rates, converts those yen into dollars, buys US Treasury bonds yielding 4–5%, and pockets the difference. This trade is profitable as long as two conditions hold — that Japanese rates stay low and that the yen does not appreciate dramatically against the dollar (which would erode returns when converting profits back). The <strong>Bank of Japan (BOJ)</strong>, Japan's central bank, sustained this environment through a policy called <strong>Yield Curve Control (YCC)</strong>, under which it pledged to cap the 10-year JGB yield at a specific ceiling — first 0.1%, then 0.25%, then 0.5%, then 1.0% — by buying unlimited quantities of bonds to enforce that ceiling. This was the key structural distortion: the BOJ was artificially suppressing the price of Japanese money, which had a direct knock-on effect of suppressing yields everywhere else too, because Japanese capital flooded into every other market.</p>
+
+<p>The real-world example that crystallized this dynamic was the <strong>JGB yield surge of 2025–2026</strong>. When the 10-year JGB crossed <strong>3.0% for the first time since 1996</strong>, it was not simply a local Japanese bond story — it was a structural regime change in global capital flows. Simultaneously, the <strong>5-year JGB hit a record 2.265%</strong>, the <strong>30-year approached 4.18%</strong>, and the <strong>2-year reached a 31-year high</strong>. The entire curve — short, medium, and long — was lifting off the floor at once. This is what the video means by "the entire curve lifting off zero." Meanwhile, the US 10-year Treasury hit <strong>4.81%</strong>, Germany's 10-year Bund touched <strong>3.36%</strong>, France's 10-year crossed <strong>4.21%</strong> (not seen since 2008), and Britain's 30-year gilt approached <strong>6%</strong> at a 27-year high. Four of the world's largest sovereign bond markets convulsed simultaneously — not because of oil headlines, but because a common gravitational anchor had shifted.</p>
+
+<p>Traders watch the <strong>JGB yield curve</strong> as a leading signal for global rate pressure the same way they watch the Treasury curve for US recession signals. The specific shape of the curve matters enormously. A <strong>steepening yield curve</strong> — where long-term yields rise faster than short-term yields — signals that investors expect higher inflation or growth, and demand more compensation to lock up money for longer. A <strong>flattening or inverted curve</strong> signals economic pessimism. When the entire JGB curve lifts together, as happened here, it signals something more fundamental: the BOJ is losing its grip on Yield Curve Control, or abandoning it intentionally. Sophisticated traders use JGB moves as a canary — when Japanese yields start climbing, they begin reducing positions in US Treasuries and other foreign bonds before the institutional repatriation flows visibly hit the market. The JGB move precedes, and partly causes, the moves in every other market.</p>
+
+<p>The critical nuance here — the one mainstream financial media consistently misses — is the difference between <strong>cyclical</strong> and <strong>structural</strong> drivers of bond yields. Geopolitical events like oil supply disruptions are cyclical: they spike, they fade, and the bond market digests them within weeks. Structural shifts in major economies — the unwinding of three decades of Japanese monetary repression — are permanent regime changes that re-price assets for years. The video makes this distinction sharply:</p>
+
+<blockquote>"When every single mainstream outlet agrees on the exact same tidy one-sentence explanation for a massive asset move like that, that is precisely when you need to look deeper."</blockquote>
+
+<p>Oil spiking to $90 or $94 a barrel might cause a temporary bump in inflation expectations, but it cannot by itself explain why Germany, France, the UK, Japan, and the US all repriced simultaneously in the same direction. Synchronous global moves almost always point to a shared structural variable — and the shared variable here was the unwinding of the BOJ's ultra-loose policy regime and the consequent reversal of decades of Japanese capital outflows. Understanding this prevents the common mistake of chasing inflation headlines and missing the deeper plumbing of global capital allocation.</p>
+
+<p>The failure mode of this system is called a <strong>disorderly unwind</strong>. If JGB yields rise too fast, Japanese institutions holding foreign bonds face a compounding problem: rising domestic yields make home assets attractive, the yen tends to strengthen (which shrinks the value of their foreign holdings in yen terms), and they face pressure to sell foreign bonds and repatriate simultaneously. If enough institutions do this at once, it creates a self-reinforcing selling spiral in global bond markets — yields spike, asset prices fall, more investors sell to cover losses, yields spike further. The BOJ has historically intervened to prevent this by buying bonds aggressively. But the BOJ's own balance sheet is already extraordinary: it owns roughly half of all outstanding JGBs. If markets lose confidence that the BOJ can or will keep absorbing bonds indefinitely, the structural overhang of $3–4 trillion in Japanese-held foreign assets becomes a live systemic risk. This is what the video calls "the Tokyo time bomb" — not an imminent explosion, but a slow-burning structural force that connects Japanese monetary policy directly to the mortgage rate on an American home.</p>
+
+<p>JGB dynamics connect directly to several other concepts in this guide. They are central to understanding the <strong>global carry trade</strong>, the role of the <strong>yen as a funding currency</strong>, and the mechanics of <strong>sovereign bond markets</strong> broadly. Rising JGB yields compress the carry trade's profitability, which reduces demand for risk assets globally and strengthens the yen — a pattern that has triggered sharp unwinding episodes in equities and emerging market currencies. They also illustrate the concept of <strong>policy transmission</strong>: central bank decisions in Tokyo ripple through mortgage rates in Dallas, corporate bond spreads in London, and equity valuations in Shanghai, all through the mechanism of cross-border capital flows and yield differentials. For any investor trying to understand why borrowing costs remain elevated even as domestic inflation cools, the answer often lies not in the Fed's next meeting but in the slow structural shift happening on the other side of the planet.</p>
+<div class="concept-side">Sources: THE TOKYO TIME BOMB: The Hidden Catalyst Locking Mortgage Rates at 7%<br>Related in this category: <a href="two_year_treasury_yield.html">Two-Year Treasury Yield</a>, <a href="treasury_bond_buyback_program.html">Treasury Bond Buyback Program</a>, <a href="thirty_year_treasury_bond.html">30-Year Treasury Bond</a>, <a href="debt_rollover_risk.html">Debt Rollover Risk</a>, <a href="corporate_refinancing_cliff.html">Corporate Refinancing Cliff</a>, <a href="duration_risk.html">Duration Risk</a></div>
+<button class="concept-done" data-slug="japanese_government_bond_jgb" onclick="toggleDone('japanese_government_bond_jgb')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_japanese_government_bond_jgb';</script>
+<script src="../../book.js"></script>
+
+<script>
+(function() {
+  var DONE_KEY = 'fg_done', FILTER_KEY = 'fg_filter';
+  var done = JSON.parse(localStorage.getItem(DONE_KEY) || '{}');
+  var filter = localStorage.getItem(FILTER_KEY) || 'all';
+
+  function visible(flag) {
+    if (filter === 'star') return flag === 'star';
+    if (filter === 'nodeep') return flag !== 'deep';
+    return true;
+  }
+
+  function apply() {
+    var shown = 0, total = 0, hidden = 0;
+    document.querySelectorAll('.concept-row').forEach(function(r) {
+      var slug = r.dataset.slug, flag = r.dataset.flag;
+      total++;
+      if (done[slug]) r.classList.add('done'); else r.classList.remove('done');
+      if (visible(flag)) { r.classList.remove('fg-hidden'); shown++; }
+      else { r.classList.add('fg-hidden'); hidden++; }
+    });
+    document.querySelectorAll('.cat-card').forEach(function(card) {
+      var slugs = card.dataset.slugs ? card.dataset.slugs.split(',') : [];
+      var flags = card.dataset.flags ? card.dataset.flags.split(',') : [];
+      var vis = 0, allDone = slugs.length > 0;
+      slugs.forEach(function(sl, i) {
+        if (visible(flags[i])) vis++;
+        if (!done[sl]) allDone = false;
+      });
+      total += slugs.length; shown += vis;
+      var c = card.querySelector('.cat-count');
+      if (c) c.textContent = vis + (vis !== slugs.length ? ' of ' + slugs.length : '') + ' concepts' +
+        (card.dataset.stars ? ' \u00b7 ' + card.dataset.stars + ' \u2605' : '');
+      if (vis === 0) card.classList.add('fg-empty'); else card.classList.remove('fg-empty');
+      if (allDone) card.classList.add('done'); else card.classList.remove('done');
+    });
+    document.querySelectorAll('[data-filter]').forEach(function(b) {
+      b.classList.toggle('active', b.dataset.filter === filter);
+    });
+    var n = document.getElementById('fgCount');
+    if (n) n.textContent = shown + ' of ' + total + ' shown';
+    var h = document.getElementById('fgHiddenNote');
+    if (h) h.textContent = hidden ? hidden + ' hidden by the filter.' : '';
+    var btn = document.querySelector('.concept-done');
+    if (btn) {
+      var on = !!done[btn.dataset.slug];
+      btn.classList.toggle('on', on);
+      btn.textContent = on ? '\u2713 Completed' : '\u2713 Mark complete';
+    }
+  }
+
+  window.setFilter = function(f) {
+    filter = f; localStorage.setItem(FILTER_KEY, f); apply();
+  };
+  window.toggleDone = function(slug) {
+    if (done[slug]) delete done[slug]; else done[slug] = true;
+    localStorage.setItem(DONE_KEY, JSON.stringify(done));
+    apply();
+  };
+  window.toggleHideDone = function() {
+    document.body.classList.toggle('hide-done');
+  };
+  apply();
+})();
+</script>
+
+</body>
+</html>

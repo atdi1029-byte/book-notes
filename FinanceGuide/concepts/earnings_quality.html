@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Earnings Quality (Adjusted vs. Reported Earnings) - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.tier .tier-desc { color: #a08060; font-size: 0.85rem; margin: 0.4rem 0 0.8rem; }
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../accounting-financial-statements.html">&larr; Accounting &amp; Financial Statements</a>
+
+<div class="concept-meta"><span>standard</span><span>Accounting &amp; Financial Statements</span><span>added 2026-09-06</span></div>
+<h4 id="earnings_quality">Earnings Quality (Adjusted vs. Reported Earnings)</h4>
+
+<p>When a company reports earnings, it actually reports two different numbers — and understanding the difference between them is one of the most important skills you can develop as an investor. <strong>Reported earnings</strong>, sometimes called GAAP earnings (for Generally Accepted Accounting Principles), represent the bottom-line profit calculated under standardized accounting rules. <strong>Adjusted earnings</strong>, sometimes called non-GAAP earnings or "adjusted EPS," are a modified version where the company strips out certain items it considers unusual, one-time, or non-recurring. The gap between these two figures is what analysts call <strong>earnings quality</strong> — a measure of how much of the profit a company is reporting actually reflects the underlying health and earning power of the core business.</p>
+
+<p>Earnings quality matters because stock prices are ultimately claims on future cash flows, and those future cash flows depend on what the business can reliably generate year after year. If a company earns $3 per share but $1 of that came from selling a building, the market can't assume it will sell a building every year. When earnings quality is low — meaning a large portion of profits came from unusual sources rather than core operations — the stock's valuation math changes entirely. Investors paying a 30x multiple on earnings are implicitly betting those earnings repeat. If they don't repeat, the multiple contracts, and the stock falls even if the reported number looked strong on the surface. This is why analysts spend so much time dissecting the components of an earnings report rather than just looking at the headline figure.</p>
+
+<p>Mechanically, here's how adjusted earnings get constructed. A company starts with its GAAP net income, then adds back items the management team designates as non-recurring or non-cash. Common add-backs include stock-based compensation (real economic cost to shareholders, but management likes to exclude it), restructuring charges (layoffs, facility closures), amortization of acquired intangibles, legal settlements, and — increasingly common — things like tariff impacts, currency effects, or one-time government refunds. The company presents these adjustments in a table in its earnings release, arguing that removing them helps investors see the "true" underlying business performance. The problem is that management has wide latitude in deciding what counts as one-time. There's no independent regulator approving the adjustment list.</p>
+
+<p>The Lululemon example from the week of September 5th, 2026 is a textbook illustration of why these adjustments demand scrutiny. Lululemon reported <strong>adjusted EPS of $2.92</strong>, a number that dramatically crushed the analyst consensus estimate of $1.82. On the surface, that looks like a massive beat — the kind of result that should send a stock surging. But buried in the details was a single line item: <strong>$0.86 per share came from a tariff refund</strong>. Strip that out, and adjusted EPS falls to roughly $2.06 — a much less impressive result, and one that lands against a backdrop of revenue down 4% year-over-year and comparable sales dropping 9% overall, including a 12% decline in the Americas. The headline beat was real in accounting terms. The business beat was not.</p>
+
+<blockquote>
+"A company that beats on a tariff refund and misses on its own customers doesn't have an accounting problem — it has a brand problem, and you can't refund your way out of that."
+<cite>— Mark Malik, Wall Street Truth Bombs</cite>
+</blockquote>
+
+<p>Traders and investors use earnings quality as both a signal and a risk filter. The most important question to ask during earnings season isn't "did they beat?" — it's "what drove the beat?" A beat fueled by cost cuts, one-time gains, or accounting adjustments tells a very different story than a beat driven by accelerating revenue and expanding margins. Experienced investors will often build their own <strong>normalized earnings estimate</strong> — stripping out every non-recurring item regardless of what management calls it — to see what the business actually generated from operations. When the normalized number is materially below the adjusted number, that's a warning sign. When it's materially above reported earnings, that can actually indicate hidden value that the market is missing.</p>
+
+<p>A common misconception is that adjusted earnings are inherently dishonest or manipulative. They're not — at least not always. Sometimes an adjustment genuinely makes economic sense. If a company gets hit with a one-time lawsuit settlement of $500 million, excluding that from the earnings trend gives investors a cleaner picture of operating performance going forward. Stock-based compensation is genuinely non-cash, even if it's economically real. The problem arises when the same types of "one-time" charges appear in every single quarter, or when management adjusts out any expense that's inconvenient while never adjusting out favorable one-time items. If you see restructuring charges for five straight years, those are not one-time — those are the cost of running the company. The discipline is in recognizing which adjustments are legitimate and which are cosmetic.</p>
+
+<p>When earnings quality fails, the market tends to correct harshly and quickly. The pattern usually unfolds like this: a company reports impressive adjusted numbers for several quarters, the stock trades up, and investors price in the adjusted earnings trajectory. Then either a short-seller publishes a teardown of the adjustments, or the company misses even its adjusted estimates, or revenue growth stalls and there are no more one-time gains to harvest. Suddenly the normalized earnings power of the business is revealed, and it's much lower than the multiple implied. Lululemon's 17% single-day drop is partly this dynamic — the tariff refund won't be there next quarter. Guidance came down, comparable sales are declining, and the adjustments that made the quarter look respectable are explicitly non-repeatable. The stock repriced to reflect what the business actually earns.</p>
+
+<p>Earnings quality connects tightly to several adjacent concepts worth understanding. <strong>Revenue quality</strong> is the same idea applied to the top line — not all revenue is equally durable or valuable. <strong>Free cash flow</strong> is often cited as a purer signal than any earnings figure because cash is harder to adjust than accruals. When adjusted EPS is high but free cash flow is low, that mismatch deserves investigation. <strong>Comparable sales</strong> (or same-store sales) is a revenue quality metric in retail — it strips out the effect of new store openings so you can see whether existing locations are actually growing. Lululemon's 9% comp decline was the real tell on the business even before you touched the earnings adjustments. Mastering earnings quality means learning to read financial statements as a whole, triangulating between the income statement, the cash flow statement, and the footnotes — not stopping at the first big number you see.</p>
+<div class="concept-side">Sources: THE JOBS GUT PUNCH: Why Good News Sold Off Wall Street &amp; Crushed Tech!<br>Related in this category: <a href="interest_coverage_ratio.html">Interest Coverage Ratio</a>, <a href="loan_loss_provisions.html">Loan Loss Provisions (Agricultural)</a>, <a href="comparable_store_sales.html">Comparable Store Sales (Comp Sales / Same-Store Sales)</a>, <a href="gross_margin.html">Gross Margin</a></div>
+<button class="concept-done" data-slug="earnings_quality" onclick="toggleDone('earnings_quality')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_earnings_quality';</script>
+<script src="../../book.js"></script>
+
+<script>
+(function() {
+  var DONE_KEY = 'fg_done', FILTER_KEY = 'fg_filter';
+  var done = JSON.parse(localStorage.getItem(DONE_KEY) || '{}');
+  var filter = localStorage.getItem(FILTER_KEY) || 'all';
+
+  function visible(flag) {
+    if (filter === 'star') return flag === 'star';
+    if (filter === 'nodeep') return flag !== 'deep';
+    return true;
+  }
+
+  function apply() {
+    var shown = 0, total = 0, hidden = 0;
+    document.querySelectorAll('.concept-row').forEach(function(r) {
+      var slug = r.dataset.slug, flag = r.dataset.flag;
+      total++;
+      if (done[slug]) r.classList.add('done'); else r.classList.remove('done');
+      if (visible(flag)) { r.classList.remove('fg-hidden'); shown++; }
+      else { r.classList.add('fg-hidden'); hidden++; }
+    });
+    document.querySelectorAll('.cat-card').forEach(function(card) {
+      var slugs = card.dataset.slugs ? card.dataset.slugs.split(',') : [];
+      var flags = card.dataset.flags ? card.dataset.flags.split(',') : [];
+      var vis = 0, allDone = slugs.length > 0;
+      slugs.forEach(function(sl, i) {
+        if (visible(flags[i])) vis++;
+        if (!done[sl]) allDone = false;
+      });
+      total += slugs.length; shown += vis;
+      var c = card.querySelector('.cat-count');
+      if (c) c.textContent = vis + (vis !== slugs.length ? ' of ' + slugs.length : '') + ' concepts' +
+        (card.dataset.stars ? ' \u00b7 ' + card.dataset.stars + ' \u2605' : '');
+      if (vis === 0) card.classList.add('fg-empty'); else card.classList.remove('fg-empty');
+      if (allDone) card.classList.add('done'); else card.classList.remove('done');
+    });
+    document.querySelectorAll('[data-filter]').forEach(function(b) {
+      b.classList.toggle('active', b.dataset.filter === filter);
+    });
+    var n = document.getElementById('fgCount');
+    if (n) n.textContent = shown + ' of ' + total + ' shown';
+    var h = document.getElementById('fgHiddenNote');
+    if (h) h.textContent = hidden ? hidden + ' hidden by the filter.' : '';
+    var btn = document.querySelector('.concept-done');
+    if (btn) {
+      var on = !!done[btn.dataset.slug];
+      btn.classList.toggle('on', on);
+      btn.textContent = on ? '\u2713 Completed' : '\u2713 Mark complete';
+    }
+  }
+
+  window.setFilter = function(f) {
+    filter = f; localStorage.setItem(FILTER_KEY, f); apply();
+  };
+  window.toggleDone = function(slug) {
+    if (done[slug]) delete done[slug]; else done[slug] = true;
+    localStorage.setItem(DONE_KEY, JSON.stringify(done));
+    apply();
+  };
+  window.toggleHideDone = function() {
+    document.body.classList.toggle('hide-done');
+  };
+  apply();
+})();
+</script>
+
+</body>
+</html>

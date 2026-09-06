@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>COMEX Registered Inventory - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.tier .tier-desc { color: #a08060; font-size: 0.85rem; margin: 0.4rem 0 0.8rem; }
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../commodities-energy.html">&larr; Commodities &amp; Energy</a>
+
+<div class="concept-meta"><span>deep cut</span><span>Commodities &amp; Energy</span><span>added 2026-09-04</span></div>
+<h4 id="comex_registered_inventory">COMEX Registered Inventory</h4>
+
+<p>
+The <strong>COMEX</strong> — the Commodity Exchange, a division of the
+CME Group based in New York — is the primary futures exchange where
+gold, silver, copper, and other metals are traded in the United States.
+When you buy a silver futures contract on COMEX, you are technically
+buying the right to take delivery of actual, physical silver at
+expiration. For that promise to mean anything, the silver has to exist
+somewhere real. That "somewhere" is a network of COMEX-approved
+warehouses, mostly clustered in the New York area, where vaulted metal
+is tracked, audited, and reported daily. The exchange publishes two
+inventory figures every day: <strong>eligible inventory</strong> and
+<strong>registered inventory</strong>. Understanding the difference
+between these two numbers is the whole ballgame.
+</p>
+
+<p>
+Eligible inventory is metal sitting in a COMEX-approved vault that
+meets exchange quality standards — the right purity, the right bar
+weight, the right hallmarks — but its owner has not yet made it
+available for delivery against a futures contract. Think of it as silver
+that <em>could</em> be used to settle a contract if the owner chose to
+register it, but hasn't been. The owner might be a bank, a hedge fund,
+an industrial user, or a private investor who just wants secure
+storage. Registered inventory is the critical number. <strong>Registered
+silver</strong> is metal whose owner has formally put it forward as
+available for delivery. It is the actual stock standing behind every
+open futures contract. When registered inventory falls, the physical
+backstop for the paper market shrinks.
+</p>
+
+<p>
+Here is the mechanical sequence that connects those daily inventory
+reports to real market pressure. A silver futures contract on COMEX
+represents 5,000 troy ounces of silver. As a contract approaches its
+expiration date, a buyer who wants physical metal — not cash settlement
+— issues a <strong>notice of intent to take delivery</strong>. The
+exchange then matches that buyer with a seller who holds registered
+silver in an approved vault. The seller hands over a
+<strong>warehouse receipt</strong>, which is essentially a title
+document for a specific stack of bars in a specific vault. The buyer
+now owns those bars. If there are more delivery notices outstanding than
+there is registered silver to cover them, the exchange faces a
+structural crisis. This is why the registered figure, not the eligible
+figure, is the one traders watch obsessively when they suspect a
+physical squeeze is building.
+</p>
+
+<p>
+The decline in registered silver inventory since 2020 has been
+dramatic. From a peak of roughly 150–160 million ounces around the time
+of the 2021 retail-driven <strong>silver short squeeze</strong>, COMEX
+registered silver has fallen by approximately 75% — landing in the
+range of 35–40 million ounces at the time the video was recorded. To
+put that in context: the Silver Institute's 2026 world silver survey
+cited in the video shows a global supply shortfall of 46.3 million
+ounces in 2026 alone. That means the annual physical deficit now
+exceeds the entire COMEX registered stockpile. When those two numbers
+cross — when the gap in the ground exceeds the buffer on the shelf —
+the margin for error in the paper market essentially disappears.
+</p>
+
+<p>
+Traders and analysts use registered inventory as a leading indicator
+of physical tightness that price charts can miss entirely. The ratio
+most closely watched is <strong>the cover ratio</strong>: registered
+ounces divided by the number of ounces represented by open interest
+in nearby contracts. A cover ratio above 1.0 means there is more than
+enough registered metal to settle all open contracts if every holder
+demanded delivery simultaneously. A ratio below 1.0 means the exchange
+is technically relying on the assumption that most contracts will be
+cash-settled or rolled forward. When the ratio tightens sharply, it
+signals that the traditional assumption — that futures are just paper
+and almost nobody wants the metal — may no longer hold, and price
+can move violently to ration the remaining physical supply.
+</p>
+
+<p>
+The video makes an important distinction that many retail observers
+miss: falling registered inventory is <em>not</em> the same as
+sentiment or speculation. Gold's 20% decline from its January 2026
+record of $5,589.38 per ounce is explainable in sentiment terms —
+crowded trade, rates staying higher for longer, profit-taking. But
+silver's 60.8% year-over-year gain happening simultaneously with gold's
+decline cannot be explained the same way. The COMEX registered data
+provides the structural reason. Silver is in its sixth consecutive year
+of global supply deficit. Since 2021, 762 million ounces have been
+drawn from above-ground inventory just to cover the running shortfall.
+When physical supply is genuinely contracting at that scale, the paper
+market's ability to set price through purely financial flows weakens,
+and the physical reality starts to dominate.
+</p>
+
+<blockquote>
+"Silver is in its sixth straight year of a global supply deficit. The
+Silver Institute's own world silver survey puts the 2026 shortfall at
+46.3 million ounces. That's up 15% from last year's gap. Since 2021,
+the market has drawn down 762 million ounces from above ground
+inventory just to cover it."
+</blockquote>
+
+<p>
+The most common misconception about COMEX inventory is conflating
+eligible and registered, and concluding that a large eligible stockpile
+means the market is well-supplied. It doesn't. Eligible metal belongs
+to specific owners who have made no commitment to sell or deliver it.
+An industrial manufacturer storing silver in a COMEX vault for its own
+future production use is contributing to the eligible number, but that
+silver will never flow to a futures buyer. During periods of stress,
+eligible metal does get registered — owners respond to price incentives
+— but this conversion is voluntary and price-dependent. If the price
+rise needed to coax out eligible silver is large, that price rise itself
+becomes a market event. Assuming eligible inventory provides a passive
+cushion is a mistake that has cost traders money in past squeezes.
+</p>
+
+<p>
+When registered inventory falls to critically low levels and a large
+wave of delivery notices hits simultaneously — a scenario sometimes
+called a <strong>delivery squeeze</strong> or
+<strong>corner</strong> — the exchange has several pressure-release
+valves it can and historically has pulled. It can raise margin
+requirements sharply to force leveraged longs to liquidate before
+expiration. It can allow <strong>cash settlement</strong> in lieu of
+physical delivery, which effectively turns a physical contract into
+a paper one against the original buyer's wishes. It can also change
+position limits to prevent further accumulation. All of these
+interventions protect the functioning of the exchange but impose
+losses on the buyers who wanted physical metal. The 2021 silver
+squeeze episode showed exactly how quickly the exchange can change
+the rules when the physical buffer gets uncomfortably thin — a
+risk that every investor citing COMEX inventory as a bullish signal
+should keep firmly in mind.
+</p>
+
+<p>
+COMEX registered inventory connects directly to several other
+concepts worth understanding together. The <strong>gold-silver
+ratio</strong> — currently 67.4 against a long-run average of 60.5
+— measures how relatively expensive gold is to silver in paper
+market terms, but it does not account for physical supply dynamics.
+The divergence between gold falling 20% and silver rising 60.8%
+simultaneously makes much more sense when you overlay the COMEX
+registered drawdown: one metal's paper market remains comfortably
+backstopped, while the other's is not. The inventory data also links
+to <strong>industrial demand</strong> — silver's use in solar panels,
+EV batteries, and electronics creates a floor of non-discretionary
+buying that gold simply does not have. Finally, the registered
+figure feeds into the broader concept of <strong>backwardation</strong>:
+when physical metal commands a higher price than futures contracts
+for future delivery, the market is screaming that immediate
+possession is more valuable than paper promises, the clearest
+possible signal that a real shortage has arrived.
+</p>
+<div class="concept-side">Sources: THE GREAT METALS DIVIDE: Why Gold Crashed 20% While Silver Exploded 60%!<br>Related in this category: <a href="gold_futures.html">Gold Futures</a>, <a href="hard_assets_inflation_hedge.html">Hard Assets as Inflation Hedges</a>, <a href="farm_debt_to_asset_ratio.html">Farm Debt-to-Asset Ratio</a>, <a href="farm_debt_service_ratio.html">Farm Debt Service Ratio</a>, <a href="agricultural_direct_payment_subsidies.html">Agricultural Direct Payment Subsidies</a>, <a href="net_farm_income.html">Net Farm Income</a></div>
+<button class="concept-done" data-slug="comex_registered_inventory" onclick="toggleDone('comex_registered_inventory')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_comex_registered_inventory';</script>
+<script src="../../book.js"></script>
+
+<script>
+(function() {
+  var DONE_KEY = 'fg_done', FILTER_KEY = 'fg_filter';
+  var done = JSON.parse(localStorage.getItem(DONE_KEY) || '{}');
+  var filter = localStorage.getItem(FILTER_KEY) || 'all';
+
+  function visible(flag) {
+    if (filter === 'star') return flag === 'star';
+    if (filter === 'nodeep') return flag !== 'deep';
+    return true;
+  }
+
+  function apply() {
+    var shown = 0, total = 0, hidden = 0;
+    document.querySelectorAll('.concept-row').forEach(function(r) {
+      var slug = r.dataset.slug, flag = r.dataset.flag;
+      total++;
+      if (done[slug]) r.classList.add('done'); else r.classList.remove('done');
+      if (visible(flag)) { r.classList.remove('fg-hidden'); shown++; }
+      else { r.classList.add('fg-hidden'); hidden++; }
+    });
+    document.querySelectorAll('.cat-card').forEach(function(card) {
+      var slugs = card.dataset.slugs ? card.dataset.slugs.split(',') : [];
+      var flags = card.dataset.flags ? card.dataset.flags.split(',') : [];
+      var vis = 0, allDone = slugs.length > 0;
+      slugs.forEach(function(sl, i) {
+        if (visible(flags[i])) vis++;
+        if (!done[sl]) allDone = false;
+      });
+      total += slugs.length; shown += vis;
+      var c = card.querySelector('.cat-count');
+      if (c) c.textContent = vis + (vis !== slugs.length ? ' of ' + slugs.length : '') + ' concepts' +
+        (card.dataset.stars ? ' \u00b7 ' + card.dataset.stars + ' \u2605' : '');
+      if (vis === 0) card.classList.add('fg-empty'); else card.classList.remove('fg-empty');
+      if (allDone) card.classList.add('done'); else card.classList.remove('done');
+    });
+    document.querySelectorAll('[data-filter]').forEach(function(b) {
+      b.classList.toggle('active', b.dataset.filter === filter);
+    });
+    var n = document.getElementById('fgCount');
+    if (n) n.textContent = shown + ' of ' + total + ' shown';
+    var h = document.getElementById('fgHiddenNote');
+    if (h) h.textContent = hidden ? hidden + ' hidden by the filter.' : '';
+    var btn = document.querySelector('.concept-done');
+    if (btn) {
+      var on = !!done[btn.dataset.slug];
+      btn.classList.toggle('on', on);
+      btn.textContent = on ? '\u2713 Completed' : '\u2713 Mark complete';
+    }
+  }
+
+  window.setFilter = function(f) {
+    filter = f; localStorage.setItem(FILTER_KEY, f); apply();
+  };
+  window.toggleDone = function(slug) {
+    if (done[slug]) delete done[slug]; else done[slug] = true;
+    localStorage.setItem(DONE_KEY, JSON.stringify(done));
+    apply();
+  };
+  window.toggleHideDone = function() {
+    document.body.classList.toggle('hide-done');
+  };
+  apply();
+})();
+</script>
+
+</body>
+</html>

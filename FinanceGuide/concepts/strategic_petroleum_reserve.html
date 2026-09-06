@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Strategic Petroleum Reserve (SPR) - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.tier .tier-desc { color: #a08060; font-size: 0.85rem; margin: 0.4rem 0 0.8rem; }
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../commodities-energy.html">&larr; Commodities &amp; Energy</a>
+
+<div class="concept-meta"><span>standard</span><span>Commodities &amp; Energy</span><span>added 2026-09-02</span></div>
+<h4 id="strategic_petroleum_reserve">Strategic Petroleum Reserve (SPR)</h4>
+
+<p>The <strong>Strategic Petroleum Reserve (SPR)</strong> is the United States government's emergency stockpile of crude oil, stored in a network of underground <strong>salt caverns</strong> carved into the bedrock along the Gulf Coast in Texas and Louisiana. Created by Congress after the 1973 Arab oil embargo left American gas stations running dry, the SPR was designed to give the country a buffer — a supply cushion that could be released into the market whenever a geopolitical crisis, natural disaster, or sudden supply disruption threatened to send energy prices spiraling. At its peak capacity, the reserve holds around 714 million barrels, enough to replace roughly 60 days of net petroleum imports. Think of it as the national rainy-day fund, except the currency is crude oil.</p>
+
+<p>The SPR matters because energy is the input cost for nearly everything. When oil prices rise sharply, the effect cascades through the entire economy within weeks. Gasoline at the pump gets more expensive, obviously, but so does shipping, manufacturing, agriculture, and air travel — because diesel and jet fuel follow crude. <strong>Energy inflation</strong> is particularly painful for lower-income households, who spend a disproportionate share of their budget on fuel. Every <strong>$5 move in a barrel of crude</strong> translates to roughly 12 to 15 cents per gallon at your local station. That's why policymakers treat the SPR as a policy tool, not just a war chest. Releasing barrels into the market increases supply, which — all else equal — suppresses prices and buys time for other solutions to take hold.</p>
+
+<p>Mechanically, an SPR release works like this: the President authorizes a drawdown, the Department of Energy schedules a competitive sale, and private oil companies bid to purchase specific quantities. The crude is pumped out of the salt caverns, loaded onto pipelines or tankers, and delivered to refineries, typically within two to three weeks of the sale authorization. The caverns themselves work because salt is impermeable to oil and naturally self-sealing — cracks close over time, making it an ideal long-term storage medium. <strong>Drawdowns</strong> can be done as emergency releases (directed by the President under the Energy Policy and Conservation Act) or as smaller <strong>exchange agreements</strong> where oil is borrowed by a company and replaced later with interest in additional barrels.</p>
+
+<p>The most significant SPR release in history happened in 2022, when the Biden administration authorized the release of 180 million barrels over six months following Russia's invasion of Ukraine, which disrupted global energy markets and sent Brent crude above $120 per barrel. The administration coordinated with the <strong>International Energy Agency (IEA)</strong>, whose member countries released an additional 60 million barrels, creating a coordinated intervention. Gas prices did eventually fall — though economists still debate how much credit belongs to the SPR versus demand destruction and Federal Reserve rate hikes. The critical aftermath: those 180 million barrels were never fully repurchased. The reserve dropped to levels not seen since the early 1980s, sitting below 400 million barrels, and continued declining to below 300 million barrels by mid-decade.</p>
+
+<blockquote>"Our Strategic Petroleum Reserve has been drained to its lowest level in over 40 years — sitting below 300 billion barrels. That means Washington can't simply open the taps on our emergency reserves to artificially crush gas prices like it did in past years."</blockquote>
+
+<p>For traders and investors, the SPR is a key signal in the <strong>oil market structure</strong>. When the SPR is well-stocked, the market prices in a government put — an implicit floor where Washington could intervene to prevent the worst price spikes. When the reserve is depleted, that put disappears, and the market reprices risk accordingly. Crude oil <strong>options volatility</strong> tends to increase during periods of SPR depletion because the tail risk of an uncontrolled price spike becomes more credible. Energy traders watch weekly <strong>Energy Information Administration (EIA) inventory reports</strong> alongside SPR levels to gauge total system supply. A depleted SPR combined with declining commercial inventories and geopolitical tension is a classic setup for a sustained oil price rally.</p>
+
+<p>A common misconception is that the SPR can simply be refilled quickly whenever convenient. Replenishing 400 million barrels at current production and import rates takes years, not months. The government must buy oil on the open market, competing with refineries and other buyers, which means purchasing at market prices — often elevated ones. There's also a logistical constraint: the salt caverns can only accept oil so fast, and pipeline infrastructure limits the injection rate. Politicians frequently promise to "refill the SPR at low prices," but executing that at scale is slow and expensive. The 2022 drawdown cost the government roughly $95 per barrel on average when accounting for the timing; repurchasing at $70–$80 represents a better deal, but the volume needed is enormous.</p>
+
+<p>The SPR fails as a policy tool in two specific scenarios. First, when the supply disruption is structural rather than temporary — Venezuela's oil fields producing at a fraction of their historical capacity, for example, or a permanent shift in <strong>OPEC+ production quotas</strong> — releasing emergency barrels just delays the price adjustment without solving the underlying imbalance. Second, when the reserve is already depleted, as discussed: you cannot release what you do not have. The Venezuela deal illustrates both failure modes simultaneously. A 65-billion-barrel reserve agreement sounds enormous, but Venezuelan production capacity is currently around 800,000 barrels per day — a fraction of the 13 million barrels per day the U.S. consumes. The physical flow of new barrels to American refineries takes months to arrange, while a military strike near the <strong>Strait of Hormuz</strong> moves prices in seconds.</p>
+
+<p>The SPR connects directly to several other market concepts worth understanding together. The <strong>Strait of Hormuz</strong> is the single maritime choke point through which roughly 20% of global petroleum flows; any disruption there triggers immediate crude price spikes that the SPR was originally designed to buffer. <strong>OPEC+ production decisions</strong> interact with SPR levels because cartel cuts reduce global supply while a depleted reserve removes the U.S. government's counter-lever. <strong>Energy sector equities</strong> — oil producers, refiners, pipeline companies — all reprice when SPR data shifts the supply outlook. And at the macro level, sustained energy inflation feeds into <strong>CPI readings</strong>, complicates Federal Reserve rate decisions, and erodes consumer spending power. The SPR, when healthy, is a quiet stabilizer. When it's depleted, its absence shows up everywhere at once.</p>
+<div class="concept-side">Sources: THE GAS PRICE LIE: Why the Venezuela Oil Deal Won't Save You!<br>Related in this category: <a href="gold_futures.html">Gold Futures</a>, <a href="hard_assets_inflation_hedge.html">Hard Assets as Inflation Hedges</a>, <a href="farm_debt_to_asset_ratio.html">Farm Debt-to-Asset Ratio</a>, <a href="farm_debt_service_ratio.html">Farm Debt Service Ratio</a>, <a href="agricultural_direct_payment_subsidies.html">Agricultural Direct Payment Subsidies</a>, <a href="net_farm_income.html">Net Farm Income</a></div>
+<button class="concept-done" data-slug="strategic_petroleum_reserve" onclick="toggleDone('strategic_petroleum_reserve')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_strategic_petroleum_reserve';</script>
+<script src="../../book.js"></script>
+
+<script>
+(function() {
+  var DONE_KEY = 'fg_done', FILTER_KEY = 'fg_filter';
+  var done = JSON.parse(localStorage.getItem(DONE_KEY) || '{}');
+  var filter = localStorage.getItem(FILTER_KEY) || 'all';
+
+  function visible(flag) {
+    if (filter === 'star') return flag === 'star';
+    if (filter === 'nodeep') return flag !== 'deep';
+    return true;
+  }
+
+  function apply() {
+    var shown = 0, total = 0, hidden = 0;
+    document.querySelectorAll('.concept-row').forEach(function(r) {
+      var slug = r.dataset.slug, flag = r.dataset.flag;
+      total++;
+      if (done[slug]) r.classList.add('done'); else r.classList.remove('done');
+      if (visible(flag)) { r.classList.remove('fg-hidden'); shown++; }
+      else { r.classList.add('fg-hidden'); hidden++; }
+    });
+    document.querySelectorAll('.cat-card').forEach(function(card) {
+      var slugs = card.dataset.slugs ? card.dataset.slugs.split(',') : [];
+      var flags = card.dataset.flags ? card.dataset.flags.split(',') : [];
+      var vis = 0, allDone = slugs.length > 0;
+      slugs.forEach(function(sl, i) {
+        if (visible(flags[i])) vis++;
+        if (!done[sl]) allDone = false;
+      });
+      total += slugs.length; shown += vis;
+      var c = card.querySelector('.cat-count');
+      if (c) c.textContent = vis + (vis !== slugs.length ? ' of ' + slugs.length : '') + ' concepts' +
+        (card.dataset.stars ? ' \u00b7 ' + card.dataset.stars + ' \u2605' : '');
+      if (vis === 0) card.classList.add('fg-empty'); else card.classList.remove('fg-empty');
+      if (allDone) card.classList.add('done'); else card.classList.remove('done');
+    });
+    document.querySelectorAll('[data-filter]').forEach(function(b) {
+      b.classList.toggle('active', b.dataset.filter === filter);
+    });
+    var n = document.getElementById('fgCount');
+    if (n) n.textContent = shown + ' of ' + total + ' shown';
+    var h = document.getElementById('fgHiddenNote');
+    if (h) h.textContent = hidden ? hidden + ' hidden by the filter.' : '';
+    var btn = document.querySelector('.concept-done');
+    if (btn) {
+      var on = !!done[btn.dataset.slug];
+      btn.classList.toggle('on', on);
+      btn.textContent = on ? '\u2713 Completed' : '\u2713 Mark complete';
+    }
+  }
+
+  window.setFilter = function(f) {
+    filter = f; localStorage.setItem(FILTER_KEY, f); apply();
+  };
+  window.toggleDone = function(slug) {
+    if (done[slug]) delete done[slug]; else done[slug] = true;
+    localStorage.setItem(DONE_KEY, JSON.stringify(done));
+    apply();
+  };
+  window.toggleHideDone = function() {
+    document.body.classList.toggle('hide-done');
+  };
+  apply();
+})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>JOLTS Job Openings and Labor Turnover Survey - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.tier .tier-desc { color: #a08060; font-size: 0.85rem; margin: 0.4rem 0 0.8rem; }
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../economic-indicators.html">&larr; Economic Indicators</a>
+
+<div class="concept-meta"><span>standard</span><span>Economic Indicators</span><span>added 2026-09-06</span></div>
+<h4 id="jolts_job_openings_survey">JOLTS Job Openings and Labor Turnover Survey</h4>
+
+<p>The <strong>Job Openings and Labor Turnover Survey</strong>, universally known as <strong>JOLTS</strong>, is a monthly report published by the <strong>Bureau of Labor Statistics (BLS)</strong> that measures the unmet demand for workers across the U.S. economy. Where the standard monthly jobs report tells you how many people got hired, JOLTS tells you how many jobs employers are actively trying to fill — and how many workers are quitting, being laid off, or otherwise leaving their positions. It tracks four core flows: <strong>job openings</strong>, <strong>hires</strong>, <strong>quits</strong>, and <strong>layoffs and discharges</strong>. Think of it as an X-ray of labor market conditions rather than just a headcount. Released roughly five weeks after the reference month, it captures the state of employer demand before that demand converts into actual employment.</p>
+
+<p>JOLTS matters because it speaks directly to <strong>labor market tightness</strong> — the balance of power between workers and employers. When openings are high relative to unemployed workers, employers must compete for talent by raising wages. Wage growth then feeds into inflation, since businesses pass higher labor costs into the prices of goods and services. The <strong>Federal Reserve</strong> watches this ratio obsessively. A high <strong>job openings-to-unemployed ratio</strong> signals that the labor market is adding inflationary pressure; a falling ratio signals the opposite. In the post-pandemic era, the Fed cited JOLTS data repeatedly when justifying its aggressive rate-hiking cycle — openings had swelled to over 12 million in 2022, far more than the roughly 6 million unemployed workers available to fill them.</p>
+
+<p>Mechanically, the BLS surveys approximately 21,000 business establishments each month across non-farm industries, including government. A <strong>job opening</strong> is counted only if: the position exists and work could begin within 30 days, there is active recruiting underway, and the employer is willing to hire from outside the establishment. The survey then asks those same establishments about their hires and separations during the reference month. Separations are broken into quits (voluntary), layoffs and discharges (involuntary), and other separations such as retirements. The data is published in both seasonally adjusted and not-seasonally-adjusted form. The headline number that markets watch most closely is total nonfarm job openings, but the <strong>quits rate</strong> — the share of employed workers who voluntarily left their jobs — is often called the "take this job and shove it" indicator, since workers only quit confidently when they believe better jobs are available.</p>
+
+<p>The real-world example from early September 2026 illustrates exactly how JOLTS fits into the broader puzzle. On the Tuesday before Labor Day weekend, the JOLTS report showed July job openings <strong>flat at 7.3 million</strong>, while June openings were revised down by <strong>177,000</strong>. Two days later, <strong>ADP</strong> — the private payroll processor — reported that private employers added just <strong>38,000 jobs</strong> in August, a number that screamed slowdown. Then on Friday, the BLS reported that the economy added <strong>162,000 jobs</strong> in August, more than triple the ADP figure, with an additional <strong>55,000 in upward revisions</strong> to June and July combined. Three data sources, three different stories about the same labor market — all within one week, all feeding into the same Fed decision on September 16th.</p>
+
+<blockquote>"On Tuesday, the JOLTS job opening survey showed July openings flat at 7.3 million with June revised down by 177,000. The surveys, well, they disagreed. The Fed had to decide on September 16th, coming up fast, using numbers still fighting amongst themselves." <cite>— Mark Malik, Wall Street Truth Bombs</cite></blockquote>
+
+<p>Traders and investors use JOLTS as a <strong>leading indicator of wage inflation</strong> and, by extension, Fed policy. A surprising rise in job openings tends to push short-term bond yields higher — because it implies the Fed will need to keep rates elevated or raise them further to cool demand. Conversely, a sharp drop in openings can rally rate-sensitive assets like <strong>growth stocks</strong>, <strong>REITs</strong>, and <strong>long-duration bonds</strong> by signaling that the Fed has room to cut. The quits rate receives particular attention: when it rises, expect wage growth to accelerate within the next few months, as employers are forced to offer better pay to retain staff. When it falls, wage pressure eases. Options traders often position around JOLTS releases in sectors like homebuilders and financials, which are especially sensitive to the rate path implied by labor market data.</p>
+
+<p>The most important nuance is that JOLTS measures <strong>employer intent</strong>, not actual economic outcomes. A job posting on a company's website counts as an opening even if the company is posting defensively, building a talent pipeline, or keeping a requisition open indefinitely. During the 2021–2022 period, critics argued that the surge in openings was partly a measurement artifact — firms posted jobs they were only half-heartedly trying to fill, inflating the headline number. Additionally, JOLTS covers only establishments, so it misses gig economy participants and self-employed workers. The <strong>five-week publication lag</strong> means the data is always describing a past state of the labor market, not the present one — by the time July's JOLTS lands in September, August has already passed and September is well underway.</p>
+
+<p>JOLTS breaks down most visibly when the economy is undergoing structural shifts that survey methodology cannot capture cleanly. During the COVID-19 pandemic, millions of workers exited the labor force entirely — they were neither employed nor counted as unemployed — which made the openings-to-unemployed ratio look historically extreme in ways that overstated tightness. Similarly, when <strong>revisions</strong> are large — as they routinely are — the headline number from month to month can tell a contradictory story. The June revision of 177,000 downward in the September 2026 data release was a perfect example: July appeared flat, but the baseline it was measured against had quietly shrunk. Revisions to JOLTS tend to be larger and less predictable than revisions to the headline payrolls number, which means initial readings carry more uncertainty than markets often price in.</p>
+
+<p>JOLTS sits at the intersection of several interrelated indicators. Paired with <strong>initial jobless claims</strong> (weekly) and the <strong>ADP National Employment Report</strong> (monthly), it forms a mosaic of labor market health that the Fed synthesizes into its <strong>dual mandate</strong> assessment — maximum employment on one side, price stability on the other. When all three sources align, the Fed's path is clear. When they fight amongst themselves, as they did in early September 2026, the Fed faces a genuinely uncertain decision. JOLTS also interacts with <strong>CPI and PPI data</strong>: if openings are rising while inflation prints remain elevated, the case for rate hikes strengthens; if openings are falling while inflation cools, the case for cuts builds. Understanding JOLTS means understanding that no single labor market number tells the full story — it is always one instrument in an ensemble, and the music only makes sense when you hear all the parts together.</p>
+<div class="concept-side">Sources: THE JOBS GUT PUNCH: Why Good News Sold Off Wall Street &amp; Crushed Tech!<br>Related in this category: <a href="inflation_breadth.html">Inflation Breadth</a>, <a href="congressional_budget_office_projections.html">Congressional Budget Office (CBO) Projections</a>, <a href="financial_conditions_index.html">Financial Conditions Index</a>, <a href="core_pce.html">Core PCE (Personal Consumption Expenditures)</a>, <a href="consumer_credit_card_delinquency_rate.html">Consumer Credit Card Delinquency Rate</a>, <a href="total_consumer_debt.html">Total Household / Consumer Debt</a></div>
+<button class="concept-done" data-slug="jolts_job_openings_survey" onclick="toggleDone('jolts_job_openings_survey')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_jolts_job_openings_survey';</script>
+<script src="../../book.js"></script>
+
+<script>
+(function() {
+  var DONE_KEY = 'fg_done', FILTER_KEY = 'fg_filter';
+  var done = JSON.parse(localStorage.getItem(DONE_KEY) || '{}');
+  var filter = localStorage.getItem(FILTER_KEY) || 'all';
+
+  function visible(flag) {
+    if (filter === 'star') return flag === 'star';
+    if (filter === 'nodeep') return flag !== 'deep';
+    return true;
+  }
+
+  function apply() {
+    var shown = 0, total = 0, hidden = 0;
+    document.querySelectorAll('.concept-row').forEach(function(r) {
+      var slug = r.dataset.slug, flag = r.dataset.flag;
+      total++;
+      if (done[slug]) r.classList.add('done'); else r.classList.remove('done');
+      if (visible(flag)) { r.classList.remove('fg-hidden'); shown++; }
+      else { r.classList.add('fg-hidden'); hidden++; }
+    });
+    document.querySelectorAll('.cat-card').forEach(function(card) {
+      var slugs = card.dataset.slugs ? card.dataset.slugs.split(',') : [];
+      var flags = card.dataset.flags ? card.dataset.flags.split(',') : [];
+      var vis = 0, allDone = slugs.length > 0;
+      slugs.forEach(function(sl, i) {
+        if (visible(flags[i])) vis++;
+        if (!done[sl]) allDone = false;
+      });
+      total += slugs.length; shown += vis;
+      var c = card.querySelector('.cat-count');
+      if (c) c.textContent = vis + (vis !== slugs.length ? ' of ' + slugs.length : '') + ' concepts' +
+        (card.dataset.stars ? ' \u00b7 ' + card.dataset.stars + ' \u2605' : '');
+      if (vis === 0) card.classList.add('fg-empty'); else card.classList.remove('fg-empty');
+      if (allDone) card.classList.add('done'); else card.classList.remove('done');
+    });
+    document.querySelectorAll('[data-filter]').forEach(function(b) {
+      b.classList.toggle('active', b.dataset.filter === filter);
+    });
+    var n = document.getElementById('fgCount');
+    if (n) n.textContent = shown + ' of ' + total + ' shown';
+    var h = document.getElementById('fgHiddenNote');
+    if (h) h.textContent = hidden ? hidden + ' hidden by the filter.' : '';
+    var btn = document.querySelector('.concept-done');
+    if (btn) {
+      var on = !!done[btn.dataset.slug];
+      btn.classList.toggle('on', on);
+      btn.textContent = on ? '\u2713 Completed' : '\u2713 Mark complete';
+    }
+  }
+
+  window.setFilter = function(f) {
+    filter = f; localStorage.setItem(FILTER_KEY, f); apply();
+  };
+  window.toggleDone = function(slug) {
+    if (done[slug]) delete done[slug]; else done[slug] = true;
+    localStorage.setItem(DONE_KEY, JSON.stringify(done));
+    apply();
+  };
+  window.toggleHideDone = function() {
+    document.body.classList.toggle('hide-done');
+  };
+  apply();
+})();
+</script>
+
+</body>
+</html>

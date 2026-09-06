@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Neutral Interest Rate (r-star) - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.tier .tier-desc { color: #a08060; font-size: 0.85rem; margin: 0.4rem 0 0.8rem; }
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../monetary-policy-central-banking.html">&larr; Monetary Policy &amp; Central Banking</a>
+
+<div class="concept-meta"><span>standard</span><span>Monetary Policy &amp; Central Banking</span><span>added 2026-08-31</span></div>
+<h4 id="neutral_interest_rate">Neutral Interest Rate (r-star)</h4>
+
+<p>The <strong>neutral interest rate</strong>, often called <strong>r-star</strong> (written as r*), is the theoretical interest rate at which monetary policy is neither stimulating nor restraining economic growth. Think of it like a car's cruise control set to the perfect speed — not accelerating, not braking, just maintaining. When the Federal Reserve sets its benchmark rate at r-star, it is essentially standing aside and letting the economy run on its own power. If rates are below r-star, the Fed is pressing the gas pedal, pumping cheap money into the system. If rates are above r-star, the Fed is applying the brakes, deliberately slowing borrowing, spending, and inflation. The problem is that r-star is invisible — no one can measure it directly, only estimate it after the fact.</p>
+
+<p>R-star matters enormously because it is the benchmark against which every monetary policy decision is judged. A rate of 5% sounds high in absolute terms, but if r-star is 4.5%, then policy is only mildly restrictive. If r-star is 5.5%, then that same 5% rate is actually <strong>accommodative</strong> — it is adding fuel to the economy rather than cooling it. This distinction has direct consequences for mortgage rates, car loans, business investment, stock valuations, and inflation itself. When policymakers misjudge where r-star sits, they either allow inflation to persist longer than necessary or they over-tighten and trigger a recession. Getting this number wrong is not an academic error — it translates into real pain at the kitchen table.</p>
+
+<p>Mechanically, the neutral rate works through the credit and investment channel. When borrowing costs are below r-star, businesses find it cheaper to finance expansion than their expected returns, so they borrow and invest aggressively. Consumers find loans affordable relative to their income expectations and spend more freely. Asset prices rise because investors discount future cash flows at lower rates. This aggregate demand pushes prices upward. Conversely, when rates exceed r-star, the math reverses: borrowing becomes expensive relative to expected returns, investment slows, consumers pull back, asset prices fall, and demand-side inflation pressure eases. The entire machine runs through expectations and incentives, not direct government control of prices.</p>
+
+<p>The concept became urgently real in the summer of 2025 at the <strong>Jackson Hole Economic Symposium</strong> in Wyoming. Fed Chair Kevin Warsh stood before policymakers and economists and delivered language that stunned bond traders. He said he would be "hard pressed to describe broad financial conditions as restrictive right now" — meaning the Fed's own chair was signaling that the current policy rate, despite being historically elevated in nominal terms, may actually be sitting at or even below r-star. The implication was stark: if the Fed believed its rate was not truly restrictive, then it had not finished the inflation-fighting job, and rate hikes — which markets had entirely ruled out — were potentially back on the table. Traders who had been positioning for cuts were suddenly caught flat-footed.</p>
+
+<blockquote>"He said that he would be hard pressed to describe broad financial conditions as restrictive right now... The Central Bank does not believe its current policy is squeezing the economy hard enough to finish the inflation job."</blockquote>
+
+<p>For traders and investors, r-star functions as a critical calibration tool. <strong>Bond traders</strong> use estimates of r-star to price long-term Treasuries — if r-star is rising, long-term yields should follow, and bond prices fall. Equity investors use it to assess whether the Fed put (the expectation that the Fed will cut rates to rescue falling markets) is still valid. Mortgage rate forecasters use r-star to project where 30-year fixed rates will eventually stabilize. When a Fed chair signals that r-star may be higher than previously thought — as Warsh did at Jackson Hole — the entire yield curve reprices almost instantly. Practical signal: watch for Fed officials using words like "neutral" or "restrictive" in speeches. Those words are load-bearing.</p>
+
+<p>The biggest misconception about r-star is that it is a fixed number that economists have quietly agreed upon. It is not. R-star is <strong>unobservable</strong> and changes over time based on factors like productivity growth, demographics, global savings rates, and fiscal deficits. In the decade after the 2008 financial crisis, most economists believed r-star had fallen to historically low levels — near or even below zero in real terms — because of slow growth and aging populations. That consensus led the Fed to keep rates near zero for years. The mistake many investors made in 2021-2022 was assuming r-star was still that low, when in reality structural forces — massive fiscal spending, deglobalization, energy transition costs — may have pushed r-star meaningfully higher.</p>
+
+<p>When estimates of r-star prove dramatically wrong, the consequences can be severe. If the Fed believes r-star is low and therefore keeps rates "high" at, say, 4%, but the true r-star is actually 2%, then policy becomes crushingly tight and pushes the economy into recession. The opposite failure — the one Warsh was warning about — is more insidious: the Fed believes it is being restrictive, but r-star has actually drifted up, meaning policy is providing hidden stimulus while inflation continues to burn. This second failure is particularly dangerous because it is invisible until it shows up in persistent price data. By the time the error is recognized, inflation expectations may have become unanchored, requiring far more aggressive action to correct.</p>
+
+<p>R-star connects directly to several other foundational monetary concepts. The <strong>real interest rate</strong> (nominal rate minus inflation) determines whether r-star is being met in purchasing-power terms — a 5% rate with 4% inflation is only 1% real, which may still be below a real r-star of 2%. The <strong>Taylor Rule</strong>, a formula economists use to derive appropriate policy rates, takes r-star as one of its core inputs. <strong>Yield curve shape</strong> often reflects market consensus about where r-star sits relative to current rates. And <strong>quantitative tightening</strong> (the Fed shrinking its balance sheet) can affect the effective level of financial conditions independently of the policy rate, complicating the already difficult task of knowing whether you are above or below neutral at any given moment.</p>
+
+<p>The ultimate lesson of r-star for any investor, homeowner, or saver is this: never anchor your financial planning to the absolute level of interest rates. Anchor it to rates relative to neutral. A falling rate that is still above r-star means continued tightening pressure. A rising rate that stays below r-star means the economy is still being stimulated. Warsh's Jackson Hole remarks were a masterclass in this distinction — markets heard "conditions are not restrictive" and immediately had to recalibrate years of assumptions. If you understand r-star, you understand why the Fed's language matters more than its actions, and why a single phrase spoken beneath elk antler chandeliers in Wyoming can move mortgage rates, stock portfolios, and the dollar all at once.</p>
+<div class="concept-side">Sources: KEVIN WARSH DROPS THE HAMMER: Why a Fed Rate Hike Is Back on the Table!<br>Related in this category: <a href="pce_inflation_basket.html">PCE Inflation Basket</a>, <a href="jackson_hole_symposium.html">Jackson Hole Symposium</a>, <a href="hawkish_dovish_fed_signaling.html">Hawkish vs. Dovish Fed Signaling</a>, <a href="debt_servicing_cost.html">Debt Servicing Cost</a>, <a href="fiscal_monetary_policy_conflict.html">Fiscal-Monetary Policy Conflict</a>, <a href="central_bank_credibility.html">Central Bank Credibility</a></div>
+<button class="concept-done" data-slug="neutral_interest_rate" onclick="toggleDone('neutral_interest_rate')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_neutral_interest_rate';</script>
+<script src="../../book.js"></script>
+
+<script>
+(function() {
+  var DONE_KEY = 'fg_done', FILTER_KEY = 'fg_filter';
+  var done = JSON.parse(localStorage.getItem(DONE_KEY) || '{}');
+  var filter = localStorage.getItem(FILTER_KEY) || 'all';
+
+  function visible(flag) {
+    if (filter === 'star') return flag === 'star';
+    if (filter === 'nodeep') return flag !== 'deep';
+    return true;
+  }
+
+  function apply() {
+    var shown = 0, total = 0, hidden = 0;
+    document.querySelectorAll('.concept-row').forEach(function(r) {
+      var slug = r.dataset.slug, flag = r.dataset.flag;
+      total++;
+      if (done[slug]) r.classList.add('done'); else r.classList.remove('done');
+      if (visible(flag)) { r.classList.remove('fg-hidden'); shown++; }
+      else { r.classList.add('fg-hidden'); hidden++; }
+    });
+    document.querySelectorAll('.cat-card').forEach(function(card) {
+      var slugs = card.dataset.slugs ? card.dataset.slugs.split(',') : [];
+      var flags = card.dataset.flags ? card.dataset.flags.split(',') : [];
+      var vis = 0, allDone = slugs.length > 0;
+      slugs.forEach(function(sl, i) {
+        if (visible(flags[i])) vis++;
+        if (!done[sl]) allDone = false;
+      });
+      total += slugs.length; shown += vis;
+      var c = card.querySelector('.cat-count');
+      if (c) c.textContent = vis + (vis !== slugs.length ? ' of ' + slugs.length : '') + ' concepts' +
+        (card.dataset.stars ? ' \u00b7 ' + card.dataset.stars + ' \u2605' : '');
+      if (vis === 0) card.classList.add('fg-empty'); else card.classList.remove('fg-empty');
+      if (allDone) card.classList.add('done'); else card.classList.remove('done');
+    });
+    document.querySelectorAll('[data-filter]').forEach(function(b) {
+      b.classList.toggle('active', b.dataset.filter === filter);
+    });
+    var n = document.getElementById('fgCount');
+    if (n) n.textContent = shown + ' of ' + total + ' shown';
+    var h = document.getElementById('fgHiddenNote');
+    if (h) h.textContent = hidden ? hidden + ' hidden by the filter.' : '';
+    var btn = document.querySelector('.concept-done');
+    if (btn) {
+      var on = !!done[btn.dataset.slug];
+      btn.classList.toggle('on', on);
+      btn.textContent = on ? '\u2713 Completed' : '\u2713 Mark complete';
+    }
+  }
+
+  window.setFilter = function(f) {
+    filter = f; localStorage.setItem(FILTER_KEY, f); apply();
+  };
+  window.toggleDone = function(slug) {
+    if (done[slug]) delete done[slug]; else done[slug] = true;
+    localStorage.setItem(DONE_KEY, JSON.stringify(done));
+    apply();
+  };
+  window.toggleHideDone = function() {
+    document.body.classList.toggle('hide-done');
+  };
+  apply();
+})();
+</script>
+
+</body>
+</html>

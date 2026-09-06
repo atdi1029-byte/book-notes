@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Average Hourly Earnings (Wage Growth) - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.tier .tier-desc { color: #a08060; font-size: 0.85rem; margin: 0.4rem 0 0.8rem; }
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../economic-indicators.html">&larr; Economic Indicators</a>
+
+<div class="concept-meta"><span><span class="star">&#9733;</span> must-know</span><span>Economic Indicators</span><span>added 2026-09-05</span></div>
+<h4 id="average_hourly_earnings">Average Hourly Earnings (Wage Growth)</h4>
+
+<p><strong>Average Hourly Earnings (AHE)</strong> is a monthly economic statistic published by the U.S. Bureau of Labor Statistics as part of the Jobs Report (the Employment Situation Summary) released on the first Friday of each month. It measures the average amount that private-sector, non-farm employees earn per hour of work across the economy. The headline figure comes in two forms: the month-over-month change (how much wages grew compared to last month) and the year-over-year change (how much wages grew compared to the same month last year). In August of the video's example, AHE rose 0.3% month-over-month, bringing the average hourly wage to <strong>$37.75</strong>, representing a 3.1% increase compared to August of the prior year.</p>
+
+<p>Why does this number matter so deeply? Because wages are simultaneously the largest cost for most businesses and the primary source of income for most households. When wages rise faster than inflation, workers have more real purchasing power — they can buy more goods and services. When wages rise faster than productivity gains, businesses face pressure to raise prices to protect their margins, which can <strong>fuel inflation</strong>. This is the crux of the tension: moderate wage growth is healthy, but wage growth that consistently outpaces productivity becomes an inflationary engine. That inflationary potential is precisely what makes the Federal Reserve watch AHE so closely — it directly feeds into their dual mandate of price stability and maximum employment.</p>
+
+<p>The mechanical pathway from wage growth to the broader economy works like this: employers compete for workers, pushing wages up. Higher wages increase household income, which boosts consumer spending (since consumption is roughly 70% of U.S. GDP). Businesses facing both higher labor costs and stronger demand may raise prices. Rising prices reduce the purchasing power of money. The Fed, seeing inflation pressures build, considers raising interest rates to cool demand. Higher interest rates make borrowing more expensive — mortgages, car loans, business credit lines all get pricier. This chain reaction connects a monthly payroll statistic directly to what someone pays for a home or carries on their credit card. It's a feedback loop, and AHE is one of the earliest visible links in that chain.</p>
+
+<p>The August report in the video illustrates the concept with real precision. The headline jobs number — 162,000 — grabbed all the attention. But the wage data told its own story. A 0.3% monthly gain in average hourly earnings is neither alarming nor comforting. Annualized, 0.3% per month implies roughly 3.6% annual wage growth. The actual year-over-year reading came in at 3.1%, which is above the Fed's informal comfort zone (closer to 2-2.5% in alignment with their 2% inflation target) but not so far above it that it signals a wage-price spiral. As the host put it, wages were:</p>
+
+<blockquote>"not hot enough to trigger alarm but not cool enough to give the Fed comfort to cut."</blockquote>
+
+<p>That ambiguity is itself a policy signal. The Fed needs wage growth to be clearly cooling before it can justify cutting rates. At 3.1% year-over-year, it cannot make that case confidently.</p>
+
+<p>Traders and investors use AHE data as a real-time input into their <strong>interest rate expectations</strong>, which in turn drive bond prices, equity valuations, and currency movements. The practical workflow looks like this: when AHE comes in hotter than expected, bond traders sell Treasuries (pushing yields up), because they anticipate the Fed will need to keep rates higher for longer. When AHE comes in cooler than expected, they buy bonds in anticipation of eventual rate cuts. Equity investors watch the same signal: higher-for-longer rates compress the <strong>discount rate</strong> used to value future earnings, which pushes stock prices down — particularly for growth stocks whose value is concentrated far in the future. A single 0.1% surprise in AHE can move markets meaningfully on Jobs Report Friday.</p>
+
+<p>There are several important nuances and common misconceptions to understand. First, AHE is a simple average, not a median — it can be skewed by changes in the <strong>composition of employment</strong>. If a jobs report adds disproportionately many low-wage workers (as the August report did, with 59,000 food service jobs and 42,000 local government education jobs), the average wage can actually be dragged down even if no individual worker got a pay cut. Conversely, mass layoffs of low-wage workers make average wages appear to rise even with no actual raises. This compositional effect means AHE can mislead if read in isolation. Second, the 3.1% year-over-year figure means nothing without comparing it to <strong>inflation</strong> — real wage growth is what matters for living standards, and nominal AHE growth below the CPI means workers are actually falling behind.</p>
+
+<p>The concept can also break down or mislead in edge cases. During the COVID-19 pandemic, AHE spiked dramatically — not because workers were getting raises, but because millions of low-wage workers in hospitality and retail were laid off, mechanically raising the average of who remained employed. This was a statistical illusion, not economic prosperity. Similarly, when the economy shifts toward gig work, part-time employment, or contract arrangements, AHE may understates true wage pressure because these workers are sometimes excluded or their hours are miscounted. <strong>Wage theft</strong> (unpaid overtime, off-the-clock work) is another gap — it creates a gap between reported wages and what workers actually take home, making official AHE appear healthier than the lived reality on the ground.</p>
+
+<p>AHE connects most directly to several adjacent concepts worth understanding together. The <strong>Employment Cost Index (ECI)</strong>, released quarterly, is considered by many economists to be a more accurate wage measure because it controls for compositional shifts. The <strong>Atlanta Fed Wage Growth Tracker</strong> tracks wage changes for the same workers over time, avoiding the composition problem entirely. Together with the <strong>Consumer Price Index (CPI)</strong> and <strong>Personal Consumption Expenditures (PCE)</strong> deflator, AHE forms part of the Fed's inflationary picture. And it ties directly to <strong>Federal Funds Rate</strong> expectations, which ripple into mortgage rates, auto loan rates, and the cost of carrying any variable-rate debt. When you understand AHE, you understand the first domino in a chain that ends at your monthly payment.</p>
+<div class="concept-side">Sources: THE 162K AMBUSH: Why the 'Blowout' Jobs Report Hands Hawks Cover to Hike!; THE JOBS GUT PUNCH: Why Good News Sold Off Wall Street &amp; Crushed Tech!<br>Related in this category: <a href="inflation_breadth.html">Inflation Breadth</a>, <a href="congressional_budget_office_projections.html">Congressional Budget Office (CBO) Projections</a>, <a href="financial_conditions_index.html">Financial Conditions Index</a>, <a href="core_pce.html">Core PCE (Personal Consumption Expenditures)</a>, <a href="consumer_credit_card_delinquency_rate.html">Consumer Credit Card Delinquency Rate</a>, <a href="total_consumer_debt.html">Total Household / Consumer Debt</a></div>
+<button class="concept-done" data-slug="average_hourly_earnings" onclick="toggleDone('average_hourly_earnings')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_average_hourly_earnings';</script>
+<script src="../../book.js"></script>
+
+<script>
+(function() {
+  var DONE_KEY = 'fg_done', FILTER_KEY = 'fg_filter';
+  var done = JSON.parse(localStorage.getItem(DONE_KEY) || '{}');
+  var filter = localStorage.getItem(FILTER_KEY) || 'all';
+
+  function visible(flag) {
+    if (filter === 'star') return flag === 'star';
+    if (filter === 'nodeep') return flag !== 'deep';
+    return true;
+  }
+
+  function apply() {
+    var shown = 0, total = 0, hidden = 0;
+    document.querySelectorAll('.concept-row').forEach(function(r) {
+      var slug = r.dataset.slug, flag = r.dataset.flag;
+      total++;
+      if (done[slug]) r.classList.add('done'); else r.classList.remove('done');
+      if (visible(flag)) { r.classList.remove('fg-hidden'); shown++; }
+      else { r.classList.add('fg-hidden'); hidden++; }
+    });
+    document.querySelectorAll('.cat-card').forEach(function(card) {
+      var slugs = card.dataset.slugs ? card.dataset.slugs.split(',') : [];
+      var flags = card.dataset.flags ? card.dataset.flags.split(',') : [];
+      var vis = 0, allDone = slugs.length > 0;
+      slugs.forEach(function(sl, i) {
+        if (visible(flags[i])) vis++;
+        if (!done[sl]) allDone = false;
+      });
+      total += slugs.length; shown += vis;
+      var c = card.querySelector('.cat-count');
+      if (c) c.textContent = vis + (vis !== slugs.length ? ' of ' + slugs.length : '') + ' concepts' +
+        (card.dataset.stars ? ' \u00b7 ' + card.dataset.stars + ' \u2605' : '');
+      if (vis === 0) card.classList.add('fg-empty'); else card.classList.remove('fg-empty');
+      if (allDone) card.classList.add('done'); else card.classList.remove('done');
+    });
+    document.querySelectorAll('[data-filter]').forEach(function(b) {
+      b.classList.toggle('active', b.dataset.filter === filter);
+    });
+    var n = document.getElementById('fgCount');
+    if (n) n.textContent = shown + ' of ' + total + ' shown';
+    var h = document.getElementById('fgHiddenNote');
+    if (h) h.textContent = hidden ? hidden + ' hidden by the filter.' : '';
+    var btn = document.querySelector('.concept-done');
+    if (btn) {
+      var on = !!done[btn.dataset.slug];
+      btn.classList.toggle('on', on);
+      btn.textContent = on ? '\u2713 Completed' : '\u2713 Mark complete';
+    }
+  }
+
+  window.setFilter = function(f) {
+    filter = f; localStorage.setItem(FILTER_KEY, f); apply();
+  };
+  window.toggleDone = function(slug) {
+    if (done[slug]) delete done[slug]; else done[slug] = true;
+    localStorage.setItem(DONE_KEY, JSON.stringify(done));
+    apply();
+  };
+  window.toggleHideDone = function() {
+    document.body.classList.toggle('hide-done');
+  };
+  apply();
+})();
+</script>
+
+</body>
+</html>

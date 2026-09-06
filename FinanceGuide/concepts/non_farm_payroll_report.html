@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Non-Farm Payroll (NFP) Report - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.tier .tier-desc { color: #a08060; font-size: 0.85rem; margin: 0.4rem 0 0.8rem; }
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../economic-indicators.html">&larr; Economic Indicators</a>
+
+<div class="concept-meta"><span><span class="star">&#9733;</span> must-know</span><span>Economic Indicators</span><span>added 2026-09-05</span></div>
+<h4 id="non_farm_payroll_report">Non-Farm Payroll (NFP) Report</h4>
+
+<p>The <strong>Non-Farm Payroll (NFP) report</strong> is the United States government's monthly count of how many jobs were added or lost across the American economy — excluding farm workers, private household employees, and non-profit organization employees. It is published on the first Friday of every month by the <strong>Bureau of Labor Statistics (BLS)</strong> as part of the broader <strong>Employment Situation Summary</strong>. The name "non-farm" simply reflects the historical exclusion of agricultural work, which has highly seasonal and volatile employment patterns that would distort the underlying trend. This single data release is widely considered the most market-moving economic report on the calendar — more than GDP, more than inflation, more than almost anything else the government publishes.</p>
+
+<p>The NFP report matters because employment is the foundation of consumer spending, and consumer spending drives roughly 70% of the U.S. economy. When people have jobs, they pay rent, buy cars, eat out, and service their debts. When hiring slows or reverses, that entire chain of economic activity begins to contract. But the report's power extends beyond the real economy into financial markets. The <strong>Federal Reserve</strong> has a dual mandate — price stability and maximum employment — which means the NFP number directly shapes decisions about interest rates. A strong jobs report signals the Fed can keep rates higher or raise them further. A weak report signals room to cut. That feedback loop connects a single monthly data point to mortgage rates, bond yields, stock prices, and the dollar, almost instantly.</p>
+
+<p>Mechanically, the NFP is compiled through two separate surveys conducted every month. The first is the <strong>establishment survey</strong> (also called the payroll survey), which contacts roughly 119,000 businesses and government agencies representing about 629,000 individual work sites. These employers report how many people were on payroll during the pay period that includes the 12th of the month. The second is the <strong>household survey</strong>, which interviews about 60,000 households to determine the <strong>unemployment rate</strong> — the share of the labor force actively looking for work but unable to find it. The headline NFP number comes from the establishment survey, while the unemployment rate comes from the household survey. Because they measure different things using different methods, they can and do diverge, which is one of the report's most important nuances.</p>
+
+<p>The August report described in the video is a textbook case study in why the headline number demands closer inspection. The consensus estimate — what Wall Street economists expected — was approximately <strong>56,000 jobs</strong>. The actual print came in at <strong>162,000</strong>, nearly triple the forecast. The financial media immediately declared a "blowout." But when the sector breakdown was examined, two industries accounted for the vast majority of the gains: <strong>food services and drinking places</strong> added 59,000 jobs, and <strong>local government education</strong> added 42,000. Together, those two categories contributed 101,000 jobs — or 62.3% of the entire headline figure. The report also included upward <strong>revisions</strong> to prior months, with June revised from 20,000 to 31,000 and July flipped from negative 23,000 to positive 21,000.</p>
+
+<blockquote>"If this were really the broad-based healthy labor market Washington would like you to believe, ask yourself why two industries did almost two-thirds of all the heavy lifting."</blockquote>
+
+<p>Traders and investors use the NFP report as a primary input for <strong>rate expectations</strong>, which are the market's collective forecast of where the Federal Reserve will set the federal funds rate over the coming months. These expectations are priced into <strong>interest rate futures</strong>, <strong>Treasury bonds</strong>, and currency markets in real time. A strong NFP print tends to push bond yields higher (prices lower), strengthen the dollar, and often pressure equities — particularly rate-sensitive sectors like real estate and utilities. The logic is straightforward: more jobs mean the Fed has less urgency to cut rates, so borrowing costs stay elevated. In the August example, the 162,000 print arrived two days after a dramatically weaker <strong>ADP private payroll report</strong> showing only 38,000 jobs — the whiplash between those two numbers amplified the market reaction significantly.</p>
+
+<p>The most dangerous misconception about the NFP is treating the headline number as a complete picture of labor market health. <strong>Sector composition</strong> matters enormously. Jobs in high-productivity industries — technology, manufacturing, professional services — generate more economic multiplier effects than jobs in low-wage, non-tradeable sectors. Restaurant and bar jobs are real employment, and the workers who hold them have genuine purchasing power. But they are not the same economic signal as a surge in semiconductor manufacturing or software development. Similarly, <strong>government education payrolls</strong> are sensitive to the academic calendar and can surge in August as schools re-open, creating a seasonal pattern that doesn't reflect underlying private sector momentum. Both categories are legitimate employment — but using them to infer Fed policy implications requires careful qualification.</p>
+
+<p>The NFP report also carries significant structural risks that can distort its signal. <strong>Seasonal adjustment</strong> is applied to strip out predictable calendar effects, but if the seasonal patterns themselves have shifted — as they did post-pandemic — the adjustments can introduce errors. The <strong>birth-death model</strong> is another source of noise: the BLS uses a statistical model to estimate jobs created or destroyed by businesses too new or recently closed to be captured in the survey, and this model can add or subtract hundreds of thousands of jobs over a year based on assumptions that lag reality. And crucially, <strong>benchmark revisions</strong> happen annually, sometimes dramatically restating a full year's worth of data. In 2024, a benchmark revision erased over 800,000 previously reported jobs — meaning the "strong" labor market the Fed had been responding to was materially weaker than reported in real time.</p>
+
+<p>The NFP connects directly to several other concepts that compound its importance. The <strong>unemployment rate</strong> from the same release has its own interpretation layer — the rate can fall even as hiring slows if discouraged workers exit the labor force, shrinking the denominator. <strong>Average hourly earnings</strong>, also released alongside NFP, tell the wage inflation story: rapid wage growth can sustain consumer spending but also fuel the kind of inflation the Fed is trying to suppress, creating a hawkish feedback loop even in a moderating jobs market. The NFP also interacts with the <strong>yield curve</strong>, <strong>mortgage rates</strong> (which are priced off Treasury yields), and <strong>credit spreads</strong>. For anyone renting, borrowing, or waiting on rate cuts, a single stronger-than-expected Friday morning number can delay financial relief by months — which is precisely the mechanism the video's host was describing when he said the blowout report would cost viewers more in their mortgages, not less.</p>
+<div class="concept-side">Sources: THE 162K AMBUSH: Why the 'Blowout' Jobs Report Hands Hawks Cover to Hike!; THE JOBS GUT PUNCH: Why Good News Sold Off Wall Street &amp; Crushed Tech!<br>Related in this category: <a href="inflation_breadth.html">Inflation Breadth</a>, <a href="congressional_budget_office_projections.html">Congressional Budget Office (CBO) Projections</a>, <a href="financial_conditions_index.html">Financial Conditions Index</a>, <a href="core_pce.html">Core PCE (Personal Consumption Expenditures)</a>, <a href="consumer_credit_card_delinquency_rate.html">Consumer Credit Card Delinquency Rate</a>, <a href="total_consumer_debt.html">Total Household / Consumer Debt</a></div>
+<button class="concept-done" data-slug="non_farm_payroll_report" onclick="toggleDone('non_farm_payroll_report')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_non_farm_payroll_report';</script>
+<script src="../../book.js"></script>
+
+<script>
+(function() {
+  var DONE_KEY = 'fg_done', FILTER_KEY = 'fg_filter';
+  var done = JSON.parse(localStorage.getItem(DONE_KEY) || '{}');
+  var filter = localStorage.getItem(FILTER_KEY) || 'all';
+
+  function visible(flag) {
+    if (filter === 'star') return flag === 'star';
+    if (filter === 'nodeep') return flag !== 'deep';
+    return true;
+  }
+
+  function apply() {
+    var shown = 0, total = 0, hidden = 0;
+    document.querySelectorAll('.concept-row').forEach(function(r) {
+      var slug = r.dataset.slug, flag = r.dataset.flag;
+      total++;
+      if (done[slug]) r.classList.add('done'); else r.classList.remove('done');
+      if (visible(flag)) { r.classList.remove('fg-hidden'); shown++; }
+      else { r.classList.add('fg-hidden'); hidden++; }
+    });
+    document.querySelectorAll('.cat-card').forEach(function(card) {
+      var slugs = card.dataset.slugs ? card.dataset.slugs.split(',') : [];
+      var flags = card.dataset.flags ? card.dataset.flags.split(',') : [];
+      var vis = 0, allDone = slugs.length > 0;
+      slugs.forEach(function(sl, i) {
+        if (visible(flags[i])) vis++;
+        if (!done[sl]) allDone = false;
+      });
+      total += slugs.length; shown += vis;
+      var c = card.querySelector('.cat-count');
+      if (c) c.textContent = vis + (vis !== slugs.length ? ' of ' + slugs.length : '') + ' concepts' +
+        (card.dataset.stars ? ' \u00b7 ' + card.dataset.stars + ' \u2605' : '');
+      if (vis === 0) card.classList.add('fg-empty'); else card.classList.remove('fg-empty');
+      if (allDone) card.classList.add('done'); else card.classList.remove('done');
+    });
+    document.querySelectorAll('[data-filter]').forEach(function(b) {
+      b.classList.toggle('active', b.dataset.filter === filter);
+    });
+    var n = document.getElementById('fgCount');
+    if (n) n.textContent = shown + ' of ' + total + ' shown';
+    var h = document.getElementById('fgHiddenNote');
+    if (h) h.textContent = hidden ? hidden + ' hidden by the filter.' : '';
+    var btn = document.querySelector('.concept-done');
+    if (btn) {
+      var on = !!done[btn.dataset.slug];
+      btn.classList.toggle('on', on);
+      btn.textContent = on ? '\u2713 Completed' : '\u2713 Mark complete';
+    }
+  }
+
+  window.setFilter = function(f) {
+    filter = f; localStorage.setItem(FILTER_KEY, f); apply();
+  };
+  window.toggleDone = function(slug) {
+    if (done[slug]) delete done[slug]; else done[slug] = true;
+    localStorage.setItem(DONE_KEY, JSON.stringify(done));
+    apply();
+  };
+  window.toggleHideDone = function() {
+    document.body.classList.toggle('hide-done');
+  };
+  apply();
+})();
+</script>
+
+</body>
+</html>

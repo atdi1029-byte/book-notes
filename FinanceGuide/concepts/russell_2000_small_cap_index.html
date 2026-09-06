@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Russell 2000 Small Cap Index - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.tier .tier-desc { color: #a08060; font-size: 0.85rem; margin: 0.4rem 0 0.8rem; }
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../investing-fundamentals.html">&larr; Investing Fundamentals</a>
+
+<div class="concept-meta"><span>standard</span><span>Investing Fundamentals</span><span>added 2026-08-31</span></div>
+<h4 id="russell_2000_small_cap_index">Russell 2000 Small Cap Index</h4>
+
+<p>The <strong>Russell 2000</strong> is an index of the 2,000 smallest companies in the broader <strong>Russell 3000</strong>, which itself represents roughly 98% of the entire U.S. stock market by market capitalization. These are not household names — they're regional banks, niche manufacturers, early-stage biotech firms, local retailers, and specialty service companies. The index is maintained by <strong>FTSE Russell</strong> and reconstituted annually each June, when companies are added or dropped based on their updated market caps. When people talk about <strong>small-cap stocks</strong>, they almost always mean the Russell 2000. It's the benchmark that institutional investors, ETF managers, and options traders use to track — and bet on — the health of America's smaller businesses.</p>
+
+<p>The Russell 2000 matters because small-cap companies are a proxy for the domestic U.S. economy in a way that large-cap indices like the S&amp;P 500 simply are not. The S&amp;P 500 is dominated by multinationals — Apple, Microsoft, Amazon — that earn substantial revenue overseas. When the dollar strengthens or global demand shifts, those companies have hedges and diversification. Small caps don't. They live and die by domestic demand, domestic borrowing costs, and domestic credit conditions. When the Russell 2000 is healthy, it typically signals that Main Street businesses are expanding, hiring, and investing. When it's struggling, it often signals that credit is tightening, margins are compressing, and the real economy — not the financial economy — is under stress.</p>
+
+<p>Mechanically, the Russell 2000 is a <strong>float-adjusted market-cap-weighted index</strong>, meaning each company's weight is proportional to the market value of its publicly tradable shares. A company with a $500 million float has twice the index weight of one with a $250 million float. Because these are small companies, individual stocks can move dramatically without meaningfully shifting the index. Liquidity in the underlying names is thinner than in large-cap stocks, which means the index itself can be harder to trade efficiently — spreads widen, slippage increases, and price discovery becomes noisier during periods of market stress. <strong>IWM</strong>, the iShares Russell 2000 ETF, is the most heavily traded vehicle for gaining index exposure, with futures contracts on the <strong>CME</strong> adding another layer of speculative access.</p>
+
+<p>The critical vulnerability the Russell 2000 carries is its relationship with debt. Unlike large-cap corporations that locked in decade-long fixed-rate bonds at near-zero rates during 2020–2021, a substantial portion of small-cap companies rely on <strong>floating-rate debt</strong> — credit facilities, revolving lines of credit, and term loans tied to benchmarks like <strong>SOFR</strong> (the Secured Overnight Financing Rate). When the Fed raises rates, these companies don't get a grace period. Their interest expense climbs with every rate hike, quarter by quarter. This is the structural difference that makes the Russell 2000 uniquely rate-sensitive: large caps borrowed long and fixed, small caps borrowed short and floating.</p>
+
+<p>The video puts a specific number on this vulnerability that deserves to sit with you for a moment. As of the time of the Jackson Hole speech, <strong>40–46% of Russell 2000 constituents were unable to cover their interest expense from operating income</strong>. That means nearly half the index — hundreds of companies — were already operating in a state where their earnings before interest weren't sufficient to service their debt. These are the <strong>zombie companies</strong>, a term for businesses that can survive only by continuously rolling over debt or accessing new capital. In a low-rate world, zombie companies can limp along indefinitely. In a sustained high-rate environment, they face a binary outcome: refinance at punishing rates and compress margins further, or default.</p>
+
+<blockquote>"The real story underneath this sell-off is actually a $40 trillion debt problem that no speech on earth can actually fix."</blockquote>
+
+<p>Traders use the Russell 2000 as a <strong>leading indicator</strong> and a <strong>risk-appetite gauge</strong>. When institutional investors feel confident about the economic outlook, they rotate into small caps because the upside is higher — smaller companies can grow faster proportionally. When fear enters the market, they rotate out, back into the safety of large caps or bonds. This rotation is visible in the <strong>Russell 2000 / S&amp;P 500 ratio</strong>, a widely watched spread. A rising ratio signals risk-on sentiment; a falling ratio signals defensiveness. Options traders watch <strong>implied volatility</strong> on IWM for signals about expected turbulence in smaller names. When IWM's IV spikes, it often telegraphs stress in credit markets before it shows up in the headlines.</p>
+
+<p>The most common misconception about the Russell 2000 is that it represents "American innovation" or early-stage growth — a scrappy, entrepreneurial index. In practice, the index is heavily weighted toward <strong>financials</strong> (regional banks, insurance companies, specialty lenders) and <strong>industrials</strong>. These sectors are cyclical and capital-intensive, not the high-growth tech narrative many retail investors imagine when they buy IWM. A second misconception is that small-cap underperformance is always a buying opportunity because valuations are cheap. When rate pressure is the driver — as it was in the post-Jackson Hole environment — cheap valuations don't matter if the cost of capital is rising faster than earnings can grow. A company trading at 10x earnings looks expensive, not cheap, if those earnings are about to be eroded by a 400-basis-point jump in borrowing costs.</p>
+
+<p>When the Russell 2000 breaks down systemically, the transmission mechanism into the broader economy is concrete and fast. Zombie companies stop investing in equipment and headcount. Regional banks — themselves heavily represented in the index — tighten lending standards because their small-business loan books deteriorate. Those tighter lending standards then feed back into further stress on the very companies they serve. This is the <strong>credit crunch loop</strong>: rising rates → deteriorating small-cap balance sheets → tighter bank lending → fewer business loans → slower economic activity → lower earnings → further credit stress. The Russell 2000 is often where this loop begins to surface before it reaches the broader S&amp;P 500, which is why watching the index closely around Fed policy inflection points — like a Jackson Hole speech — is not academic. It's where the real economy's stress fractures first appear.</p>
+
+<p>The connection to the Jackson Hole narrative is direct. When Kevin Warsh signaled that rate cuts were off the table and a September hike was possible, the two-year Treasury yield jumped past 4.3%. For a large-cap company with fixed-rate debt, that number is largely symbolic. For a small-cap company rolling a floating-rate credit facility, it means higher cash interest payments next quarter. When nearly half the Russell 2000 already can't cover interest from operations, even a marginal increase in the cost of debt pushes more companies past the distress threshold. Warsh's speech didn't create this vulnerability — the $40 trillion debt structure did. The speech simply reminded the market that the pressure wasn't going away, and the Russell 2000 is the index where that reminder lands hardest.</p>
+<div class="concept-side">Sources: THE JACKSON HOLE TRAP: Why Kevin Warsh Just Crashed Gold &amp; Bitcoin!; THE JOBS GUT PUNCH: Why Good News Sold Off Wall Street &amp; Crushed Tech!<br>Related in this category: <a href="opportunity_cost_non_yielding_assets.html">Opportunity Cost of Non-Yielding Assets</a>, <a href="money_market_funds.html">Money Market Funds</a></div>
+<button class="concept-done" data-slug="russell_2000_small_cap_index" onclick="toggleDone('russell_2000_small_cap_index')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_russell_2000_small_cap_index';</script>
+<script src="../../book.js"></script>
+
+<script>
+(function() {
+  var DONE_KEY = 'fg_done', FILTER_KEY = 'fg_filter';
+  var done = JSON.parse(localStorage.getItem(DONE_KEY) || '{}');
+  var filter = localStorage.getItem(FILTER_KEY) || 'all';
+
+  function visible(flag) {
+    if (filter === 'star') return flag === 'star';
+    if (filter === 'nodeep') return flag !== 'deep';
+    return true;
+  }
+
+  function apply() {
+    var shown = 0, total = 0, hidden = 0;
+    document.querySelectorAll('.concept-row').forEach(function(r) {
+      var slug = r.dataset.slug, flag = r.dataset.flag;
+      total++;
+      if (done[slug]) r.classList.add('done'); else r.classList.remove('done');
+      if (visible(flag)) { r.classList.remove('fg-hidden'); shown++; }
+      else { r.classList.add('fg-hidden'); hidden++; }
+    });
+    document.querySelectorAll('.cat-card').forEach(function(card) {
+      var slugs = card.dataset.slugs ? card.dataset.slugs.split(',') : [];
+      var flags = card.dataset.flags ? card.dataset.flags.split(',') : [];
+      var vis = 0, allDone = slugs.length > 0;
+      slugs.forEach(function(sl, i) {
+        if (visible(flags[i])) vis++;
+        if (!done[sl]) allDone = false;
+      });
+      total += slugs.length; shown += vis;
+      var c = card.querySelector('.cat-count');
+      if (c) c.textContent = vis + (vis !== slugs.length ? ' of ' + slugs.length : '') + ' concepts' +
+        (card.dataset.stars ? ' \u00b7 ' + card.dataset.stars + ' \u2605' : '');
+      if (vis === 0) card.classList.add('fg-empty'); else card.classList.remove('fg-empty');
+      if (allDone) card.classList.add('done'); else card.classList.remove('done');
+    });
+    document.querySelectorAll('[data-filter]').forEach(function(b) {
+      b.classList.toggle('active', b.dataset.filter === filter);
+    });
+    var n = document.getElementById('fgCount');
+    if (n) n.textContent = shown + ' of ' + total + ' shown';
+    var h = document.getElementById('fgHiddenNote');
+    if (h) h.textContent = hidden ? hidden + ' hidden by the filter.' : '';
+    var btn = document.querySelector('.concept-done');
+    if (btn) {
+      var on = !!done[btn.dataset.slug];
+      btn.classList.toggle('on', on);
+      btn.textContent = on ? '\u2713 Completed' : '\u2713 Mark complete';
+    }
+  }
+
+  window.setFilter = function(f) {
+    filter = f; localStorage.setItem(FILTER_KEY, f); apply();
+  };
+  window.toggleDone = function(slug) {
+    if (done[slug]) delete done[slug]; else done[slug] = true;
+    localStorage.setItem(DONE_KEY, JSON.stringify(done));
+    apply();
+  };
+  window.toggleHideDone = function() {
+    document.body.classList.toggle('hide-done');
+  };
+  apply();
+})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Gold-Silver Ratio - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.tier .tier-desc { color: #a08060; font-size: 0.85rem; margin: 0.4rem 0 0.8rem; }
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../commodities-energy.html">&larr; Commodities &amp; Energy</a>
+
+<div class="concept-meta"><span>deep cut</span><span>Commodities &amp; Energy</span><span>added 2026-09-04</span></div>
+<h4 id="gold_silver_ratio">Gold-Silver Ratio</h4>
+
+<p>The <strong>gold-silver ratio</strong> is one of the oldest and most watched measures in commodities trading. It answers a single question: how many ounces of silver does it take to buy one ounce of gold? The math is simple — divide the current gold price by the current silver price. If gold trades at $4,467 an ounce and silver at $66.21, the ratio is roughly 67.4. That number tells you the relative value of the two metals at any moment in time. When the ratio is high, gold is expensive relative to silver. When it's low, silver is expensive relative to gold. Traders have tracked this relationship for centuries because the two metals historically move together — they share the same basic drivers of fear, inflation, and currency debasement — which makes it meaningful when they stop moving together.</p>
+
+<p>The ratio matters because gold and silver are not independent markets. They're linked by investor psychology, by the same macro forces that push people into hard assets, and by the simple fact that both are priced in dollars. When inflation fears spike, both metals rise. When the dollar strengthens, both typically fall. Because of this tight historical relationship, the ratio between them functions as a <strong>divergence signal</strong> — a way of measuring when one metal has gotten ahead of or fallen behind the other in a way that isn't explained by their shared fundamentals. A ratio far above its historical average says, without requiring any other data, that one of two things is probably true: gold has gotten too expensive, or silver has gotten too cheap, or both. That gap is almost always eventually closed.</p>
+
+<p>The mechanism is straightforward once you see it. Traders calculate the ratio daily, then compare it against the <strong>long-run average</strong>. Since 1971, when the Bretton Woods system collapsed and gold began free-floating, that average sits at 60.5. Any reading significantly above 60.5 suggests gold is overpriced relative to silver on a historical basis. Any reading significantly below it suggests the opposite. The ratio doesn't tell you the direction of the next move — it doesn't say gold will fall or silver will rise — but it tells you that mean reversion pressure exists. Markets have a strong tendency to pull these ratios back toward their historical centers, which is why a ratio of 80 or 90 has historically been a strong signal to rotate from gold into silver, and a ratio near 40 has historically been a signal to do the reverse.</p>
+
+<p>The video gives a precise real-world illustration. Gold peaked at <strong>$5,589.38 per ounce on January 28th, 2026</strong>, then slid roughly 20% to around $4,467 — giving back a full year of gains. The mainstream explanation was simple: the gold trade had gotten too crowded, interest rates were staying higher for longer, and precious metals were unwinding across the board. But then the ratio told a different story. At the time of the video, the ratio sat at 67.4 — above the 60.5 long-run average — which meant gold was still expensive relative to silver even after the crash. And silver itself had not crashed at all. Silver was trading around $66.21, up 60.8% year-over-year. If the metals were truly unwinding together, the ratio should have stayed flat. Instead, it signaled that the divergence was real and structural, not a momentary blip.</p>
+
+<blockquote>"Gold is still expensive relative to silver even after the crash. Which tells you the divergence I'm about to walk you through is not some tiny blip. It's a real and measurable gap."</blockquote>
+
+<p>Traders use the ratio in two primary ways. The first is a <strong>rotation trade</strong>: when the ratio climbs well above its long-run average, traders sell gold and buy silver, betting the gap will close. When it falls well below average, they do the reverse. This trade doesn't require you to be right about the direction of either metal — only about their relative relationship, which is far more predictable than absolute prices. The second use is as a <strong>confirmation tool</strong>. If you have a thesis about gold — say, that central bank buying will drive it higher — you can check the ratio to see whether silver is confirming that thesis. If gold is rising but silver is lagging badly, the ratio warns you that the gold rally may be narrow and fragile rather than broadly supported by real precious-metals demand.</p>
+
+<p>The most important misconception is treating the ratio as a precise timing tool rather than a directional indicator. A ratio of 67.4 doesn't mean gold will fall tomorrow or that silver will spike next week. Ratios can stay elevated for months or years — especially when there's a structural reason for the divergence that the historical average doesn't capture. In this case, the divergence was partly explained by silver's unique industrial demand profile. Silver is in its <strong>sixth straight year of a global supply deficit</strong>, with the Silver Institute's 2026 World Silver Survey projecting a shortfall of 46.3 million ounces — up 15% from the prior year. Since 2021, above-ground inventories have been drawn down by 762 million ounces just to cover demand. That industrial pressure kept silver from participating in gold's selloff and is a legitimate fundamental reason for the ratio to stay elevated for longer than a pure mean-reversion trader might expect.</p>
+
+<p>The ratio can also break down or mislead in specific macro environments. During extreme <strong>risk-off</strong> episodes — financial panics, crashes, acute crises — silver often falls harder and faster than gold because it has significant industrial exposure. In a severe recession, industrial demand for silver collapses while gold's safe-haven demand holds up. This can push the ratio to 80, 90, or even higher — not because of any real mispricing, but because the two metals are temporarily serving different economic functions. The COVID crash of March 2020 briefly sent the ratio above 120. Someone who mechanically bought silver at 80 expecting mean reversion learned that the ratio can move much further against you before it snaps back. The lesson: use the ratio in the context of the broader macro picture, not as a standalone trigger.</p>
+
+<p>The gold-silver ratio connects directly to several broader market concepts. It's closely related to <strong>mean reversion</strong> — the idea that extreme readings in any long-run relationship tend to correct over time. It also ties into the debate between gold's role as a pure monetary metal and silver's dual identity as both a monetary and industrial metal. When industrial demand is strong (solar panels, EVs, electronics, and medical applications all consume silver heavily), silver tends to outperform gold and compress the ratio. When fear dominates and industrial demand is weak, gold outperforms and the ratio expands. Understanding the ratio therefore requires understanding which driver — monetary fear or industrial demand — is currently in the driver's seat, and recognizing that those forces can and do pull the two metals in opposite directions for extended stretches of time.</p>
+<div class="concept-side">Sources: THE GREAT METALS DIVIDE: Why Gold Crashed 20% While Silver Exploded 60%!<br>Related in this category: <a href="gold_futures.html">Gold Futures</a>, <a href="hard_assets_inflation_hedge.html">Hard Assets as Inflation Hedges</a>, <a href="farm_debt_to_asset_ratio.html">Farm Debt-to-Asset Ratio</a>, <a href="farm_debt_service_ratio.html">Farm Debt Service Ratio</a>, <a href="agricultural_direct_payment_subsidies.html">Agricultural Direct Payment Subsidies</a>, <a href="net_farm_income.html">Net Farm Income</a></div>
+<button class="concept-done" data-slug="gold_silver_ratio" onclick="toggleDone('gold_silver_ratio')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_gold_silver_ratio';</script>
+<script src="../../book.js"></script>
+
+<script>
+(function() {
+  var DONE_KEY = 'fg_done', FILTER_KEY = 'fg_filter';
+  var done = JSON.parse(localStorage.getItem(DONE_KEY) || '{}');
+  var filter = localStorage.getItem(FILTER_KEY) || 'all';
+
+  function visible(flag) {
+    if (filter === 'star') return flag === 'star';
+    if (filter === 'nodeep') return flag !== 'deep';
+    return true;
+  }
+
+  function apply() {
+    var shown = 0, total = 0, hidden = 0;
+    document.querySelectorAll('.concept-row').forEach(function(r) {
+      var slug = r.dataset.slug, flag = r.dataset.flag;
+      total++;
+      if (done[slug]) r.classList.add('done'); else r.classList.remove('done');
+      if (visible(flag)) { r.classList.remove('fg-hidden'); shown++; }
+      else { r.classList.add('fg-hidden'); hidden++; }
+    });
+    document.querySelectorAll('.cat-card').forEach(function(card) {
+      var slugs = card.dataset.slugs ? card.dataset.slugs.split(',') : [];
+      var flags = card.dataset.flags ? card.dataset.flags.split(',') : [];
+      var vis = 0, allDone = slugs.length > 0;
+      slugs.forEach(function(sl, i) {
+        if (visible(flags[i])) vis++;
+        if (!done[sl]) allDone = false;
+      });
+      total += slugs.length; shown += vis;
+      var c = card.querySelector('.cat-count');
+      if (c) c.textContent = vis + (vis !== slugs.length ? ' of ' + slugs.length : '') + ' concepts' +
+        (card.dataset.stars ? ' \u00b7 ' + card.dataset.stars + ' \u2605' : '');
+      if (vis === 0) card.classList.add('fg-empty'); else card.classList.remove('fg-empty');
+      if (allDone) card.classList.add('done'); else card.classList.remove('done');
+    });
+    document.querySelectorAll('[data-filter]').forEach(function(b) {
+      b.classList.toggle('active', b.dataset.filter === filter);
+    });
+    var n = document.getElementById('fgCount');
+    if (n) n.textContent = shown + ' of ' + total + ' shown';
+    var h = document.getElementById('fgHiddenNote');
+    if (h) h.textContent = hidden ? hidden + ' hidden by the filter.' : '';
+    var btn = document.querySelector('.concept-done');
+    if (btn) {
+      var on = !!done[btn.dataset.slug];
+      btn.classList.toggle('on', on);
+      btn.textContent = on ? '\u2713 Completed' : '\u2713 Mark complete';
+    }
+  }
+
+  window.setFilter = function(f) {
+    filter = f; localStorage.setItem(FILTER_KEY, f); apply();
+  };
+  window.toggleDone = function(slug) {
+    if (done[slug]) delete done[slug]; else done[slug] = true;
+    localStorage.setItem(DONE_KEY, JSON.stringify(done));
+    apply();
+  };
+  window.toggleHideDone = function() {
+    document.body.classList.toggle('hide-done');
+  };
+  apply();
+})();
+</script>
+
+</body>
+</html>

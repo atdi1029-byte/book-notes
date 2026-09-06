@@ -8,80 +8,82 @@
 <title>Finance Guide - Finance Guide</title>
 <link rel="stylesheet" href="../book.css">
 <style>
-.nav-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 1rem; margin: 1.5rem 0;
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
 }
-.nav-card {
-  background: #e8e0d0; border-radius: 10px;
-  padding: 1.5rem; text-decoration: none; color: #3a2a1a;
-  border: 1px solid #d4c8b0;
-  transition: all 0.2s; position: relative;
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
 }
-.nav-card:hover {
-  border-color: #a08060; background: #ded4c0;
-  transform: translateY(-2px);
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
 }
-.nav-card h3 { margin: 0 0 0.3rem; color: #d4a574; font-size: 1.3rem; }
-.nav-card .card-sub { font-size: 0.85rem; color: #a08060; }
-.nav-card .card-count {
-  font-size: 0.75rem; color: #a08060;
-  margin-top: 0.5rem;
+.tier .tier-desc { color: #a08060; font-size: 0.85rem; margin: 0.4rem 0 0.8rem; }
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
 }
-.nav-card.done { opacity: 0.25; }
-body.hide-done .nav-card.done { display: none; }
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
 .back-link {
   display: inline-block; margin-bottom: 1rem;
   color: #a08060; text-decoration: none; font-size: 0.9rem;
 }
 .back-link:hover { color: #d4a574; }
-.concept-section { position: relative; transition: opacity 0.3s; }
-.concept-section.completed { opacity: 0.3; }
-body.hide-done .concept-section.completed { display: none; }
-.concept-done {
-  display: inline-flex; align-items: center; gap: 0.4rem;
-  background: none; border: 1px solid #d4c8b0;
-  border-radius: 4px; padding: 0.3rem 0.8rem;
-  cursor: pointer; font-size: 0.8rem; color: #a08060;
-  transition: all 0.2s; margin-top: 1rem;
-}
-.concept-done:hover { border-color: #4ade80; color: #4ade80; }
-.concept-section.completed .concept-done {
-  border-color: #4ade80; background: #4ade80; color: #1a1008;
-}
-.filter-bar {
-  display: flex; gap: 1rem; align-items: center;
-  margin: 0 0 1.5rem; padding: 0.7rem 1rem;
-  background: #e8e0d0; border-radius: 8px;
-  border: 1px solid #d4c8b0; font-size: 0.85rem;
-}
-.filter-btn {
-  background: none; border: 1px solid #d4c8b0;
-  color: #3a2a1a; padding: 0.3rem 0.8rem;
-  border-radius: 4px; cursor: pointer;
-  font-size: 0.8rem; transition: all 0.2s;
-}
-.filter-btn:hover { border-color: #a08060; }
-.filter-btn.active {
-  background: #a08060; color: #f4efe8; border-color: #a08060;
-}
-.filter-count { color: #a08060; margin-left: auto; }
-.stats-bar {
-  display: flex; gap: 1.5rem; flex-wrap: wrap;
-  margin: 1rem 0 2rem; padding: 1rem;
-  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
-  font-size: 0.9rem;
-}
-.stats-bar .stat {
-  display: flex; flex-direction: column; align-items: center;
-}
-.stats-bar .stat-num {
-  font-size: 1.4rem; font-weight: bold; color: #d4a574;
-}
 </style>
 </head>
-<body class="hide-done">
+<body>
 <div class="progress-bar" id="progressBar"></div>
 <div class="bookmark-bar" id="bookmarkBar" style="display:none"
  onclick="jumpToBookmark()">
@@ -93,78 +95,83 @@ body.hide-done .concept-section.completed { display: none; }
 
 
 <h1>Finance Guide</h1>
-<p class="subtitle">A living book &middot; 143 concepts
- &middot; 36 videos processed</p>
-<div class="filter-bar">
-  <button class="filter-btn" id="filterBtn"
-   onclick="toggleFilter()" class="active">Show All</button>
-  <span class="filter-count" id="filterCount"></span>
+<p class="subtitle">A living book &middot; 156 concepts
+ &middot; 10 videos &middot;
+ <a href="recent.html" style="color:#a08060">Added this week (156)</a></p>
+
+<div class="fg-bar">
+  <button class="fg-btn" data-filter="all" onclick="setFilter('all')">Everything</button>
+  <button class="fg-btn" data-filter="nodeep" onclick="setFilter('nodeep')">Hide deep cuts</button>
+  <button class="fg-btn" data-filter="star" onclick="setFilter('star')">&#9733; must-know only</button>
+  <button class="fg-btn" onclick="toggleHideDone()">Hide completed</button>
+  <span class="fg-count" id="fgCount"></span>
 </div>
-<div class="nav-grid">
-<a class="nav-card" href="2026/index.html" data-slugs="pce_inflation_basket,jackson_hole_symposium,two_year_treasury_yield,hawkish_dovish_fed_signaling,opportunity_cost_non_yielding_assets,inflation_breadth,gold_futures,spot_bitcoin_etf,etf_fund_flows,national_debt_debt_ceiling,debt_servicing_cost,fiscal_monetary_policy_conflict,treasury_bond_buyback_program,thirty_year_treasury_bond,interest_coverage_ratio,debt_rollover_risk,valuation_multiples_rate_sensitivity,money_market_funds,central_bank_credibility,russell_2000_small_cap_index,hard_assets_inflation_hedge,congressional_budget_office_projections,algorithmic_trading_repricing,leverage_amplification,farm_debt_to_asset_ratio,farm_debt_service_ratio,1980s_farm_credit_crisis,agricultural_direct_payment_subsidies,net_farm_income,farm_operating_loans,working_capital_squeeze,agricultural_input_cost_inflation,nitrogen_fertilizer_as_commodity,potash_supply_concentration_risk,trade_carveout_vs_treaty_guarantee,usmca_trade_agreement,retaliatory_tariffs,cost_passthrough_mechanism,structural_food_inflation_floor,commodity_supply_shock,loan_loss_provisions,margin_compression_manufacturing,forward_guidance,financial_conditions_index,fed_inflation_target,cme_fedwatch_tool,us_dollar_index,hall_of_mirrors_reflexivity,zombie_corporations,corporate_refinancing_cliff,core_pce,duration_risk,federal_funds_rate,monetary_easing_cycle,neutral_interest_rate,structural_embedded_inflation,pawn_loan_collateralized_small_dollar_lending,shadow_credit_channels,consumer_credit_card_delinquency_rate,total_consumer_debt,k_shaped_two_speed_economy,syndicated_revolving_credit_facility,effective_annual_percentage_rate,nominal_vs_real_consumer_spending,consumer_discretionary_vs_staples_portfolio_strategy,treasury_bills_liquidity_buffer,fixed_rate_mortgage_insulation,inflation_fatigue,penalty_repricing_credit_cards,pawn_receivables_economic_indicator,consumer_spending_contraction_signal,strategic_petroleum_reserve,maritime_choke_point,strait_of_hormuz_risk_premium,crude_to_gasoline_pass_through,energy_infrastructure_lag,nationalization_risk,diesel_freight_cost_inflation,fuel_exposure_portfolio_audit,energy_as_inflation_hedge,physical_commodity_flow_analysis,ten_year_treasury_yield_benchmark,japanese_government_bond_jgb,bank_of_japan_zirp_nirp,yen_carry_trade,fx_currency_hedging_cost_yield_spread,treasury_auction_mechanics,debt_to_gdp_ratio,global_sovereign_yield_contagion,structural_vs_cyclical_rate_pressure,foreign_sovereign_capital_flows_treasuries,german_bund,uk_gilts,fiscal_budget_interest_rate_assumptions,japanese_institutional_capital_export,duration_matching_strategy,fortress_balance_sheet,corporate_pricing_power,gold_silver_ratio,structural_commodity_supply_deficit,comex_registered_inventory,central_bank_gold_reserve_accumulation,paper_vs_physical_market_squeeze,real_yields,industrial_silver_demand,geopolitical_safe_haven_bid,crowded_trade_risk,mining_supply_response_lag,dual_use_commodity,sovereign_reserve_diversification,non_farm_payroll_report,u6_unemployment_rate,adp_employment_report,payroll_data_revision,challenger_gray_christmas_layoff_report,average_hourly_earnings,labor_market_breadth,private_vs_public_sector_employment,knowledge_economy_information_sector_employment,monetary_policy_transmission_mechanism,30_year_fixed_mortgage_rate,cpi_consumer_price_index,prime_rate_floating_rate_debt,full_employment_fed_mandate,trailing_average_trend_normalization,crude_oil_floor_on_consumer_prices,sovereign_wealth_fund,gdp_weighted_bond_index,market_value_weighted_bond_index,mortgage_backed_securities,commercial_mortgage_backed_securities,asset_backed_securities,term_premium,price_insensitive_buyer,mortgage_spread,risk_free_asset_repricing,de_dollarization,investment_grade_corporate_credit,benchmark_contagion,fixed_income_benchmark_allocation,foreign_treasury_holdings_share_vs_absolute,capital_flight,china_treasury_reduction"><h3>2026</h3><div class="card-sub">2 months</div><div class="card-count">143 concepts</div></a>
-</div>
+<div class="tier"><h2>Tier 1 — Foundations</h2><p class="tier-desc">Build the base. Learn how money, economies, and markets actually work.</p><a class="cat-card" href="personal-finance-basics.html" data-slugs="pawn_loan_collateralized_small_dollar_lending,effective_annual_percentage_rate,treasury_bills_liquidity_buffer,penalty_repricing_credit_cards" data-flags="deep,star,plain,deep" data-stars="1"><span class="cat-name">Personal Finance Basics</span><span class="cat-count">4 concepts &middot; 1 &#9733;</span></a><a class="cat-card" href="economics-fundamentals.html" data-slugs="national_debt_debt_ceiling,cost_passthrough_mechanism,structural_food_inflation_floor,structural_embedded_inflation,k_shaped_two_speed_economy,nominal_vs_real_consumer_spending,debt_to_gdp_ratio" data-flags="star,plain,deep,star,star,star,star" data-stars="5"><span class="cat-name">Economics Fundamentals</span><span class="cat-count">7 concepts &middot; 5 &#9733;</span></a><a class="cat-card" href="investing-fundamentals.html" data-slugs="opportunity_cost_non_yielding_assets,money_market_funds,russell_2000_small_cap_index" data-flags="plain,star,plain" data-stars="1"><span class="cat-name">Investing Fundamentals</span><span class="cat-count">3 concepts &middot; 1 &#9733;</span></a><p class="tier-empty">Also in this tier, nothing filed yet: Free Markets &amp; Political Economy</p></div><div class="tier"><h2>Tier 2 — Core Knowledge</h2><p class="tier-desc">Understand how money is created, why markets crash, and why humans are terrible with money.</p><a class="cat-card" href="monetary-policy-central-banking.html" data-slugs="pce_inflation_basket,jackson_hole_symposium,hawkish_dovish_fed_signaling,debt_servicing_cost,fiscal_monetary_policy_conflict,central_bank_credibility,forward_guidance,fed_inflation_target,cme_fedwatch_tool,hall_of_mirrors_reflexivity,zombie_corporations,federal_funds_rate,monetary_easing_cycle,neutral_interest_rate,shadow_credit_channels,bank_of_japan_zirp_nirp,structural_vs_cyclical_rate_pressure,monetary_policy_transmission_mechanism,prime_rate_floating_rate_debt,full_employment_fed_mandate,fed_blackout_period" data-flags="star,star,star,plain,plain,star,star,star,plain,deep,plain,star,star,plain,plain,star,plain,star,star,star,plain" data-stars="12"><span class="cat-name">Monetary Policy &amp; Central Banking</span><span class="cat-count">21 concepts &middot; 12 &#9733;</span></a><a class="cat-card" href="economic-history-financial-crises.html" data-slugs="1980s_farm_credit_crisis" data-flags="deep" data-stars="0"><span class="cat-name">Economic History &amp; Financial Crises</span><span class="cat-count">1 concepts &middot; 0 &#9733;</span></a><a class="cat-card" href="behavioral-finance-psychology.html" data-slugs="inflation_fatigue,good_news_bad_news_market_paradox" data-flags="plain,star" data-stars="1"><span class="cat-name">Behavioral Finance &amp; Psychology</span><span class="cat-count">2 concepts &middot; 1 &#9733;</span></a><a class="cat-card" href="portfolio-management-asset-allocation.html" data-slugs="etf_fund_flows,consumer_discretionary_vs_staples_portfolio_strategy,energy_as_inflation_hedge,price_insensitive_buyer,benchmark_contagion,fixed_income_benchmark_allocation,sector_rotation" data-flags="plain,plain,plain,plain,deep,plain,star" data-stars="1"><span class="cat-name">Portfolio Management &amp; Asset Allocation</span><span class="cat-count">7 concepts &middot; 1 &#9733;</span></a><a class="cat-card" href="accounting-financial-statements.html" data-slugs="interest_coverage_ratio,loan_loss_provisions,comparable_store_sales,earnings_quality,gross_margin" data-flags="plain,deep,plain,plain,star" data-stars="1"><span class="cat-name">Accounting &amp; Financial Statements</span><span class="cat-count">5 concepts &middot; 1 &#9733;</span></a></div><div class="tier"><h2>Tier 3 — Asset Classes</h2><p class="tier-desc">Deep dives into each major asset class — stocks, bonds, real estate, commodities, currencies, and derivatives.</p><a class="cat-card" href="value-investing-equities.html" data-slugs="valuation_multiples_rate_sensitivity,fortress_balance_sheet,corporate_pricing_power,economic_moat,guidance_cut,regulatory_risk" data-flags="star,plain,star,star,plain,plain" data-stars="3"><span class="cat-name">Value Investing &amp; Equities</span><span class="cat-count">6 concepts &middot; 3 &#9733;</span></a><a class="cat-card" href="fixed-income-bonds.html" data-slugs="two_year_treasury_yield,treasury_bond_buyback_program,thirty_year_treasury_bond,debt_rollover_risk,corporate_refinancing_cliff,duration_risk,ten_year_treasury_yield_benchmark,japanese_government_bond_jgb,treasury_auction_mechanics,german_bund,uk_gilts,fiscal_budget_interest_rate_assumptions,duration_matching_strategy,real_yields,gdp_weighted_bond_index,market_value_weighted_bond_index,mortgage_backed_securities,commercial_mortgage_backed_securities,asset_backed_securities,term_premium,mortgage_spread,risk_free_asset_repricing,investment_grade_corporate_credit" data-flags="star,deep,star,plain,plain,star,star,plain,star,plain,deep,deep,plain,star,deep,plain,star,plain,plain,star,plain,plain,star" data-stars="9"><span class="cat-name">Fixed Income &amp; Bonds</span><span class="cat-count">23 concepts &middot; 9 &#9733;</span></a><a class="cat-card" href="real-estate.html" data-slugs="fixed_rate_mortgage_insulation,30_year_fixed_mortgage_rate" data-flags="plain,star" data-stars="1"><span class="cat-name">Real Estate</span><span class="cat-count">2 concepts &middot; 1 &#9733;</span></a><a class="cat-card" href="commodities-energy.html" data-slugs="gold_futures,hard_assets_inflation_hedge,farm_debt_to_asset_ratio,farm_debt_service_ratio,agricultural_direct_payment_subsidies,net_farm_income,farm_operating_loans,agricultural_input_cost_inflation,nitrogen_fertilizer_as_commodity,potash_supply_concentration_risk,commodity_supply_shock,strategic_petroleum_reserve,strait_of_hormuz_risk_premium,crude_to_gasoline_pass_through,energy_infrastructure_lag,diesel_freight_cost_inflation,physical_commodity_flow_analysis,gold_silver_ratio,structural_commodity_supply_deficit,comex_registered_inventory,central_bank_gold_reserve_accumulation,paper_vs_physical_market_squeeze,industrial_silver_demand,mining_supply_response_lag,dual_use_commodity,crude_oil_floor_on_consumer_prices" data-flags="plain,plain,deep,deep,deep,deep,deep,deep,deep,deep,star,plain,plain,deep,deep,plain,deep,deep,plain,deep,star,deep,plain,plain,plain,plain" data-stars="2"><span class="cat-name">Commodities &amp; Energy</span><span class="cat-count">26 concepts &middot; 2 &#9733;</span></a><a class="cat-card" href="forex-currencies.html" data-slugs="us_dollar_index,yen_carry_trade,fx_currency_hedging_cost_yield_spread" data-flags="star,star,deep" data-stars="2"><span class="cat-name">Forex &amp; Currencies</span><span class="cat-count">3 concepts &middot; 2 &#9733;</span></a><a class="cat-card" href="crypto-digital-money.html" data-slugs="spot_bitcoin_etf" data-flags="plain" data-stars="0"><span class="cat-name">Crypto &amp; Digital Money</span><span class="cat-count">1 concepts &middot; 0 &#9733;</span></a><p class="tier-empty">Also in this tier, nothing filed yet: Options &amp; Derivatives</p></div><div class="tier"><h2>Tier 4 — Advanced Strategies</h2><p class="tier-desc">Active trading, cycles, quant methods, and global macro. For when you want to go deeper.</p><a class="cat-card" href="quantitative-algorithmic-trading.html" data-slugs="algorithmic_trading_repricing" data-flags="plain" data-stars="0"><span class="cat-name">Quantitative &amp; Algorithmic Trading</span><span class="cat-count">1 concepts &middot; 0 &#9733;</span></a><a class="cat-card" href="risk-management-position-sizing.html" data-slugs="leverage_amplification,fuel_exposure_portfolio_audit,crowded_trade_risk" data-flags="star,deep,star" data-stars="2"><span class="cat-name">Risk Management &amp; Position Sizing</span><span class="cat-count">3 concepts &middot; 2 &#9733;</span></a><a class="cat-card" href="macro-investing-geopolitics.html" data-slugs="trade_carveout_vs_treaty_guarantee,usmca_trade_agreement,retaliatory_tariffs,maritime_choke_point,nationalization_risk,global_sovereign_yield_contagion,foreign_sovereign_capital_flows_treasuries,japanese_institutional_capital_export,geopolitical_safe_haven_bid,sovereign_reserve_diversification,sovereign_wealth_fund,de_dollarization,foreign_treasury_holdings_share_vs_absolute,capital_flight,china_treasury_reduction" data-flags="deep,plain,star,plain,deep,plain,star,deep,plain,plain,star,star,deep,star,deep" data-stars="5"><span class="cat-name">Macro Investing &amp; Geopolitics</span><span class="cat-count">15 concepts &middot; 5 &#9733;</span></a><a class="cat-card" href="economic-indicators.html" data-slugs="inflation_breadth,congressional_budget_office_projections,financial_conditions_index,core_pce,consumer_credit_card_delinquency_rate,total_consumer_debt,pawn_receivables_economic_indicator,consumer_spending_contraction_signal,non_farm_payroll_report,u6_unemployment_rate,adp_employment_report,payroll_data_revision,challenger_gray_christmas_layoff_report,average_hourly_earnings,labor_market_breadth,private_vs_public_sector_employment,knowledge_economy_information_sector_employment,cpi_consumer_price_index,trailing_average_trend_normalization,producer_price_index,jolts_job_openings_survey,university_of_michigan_consumer_sentiment,ism_pmi" data-flags="deep,deep,star,star,plain,star,deep,deep,star,plain,deep,deep,deep,star,deep,plain,deep,star,deep,star,plain,plain,plain" data-stars="7"><span class="cat-name">Economic Indicators</span><span class="cat-count">23 concepts &middot; 7 &#9733;</span></a><p class="tier-empty">Also in this tier, nothing filed yet: Trading &amp; Technical Analysis, Trading Psychology, Cycles &amp; Market Timing</p></div><div class="tier"><h2>Tier 5 — Wisdom &amp; Perspective</h2><p class="tier-desc">Wall Street war stories, big-picture thinking, and the mindset to keep going.</p><a class="cat-card" href="corporate-finance-investment-banking.html" data-slugs="working_capital_squeeze,margin_compression_manufacturing,syndicated_revolving_credit_facility" data-flags="plain,deep,deep" data-stars="0"><span class="cat-name">Corporate Finance &amp; Investment Banking</span><span class="cat-count">3 concepts &middot; 0 &#9733;</span></a><p class="tier-empty">Also in this tier, nothing filed yet: Wall Street Stories &amp; Biographies, Geopolitics, Sociology &amp; Power, Self-Development &amp; Mindset, Training &amp; Nutrition, Courses</p></div>
 <script>var BM_KEY = 'finance_guide';</script>
 <script src="../book.js"></script>
 
 <script>
 (function() {
-  var KEY = 'fg_done';
-  var done = JSON.parse(localStorage.getItem(KEY) || '{}');
+  var DONE_KEY = 'fg_done', FILTER_KEY = 'fg_filter';
+  var done = JSON.parse(localStorage.getItem(DONE_KEY) || '{}');
+  var filter = localStorage.getItem(FILTER_KEY) || 'all';
+
+  function visible(flag) {
+    if (filter === 'star') return flag === 'star';
+    if (filter === 'nodeep') return flag !== 'deep';
+    return true;
+  }
 
   function apply() {
-    // Mark completed concepts
-    document.querySelectorAll('.concept-section').forEach(function(s) {
-      if (done[s.dataset.slug]) s.classList.add('completed');
-      else s.classList.remove('completed');
+    var shown = 0, total = 0, hidden = 0;
+    document.querySelectorAll('.concept-row').forEach(function(r) {
+      var slug = r.dataset.slug, flag = r.dataset.flag;
+      total++;
+      if (done[slug]) r.classList.add('done'); else r.classList.remove('done');
+      if (visible(flag)) { r.classList.remove('fg-hidden'); shown++; }
+      else { r.classList.add('fg-hidden'); hidden++; }
     });
-    // Mark completed nav cards (all children done)
-    document.querySelectorAll('.nav-card[data-slugs]').forEach(function(card) {
-      var slugs = card.dataset.slugs.split(',');
-      var allDone = slugs.length > 0 && slugs.every(function(s) { return done[s]; });
-      if (allDone) card.classList.add('done');
-      else card.classList.remove('done');
+    document.querySelectorAll('.cat-card').forEach(function(card) {
+      var slugs = card.dataset.slugs ? card.dataset.slugs.split(',') : [];
+      var flags = card.dataset.flags ? card.dataset.flags.split(',') : [];
+      var vis = 0, allDone = slugs.length > 0;
+      slugs.forEach(function(sl, i) {
+        if (visible(flags[i])) vis++;
+        if (!done[sl]) allDone = false;
+      });
+      total += slugs.length; shown += vis;
+      var c = card.querySelector('.cat-count');
+      if (c) c.textContent = vis + (vis !== slugs.length ? ' of ' + slugs.length : '') + ' concepts' +
+        (card.dataset.stars ? ' \u00b7 ' + card.dataset.stars + ' \u2605' : '');
+      if (vis === 0) card.classList.add('fg-empty'); else card.classList.remove('fg-empty');
+      if (allDone) card.classList.add('done'); else card.classList.remove('done');
     });
-    updateCount();
-  }
-
-  function updateCount() {
-    var concepts = document.querySelectorAll('.concept-section');
-    var cards = document.querySelectorAll('.nav-card[data-slugs]');
-    var total = concepts.length || cards.length;
-    var read = concepts.length
-      ? [].filter.call(concepts, function(s) { return done[s.dataset.slug]; }).length
-      : [].filter.call(cards, function(c) { return c.classList.contains('done'); }).length;
-    var el = document.getElementById('filterCount');
-    if (el) el.textContent = read + '/' + total + ' completed';
-  }
-
-  window.toggleDone = function(slug) {
-    if (done[slug]) delete done[slug];
-    else done[slug] = true;
-    localStorage.setItem(KEY, JSON.stringify(done));
-    apply();
-  };
-
-  window.toggleFilter = function() {
-    document.body.classList.toggle('hide-done');
-    var btn = document.getElementById('filterBtn');
-    if (document.body.classList.contains('hide-done')) {
-      btn.textContent = 'Show All';
-      btn.classList.add('active');
-    } else {
-      btn.textContent = 'Hide Completed';
-      btn.classList.remove('active');
+    document.querySelectorAll('[data-filter]').forEach(function(b) {
+      b.classList.toggle('active', b.dataset.filter === filter);
+    });
+    var n = document.getElementById('fgCount');
+    if (n) n.textContent = shown + ' of ' + total + ' shown';
+    var h = document.getElementById('fgHiddenNote');
+    if (h) h.textContent = hidden ? hidden + ' hidden by the filter.' : '';
+    var btn = document.querySelector('.concept-done');
+    if (btn) {
+      var on = !!done[btn.dataset.slug];
+      btn.classList.toggle('on', on);
+      btn.textContent = on ? '\u2713 Completed' : '\u2713 Mark complete';
     }
-  };
+  }
 
-  window.markAllDone = function() {
-    document.querySelectorAll('.concept-section').forEach(function(s) {
-      done[s.dataset.slug] = true;
-    });
-    localStorage.setItem(KEY, JSON.stringify(done));
+  window.setFilter = function(f) {
+    filter = f; localStorage.setItem(FILTER_KEY, f); apply();
+  };
+  window.toggleDone = function(slug) {
+    if (done[slug]) delete done[slug]; else done[slug] = true;
+    localStorage.setItem(DONE_KEY, JSON.stringify(done));
     apply();
   };
-
+  window.toggleHideDone = function() {
+    document.body.classList.toggle('hide-done');
+  };
   apply();
 })();
 </script>

@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>ADP National Employment Report - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.tier .tier-desc { color: #a08060; font-size: 0.85rem; margin: 0.4rem 0 0.8rem; }
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../economic-indicators.html">&larr; Economic Indicators</a>
+
+<div class="concept-meta"><span>deep cut</span><span>Economic Indicators</span><span>added 2026-09-05</span></div>
+<h4 id="adp_employment_report">ADP National Employment Report</h4>
+
+<p>The <strong>ADP National Employment Report</strong> is a monthly private-sector jobs estimate published by ADP (Automatic Data Processing), one of the largest payroll processing companies in the United States. Released on the Wednesday before the government's official <strong>Non-Farm Payroll (NFP) report</strong>, the ADP report counts the number of jobs added or lost across private U.S. businesses based on actual payroll data that ADP processes for roughly 25 million workers nationwide. Because ADP handles payroll for a vast swath of American employers — from small businesses to large corporations — its data is considered a meaningful real-world snapshot of hiring activity. It covers private-sector employment only, intentionally excluding government jobs, military personnel, and farm workers.</p>
+
+<p>The ADP report matters because employment is one of the two core mandates of the <strong>Federal Reserve</strong> — price stability and maximum employment. When the job market is strong, the Fed feels comfortable keeping interest rates higher for longer or even raising them further. When it weakens, the Fed has cover to cut. That dynamic feeds directly into mortgage rates, car loan rates, credit card APRs, and business borrowing costs. In other words, a single employment data point can shift the interest rate expectations that determine what millions of Americans pay to borrow money every month. Traders, economists, and policy analysts watch the ADP report obsessively because it arrives two days before the official government number, offering what feels like a critical early read on labor market health.</p>
+
+<p>Mechanically, the ADP report works like this: every month, ADP compiles actual payroll transaction data from the businesses it services — running payroll, processing direct deposits, and managing withholding for employers across the country. Researchers at the Stanford Digital Economy Lab collaborate with ADP to produce the estimate. The raw payroll data is aggregated, adjusted for seasonal patterns (since hiring surges naturally in summer and December, for example), and then benchmarked against historical trends to produce a seasonally adjusted headline number. This number represents the net change in private-sector employment — jobs added minus jobs lost — for the prior month. The report also breaks down results by company size (small, medium, large) and sector, giving a more granular view than just the headline figure.</p>
+
+<p>The classic example of the ADP report's market power — and its limits — played out in the episode described in this video. On a Wednesday, the ADP report printed just <strong>38,000 private-sector jobs added</strong>, the weakest reading since January and well below the <strong>consensus estimate of 47,000</strong>. Wall Street immediately went on recession watch. Bond markets rallied (yields fell) as traders priced in a weaker-than-expected Friday NFP and therefore a more dovish Fed. Risk assets softened. The 48 hours between Wednesday's ADP print and Friday's NFP became a slow-motion brace for bad news — and then the government released its number: <strong>162,000 jobs</strong>, nearly triple the consensus of 56,000. The whiplash was severe and immediate.</p>
+
+<p>Traders and investors use the ADP report as a <strong>leading indicator</strong> — not as gospel, but as directional evidence. The standard playbook goes like this: a strong ADP print raises expectations for a strong NFP, which pressures bond yields higher (since a hot labor market means the Fed stays hawkish), which strengthens the dollar, which can weigh on gold and rate-sensitive stocks like utilities and real estate investment trusts. A weak ADP print does the reverse — bond prices rise, yields fall, and rate-sensitive assets breathe easier. Sophisticated traders don't just watch the headline number; they watch the <strong>deviation from consensus</strong>. A print of 38,000 when consensus is 47,000 is a miss. That miss is what moves markets, not the absolute number alone.</p>
+
+<p>The biggest misconception about the ADP report is that it reliably predicts the NFP. It does not — not consistently, and not precisely. The two reports measure different things using different methodologies. NFP counts government and private workers; ADP counts only private payroll clients. NFP uses surveys of employers; ADP uses actual payroll transactions. Historically, the correlation between ADP and NFP has been positive but noisy. There are months where they point in completely opposite directions, as the 38,000-versus-162,000 episode illustrated with jarring clarity. Treating ADP as a reliable NFP preview is one of the more expensive mistakes retail traders make, because it leads them to position aggressively ahead of Friday only to get blindsided when the government's number breaks the other way.</p>
+
+<p>When the ADP report breaks down — when it gives a dramatically wrong signal — the consequences ripple outward in a specific and predictable way. Traders who positioned based on the ADP miss get caught on the wrong side of the NFP surprise. <strong>Short-term volatility spikes</strong> as positions are unwound rapidly. In the 38,000-to-162,000 case, anyone who bought bonds (betting on a weak NFP and therefore a more dovish Fed) watched yields surge and bond prices fall on Friday morning. Anyone who shorted rate-sensitive stocks got squeezed. The bigger structural risk is the one the video underscores: a blowout headline number gives <strong>hawks on the Federal Reserve</strong> — the members who favor higher rates to fight inflation — the political and rhetorical cover to delay rate cuts or even advocate for additional hikes, regardless of what the underlying composition of that jobs report actually shows.</p>
+
+<p>The ADP report connects directly to several other critical market concepts. It feeds into <strong>Fed funds futures pricing</strong>, which is the market's real-time bet on where the Fed will set interest rates at upcoming meetings. It influences the <strong>yield curve</strong> — particularly the 2-year Treasury yield, which is most sensitive to near-term rate expectations. It interacts with the <strong>Consumer Price Index (CPI)</strong> and <strong>Personal Consumption Expenditures (PCE)</strong> data to form the Fed's overall picture of economic conditions. Strong employment plus stubborn inflation is the most hawkish possible combination. As the video makes clear, the 162,000 print — whatever its compositional weaknesses — handed hawks exactly that cover:
+
+<blockquote>"162,000 jobs. That's nearly triple what Wall Street was expecting. And it's about to cost you more in your mortgage, not less."</blockquote>
+
+Understanding that chain — from ADP miss, to NFP surprise, to Fed posture, to your borrowing costs — is the entire point of watching these reports in the first place.</p>
+<div class="concept-side">Sources: THE 162K AMBUSH: Why the 'Blowout' Jobs Report Hands Hawks Cover to Hike!; THE JOBS GUT PUNCH: Why Good News Sold Off Wall Street &amp; Crushed Tech!<br>Related in this category: <a href="inflation_breadth.html">Inflation Breadth</a>, <a href="congressional_budget_office_projections.html">Congressional Budget Office (CBO) Projections</a>, <a href="financial_conditions_index.html">Financial Conditions Index</a>, <a href="core_pce.html">Core PCE (Personal Consumption Expenditures)</a>, <a href="consumer_credit_card_delinquency_rate.html">Consumer Credit Card Delinquency Rate</a>, <a href="total_consumer_debt.html">Total Household / Consumer Debt</a></div>
+<button class="concept-done" data-slug="adp_employment_report" onclick="toggleDone('adp_employment_report')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_adp_employment_report';</script>
+<script src="../../book.js"></script>
+
+<script>
+(function() {
+  var DONE_KEY = 'fg_done', FILTER_KEY = 'fg_filter';
+  var done = JSON.parse(localStorage.getItem(DONE_KEY) || '{}');
+  var filter = localStorage.getItem(FILTER_KEY) || 'all';
+
+  function visible(flag) {
+    if (filter === 'star') return flag === 'star';
+    if (filter === 'nodeep') return flag !== 'deep';
+    return true;
+  }
+
+  function apply() {
+    var shown = 0, total = 0, hidden = 0;
+    document.querySelectorAll('.concept-row').forEach(function(r) {
+      var slug = r.dataset.slug, flag = r.dataset.flag;
+      total++;
+      if (done[slug]) r.classList.add('done'); else r.classList.remove('done');
+      if (visible(flag)) { r.classList.remove('fg-hidden'); shown++; }
+      else { r.classList.add('fg-hidden'); hidden++; }
+    });
+    document.querySelectorAll('.cat-card').forEach(function(card) {
+      var slugs = card.dataset.slugs ? card.dataset.slugs.split(',') : [];
+      var flags = card.dataset.flags ? card.dataset.flags.split(',') : [];
+      var vis = 0, allDone = slugs.length > 0;
+      slugs.forEach(function(sl, i) {
+        if (visible(flags[i])) vis++;
+        if (!done[sl]) allDone = false;
+      });
+      total += slugs.length; shown += vis;
+      var c = card.querySelector('.cat-count');
+      if (c) c.textContent = vis + (vis !== slugs.length ? ' of ' + slugs.length : '') + ' concepts' +
+        (card.dataset.stars ? ' \u00b7 ' + card.dataset.stars + ' \u2605' : '');
+      if (vis === 0) card.classList.add('fg-empty'); else card.classList.remove('fg-empty');
+      if (allDone) card.classList.add('done'); else card.classList.remove('done');
+    });
+    document.querySelectorAll('[data-filter]').forEach(function(b) {
+      b.classList.toggle('active', b.dataset.filter === filter);
+    });
+    var n = document.getElementById('fgCount');
+    if (n) n.textContent = shown + ' of ' + total + ' shown';
+    var h = document.getElementById('fgHiddenNote');
+    if (h) h.textContent = hidden ? hidden + ' hidden by the filter.' : '';
+    var btn = document.querySelector('.concept-done');
+    if (btn) {
+      var on = !!done[btn.dataset.slug];
+      btn.classList.toggle('on', on);
+      btn.textContent = on ? '\u2713 Completed' : '\u2713 Mark complete';
+    }
+  }
+
+  window.setFilter = function(f) {
+    filter = f; localStorage.setItem(FILTER_KEY, f); apply();
+  };
+  window.toggleDone = function(slug) {
+    if (done[slug]) delete done[slug]; else done[slug] = true;
+    localStorage.setItem(DONE_KEY, JSON.stringify(done));
+    apply();
+  };
+  window.toggleHideDone = function() {
+    document.body.classList.toggle('hide-done');
+  };
+  apply();
+})();
+</script>
+
+</body>
+</html>

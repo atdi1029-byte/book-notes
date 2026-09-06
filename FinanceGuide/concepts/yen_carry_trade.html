@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Yen Carry Trade - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.tier .tier-desc { color: #a08060; font-size: 0.85rem; margin: 0.4rem 0 0.8rem; }
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../forex-currencies.html">&larr; Forex &amp; Currencies</a>
+
+<div class="concept-meta"><span><span class="star">&#9733;</span> must-know</span><span>Forex &amp; Currencies</span><span>added 2026-09-03</span></div>
+<h4 id="yen_carry_trade">Yen Carry Trade</h4>
+
+<p>The <strong>yen carry trade</strong> is one of the most powerful and least understood forces in global finance. At its core, it is a borrowing strategy: an investor borrows money in Japanese yen at near-zero interest rates, converts that borrowed yen into a higher-yielding currency, and then invests the proceeds in assets that earn more than the cost of the loan. The profit is the <strong>interest rate differential</strong> — the spread between what you pay to borrow in Japan and what you earn on your investment abroad. For decades, Japan has maintained some of the lowest interest rates on Earth, making the yen the world's preferred funding currency for this kind of leveraged arbitrage. Understanding this trade means understanding why a country half a world away can quietly dictate mortgage rates in Ohio.</p>
+
+<p>The reason the yen carry trade matters extends far beyond currency traders and hedge funds. When the trade is running at full scale, Japanese institutions — pension funds, life insurers, regional banks — are effectively <strong>exporting their savings</strong> to the rest of the world. They wire trillions of dollars across the Pacific and Atlantic, buying US Treasuries, UK gilts, German bunds, and French bonds. This flood of foreign demand pushes those bond prices up, which pushes their yields — and by extension, global borrowing costs — down. For a generation, the yen carry trade quietly acted as a subsidy on Western debt. It helped keep your mortgage rate, your car loan, and your government's borrowing costs lower than they otherwise would have been. When the trade unwinds, that subsidy disappears — and rates rise, sometimes violently.</p>
+
+<p>The mechanical steps are straightforward once you see them laid out. Step one: a Japanese institution or hedge fund borrows yen at Japan's <strong>Bank of Japan (BOJ)</strong> policy rate, which sat near zero or even negative for most of the period between 2010 and 2024. Step two: they sell yen in the foreign exchange market and buy US dollars (or euros, or British pounds). Step three: they deploy those dollars into higher-yielding assets — most commonly US Treasuries, which during this period paid 2%, 3%, 4% annually compared to Japan's near-zero rates. Step four: they pocket the spread. The trade is self-reinforcing: as more investors pile in, selling yen to buy dollars, the yen weakens and the dollar strengthens, which itself generates currency gains on top of the yield pickup. Carry traders win on two fronts simultaneously.</p>
+
+<p>To see the scale of this, consider what the video describes: Japanese institutions wired the equivalent of <em>trillions</em> of dollars into Western sovereign debt markets over the course of decades. This wasn't speculative day-trading — it was systematic, institutionalized capital flow driven by one simple fact: Japan's domestic rates were zero and everywhere else's rates were higher. A Japanese life insurer with a trillion yen in assets and a domestic yield of 0.1% has an overwhelming incentive to seek 3-4% in US Treasuries. Multiply that across hundreds of institutions and you begin to understand why the US 10-year Treasury yield spent much of the 2010s pinned below 2%. It wasn't just Federal Reserve policy. It was Tokyo. The yen carry trade was the hidden hand suppressing borrowing costs across the developed world.</p>
+
+<p>Traders and sophisticated investors watch several signals to gauge the health of the carry trade. The most important is the <strong>BOJ policy rate</strong> itself — any hint that Japan is moving toward rate normalization is a carry trade threat. Equally important is <strong>USD/JPY volatility</strong>: when the yen starts strengthening rapidly (meaning the dollar is falling against it), that's a signal that carry traders are unwinding — selling their foreign assets, buying back yen to repay their loans. Investors also monitor <strong>Japanese current account data</strong> and institutional flow reports, since large Japanese insurers and pension funds file quarterly disclosures revealing their foreign bond holdings. A sharp reduction in those holdings is a leading indicator that carry trade capital is coming home. The key insight for any investor is this: when carry trades unwind, correlations go to one — everything sells off simultaneously, because the selling is mechanical, not fundamental.</p>
+
+<p>The most common misconception about the yen carry trade is that it only affects currency traders. In reality, it affects every asset class. When carry traders borrow cheap yen and buy US Treasuries, they are suppressing the <strong>risk-free rate</strong> — the baseline off which every other asset in the world is priced. Stocks, real estate, corporate bonds, private equity — all of them are valued relative to what a risk-free Treasury yields. A lower Treasury yield makes every other asset look more attractive by comparison, inflating valuations across the board. Conversely, when the carry trade unwinds and Treasury yields spike — as they did when the 10-year hit 4.81% — every risk asset reprices lower simultaneously. This is why mortgage rates hit 7% even as inflation was supposedly cooling: the culprit wasn't just domestic policy, it was the reversal of a decades-long structural bid from Japan.</p>
+
+<p>When the yen carry trade breaks down, it does so with remarkable speed and violence. The mechanism is a <strong>forced unwind</strong>: if the yen strengthens sharply (perhaps because the BOJ raises rates or signals tightening), the dollar-denominated assets the carry trader holds become worth fewer yen when converted back. Their loan is in yen; their assets are in dollars. A strengthening yen means their liability is growing in real terms while their asset is shrinking. To stop the bleeding, they must sell their foreign assets, repatriate the yen, and repay the loan. But every carry trader faces this same pressure at the same time — so they all sell simultaneously. Bond yields spike. Stocks fall. The yen surges. The August 2024 carry trade unwind — triggered by a surprise BOJ rate hike — saw global equity markets fall 10% in days and USD/JPY collapse by over 10 yen in weeks. This is what a crowded trade looks like when the exit is too small for everyone at once.</p>
+
+<p>The yen carry trade connects directly to several other macro concepts worth understanding. It is a primary driver of <strong>global dollar liquidity</strong> — when the trade is expanding, dollars flow out into global markets, loosening financial conditions worldwide. It is also deeply linked to <strong>BOJ policy normalization</strong>: every time the Bank of Japan raises rates even modestly, the interest rate differential that powers the trade narrows, triggering partial unwinds. The video's central argument — that the simultaneous convulsion in US, UK, German, and French bond markets reflected something deeper than Middle East geopolitics — points here. Four sovereign bond markets don't move in lockstep because of oil. They move in lockstep because the same pool of Japanese institutional capital flows through all of them. When that capital moves, it moves everywhere at once. That's the Tokyo time bomb: a structural dependency that mainstream financial media consistently underweights, right up until the moment it detonates.</p>
+<div class="concept-side">Sources: THE TOKYO TIME BOMB: The Hidden Catalyst Locking Mortgage Rates at 7%<br>Related in this category: <a href="us_dollar_index.html">US Dollar Index (DXY)</a>, <a href="fx_currency_hedging_cost_yield_spread.html">Currency Hedging Cost and Yield Spread Erosion</a></div>
+<button class="concept-done" data-slug="yen_carry_trade" onclick="toggleDone('yen_carry_trade')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_yen_carry_trade';</script>
+<script src="../../book.js"></script>
+
+<script>
+(function() {
+  var DONE_KEY = 'fg_done', FILTER_KEY = 'fg_filter';
+  var done = JSON.parse(localStorage.getItem(DONE_KEY) || '{}');
+  var filter = localStorage.getItem(FILTER_KEY) || 'all';
+
+  function visible(flag) {
+    if (filter === 'star') return flag === 'star';
+    if (filter === 'nodeep') return flag !== 'deep';
+    return true;
+  }
+
+  function apply() {
+    var shown = 0, total = 0, hidden = 0;
+    document.querySelectorAll('.concept-row').forEach(function(r) {
+      var slug = r.dataset.slug, flag = r.dataset.flag;
+      total++;
+      if (done[slug]) r.classList.add('done'); else r.classList.remove('done');
+      if (visible(flag)) { r.classList.remove('fg-hidden'); shown++; }
+      else { r.classList.add('fg-hidden'); hidden++; }
+    });
+    document.querySelectorAll('.cat-card').forEach(function(card) {
+      var slugs = card.dataset.slugs ? card.dataset.slugs.split(',') : [];
+      var flags = card.dataset.flags ? card.dataset.flags.split(',') : [];
+      var vis = 0, allDone = slugs.length > 0;
+      slugs.forEach(function(sl, i) {
+        if (visible(flags[i])) vis++;
+        if (!done[sl]) allDone = false;
+      });
+      total += slugs.length; shown += vis;
+      var c = card.querySelector('.cat-count');
+      if (c) c.textContent = vis + (vis !== slugs.length ? ' of ' + slugs.length : '') + ' concepts' +
+        (card.dataset.stars ? ' \u00b7 ' + card.dataset.stars + ' \u2605' : '');
+      if (vis === 0) card.classList.add('fg-empty'); else card.classList.remove('fg-empty');
+      if (allDone) card.classList.add('done'); else card.classList.remove('done');
+    });
+    document.querySelectorAll('[data-filter]').forEach(function(b) {
+      b.classList.toggle('active', b.dataset.filter === filter);
+    });
+    var n = document.getElementById('fgCount');
+    if (n) n.textContent = shown + ' of ' + total + ' shown';
+    var h = document.getElementById('fgHiddenNote');
+    if (h) h.textContent = hidden ? hidden + ' hidden by the filter.' : '';
+    var btn = document.querySelector('.concept-done');
+    if (btn) {
+      var on = !!done[btn.dataset.slug];
+      btn.classList.toggle('on', on);
+      btn.textContent = on ? '\u2713 Completed' : '\u2713 Mark complete';
+    }
+  }
+
+  window.setFilter = function(f) {
+    filter = f; localStorage.setItem(FILTER_KEY, f); apply();
+  };
+  window.toggleDone = function(slug) {
+    if (done[slug]) delete done[slug]; else done[slug] = true;
+    localStorage.setItem(DONE_KEY, JSON.stringify(done));
+    apply();
+  };
+  window.toggleHideDone = function() {
+    document.body.classList.toggle('hide-done');
+  };
+  apply();
+})();
+</script>
+
+</body>
+</html>

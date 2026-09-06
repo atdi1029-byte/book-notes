@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Zombie Corporations - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.tier .tier-desc { color: #a08060; font-size: 0.85rem; margin: 0.4rem 0 0.8rem; }
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../monetary-policy-central-banking.html">&larr; Monetary Policy &amp; Central Banking</a>
+
+<div class="concept-meta"><span>standard</span><span>Monetary Policy &amp; Central Banking</span><span>added 2026-08-31</span></div>
+<h4 id="zombie_corporations">Zombie Corporations</h4>
+
+<p>A <strong>zombie corporation</strong> is a company that earns just enough revenue to service its debt — paying interest — but not enough to actually pay down the principal or invest meaningfully in growth. The term borrows from horror fiction deliberately: these companies are technically alive but not truly functioning. They shuffle forward, consuming resources, unable to die cleanly and unable to thrive. The formal threshold economists use is a firm whose <strong>interest coverage ratio</strong> — earnings before interest and taxes divided by interest expense — falls below 1.0 for three or more consecutive years. Below 1.0 means the company cannot cover its interest payments from operations alone. It survives only by rolling over old debt into new debt, often at whatever rate the market demands.</p>
+
+<p>Zombie corporations matter far beyond the companies themselves. When a significant portion of an economy's businesses are zombies, capital gets trapped. Banks keep lending to weak companies to avoid booking losses, which means healthier companies with better growth prospects compete for the same pool of credit. <strong>Capital misallocation</strong> at scale suppresses productivity across the entire economy — resources flow toward survival rather than innovation. Japan learned this lesson brutally during its "Lost Decade" after 1991, when banks propped up insolvent firms for years rather than forcing restructuring, and the whole economy stagnated as a result. When zombies crowd the landscape, you get an economy that looks functional on headline numbers but feels stagnant to everyone living inside it.</p>
+
+<p>The mechanical process works like this: a company borrows heavily during a period of low interest rates — say, 2012 through 2021 when the Federal Reserve held rates near zero. It issues <strong>corporate bonds</strong> or takes bank loans at 2–3% interest, which feels manageable against its operating margins. But debt has a maturity date. When those bonds come due — at a <strong>refinancing cliff</strong> — the company must either repay the principal (which it rarely has sitting in cash) or issue new debt at whatever the current rate is. If rates have risen to 7–8%, the company's annual interest burden can double or triple overnight. Margins that were thin at 2% rates become negative at 7% rates. The company is now definitively a zombie, bleeding cash just to keep the lights on.</p>
+
+<p>The video's warning about companies refinancing at 7–8% cuts straight to this mechanism. Consider a hypothetical manufacturer that issued $500 million in bonds at 3% in 2019 — annual interest of $15 million. Those bonds mature in 2025. Now the company must refinance at 7.5%. Annual interest jumps to $37.5 million — an additional $22.5 million drain on earnings, every single year, without any new investment or growth. If that company ran a 6% operating margin on $400 million in revenue, it generated $24 million in operating profit. After the refinancing, interest alone consumes nearly all of it. There is nothing left for capital expenditure, R&D, or hiring. The company exists to service debt, period.</p>
+
+<blockquote>"Companies with heavy debt loads forced to refinance at 7–8% will see operating margins crushed — the gap between the two groups is expected to widen rapidly as the refinancing cliff arrives."</blockquote>
+
+<p>Traders and investors watch for zombie signals through several practical lenses. The <strong>debt-to-EBITDA ratio</strong> is the first screen — anything above 5x in a rising rate environment is a yellow flag, above 7x is serious trouble. <strong>Interest coverage ratio</strong> below 1.5x signals vulnerability. Credit analysts also track <strong>free cash flow yield</strong>: if a company generates no free cash flow after interest payments, it cannot self-fund. Bond investors watch <strong>credit spreads</strong> — the extra yield a company's bonds pay above Treasury bonds — which widen sharply when markets price in distress. When spreads blow out on a sector, it often signals the market has identified a cluster of zombies about to be exposed by refinancing pressure.</p>
+
+<p>The biggest misconception about zombie corporations is that they are easy to spot from public earnings reports. They are not — accounting rules allow considerable flexibility in how interest, depreciation, and one-time charges are presented. A company can show <strong>GAAP net income</strong> that looks positive while burning through cash. The tell is in the cash flow statement, specifically <strong>operating cash flow</strong> minus capital expenditures — true free cash flow. Another misconception is that zombie status is permanent. A company can exit zombie status if rates fall, if it sells assets, or if management aggressively cuts costs. But in a sustained high-rate environment, the exit paths narrow considerably, and many zombies simply delay the reckoning until they cannot.</p>
+
+<p>When zombies finally fail, the cascade can surprise markets. <strong>Credit contagion</strong> spreads through sectors when one large zombie defaults — counterparties reassess exposure, banks tighten lending standards, and other weak companies that relied on the same easy refinancing assumption suddenly face the same wall. <strong>High-yield bond funds</strong> and <strong>leveraged loan funds</strong> that hold zombie debt can face redemption pressure as investors flee, forcing fire-sale liquidations that drive prices down further. The 2008 financial crisis showed how quickly this feedback loop accelerates. Private equity portfolios are particularly exposed because private equity firms routinely use debt to juice returns — a playbook that works magnificently at 2% rates and turns lethal at 7%.</p>
+
+<p>Zombie corporations connect directly to <strong>monetary policy transmission</strong>, which is why Kevin Warsh's Jackson Hole remarks carry such weight. When the Federal Reserve raises rates, the goal is to slow inflation by making borrowing expensive — forcing businesses and consumers to spend less. But if a large share of the corporate sector consists of zombies that cannot absorb higher rates, the Fed faces a dilemma: tighten enough to kill inflation and you also detonate a wave of corporate distress; ease prematurely and inflation re-accelerates. This is the knife-edge the current Fed walks. The refinancing cliff — the wave of debt issued at 2021 rates now coming due — is not a distant theoretical risk. It is a concrete calendar event, and the gap between cash-rich companies that navigated the low-rate era prudently and debt-laden zombies that did not is about to become impossible for markets to ignore.</p>
+<div class="concept-side">Sources: KEVIN WARSH DROPS THE HAMMER: Why a Fed Rate Hike Is Back on the Table!<br>Related in this category: <a href="pce_inflation_basket.html">PCE Inflation Basket</a>, <a href="jackson_hole_symposium.html">Jackson Hole Symposium</a>, <a href="hawkish_dovish_fed_signaling.html">Hawkish vs. Dovish Fed Signaling</a>, <a href="debt_servicing_cost.html">Debt Servicing Cost</a>, <a href="fiscal_monetary_policy_conflict.html">Fiscal-Monetary Policy Conflict</a>, <a href="central_bank_credibility.html">Central Bank Credibility</a></div>
+<button class="concept-done" data-slug="zombie_corporations" onclick="toggleDone('zombie_corporations')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_zombie_corporations';</script>
+<script src="../../book.js"></script>
+
+<script>
+(function() {
+  var DONE_KEY = 'fg_done', FILTER_KEY = 'fg_filter';
+  var done = JSON.parse(localStorage.getItem(DONE_KEY) || '{}');
+  var filter = localStorage.getItem(FILTER_KEY) || 'all';
+
+  function visible(flag) {
+    if (filter === 'star') return flag === 'star';
+    if (filter === 'nodeep') return flag !== 'deep';
+    return true;
+  }
+
+  function apply() {
+    var shown = 0, total = 0, hidden = 0;
+    document.querySelectorAll('.concept-row').forEach(function(r) {
+      var slug = r.dataset.slug, flag = r.dataset.flag;
+      total++;
+      if (done[slug]) r.classList.add('done'); else r.classList.remove('done');
+      if (visible(flag)) { r.classList.remove('fg-hidden'); shown++; }
+      else { r.classList.add('fg-hidden'); hidden++; }
+    });
+    document.querySelectorAll('.cat-card').forEach(function(card) {
+      var slugs = card.dataset.slugs ? card.dataset.slugs.split(',') : [];
+      var flags = card.dataset.flags ? card.dataset.flags.split(',') : [];
+      var vis = 0, allDone = slugs.length > 0;
+      slugs.forEach(function(sl, i) {
+        if (visible(flags[i])) vis++;
+        if (!done[sl]) allDone = false;
+      });
+      total += slugs.length; shown += vis;
+      var c = card.querySelector('.cat-count');
+      if (c) c.textContent = vis + (vis !== slugs.length ? ' of ' + slugs.length : '') + ' concepts' +
+        (card.dataset.stars ? ' \u00b7 ' + card.dataset.stars + ' \u2605' : '');
+      if (vis === 0) card.classList.add('fg-empty'); else card.classList.remove('fg-empty');
+      if (allDone) card.classList.add('done'); else card.classList.remove('done');
+    });
+    document.querySelectorAll('[data-filter]').forEach(function(b) {
+      b.classList.toggle('active', b.dataset.filter === filter);
+    });
+    var n = document.getElementById('fgCount');
+    if (n) n.textContent = shown + ' of ' + total + ' shown';
+    var h = document.getElementById('fgHiddenNote');
+    if (h) h.textContent = hidden ? hidden + ' hidden by the filter.' : '';
+    var btn = document.querySelector('.concept-done');
+    if (btn) {
+      var on = !!done[btn.dataset.slug];
+      btn.classList.toggle('on', on);
+      btn.textContent = on ? '\u2713 Completed' : '\u2713 Mark complete';
+    }
+  }
+
+  window.setFilter = function(f) {
+    filter = f; localStorage.setItem(FILTER_KEY, f); apply();
+  };
+  window.toggleDone = function(slug) {
+    if (done[slug]) delete done[slug]; else done[slug] = true;
+    localStorage.setItem(DONE_KEY, JSON.stringify(done));
+    apply();
+  };
+  window.toggleHideDone = function() {
+    document.body.classList.toggle('hide-done');
+  };
+  apply();
+})();
+</script>
+
+</body>
+</html>

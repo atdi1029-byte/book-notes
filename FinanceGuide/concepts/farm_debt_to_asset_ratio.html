@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Farm Debt-to-Asset Ratio - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.tier .tier-desc { color: #a08060; font-size: 0.85rem; margin: 0.4rem 0 0.8rem; }
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../commodities-energy.html">&larr; Commodities &amp; Energy</a>
+
+<div class="concept-meta"><span>deep cut</span><span>Commodities &amp; Energy</span><span>added 2026-08-31</span></div>
+<h4 id="farm_debt_to_asset_ratio">Farm Debt-to-Asset Ratio</h4>
+
+<p>The <strong>farm debt-to-asset ratio</strong> is exactly what it sounds like: a single percentage that tells you how much of American agriculture's total wealth is financed by borrowed money. You calculate it by dividing total farm sector debt by total farm sector assets, then multiplying by 100. If farmers collectively own $4 trillion in land, equipment, and livestock — and owe $500 billion to banks and creditors — the ratio is 12.5%. Think of it as the agricultural sector's version of a personal balance sheet check. A low ratio means farmers own most of what they have. A high ratio means creditors have a larger claim on the sector's wealth. It is the foundational solvency indicator for American agriculture, and right now, it is flashing red.</p>
+
+<p>This ratio matters far beyond farm country because agriculture is the upstream layer of everything you eat. When the farm debt-to-asset ratio climbs, it signals that the people growing your food are operating with thinner and thinner financial cushions. They become vulnerable to any shock — a bad harvest, a commodity price drop, a spike in input costs — that can tip a leveraged operation into default. And when farms fail at scale, the consequences ripple downstream: food processors lose suppliers, rural banks absorb losses, land values crater in agricultural communities, and — critically for everyone reading this — the supply of staple crops tightens, pushing grocery prices higher. The ratio is a leading indicator of systemic stress in the food supply chain, not just a farm-specific accounting curiosity.</p>
+
+<p>The mechanical logic works like this: farmers borrow to buy land, purchase seed and fertilizer, finance equipment, and bridge the gap between planting and harvest. Those loans sit on the liability side of the balance sheet. The assets — land, crops, livestock, machinery — sit on the other side. When asset values rise (as they did during the farmland boom of the 2000s and 2010s), the ratio naturally compresses even if debt grows, because the denominator is expanding faster. But when asset values plateau or fall while debt keeps accumulating — or when interest rates rise and make servicing that existing debt more expensive — the ratio expands. The numerator grows, the denominator stalls, and the percentage climbs. This is the squeeze currently underway in American agriculture.</p>
+
+<p>The historical benchmark everyone uses to understand today's numbers is the <strong>1980s farm credit collapse</strong>. Through the 1970s, farmland values soared on the back of export booms and easy credit. Farmers borrowed aggressively against inflated land values. Then commodity prices collapsed, the Federal Reserve raised interest rates sharply, export markets dried up, and land values fell. Suddenly the assets backing all that debt were worth far less, while the debt itself remained at full face value — and the interest burden ballooned. The debt-to-asset ratio spiked. Foreclosures cascaded. Entire farming communities were wiped out. It was severe enough that musicians organized <em>Farm Aid</em> in 1985 to raise emergency funds. That crisis defined a generation's relationship with agricultural finance, which is exactly why analysts go quiet when today's numbers start rhyming with it.</p>
+
+<p>According to <strong>USDA projections</strong>, total farm sector debt is on track to hit a record <strong>$624.7 billion</strong> in the current year — up more than 5% from 2025 alone. That pushes the farm debt-to-asset ratio to <strong>13.75%</strong>, the highest reading in over a decade. Compounding the alarm, the <strong>farm debt service ratio</strong> — which measures what fraction of gross farm income gets consumed by loan payments before a single operating bill is paid — is forecast to tie its highest level since 1987. As the video puts it:</p>
+
+<blockquote>"American agriculture is currently carrying a heavier debt load relative to its actual ability to service that debt than at almost any point since the mid-1980s farm crisis. That is the crisis your grandfather's neighbor talked about in hushed tones. Foreclosures, forced auctions, an entire generation of family operations wiped out overnight."</blockquote>
+
+<p>For investors and traders, the farm debt-to-asset ratio functions as a <strong>sector stress indicator</strong> with specific downstream implications. A rising ratio historically correlates with pressure on agricultural commodity prices (as distressed farmers liquidate inventory), increased credit losses at regional and agricultural-specialty banks, and upward pressure on food prices at the retail level as supply chains tighten. Commodity traders watch it alongside crop report data. Fixed-income analysts use it to assess the credit quality of agricultural mortgage-backed securities and farm credit system bonds. Equity analysts covering food processors, agricultural input companies like fertilizer and seed manufacturers, and farm equipment makers like Deere use it as a demand-signal indicator — financially squeezed farmers cut capital expenditure first.</p>
+
+<p>One important nuance: a higher debt-to-asset ratio is not automatically catastrophic. The critical question is what the ratio is doing relative to income and interest rates. A farm sector carrying 13.75% debt-to-assets in a low-interest-rate environment with strong commodity prices might be perfectly manageable. The same ratio becomes dangerous when rates are elevated and commodity prices are soft — because the <strong>debt service coverage</strong> deteriorates even without the ratio itself changing. This is why analysts track both the debt-to-asset ratio and the debt service ratio together. The first tells you the structural leverage. The second tells you whether current income can actually service that leverage. Both trending toward 1987 levels simultaneously is what creates the alarm, not either number in isolation.</p>
+
+<p>When this ratio breaks — meaning it rises sharply enough that widespread farm defaults begin — the failure mode is not gradual. It tends to be a <strong>cascade</strong>. Distressed farm sales push land values down. Falling land values reduce the collateral supporting other farms' loans, triggering margin calls or covenant violations on debt that was previously performing. Banks pull back on agricultural lending broadly, starving even healthy operations of operating credit. This is a classic <strong>debt deflation loop</strong>: falling asset values force selling, which depresses values further, which triggers more defaults. The 1980s took a decade to fully clear. Today's overlay of a potential fertilizer supply disruption — with Canada supplying an estimated 90% of U.S. potash — means an external supply shock could accelerate a stress event that is already structurally primed. The farm debt-to-asset ratio is the early warning gauge. When it reaches these levels, the margin for error across the entire food supply chain narrows to nearly nothing.</p>
+
+<p>The farm debt-to-asset ratio connects directly to several broader financial concepts worth understanding in context. It is a sector-specific application of the <strong>leverage ratio</strong> framework used across corporate and sovereign credit analysis. It feeds into <strong>agricultural credit market</strong> dynamics, particularly the health of the <strong>Farm Credit System</strong> — the government-sponsored network of lending cooperatives that holds a large share of U.S. farm debt. Stress in the farm sector transmits into <strong>rural bank balance sheets</strong>, which affects regional Federal Reserve bank monitoring. And because food is a non-discretionary input to every household budget, the ratio ultimately connects to <strong>CPI inflation</strong> data — specifically the food-at-home component that working-class families feel most acutely. Understanding the farm debt-to-asset ratio is understanding one of the least-covered but most consequential pressure points in the entire American financial system.</p>
+<div class="concept-side">Sources: THE 1987 FARM CRISIS IS BACK: The $624B Debt Bomb Under Your Food Supply!<br>Related in this category: <a href="gold_futures.html">Gold Futures</a>, <a href="hard_assets_inflation_hedge.html">Hard Assets as Inflation Hedges</a>, <a href="farm_debt_service_ratio.html">Farm Debt Service Ratio</a>, <a href="agricultural_direct_payment_subsidies.html">Agricultural Direct Payment Subsidies</a>, <a href="net_farm_income.html">Net Farm Income</a>, <a href="farm_operating_loans.html">Farm Operating Loans</a></div>
+<button class="concept-done" data-slug="farm_debt_to_asset_ratio" onclick="toggleDone('farm_debt_to_asset_ratio')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_farm_debt_to_asset_ratio';</script>
+<script src="../../book.js"></script>
+
+<script>
+(function() {
+  var DONE_KEY = 'fg_done', FILTER_KEY = 'fg_filter';
+  var done = JSON.parse(localStorage.getItem(DONE_KEY) || '{}');
+  var filter = localStorage.getItem(FILTER_KEY) || 'all';
+
+  function visible(flag) {
+    if (filter === 'star') return flag === 'star';
+    if (filter === 'nodeep') return flag !== 'deep';
+    return true;
+  }
+
+  function apply() {
+    var shown = 0, total = 0, hidden = 0;
+    document.querySelectorAll('.concept-row').forEach(function(r) {
+      var slug = r.dataset.slug, flag = r.dataset.flag;
+      total++;
+      if (done[slug]) r.classList.add('done'); else r.classList.remove('done');
+      if (visible(flag)) { r.classList.remove('fg-hidden'); shown++; }
+      else { r.classList.add('fg-hidden'); hidden++; }
+    });
+    document.querySelectorAll('.cat-card').forEach(function(card) {
+      var slugs = card.dataset.slugs ? card.dataset.slugs.split(',') : [];
+      var flags = card.dataset.flags ? card.dataset.flags.split(',') : [];
+      var vis = 0, allDone = slugs.length > 0;
+      slugs.forEach(function(sl, i) {
+        if (visible(flags[i])) vis++;
+        if (!done[sl]) allDone = false;
+      });
+      total += slugs.length; shown += vis;
+      var c = card.querySelector('.cat-count');
+      if (c) c.textContent = vis + (vis !== slugs.length ? ' of ' + slugs.length : '') + ' concepts' +
+        (card.dataset.stars ? ' \u00b7 ' + card.dataset.stars + ' \u2605' : '');
+      if (vis === 0) card.classList.add('fg-empty'); else card.classList.remove('fg-empty');
+      if (allDone) card.classList.add('done'); else card.classList.remove('done');
+    });
+    document.querySelectorAll('[data-filter]').forEach(function(b) {
+      b.classList.toggle('active', b.dataset.filter === filter);
+    });
+    var n = document.getElementById('fgCount');
+    if (n) n.textContent = shown + ' of ' + total + ' shown';
+    var h = document.getElementById('fgHiddenNote');
+    if (h) h.textContent = hidden ? hidden + ' hidden by the filter.' : '';
+    var btn = document.querySelector('.concept-done');
+    if (btn) {
+      var on = !!done[btn.dataset.slug];
+      btn.classList.toggle('on', on);
+      btn.textContent = on ? '\u2713 Completed' : '\u2713 Mark complete';
+    }
+  }
+
+  window.setFilter = function(f) {
+    filter = f; localStorage.setItem(FILTER_KEY, f); apply();
+  };
+  window.toggleDone = function(slug) {
+    if (done[slug]) delete done[slug]; else done[slug] = true;
+    localStorage.setItem(DONE_KEY, JSON.stringify(done));
+    apply();
+  };
+  window.toggleHideDone = function() {
+    document.body.classList.toggle('hide-done');
+  };
+  apply();
+})();
+</script>
+
+</body>
+</html>

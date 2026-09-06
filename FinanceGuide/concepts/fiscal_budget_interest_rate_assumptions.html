@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Fiscal Budget Interest Rate Assumptions - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.tier .tier-desc { color: #a08060; font-size: 0.85rem; margin: 0.4rem 0 0.8rem; }
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../fixed-income-bonds.html">&larr; Fixed Income &amp; Bonds</a>
+
+<div class="concept-meta"><span>deep cut</span><span>Fixed Income &amp; Bonds</span><span>added 2026-09-03</span></div>
+<h4 id="fiscal_budget_interest_rate_assumptions">Fiscal Budget Interest Rate Assumptions</h4>
+
+<p>Every government budget is built on a set of assumptions — projected tax revenues, anticipated spending levels, expected GDP growth. But buried inside every sovereign budget document is one assumption that receives almost no public attention and carries enormous consequences: the <strong>interest rate assumption</strong>, specifically the rate at which the government expects to borrow money over the coming fiscal year. This is the number a finance ministry plugs into its spreadsheet when calculating how much of the national budget will be consumed by interest payments on existing debt. Get it right, and the budget arithmetic works. Get it wrong — especially when debt levels are high — and the entire fiscal plan can unravel within months.</p>
+
+<p>The reason this matters so profoundly is the interaction between two variables: the assumed borrowing rate and the total stock of existing debt. A government with modest debt can afford to be wrong about interest rates. A percentage-point surprise costs a few billion dollars — painful but manageable. But a government carrying <strong>debt-to-GDP</strong> ratios of 100%, 150%, or 200% faces a completely different arithmetic. At those levels, every basis point of unexpected rate increase translates into tens of billions in unbudgeted interest expense. That money has to come from somewhere — either deeper borrowing, spending cuts, tax increases, or, in the extreme, monetization by the central bank. None of those options are painless, and some are genuinely destabilizing.</p>
+
+<p>The mechanism works like this. A government's finance ministry, in drafting the annual budget, must estimate its <strong>debt service costs</strong> — the total interest bill on all outstanding bonds. To do that, they need a rate assumption for new issuance and for any existing debt rolling over at maturity. If they assume, say, 2.5% on ten-year bonds, they build a budget where interest payments consume X percent of revenues. Now suppose actual market yields settle at 3.5%. Every bond they issue or roll over during that fiscal year costs 100 basis points more than planned. Multiply that difference across hundreds of billions in new and maturing debt, and the gap between the assumed budget and fiscal reality can balloon quickly into the tens of billions — a structural shortfall baked in from day one.</p>
+
+<p>Japan provides the clearest and most alarming real-world example. In its <strong>fiscal year 2026 budget</strong>, Japan's Ministry of Finance explicitly assumed that long-term borrowing costs would not exceed 3%. This was the number enshrined in official government documents, used to calculate debt service on a debt load exceeding 200% of GDP — the highest among any major developed economy on earth. Japanese government bond yields then moved decisively above that 3% ceiling. This wasn't a minor technical breach. Japan carries so much debt that a sustained move above its own budget assumption creates what analysts call a <strong>fiscal arithmetic crisis</strong>: the government is immediately spending more on interest than it planned, with no cushion in a budget that was already stretched.</p>
+
+<p>For traders and investors, budget interest rate assumptions serve as a powerful signal and a tripwire to monitor. When a country's market yields approach or breach the government's own published assumption, the market is effectively declaring the budget insolvent as written. Sophisticated <strong>sovereign bond traders</strong> track these thresholds explicitly. A yield breaking above the budget assumption is a trigger: it means the country will either need to revise its deficit projections upward, announce emergency fiscal measures, or lean on the central bank to suppress yields — all of which carry their own market implications. The moment Japan's yield crossed 3%, traders watching that number knew the official budget math no longer held.</p>
+
+<p>The most common misconception is that interest rate assumptions are merely accounting formalities — numbers in a bureaucratic document that don't move markets. In reality, these assumptions are <strong>policy commitments in disguise</strong>. When a government publishes a budget assuming 3% borrowing costs, it is implicitly betting that either the market will cooperate or the central bank will intervene to keep rates there. For decades, Japan's central bank did exactly that through <strong>yield curve control</strong>, an explicit policy of capping long-term bond yields. The budget assumption and the monetary policy were intertwined. When yield curve control loosened, the budget assumption became exposed — and the gap between assumption and reality became a market event rather than a policy footnote.</p>
+
+<p>When budget interest rate assumptions break — when actual borrowing costs exceed what the government projected — the cascading effects move well beyond government balance sheets. Pension funds holding sovereign bonds mark those positions down. Banks with large government bond portfolios face capital pressures. The sovereign's credit trajectory shifts, prompting rating agency scrutiny. Most consequentially, the <strong>global rate contagion</strong> dynamic kicks in: when Japan's government bonds convulse, Japanese institutions that hold foreign bonds — including massive quantities of US Treasuries — reassess their portfolios. If they sell foreign bonds to repatriate capital and shore up domestic positions, that selling pressure exports higher yields globally. This is precisely the mechanism connecting Tokyo's fiscal arithmetic to American mortgage rates sitting at 7%.</p>
+
+<p>This concept connects directly to <strong>debt sustainability analysis</strong>, <strong>primary balance requirements</strong>, and the broader framework of sovereign solvency. A country's debt is sustainable when the interest rate on that debt is below the nominal growth rate of the economy — the famous r-versus-g comparison in academic economics. When budget assumptions assume r stays manageable, they are making an implicit bet on this relationship holding. Japan's situation illustrates what happens when r threatens to exceed g in an economy that has been structurally low-growth for three decades. Understanding fiscal budget interest rate assumptions means understanding that sovereign budgets are not static documents but dynamic bets on market conditions — and that when those bets go wrong at sufficient scale, the consequences ripple through every asset class on the planet, from gilts to Bunds to Treasuries to the rate on a thirty-year American mortgage.</p>
+<div class="concept-side">Sources: THE TOKYO TIME BOMB: The Hidden Catalyst Locking Mortgage Rates at 7%<br>Related in this category: <a href="two_year_treasury_yield.html">Two-Year Treasury Yield</a>, <a href="treasury_bond_buyback_program.html">Treasury Bond Buyback Program</a>, <a href="thirty_year_treasury_bond.html">30-Year Treasury Bond</a>, <a href="debt_rollover_risk.html">Debt Rollover Risk</a>, <a href="corporate_refinancing_cliff.html">Corporate Refinancing Cliff</a>, <a href="duration_risk.html">Duration Risk</a></div>
+<button class="concept-done" data-slug="fiscal_budget_interest_rate_assumptions" onclick="toggleDone('fiscal_budget_interest_rate_assumptions')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_fiscal_budget_interest_rate_assumptions';</script>
+<script src="../../book.js"></script>
+
+<script>
+(function() {
+  var DONE_KEY = 'fg_done', FILTER_KEY = 'fg_filter';
+  var done = JSON.parse(localStorage.getItem(DONE_KEY) || '{}');
+  var filter = localStorage.getItem(FILTER_KEY) || 'all';
+
+  function visible(flag) {
+    if (filter === 'star') return flag === 'star';
+    if (filter === 'nodeep') return flag !== 'deep';
+    return true;
+  }
+
+  function apply() {
+    var shown = 0, total = 0, hidden = 0;
+    document.querySelectorAll('.concept-row').forEach(function(r) {
+      var slug = r.dataset.slug, flag = r.dataset.flag;
+      total++;
+      if (done[slug]) r.classList.add('done'); else r.classList.remove('done');
+      if (visible(flag)) { r.classList.remove('fg-hidden'); shown++; }
+      else { r.classList.add('fg-hidden'); hidden++; }
+    });
+    document.querySelectorAll('.cat-card').forEach(function(card) {
+      var slugs = card.dataset.slugs ? card.dataset.slugs.split(',') : [];
+      var flags = card.dataset.flags ? card.dataset.flags.split(',') : [];
+      var vis = 0, allDone = slugs.length > 0;
+      slugs.forEach(function(sl, i) {
+        if (visible(flags[i])) vis++;
+        if (!done[sl]) allDone = false;
+      });
+      total += slugs.length; shown += vis;
+      var c = card.querySelector('.cat-count');
+      if (c) c.textContent = vis + (vis !== slugs.length ? ' of ' + slugs.length : '') + ' concepts' +
+        (card.dataset.stars ? ' \u00b7 ' + card.dataset.stars + ' \u2605' : '');
+      if (vis === 0) card.classList.add('fg-empty'); else card.classList.remove('fg-empty');
+      if (allDone) card.classList.add('done'); else card.classList.remove('done');
+    });
+    document.querySelectorAll('[data-filter]').forEach(function(b) {
+      b.classList.toggle('active', b.dataset.filter === filter);
+    });
+    var n = document.getElementById('fgCount');
+    if (n) n.textContent = shown + ' of ' + total + ' shown';
+    var h = document.getElementById('fgHiddenNote');
+    if (h) h.textContent = hidden ? hidden + ' hidden by the filter.' : '';
+    var btn = document.querySelector('.concept-done');
+    if (btn) {
+      var on = !!done[btn.dataset.slug];
+      btn.classList.toggle('on', on);
+      btn.textContent = on ? '\u2713 Completed' : '\u2713 Mark complete';
+    }
+  }
+
+  window.setFilter = function(f) {
+    filter = f; localStorage.setItem(FILTER_KEY, f); apply();
+  };
+  window.toggleDone = function(slug) {
+    if (done[slug]) delete done[slug]; else done[slug] = true;
+    localStorage.setItem(DONE_KEY, JSON.stringify(done));
+    apply();
+  };
+  window.toggleHideDone = function() {
+    document.body.classList.toggle('hide-done');
+  };
+  apply();
+})();
+</script>
+
+</body>
+</html>

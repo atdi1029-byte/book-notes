@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Capital Flight - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.tier .tier-desc { color: #a08060; font-size: 0.85rem; margin: 0.4rem 0 0.8rem; }
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../macro-investing-geopolitics.html">&larr; Macro Investing &amp; Geopolitics</a>
+
+<div class="concept-meta"><span><span class="star">&#9733;</span> must-know</span><span>Macro Investing &amp; Geopolitics</span><span>added 2026-09-06</span></div>
+<h4 id="capital_flight">Capital Flight</h4>
+
+<p><strong>Capital flight</strong> is the large-scale movement of money out of a country — or out of a country's financial assets — driven by fear, loss of confidence, or the perception that better risk-adjusted returns exist elsewhere. The term conjures dramatic images: investors fleeing a sinking ship, currencies collapsing overnight, foreign buyers dumping government bonds in panic. And sometimes that is exactly what happens. But the concept is routinely misapplied by financial media, used as a headline shorthand for any large reallocation of cross-border money, even when the underlying data tells a far more nuanced story. Understanding what capital flight actually is — and what it is not — is essential for anyone trying to read markets clearly.</p>
+
+<p>Capital flight matters because it can be genuinely destabilizing. When large pools of foreign capital exit a country's bond or currency markets simultaneously, the effects ripple across the entire economy. <strong>Sovereign bond yields</strong> rise as prices fall from selling pressure, which pushes up borrowing costs for the government. A rising cost of government borrowing tends to drag up interest rates broadly — mortgages, corporate loans, credit cards. The domestic currency typically weakens as sellers convert local-currency assets back into foreign currencies. Inflation can follow if the currency weakness is severe enough to raise the price of imports. In short, genuine capital flight tightens financial conditions across the board and can tip a fragile economy into crisis.</p>
+
+<p>The mechanism works in stages. First, foreign investors — whether sovereign wealth funds, pension funds, hedge funds, or individual institutions — decide that assets in a particular country carry too much risk relative to their return. That decision triggers selling. Selling means converting local assets (bonds, equities, real estate) back into the investor's home currency. That conversion requires selling the local currency on the foreign exchange market, which pushes the exchange rate down. Falling currency and rising yields then create a feedback loop: local investors see the writing on the wall and join the exit, accelerating the outflow. Central banks can attempt to interrupt this cycle by raising interest rates to attract capital back in, but at the cost of slowing domestic growth.</p>
+
+<p>Historical examples make the mechanism concrete. During the <strong>1997 Asian Financial Crisis</strong>, Thailand, Indonesia, and South Korea saw foreign capital exit at a pace their central banks could not absorb. Thailand burned through its foreign currency reserves trying to defend the baht's peg to the dollar before being forced to float it in July 1997 — triggering a 40% currency collapse within months. The contagion spread regionally because once investors lost confidence in one emerging market, they reassessed all similar markets. Argentina in 2001, Russia in 1998, and Venezuela across the 2010s all share the same basic anatomy: loss of confidence, accelerating outflows, currency crisis, economic contraction.</p>
+
+<p>The Norway situation covered in this video is a precise example of what capital flight is <em>not</em> — and why the distinction matters enormously. <strong>Norges Bank Investment Management</strong>, which manages Norway's $2.3 trillion sovereign wealth fund, proposed cutting its government bond allocation from 70% to 50% of its fixed income benchmark. For US Treasuries specifically, that means reducing exposure from roughly 34.1% to 21.9% of the government bond slice — somewhere between $75 billion and $85 billion of US government paper leaving the fund's portfolio. Financial media ran with the obvious narrative: <em>de-dollarization, capital flight, foreign buyers abandoning Washington.</em></p>
+
+<blockquote>"De-dollarization, we've talked about that here at Wall Street Truth Bombs. Capital flight, the foreign buyers are abandoning Washington, is a great story. It is a clean, great, scary story that fits perfectly on a chyron on the bottom of a cable TV financial news station."</blockquote>
+
+<p>The single number that demolishes the capital flight narrative is this: Norway's <strong>total US dollar exposure remains at approximately 50%</strong> — unchanged. The fund is not reducing its exposure to America. It is repositioning <em>within</em> America, rotating from US government debt into US private credit markets. Think mortgage-backed securities, corporate bonds, private lending. Norway is still just as committed to the dollar and to American financial assets as before — it has simply decided that lending to American homeowners and corporations offers better risk-adjusted returns than lending to the American government at current Treasury yields. That is portfolio optimization, not flight.</p>
+
+<p>For traders and investors, understanding the difference between genuine capital flight and routine reallocation is a critical analytical skill. The key signal to watch is not whether a large institution is selling a specific asset class — it is whether their <em>aggregate currency exposure</em> is changing. If Norway were cutting dollar exposure from 50% toward 30%, that would warrant attention. A shift in composition while maintaining the same overall exposure is unremarkable portfolio management. Sophisticated investors also watch the <strong>TIC data</strong> (Treasury International Capital) published monthly by the US Treasury, which tracks foreign holdings of US securities. A sustained downtrend in foreign Treasury holdings across multiple large holders simultaneously would be a genuine warning signal. One fund repositioning is noise.</p>
+
+<p>The most dangerous misconception about capital flight is conflating it with any form of asset rotation by a foreign entity. <strong>Portfolio rebalancing</strong> — moving from one asset class to another within the same currency and country — is a completely normal function of institutional money management. Sovereign wealth funds like Norway's are explicitly designed to be slow, committee-driven, and mathematically disciplined. As the video notes, this is a fund that writes academic papers before changing a decimal point in its benchmark. When an institution this deliberate makes a move, it is almost certainly responding to a long-run risk/return calculation, not to political anger or a loss of faith in America. Treating systematic rebalancing as capital flight misleads retail investors into fear-driven decisions.</p>
+
+<p>The edge case where this distinction breaks down is when the <em>reason</em> for the reallocation signals something deeper than pure math. If Norway's internal analysis concluded that US Treasuries carry elevated political risk — due to debt ceiling brinkmanship, unprecedented fiscal deficits, or erosion of institutional independence at the Federal Reserve — then the repositioning is still not capital flight in the technical sense, but it is a meaningful vote of no confidence in the creditworthiness trajectory of the US government. The shift from sovereign to private credit could reflect a judgment that US corporations and homeowners are now safer credits than the US government itself. That inversion, if confirmed by other large sovereign investors, would be worth watching closely — not because money is leaving America, but because it would suggest the <strong>risk-free rate</strong> framework underlying global finance is being quietly renegotiated.</p>
+
+<p>Capital flight connects directly to concepts like <strong>currency risk</strong>, <strong>sovereign credit risk</strong>, <strong>yield spreads</strong>, and the <strong>dollar's reserve currency status</strong>. The reason the dollar has historically been insulated from capital flight dynamics that devastate emerging markets is precisely because global investors treat US Treasuries as the risk-free benchmark — the asset you hold when you want safety. Norway's move is a small but telling crack in that assumption: not a flight from the dollar, but a flight <em>within</em> the dollar from government paper toward private credit. If that preference spreads, it does not trigger the explosive dynamics of a traditional capital flight crisis. Instead, it slowly and methodically raises the cost of US government borrowing — which, given the scale of current US deficits, is its own kind of slow-motion problem worth understanding.</p>
+<div class="concept-side">Sources: THE RISK-FREE TRAP: Norway Cuts US Treasuries to Lend to American Homeowners!<br>Related in this category: <a href="trade_carveout_vs_treaty_guarantee.html">Trade Carve-Out vs. Treaty Guarantee</a>, <a href="usmca_trade_agreement.html">USMCA Trade Agreement and Joint Review Mechanism</a>, <a href="retaliatory_tariffs.html">Retaliatory Tariffs</a>, <a href="maritime_choke_point.html">Maritime Choke Point</a>, <a href="nationalization_risk.html">Asset Nationalization Risk</a>, <a href="global_sovereign_yield_contagion.html">Global Sovereign Yield Contagion</a></div>
+<button class="concept-done" data-slug="capital_flight" onclick="toggleDone('capital_flight')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_capital_flight';</script>
+<script src="../../book.js"></script>
+
+<script>
+(function() {
+  var DONE_KEY = 'fg_done', FILTER_KEY = 'fg_filter';
+  var done = JSON.parse(localStorage.getItem(DONE_KEY) || '{}');
+  var filter = localStorage.getItem(FILTER_KEY) || 'all';
+
+  function visible(flag) {
+    if (filter === 'star') return flag === 'star';
+    if (filter === 'nodeep') return flag !== 'deep';
+    return true;
+  }
+
+  function apply() {
+    var shown = 0, total = 0, hidden = 0;
+    document.querySelectorAll('.concept-row').forEach(function(r) {
+      var slug = r.dataset.slug, flag = r.dataset.flag;
+      total++;
+      if (done[slug]) r.classList.add('done'); else r.classList.remove('done');
+      if (visible(flag)) { r.classList.remove('fg-hidden'); shown++; }
+      else { r.classList.add('fg-hidden'); hidden++; }
+    });
+    document.querySelectorAll('.cat-card').forEach(function(card) {
+      var slugs = card.dataset.slugs ? card.dataset.slugs.split(',') : [];
+      var flags = card.dataset.flags ? card.dataset.flags.split(',') : [];
+      var vis = 0, allDone = slugs.length > 0;
+      slugs.forEach(function(sl, i) {
+        if (visible(flags[i])) vis++;
+        if (!done[sl]) allDone = false;
+      });
+      total += slugs.length; shown += vis;
+      var c = card.querySelector('.cat-count');
+      if (c) c.textContent = vis + (vis !== slugs.length ? ' of ' + slugs.length : '') + ' concepts' +
+        (card.dataset.stars ? ' \u00b7 ' + card.dataset.stars + ' \u2605' : '');
+      if (vis === 0) card.classList.add('fg-empty'); else card.classList.remove('fg-empty');
+      if (allDone) card.classList.add('done'); else card.classList.remove('done');
+    });
+    document.querySelectorAll('[data-filter]').forEach(function(b) {
+      b.classList.toggle('active', b.dataset.filter === filter);
+    });
+    var n = document.getElementById('fgCount');
+    if (n) n.textContent = shown + ' of ' + total + ' shown';
+    var h = document.getElementById('fgHiddenNote');
+    if (h) h.textContent = hidden ? hidden + ' hidden by the filter.' : '';
+    var btn = document.querySelector('.concept-done');
+    if (btn) {
+      var on = !!done[btn.dataset.slug];
+      btn.classList.toggle('on', on);
+      btn.textContent = on ? '\u2713 Completed' : '\u2713 Mark complete';
+    }
+  }
+
+  window.setFilter = function(f) {
+    filter = f; localStorage.setItem(FILTER_KEY, f); apply();
+  };
+  window.toggleDone = function(slug) {
+    if (done[slug]) delete done[slug]; else done[slug] = true;
+    localStorage.setItem(DONE_KEY, JSON.stringify(done));
+    apply();
+  };
+  window.toggleHideDone = function() {
+    document.body.classList.toggle('hide-done');
+  };
+  apply();
+})();
+</script>
+
+</body>
+</html>

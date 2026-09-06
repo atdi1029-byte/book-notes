@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>UK Gilts (British Sovereign Bonds) - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.tier .tier-desc { color: #a08060; font-size: 0.85rem; margin: 0.4rem 0 0.8rem; }
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../fixed-income-bonds.html">&larr; Fixed Income &amp; Bonds</a>
+
+<div class="concept-meta"><span>deep cut</span><span>Fixed Income &amp; Bonds</span><span>added 2026-09-03</span></div>
+<h4 id="uk_gilts">UK Gilts (British Sovereign Bonds)</h4>
+
+<p><strong>UK gilts</strong> are bonds issued by the British government to borrow money from investors. When the government needs to fund spending beyond what taxes collect, it issues these debt instruments — essentially IOUs promising to pay back the principal at a fixed future date, plus regular interest payments called <strong>coupons</strong> along the way. The name comes from the original certificates, which had gilded (gold-leaf) edges, signaling their status as premier, low-risk investments. They come in short-dated (under five years), medium-dated (five to fifteen years), and long-dated forms, with <strong>30-year gilts</strong> at the far end representing the government's longest borrowing commitments. The UK's <strong>Debt Management Office (DMO)</strong> manages issuance on behalf of HM Treasury.</p>
+
+<p>Gilts matter far beyond government accounting because they set the floor price of money across the entire British economy. Mortgage rates, corporate borrowing costs, pension fund valuations, and even the pound sterling's exchange rate all anchor themselves — directly or indirectly — to gilt yields. When gilt yields rise, banks charge more to lend, businesses face higher capital costs, and homeowners renewing fixed-rate mortgages find themselves confronting payments that can climb by hundreds of pounds per month. Pension funds, which hold enormous gilt positions to match their long-dated liabilities, face immediate mark-to-market losses when prices fall. This transmission mechanism means a move in a 30-year gilt yield is never an abstract financial number — it ripples into household budgets within months.</p>
+
+<p>The mechanical relationship at the core of gilt investing is the inverse link between <strong>price</strong> and <strong>yield</strong>. When a gilt is issued, it carries a fixed coupon — say 4% annually on a £1,000 face value, paying £40 per year. If investor demand drops and the price falls to £800 in the secondary market, that same £40 coupon now represents a 5% return on what you paid. Yield has risen without any change to the bond itself. This happens because investors demand compensation: if inflation, fiscal risk, or alternative investments make gilts less attractive, sellers must accept lower prices to find buyers, mechanically pushing yields higher. The 30-year gilt is especially sensitive because its price must discount cash flows stretching three decades into an uncertain future.</p>
+
+<p>The video delivered a striking real-world data point: Britain's 30-year gilt was sitting at a <strong>27-year high approaching 6%</strong> during the bond market convulsion described. To appreciate what that means, consider that for most of the 2010s the same 30-year gilt yielded between 1% and 3%. A move toward 6% implies the market now demands roughly double the compensation it previously required to lend the UK government money for three decades. For a pension fund that bought 30-year gilts at 2% yield — paying perhaps £150 for every £100 of face value — a yield move to 6% can slash that holding's market value by 40% or more. This is not hypothetical arithmetic; the UK's <strong>2022 LDI crisis</strong> showed exactly this dynamic when pension funds faced devastating collateral calls during a gilt rout.</p>
+
+<p>Traders use gilts as both a directional trade and a hedging instrument. A <strong>gilt bear</strong> position — shorting gilt futures or buying <strong>gilt options</strong> with a rising-yield thesis — profits when fiscal concerns mount or inflation expectations climb. Conversely, a long gilt position profits in recessions when investors flee to safety. Sophisticated players watch the <strong>gilt-OIS spread</strong> (the difference between gilt yields and overnight indexed swap rates) as a measure of UK-specific sovereign credit risk layered on top of pure rate expectations. They also monitor <strong>gilt auction results</strong> — specifically the <strong>bid-to-cover ratio</strong> and the <strong>tail</strong> (the gap between average and lowest accepted price) — as real-time signals of foreign and domestic appetite for British debt.</p>
+
+<blockquote>
+  "Britain's 30-year guilt is sitting at a 27-year high, my friends, knocking on 6%."
+  <cite>— Wall Street Truth Bombs, "The Tokyo Time Bomb"</cite>
+</blockquote>
+
+<p>A common misconception is that high gilt yields automatically signal a sovereign crisis or imminent default. In practice, elevated yields can reflect several very different forces: genuine fiscal concern, globally rising rates from central bank tightening, or simply higher <strong>term premium</strong> — the extra return investors demand for locking money up for decades rather than rolling short-term instruments. The UK has its own central bank and issues debt in its own currency, so outright default is extraordinarily unlikely. But that doesn't mean gilt yields can't do serious damage. The 2022 episode — triggered by the Truss government's unfunded tax cuts — showed that even a AAA-adjacent sovereign can suffer a confidence crisis severe enough to force emergency Bank of England intervention, even if formal default was never on the table.</p>
+
+<p>The most dangerous scenario in gilt markets is a <strong>self-reinforcing spiral</strong>: rising yields increase the government's future borrowing costs, which worsens the fiscal outlook, which pushes yields higher still. Because the UK runs persistent deficits and must continually roll over existing debt, this feedback loop is a genuine structural vulnerability. Long-dated gilts are also the primary collateral asset for <strong>Liability-Driven Investment (LDI)</strong> strategies used by UK pension funds. When gilt prices fall sharply, these funds face margin calls that force them to sell more gilts — further depressing prices. This was the doom loop that forced the Bank of England to buy gilts as an emergency backstop in autumn 2022, a crisis that few outside specialist circles saw coming.</p>
+
+<p>Gilts connect directly to the global sovereign bond story the video tells. The simultaneous move in US Treasuries, German Bunds, French OATs, and UK gilts during the same window illustrates that these markets are structurally linked. <strong>Japanese Government Bond (JGB)</strong> yields matter to gilts because when the Bank of Japan relaxes <strong>yield curve control</strong>, Japanese institutions — some of the world's largest holders of foreign sovereign debt — can earn acceptable returns at home and begin repatriating capital, selling gilts and Treasuries alike. That global selling pressure translates into higher yields across all sovereign markets simultaneously, which is precisely why a shadow data point out of Tokyo can move UK borrowing costs more than a Middle East headline. Gilts are not an island; they are a node in a deeply interconnected global web of sovereign credit.</p>
+<div class="concept-side">Sources: THE TOKYO TIME BOMB: The Hidden Catalyst Locking Mortgage Rates at 7%<br>Related in this category: <a href="two_year_treasury_yield.html">Two-Year Treasury Yield</a>, <a href="treasury_bond_buyback_program.html">Treasury Bond Buyback Program</a>, <a href="thirty_year_treasury_bond.html">30-Year Treasury Bond</a>, <a href="debt_rollover_risk.html">Debt Rollover Risk</a>, <a href="corporate_refinancing_cliff.html">Corporate Refinancing Cliff</a>, <a href="duration_risk.html">Duration Risk</a></div>
+<button class="concept-done" data-slug="uk_gilts" onclick="toggleDone('uk_gilts')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_uk_gilts';</script>
+<script src="../../book.js"></script>
+
+<script>
+(function() {
+  var DONE_KEY = 'fg_done', FILTER_KEY = 'fg_filter';
+  var done = JSON.parse(localStorage.getItem(DONE_KEY) || '{}');
+  var filter = localStorage.getItem(FILTER_KEY) || 'all';
+
+  function visible(flag) {
+    if (filter === 'star') return flag === 'star';
+    if (filter === 'nodeep') return flag !== 'deep';
+    return true;
+  }
+
+  function apply() {
+    var shown = 0, total = 0, hidden = 0;
+    document.querySelectorAll('.concept-row').forEach(function(r) {
+      var slug = r.dataset.slug, flag = r.dataset.flag;
+      total++;
+      if (done[slug]) r.classList.add('done'); else r.classList.remove('done');
+      if (visible(flag)) { r.classList.remove('fg-hidden'); shown++; }
+      else { r.classList.add('fg-hidden'); hidden++; }
+    });
+    document.querySelectorAll('.cat-card').forEach(function(card) {
+      var slugs = card.dataset.slugs ? card.dataset.slugs.split(',') : [];
+      var flags = card.dataset.flags ? card.dataset.flags.split(',') : [];
+      var vis = 0, allDone = slugs.length > 0;
+      slugs.forEach(function(sl, i) {
+        if (visible(flags[i])) vis++;
+        if (!done[sl]) allDone = false;
+      });
+      total += slugs.length; shown += vis;
+      var c = card.querySelector('.cat-count');
+      if (c) c.textContent = vis + (vis !== slugs.length ? ' of ' + slugs.length : '') + ' concepts' +
+        (card.dataset.stars ? ' \u00b7 ' + card.dataset.stars + ' \u2605' : '');
+      if (vis === 0) card.classList.add('fg-empty'); else card.classList.remove('fg-empty');
+      if (allDone) card.classList.add('done'); else card.classList.remove('done');
+    });
+    document.querySelectorAll('[data-filter]').forEach(function(b) {
+      b.classList.toggle('active', b.dataset.filter === filter);
+    });
+    var n = document.getElementById('fgCount');
+    if (n) n.textContent = shown + ' of ' + total + ' shown';
+    var h = document.getElementById('fgHiddenNote');
+    if (h) h.textContent = hidden ? hidden + ' hidden by the filter.' : '';
+    var btn = document.querySelector('.concept-done');
+    if (btn) {
+      var on = !!done[btn.dataset.slug];
+      btn.classList.toggle('on', on);
+      btn.textContent = on ? '\u2713 Completed' : '\u2713 Mark complete';
+    }
+  }
+
+  window.setFilter = function(f) {
+    filter = f; localStorage.setItem(FILTER_KEY, f); apply();
+  };
+  window.toggleDone = function(slug) {
+    if (done[slug]) delete done[slug]; else done[slug] = true;
+    localStorage.setItem(DONE_KEY, JSON.stringify(done));
+    apply();
+  };
+  window.toggleHideDone = function() {
+    document.body.classList.toggle('hide-done');
+  };
+  apply();
+})();
+</script>
+
+</body>
+</html>

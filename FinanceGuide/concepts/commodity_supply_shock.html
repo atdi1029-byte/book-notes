@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Commodity Supply Shock - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.tier .tier-desc { color: #a08060; font-size: 0.85rem; margin: 0.4rem 0 0.8rem; }
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../commodities-energy.html">&larr; Commodities &amp; Energy</a>
+
+<div class="concept-meta"><span><span class="star">&#9733;</span> must-know</span><span>Commodities &amp; Energy</span><span>added 2026-08-31</span></div>
+<h4 id="commodity_supply_shock">Commodity Supply Shock</h4>
+
+<p>A <strong>commodity supply shock</strong> is a sudden, unexpected disruption to the production or availability of a raw material — whether agricultural, energy-related, or mineral — that causes prices to spike sharply and quickly. Unlike demand-driven price increases, which build gradually as consumers or businesses buy more, a supply shock hits from the other side: the same number of buyers suddenly competing for a smaller pool of goods. The word "shock" is deliberate. These events are typically abrupt, difficult to anticipate in advance, and have ripple effects far beyond the commodity itself. Wheat, corn, crude oil, natural gas, fertilizer — any of these can transmit a shock upstream and downstream through the entire economy.</p>
+
+<p>Supply shocks matter because commodities are the raw inputs for nearly everything humans consume. When the price of corn surges, it doesn't just affect a bag of tortilla chips — it raises the cost of cattle feed, which raises beef prices, which raises the cost of restaurant meals and grocery bills. This is called <strong>upstream price transmission</strong>, and it's why commodity supply shocks are among the most inflationary forces in any economy. Central banks watch them closely because commodity-driven inflation is notoriously difficult to fight with interest rate policy alone. You can't raise interest rates and conjure more wheat. The Federal Reserve can slow demand, but it cannot fix a broken harvest or a severed supply chain.</p>
+
+<p>Mechanically, a supply shock works through a basic but powerful sequence. First, some event — drought, debt crisis, trade breakdown, war, regulation — reduces either the actual or expected supply of a commodity. Second, inventories begin to draw down as buyers continue purchasing at previous rates. Third, as <strong>inventory buffers</strong> thin, prices become highly sensitive to any additional news, creating volatility. Fourth, higher prices eventually dampen demand (a process called <strong>demand destruction</strong>) and incentivize new supply — but these corrective forces are slow. Agricultural supply takes a full growing season to respond. Energy infrastructure takes years. In the gap between shock and recovery, prices can reach levels that seem irrational until you understand the timeline mismatch.</p>
+
+<p>The video frames a particularly sobering real-world example: the U.S. farm sector is currently carrying <strong>$624.7 billion in total debt</strong> — a record high, up more than 5% from 2025 — pushing the farm debt-to-asset ratio to 13.75%, its highest reading in over a decade. More alarming still, the sector's <strong>debt service ratio</strong> (the share of gross farm income consumed by loan payments before any operating expenses are paid) is forecast to match its highest level since 1987. That year is not chosen casually. The 1987 farm crisis triggered mass foreclosures, forced auctions, and the wholesale destruction of family farming operations. When working capital collapses, farmers don't just tighten their belts — they plant fewer acres, purchase less seed and fertilizer, and reduce herd sizes. That reduction in planted acreage is itself the supply shock in formation.</p>
+
+<blockquote>"American agriculture is currently carrying a heavier debt load relative to its actual ability to service that debt than at almost any point since the mid-1980s farm crisis. That is the crisis your grandfather's neighbor talked about in hushed tones. Foreclosures, forced auctions, an entire generation of family operations wiped out overnight."</blockquote>
+
+<p>The video introduces a particularly underappreciated supply shock risk: the potential disruption of Canada's fertilizer supply. North American agriculture depends heavily on Canadian potash and nitrogen fertilizer. A lapsed trade treaty or trade war escalation could threaten access to inputs that American farmers need before a single seed goes in the ground. This is an example of a <strong>second-order supply shock</strong> — not a failure of the crop itself, but a failure of the inputs required to grow it. Traders who only watch weather reports miss this layer entirely. Input cost shocks can reduce planted acreage just as effectively as a drought, and they do so before the growing season even begins, making the eventual price spike harder to anticipate from traditional crop-monitoring signals.</p>
+
+<p>Traders and investors use commodity supply shock signals in several practical ways. <strong>Futures markets</strong> are the primary instrument — buying long-dated corn, wheat, or soybean futures when supply disruption signals accumulate is a classic positioning strategy. More sophisticated players watch <strong>farm working capital</strong> data (published quarterly by the USDA) as a leading indicator: when working capital deteriorates, reduced planted acreage follows in the next growing season, and reduced planted acreage means tighter eventual supply. <strong>Agricultural commodity ETFs</strong>, <strong>fertilizer company stocks</strong>, and even <strong>food manufacturer equities</strong> all move in response to these dynamics. A trader who sees the farm debt-to-asset ratio hitting 40-year highs and a fertilizer supply chain at risk has actionable intelligence well before a price move shows up on a grocery store shelf.</p>
+
+<p>The most common misconception about commodity supply shocks is conflating them with ordinary price volatility. Markets are always noisy. What distinguishes a true supply shock is its <strong>structural, multi-season character</strong> — it cannot be resolved in days or weeks. A temporary port disruption is noise. A collapse in farm working capital that causes a 10% reduction in planted corn acreage is a structural shift that takes 12 to 18 months to fully price in. A related misconception is assuming that high prices automatically and quickly resolve shocks by incentivizing more production. In agriculture, there is a hard biological ceiling: you cannot grow a new corn crop in three months regardless of how profitable it would be. Prices can remain elevated far longer than markets initially expect.</p>
+
+<p>Supply shocks can also <strong>fail to materialize</strong> in the ways analysts predict, and this is where the real risk lies for investors who position aggressively. Demand destruction can happen faster than expected — if beef prices rise enough, consumers switch to chicken or plant-based protein, reducing corn demand from feedlots. Government intervention (emergency import permits, strategic reserve releases, farm subsidy expansions) can artificially cushion shocks. And technological substitution can route around bottlenecks over a longer horizon. The investor who goes all-in on a commodity shock thesis must understand the timing problem: being right about the shock but wrong about the timing can be just as costly as being wrong entirely. Position sizing, options strategies, and watching for <strong>confirmation signals</strong> in inventory data are essential risk management tools.</p>
+
+<p>Commodity supply shocks connect directly to several other critical financial concepts. They are a primary driver of <strong>cost-push inflation</strong> — the type of inflation that originates in production costs rather than consumer demand, and the type that is hardest for central banks to control. They interact with <strong>currency dynamics</strong> because commodities are globally priced in U.S. dollars; a strong dollar can mask domestic price increases while amplifying shocks for importing nations. They connect to <strong>credit cycles</strong> — as the current farm debt crisis illustrates, financial stress in the producing sector is itself a supply shock trigger. And they link to <strong>geopolitical risk</strong>, since trade treaties, sanctions, and border policies directly control the flow of agricultural inputs and outputs. Understanding commodity supply shocks means understanding that food prices are not a grocery store problem — they are a financial system problem.</p>
+<div class="concept-side">Sources: THE 1987 FARM CRISIS IS BACK: The $624B Debt Bomb Under Your Food Supply!<br>Related in this category: <a href="gold_futures.html">Gold Futures</a>, <a href="hard_assets_inflation_hedge.html">Hard Assets as Inflation Hedges</a>, <a href="farm_debt_to_asset_ratio.html">Farm Debt-to-Asset Ratio</a>, <a href="farm_debt_service_ratio.html">Farm Debt Service Ratio</a>, <a href="agricultural_direct_payment_subsidies.html">Agricultural Direct Payment Subsidies</a>, <a href="net_farm_income.html">Net Farm Income</a></div>
+<button class="concept-done" data-slug="commodity_supply_shock" onclick="toggleDone('commodity_supply_shock')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_commodity_supply_shock';</script>
+<script src="../../book.js"></script>
+
+<script>
+(function() {
+  var DONE_KEY = 'fg_done', FILTER_KEY = 'fg_filter';
+  var done = JSON.parse(localStorage.getItem(DONE_KEY) || '{}');
+  var filter = localStorage.getItem(FILTER_KEY) || 'all';
+
+  function visible(flag) {
+    if (filter === 'star') return flag === 'star';
+    if (filter === 'nodeep') return flag !== 'deep';
+    return true;
+  }
+
+  function apply() {
+    var shown = 0, total = 0, hidden = 0;
+    document.querySelectorAll('.concept-row').forEach(function(r) {
+      var slug = r.dataset.slug, flag = r.dataset.flag;
+      total++;
+      if (done[slug]) r.classList.add('done'); else r.classList.remove('done');
+      if (visible(flag)) { r.classList.remove('fg-hidden'); shown++; }
+      else { r.classList.add('fg-hidden'); hidden++; }
+    });
+    document.querySelectorAll('.cat-card').forEach(function(card) {
+      var slugs = card.dataset.slugs ? card.dataset.slugs.split(',') : [];
+      var flags = card.dataset.flags ? card.dataset.flags.split(',') : [];
+      var vis = 0, allDone = slugs.length > 0;
+      slugs.forEach(function(sl, i) {
+        if (visible(flags[i])) vis++;
+        if (!done[sl]) allDone = false;
+      });
+      total += slugs.length; shown += vis;
+      var c = card.querySelector('.cat-count');
+      if (c) c.textContent = vis + (vis !== slugs.length ? ' of ' + slugs.length : '') + ' concepts' +
+        (card.dataset.stars ? ' \u00b7 ' + card.dataset.stars + ' \u2605' : '');
+      if (vis === 0) card.classList.add('fg-empty'); else card.classList.remove('fg-empty');
+      if (allDone) card.classList.add('done'); else card.classList.remove('done');
+    });
+    document.querySelectorAll('[data-filter]').forEach(function(b) {
+      b.classList.toggle('active', b.dataset.filter === filter);
+    });
+    var n = document.getElementById('fgCount');
+    if (n) n.textContent = shown + ' of ' + total + ' shown';
+    var h = document.getElementById('fgHiddenNote');
+    if (h) h.textContent = hidden ? hidden + ' hidden by the filter.' : '';
+    var btn = document.querySelector('.concept-done');
+    if (btn) {
+      var on = !!done[btn.dataset.slug];
+      btn.classList.toggle('on', on);
+      btn.textContent = on ? '\u2713 Completed' : '\u2713 Mark complete';
+    }
+  }
+
+  window.setFilter = function(f) {
+    filter = f; localStorage.setItem(FILTER_KEY, f); apply();
+  };
+  window.toggleDone = function(slug) {
+    if (done[slug]) delete done[slug]; else done[slug] = true;
+    localStorage.setItem(DONE_KEY, JSON.stringify(done));
+    apply();
+  };
+  window.toggleHideDone = function() {
+    document.body.classList.toggle('hide-done');
+  };
+  apply();
+})();
+</script>
+
+</body>
+</html>

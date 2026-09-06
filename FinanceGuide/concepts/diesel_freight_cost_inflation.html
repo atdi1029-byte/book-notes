@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Diesel Cost Pass-Through to Freight and Consumer Prices - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.tier .tier-desc { color: #a08060; font-size: 0.85rem; margin: 0.4rem 0 0.8rem; }
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../commodities-energy.html">&larr; Commodities &amp; Energy</a>
+
+<div class="concept-meta"><span>standard</span><span>Commodities &amp; Energy</span><span>added 2026-09-02</span></div>
+<h4 id="diesel_freight_cost_inflation">Diesel Cost Pass-Through to Freight and Consumer Prices</h4>
+
+<p><strong>Diesel cost pass-through</strong> is the mechanism by which rising diesel fuel prices ripple outward through the supply chain until they land, invisibly but inevitably, in the prices you pay at the grocery store, the hardware store, and everywhere else. Unlike gasoline, which powers personal vehicles, diesel is the fuel of commerce — it runs the long-haul trucks, freight trains, cargo ships, and farm equipment that move virtually every physical good in the American economy. When diesel prices rise, every business that relies on moving goods faces higher operating costs almost immediately. And because those businesses cannot absorb those costs indefinitely, they pass them downstream to the next buyer in the chain, until the final price increase lands on the consumer's receipt.</p>
+
+<p>The reason this matters so deeply is that diesel is not one input among many — it is the connective tissue of the physical economy. A clothing retailer does not burn diesel, but every garment it sells was transported by someone who does. A restaurant does not run diesel engines, but every vegetable, protein, and cooking oil it uses arrived on a diesel-powered truck. <strong>Freight costs</strong> are embedded invisibly inside almost every product price, which means diesel inflation is not a narrow energy story. It is a broad consumer price story. When analysts talk about <strong>cost-push inflation</strong> — the kind driven by rising input costs rather than excess demand — diesel is often the single most important transmission mechanism from an energy shock to the general price level.</p>
+
+<p>The mechanical sequence works like this. Crude oil prices rise — triggered by a supply disruption, a geopolitical event, or a drawdown in reserves. Diesel is refined from crude, so its price rises in tandem, typically within days. <strong>Trucking companies</strong>, which operate on notoriously thin margins (often 3–6% net), immediately face a cost increase they cannot absorb. Most trucking contracts include a <strong>fuel surcharge</strong> — a variable add-on tied to a published diesel index that automatically passes fuel cost increases to shippers. Shippers (manufacturers, distributors, retailers) then face higher landed costs on everything they move. Depending on their own margin structure and competitive pressure, they absorb some and pass the rest through to the next buyer. This chain repeats until the final price adjustment reaches the consumer, typically with a lag of four to twelve weeks.</p>
+
+<p>The video provides a concrete example of how quickly this process can be set in motion. A fresh round of military strikes near the <strong>Strait of Hormuz</strong> — the narrow maritime chokepoint through which roughly 20% of the world's petroleum passes — pushed crude oil above $85 a barrel over a single weekend. The national average gasoline price hit $4.08 per gallon heading into what the video described as potentially the most expensive Labor Day weekend on record. The key insight from a commodity trading perspective is the speed: crude reacted in hours, not weeks. At the rule of thumb the video cites — every $5 increase in a barrel of crude adds roughly 12 to 15 cents per gallon at the pump — that $85 crude level translates immediately into higher diesel input costs for every freight operator in the country.</p>
+
+<blockquote>"When you work on a commodity trading desk, you learn to ignore the political promises and focus entirely on the physical flow of barrels."</blockquote>
+
+<p>For traders and investors, diesel pass-through creates a reliable set of forward-looking signals. Rising diesel prices are a leading indicator of margin compression in any business with significant freight exposure — retailers, food manufacturers, auto parts distributors, building materials companies. Investors who track the <strong>Department of Energy's weekly retail diesel price index</strong> alongside corporate earnings guidance can often anticipate margin warnings before they are announced. On the long side, trucking companies with strong fuel surcharge mechanisms in their contracts become more resilient than those operating on fixed-rate agreements. <strong>Commodities traders</strong> also watch the <strong>crack spread</strong> — the difference between crude oil prices and refined product prices like diesel and gasoline — as a measure of refinery profitability and a forward signal for pump prices.</p>
+
+<p>The most important nuance to understand is the asymmetry in how pass-through works in different directions. When diesel prices rise sharply, trucking companies pass surcharges upstream almost immediately — their survival depends on it. But when diesel prices fall, those savings do not flow back to consumers at the same speed or in the same proportion. Retailers may keep prices elevated while rebuilding margins squeezed during the high-cost period. This asymmetry is one reason why post-energy-shock inflation tends to be <strong>sticky</strong>: the price increases propagate quickly on the way up, but retreat slowly and incompletely on the way down. It also explains why central banks often treat energy-driven inflation with skepticism — they know the pass-through is real, but also that it can reverse without any policy action.</p>
+
+<p>The mechanism can also fail or distort in several ways worth understanding. When fuel costs spike suddenly and severely, some trucking operators cannot pass surcharges fast enough and face <strong>insolvency</strong> — which paradoxically tightens trucking capacity and keeps freight costs elevated even after diesel prices stabilize. In highly competitive retail categories, retailers may absorb diesel-driven cost increases rather than lose market share, compressing margins instead of raising prices. This is more common for commodity-like products (store-brand groceries, basic apparel) than for branded goods. And in a deflationary demand environment — where consumers are already cutting back — businesses may have no ability to pass costs through at all, leaving the pain entirely within the supply chain rather than spreading it to consumer prices.</p>
+
+<p>The diesel pass-through story connects directly to two other concepts covered elsewhere in this guide. First, the <strong>Strategic Petroleum Reserve</strong> — the emergency crude buffer the video notes has been drained to its lowest level in over 40 years — represents the government's primary tool for dampening exactly this kind of pass-through during a supply shock. With reserves depleted, policymakers have less capacity to inject supply and suppress crude prices before they reach the diesel stage. Second, the <strong>Venezuela oil deal</strong> discussed in the video illustrates why political announcements about future supply rarely move pump prices in real time: Venezuelan fields currently produce far below capacity, infrastructure rehabilitation takes years, and geopolitical risk premiums — the kind generated by Strait of Hormuz strikes — reprice global crude in seconds, not in the months or years required to bring new production online. The physical reality of barrel flow always dominates the political narrative.</p>
+<div class="concept-side">Sources: THE GAS PRICE LIE: Why the Venezuela Oil Deal Won't Save You!; THE JOBS GUT PUNCH: Why Good News Sold Off Wall Street &amp; Crushed Tech!<br>Related in this category: <a href="gold_futures.html">Gold Futures</a>, <a href="hard_assets_inflation_hedge.html">Hard Assets as Inflation Hedges</a>, <a href="farm_debt_to_asset_ratio.html">Farm Debt-to-Asset Ratio</a>, <a href="farm_debt_service_ratio.html">Farm Debt Service Ratio</a>, <a href="agricultural_direct_payment_subsidies.html">Agricultural Direct Payment Subsidies</a>, <a href="net_farm_income.html">Net Farm Income</a></div>
+<button class="concept-done" data-slug="diesel_freight_cost_inflation" onclick="toggleDone('diesel_freight_cost_inflation')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_diesel_freight_cost_inflation';</script>
+<script src="../../book.js"></script>
+
+<script>
+(function() {
+  var DONE_KEY = 'fg_done', FILTER_KEY = 'fg_filter';
+  var done = JSON.parse(localStorage.getItem(DONE_KEY) || '{}');
+  var filter = localStorage.getItem(FILTER_KEY) || 'all';
+
+  function visible(flag) {
+    if (filter === 'star') return flag === 'star';
+    if (filter === 'nodeep') return flag !== 'deep';
+    return true;
+  }
+
+  function apply() {
+    var shown = 0, total = 0, hidden = 0;
+    document.querySelectorAll('.concept-row').forEach(function(r) {
+      var slug = r.dataset.slug, flag = r.dataset.flag;
+      total++;
+      if (done[slug]) r.classList.add('done'); else r.classList.remove('done');
+      if (visible(flag)) { r.classList.remove('fg-hidden'); shown++; }
+      else { r.classList.add('fg-hidden'); hidden++; }
+    });
+    document.querySelectorAll('.cat-card').forEach(function(card) {
+      var slugs = card.dataset.slugs ? card.dataset.slugs.split(',') : [];
+      var flags = card.dataset.flags ? card.dataset.flags.split(',') : [];
+      var vis = 0, allDone = slugs.length > 0;
+      slugs.forEach(function(sl, i) {
+        if (visible(flags[i])) vis++;
+        if (!done[sl]) allDone = false;
+      });
+      total += slugs.length; shown += vis;
+      var c = card.querySelector('.cat-count');
+      if (c) c.textContent = vis + (vis !== slugs.length ? ' of ' + slugs.length : '') + ' concepts' +
+        (card.dataset.stars ? ' \u00b7 ' + card.dataset.stars + ' \u2605' : '');
+      if (vis === 0) card.classList.add('fg-empty'); else card.classList.remove('fg-empty');
+      if (allDone) card.classList.add('done'); else card.classList.remove('done');
+    });
+    document.querySelectorAll('[data-filter]').forEach(function(b) {
+      b.classList.toggle('active', b.dataset.filter === filter);
+    });
+    var n = document.getElementById('fgCount');
+    if (n) n.textContent = shown + ' of ' + total + ' shown';
+    var h = document.getElementById('fgHiddenNote');
+    if (h) h.textContent = hidden ? hidden + ' hidden by the filter.' : '';
+    var btn = document.querySelector('.concept-done');
+    if (btn) {
+      var on = !!done[btn.dataset.slug];
+      btn.classList.toggle('on', on);
+      btn.textContent = on ? '\u2713 Completed' : '\u2713 Mark complete';
+    }
+  }
+
+  window.setFilter = function(f) {
+    filter = f; localStorage.setItem(FILTER_KEY, f); apply();
+  };
+  window.toggleDone = function(slug) {
+    if (done[slug]) delete done[slug]; else done[slug] = true;
+    localStorage.setItem(DONE_KEY, JSON.stringify(done));
+    apply();
+  };
+  window.toggleHideDone = function() {
+    document.body.classList.toggle('hide-done');
+  };
+  apply();
+})();
+</script>
+
+</body>
+</html>

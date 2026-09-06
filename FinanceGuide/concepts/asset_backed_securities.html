@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Asset-Backed Securities (ABS) - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.tier .tier-desc { color: #a08060; font-size: 0.85rem; margin: 0.4rem 0 0.8rem; }
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../fixed-income-bonds.html">&larr; Fixed Income &amp; Bonds</a>
+
+<div class="concept-meta"><span>standard</span><span>Fixed Income &amp; Bonds</span><span>added 2026-09-06</span></div>
+<h4 id="asset_backed_securities">Asset-Backed Securities (ABS)</h4>
+
+<p>An <strong>asset-backed security (ABS)</strong> is a financial instrument created by pooling together a large collection of loans or other income-generating assets, then selling slices of that pool to investors as tradeable bonds. The key word is "backed" — unlike a corporate bond where you're trusting a company's future earnings, or a Treasury where you're trusting a government's taxing power, an ABS is backed by something more concrete: a specific bundle of contractual cash flows. Car loans, credit card receivables, student loans, equipment leases — anything where someone owes regular payments can theoretically become an ABS. The investor's return comes not from a single borrower's promise, but from thousands of them simultaneously.</p>
+
+<p>ABS matters because it is one of the primary mechanisms through which credit flows from Wall Street to Main Street at scale. When a bank makes 10,000 auto loans, it eventually runs out of capital to make more. By packaging those loans into an ABS and selling them to investors, the bank gets its money back immediately and can turn around and make 10,000 more loans. This process — called <strong>securitization</strong> — dramatically expands the total amount of credit available in the economy. It also shifts risk from banks to capital markets, which is both its great strength and, as 2008 demonstrated, its potential catastrophe. Without securitization, most Americans would find consumer credit significantly more expensive and harder to access.</p>
+
+<p>The mechanical process works in several distinct steps. First, an originator — a bank, auto lender, or credit card company — accumulates a large pool of loans. Second, those loans are sold to a <strong>special purpose vehicle (SPV)</strong>, a legally separate entity created purely to hold these assets, insulating them from the originator's bankruptcy risk. Third, the SPV issues bonds backed by the cash flows from the loan pool. Fourth, those bonds are divided into <strong>tranches</strong> — slices with different priority claims on the cash flows. Senior tranches get paid first and carry the least risk; junior or <strong>equity tranches</strong> absorb losses first and offer higher potential returns. A rating agency then evaluates each tranche separately. Finally, investors buy whichever tranche fits their risk appetite.</p>
+
+<p>The tranche structure is the most important mechanical detail to internalize. Imagine a pool of 1,000 auto loans generating $1 million per month. The senior tranche might have first claim on $800,000 — so even if 20% of borrowers default, senior investors still get paid in full. The mezzanine tranche takes the next $150,000, and the equity slice gets whatever remains. Rating agencies model expected default rates and assign AAA to the senior tranche because the buffer of subordinate tranches below it is enormous. This is why ABS allows genuinely risky underlying loans — subprime auto borrowers, for instance — to produce AAA-rated paper. The mathematics of diversification and subordination manufacture safety, at least in theory.</p>
+
+<p>In the context of the Norway video, ABS appears alongside <strong>mortgage-backed securities (MBS)</strong> and corporate credit as part of Norges Bank Investment Management's proposal to shift their fixed income benchmark away from sovereign bonds and into what the document calls "spread products." When Norway reduces its government bond allocation from 70% to 50%, that freed-up capital has to go somewhere. The buried detail the video emphasizes — the one that got no headlines — is that Norway intends to move down the credit quality ladder within the US dollar universe rather than leaving the dollar entirely. Buying US auto loan ABS or credit card ABS keeps their dollar exposure intact while earning a <strong>credit spread</strong>, the additional yield over Treasuries that compensates for taking on private credit risk.</p>
+
+<p>Traders and institutional investors use ABS primarily for yield pickup and portfolio diversification. Because ABS tranches carry credit risk that Treasuries do not, they offer higher interest rates — that spread is the whole point. A portfolio manager at a pension fund or sovereign wealth fund who needs to earn 5% annually but can only get 4.3% from Treasuries will look to ABS to close the gap. They analyze <strong>prepayment risk</strong> (borrowers paying off loans early, returning capital when reinvestment rates may be lower), <strong>default risk</strong> (borrowers stopping payments entirely), and <strong>extension risk</strong> (loans lasting longer than modeled). The spread an ABS offers relative to comparable Treasuries — its <strong>option-adjusted spread</strong> — is the primary signal of how much compensation the market demands for these risks at any moment.</p>
+
+<p>The most dangerous misconception about ABS is that diversification alone creates safety. The 2008 financial crisis exposed this flaw brutally. Mortgage-backed ABS were structured assuming that housing prices across different US regions were largely uncorrelated — that Tampa defaults wouldn't predict Las Vegas defaults. When the entire US housing market fell simultaneously, the correlation assumptions that underpinned AAA ratings collapsed. Every tranche suffered, including senior ones. The second misconception is opacity confusion with complexity: ABS are complex instruments, but that complexity doesn't mean they're inherently opaque. Modern ABS typically come with detailed loan-level data that sophisticated investors can model themselves — though most buyers historically trusted ratings agencies instead of doing their own analysis, which proved to be a catastrophic shortcut.</p>
+
+<p>When ABS markets break, they break fast and the damage radiates outward through credit channels into the real economy. The mechanism is straightforward: if ABS spreads blow out — meaning investors demand much higher yields to compensate for perceived risk — originators find it expensive or impossible to securitize new loans. With no way to offload loans onto capital markets, banks stop making new ones. Auto lending tightens. Credit card limits shrink. Student loan availability contracts. This is exactly what happened in 2008–2009 when the ABS market essentially froze, contributing directly to the sharp contraction in consumer credit that deepened the recession. Norway moving capital toward ABS is therefore a signal that sophisticated institutional money currently views these markets as reasonably stable — they are climbing the risk ladder deliberately, not desperately.</p>
+
+<p>ABS connects directly to its cousin concept, <strong>mortgage-backed securities (MBS)</strong>, which are simply ABS where the underlying assets are home loans rather than auto loans or credit card debt. Both are products of securitization. Both use tranches and SPVs. The distinction matters because MBS carry real estate-specific risks — property value fluctuation, geographic concentration, prepayment behavior tied to interest rate cycles — while a diversified auto loan ABS is somewhat insulated from housing market dynamics. When Norway's proposal bundles MBS and ABS together as "spread products" that would replace sovereign bonds, it's acknowledging that both sit on a similar rung of the risk ladder: higher yield than Treasuries, backed by real economic activity rather than government taxing authority, and subject to credit cycle risk that pure government bonds theoretically don't carry. Understanding this ladder — from risk-free Treasuries at the bottom up through investment-grade ABS, high-yield corporate bonds, and eventually equity — is the foundation of all fixed income investing.</p>
+<div class="concept-side">Sources: THE RISK-FREE TRAP: Norway Cuts US Treasuries to Lend to American Homeowners!<br>Related in this category: <a href="two_year_treasury_yield.html">Two-Year Treasury Yield</a>, <a href="treasury_bond_buyback_program.html">Treasury Bond Buyback Program</a>, <a href="thirty_year_treasury_bond.html">30-Year Treasury Bond</a>, <a href="debt_rollover_risk.html">Debt Rollover Risk</a>, <a href="corporate_refinancing_cliff.html">Corporate Refinancing Cliff</a>, <a href="duration_risk.html">Duration Risk</a></div>
+<button class="concept-done" data-slug="asset_backed_securities" onclick="toggleDone('asset_backed_securities')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_asset_backed_securities';</script>
+<script src="../../book.js"></script>
+
+<script>
+(function() {
+  var DONE_KEY = 'fg_done', FILTER_KEY = 'fg_filter';
+  var done = JSON.parse(localStorage.getItem(DONE_KEY) || '{}');
+  var filter = localStorage.getItem(FILTER_KEY) || 'all';
+
+  function visible(flag) {
+    if (filter === 'star') return flag === 'star';
+    if (filter === 'nodeep') return flag !== 'deep';
+    return true;
+  }
+
+  function apply() {
+    var shown = 0, total = 0, hidden = 0;
+    document.querySelectorAll('.concept-row').forEach(function(r) {
+      var slug = r.dataset.slug, flag = r.dataset.flag;
+      total++;
+      if (done[slug]) r.classList.add('done'); else r.classList.remove('done');
+      if (visible(flag)) { r.classList.remove('fg-hidden'); shown++; }
+      else { r.classList.add('fg-hidden'); hidden++; }
+    });
+    document.querySelectorAll('.cat-card').forEach(function(card) {
+      var slugs = card.dataset.slugs ? card.dataset.slugs.split(',') : [];
+      var flags = card.dataset.flags ? card.dataset.flags.split(',') : [];
+      var vis = 0, allDone = slugs.length > 0;
+      slugs.forEach(function(sl, i) {
+        if (visible(flags[i])) vis++;
+        if (!done[sl]) allDone = false;
+      });
+      total += slugs.length; shown += vis;
+      var c = card.querySelector('.cat-count');
+      if (c) c.textContent = vis + (vis !== slugs.length ? ' of ' + slugs.length : '') + ' concepts' +
+        (card.dataset.stars ? ' \u00b7 ' + card.dataset.stars + ' \u2605' : '');
+      if (vis === 0) card.classList.add('fg-empty'); else card.classList.remove('fg-empty');
+      if (allDone) card.classList.add('done'); else card.classList.remove('done');
+    });
+    document.querySelectorAll('[data-filter]').forEach(function(b) {
+      b.classList.toggle('active', b.dataset.filter === filter);
+    });
+    var n = document.getElementById('fgCount');
+    if (n) n.textContent = shown + ' of ' + total + ' shown';
+    var h = document.getElementById('fgHiddenNote');
+    if (h) h.textContent = hidden ? hidden + ' hidden by the filter.' : '';
+    var btn = document.querySelector('.concept-done');
+    if (btn) {
+      var on = !!done[btn.dataset.slug];
+      btn.classList.toggle('on', on);
+      btn.textContent = on ? '\u2713 Completed' : '\u2713 Mark complete';
+    }
+  }
+
+  window.setFilter = function(f) {
+    filter = f; localStorage.setItem(FILTER_KEY, f); apply();
+  };
+  window.toggleDone = function(slug) {
+    if (done[slug]) delete done[slug]; else done[slug] = true;
+    localStorage.setItem(DONE_KEY, JSON.stringify(done));
+    apply();
+  };
+  window.toggleHideDone = function() {
+    document.body.classList.toggle('hide-done');
+  };
+  apply();
+})();
+</script>
+
+</body>
+</html>

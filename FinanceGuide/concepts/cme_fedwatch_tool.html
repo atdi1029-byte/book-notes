@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>CME FedWatch Tool - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.tier .tier-desc { color: #a08060; font-size: 0.85rem; margin: 0.4rem 0 0.8rem; }
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../monetary-policy-central-banking.html">&larr; Monetary Policy &amp; Central Banking</a>
+
+<div class="concept-meta"><span>standard</span><span>Monetary Policy &amp; Central Banking</span><span>added 2026-08-31</span></div>
+<h4 id="cme_fedwatch_tool">CME FedWatch Tool</h4>
+
+<p>The <strong>CME FedWatch Tool</strong> is a free, publicly accessible probability calculator published by the <strong>CME Group</strong> — the company that operates the Chicago Mercantile Exchange — that shows the market's real-time estimate of what the Federal Reserve will do with interest rates at each upcoming policy meeting. It doesn't poll economists or survey fund managers. It reads the prices of a specific derivative instrument called a <strong>federal funds futures contract</strong> and translates those prices into percentage probabilities. When the tool shows a 65% chance of a rate cut, it means traders are collectively pricing that outcome as more likely than not — and they are putting actual money behind that bet. This is market intelligence in its purest form: not what anyone says, but what they're willing to risk capital on.</p>
+
+<p>The reason FedWatch matters so deeply to everyday investors is that the federal funds rate is the single most influential price in the entire global financial system. When the Fed raises that rate, borrowing becomes more expensive for banks, which flows through to mortgages, car loans, credit cards, and corporate debt. Stock valuations compress because future earnings get discounted at a higher rate. When the Fed cuts, the opposite pressure applies — cheap money lifts asset prices, encourages risk-taking, and generally inflates the economy. FedWatch tells you where the market thinks that lever is headed. If you own a 401(k), are waiting to refinance, or hold any bonds, this tool is reading the map of forces that directly determine your financial outcomes.</p>
+
+<p>The mechanical engine behind FedWatch is the <strong>federal funds futures market</strong>. These contracts, traded on the CME, settle at the average effective federal funds rate for a given calendar month. Because their price reflects what traders expect that average to be, you can work backward from the price to extract an implied rate expectation. For example, if a contract for December is priced to imply a rate of 4.75%, and the current rate is 5.25%, the market is pricing in a 50-basis-point cut before year-end. CME's tool automates this math, distributes it across every upcoming <strong>FOMC meeting</strong> date, and presents the output as clean percentage probabilities for each possible rate outcome — hold, cut 25bps, cut 50bps, hike 25bps, and so on.</p>
+
+<p>The crucial thing to understand about this mechanism is that it is continuous and self-correcting. Every trade in the futures market updates the implied probability in real time. When new information arrives — a hot inflation print, a Fed official's speech, a geopolitical shock — traders immediately reprice their contracts, and FedWatch updates within seconds. This is how markets "price in" news. The probability shift isn't a poll result published the next day; it's the aggregate reaction of thousands of professional traders adjusting positions as events unfold. That speed and simultaneity is what makes FedWatch a genuinely useful signal rather than a lagging indicator.</p>
+
+<p>The real-world example from the video is almost textbook-perfect. When <strong>Kevin Warsh</strong> — the newly appointed Fed Chair — stepped to the podium at the <strong>Jackson Hole Economic Symposium</strong> and delivered remarks that challenged the prevailing consensus that inflation was conquered, FedWatch odds shifted immediately and dramatically. Before his remarks, the probability of a September rate hike sat somewhere around 30–35% — a minority view that most traders weren't positioning for. Within minutes of Warsh stating that he would be "hard pressed to describe broad financial conditions as restrictive," those odds crossed above 50%. That single sentence, parsed by bond desks in real time, was enough to flip the modal expectation from "hold" to "hike." That is FedWatch doing exactly what it's designed to do.</p>
+
+<p>Professional traders use FedWatch in several interconnected ways. The most basic is <strong>positioning ahead of FOMC meetings</strong>: if FedWatch shows a 70% probability of a cut and a trader believes the true probability is only 40%, they can trade against the consensus by buying rate-sensitive instruments that benefit if the cut doesn't materialize. Traders also watch the <em>change</em> in probabilities as a signal — a rapid shift from 30% to 60% on a hike tells you a regime change in market thinking is underway. Fixed-income desks use it to hedge duration risk. Equity traders use it to anticipate rotations between sectors that benefit from loose versus tight money. Even retail investors can use it as a sentiment gauge: when the tool shows extreme certainty in one direction, history suggests that's often when surprises happen.</p>
+
+<p>The most important misconception about FedWatch is conflating market probability with actual probability. A 60% reading doesn't mean the Fed <em>will</em> hike — it means current pricing implies 60% odds, which in turn reflects current information and sentiment. The futures market has been spectacularly wrong before. In early 2022, FedWatch was pricing in modest, gradual rate increases; the Fed ultimately delivered the fastest hiking cycle in 40 years. Markets are also subject to <strong>herding behavior</strong>: if most large funds are positioned the same way, the tool can show high confidence in an outcome that a single data release can completely invert. FedWatch reflects the consensus view, and consensus views carry all the risks of groupthink. Warsh's Jackson Hole speech was valuable precisely because it broke a consensus the tool had been reinforcing all summer.</p>
+
+<p>FedWatch can also produce misleading readings in illiquid or technically distorted conditions. Near contract expiration, thin trading can cause the implied probabilities to look more extreme than they actually are. During market stress events — a sudden banking crisis, a geopolitical shock — the futures market can gap dramatically as large players rush to hedge, making the probabilities look more certain than the underlying situation warrants. This connects to a broader concept: FedWatch is a measure of <strong>market positioning</strong>, not a measure of what the Fed will actually do. The Fed retains full discretion. In periods of extreme uncertainty, the tool can swing from 30% to 70% and back within a single week, which is less a signal about Fed policy and more a signal about how uncertain and reactive market participants are. Used well, FedWatch is one of the most powerful free tools available to any investor. Used naively — as a prediction rather than a sentiment indicator — it can give false confidence right before a major surprise.</p>
+<div class="concept-side">Sources: KEVIN WARSH DROPS THE HAMMER: Why a Fed Rate Hike Is Back on the Table!; THE JOBS GUT PUNCH: Why Good News Sold Off Wall Street &amp; Crushed Tech!<br>Related in this category: <a href="pce_inflation_basket.html">PCE Inflation Basket</a>, <a href="jackson_hole_symposium.html">Jackson Hole Symposium</a>, <a href="hawkish_dovish_fed_signaling.html">Hawkish vs. Dovish Fed Signaling</a>, <a href="debt_servicing_cost.html">Debt Servicing Cost</a>, <a href="fiscal_monetary_policy_conflict.html">Fiscal-Monetary Policy Conflict</a>, <a href="central_bank_credibility.html">Central Bank Credibility</a></div>
+<button class="concept-done" data-slug="cme_fedwatch_tool" onclick="toggleDone('cme_fedwatch_tool')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_cme_fedwatch_tool';</script>
+<script src="../../book.js"></script>
+
+<script>
+(function() {
+  var DONE_KEY = 'fg_done', FILTER_KEY = 'fg_filter';
+  var done = JSON.parse(localStorage.getItem(DONE_KEY) || '{}');
+  var filter = localStorage.getItem(FILTER_KEY) || 'all';
+
+  function visible(flag) {
+    if (filter === 'star') return flag === 'star';
+    if (filter === 'nodeep') return flag !== 'deep';
+    return true;
+  }
+
+  function apply() {
+    var shown = 0, total = 0, hidden = 0;
+    document.querySelectorAll('.concept-row').forEach(function(r) {
+      var slug = r.dataset.slug, flag = r.dataset.flag;
+      total++;
+      if (done[slug]) r.classList.add('done'); else r.classList.remove('done');
+      if (visible(flag)) { r.classList.remove('fg-hidden'); shown++; }
+      else { r.classList.add('fg-hidden'); hidden++; }
+    });
+    document.querySelectorAll('.cat-card').forEach(function(card) {
+      var slugs = card.dataset.slugs ? card.dataset.slugs.split(',') : [];
+      var flags = card.dataset.flags ? card.dataset.flags.split(',') : [];
+      var vis = 0, allDone = slugs.length > 0;
+      slugs.forEach(function(sl, i) {
+        if (visible(flags[i])) vis++;
+        if (!done[sl]) allDone = false;
+      });
+      total += slugs.length; shown += vis;
+      var c = card.querySelector('.cat-count');
+      if (c) c.textContent = vis + (vis !== slugs.length ? ' of ' + slugs.length : '') + ' concepts' +
+        (card.dataset.stars ? ' \u00b7 ' + card.dataset.stars + ' \u2605' : '');
+      if (vis === 0) card.classList.add('fg-empty'); else card.classList.remove('fg-empty');
+      if (allDone) card.classList.add('done'); else card.classList.remove('done');
+    });
+    document.querySelectorAll('[data-filter]').forEach(function(b) {
+      b.classList.toggle('active', b.dataset.filter === filter);
+    });
+    var n = document.getElementById('fgCount');
+    if (n) n.textContent = shown + ' of ' + total + ' shown';
+    var h = document.getElementById('fgHiddenNote');
+    if (h) h.textContent = hidden ? hidden + ' hidden by the filter.' : '';
+    var btn = document.querySelector('.concept-done');
+    if (btn) {
+      var on = !!done[btn.dataset.slug];
+      btn.classList.toggle('on', on);
+      btn.textContent = on ? '\u2713 Completed' : '\u2713 Mark complete';
+    }
+  }
+
+  window.setFilter = function(f) {
+    filter = f; localStorage.setItem(FILTER_KEY, f); apply();
+  };
+  window.toggleDone = function(slug) {
+    if (done[slug]) delete done[slug]; else done[slug] = true;
+    localStorage.setItem(DONE_KEY, JSON.stringify(done));
+    apply();
+  };
+  window.toggleHideDone = function() {
+    document.body.classList.toggle('hide-done');
+  };
+  apply();
+})();
+</script>
+
+</body>
+</html>

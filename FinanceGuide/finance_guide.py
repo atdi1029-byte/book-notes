@@ -37,6 +37,132 @@ BOOKS_DIR = BASE_DIR.parent
 TRANSCRIPTS_DIR.mkdir(exist_ok=True)
 
 
+# === OUTLINE: borrowed from the Master Investment Reading List ===
+# The guide files every concept into one of these categories and lays the
+# pages out tier -> category -> concept.  Snapshot of the list as of
+# Sept 2026; update by hand if the list's outline changes.  The list itself
+# is never modified by this bot.
+OUTLINE = [
+    {"tier": 1, "name": "Tier 1 \u2014 Foundations",
+     "desc": "Build the base. Learn how money, economies, and markets actually work.",
+     "cats": [
+        {"slug": "personal-finance-basics", "name": "Personal Finance Basics",
+         "stars": ["I Will Teach You To Be Rich — Ramit Sethi", "The Simple Path To Wealth — JL Collins", "The Total Money Makeover — Dave Ramsey", "Your Money or Your Life — Vicki Robin", "The Millionaire Next Door — Thomas Stanley", "The Millionaire Mind — Thomas Stanley"]},
+        {"slug": "economics-fundamentals", "name": "Economics Fundamentals",
+         "stars": ["Basic Economics, Vol 1 & 2 — Thomas Sowell", "Economics in One Lesson — Henry Hazlitt", "The 6 Lessons — Ludwig von Mises", "Talking to My Daughter About the Economy — Yanis Varoufakis", "The Wealth of Nations — Adam Smith", "Naked Economics — Charles Wheelan"]},
+        {"slug": "investing-fundamentals", "name": "Investing Fundamentals",
+         "stars": ["Winning the Loser's Game — Charles D. Ellis", "A Random Walk Down Wall Street — Burton Malkiel", "The Four Pillars of Investing — William Bernstein", "The Little Book of Common Sense Investing — John Bogle", "Common Sense on Mutual Funds — John Bogle", "Just Keep Buying — Nick Maggiulli"]},
+        {"slug": "free-markets-political-economy", "name": "Free Markets & Political Economy",
+         "stars": ["Free To Choose — Milton Friedman", "Capitalism And Freedom — Milton Friedman", "The Road To Serfdom — F.A. Hayek", "Capital in the Twenty-First Century — Thomas Piketty"]},
+     ]},
+    {"tier": 2, "name": "Tier 2 \u2014 Core Knowledge",
+     "desc": "Understand how money is created, why markets crash, and why humans are terrible with money.",
+     "cats": [
+        {"slug": "monetary-policy-central-banking", "name": "Monetary Policy & Central Banking",
+         "stars": ["The Price of Time: The Real Story of Interest — Edward Chancellor", "A History of Interest Rates — Sidney Homer & Richard Sylla", "The Creature From Jekyll Island — G. Edward Griffin", "When Money Dies — Adam Fergusson", "A Monetary History of the United States, 1867-1960 — Friedman & Schwartz"]},
+        {"slug": "economic-history-financial-crises", "name": "Economic History & Financial Crises",
+         "stars": ["Big Debt Crises — Ray Dalio", "Against the Gods: The Remarkable Story of Risk — Peter Bernstein", "Manias, Panics, and Crashes — Charles Kindleberger", "This Time Is Different: Eight Centuries of Financial Folly — Reinhart & Rogoff", "The Lessons of History — Will & Ariel Durant", "Extraordinary Popular Delusions And The Madness Of Crowds — Charles Mackay", "Debt: The First 5,000 Years — David Graeber", "Alexander Hamilton — Ron Chernow"]},
+        {"slug": "behavioral-finance-psychology", "name": "Behavioral Finance & Psychology",
+         "stars": ["Thinking, Fast and Slow — Daniel Kahneman", "The Psychology of Money — Morgan Housel", "Fooled By Randomness — Nassim Taleb", "The Black Swan — Nassim Taleb", "Antifragile — Nassim Taleb", "Misbehaving — Richard Thaler"]},
+        {"slug": "portfolio-management-asset-allocation", "name": "Portfolio Management & Asset Allocation",
+         "stars": ["The Most Important Thing — Howard Marks", "Pioneering Portfolio Management — David Swensen", "Expected Returns — Antti Ilmanen", "Portfolio Selection: Efficient Diversification of Investments — Harry Markowitz"]},
+        {"slug": "accounting-financial-statements", "name": "Accounting & Financial Statements",
+         "stars": ["The Interpretation of Financial Statements — Benjamin Graham", "Financial Statements: A Step-by-Step Guide — Thomas Ittelson"]},
+     ]},
+    {"tier": 3, "name": "Tier 3 \u2014 Asset Classes",
+     "desc": "Deep dives into each major asset class \u2014 stocks, bonds, real estate, commodities, currencies, and derivatives.",
+     "cats": [
+        {"slug": "value-investing-equities", "name": "Value Investing & Equities",
+         "stars": ["The Intelligent Investor — Benjamin Graham", "Security Analysis — Benjamin Graham & David Dodd", "The Essays of Warren Buffett — Buffett & Cunningham", "One Up on Wall Street — Peter Lynch", "Common Stocks and Uncommon Profits — Philip Fisher", "Common Stocks as Long Term Investments — Edgar Lawrence Smith", "Margin of Safety — Seth Klarman", "Stocks For The Long Run — Jeremy Siegel", "The Dhandho Investor — Mohnish Pabrai"]},
+        {"slug": "fixed-income-bonds", "name": "Fixed Income & Bonds",
+         "stars": ["The Handbook of Fixed Income Securities — Frank Fabozzi", "Bond Markets — Frank Fabozzi", "The Bond Book — Annette Thau"]},
+        {"slug": "real-estate", "name": "Real Estate",
+         "stars": ["What Every Real Estate Investor Needs to Know About Cash Flow — Frank Gallinelli"]},
+        {"slug": "commodities-energy", "name": "Commodities & Energy",
+         "stars": ["The Prize — Daniel Yergin", "The World for Sale — Javier Blas", "Hot Commodities — Jim Rogers"]},
+        {"slug": "forex-currencies", "name": "Forex & Currencies",
+         "stars": ["Trade Wars Are Class Wars — Matthew Klein", "Making Sense of the Dollar — Marc Chandler"]},
+        {"slug": "options-derivatives", "name": "Options & Derivatives",
+         "stars": ["Option Volatility and Pricing — Sheldon Natenberg", "Options As A Strategic Investment — Lawrence McMillan"]},
+        {"slug": "crypto-digital-money", "name": "Crypto & Digital Money",
+         "stars": []},
+     ]},
+    {"tier": 4, "name": "Tier 4 \u2014 Advanced Strategies",
+     "desc": "Active trading, cycles, quant methods, and global macro. For when you want to go deeper.",
+     "cats": [
+        {"slug": "trading-technical-analysis", "name": "Trading & Technical Analysis",
+         "stars": ["Winning on Wall Street — Martin Zweig", "Market Wizards — Jack Schwager", "Hedge Fund Market Wizards — Jack Schwager", "Reminiscences of a Stock Operator — Edwin Lefevre", "Come Into My Trading Room — Alexander Elder", "Trade Your Way To Financial Freedom — Van Tharp"]},
+        {"slug": "trading-psychology", "name": "Trading Psychology",
+         "stars": ["Trading Psychology 2.0 — Brett Steenbarger"]},
+        {"slug": "cycles-market-timing", "name": "Cycles & Market Timing",
+         "stars": ["Secular Cycles — Peter Turchin", "The Fourth Turning — Strauss & Howe", "Generations — Strauss & Howe", "Capital Wars: The Rise of Global Liquidity — Michael Howell", "Mastering the Market Cycle — Howard Marks"]},
+        {"slug": "quantitative-algorithmic-trading", "name": "Quantitative & Algorithmic Trading",
+         "stars": ["The Quants — Scott Patterson", "Flash Boys — Michael Lewis", "Fortune's Formula — William Poundstone", "The Signal and the Noise — Nate Silver"]},
+        {"slug": "risk-management-position-sizing", "name": "Risk Management & Position Sizing",
+         "stars": ["Safe Haven — Mark Spitznagel", "Super Trader — Van Tharp", "Definitive Guide To Position Sizing Strategies — Van Tharp"]},
+        {"slug": "macro-investing-geopolitics", "name": "Macro Investing & Geopolitics",
+         "stars": ["The Changing World Order — Ray Dalio", "Principles — Ray Dalio", "The Rise and Fall of Great Powers — Paul Kennedy", "Why Nations Fail — Acemoglu & Robinson", "The Accidental Superpower — Peter Zeihan"]},
+        {"slug": "economic-indicators", "name": "Economic Indicators",
+         "stars": ["The Trader's Guide to Key Economic Indicators — Richard Yamarone"]},
+     ]},
+    {"tier": 5, "name": "Tier 5 \u2014 Wisdom & Perspective",
+     "desc": "Wall Street war stories, big-picture thinking, and the mindset to keep going.",
+     "cats": [
+        {"slug": "wall-street-stories-biographies", "name": "Wall Street Stories & Biographies",
+         "stars": ["Liar's Poker — Michael Lewis", "Barbarians at the Gate — Burrough & Helyar", "More Money Than God — Sebastian Mallaby", "The Ascent of Money — Niall Ferguson", "Lords Of Finance — Liaquat Ahamed"]},
+        {"slug": "corporate-finance-investment-banking", "name": "Corporate Finance & Investment Banking",
+         "stars": ["Corporate Finance — Berk & DeMarzo", "Investment Banking — Rosenbaum & Pearl"]},
+        {"slug": "geopolitics-sociology-power", "name": "Geopolitics, Sociology & Power",
+         "stars": ["Guns, Germs, and Steel — Jared Diamond", "Sapiens — Yuval Noah Harari", "Bowling Alone — Robert Putnam", "The Great Leveler — Walter Scheidel"]},
+        {"slug": "self-development-mindset", "name": "Self-Development & Mindset",
+         "stars": ["Grit — Angela Duckworth", "Influence: The Psychology of Persuasion — Robert Cialdini", "Think and Grow Rich — Napoleon Hill", "Meditations — Marcus Aurelius"]},
+        {"slug": "training-nutrition", "name": "Training & Nutrition",
+         "stars": ["The Muscle & Strength Pyramid: Training — Eric Helms, Andy Morgan & Andrea Valdez"]},
+        {"slug": "courses", "name": "Courses",
+         "stars": []},
+     ]},
+]
+
+CATEGORIES = {c["name"]: dict(c, tier=t["tier"], tier_name=t["name"])
+              for t in OUTLINE for c in t["cats"]}
+CATEGORY_NAMES = list(CATEGORIES)
+FLAGS = ("star", "plain", "deep")   # must-know / standard / deep cut
+
+# Categories the bot may file concepts into (the rest are book-only shelves)
+FILEABLE = [n for n in CATEGORY_NAMES if n not in (
+    "Wall Street Stories & Biographies", "Self-Development & Mindset",
+    "Training & Nutrition", "Courses")]
+
+# Legacy category -> outline category, used only until backfill has run
+LEGACY_CATEGORY = {
+    "monetary_policy": "Monetary Policy & Central Banking",
+    "credit_bonds": "Fixed Income & Bonds",
+    "fiscal_policy": "Macro Investing & Geopolitics",
+    "macro": "Macro Investing & Geopolitics",
+    "labor_economics": "Economic Indicators",
+    "commodities": "Commodities & Energy",
+    "market_structure": "Portfolio Management & Asset Allocation",
+    "real_estate": "Real Estate",
+    "crypto": "Crypto & Digital Money",
+    "technicals": "Trading & Technical Analysis",
+    "derivatives": "Options & Derivatives",
+    "sentiment_flows": "Behavioral Finance & Psychology",
+}
+
+
+def concept_category(c):
+    """Outline category for a concept, tolerating legacy values."""
+    cat = c.get("category", "")
+    if cat in CATEGORIES:
+        return cat
+    return LEGACY_CATEGORY.get(cat, "Macro Investing & Geopolitics")
+
+
+def concept_flag(c):
+    f = c.get("flag", "plain")
+    return f if f in FLAGS else "plain"
+
+
 def log(msg):
     ts = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     line = f"[{ts}] {msg}"
@@ -80,6 +206,11 @@ def get_channel_videos(channel_url, limit=30):
         return []
 
 
+def _needs_processing(vid_id, processed):
+    entry = processed.get(vid_id)
+    return entry is None or entry.get("retry", False)
+
+
 def find_new_videos():
     """Check all channels, return videos not yet processed.
 
@@ -114,12 +245,13 @@ def find_new_videos():
             save_json(PROCESSED_FILE, processed)
             continue
 
+        picked = []
         for v in videos:
-            if v["id"] not in processed:
+            if _needs_processing(v["id"], processed):
                 v["channel"] = channel["name"]
-                new_videos.append(v)
-        log(f"  Found {len(videos)} total, "
-            f"{sum(1 for v in videos if v['id'] not in processed)} new")
+                picked.append(v)
+        new_videos.extend(picked)
+        log(f"  Found {len(videos)} total, {len(picked)} new/retry")
 
     return new_videos if MAX_VIDEOS_PER_RUN == 0 else new_videos[:MAX_VIDEOS_PER_RUN]
 
@@ -178,67 +310,405 @@ def download_transcript(video_id):
     return text
 
 
-# === STEP 3: Extract concepts via Claude CLI ===
-def extract_concepts(video_id, title, transcript, existing_concepts):
-    """Call Claude to read transcript and extract finance concepts."""
+# === Claude CLI helper ===
+CHUNK_CHARS = 25000        # max transcript chars per extraction call
+CHUNK_OVERLAP = 1500       # overlap between chunks so nothing is cut mid-idea
+EXCERPT_MAX = 15000        # chapter writer sees the whole transcript up to this
 
-    concept_list = "\n".join(
-        f"- {c['title']} ({c['category']})"
-        for c in existing_concepts.values()
-    )
 
-    # Truncate very long transcripts to avoid CLI timeout
-    trunc = transcript[:25000] if len(transcript) > 25000 else transcript
+def run_claude(prompt, timeout=300, model="sonnet"):
+    """Run `claude -p` and return stdout, or None on any failure.
 
-    prompt = f"""You are building a living finance education guide. Read this YouTube video transcript
-and extract every distinct finance/economics/market concept mentioned.
-
-VIDEO: "{title}"
-TRANSCRIPT:
-{trunc}
-
-ALREADY COVERED CONCEPTS (do NOT re-extract these — skip them):
-{concept_list if concept_list else "(none yet)"}
-
-For each NEW concept not in the list above, output a JSON array of objects:
-[
-  {{
-    "slug": "yield_curve_inversion",
-    "title": "Yield Curve Inversion",
-    "category": "macro|technicals|credit_bonds|derivatives|market_structure|sentiment_flows|fiscal_policy|monetary_policy|commodities|crypto|real_estate|labor_economics",
-    "summary": "One sentence explaining what this concept is",
-    "context": "How the video discussed it — what claim was made, what evidence given"
-  }}
-]
-
-Rules:
-- Extract CONCEPTS, not news events. "Fed raised rates" is news; "Federal Funds Rate" is a concept.
-- Be specific: "Credit Default Swaps" not just "derivatives"
-- If the video mentions a concept already covered, SKIP IT entirely
-- If no new concepts, return an empty array: []
-- Output ONLY the JSON array, nothing else
-"""
-
+    The CLI exits 0 and prints "API Error: ..." on network failures,
+    so a return-code check alone is not enough.
+    """
     try:
         result = subprocess.run(
-            ["claude", "-p", prompt, "--model", "sonnet"],
-            capture_output=True, text=True, timeout=300
+            ["claude", "-p", prompt, "--model", model],
+            capture_output=True, text=True, timeout=timeout
         )
-        output = result.stdout.strip()
-
-        # Extract JSON from output
-        match = re.search(r"\[.*\]", output, re.DOTALL)
-        if match:
-            return json.loads(match.group())
-        return []
     except Exception as e:
-        log(f"  ERROR extracting concepts: {e}")
-        return []
+        log(f"  ERROR running claude: {e}")
+        return None
+    out = (result.stdout or "").strip()
+    if result.returncode != 0:
+        log(f"  ERROR claude exit {result.returncode}: "
+            f"{(result.stderr or out)[:200]}")
+        return None
+    if not out or re.match(r"^(API Error|Error:)", out):
+        log(f"  ERROR claude returned: {out[:200]}")
+        return None
+    return out
+
+
+def clean_chapter_html(text, slug=None):
+    """Strip markdown fences / preamble; require a real chapter.
+
+    Returns cleaned HTML or None if the output is not a usable chapter.
+    """
+    if not text:
+        return None
+    t = text.strip()
+    # Drop ```html ... ``` fences (with or without the language tag)
+    t = re.sub(r"^```[a-zA-Z]*\s*\n?", "", t)
+    t = re.sub(r"\n?```\s*$", "", t)
+    t = t.strip()
+    # Drop anything before the first <h4 (chatty preamble)
+    idx = t.find("<h4")
+    if idx == -1:
+        return None
+    t = t[idx:]
+    # Sanity: must contain real paragraphs
+    if t.count("<p") < 3:
+        return None
+    if slug and f'id="{slug}"' not in t:
+        t = re.sub(r'<h4[^>]*>', f'<h4 id="{slug}">', t, count=1)
+    return t
+
+
+def relevant_excerpt(transcript, concept, max_chars=EXCERPT_MAX,
+                     window=3000, top_n=3):
+    """Give the chapter writer the part of the transcript that actually
+    discusses the concept, not just the intro.
+
+    Short transcripts are returned whole. Long ones are split into windows,
+    scored by keyword hits from the concept title/summary, and the best
+    windows are joined in order.
+    """
+    if len(transcript) <= max_chars:
+        return transcript
+
+    stop = {"the", "and", "of", "in", "vs", "as", "a", "an", "to", "on",
+            "for", "or", "with", "from", "by", "at", "rate", "market"}
+    words = re.findall(r"[a-zA-Z][a-zA-Z\-]{3,}",
+                       f"{concept.get('title','')} {concept.get('summary','')}")
+    keys = {w.lower() for w in words if w.lower() not in stop}
+    if not keys:
+        return transcript[:max_chars]
+
+    low = transcript.lower()
+    step = window // 2
+    scored = []
+    for start in range(0, len(low), step):
+        seg = low[start:start + window]
+        score = sum(seg.count(k) for k in keys)
+        scored.append((score, start))
+    best = sorted(scored, reverse=True)[:top_n]
+
+    # Merge overlapping windows into ranges, in transcript order
+    ranges = []
+    for s in sorted(s for _, s in best):
+        e = min(s + window, len(transcript))
+        if ranges and s <= ranges[-1][1]:
+            ranges[-1][1] = max(ranges[-1][1], e)
+        else:
+            ranges.append([s, e])
+    out = "\n[...]\n".join(transcript[s:e] for s, e in ranges)
+    return out[:max_chars]
+
+
+# === DEDUP: keep the book from re-covering old concepts ===
+# Fuzzy title matching is a RETRIEVAL step (it picks what the judge sees),
+# not a decision step: finance titles share too many domain words for it to
+# be trusted ("Farm Debt-to-Asset Ratio" vs "Farm Debt Service Ratio").
+# It only auto-merges near-exact rewordings; the LLM judge decides the rest.
+FUZZY_DUP_RATIO = 0.95     # difflib ratio on normalized titles → auto-merge
+FUZZY_DUP_JACCARD = 1.01   # disabled as an auto-merge trigger
+JUDGE_CANDIDATES = 10      # closest existing concepts shown with summaries
+JUDGE_MODEL = "haiku"
+
+_STOP = {"the", "and", "of", "in", "vs", "as", "a", "an", "to", "on", "for",
+         "or", "with", "from", "by", "at", "into", "its", "their", "concept",
+         "mechanism", "dynamics", "risk", "effect", "effects"}
+
+
+def _norm_tokens(title):
+    """Lowercase, drop punctuation/stopwords, crude stem.  Parenthetical
+    text is kept so acronyms match either way: "CPI (Consumer Price Index)"
+    and "Consumer Price Index (CPI)" produce the same tokens."""
+    t = re.sub(r"[^a-z0-9 ]+", " ", title.lower())
+    toks = []
+    for w in t.split():
+        if w in _STOP or len(w) < 3:
+            continue
+        for suf in ("ization", "isation", "ations", "ation", "ings", "ing",
+                    "ies", "ers", "er", "es", "s"):
+            if w.endswith(suf) and len(w) - len(suf) >= 4:
+                w = w[: -len(suf)]
+                break
+        toks.append(w)
+    return toks
+
+
+def _similarity(a, b):
+    """Return (ratio, jaccard) between two titles."""
+    import difflib
+    ta, tb = _norm_tokens(a), _norm_tokens(b)
+    if not ta or not tb:
+        return 0.0, 0.0
+    ratio = difflib.SequenceMatcher(None, " ".join(ta), " ".join(tb)).ratio()
+    sa, sb = set(ta), set(tb)
+    jacc = len(sa & sb) / len(sa | sb)
+    return ratio, jacc
+
+
+def closest_concepts(title, concepts, n=JUDGE_CANDIDATES):
+    """Rank existing concepts by similarity to a candidate title.
+    Compares against each concept's title AND its aliases."""
+    scored = []
+    for slug, c in concepts.items():
+        names = [c.get("title", "")] + c.get("aliases", [])
+        best = max(_similarity(title, nm) for nm in names)
+        scored.append((max(best), best, slug))
+    scored.sort(reverse=True)
+    return [(slug, best) for _, best, slug in scored[:n]]
+
+
+def find_fuzzy_duplicate(title, concepts):
+    """Layer 1: free local match. Returns matching slug or None."""
+    ranked = closest_concepts(title, concepts, n=1)
+    if not ranked:
+        return None
+    slug, (ratio, jacc) = ranked[0]
+    if ratio >= FUZZY_DUP_RATIO or jacc >= FUZZY_DUP_JACCARD:
+        log(f"    Dedup (fuzzy {ratio:.2f}/{jacc:.2f}): "
+            f"'{title}' ~ {slug}")
+        return slug
+    return None
+
+
+def judge_duplicate(candidate, concepts):
+    """Layer 2: cheap LLM judge against the closest existing concepts.
+
+    Returns {"verdict": "same|instance|new", "match_slug": str|None}
+    or None if the call failed (caller treats that as a failure so the
+    video is retried, rather than silently writing a possible duplicate).
+    """
+    ranked = closest_concepts(candidate["title"], concepts)
+    if not ranked:
+        return {"verdict": "new", "match_slug": None}
+    shown = {slug for slug, _ in ranked}
+    listing = "\n".join(
+        f"- {slug}: {concepts[slug]['title']} — {concepts[slug].get('summary','')}"
+        for slug, _ in ranked
+    )
+    # Same-category entries (titles only) widen recall cheaply
+    cat = concept_category(candidate)
+    same_cat = [
+        f"- {slug}: {c['title']}" for slug, c in concepts.items()
+        if concept_category(c) == cat and slug not in shown
+    ]
+    cat_block = ""
+    if same_cat:
+        cat_block = (f"\nOTHER EXISTING ENTRIES IN THE SAME CATEGORY ({cat}):\n"
+                     + "\n".join(same_cat[:60]) + "\n")
+    prompt = f"""You maintain a finance glossary. Decide whether a CANDIDATE concept is
+already covered by one of the EXISTING entries.
+
+CANDIDATE:
+- title: {candidate['title']}
+- summary: {candidate.get('summary','')}
+
+EXISTING (closest matches by title):
+{listing}
+{cat_block}
+Verdicts:
+- "same": the candidate is the same concept as an existing entry, just worded differently.
+- "instance": the candidate is a specific example, application, or narrower framing of an
+  existing entry (e.g. "Diesel Cost Pass-Through" is an instance of "Cost Pass-Through";
+  "China Reducing Treasury Holdings" is an instance of "Foreign Treasury Holdings").
+- "new": a genuinely distinct concept that deserves its own glossary entry.
+
+Be strict: when in doubt between "instance" and "new", answer "instance".
+Output ONLY JSON: {{"verdict": "same|instance|new", "match_slug": "<slug or null>"}}
+"""
+    out = run_claude(prompt, timeout=120, model=JUDGE_MODEL)
+    if out is None:
+        return None
+    m = re.search(r"\{.*\}", out, re.DOTALL)
+    if not m:
+        log(f"  ERROR judge output not JSON: {out[:150]}")
+        return None
+    try:
+        data = json.loads(m.group())
+    except json.JSONDecodeError:
+        log(f"  ERROR judge bad JSON: {out[:150]}")
+        return None
+    verdict = str(data.get("verdict", "new")).lower()
+    match = data.get("match_slug")
+    if verdict in ("same", "instance") and match in concepts:
+        log(f"    Dedup (judge {verdict}): '{candidate['title']}' -> {match}")
+        return {"verdict": verdict, "match_slug": match}
+    return {"verdict": "new", "match_slug": None}
+
+
+def merge_into(existing_slug, candidate_title, vid_id, concepts):
+    """Record a duplicate against its existing concept: video becomes a
+    source, the alternate wording becomes an alias (so both the prompt
+    list and future fuzzy matches see it)."""
+    c = concepts[existing_slug]
+    src = c.setdefault("sources", [])
+    if vid_id and vid_id not in src:
+        src.append(vid_id)
+    aliases = c.setdefault("aliases", [])
+    if candidate_title and candidate_title != c.get("title") \
+            and candidate_title not in aliases:
+        aliases.append(candidate_title)
+
+
+def resolve_candidate(candidate, concepts):
+    """Run both dedup layers. Returns ("new", None), ("dup", slug),
+    or (None, None) on judge failure."""
+    dup = find_fuzzy_duplicate(candidate["title"], concepts)
+    if dup:
+        return "dup", dup
+    verdict = judge_duplicate(candidate, concepts)
+    if verdict is None:
+        return None, None
+    if verdict["verdict"] in ("same", "instance"):
+        return "dup", verdict["match_slug"]
+    return "new", None
+
+
+# === STEP 3: Extract concepts via Claude CLI ===
+def category_rubric():
+    return "\n".join(
+        f"- {n}  ({CATEGORIES[n]['tier_name']})" for n in FILEABLE)
+
+
+def _extract_from_chunk(title, chunk, concept_list, part_label):
+    """One extraction call. Returns dict {"new": [...], "existing": [...]}
+    or None on failure."""
+    category_rubric_text = category_rubric()
+    prompt = f"""You are building a living finance education guide. Read this YouTube video transcript
+and extract every distinct finance/economics/market concept it teaches or relies on.
+
+VIDEO: "{title}"{part_label}
+TRANSCRIPT:
+{chunk}
+
+ALREADY COVERED CONCEPTS (do NOT re-extract these):
+{concept_list if concept_list else "(none yet)"}
+
+Output ONE JSON object:
+{{
+  "new": [
+    {{
+      "slug": "yield_curve_inversion",
+      "title": "Yield Curve Inversion",
+      "category": "<exactly one of the CATEGORIES below>",
+      "flag": "star|plain|deep",
+      "summary": "One sentence explaining what this concept is",
+      "context": "How the video discussed it — what claim was made, what evidence given"
+    }}
+  ],
+  "existing": ["slug_of_already_covered_concept_this_video_discussed", "..."]
+}}
+
+CATEGORIES (use the exact name; pick the shelf a textbook on this concept would sit on):
+{category_rubric_text}
+
+FLAG:
+- "star": must-know — you cannot follow a markets conversation without it
+  (Federal Funds Rate, Term Premium, Yield Curve, CPI).
+- "plain": standard working knowledge for someone actively trading or investing.
+- "deep": deep cut — sector plumbing, single-country or single-industry mechanics,
+  a curiosity (fertilizer pricing, farm loan-loss provisions, COMEX inventories).
+
+Rules:
+- A CONCEPT is something that would have its own glossary or textbook entry and
+  would still make sense in a video from a different year. "Federal Funds Rate" is
+  a concept. "Fed raised rates" is news. "China cutting Treasury holdings" is a claim
+  about a concept (Foreign Treasury Holdings), not a new concept.
+- Do NOT create a new concept for a specific instance, example, or framing of an
+  existing one. Prefer the general mechanism ("Cost Pass-Through") over the
+  instance ("Diesel Cost Pass-Through to Freight").
+- Be specific where the distinction matters: "Credit Default Swaps" not "derivatives".
+- Slugs: lowercase, underscores, no filler words.
+- If the video substantively discusses a concept already covered, put its EXACT slug
+  (as written in the list) in "existing" — do not re-extract it.
+- If nothing new, "new" is an empty array.
+- Output ONLY the JSON object, nothing else.
+"""
+    out = run_claude(prompt)
+    if out is None:
+        return None
+    # Accept either the new object format or a bare array (old format)
+    m = re.search(r"\{.*\}", out, re.DOTALL) or re.search(r"\[.*\]", out, re.DOTALL)
+    if not m:
+        log(f"  ERROR no JSON in extraction output: {out[:200]}")
+        return None
+    try:
+        data = json.loads(m.group())
+    except json.JSONDecodeError as e:
+        log(f"  ERROR bad JSON from extraction: {e}")
+        return None
+    if isinstance(data, list):
+        data = {"new": data, "existing": []}
+    data.setdefault("new", [])
+    data.setdefault("existing", [])
+    return data
+
+
+def extract_concepts(video_id, title, transcript, existing_concepts):
+    """Call Claude to read the transcript and extract finance concepts.
+
+    Long transcripts are processed in overlapping chunks and merged.
+    Returns {"new": [...], "existing": [...]} or None if ANY chunk failed
+    (so the caller can leave the video unprocessed and retry later).
+    """
+    def _line(slug, c):
+        line = f"- {slug}: {c['title']} ({c['category']})"
+        if c.get("aliases"):
+            line += " [aka: " + "; ".join(c["aliases"][:4]) + "]"
+        return line
+    concept_list = "\n".join(
+        _line(slug, c) for slug, c in existing_concepts.items()
+    )
+
+    chunks = []
+    if len(transcript) <= CHUNK_CHARS:
+        chunks = [transcript]
+    else:
+        start = 0
+        while start < len(transcript):
+            chunks.append(transcript[start:start + CHUNK_CHARS])
+            start += CHUNK_CHARS - CHUNK_OVERLAP
+
+    merged_new, merged_existing = {}, set()
+    for i, chunk in enumerate(chunks):
+        label = f" (part {i + 1} of {len(chunks)})" if len(chunks) > 1 else ""
+        data = _extract_from_chunk(title, chunk, concept_list, label)
+        if data is None:
+            return None
+        for c in data["new"]:
+            slug = c.get("slug")
+            if not slug or not c.get("title"):
+                continue
+            if slug in existing_concepts or slug in merged_new:
+                continue
+            if c.get("category") not in CATEGORIES:
+                c["category"] = concept_category(c)
+            if c.get("flag") not in FLAGS:
+                c["flag"] = "plain"
+            c.setdefault("summary", "")
+            c.setdefault("context", "")
+            merged_new[slug] = c
+        for s in data["existing"]:
+            if s in existing_concepts:
+                merged_existing.add(s)
+    return {"new": list(merged_new.values()),
+            "existing": sorted(merged_existing)}
 
 
 # === STEP 4: Write chapter for a concept via Claude CLI ===
-def write_chapter(concept, video_title, transcript_excerpt):
-    """Call Claude to write a bookai-depth chapter for one concept."""
+def write_chapter(concept, video_title, transcript):
+    """Call Claude to write a bookai-depth chapter for one concept.
+
+    Returns cleaned chapter HTML, or None if the call failed or the
+    output was not a usable chapter (so the caller does NOT save it).
+    """
+    excerpt = relevant_excerpt(transcript, concept)
 
     prompt = f"""You are writing a chapter for a personal finance education guide.
 Write a thorough, clear explanation of this concept that would help someone
@@ -246,11 +716,11 @@ truly understand it — not a summary, but real teaching.
 
 CONCEPT: {concept['title']}
 CATEGORY: {concept['category']}
-CONTEXT FROM VIDEO: {concept['context']}
+CONTEXT FROM VIDEO: {concept.get('context') or concept.get('summary', '')}
 VIDEO: "{video_title}"
 
 RELEVANT TRANSCRIPT EXCERPT:
-{transcript_excerpt[:3000]}
+{excerpt}
 
 Write the chapter in HTML format (just the content, no <html>/<body> tags).
 Structure:
@@ -269,186 +739,202 @@ Structure:
 - Use <strong> for key terms (first mention)
 - Use <blockquote> for any memorable quotes from the video
 - Write in direct, clear prose — not academic, not dumbed down
-- Output ONLY the HTML content, nothing else
+- Output ONLY the raw HTML content — no markdown code fences, no preamble
 """
 
-    try:
-        result = subprocess.run(
-            ["claude", "-p", prompt, "--model", "sonnet"],
-            capture_output=True, text=True, timeout=300
-        )
-        return result.stdout.strip()
-    except Exception as e:
-        log(f"  ERROR writing chapter for {concept['title']}: {e}")
-        return None
+    out = run_claude(prompt)
+    html = clean_chapter_html(out, concept.get("slug"))
+    if html is None:
+        log(f"  ERROR unusable chapter output for {concept['title']}: "
+            f"{(out or '')[:120]!r}")
+    return html
 
 
-# === STEP 5: Rebuild HTML (multi-page drill-down) ===
+# === STEP 5: Rebuild HTML (tier -> category -> concept) ===
 
-# Shared CSS for all pages
-PAGE_CSS = '''
-.nav-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 1rem; margin: 1.5rem 0;
+# Shared CSS for all pages (on top of the site's book.css)
+PAGE_CSS = """
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
 }
-.nav-card {
-  background: #e8e0d0; border-radius: 10px;
-  padding: 1.5rem; text-decoration: none; color: #3a2a1a;
-  border: 1px solid #d4c8b0;
-  transition: all 0.2s; position: relative;
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
 }
-.nav-card:hover {
-  border-color: #a08060; background: #ded4c0;
-  transform: translateY(-2px);
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
 }
-.nav-card h3 { margin: 0 0 0.3rem; color: #d4a574; font-size: 1.3rem; }
-.nav-card .card-sub { font-size: 0.85rem; color: #a08060; }
-.nav-card .card-count {
-  font-size: 0.75rem; color: #a08060;
-  margin-top: 0.5rem;
+.tier .tier-desc { color: #a08060; font-size: 0.85rem; margin: 0.4rem 0 0.8rem; }
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
 }
-.nav-card.done { opacity: 0.25; }
-body.hide-done .nav-card.done { display: none; }
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
 .back-link {
   display: inline-block; margin-bottom: 1rem;
   color: #a08060; text-decoration: none; font-size: 0.9rem;
 }
 .back-link:hover { color: #d4a574; }
-.concept-section { position: relative; transition: opacity 0.3s; }
-.concept-section.completed { opacity: 0.3; }
-body.hide-done .concept-section.completed { display: none; }
-.concept-done {
-  display: inline-flex; align-items: center; gap: 0.4rem;
-  background: none; border: 1px solid #d4c8b0;
-  border-radius: 4px; padding: 0.3rem 0.8rem;
-  cursor: pointer; font-size: 0.8rem; color: #a08060;
-  transition: all 0.2s; margin-top: 1rem;
-}
-.concept-done:hover { border-color: #4ade80; color: #4ade80; }
-.concept-section.completed .concept-done {
-  border-color: #4ade80; background: #4ade80; color: #1a1008;
-}
-.filter-bar {
-  display: flex; gap: 1rem; align-items: center;
-  margin: 0 0 1.5rem; padding: 0.7rem 1rem;
-  background: #e8e0d0; border-radius: 8px;
-  border: 1px solid #d4c8b0; font-size: 0.85rem;
-}
-.filter-btn {
-  background: none; border: 1px solid #d4c8b0;
-  color: #3a2a1a; padding: 0.3rem 0.8rem;
-  border-radius: 4px; cursor: pointer;
-  font-size: 0.8rem; transition: all 0.2s;
-}
-.filter-btn:hover { border-color: #a08060; }
-.filter-btn.active {
-  background: #a08060; color: #f4efe8; border-color: #a08060;
-}
-.filter-count { color: #a08060; margin-left: auto; }
-.stats-bar {
-  display: flex; gap: 1.5rem; flex-wrap: wrap;
-  margin: 1rem 0 2rem; padding: 1rem;
-  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
-  font-size: 0.9rem;
-}
-.stats-bar .stat {
-  display: flex; flex-direction: column; align-items: center;
-}
-.stats-bar .stat-num {
-  font-size: 1.4rem; font-weight: bold; color: #d4a574;
-}
-'''
+"""
 
-# Shared JS for completion tracking (cascading hide)
-PAGE_JS = '''
+# Shared JS: completion tracking + the star/deep-cut filter, both persisted
+PAGE_JS = """
 <script>
 (function() {
-  var KEY = 'fg_done';
-  var done = JSON.parse(localStorage.getItem(KEY) || '{}');
+  var DONE_KEY = 'fg_done', FILTER_KEY = 'fg_filter';
+  var done = JSON.parse(localStorage.getItem(DONE_KEY) || '{}');
+  var filter = localStorage.getItem(FILTER_KEY) || 'all';
+
+  function visible(flag) {
+    if (filter === 'star') return flag === 'star';
+    if (filter === 'nodeep') return flag !== 'deep';
+    return true;
+  }
 
   function apply() {
-    // Mark completed concepts
-    document.querySelectorAll('.concept-section').forEach(function(s) {
-      if (done[s.dataset.slug]) s.classList.add('completed');
-      else s.classList.remove('completed');
+    var shown = 0, total = 0, hidden = 0;
+    document.querySelectorAll('.concept-row').forEach(function(r) {
+      var slug = r.dataset.slug, flag = r.dataset.flag;
+      total++;
+      if (done[slug]) r.classList.add('done'); else r.classList.remove('done');
+      if (visible(flag)) { r.classList.remove('fg-hidden'); shown++; }
+      else { r.classList.add('fg-hidden'); hidden++; }
     });
-    // Mark completed nav cards (all children done)
-    document.querySelectorAll('.nav-card[data-slugs]').forEach(function(card) {
-      var slugs = card.dataset.slugs.split(',');
-      var allDone = slugs.length > 0 && slugs.every(function(s) { return done[s]; });
-      if (allDone) card.classList.add('done');
-      else card.classList.remove('done');
+    document.querySelectorAll('.cat-card').forEach(function(card) {
+      var slugs = card.dataset.slugs ? card.dataset.slugs.split(',') : [];
+      var flags = card.dataset.flags ? card.dataset.flags.split(',') : [];
+      var vis = 0, allDone = slugs.length > 0;
+      slugs.forEach(function(sl, i) {
+        if (visible(flags[i])) vis++;
+        if (!done[sl]) allDone = false;
+      });
+      total += slugs.length; shown += vis;
+      var c = card.querySelector('.cat-count');
+      if (c) c.textContent = vis + (vis !== slugs.length ? ' of ' + slugs.length : '') + ' concepts' +
+        (card.dataset.stars ? ' \\u00b7 ' + card.dataset.stars + ' \\u2605' : '');
+      if (vis === 0) card.classList.add('fg-empty'); else card.classList.remove('fg-empty');
+      if (allDone) card.classList.add('done'); else card.classList.remove('done');
     });
-    updateCount();
-  }
-
-  function updateCount() {
-    var concepts = document.querySelectorAll('.concept-section');
-    var cards = document.querySelectorAll('.nav-card[data-slugs]');
-    var total = concepts.length || cards.length;
-    var read = concepts.length
-      ? [].filter.call(concepts, function(s) { return done[s.dataset.slug]; }).length
-      : [].filter.call(cards, function(c) { return c.classList.contains('done'); }).length;
-    var el = document.getElementById('filterCount');
-    if (el) el.textContent = read + '/' + total + ' completed';
-  }
-
-  window.toggleDone = function(slug) {
-    if (done[slug]) delete done[slug];
-    else done[slug] = true;
-    localStorage.setItem(KEY, JSON.stringify(done));
-    apply();
-  };
-
-  window.toggleFilter = function() {
-    document.body.classList.toggle('hide-done');
-    var btn = document.getElementById('filterBtn');
-    if (document.body.classList.contains('hide-done')) {
-      btn.textContent = 'Show All';
-      btn.classList.add('active');
-    } else {
-      btn.textContent = 'Hide Completed';
-      btn.classList.remove('active');
+    document.querySelectorAll('[data-filter]').forEach(function(b) {
+      b.classList.toggle('active', b.dataset.filter === filter);
+    });
+    var n = document.getElementById('fgCount');
+    if (n) n.textContent = shown + ' of ' + total + ' shown';
+    var h = document.getElementById('fgHiddenNote');
+    if (h) h.textContent = hidden ? hidden + ' hidden by the filter.' : '';
+    var btn = document.querySelector('.concept-done');
+    if (btn) {
+      var on = !!done[btn.dataset.slug];
+      btn.classList.toggle('on', on);
+      btn.textContent = on ? '\\u2713 Completed' : '\\u2713 Mark complete';
     }
-  };
+  }
 
-  window.markAllDone = function() {
-    document.querySelectorAll('.concept-section').forEach(function(s) {
-      done[s.dataset.slug] = true;
-    });
-    localStorage.setItem(KEY, JSON.stringify(done));
+  window.setFilter = function(f) {
+    filter = f; localStorage.setItem(FILTER_KEY, f); apply();
+  };
+  window.toggleDone = function(slug) {
+    if (done[slug]) delete done[slug]; else done[slug] = true;
+    localStorage.setItem(DONE_KEY, JSON.stringify(done));
     apply();
   };
-
+  window.toggleHideDone = function() {
+    document.body.classList.toggle('hide-done');
+  };
   apply();
 })();
 </script>
-'''
+"""
+
+FILTER_BAR = """
+<div class="fg-bar">
+  <button class="fg-btn" data-filter="all" onclick="setFilter('all')">Everything</button>
+  <button class="fg-btn" data-filter="nodeep" onclick="setFilter('nodeep')">Hide deep cuts</button>
+  <button class="fg-btn" data-filter="star" onclick="setFilter('star')">&#9733; must-know only</button>
+  <button class="fg-btn" onclick="toggleHideDone()">Hide completed</button>
+  <span class="fg-count" id="fgCount"></span>
+</div>"""
+
+
+def _esc(t):
+    return (str(t).replace("&", "&amp;").replace("<", "&lt;")
+            .replace(">", "&gt;").replace('"', "&quot;"))
 
 
 def _page_wrap(title, body, css_path="../book.css", back_href=None,
                back_label=None, bm_key=None, extra_js=""):
-    """Wrap content in a full HTML page."""
+    """Wrap content in a full HTML page (site chrome from book.css/book.js)."""
     back = ""
     if back_href:
         back = (f'<a class="back-link" href="{back_href}">'
-                f'&larr; {back_label or "Back"}</a>')
+                f'&larr; {_esc(back_label or "Back")}</a>')
     bm = ""
     if bm_key:
-        bm = f'<script>var BM_KEY = \'{bm_key}\';</script>'
-    return f'''<!DOCTYPE html>
+        bm = f"<script>var BM_KEY = '{bm_key}';</script>"
+    return f"""<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#f4efe8">
-<title>{title} - Finance Guide</title>
+<title>{_esc(title)} - Finance Guide</title>
 <link rel="stylesheet" href="{css_path}">
 <style>{PAGE_CSS}</style>
 </head>
-<body class="hide-done">
+<body>
 <div class="progress-bar" id="progressBar"></div>
 <div class="bookmark-bar" id="bookmarkBar" style="display:none"
  onclick="jumpToBookmark()">
@@ -460,214 +946,185 @@ def _page_wrap(title, body, css_path="../book.css", back_href=None,
 {back}
 {body}
 {bm}
-<script src="{css_path.replace('book.css','book.js')}"></script>
+<script src="{css_path.replace('book.css', 'book.js')}"></script>
 {extra_js}
 </body>
-</html>'''
+</html>"""
+
+
+def _mark(flag):
+    if flag == "star":
+        return '<span class="mark">&#9733;</span>'
+    if flag == "deep":
+        return '<span class="mark deep">deep</span>'
+    return '<span class="mark"></span>'
+
+
+def _concept_rows(items, href_prefix):
+    order = {"star": 0, "plain": 1, "deep": 2}
+    items = sorted(items, key=lambda x: (order[concept_flag(x[1])],
+                                          x[1]["title"].lower()))
+    return "".join(
+        f'<a class="concept-row" href="{href_prefix}{slug}.html"'
+        f' data-slug="{slug}" data-flag="{concept_flag(c)}">'
+        f'{_mark(concept_flag(c))}'
+        f'<span class="ctitle">{_esc(c["title"])}</span></a>'
+        for slug, c in items
+    )
 
 
 def rebuild_html(concepts):
-    """Rebuild multi-page drill-down: index → year → month → week pages."""
+    """Rebuild the site: index (tiers -> categories) -> category pages ->
+    one page per concept, plus recent.html.  Layout follows the Master
+    Reading List outline; filing decided at extraction time."""
+    processed = load_json(PROCESSED_FILE)
+    videos_done = sum(1 for v in processed.values() if not v.get("skipped"))
+    video_titles = {k: v.get("title", k) for k, v in processed.items()}
 
-    # Group concepts into hierarchy
-    hierarchy = {}  # year → month → week_key → [concepts]
+    by_cat = {n: [] for n in CATEGORY_NAMES}
     for slug, c in concepts.items():
-        added = c.get("added", "2026-01-01")
-        dt = datetime.strptime(added, "%Y-%m-%d")
-        year = dt.strftime("%Y")
-        month_key = dt.strftime("%m")
-        month_name = dt.strftime("%B")
-        week_start = dt - timedelta(days=dt.weekday())
-        week_key = week_start.strftime("%m-%d")
-        week_label = f"Week of {week_start.strftime('%B %d')}"
-
-        if year not in hierarchy:
-            hierarchy[year] = {}
-        if month_key not in hierarchy[year]:
-            hierarchy[year][month_key] = {
-                "name": month_name, "weeks": {}
-            }
-        if week_key not in hierarchy[year][month_key]["weeks"]:
-            hierarchy[year][month_key]["weeks"][week_key] = {
-                "label": week_label, "concepts": []
-            }
-        hierarchy[year][month_key]["weeks"][week_key][
-            "concepts"].append((slug, c))
+        by_cat[concept_category(c)].append((slug, c))
 
     total = len(concepts)
-    videos = len(load_json(PROCESSED_FILE))
+    written = set()
 
-    # === MAIN INDEX (years) ===
-    cards = []
-    for year in sorted(hierarchy.keys(), reverse=True):
-        months = hierarchy[year]
-        concept_count = sum(
-            len(w["concepts"])
-            for m in months.values()
-            for w in m["weeks"].values()
-        )
-        all_slugs = ",".join(
-            slug for m in months.values()
-            for w in m["weeks"].values()
-            for slug, _ in w["concepts"]
-        )
-        cards.append(
-            f'<a class="nav-card" href="{year}/index.html"'
-            f' data-slugs="{all_slugs}">'
-            f'<h3>{year}</h3>'
-            f'<div class="card-sub">'
-            f'{len(months)} month{"s" if len(months) != 1 else ""}</div>'
-            f'<div class="card-count">'
-            f'{concept_count} concepts</div></a>'
+    # ---- index: tiers -> category cards ----
+    tiers_html = []
+    for t in OUTLINE:
+        cards, empty = [], []
+        for cat in t["cats"]:
+            items = by_cat[cat["name"]]
+            if not items:
+                empty.append(cat["name"])
+                continue
+            slugs = ",".join(sl for sl, _ in items)
+            flags = ",".join(concept_flag(c) for _, c in items)
+            stars = sum(1 for _, c in items if concept_flag(c) == "star")
+            cards.append(
+                f'<a class="cat-card" href="{cat["slug"]}.html"'
+                f' data-slugs="{slugs}" data-flags="{flags}" data-stars="{stars}">'
+                f'<span class="cat-name">{_esc(cat["name"])}</span>'
+                f'<span class="cat-count">{len(items)} concepts &middot; {stars} &#9733;</span></a>'
+            )
+        if not cards:
+            cards.append('<p class="tier-empty">No concepts filed here yet.</p>')
+        em = ""
+        if empty and len(empty) < len(t["cats"]):
+            em = ('<p class="tier-empty">Also in this tier, nothing filed yet: '
+                  + ", ".join(_esc(n) for n in empty) + "</p>")
+        tiers_html.append(
+            f'<div class="tier"><h2>{_esc(t["name"])}</h2>'
+            f'<p class="tier-desc">{_esc(t["desc"])}</p>'
+            f'{"".join(cards)}{em}</div>'
         )
 
-    body = f'''
+    recent = _recent_concepts(concepts)
+    body = f"""
 <h1>Finance Guide</h1>
 <p class="subtitle">A living book &middot; {total} concepts
- &middot; {videos} videos processed</p>
-<div class="filter-bar">
-  <button class="filter-btn" id="filterBtn"
-   onclick="toggleFilter()" class="active">Show All</button>
-  <span class="filter-count" id="filterCount"></span>
-</div>
-<div class="nav-grid">
-{"".join(cards)}
-</div>'''
+ &middot; {videos_done} videos &middot;
+ <a href="recent.html" style="color:#a08060">Added this week ({len(recent)})</a></p>
+{FILTER_BAR}
+{"".join(tiers_html)}"""
+    HTML_FILE.write_text(_page_wrap("Finance Guide", body, css_path="../book.css",
+                                    bm_key="finance_guide", extra_js=PAGE_JS))
+    written.add(HTML_FILE)
 
-    index_html = _page_wrap("Finance Guide", body,
-                             css_path="../book.css",
-                             bm_key="finance_guide",
-                             extra_js=PAGE_JS)
-    HTML_FILE.write_text(index_html)
+    # ---- category pages ----
+    for name, cat in CATEGORIES.items():
+        items = by_cat[name]
+        if not items:
+            continue
+        books = ""
+        if cat["stars"]:
+            books = ('<div class="books"><h3>Read deeper &mdash; &#9733; picks from the reading list</h3><ul>'
+                     + "".join(f"<li>{_esc(b)}</li>" for b in cat["stars"])
+                     + "</ul></div>")
+        body = f"""
+<h1>{_esc(name)}</h1>
+<p class="subtitle">{_esc(cat["tier_name"])} &middot; {len(items)} concepts</p>
+{FILTER_BAR}
+{_concept_rows(items, "concepts/")}
+<p class="fg-hidden-note" id="fgHiddenNote"></p>
+{books}"""
+        path = BASE_DIR / f"{cat['slug']}.html"
+        path.write_text(_page_wrap(name, body, css_path="../book.css",
+                                   back_href="index.html", back_label="Finance Guide",
+                                   bm_key=f"fg_{cat['slug']}", extra_js=PAGE_JS))
+        written.add(path)
 
-    # === YEAR PAGES (months) ===
-    for year in hierarchy:
-        year_dir = BASE_DIR / year
-        year_dir.mkdir(exist_ok=True)
-        months = hierarchy[year]
+    # ---- recent page ----
+    body = f"""
+<h1>Added this week</h1>
+<p class="subtitle">{len(recent)} concepts, newest first</p>
+{FILTER_BAR}
+{_concept_rows(recent, "concepts/")}
+<p class="fg-hidden-note" id="fgHiddenNote"></p>"""
+    path = BASE_DIR / "recent.html"
+    path.write_text(_page_wrap("Added this week", body, css_path="../book.css",
+                               back_href="index.html", back_label="Finance Guide",
+                               bm_key="fg_recent", extra_js=PAGE_JS))
+    written.add(path)
 
-        cards = []
-        for mk in sorted(months.keys(), reverse=True):
-            m = months[mk]
-            concept_count = sum(
-                len(w["concepts"]) for w in m["weeks"].values()
-            )
-            all_slugs = ",".join(
-                slug for w in m["weeks"].values()
-                for slug, _ in w["concepts"]
-            )
-            cards.append(
-                f'<a class="nav-card" href="{mk}.html"'
-                f' data-slugs="{all_slugs}">'
-                f'<h3>{m["name"]}</h3>'
-                f'<div class="card-sub">'
-                f'{len(m["weeks"])} week'
-                f'{"s" if len(m["weeks"]) != 1 else ""}</div>'
-                f'<div class="card-count">'
-                f'{concept_count} concepts</div></a>'
-            )
+    # ---- one page per concept ----
+    cdir = BASE_DIR / "concepts"
+    cdir.mkdir(exist_ok=True)
+    for slug, c in concepts.items():
+        cat_name = concept_category(c)
+        cat = CATEGORIES[cat_name]
+        flag = concept_flag(c)
+        flag_html = ('<span><span class="star">&#9733;</span> must-know</span>' if flag == "star"
+                     else "<span>deep cut</span>" if flag == "deep" else "<span>standard</span>")
+        chapter = c.get("chapter_html") or (
+            f'<h4 id="{slug}">{_esc(c["title"])}</h4><p>{_esc(c.get("summary", ""))}</p>')
+        srcs = "; ".join(_esc(video_titles.get(v, v)) for v in c.get("sources", []))
+        related = [(sl, x) for sl, x in by_cat[cat_name] if sl != slug][:6]
+        side = f"Sources: {srcs}"
+        if c.get("aliases"):
+            side += "<br>Also called: " + _esc(", ".join(c["aliases"]))
+        if related:
+            side += ("<br>Related in this category: "
+                     + ", ".join(f'<a href="{sl}.html">{_esc(x["title"])}</a>' for sl, x in related))
+        body = f"""
+<div class="concept-meta">{flag_html}<span>{_esc(cat_name)}</span><span>added {c.get("added", "")}</span></div>
+{chapter}
+<div class="concept-side">{side}</div>
+<button class="concept-done" data-slug="{slug}" onclick="toggleDone('{slug}')">&#x2713; Mark complete</button>"""
+        path = cdir / f"{slug}.html"
+        path.write_text(_page_wrap(c["title"], body, css_path="../../book.css",
+                                   back_href=f"../{cat['slug']}.html", back_label=cat_name,
+                                   bm_key=f"fg_c_{slug}", extra_js=PAGE_JS))
+        written.add(path)
 
-        body = f'''
-<h1>{year}</h1>
-<div class="filter-bar">
-  <button class="filter-btn" id="filterBtn"
-   onclick="toggleFilter()" class="active">Show All</button>
-  <span class="filter-count" id="filterCount"></span>
-</div>
-<div class="nav-grid">
-{"".join(cards)}
-</div>'''
-
-        year_html = _page_wrap(year, body,
-                                css_path="../../book.css",
-                                back_href="../index.html",
-                                back_label="Finance Guide",
-                                bm_key=f"fg_{year}",
-                                extra_js=PAGE_JS)
-        (year_dir / "index.html").write_text(year_html)
-
-        # === MONTH PAGES (weeks) ===
-        for mk in months:
-            m = months[mk]
-            cards = []
-            for wk in sorted(m["weeks"].keys(), reverse=True):
-                w = m["weeks"][wk]
-                all_slugs = ",".join(
-                    slug for slug, _ in w["concepts"]
-                )
-                cards.append(
-                    f'<a class="nav-card" href="{mk}-{wk}.html"'
-                    f' data-slugs="{all_slugs}">'
-                    f'<h3>{w["label"]}</h3>'
-                    f'<div class="card-count">'
-                    f'{len(w["concepts"])} concepts</div></a>'
-                )
-
-            body = f'''
-<h1>{m["name"]} {year}</h1>
-<div class="filter-bar">
-  <button class="filter-btn" id="filterBtn"
-   onclick="toggleFilter()" class="active">Show All</button>
-  <span class="filter-count" id="filterCount"></span>
-</div>
-<div class="nav-grid">
-{"".join(cards)}
-</div>'''
-
-            month_html = _page_wrap(
-                f'{m["name"]} {year}', body,
-                css_path="../../book.css",
-                back_href="index.html",
-                back_label=year,
-                bm_key=f"fg_{year}_{mk}",
-                extra_js=PAGE_JS)
-            (year_dir / f"{mk}.html").write_text(month_html)
-
-            # === WEEK PAGES (concepts) ===
-            for wk in m["weeks"]:
-                w = m["weeks"][wk]
-                sections = []
-                for slug, c in w["concepts"]:
-                    ch = c.get("chapter_html", "")
-                    if not ch:
-                        ch = (f'<h4 id="{slug}">{c["title"]}</h4>'
-                              f'\n<p>{c.get("summary", "")}</p>')
-                    sections.append(
-                        f'<section class="concept-section"'
-                        f' data-slug="{slug}">'
-                        f'{ch}'
-                        f'<button class="concept-done"'
-                        f' onclick="toggleDone(\'{slug}\')"'
-                        f' title="Mark as understood">'
-                        f'&#x2713; Mark Complete</button>'
-                        f'</section>'
-                    )
-
-                body = f'''
-<h1>{w["label"]}</h1>
-<p class="subtitle">{m["name"]} {year}
- &middot; {len(w["concepts"])} concepts</p>
-<div class="filter-bar">
-  <button class="filter-btn" id="filterBtn"
-   onclick="toggleFilter()" class="active">Show All</button>
-  <button class="filter-btn"
-   onclick="markAllDone()">Mark All Done</button>
-  <span class="filter-count" id="filterCount"></span>
-</div>
-{"".join(sections)}'''
-
-                week_html = _page_wrap(
-                    w["label"], body,
-                    css_path="../../book.css",
-                    back_href=f"{mk}.html",
-                    back_label=f"{m['name']} {year}",
-                    bm_key=f"fg_{year}_{mk}_{wk}",
-                    extra_js=PAGE_JS)
-                (year_dir / f"{mk}-{wk}.html").write_text(
-                    week_html)
+    # ---- remove pages the bot owns but no longer generates ----
+    owned = {BASE_DIR / f"{c['slug']}.html" for c in CATEGORIES.values()}
+    owned.add(BASE_DIR / "recent.html")
+    for stale in list(owned) + list(cdir.glob("*.html")):
+        if stale.exists() and stale not in written:
+            stale.unlink()
+            log(f"  Removed stale page: {stale.relative_to(BASE_DIR)}")
+    for ydir in BASE_DIR.glob("[12][0-9][0-9][0-9]"):
+        if ydir.is_dir():
+            for f in ydir.glob("*.html"):
+                f.unlink()
+            try:
+                ydir.rmdir()
+                log(f"  Removed old layout dir: {ydir.name}/")
+            except OSError:
+                pass
 
     log(f"  HTML rebuilt: {total} concepts, "
-        f"{len(hierarchy)} years, multi-page")
+        f"{sum(1 for v in by_cat.values() if v)} categories, "
+        f"{len(recent)} added this week")
+
+
+def _recent_concepts(concepts, days=7):
+    if not concepts:
+        return []
+    latest = max(c.get("added", "2026-01-01") for c in concepts.values())
+    cutoff = (datetime.strptime(latest, "%Y-%m-%d") - timedelta(days=days - 1)).strftime("%Y-%m-%d")
+    items = [(s, c) for s, c in concepts.items() if c.get("added", "") >= cutoff]
+    return sorted(items, key=lambda x: x[1].get("added", ""), reverse=True)
 
 
 # === STEP 6: Git push ===
@@ -713,6 +1170,7 @@ def run_once():
     concepts = load_json(CONCEPTS_FILE)
     processed = load_json(PROCESSED_FILE)
     new_concept_count = 0
+    videos_done = 0
 
     for video in new_videos:
         vid_id = video["id"]
@@ -723,22 +1181,65 @@ def run_once():
         # Download transcript
         transcript = download_transcript(vid_id)
         if not transcript:
-            log(f"    Skipped (no transcript)")
+            # Captions often appear a few hours after upload — leave the
+            # video unprocessed so it is retried, but give up after a while.
+            attempts = processed.get(vid_id, {}).get("no_transcript_attempts", 0) + 1
+            if attempts >= 4:
+                log(f"    Skipped (no transcript after {attempts} tries)")
+                processed[vid_id] = {
+                    "title": title, "channel": channel,
+                    "processed": datetime.now().strftime("%Y-%m-%d %H:%M"),
+                    "concepts_extracted": 0, "skipped": "no_transcript",
+                }
+            else:
+                log(f"    No transcript yet (attempt {attempts}), will retry")
+                entry = processed.get(vid_id, {"title": title, "channel": channel})
+                entry["no_transcript_attempts"] = attempts
+                entry["retry"] = True
+                processed[vid_id] = entry
+            save_json(PROCESSED_FILE, processed)
             continue
 
         log(f"    Transcript: {len(transcript)} chars")
 
-        # Extract concepts
-        new_concepts = extract_concepts(
-            vid_id, title, transcript, concepts
-        )
-        log(f"    Extracted: {len(new_concepts)} new concepts")
+        # Extract concepts — None means the call failed; leave the video
+        # unprocessed so the next cycle retries it.
+        result = extract_concepts(vid_id, title, transcript, concepts)
+        if result is None:
+            log(f"    Extraction FAILED — will retry next cycle")
+            continue
+        new_concepts = result["new"]
+        log(f"    Extracted: {len(new_concepts)} candidates, "
+            f"{len(result['existing'])} existing mentioned")
+
+        # Record this video as a source on existing concepts it discussed
+        for slug in result["existing"]:
+            src = concepts[slug].setdefault("sources", [])
+            if vid_id not in src:
+                src.append(vid_id)
+        if result["existing"]:
+            save_json(CONCEPTS_FILE, concepts)
 
         # Write chapters for each new concept
+        failed = 0
+        merged = 0
         for concept in new_concepts:
             slug = concept["slug"]
             if slug in concepts:
                 log(f"    Skip (exists): {concept['title']}")
+                merge_into(slug, concept["title"], vid_id, concepts)
+                save_json(CONCEPTS_FILE, concepts)
+                continue
+
+            # Dedup layers: fuzzy title match, then LLM judge
+            status, match = resolve_candidate(concept, concepts)
+            if status is None:
+                failed += 1
+                continue
+            if status == "dup":
+                merge_into(match, concept["title"], vid_id, concepts)
+                save_json(CONCEPTS_FILE, concepts)
+                merged += 1
                 continue
 
             log(f"    Writing: {concept['title']}")
@@ -748,7 +1249,9 @@ def run_once():
                 concepts[slug] = {
                     "title": concept["title"],
                     "category": concept["category"],
+                    "flag": concept.get("flag", "plain"),
                     "summary": concept["summary"],
+                    "context": concept.get("context", ""),
                     "sources": [vid_id],
                     "added": datetime.now().strftime("%Y-%m-%d"),
                     "chapter_html": chapter_html,
@@ -756,22 +1259,35 @@ def run_once():
                 new_concept_count += 1
                 # Save after each concept (crash safety)
                 save_json(CONCEPTS_FILE, concepts)
+            else:
+                failed += 1
 
-        # Mark video as processed
+        if failed:
+            # Concepts that did get written are saved and will be skipped
+            # next time; the video stays unprocessed so the rest get retried.
+            log(f"    {failed} chapter(s) failed — video left for retry")
+            continue
+
+        # Mark video as processed.  Health metric: over time a channel's
+        # videos should show fewer "new" and more "existing"/"merged".
         processed[vid_id] = {
             "title": title,
             "channel": channel,
             "processed": datetime.now().strftime("%Y-%m-%d %H:%M"),
-            "concepts_extracted": len(new_concepts),
+            "concepts_extracted": len(new_concepts) - merged,
+            "merged_duplicates": merged,
+            "existing_mentioned": len(result["existing"]),
         }
         save_json(PROCESSED_FILE, processed)
+        videos_done += 1
 
-    if new_concept_count > 0:
-        log(f"  Total new concepts: {new_concept_count}")
+    if videos_done > 0 or new_concept_count > 0:
+        log(f"  Videos completed: {videos_done}, "
+            f"new concepts: {new_concept_count}")
         rebuild_html(concepts)
         git_push()
     else:
-        log("  No new concepts to add")
+        log("  Nothing completed this cycle")
 
     log("=== Done ===\n")
 

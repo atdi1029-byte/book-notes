@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Duration Matching Strategy - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.tier .tier-desc { color: #a08060; font-size: 0.85rem; margin: 0.4rem 0 0.8rem; }
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../fixed-income-bonds.html">&larr; Fixed Income &amp; Bonds</a>
+
+<div class="concept-meta"><span>standard</span><span>Fixed Income &amp; Bonds</span><span>added 2026-09-03</span></div>
+<h4 id="duration_matching_strategy">Duration Matching Strategy</h4>
+
+<p><strong>Duration matching</strong> is the practice of aligning the maturity dates of your bond investments with the dates when you actually need the money. If you need $50,000 in three years for a down payment, you buy bonds that mature in three years — not bonds maturing in ten or thirty. It sounds almost too simple to deserve a name, but violations of this principle are responsible for a stunning share of investor losses in rising-rate environments. The concept lives at the intersection of cash flow planning and interest rate risk management, and understanding it well means understanding why bond prices move at all.</p>
+
+<p>To see why duration matching matters, you first need to understand what <strong>bond duration</strong> actually measures. Duration is not simply the time until a bond matures — it is a weighted measure of how sensitive a bond's price is to changes in interest rates. A bond with a duration of ten years will lose roughly ten percent of its market value if interest rates rise by one percentage point. A bond with a duration of two years loses roughly two percent under the same shock. This is the mechanical reality that makes the choice of duration one of the most consequential decisions a bond investor makes, and it is largely invisible until rates actually move.</p>
+
+<p>The mechanism works like this. When you buy a bond, you lock in a fixed coupon payment — say, 3% annually on a ten-year Treasury. If market rates then climb to 5%, newly issued bonds offer better terms. Your old bond, paying only 3%, becomes less attractive, so its market price falls until the effective yield to a new buyer equals the prevailing 5%. The longer the bond's remaining life, the more future payments are affected by this repricing, and the more its price drops. Short-duration bonds reprice modestly. <strong>Long-duration bonds</strong> reprice violently. Duration matching protects you by ensuring you never need to sell before maturity — because at maturity, you receive your full principal back regardless of what rates did in between.</p>
+
+<p>The video's warning lands with particular force in the context of the 2024 rate environment. The US ten-year Treasury yield surged to 4.81%, its highest level since November 2023. Investors who had loaded up on long-duration Treasury funds — perhaps expecting rate cuts to deliver capital gains — found themselves directly in the path of that repricing. A fund holding thirty-year Treasuries with an effective duration near twenty years would have lost roughly twenty percent of its market value for every one-percentage-point rise in long rates. Investors who needed that money for near-term expenses could not wait for rates to fall back — they were forced to sell at depressed prices, crystallizing losses that a simple duration-matching discipline would have prevented entirely.</p>
+
+<p>Practically, implementing a duration match starts with mapping your cash flow needs. When do you need the money — and how precisely? A retiree drawing down savings over twenty years has very different needs than someone saving for a house purchase in four years. Once you have a timeline, you ladder bonds across those maturities: buy some bonds maturing in one year, some in two, some in three, and so on, weighted toward when the cash is actually needed. This <strong>bond ladder</strong> structure means you always have bonds coming due near term, reducing the risk that you ever need to sell a long-duration position into a bad market. Each rung of the ladder also reinvests at prevailing rates as it matures, giving you natural rate exposure on the way up.</p>
+
+<p>The video frames the duration check as the first practical action a viewer should take — specifically warning those sitting in <strong>extended-duration Treasury funds</strong> while hoping for rate cuts. This is a common and costly strategy. The logic is seductive: if you believe rates will fall, long-duration bonds will appreciate most, delivering capital gains on top of the coupon. But this is speculation, not duration matching. If you are wrong — if rates stay elevated or climb further, as structural forces like Japanese government bond market disruptions can push them — you are holding the most interest-rate-sensitive instruments in the market while needing cash that you cannot afford to sell at a loss. The strategy only pays off if your rate-cut timing is correct. Duration matching eliminates the need to be right about timing entirely.</p>
+
+<p>The most common misconception about duration matching is that it requires accepting lower yields. It does not, necessarily. A well-constructed ladder captures the entire yield curve — short maturities, intermediate maturities, and select longer maturities for cash you genuinely will not need for many years. If the yield curve is steep (long rates significantly higher than short rates), a ladder captures meaningful yield at multiple tenors without concentrating all risk at the long end. The error is not holding long bonds per se — it is holding more long-duration exposure than your actual cash flow horizon justifies. If you will not touch money for fifteen years, a fifteen-year bond is duration-matched. If you might need money in three years, a fifteen-year bond is a speculation, not an investment.</p>
+
+<p>Duration matching breaks down in a few specific situations worth understanding. First, <strong>inflation risk</strong>: even a perfectly duration-matched portfolio delivers a fixed nominal sum. If inflation has eroded purchasing power by the time the bonds mature, you receive all your principal but can buy less with it. This is why many planners combine duration-matched nominal Treasuries with <strong>TIPS</strong> (Treasury Inflation-Protected Securities) to hedge the real value of future cash flows. Second, forced selling: a job loss or medical emergency can force you to liquidate before maturity, breaking the protection the strategy offers. This argues for holding a genuine cash emergency fund outside the bond ladder entirely. Third, when bond funds rather than individual bonds are used, true duration matching is difficult — funds have no maturity date, so they can never simply return your principal at a fixed point in time.</p>
+
+<p>This concept connects directly to broader market dynamics visible in the video's global bond convulsion. When Japanese investors — the world's largest holders of foreign bonds — repatriate capital because domestic Japanese government bond yields finally offer a competitive return, they sell long-duration foreign bonds first. This selling pressure pushes long yields higher globally, as it did when Germany's thirty-year broke above 3.84% and Britain's thirty-year guilt approached a twenty-seven-year high near 6%. For an individual investor, understanding duration matching means understanding why these macro flows matter to your portfolio: the same mechanism that reprices sovereign debt reprices your bond fund. The investors best insulated from that repricing are those who matched durations to their actual needs and can simply hold to maturity, collecting coupons and sleeping through the volatility.</p>
+<div class="concept-side">Sources: THE TOKYO TIME BOMB: The Hidden Catalyst Locking Mortgage Rates at 7%<br>Related in this category: <a href="two_year_treasury_yield.html">Two-Year Treasury Yield</a>, <a href="treasury_bond_buyback_program.html">Treasury Bond Buyback Program</a>, <a href="thirty_year_treasury_bond.html">30-Year Treasury Bond</a>, <a href="debt_rollover_risk.html">Debt Rollover Risk</a>, <a href="corporate_refinancing_cliff.html">Corporate Refinancing Cliff</a>, <a href="duration_risk.html">Duration Risk</a></div>
+<button class="concept-done" data-slug="duration_matching_strategy" onclick="toggleDone('duration_matching_strategy')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_duration_matching_strategy';</script>
+<script src="../../book.js"></script>
+
+<script>
+(function() {
+  var DONE_KEY = 'fg_done', FILTER_KEY = 'fg_filter';
+  var done = JSON.parse(localStorage.getItem(DONE_KEY) || '{}');
+  var filter = localStorage.getItem(FILTER_KEY) || 'all';
+
+  function visible(flag) {
+    if (filter === 'star') return flag === 'star';
+    if (filter === 'nodeep') return flag !== 'deep';
+    return true;
+  }
+
+  function apply() {
+    var shown = 0, total = 0, hidden = 0;
+    document.querySelectorAll('.concept-row').forEach(function(r) {
+      var slug = r.dataset.slug, flag = r.dataset.flag;
+      total++;
+      if (done[slug]) r.classList.add('done'); else r.classList.remove('done');
+      if (visible(flag)) { r.classList.remove('fg-hidden'); shown++; }
+      else { r.classList.add('fg-hidden'); hidden++; }
+    });
+    document.querySelectorAll('.cat-card').forEach(function(card) {
+      var slugs = card.dataset.slugs ? card.dataset.slugs.split(',') : [];
+      var flags = card.dataset.flags ? card.dataset.flags.split(',') : [];
+      var vis = 0, allDone = slugs.length > 0;
+      slugs.forEach(function(sl, i) {
+        if (visible(flags[i])) vis++;
+        if (!done[sl]) allDone = false;
+      });
+      total += slugs.length; shown += vis;
+      var c = card.querySelector('.cat-count');
+      if (c) c.textContent = vis + (vis !== slugs.length ? ' of ' + slugs.length : '') + ' concepts' +
+        (card.dataset.stars ? ' \u00b7 ' + card.dataset.stars + ' \u2605' : '');
+      if (vis === 0) card.classList.add('fg-empty'); else card.classList.remove('fg-empty');
+      if (allDone) card.classList.add('done'); else card.classList.remove('done');
+    });
+    document.querySelectorAll('[data-filter]').forEach(function(b) {
+      b.classList.toggle('active', b.dataset.filter === filter);
+    });
+    var n = document.getElementById('fgCount');
+    if (n) n.textContent = shown + ' of ' + total + ' shown';
+    var h = document.getElementById('fgHiddenNote');
+    if (h) h.textContent = hidden ? hidden + ' hidden by the filter.' : '';
+    var btn = document.querySelector('.concept-done');
+    if (btn) {
+      var on = !!done[btn.dataset.slug];
+      btn.classList.toggle('on', on);
+      btn.textContent = on ? '\u2713 Completed' : '\u2713 Mark complete';
+    }
+  }
+
+  window.setFilter = function(f) {
+    filter = f; localStorage.setItem(FILTER_KEY, f); apply();
+  };
+  window.toggleDone = function(slug) {
+    if (done[slug]) delete done[slug]; else done[slug] = true;
+    localStorage.setItem(DONE_KEY, JSON.stringify(done));
+    apply();
+  };
+  window.toggleHideDone = function() {
+    document.body.classList.toggle('hide-done');
+  };
+  apply();
+})();
+</script>
+
+</body>
+</html>

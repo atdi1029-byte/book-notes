@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Structural Food Price Floor - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.tier .tier-desc { color: #a08060; font-size: 0.85rem; margin: 0.4rem 0 0.8rem; }
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../economics-fundamentals.html">&larr; Economics Fundamentals</a>
+
+<div class="concept-meta"><span>deep cut</span><span>Economics Fundamentals</span><span>added 2026-08-31</span></div>
+<h4 id="structural_food_inflation_floor">Structural Food Price Floor</h4>
+
+<p>A <strong>structural food price floor</strong> is a baseline level below which grocery prices cannot sustainably fall, regardless of what central banks do with interest rates or what policymakers do with trade policy. The word "structural" is doing real work here — it means the floor is built into the architecture of food production itself, not a temporary market quirk. Think of it like the foundation of a building: you can redecorate the rooms above all you want, but you cannot move the floors lower than the foundation allows. In food markets, that foundation is the cost of producing the food in the first place — seeds, fertilizer, fuel, machinery, and critically, the debt farmers carry to finance all of it months before a single crop reaches your cart.</p>
+
+<p>This concept matters enormously because most inflation debates focus on the wrong variables. Commentators obsess over Federal Reserve rate decisions, tariffs on finished goods, or consumer demand patterns. But food prices have a supply-side cost structure that is largely indifferent to those levers. When a farmer plants corn in April, the cost of that corn is already locked in: the fertilizer was purchased in February, the fuel to run the tractor is a daily input, and the loan payment on the equipment is due regardless of what the harvest brings. If those input costs are elevated, the price the farmer must charge at the farm gate is elevated — and that cost ripples forward through every processor, distributor, and retailer before landing on your grocery receipt months later.</p>
+
+<p>The mechanism works in a specific sequence that plays out over a 9-to-18-month production cycle. Step one: farmers take on debt or spend capital to purchase <strong>farm inputs</strong> — fertilizer, seeds, pesticides, diesel. Step two: they plant and manage the crop through the growing season, during which time they are paying interest on operating loans. Step three: at harvest, whatever the market price is, the farmer must still recover enough to cover those input costs plus their <strong>debt service</strong> — the principal and interest payments on farm loans. If market prices fall below that recovery threshold, farmers lose money and eventually exit production. Reduced production then pushes prices back up. The floor self-enforces through the brutal economics of insolvency: prices cannot stay below cost of production for long without contracting supply.</p>
+
+<p>The real-world numbers from 2026 make this concrete and alarming. According to USDA projections cited in the video, total American farm sector debt will hit a record <strong>$624.7 billion</strong> this year, up more than 5% from 2025. The <strong>farm debt-to-asset ratio</strong> has climbed to 13.75%, the highest reading in over a decade. But the most telling metric is the <strong>debt service ratio</strong> — the share of gross farm income consumed by loan payments before a single operating bill is paid. That ratio is forecast to match its highest level since 1987. That year matters: 1987 was the tail end of the 1980s farm credit collapse, a crisis that triggered mass foreclosures, forced auctions, and wiped out an entire generation of family farming operations.</p>
+
+<blockquote>"American agriculture is currently carrying a heavier debt load relative to its actual ability to service that debt than at almost any point since the mid-1980s farm crisis... We are talking about matching the peak of the 1980s farm credit collapse."</blockquote>
+
+<p>For investors and traders, a structural food price floor creates a specific set of actionable signals. When farm debt metrics deteriorate — rising debt-to-asset ratios, rising debt service ratios, falling <strong>net farm income</strong> — it is a leading indicator that food commodity prices will remain elevated or continue rising. Futures traders in corn, wheat, soybeans, and cattle watch these balance sheet signals because they reveal producer stress before it shows up in spot prices. Equity investors monitoring consumer staples companies, grocery chains, or food processors use the same data to anticipate <strong>cost-push inflation</strong> that will compress margins or get passed through to consumers. The key insight: farm financial stress is a 6-to-18-month leading indicator for grocery price behavior.</p>
+
+<p>There are important nuances that trip people up. First, a structural floor does not mean prices cannot fall temporarily — they absolutely can during bumper harvests or demand shocks. The floor means they cannot stay low sustainably without triggering supply contraction that eventually restores them. Second, the floor is not a single price point; it shifts over time as input costs change. If fertilizer costs drop significantly, the floor lowers. If diesel prices surge, the floor rises. Third, this is a <strong>sector-wide phenomenon</strong>, not uniform across all farms. Large, well-capitalized operations can absorb losses longer. It is the marginal producer — the smaller family farm with thin equity — who defines where the floor actually sits, because they are the first to exit when prices fall below cost.</p>
+
+<p>The concept gets particularly dangerous when the floor itself is under threat from external shocks that spike input costs simultaneously. The video highlights fertilizer as exactly this kind of compounding risk. A lapsed trade treaty with Canada — a major supplier — threatens to disrupt up to 90% of American <strong>potash</strong> supply, a core fertilizer ingredient. If fertilizer costs spike sharply, the structural floor rises with them, potentially quite rapidly. This is different from demand-pull inflation, which the Fed can theoretically fight with rate hikes. Cost-push inflation baked into agricultural inputs is largely immune to monetary policy. Rate hikes might slow consumer spending on electronics; they do nothing to lower the price of nitrogen fertilizer or diesel.</p>
+
+<p>The structural food price floor connects directly to several adjacent concepts worth understanding. <strong>Cost-push inflation</strong> is the broader category — inflation driven by rising production costs rather than excess demand. The <strong>farm credit system</strong> and its stress levels are the institutional plumbing through which the floor manifests. <strong>Commodity futures markets</strong> are where the signal most quickly appears when farm stress becomes acute. And historically, this concept links to the <strong>agricultural credit crisis of the 1980s</strong>, when land prices collapsed, debt remained fixed, and the resulting squeeze produced exactly the foreclosure wave the USDA data suggests we may be approaching again. Understanding the structural floor is understanding that food price inflation has roots that precede any store shelf by a full growing season — and that those roots are currently under severe financial stress.</p>
+<div class="concept-side">Sources: THE 1987 FARM CRISIS IS BACK: The $624B Debt Bomb Under Your Food Supply!<br>Related in this category: <a href="national_debt_debt_ceiling.html">National Debt</a>, <a href="cost_passthrough_mechanism.html">Cost Pass-Through Mechanism (Farm to Consumer)</a>, <a href="structural_embedded_inflation.html">Structural (Embedded) Inflation</a>, <a href="k_shaped_two_speed_economy.html">K-Shaped / Two-Speed Economy</a>, <a href="nominal_vs_real_consumer_spending.html">Nominal vs. Real Consumer Spending</a>, <a href="debt_to_gdp_ratio.html">Debt-to-GDP Ratio</a></div>
+<button class="concept-done" data-slug="structural_food_inflation_floor" onclick="toggleDone('structural_food_inflation_floor')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_structural_food_inflation_floor';</script>
+<script src="../../book.js"></script>
+
+<script>
+(function() {
+  var DONE_KEY = 'fg_done', FILTER_KEY = 'fg_filter';
+  var done = JSON.parse(localStorage.getItem(DONE_KEY) || '{}');
+  var filter = localStorage.getItem(FILTER_KEY) || 'all';
+
+  function visible(flag) {
+    if (filter === 'star') return flag === 'star';
+    if (filter === 'nodeep') return flag !== 'deep';
+    return true;
+  }
+
+  function apply() {
+    var shown = 0, total = 0, hidden = 0;
+    document.querySelectorAll('.concept-row').forEach(function(r) {
+      var slug = r.dataset.slug, flag = r.dataset.flag;
+      total++;
+      if (done[slug]) r.classList.add('done'); else r.classList.remove('done');
+      if (visible(flag)) { r.classList.remove('fg-hidden'); shown++; }
+      else { r.classList.add('fg-hidden'); hidden++; }
+    });
+    document.querySelectorAll('.cat-card').forEach(function(card) {
+      var slugs = card.dataset.slugs ? card.dataset.slugs.split(',') : [];
+      var flags = card.dataset.flags ? card.dataset.flags.split(',') : [];
+      var vis = 0, allDone = slugs.length > 0;
+      slugs.forEach(function(sl, i) {
+        if (visible(flags[i])) vis++;
+        if (!done[sl]) allDone = false;
+      });
+      total += slugs.length; shown += vis;
+      var c = card.querySelector('.cat-count');
+      if (c) c.textContent = vis + (vis !== slugs.length ? ' of ' + slugs.length : '') + ' concepts' +
+        (card.dataset.stars ? ' \u00b7 ' + card.dataset.stars + ' \u2605' : '');
+      if (vis === 0) card.classList.add('fg-empty'); else card.classList.remove('fg-empty');
+      if (allDone) card.classList.add('done'); else card.classList.remove('done');
+    });
+    document.querySelectorAll('[data-filter]').forEach(function(b) {
+      b.classList.toggle('active', b.dataset.filter === filter);
+    });
+    var n = document.getElementById('fgCount');
+    if (n) n.textContent = shown + ' of ' + total + ' shown';
+    var h = document.getElementById('fgHiddenNote');
+    if (h) h.textContent = hidden ? hidden + ' hidden by the filter.' : '';
+    var btn = document.querySelector('.concept-done');
+    if (btn) {
+      var on = !!done[btn.dataset.slug];
+      btn.classList.toggle('on', on);
+      btn.textContent = on ? '\u2713 Completed' : '\u2713 Mark complete';
+    }
+  }
+
+  window.setFilter = function(f) {
+    filter = f; localStorage.setItem(FILTER_KEY, f); apply();
+  };
+  window.toggleDone = function(slug) {
+    if (done[slug]) delete done[slug]; else done[slug] = true;
+    localStorage.setItem(DONE_KEY, JSON.stringify(done));
+    apply();
+  };
+  window.toggleHideDone = function() {
+    document.body.classList.toggle('hide-done');
+  };
+  apply();
+})();
+</script>
+
+</body>
+</html>
