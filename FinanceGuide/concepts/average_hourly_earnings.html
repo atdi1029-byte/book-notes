@@ -121,71 +121,7 @@
 <script>var BM_KEY = 'fg_c_average_hourly_earnings';</script>
 <script src="../../book.js"></script>
 
-<script>
-(function() {
-  var DONE_KEY = 'fg_done', FILTER_KEY = 'fg_filter';
-  var done = JSON.parse(localStorage.getItem(DONE_KEY) || '{}');
-  var filter = localStorage.getItem(FILTER_KEY) || 'all';
-
-  function visible(flag) {
-    if (filter === 'star') return flag === 'star';
-    if (filter === 'nodeep') return flag !== 'deep';
-    return true;
-  }
-
-  function apply() {
-    var shown = 0, total = 0, hidden = 0;
-    document.querySelectorAll('.concept-row').forEach(function(r) {
-      var slug = r.dataset.slug, flag = r.dataset.flag;
-      total++;
-      if (done[slug]) r.classList.add('done'); else r.classList.remove('done');
-      if (visible(flag)) { r.classList.remove('fg-hidden'); shown++; }
-      else { r.classList.add('fg-hidden'); hidden++; }
-    });
-    document.querySelectorAll('.cat-card').forEach(function(card) {
-      var slugs = card.dataset.slugs ? card.dataset.slugs.split(',') : [];
-      var flags = card.dataset.flags ? card.dataset.flags.split(',') : [];
-      var vis = 0, allDone = slugs.length > 0;
-      slugs.forEach(function(sl, i) {
-        if (visible(flags[i])) vis++;
-        if (!done[sl]) allDone = false;
-      });
-      total += slugs.length; shown += vis;
-      var c = card.querySelector('.cat-count');
-      if (c) c.textContent = vis + (vis !== slugs.length ? ' of ' + slugs.length : '') + ' concepts' +
-        (card.dataset.stars ? ' \u00b7 ' + card.dataset.stars + ' \u2605' : '');
-      if (vis === 0) card.classList.add('fg-empty'); else card.classList.remove('fg-empty');
-      if (allDone) card.classList.add('done'); else card.classList.remove('done');
-    });
-    document.querySelectorAll('[data-filter]').forEach(function(b) {
-      b.classList.toggle('active', b.dataset.filter === filter);
-    });
-    var n = document.getElementById('fgCount');
-    if (n) n.textContent = shown + ' of ' + total + ' shown';
-    var h = document.getElementById('fgHiddenNote');
-    if (h) h.textContent = hidden ? hidden + ' hidden by the filter.' : '';
-    var btn = document.querySelector('.concept-done');
-    if (btn) {
-      var on = !!done[btn.dataset.slug];
-      btn.classList.toggle('on', on);
-      btn.textContent = on ? '\u2713 Completed' : '\u2713 Mark complete';
-    }
-  }
-
-  window.setFilter = function(f) {
-    filter = f; localStorage.setItem(FILTER_KEY, f); apply();
-  };
-  window.toggleDone = function(slug) {
-    if (done[slug]) delete done[slug]; else done[slug] = true;
-    localStorage.setItem(DONE_KEY, JSON.stringify(done));
-    apply();
-  };
-  window.toggleHideDone = function() {
-    document.body.classList.toggle('hide-done');
-  };
-  apply();
-})();
-</script>
+<script src="../fg.js"></script>
 
 </body>
 </html>

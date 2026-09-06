@@ -829,81 +829,15 @@ PAGE_CSS = """
 .back-link:hover { color: #d4a574; }
 """
 
-# Shared JS: completion tracking + the star/deep-cut filter, both persisted
-PAGE_JS = """
-<script>
-(function() {
-  var DONE_KEY = 'fg_done', FILTER_KEY = 'fg_filter';
-  var done = JSON.parse(localStorage.getItem(DONE_KEY) || '{}');
-  var filter = localStorage.getItem(FILTER_KEY) || 'all';
-
-  function visible(flag) {
-    if (filter === 'star') return flag === 'star';
-    if (filter === 'nodeep') return flag !== 'deep';
-    return true;
-  }
-
-  function apply() {
-    var shown = 0, total = 0, hidden = 0;
-    document.querySelectorAll('.concept-row').forEach(function(r) {
-      var slug = r.dataset.slug, flag = r.dataset.flag;
-      total++;
-      if (done[slug]) r.classList.add('done'); else r.classList.remove('done');
-      if (visible(flag)) { r.classList.remove('fg-hidden'); shown++; }
-      else { r.classList.add('fg-hidden'); hidden++; }
-    });
-    document.querySelectorAll('.cat-card').forEach(function(card) {
-      var slugs = card.dataset.slugs ? card.dataset.slugs.split(',') : [];
-      var flags = card.dataset.flags ? card.dataset.flags.split(',') : [];
-      var vis = 0, allDone = slugs.length > 0;
-      slugs.forEach(function(sl, i) {
-        if (visible(flags[i])) vis++;
-        if (!done[sl]) allDone = false;
-      });
-      total += slugs.length; shown += vis;
-      var c = card.querySelector('.cat-count');
-      if (c) c.textContent = vis + (vis !== slugs.length ? ' of ' + slugs.length : '') + ' concepts' +
-        (card.dataset.stars ? ' \\u00b7 ' + card.dataset.stars + ' \\u2605' : '');
-      if (vis === 0) card.classList.add('fg-empty'); else card.classList.remove('fg-empty');
-      if (allDone) card.classList.add('done'); else card.classList.remove('done');
-    });
-    document.querySelectorAll('[data-filter]').forEach(function(b) {
-      b.classList.toggle('active', b.dataset.filter === filter);
-    });
-    var n = document.getElementById('fgCount');
-    if (n) n.textContent = shown + ' of ' + total + ' shown';
-    var h = document.getElementById('fgHiddenNote');
-    if (h) h.textContent = hidden ? hidden + ' hidden by the filter.' : '';
-    var btn = document.querySelector('.concept-done');
-    if (btn) {
-      var on = !!done[btn.dataset.slug];
-      btn.classList.toggle('on', on);
-      btn.textContent = on ? '\\u2713 Completed' : '\\u2713 Mark complete';
-    }
-  }
-
-  window.setFilter = function(f) {
-    filter = f; localStorage.setItem(FILTER_KEY, f); apply();
-  };
-  window.toggleDone = function(slug) {
-    if (done[slug]) delete done[slug]; else done[slug] = true;
-    localStorage.setItem(DONE_KEY, JSON.stringify(done));
-    apply();
-  };
-  window.toggleHideDone = function() {
-    document.body.classList.toggle('hide-done');
-  };
-  apply();
-})();
-</script>
-"""
+# Shared JS is now in fg.js — loaded as external script
+PAGE_JS = True  # sentinel: _page_wrap adds <script src="fg.js"> when truthy
 
 FILTER_BAR = """
 <div class="fg-bar">
   <button class="fg-btn" data-filter="all" onclick="setFilter('all')">Everything</button>
   <button class="fg-btn" data-filter="nodeep" onclick="setFilter('nodeep')">Hide deep cuts</button>
   <button class="fg-btn" data-filter="star" onclick="setFilter('star')">&#9733; must-know only</button>
-  <button class="fg-btn" onclick="toggleHideDone()">Hide completed</button>
+  <button class="fg-btn fg-btn-hide" onclick="toggleHideDone()">Hide completed</button>
   <span class="fg-count" id="fgCount"></span>
 </div>"""
 
@@ -923,6 +857,15 @@ def _page_wrap(title, body, css_path="../book.css", back_href=None,
     bm = ""
     if bm_key:
         bm = f"<script>var BM_KEY = '{bm_key}';</script>"
+    # PAGE_JS sentinel → load external fg.js (path relative to css_path)
+    if extra_js is PAGE_JS:
+        fg_dir = css_path.rsplit('book.css', 1)[0].rstrip('/')
+        # css_path is relative to the HTML file, fg.js is in FinanceGuide/
+        # ../book.css → fg.js, ../../book.css → ../fg.js
+        if css_path.startswith('../../'):
+            extra_js = '<script src="../fg.js"></script>'
+        else:
+            extra_js = '<script src="fg.js"></script>'
     return f"""<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1035,18 +978,12 @@ def rebuild_html(concepts):
         items = by_cat[name]
         if not items:
             continue
-        books = ""
-        if cat["stars"]:
-            books = ('<div class="books"><h3>Read deeper &mdash; &#9733; picks from the reading list</h3><ul>'
-                     + "".join(f"<li>{_esc(b)}</li>" for b in cat["stars"])
-                     + "</ul></div>")
         body = f"""
 <h1>{_esc(name)}</h1>
 <p class="subtitle">{_esc(cat["tier_name"])} &middot; {len(items)} concepts</p>
 {FILTER_BAR}
 {_concept_rows(items, "concepts/")}
-<p class="fg-hidden-note" id="fgHiddenNote"></p>
-{books}"""
+<p class="fg-hidden-note" id="fgHiddenNote"></p>"""
         path = BASE_DIR / f"{cat['slug']}.html"
         path.write_text(_page_wrap(name, body, css_path="../book.css",
                                    back_href="index.html", back_label="Finance Guide",

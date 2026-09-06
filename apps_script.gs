@@ -226,6 +226,27 @@ function doGet(e) {
     return jsonpWrap_(JSON.stringify({ status: 'ok', entries: existing }), callback);
   }
 
+  // ── FINANCE GUIDE DONE ──
+  // Settings!F1 stores fg_done as JSON object { slug: true, ... }
+  if (action === 'fg_get_done') {
+    var fgSheet = ss.getSheetByName('Settings');
+    if (!fgSheet) fgSheet = ss.insertSheet('Settings');
+    var raw = fgSheet.getRange('F1').getValue() || '{}';
+    return jsonpWrap_(JSON.stringify({ status: 'ok', fg_done: JSON.parse(raw) }), callback);
+  }
+
+  if (action === 'fg_toggle_done') {
+    var fgSheet = ss.getSheetByName('Settings');
+    if (!fgSheet) fgSheet = ss.insertSheet('Settings');
+    var slug = e.parameter.slug || '';
+    var isDone = e.parameter.done === 'true';
+    var fgExisting = {};
+    try { fgExisting = JSON.parse(fgSheet.getRange('F1').getValue() || '{}'); } catch(err) {}
+    if (isDone) { fgExisting[slug] = true; } else { delete fgExisting[slug]; }
+    fgSheet.getRange('F1').setValue(JSON.stringify(fgExisting));
+    return jsonpWrap_(JSON.stringify({ status: 'ok', fg_done: fgExisting }), callback);
+  }
+
   // ── ZERCHER ──
   var zSheet = ss.getSheetByName('Zercher');
   if (!zSheet && action.indexOf('zercher') === 0) {

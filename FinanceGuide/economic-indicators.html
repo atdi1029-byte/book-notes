@@ -101,80 +101,16 @@
   <button class="fg-btn" data-filter="all" onclick="setFilter('all')">Everything</button>
   <button class="fg-btn" data-filter="nodeep" onclick="setFilter('nodeep')">Hide deep cuts</button>
   <button class="fg-btn" data-filter="star" onclick="setFilter('star')">&#9733; must-know only</button>
-  <button class="fg-btn" onclick="toggleHideDone()">Hide completed</button>
+  <button class="fg-btn fg-btn-hide" onclick="toggleHideDone()">Hide completed</button>
   <span class="fg-count" id="fgCount"></span>
 </div>
 <a class="concept-row" href="concepts/ism_purchasing_managers_index.html" data-slug="ism_purchasing_managers_index" data-flag="star"><span class="mark">&#9733;</span><span class="ctitle">ISM Purchasing Managers' Index (PMI) — Prices Paid</span></a><a class="concept-row" href="concepts/producer_price_index.html" data-slug="producer_price_index" data-flag="star"><span class="mark">&#9733;</span><span class="ctitle">Producer Price Index (PPI)</span></a><a class="concept-row" href="concepts/adp_employment_report.html" data-slug="adp_employment_report" data-flag="plain"><span class="mark"></span><span class="ctitle">ADP National Employment Report</span></a><a class="concept-row" href="concepts/average_hourly_earnings.html" data-slug="average_hourly_earnings" data-flag="plain"><span class="mark"></span><span class="ctitle">Average Hourly Earnings (Wage Growth)</span></a><a class="concept-row" href="concepts/challenger_gray_christmas_layoff_report.html" data-slug="challenger_gray_christmas_layoff_report" data-flag="plain"><span class="mark"></span><span class="ctitle">Challenger, Gray &amp; Christmas Job Cut Report</span></a><a class="concept-row" href="concepts/jolts_job_openings_survey.html" data-slug="jolts_job_openings_survey" data-flag="plain"><span class="mark"></span><span class="ctitle">JOLTS (Job Openings and Labor Turnover Survey)</span></a><a class="concept-row" href="concepts/knowledge_economy_information_sector_employment.html" data-slug="knowledge_economy_information_sector_employment" data-flag="plain"><span class="mark"></span><span class="ctitle">Knowledge Economy / Information Sector Employment</span></a><a class="concept-row" href="concepts/labor_market_breadth.html" data-slug="labor_market_breadth" data-flag="plain"><span class="mark"></span><span class="ctitle">Labor Market Breadth (Sector Concentration in Hiring)</span></a><a class="concept-row" href="concepts/non_farm_payroll_report.html" data-slug="non_farm_payroll_report" data-flag="plain"><span class="mark"></span><span class="ctitle">Non-Farm Payroll (NFP) Report</span></a><a class="concept-row" href="concepts/payroll_data_revision.html" data-slug="payroll_data_revision" data-flag="plain"><span class="mark"></span><span class="ctitle">Payroll Data Revision (BLS Benchmark Revision)</span></a><a class="concept-row" href="concepts/private_vs_public_sector_employment.html" data-slug="private_vs_public_sector_employment" data-flag="plain"><span class="mark"></span><span class="ctitle">Private vs. Public Sector Employment Quality</span></a><a class="concept-row" href="concepts/u6_unemployment_rate.html" data-slug="u6_unemployment_rate" data-flag="plain"><span class="mark"></span><span class="ctitle">U6 Unemployment Rate (Broad Labor Underutilization)</span></a><a class="concept-row" href="concepts/university_of_michigan_consumer_sentiment.html" data-slug="university_of_michigan_consumer_sentiment" data-flag="plain"><span class="mark"></span><span class="ctitle">University of Michigan Consumer Sentiment Index</span></a>
 <p class="fg-hidden-note" id="fgHiddenNote"></p>
-<div class="books"><h3>Read deeper &mdash; &#9733; picks from the reading list</h3><ul><li>The Trader's Guide to Key Economic Indicators — Richard Yamarone</li></ul></div>
+
 <script>var BM_KEY = 'fg_economic-indicators';</script>
 <script src="../book.js"></script>
 
-<script>
-(function() {
-  var DONE_KEY = 'fg_done', FILTER_KEY = 'fg_filter';
-  var done = JSON.parse(localStorage.getItem(DONE_KEY) || '{}');
-  var filter = localStorage.getItem(FILTER_KEY) || 'all';
-
-  function visible(flag) {
-    if (filter === 'star') return flag === 'star';
-    if (filter === 'nodeep') return flag !== 'deep';
-    return true;
-  }
-
-  function apply() {
-    var shown = 0, total = 0, hidden = 0;
-    document.querySelectorAll('.concept-row').forEach(function(r) {
-      var slug = r.dataset.slug, flag = r.dataset.flag;
-      total++;
-      if (done[slug]) r.classList.add('done'); else r.classList.remove('done');
-      if (visible(flag)) { r.classList.remove('fg-hidden'); shown++; }
-      else { r.classList.add('fg-hidden'); hidden++; }
-    });
-    document.querySelectorAll('.cat-card').forEach(function(card) {
-      var slugs = card.dataset.slugs ? card.dataset.slugs.split(',') : [];
-      var flags = card.dataset.flags ? card.dataset.flags.split(',') : [];
-      var vis = 0, allDone = slugs.length > 0;
-      slugs.forEach(function(sl, i) {
-        if (visible(flags[i])) vis++;
-        if (!done[sl]) allDone = false;
-      });
-      total += slugs.length; shown += vis;
-      var c = card.querySelector('.cat-count');
-      if (c) c.textContent = vis + (vis !== slugs.length ? ' of ' + slugs.length : '') + ' concepts' +
-        (card.dataset.stars ? ' \u00b7 ' + card.dataset.stars + ' \u2605' : '');
-      if (vis === 0) card.classList.add('fg-empty'); else card.classList.remove('fg-empty');
-      if (allDone) card.classList.add('done'); else card.classList.remove('done');
-    });
-    document.querySelectorAll('[data-filter]').forEach(function(b) {
-      b.classList.toggle('active', b.dataset.filter === filter);
-    });
-    var n = document.getElementById('fgCount');
-    if (n) n.textContent = shown + ' of ' + total + ' shown';
-    var h = document.getElementById('fgHiddenNote');
-    if (h) h.textContent = hidden ? hidden + ' hidden by the filter.' : '';
-    var btn = document.querySelector('.concept-done');
-    if (btn) {
-      var on = !!done[btn.dataset.slug];
-      btn.classList.toggle('on', on);
-      btn.textContent = on ? '\u2713 Completed' : '\u2713 Mark complete';
-    }
-  }
-
-  window.setFilter = function(f) {
-    filter = f; localStorage.setItem(FILTER_KEY, f); apply();
-  };
-  window.toggleDone = function(slug) {
-    if (done[slug]) delete done[slug]; else done[slug] = true;
-    localStorage.setItem(DONE_KEY, JSON.stringify(done));
-    apply();
-  };
-  window.toggleHideDone = function() {
-    document.body.classList.toggle('hide-done');
-  };
-  apply();
-})();
-</script>
+<script src="fg.js"></script>
 
 </body>
 </html>
