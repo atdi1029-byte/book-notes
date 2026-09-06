@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Dow Jones Industrial Average (DJIA) - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.tier .tier-desc { color: #a08060; font-size: 0.85rem; margin: 0.4rem 0 0.8rem; }
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../investing-fundamentals.html">&larr; Investing Fundamentals</a>
+
+<div class="concept-meta"><span><span class="star">&#9733;</span> must-know</span><span>Investing Fundamentals</span><span>added 2026-09-06</span></div>
+<h4 id="dow_jones_industrial_average">Dow Jones Industrial Average (DJIA)</h4>
+
+<p>The <strong>Dow Jones Industrial Average</strong>, almost always called "the Dow," is one of the oldest and most recognized stock market indexes in the world. Created in 1896 by Charles Dow and Edward Jones, it tracks the stock prices of 30 large, publicly traded American companies — names like Apple, Boeing, Goldman Sachs, and Walmart. When people say "the market was up 200 points today," they are almost certainly talking about the Dow. It functions as a kind of temperature reading for the U.S. economy: a quick, widely understood gauge of how the nation's biggest businesses are doing on any given day. For most people, it is their first introduction to the concept of a market index.</p>
+
+<p>The Dow matters because it shapes sentiment — both on Wall Street and in everyday life. When the Dow falls sharply, consumer confidence tends to drop, businesses reconsider investment plans, and headlines spread anxiety about the economy. When it rises, the mood improves. Pension funds, 401(k) accounts, and institutional portfolios are often benchmarked loosely against it, meaning millions of ordinary Americans' retirement savings are influenced by its movements. It also serves as a proxy for how investors feel about U.S. economic health at any given moment. Policymakers watch it. Central bankers acknowledge it. Presidents reference it. Understanding the Dow means understanding the emotional and financial pulse of the American economy.</p>
+
+<p>Mechanically, the Dow works through a <strong>price-weighted calculation</strong> — which sets it apart from most modern indexes. Instead of weighting companies by their total market value, the Dow simply adds up the share prices of its 30 components and divides by a special number called the <strong>Dow Divisor</strong>. The divisor adjusts over time to account for stock splits, dividend payments, and changes in the index's composition, keeping the number historically continuous. This means a company with a higher share price has a greater influence on the Dow's daily movement than a company with a lower share price, regardless of which company is actually larger. It is an older method, and one with real limitations — but it is the one the Dow uses.</p>
+
+<p>To make the price-weighting concrete: if Company A has a share price of $400 and Company B has a share price of $40, then a 1% move in Company A has ten times the impact on the Dow as a 1% move in Company B — even if Company B is actually worth more in total market capitalization. This is why some analysts argue the Dow is less precise than the <strong>S&amp;P 500</strong>, which weights its 500 companies by market cap and therefore reflects the actual economic footprint of each business more accurately. The Dow's composition is chosen by a committee and is not formula-driven, which adds another layer of subjectivity. It is a useful shorthand, but a blunt one.</p>
+
+<p>The video from Mark Malik provides a vivid real-world illustration of how the Dow behaves — and why understanding it requires reading context, not just numbers. On the Friday in question, the August jobs report came in at 162,000 new payroll jobs against a Wall Street consensus of just 53,000. That is an enormous beat. Normally, strong hiring data would be seen as a positive for corporate earnings, consumer spending, and overall economic health. Instead, the Dow fell half a percent that day.</p>
+
+<blockquote>"The market didn't sell off Friday because the economy is weak. It sold off because the economy is strong."</blockquote>
+
+<p>The reason for that seemingly paradoxical drop goes to the heart of how investors use the Dow as a signal. A strong jobs number raised the probability that the <strong>Federal Reserve</strong> would hike interest rates further — with September rate hike odds jumping to roughly 62%. Higher interest rates increase the <strong>discount rate</strong> used to value future corporate earnings. When you discount future cash flows at a higher rate, those cash flows are worth less today. Stocks fall not because businesses are performing poorly, but because the cost of money — and therefore the present value of future profits — has just risen. The Dow's decline on that Friday was a message about monetary policy expectations, not economic weakness.</p>
+
+<p>Traders and investors use the Dow in several practical ways. First, as a <strong>market sentiment indicator</strong>: a rising Dow generally signals risk appetite and optimism; a falling Dow signals caution or fear. Second, as a sector-level diagnostic when compared against other indexes. In the video, Mark Malik contrasts the Dow's 0.2% weekly loss against the S&amp;P 500's 0.1% gain and the <strong>Russell 2000</strong>'s flat finish. The divergence between these indexes tells a story: large-cap industrials and blue chips (the Dow's territory) underperformed, while the broader large-cap universe (S&amp;P) barely held on. This kind of comparison — watching indexes move independently of each other — is called <strong>index divergence analysis</strong> and is a staple of professional market reading.</p>
+
+<p>One of the most important nuances about the Dow is what it does <em>not</em> capture. With only 30 companies, it misses enormous swaths of the economy — technology firms, smaller industrials, healthcare innovators, and entire emerging sectors that do not fit the committee's selection criteria. The video notes that seven of the eleven S&amp;P 500 sectors finished lower that same week, even though the S&amp;P itself was technically up. The Dow's flat-to-down performance and the S&amp;P's marginal gain masked significant internal deterioration. Mark Malik calls it plainly:</p>
+
+<blockquote>"That is not a rally, my friends. That is a rotation wearing a rally's clothes."</blockquote>
+
+<p>A <strong>rotation</strong> means money is moving between sectors rather than entering the market broadly. Energy gained 2.2% that week while Consumer Discretionary lost 1.9%. The Dow, because it holds a particular mix of 30 stocks, may rise or fall based on which of its specific components are moving — not because the entire market is moving in the same direction. This is why professional investors never rely on the Dow alone. It is a headline number designed for quick communication, not for nuanced portfolio analysis. Treating it as the whole story is one of the most common and costly mistakes a new investor can make.</p>
+
+<p>When market conditions become extreme — during crashes, liquidity crises, or geopolitical shocks — the Dow can behave in ways that feel disconnected from reality. <strong>Circuit breakers</strong>, which halt trading when the Dow drops more than 7%, 13%, or 20% in a single session, were introduced after the 1987 crash to prevent panic-driven free-falls. In fast-moving markets, the Dow's price-weighting can amplify volatility in a single high-priced stock and make the overall index look more distressed — or more resilient — than it actually is. The March 2020 COVID crash and the 2008 financial crisis both saw the Dow used as a daily shorthand for economic fear, which is appropriate for sentiment-reading but insufficient for understanding structural risk.</p>
+
+<p>The Dow connects directly to several other core investing concepts. Its relationship with the <strong>yield curve</strong> and <strong>interest rate expectations</strong> — as illustrated by the jobs-report selloff in the video — is perhaps the most important in today's environment. It also links to <strong>earnings season</strong>, where the performance of its 30 component companies can swing the index dramatically. Understanding the Dow means understanding how it interacts with Federal Reserve policy, bond yields, sector rotation, and investor risk appetite. It is not a standalone number. It is a data point inside a larger system, and learning to read it in context — rather than in isolation — is what separates an informed investor from someone just watching the ticker.</p>
+<div class="concept-side">Sources: THE JOBS GUT PUNCH: Why Good News Sold Off Wall Street &amp; Crushed Tech!<br>Related in this category: <a href="sp_500_index.html">S&amp;P 500 Index</a></div>
+<button class="concept-done" data-slug="dow_jones_industrial_average" onclick="toggleDone('dow_jones_industrial_average')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_dow_jones_industrial_average';</script>
+<script src="../../book.js"></script>
+
+<script>
+(function() {
+  var DONE_KEY = 'fg_done', FILTER_KEY = 'fg_filter';
+  var done = JSON.parse(localStorage.getItem(DONE_KEY) || '{}');
+  var filter = localStorage.getItem(FILTER_KEY) || 'all';
+
+  function visible(flag) {
+    if (filter === 'star') return flag === 'star';
+    if (filter === 'nodeep') return flag !== 'deep';
+    return true;
+  }
+
+  function apply() {
+    var shown = 0, total = 0, hidden = 0;
+    document.querySelectorAll('.concept-row').forEach(function(r) {
+      var slug = r.dataset.slug, flag = r.dataset.flag;
+      total++;
+      if (done[slug]) r.classList.add('done'); else r.classList.remove('done');
+      if (visible(flag)) { r.classList.remove('fg-hidden'); shown++; }
+      else { r.classList.add('fg-hidden'); hidden++; }
+    });
+    document.querySelectorAll('.cat-card').forEach(function(card) {
+      var slugs = card.dataset.slugs ? card.dataset.slugs.split(',') : [];
+      var flags = card.dataset.flags ? card.dataset.flags.split(',') : [];
+      var vis = 0, allDone = slugs.length > 0;
+      slugs.forEach(function(sl, i) {
+        if (visible(flags[i])) vis++;
+        if (!done[sl]) allDone = false;
+      });
+      total += slugs.length; shown += vis;
+      var c = card.querySelector('.cat-count');
+      if (c) c.textContent = vis + (vis !== slugs.length ? ' of ' + slugs.length : '') + ' concepts' +
+        (card.dataset.stars ? ' \u00b7 ' + card.dataset.stars + ' \u2605' : '');
+      if (vis === 0) card.classList.add('fg-empty'); else card.classList.remove('fg-empty');
+      if (allDone) card.classList.add('done'); else card.classList.remove('done');
+    });
+    document.querySelectorAll('[data-filter]').forEach(function(b) {
+      b.classList.toggle('active', b.dataset.filter === filter);
+    });
+    var n = document.getElementById('fgCount');
+    if (n) n.textContent = shown + ' of ' + total + ' shown';
+    var h = document.getElementById('fgHiddenNote');
+    if (h) h.textContent = hidden ? hidden + ' hidden by the filter.' : '';
+    var btn = document.querySelector('.concept-done');
+    if (btn) {
+      var on = !!done[btn.dataset.slug];
+      btn.classList.toggle('on', on);
+      btn.textContent = on ? '\u2713 Completed' : '\u2713 Mark complete';
+    }
+  }
+
+  window.setFilter = function(f) {
+    filter = f; localStorage.setItem(FILTER_KEY, f); apply();
+  };
+  window.toggleDone = function(slug) {
+    if (done[slug]) delete done[slug]; else done[slug] = true;
+    localStorage.setItem(DONE_KEY, JSON.stringify(done));
+    apply();
+  };
+  window.toggleHideDone = function() {
+    document.body.classList.toggle('hide-done');
+  };
+  apply();
+})();
+</script>
+
+</body>
+</html>

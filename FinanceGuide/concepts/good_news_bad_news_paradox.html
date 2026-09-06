@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Good News Is Bad News (Rate-Hike Paradox) - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.tier .tier-desc { color: #a08060; font-size: 0.85rem; margin: 0.4rem 0 0.8rem; }
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../macro-investing-geopolitics.html">&larr; Macro Investing &amp; Geopolitics</a>
+
+<div class="concept-meta"><span>standard</span><span>Macro Investing &amp; Geopolitics</span><span>added 2026-09-06</span></div>
+<h4 id="good_news_bad_news_paradox">Good News Is Bad News (Rate-Hike Paradox)</h4>
+
+<p>In most industries, good news is simply good news. A company hires more people — great. The economy adds jobs — wonderful. But in financial markets, particularly when inflation is elevated or interest rates are rising, the relationship between economic data and stock prices flips in a way that confuses nearly every new investor. This phenomenon is called the <strong>good news is bad news paradox</strong>, and it sits at the heart of how central bank policy shapes market behavior. The core idea is this: when the economy looks too strong, investors fear the Federal Reserve will raise interest rates further — or keep them high longer — which makes stocks less valuable. Strong data becomes a threat, not a celebration.</p>
+
+<p>To understand why this matters, you first need to understand what <strong>interest rates</strong> actually do to asset prices. When rates rise, the cost of borrowing increases for businesses and consumers alike. Companies pay more to finance operations, consumers take on more expensive mortgages and car loans, and the general pace of economic activity slows. But there is a second, more technical effect that hits stocks directly: higher rates increase the <strong>discount rate</strong> used to value future earnings. Every stock is essentially a claim on future profits, and those future profits must be "discounted" back to present value. When rates rise, that discounting becomes more aggressive — meaning future profits are worth less today. Higher rates make stocks structurally cheaper, all else equal.</p>
+
+<p>Here is the mechanical sequence that produces the paradox, step by step. First, a strong economic report is released — say, a jobs number well above expectations. Second, investors interpret that strength as evidence that inflation pressures may persist, because a tight labor market tends to push wages up, which feeds into prices. Third, they conclude the Federal Reserve will respond by raising its benchmark rate, the <strong>federal funds rate</strong>, or at minimum delaying any planned rate cuts. Fourth, <strong>bond yields</strong> rise — particularly on short-duration instruments like the 2-year Treasury — because the market is now pricing in those higher rates. Fifth, equities sell off because higher yields make bonds more competitive with stocks and increase the discount rate applied to corporate earnings. Strong economy, falling stocks. That is the paradox in motion.</p>
+
+<p>The week described in this video offers a near-textbook illustration. On Friday, August payrolls came in at 162,000 new jobs against a Wall Street consensus of just 53,000 — what the video's host calls "not a beat, a demolition." On top of that, June and July figures were revised upward by a combined 55,000 jobs, and July actually flipped from a reported loss of 23,000 jobs to a gain of 21,000. In any other context, this would be cause for celebration. Instead, the Dow fell half a percent, the <strong>2-year Treasury yield</strong> climbed to 4.37% — its highest since January 2025 — and market odds of a September rate hike jumped to roughly 62%. The labor market the market had spent all summer burying turned out to be alive, and investors punished it.</p>
+
+<blockquote>"The market didn't sell off Friday because the economy is weak. It sold off because the economy is strong. When 162,000 jobs and a 221% AI growth rate get punished in the same five days, that is not a growth problem. It is a discount rate problem."</blockquote>
+
+<p>Broadcom's earnings that same week illustrate how the paradox can reach into individual stocks, not just broad indexes. Broadcom reported AI semiconductor revenue up 221% year-over-year — a number that would, in a low-rate environment, send the stock sharply higher. Instead, shares fell 6% after the report. Part of the story was a guidance miss and margin compression, but the broader context matters enormously: when rates are high and rising, markets stop asking simply "how fast are you growing?" and start asking "how much of that growth do you actually keep?" Gross margin guidance of 73% versus an expectation of 78% told investors that Broadcom's explosive growth was coming with compressing profitability. In a high-discount-rate world, that calculation is unforgiving.</p>
+
+<p>Traders and investors use this framework as a practical signal for how to position around major economic data releases. Experienced participants watch the <strong>jobs report</strong> (Non-Farm Payrolls), CPI, PCE, ISM services data, and other indicators not just for their face value but for their <strong>Fed implications</strong>. A beat on payrolls in a high-inflation environment is treated as a potential rate-hike catalyst, so traders may sell equities and buy short-duration Treasuries in anticipation of higher yields. Some will look at <strong>Fed funds futures</strong> — contracts that price the probability of rate moves at upcoming Fed meetings — as the real-time translation layer between economic data and market positioning. When those futures shift dramatically on a data release, the rest of the market tends to follow.</p>
+
+<p>The most important nuance here is that the paradox is not permanent — it is context-dependent. In a low-inflation, low-rate environment (like 2010–2019), good economic news is genuinely good for stocks because there is no Fed threat attached to it. The paradox only kicks in when the central bank is actively fighting inflation or considering tightening. A second misconception is that the market is being irrational. It is not. The selloff on strong jobs data is entirely logical given the rate transmission mechanism. The market is correctly pricing a future where borrowing costs stay elevated, corporate profit margins face pressure, and the valuation multiple applied to earnings compresses. What looks like pessimism is actually precision — the market updating its model in real time.</p>
+
+<p>The paradox breaks down in a few identifiable scenarios. If inflation falls sharply enough that the Fed pivots to cutting rates, strong economic data reverts to being unambiguously positive — jobs growth stops implying rate hikes and starts implying revenue growth. It also breaks if economic strength is accompanied by a simultaneous, credible decline in inflation data, giving the Fed permission to hold or cut even with a strong labor market. The video hints at exactly this dynamic for the week ahead: August CPI was the number that could either ratify the rate-hike fears or dissolve them. A soft inflation print despite a strong jobs report would be the market's ideal scenario — strong growth without the Fed threat attached to it. Until that kind of data arrives, every strong number carries a shadow.</p>
+
+<p>This concept connects directly to several other pillars of macro investing. The <strong>yield curve</strong> — particularly the spread between 2-year and 10-year Treasuries — is a real-time map of how the market is pricing rate expectations across time. The <strong>equity risk premium</strong>, the extra return stocks must offer over risk-free Treasuries to attract capital, compresses when yields rise, which mechanically makes stocks less attractive. And <strong>sector rotation</strong> — the shift from growth stocks to energy, value, or defensives — is often driven by exactly this dynamic. In the week covered here, energy gained 2.2% while Consumer Discretionary lost 1.9%, a textbook rotation into inflation-resilient hard assets away from rate-sensitive growth. Understanding the good news is bad news paradox is not a footnote to macro investing — it is the operating system beneath almost everything else that moves markets when rates are in play.</p>
+<div class="concept-side">Sources: THE JOBS GUT PUNCH: Why Good News Sold Off Wall Street &amp; Crushed Tech!<br>Related in this category: <a href="opportunity_cost_non_yielding_assets.html">Opportunity Cost of Non-Yielding Assets</a>, <a href="national_debt_debt_ceiling.html">National Debt</a>, <a href="debt_servicing_cost.html">Debt Servicing Cost</a>, <a href="fiscal_monetary_policy_conflict.html">Fiscal-Monetary Policy Conflict</a>, <a href="treasury_bond_buyback_program.html">Treasury Bond Buyback Program</a>, <a href="hard_assets_inflation_hedge.html">Hard Assets as Inflation Hedges</a></div>
+<button class="concept-done" data-slug="good_news_bad_news_paradox" onclick="toggleDone('good_news_bad_news_paradox')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_good_news_bad_news_paradox';</script>
+<script src="../../book.js"></script>
+
+<script>
+(function() {
+  var DONE_KEY = 'fg_done', FILTER_KEY = 'fg_filter';
+  var done = JSON.parse(localStorage.getItem(DONE_KEY) || '{}');
+  var filter = localStorage.getItem(FILTER_KEY) || 'all';
+
+  function visible(flag) {
+    if (filter === 'star') return flag === 'star';
+    if (filter === 'nodeep') return flag !== 'deep';
+    return true;
+  }
+
+  function apply() {
+    var shown = 0, total = 0, hidden = 0;
+    document.querySelectorAll('.concept-row').forEach(function(r) {
+      var slug = r.dataset.slug, flag = r.dataset.flag;
+      total++;
+      if (done[slug]) r.classList.add('done'); else r.classList.remove('done');
+      if (visible(flag)) { r.classList.remove('fg-hidden'); shown++; }
+      else { r.classList.add('fg-hidden'); hidden++; }
+    });
+    document.querySelectorAll('.cat-card').forEach(function(card) {
+      var slugs = card.dataset.slugs ? card.dataset.slugs.split(',') : [];
+      var flags = card.dataset.flags ? card.dataset.flags.split(',') : [];
+      var vis = 0, allDone = slugs.length > 0;
+      slugs.forEach(function(sl, i) {
+        if (visible(flags[i])) vis++;
+        if (!done[sl]) allDone = false;
+      });
+      total += slugs.length; shown += vis;
+      var c = card.querySelector('.cat-count');
+      if (c) c.textContent = vis + (vis !== slugs.length ? ' of ' + slugs.length : '') + ' concepts' +
+        (card.dataset.stars ? ' \u00b7 ' + card.dataset.stars + ' \u2605' : '');
+      if (vis === 0) card.classList.add('fg-empty'); else card.classList.remove('fg-empty');
+      if (allDone) card.classList.add('done'); else card.classList.remove('done');
+    });
+    document.querySelectorAll('[data-filter]').forEach(function(b) {
+      b.classList.toggle('active', b.dataset.filter === filter);
+    });
+    var n = document.getElementById('fgCount');
+    if (n) n.textContent = shown + ' of ' + total + ' shown';
+    var h = document.getElementById('fgHiddenNote');
+    if (h) h.textContent = hidden ? hidden + ' hidden by the filter.' : '';
+    var btn = document.querySelector('.concept-done');
+    if (btn) {
+      var on = !!done[btn.dataset.slug];
+      btn.classList.toggle('on', on);
+      btn.textContent = on ? '\u2713 Completed' : '\u2713 Mark complete';
+    }
+  }
+
+  window.setFilter = function(f) {
+    filter = f; localStorage.setItem(FILTER_KEY, f); apply();
+  };
+  window.toggleDone = function(slug) {
+    if (done[slug]) delete done[slug]; else done[slug] = true;
+    localStorage.setItem(DONE_KEY, JSON.stringify(done));
+    apply();
+  };
+  window.toggleHideDone = function() {
+    document.body.classList.toggle('hide-done');
+  };
+  apply();
+})();
+</script>
+
+</body>
+</html>

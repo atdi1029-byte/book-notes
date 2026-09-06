@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Discounted Cash Flow (DCF) Valuation - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.tier .tier-desc { color: #a08060; font-size: 0.85rem; margin: 0.4rem 0 0.8rem; }
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../value-investing-equities.html">&larr; Value Investing &amp; Equities</a>
+
+<div class="concept-meta"><span><span class="star">&#9733;</span> must-know</span><span>Value Investing &amp; Equities</span><span>added 2026-09-06</span></div>
+<h4 id="discounted_cash_flow_valuation">Discounted Cash Flow (DCF) Valuation</h4>
+
+<p><strong>Discounted Cash Flow (DCF) valuation</strong> is the foundational method for determining what any investment is worth today based on what it is expected to earn in the future. The core idea is deceptively simple: a dollar you receive ten years from now is worth less than a dollar in your pocket today, because today's dollar can be invested, compounded, and grown. DCF takes every dollar of future cash a business is expected to generate, applies a mathematical "shrinkage" factor to each one, and adds them all up to arrive at a <strong>present value</strong> — what the entire stream of future earnings is worth right now. This is not a theory. It is the mathematical backbone behind nearly every professional stock valuation on Wall Street.</p>
+
+<p>DCF matters because it is the invisible force determining whether stocks go up or down on any given day — even days when the news seems good. When analysts and portfolio managers decide whether to buy or sell a company, they are not just asking "is this business growing?" They are asking "what is that growth worth to me today, given what else I could do with my money?" Every time interest rates move, every time inflation expectations shift, every time the economy sends a signal about the future cost of capital, DCF calculations across thousands of companies are being silently revised. That repricing does not show up on a balance sheet. It shows up in stock prices, often violently and without obvious explanation to those who do not understand the mechanism.</p>
+
+<p>The mechanics work as follows. First, you project a company's <strong>free cash flow</strong> — the actual cash left over after operating expenses and capital investments — for each year into the future, typically five to ten years out. Second, you choose a <strong>discount rate</strong>, which reflects the risk of those future cash flows and the opportunity cost of capital. The most common framework uses the <strong>Weighted Average Cost of Capital (WACC)</strong>, which blends the cost of debt and equity financing. Third, you divide each year's projected cash flow by (1 + discount rate) raised to the power of that year's number. Year one cash flow gets divided by (1 + r)¹, year five by (1 + r)⁵, and so on. Finally, you add all those discounted values together, along with a <strong>terminal value</strong> representing cash flows beyond the projection window. The sum is the company's estimated intrinsic value.</p>
+
+<p>The discount rate is where everything gets interesting — and where the week described in the video becomes a textbook DCF lesson in real time. On Friday, August payrolls came in at 162,000 jobs against a consensus expectation of 53,000. That single data point, combined with 55,000 in upward revisions, told the market that the labor market was far stronger than assumed. A strong economy means the Federal Reserve is less likely to cut rates — and may need to raise them further. The 2-year Treasury yield jumped to 4.37%, its highest since January 2025, and rate-hike odds for September climbed to 62%. Higher yields mean higher discount rates. Higher discount rates mean every dollar of future earnings gets shrunk more aggressively. Stocks fell not because businesses got worse, but because the math governing their valuation shifted beneath them.</p>
+
+<p>Broadcom provides the most instructive individual stock example from the week. The company reported AI semiconductor revenue of $16.7 billion, up 221% year-over-year, and total revenue of $29.6 billion, up 86%. By any growth metric, the quarter was extraordinary. Yet the stock fell 6% on Thursday. Why? Fourth-quarter guidance of $34.8 billion landed just below Wall Street's expectation of $35.05 billion, and gross margin guidance came in at 73% against expectations of 78% from a year ago. In DCF terms, the market was not punishing Broadcom for growing slowly. It was punishing it for growing into shrinking margins, which means each future dollar of revenue converts into less free cash flow, which means the present value of the entire earnings stream compresses. As Mark Malik put it: "Growing 86% into a shrinking margin is a different investment case than growing 86% into an expanding one."</p>
+
+<blockquote>"The market didn't sell off Friday because the economy is weak. It sold off because the economy is strong. When 162,000 jobs and a 221% AI growth rate get punished in the same five days, that is not a growth problem. It is a discount rate problem."</blockquote>
+
+<p>Traders and investors use DCF not as a single precise answer but as a <strong>sensitivity analysis</strong> tool. A professional investor will build a DCF model and then deliberately stress-test the discount rate — asking what happens to the present value if rates rise by half a percent, or if growth slows by two percentage points. This is called running scenarios, and it reveals which stocks are most exposed to rate movements. <strong>High-duration assets</strong> — growth companies whose cash flows are weighted heavily toward the distant future, like many tech stocks — are the most sensitive to discount rate changes. A company whose earnings are mostly years away sees far more compression per unit of discount rate increase than a mature company with near-term, predictable cash flows. This explains why tech led the selloff despite strong underlying business results.</p>
+
+<p>The most common misconception about DCF is confusing the quality of growth with the value of growth. Investors frequently assume that faster growth automatically means a higher stock price. But DCF shows this is only true if the discount rate stays constant. When rates rise, the denominator in every future cash flow calculation grows larger, and the present value shrinks — even if the numerator (future earnings) is growing rapidly. This is precisely the trap Broadcom's buyers fell into. A second misconception is treating the discount rate as a fixed, knowable number. In practice, the market's discount rate is constantly shifting in response to monetary policy, inflation expectations, credit spreads, and risk appetite. Investors who build a DCF using last year's discount rate and ignore the rate environment are solving yesterday's equation.</p>
+
+<p>DCF breaks most visibly in two situations. The first is when terminal value dominates the entire valuation — a common problem with early-stage companies that have minimal current cash flows but enormous projected future ones. Because terminal value is calculated by dividing a perpetuity assumption by the discount rate, small changes in either variable produce enormous swings in the final number. A company valued at $100 billion under one set of assumptions might be worth $40 billion under only slightly different ones. The second failure mode occurs during structural regime changes — moments when the underlying risk-free rate shifts dramatically, as happened when the Federal Reserve began its hiking cycle. Models built in a near-zero rate environment dramatically overstated the present value of future cash flows. The 2022–2023 tech selloff was, at its mathematical root, a massive global DCF repricing event as the discount rate embedded in asset prices jumped from near zero to over four percent in under eighteen months.</p>
+
+<p>DCF connects directly to several other foundational market concepts. The <strong>risk-free rate</strong> — typically the yield on U.S. Treasury bonds — sets the floor for every discount rate calculation, which is why Treasury yields and stock valuations move in opposite directions so reliably. <strong>Earnings Per Share (EPS) growth</strong> feeds the numerator of the DCF equation, while monetary policy feeds the denominator; understanding both simultaneously is what separates sophisticated analysis from simple growth-chasing. The FICO story from the same week illustrates a DCF nuance around <strong>competitive moats</strong>: a company's projected cash flows are only as reliable as the business model generating them. When the Federal Housing Finance Agency authorized Vantage Score as an alternative to FICO — cutting the price from $10 to $0.99 — it did not change FICO's past earnings. It invalidated the forward projections that justified the stock's valuation. The DCF model didn't fail. The inputs to it did.</p>
+<div class="concept-side">Sources: THE JOBS GUT PUNCH: Why Good News Sold Off Wall Street &amp; Crushed Tech!<br>Related in this category: <a href="comparable_store_sales.html">Comparable Store Sales (Same-Store Sales)</a>, <a href="economic_moat.html">Economic Moat (Competitive Moat)</a>, <a href="earnings_guidance.html">Earnings Guidance (Forward Guidance — Corporate)</a></div>
+<button class="concept-done" data-slug="discounted_cash_flow_valuation" onclick="toggleDone('discounted_cash_flow_valuation')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_discounted_cash_flow_valuation';</script>
+<script src="../../book.js"></script>
+
+<script>
+(function() {
+  var DONE_KEY = 'fg_done', FILTER_KEY = 'fg_filter';
+  var done = JSON.parse(localStorage.getItem(DONE_KEY) || '{}');
+  var filter = localStorage.getItem(FILTER_KEY) || 'all';
+
+  function visible(flag) {
+    if (filter === 'star') return flag === 'star';
+    if (filter === 'nodeep') return flag !== 'deep';
+    return true;
+  }
+
+  function apply() {
+    var shown = 0, total = 0, hidden = 0;
+    document.querySelectorAll('.concept-row').forEach(function(r) {
+      var slug = r.dataset.slug, flag = r.dataset.flag;
+      total++;
+      if (done[slug]) r.classList.add('done'); else r.classList.remove('done');
+      if (visible(flag)) { r.classList.remove('fg-hidden'); shown++; }
+      else { r.classList.add('fg-hidden'); hidden++; }
+    });
+    document.querySelectorAll('.cat-card').forEach(function(card) {
+      var slugs = card.dataset.slugs ? card.dataset.slugs.split(',') : [];
+      var flags = card.dataset.flags ? card.dataset.flags.split(',') : [];
+      var vis = 0, allDone = slugs.length > 0;
+      slugs.forEach(function(sl, i) {
+        if (visible(flags[i])) vis++;
+        if (!done[sl]) allDone = false;
+      });
+      total += slugs.length; shown += vis;
+      var c = card.querySelector('.cat-count');
+      if (c) c.textContent = vis + (vis !== slugs.length ? ' of ' + slugs.length : '') + ' concepts' +
+        (card.dataset.stars ? ' \u00b7 ' + card.dataset.stars + ' \u2605' : '');
+      if (vis === 0) card.classList.add('fg-empty'); else card.classList.remove('fg-empty');
+      if (allDone) card.classList.add('done'); else card.classList.remove('done');
+    });
+    document.querySelectorAll('[data-filter]').forEach(function(b) {
+      b.classList.toggle('active', b.dataset.filter === filter);
+    });
+    var n = document.getElementById('fgCount');
+    if (n) n.textContent = shown + ' of ' + total + ' shown';
+    var h = document.getElementById('fgHiddenNote');
+    if (h) h.textContent = hidden ? hidden + ' hidden by the filter.' : '';
+    var btn = document.querySelector('.concept-done');
+    if (btn) {
+      var on = !!done[btn.dataset.slug];
+      btn.classList.toggle('on', on);
+      btn.textContent = on ? '\u2713 Completed' : '\u2713 Mark complete';
+    }
+  }
+
+  window.setFilter = function(f) {
+    filter = f; localStorage.setItem(FILTER_KEY, f); apply();
+  };
+  window.toggleDone = function(slug) {
+    if (done[slug]) delete done[slug]; else done[slug] = true;
+    localStorage.setItem(DONE_KEY, JSON.stringify(done));
+    apply();
+  };
+  window.toggleHideDone = function() {
+    document.body.classList.toggle('hide-done');
+  };
+  apply();
+})();
+</script>
+
+</body>
+</html>

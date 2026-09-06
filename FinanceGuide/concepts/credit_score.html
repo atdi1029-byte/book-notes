@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Credit Score (FICO / VantageScore) - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.tier .tier-desc { color: #a08060; font-size: 0.85rem; margin: 0.4rem 0 0.8rem; }
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../personal-finance-basics.html">&larr; Personal Finance Basics</a>
+
+<div class="concept-meta"><span><span class="star">&#9733;</span> must-know</span><span>Personal Finance Basics</span><span>added 2026-09-06</span></div>
+<h4 id="credit_score">Credit Score (FICO / VantageScore)</h4>
+
+<p>A <strong>credit score</strong> is a three-digit number — typically ranging from 300 to 850 — that represents how reliably a person has borrowed and repaid money over time. Think of it as a financial report card that lenders, landlords, insurers, and even some employers use to quickly assess how risky it is to extend credit or services to you. The higher the number, the more trustworthy you appear to a lender. The two dominant scoring models in the United States are <strong>FICO</strong> (Fair Isaac Corporation) and <strong>VantageScore</strong>. While both produce a score in the same 300–850 range, they use different algorithms, weight factors differently, and are owned by competing companies with very different business models — a distinction that became dramatically important in 2025.</p>
+
+<p>Your credit score affects nearly every major financial transaction you will make as an adult. The rate on your mortgage, the interest on your car loan, whether a landlord approves your rental application, what you pay for auto insurance in most states — all of these are influenced by that three-digit number. A borrower with a score of 760 might secure a 30-year mortgage at 6.5%, while someone at 620 might pay 8.5% or be denied entirely. On a $400,000 loan, that 2-point difference compounds to tens of thousands of dollars in extra interest over the life of the loan. At a macroeconomic level, credit scores are the invisible infrastructure of consumer lending — the mechanism by which the financial system decides who gets access to capital and at what price.</p>
+
+<p>The FICO score is calculated using five weighted categories pulled from your <strong>credit report</strong> (maintained by the three major bureaus: Equifax, Experian, and TransUnion). <strong>Payment history</strong> is the heaviest factor at 35% — did you pay your bills on time? <strong>Credit utilization</strong> accounts for 30% — how much of your available revolving credit are you actually using? <strong>Length of credit history</strong> makes up 15%, <strong>credit mix</strong> (having both installment loans and revolving accounts) adds 10%, and <strong>new credit inquiries</strong> contribute the final 10%. VantageScore uses similar inputs but weights them slightly differently and can score consumers who have less credit history — sometimes called "thin file" borrowers — making it more inclusive. Both models update dynamically as new information hits your credit report.</p>
+
+<p>Here is where this concept moves from personal finance textbook into live market news. On Friday, September 5, 2025, the <strong>Federal Housing Finance Agency (FHFA)</strong> — the regulator overseeing <strong>Fannie Mae</strong> and <strong>Freddie Mac</strong>, the government-sponsored enterprises (GSEs) that back the majority of U.S. mortgages — directed those agencies to begin accepting mortgages underwritten using VantageScore instead of requiring FICO exclusively. FICO stock fell 17.5% that single day, losing roughly $173 per share. No earnings miss. No scandal. Just a regulatory pen stroke. As market analyst Mark Malik put it on Wall Street Truth Bombs: <em>"The product didn't change. The customer just got a legal alternative."</em> That one sentence is the entire story of what happened to Fair Isaac Corporation that Friday.</p>
+
+<p>To understand why that regulatory change was so devastating, you need to understand FICO's business model. <strong>FICO's moat</strong> — the competitive advantage that protected its dominant market position — was not technology or brand loyalty among consumers. It was regulatory entrenchment. Mortgage lenders were effectively required to use FICO scores when originating loans that Fannie and Freddie would purchase, which is the vast majority of conforming mortgages in America. This captive demand allowed FICO to charge lenders approximately <strong>$10 per score pull</strong>. VantageScore, by contrast, charges approximately <strong>$0.99 per pull</strong> — about a tenth of the price. When regulators removed the requirement, they didn't just introduce competition. They obliterated the pricing power that justified FICO's entire valuation premium overnight.</p>
+
+<blockquote>"Every moat looks permanent until somebody with a regulatory pen decides that it is not. And if your margins depend on being the only option, you do not own a business. You only rent one." — Mark Malik, Wall Street Truth Bombs</blockquote>
+
+<p>For investors and traders, the FICO story illustrates a specific category of risk called <strong>regulatory moat risk</strong> — the danger that a company's competitive advantage is not inherent to its product but is instead an artifact of government-mandated exclusivity. When analyzing companies like FICO, investors should ask: does this firm win because it is genuinely better, or because switching is artificially prevented? The FHFA directive is also a signal about broader housing finance reform. Traders watching the mortgage market should note that wider VantageScore adoption could expand the pool of creditworthy borrowers (since VantageScore scores thin-file consumers more readily), potentially increasing mortgage origination volume — which is a positive signal for mortgage servicers and housing activity, even if it hurts FICO specifically.</p>
+
+<p>One of the most common misconceptions about credit scores is that there is one score. In reality, there are dozens of FICO versions (FICO 8, FICO 9, FICO 10, FICO Auto Score, FICO Bankcard Score) and multiple VantageScore versions, and lenders use different ones depending on the type of credit being extended. Your mortgage lender might pull a different FICO version than your credit card issuer. This means the score you see on a free consumer app may differ meaningfully from the score a lender actually uses to evaluate you. Another nuance: checking your own credit score is a <strong>soft inquiry</strong> and has zero impact on your score. But when a lender pulls your credit during an application, that is a <strong>hard inquiry</strong> and does cause a temporary, modest dip — typically 5 to 10 points — that fades within a year.</p>
+
+<p>The credit scoring system's vulnerabilities become apparent during economic dislocations. During the 2008 financial crisis, high FICO scores on individual borrowers masked systemic fraud in loan origination, because the scores measured individual repayment history accurately but couldn't detect that the underlying income documentation was falsified. Scores can also fail thin-file consumers — recent immigrants, young adults, and people who have historically avoided debt — not because they are poor credit risks, but because there is insufficient data to score them. This is partly why the FHFA's move toward VantageScore matters beyond the FICO stock story: it represents a philosophical shift toward more inclusive underwriting. Credit scores also connect directly to the broader interest rate environment — when the Fed raises rates as aggressively as it did in 2025, the spread between what a 700-score borrower pays versus a 620-score borrower widens, making credit score disparities even more economically consequential at the household level.</p>
+<div class="concept-side">Sources: THE JOBS GUT PUNCH: Why Good News Sold Off Wall Street &amp; Crushed Tech!</div>
+<button class="concept-done" data-slug="credit_score" onclick="toggleDone('credit_score')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_credit_score';</script>
+<script src="../../book.js"></script>
+
+<script>
+(function() {
+  var DONE_KEY = 'fg_done', FILTER_KEY = 'fg_filter';
+  var done = JSON.parse(localStorage.getItem(DONE_KEY) || '{}');
+  var filter = localStorage.getItem(FILTER_KEY) || 'all';
+
+  function visible(flag) {
+    if (filter === 'star') return flag === 'star';
+    if (filter === 'nodeep') return flag !== 'deep';
+    return true;
+  }
+
+  function apply() {
+    var shown = 0, total = 0, hidden = 0;
+    document.querySelectorAll('.concept-row').forEach(function(r) {
+      var slug = r.dataset.slug, flag = r.dataset.flag;
+      total++;
+      if (done[slug]) r.classList.add('done'); else r.classList.remove('done');
+      if (visible(flag)) { r.classList.remove('fg-hidden'); shown++; }
+      else { r.classList.add('fg-hidden'); hidden++; }
+    });
+    document.querySelectorAll('.cat-card').forEach(function(card) {
+      var slugs = card.dataset.slugs ? card.dataset.slugs.split(',') : [];
+      var flags = card.dataset.flags ? card.dataset.flags.split(',') : [];
+      var vis = 0, allDone = slugs.length > 0;
+      slugs.forEach(function(sl, i) {
+        if (visible(flags[i])) vis++;
+        if (!done[sl]) allDone = false;
+      });
+      total += slugs.length; shown += vis;
+      var c = card.querySelector('.cat-count');
+      if (c) c.textContent = vis + (vis !== slugs.length ? ' of ' + slugs.length : '') + ' concepts' +
+        (card.dataset.stars ? ' \u00b7 ' + card.dataset.stars + ' \u2605' : '');
+      if (vis === 0) card.classList.add('fg-empty'); else card.classList.remove('fg-empty');
+      if (allDone) card.classList.add('done'); else card.classList.remove('done');
+    });
+    document.querySelectorAll('[data-filter]').forEach(function(b) {
+      b.classList.toggle('active', b.dataset.filter === filter);
+    });
+    var n = document.getElementById('fgCount');
+    if (n) n.textContent = shown + ' of ' + total + ' shown';
+    var h = document.getElementById('fgHiddenNote');
+    if (h) h.textContent = hidden ? hidden + ' hidden by the filter.' : '';
+    var btn = document.querySelector('.concept-done');
+    if (btn) {
+      var on = !!done[btn.dataset.slug];
+      btn.classList.toggle('on', on);
+      btn.textContent = on ? '\u2713 Completed' : '\u2713 Mark complete';
+    }
+  }
+
+  window.setFilter = function(f) {
+    filter = f; localStorage.setItem(FILTER_KEY, f); apply();
+  };
+  window.toggleDone = function(slug) {
+    if (done[slug]) delete done[slug]; else done[slug] = true;
+    localStorage.setItem(DONE_KEY, JSON.stringify(done));
+    apply();
+  };
+  window.toggleHideDone = function() {
+    document.body.classList.toggle('hide-done');
+  };
+  apply();
+})();
+</script>
+
+</body>
+</html>

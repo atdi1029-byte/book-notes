@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>S&amp;P 500 Index - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.tier .tier-desc { color: #a08060; font-size: 0.85rem; margin: 0.4rem 0 0.8rem; }
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../investing-fundamentals.html">&larr; Investing Fundamentals</a>
+
+<div class="concept-meta"><span><span class="star">&#9733;</span> must-know</span><span>Investing Fundamentals</span><span>added 2026-09-06</span></div>
+<h4 id="sp_500_index">S&P 500 Index</h4>
+
+<p>The <strong>S&P 500</strong>, formally the Standard & Poor's 500, is a stock market index that tracks the performance of 500 of the largest publicly traded companies in the United States. Think of it as the closest thing financial markets have to a single number that captures the health of American corporate capitalism. When someone says "the market was up today," they almost certainly mean the S&P 500 was up. It was created by Standard & Poor's in 1957, though its predecessor dates to 1923, and it has become the world's most widely followed equity benchmark. It represents companies across every major sector of the economy, from technology and healthcare to energy and consumer goods, making it a genuinely broad measure of market activity.</p>
+
+<p>The S&P 500 matters because it functions as the primary <strong>scorecard</strong> for the entire U.S. stock market. Pension funds, retirement accounts, mutual funds, and endowments collectively hold tens of trillions of dollars benchmarked to or indexed against it. When the S&P 500 falls 10%, that's not an abstraction — it means real retirement savings have shrunk, corporate borrowing costs shift, consumer confidence moves, and wealth effects ripple through spending behavior. It also serves as a leading economic indicator, since stock prices theoretically reflect expectations about future corporate earnings, which in turn reflect expected economic growth. Policymakers, including those at the Federal Reserve, watch it closely as a signal of financial conditions.</p>
+
+<p>Mechanically, the S&P 500 is a <strong>market-capitalization-weighted index</strong>, which is the key to understanding how it actually moves. Each company's weight in the index is proportional to its total market value — share price multiplied by shares outstanding. A company worth $3 trillion has roughly three times the influence on the index as one worth $1 trillion. The index is maintained by S&P Dow Jones Indices, a division of S&P Global, which has a committee that decides which companies get included or removed. To qualify, a company must be U.S.-domiciled, have a market cap above a minimum threshold (currently around $18 billion), be highly liquid, have positive as-reported earnings over the most recent quarter and the trailing four quarters combined, and be publicly listed on an eligible U.S. exchange.</p>
+
+<p>This weighting structure has a profound and often underappreciated consequence: the largest companies dominate the index's daily movement. The top ten holdings — companies like Apple, Microsoft, Nvidia, and Alphabet — can represent 30% or more of the total index weight. So when technology stocks have a bad week, the S&P 500 almost certainly will too, even if hundreds of smaller companies are rising. This is exactly the dynamic Mark Malik described in the video: the S&P 500 finished the week <em>up</em> 0.1% at 7718.6, but seven of the eleven sectors actually finished lower. That's not a contradiction — it's the math of cap-weighting. A few large-cap stocks held the headline number positive while the majority of the market quietly declined.</p>
+
+<blockquote>"That's not a rally, my friends. That is a rotation wearing a rally's clothes."</blockquote>
+
+<p>This quote captures one of the most important nuances about reading the S&P 500: the index level can be misleading about market breadth. <strong>Market breadth</strong> refers to how many stocks are participating in a move. A healthy rally typically sees broad participation — most stocks rising together. A fragile rally often shows a handful of mega-cap names pulling the headline number upward while the rest of the market struggles. Analysts measure breadth using tools like the advance-decline line (how many stocks rose versus fell) or by comparing the <strong>equal-weighted S&P 500</strong> — a version where every company counts the same regardless of size — to the standard cap-weighted version. A growing gap between the two is a warning sign.</p>
+
+<p>Investors and traders use the S&P 500 in several practical ways. First, it's the benchmark against which virtually every professional fund manager measures their performance — beating the S&P 500 is the stated goal of most active managers, and most fail to do it consistently over time. Second, <strong>index funds</strong> and <strong>exchange-traded funds (ETFs)</strong> like the SPDR S&P 500 ETF (SPY) or the Vanguard S&P 500 ETF (VOO) allow ordinary investors to own all 500 companies in proportion to their weights with minimal cost. Third, traders use S&P 500 futures and options to hedge portfolios, speculate on market direction, or express views on volatility. The <strong>VIX</strong>, sometimes called the fear gauge, is derived from options on the S&P 500 and measures expected volatility over the next 30 days.</p>
+
+<p>One of the most important gotchas about the S&P 500 is that it is a <strong>price-return index</strong> by default, meaning it reflects only changes in stock prices — not dividends. The <strong>total return</strong> version, which reinvests dividends, has historically produced significantly higher long-run results. Over decades, dividends have accounted for roughly 40% of the total return from equities. Additionally, survivorship bias shapes our perception of the index: the companies listed today are, by definition, companies that succeeded enough to make the cut. Failed or struggling companies get removed. This makes the long-run historical returns look slightly more favorable than a naïve investor who picked random companies at any given point in history would have actually experienced.</p>
+
+<p>The S&P 500 can also send confusing signals during periods of regime change — moments when the underlying logic of the market shifts. The week described in the video is a textbook example. A blowout jobs report (162,000 jobs against a consensus of 53,000) would traditionally be seen as unambiguously good news. A strong economy means strong corporate earnings, which means higher stock prices. But the market sold off instead, because the strong number implied the Federal Reserve would keep interest rates higher for longer — or even raise them again. Higher rates increase the <strong>discount rate</strong> used to value future earnings, which mechanically reduces what those future earnings are worth today. When Broadcom reported 221% AI revenue growth and the stock still fell, it wasn't about the business — it was about the math of valuation in a higher-rate world.</p>
+
+<p>Understanding the S&P 500 requires understanding its relationship to interest rates, which is the central concept linking most of modern market behavior. Stock prices are fundamentally a claim on future corporate cash flows, and those future cash flows are discounted back to present value using a rate that reflects the risk-free return available elsewhere — typically the yield on U.S. Treasury bonds. When the <strong>2-year Treasury yield</strong> jumped to 4.37%, its highest since January 2025, as described in the video, that didn't just matter for bond investors. It meant the denominator in every stock valuation model got bigger, compressing <strong>price-to-earnings multiples</strong> across the board. This is why a single jobs report can simultaneously be good news for the economy and bad news for the stock market — and why fluency with the S&P 500 means understanding not just the number itself, but the web of forces that drive it.</p>
+<div class="concept-side">Sources: THE JOBS GUT PUNCH: Why Good News Sold Off Wall Street &amp; Crushed Tech!<br>Related in this category: <a href="dow_jones_industrial_average.html">Dow Jones Industrial Average (DJIA)</a></div>
+<button class="concept-done" data-slug="sp_500_index" onclick="toggleDone('sp_500_index')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_sp_500_index';</script>
+<script src="../../book.js"></script>
+
+<script>
+(function() {
+  var DONE_KEY = 'fg_done', FILTER_KEY = 'fg_filter';
+  var done = JSON.parse(localStorage.getItem(DONE_KEY) || '{}');
+  var filter = localStorage.getItem(FILTER_KEY) || 'all';
+
+  function visible(flag) {
+    if (filter === 'star') return flag === 'star';
+    if (filter === 'nodeep') return flag !== 'deep';
+    return true;
+  }
+
+  function apply() {
+    var shown = 0, total = 0, hidden = 0;
+    document.querySelectorAll('.concept-row').forEach(function(r) {
+      var slug = r.dataset.slug, flag = r.dataset.flag;
+      total++;
+      if (done[slug]) r.classList.add('done'); else r.classList.remove('done');
+      if (visible(flag)) { r.classList.remove('fg-hidden'); shown++; }
+      else { r.classList.add('fg-hidden'); hidden++; }
+    });
+    document.querySelectorAll('.cat-card').forEach(function(card) {
+      var slugs = card.dataset.slugs ? card.dataset.slugs.split(',') : [];
+      var flags = card.dataset.flags ? card.dataset.flags.split(',') : [];
+      var vis = 0, allDone = slugs.length > 0;
+      slugs.forEach(function(sl, i) {
+        if (visible(flags[i])) vis++;
+        if (!done[sl]) allDone = false;
+      });
+      total += slugs.length; shown += vis;
+      var c = card.querySelector('.cat-count');
+      if (c) c.textContent = vis + (vis !== slugs.length ? ' of ' + slugs.length : '') + ' concepts' +
+        (card.dataset.stars ? ' \u00b7 ' + card.dataset.stars + ' \u2605' : '');
+      if (vis === 0) card.classList.add('fg-empty'); else card.classList.remove('fg-empty');
+      if (allDone) card.classList.add('done'); else card.classList.remove('done');
+    });
+    document.querySelectorAll('[data-filter]').forEach(function(b) {
+      b.classList.toggle('active', b.dataset.filter === filter);
+    });
+    var n = document.getElementById('fgCount');
+    if (n) n.textContent = shown + ' of ' + total + ' shown';
+    var h = document.getElementById('fgHiddenNote');
+    if (h) h.textContent = hidden ? hidden + ' hidden by the filter.' : '';
+    var btn = document.querySelector('.concept-done');
+    if (btn) {
+      var on = !!done[btn.dataset.slug];
+      btn.classList.toggle('on', on);
+      btn.textContent = on ? '\u2713 Completed' : '\u2713 Mark complete';
+    }
+  }
+
+  window.setFilter = function(f) {
+    filter = f; localStorage.setItem(FILTER_KEY, f); apply();
+  };
+  window.toggleDone = function(slug) {
+    if (done[slug]) delete done[slug]; else done[slug] = true;
+    localStorage.setItem(DONE_KEY, JSON.stringify(done));
+    apply();
+  };
+  window.toggleHideDone = function() {
+    document.body.classList.toggle('hide-done');
+  };
+  apply();
+})();
+</script>
+
+</body>
+</html>

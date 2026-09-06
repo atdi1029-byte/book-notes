@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>FOMC Blackout Period - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.tier .tier-desc { color: #a08060; font-size: 0.85rem; margin: 0.4rem 0 0.8rem; }
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../monetary-policy-central-banking.html">&larr; Monetary Policy &amp; Central Banking</a>
+
+<div class="concept-meta"><span>standard</span><span>Monetary Policy &amp; Central Banking</span><span>added 2026-09-06</span></div>
+<h4 id="fomc_blackout_period">FOMC Blackout Period</h4>
+
+<p>The <strong>FOMC Blackout Period</strong> — sometimes called the "quiet period" or "media blackout" — is a formal communications embargo imposed on Federal Reserve officials in the days immediately preceding each scheduled <strong>Federal Open Market Committee (FOMC)</strong> meeting. During this window, no Fed governor, regional Fed president, or senior staff member is permitted to make public statements about monetary policy, give interviews, deliver speeches, or offer any guidance that could signal the committee's upcoming decision. The blackout is not optional or informal — it is governed by an explicit internal policy and typically begins around ten days before each meeting and ends the day after the Fed's decision is announced. It exists to preserve the integrity of the deliberative process and prevent market-moving leaks or uncoordinated signals.</p>
+
+<p>The reason this matters enormously to markets is that Fed communication has become one of the most powerful price-setting forces in modern finance. Over the past two decades, the Fed has embraced a philosophy called <strong>forward guidance</strong> — the practice of telegraphing future policy intentions to shape expectations before action is taken. When officials speak freely, every word from a governor or regional president moves bond yields, stock prices, currency rates, and commodity markets. The blackout period cuts off that steady stream of guidance at precisely the moment when uncertainty is highest and the decision is closest. Markets that were relying on speech-by-speech calibration suddenly have to navigate without the compass they've grown dependent on.</p>
+
+<p>Mechanically, the blackout works like this: the Fed publishes its <strong>meeting calendar</strong> well in advance, and each scheduled FOMC meeting automatically triggers a blackout that begins at midnight on the Saturday roughly ten days before the first day of the two-day meeting. From that point forward, Fed officials are prohibited from discussing the economic outlook, interest rate levels, the balance sheet, or any topic that could be construed as policy signaling. They may still perform routine administrative functions and appear in pre-scheduled academic contexts if the content was prepared before the blackout, but anything monetary-policy-adjacent goes dark. The blackout lifts the day after the meeting concludes and the statement is released, usually following the chair's press conference.</p>
+
+<p>The September 2025 meeting described in the video is a textbook case of how the blackout reshapes market dynamics in real time. As host Mark Malik put it:</p>
+
+<blockquote>"The Fed is already in blackout ahead of the September 15th and 16th meeting. So, no more speeches, no public fights, no guidance."</blockquote>
+
+<p>Just days before the blackout, Fed Governor <strong>Christopher Waller</strong> had made a consequential public statement — saying the August inflation report would decide his vote — and rate hike odds swung from roughly 65% to a coin flip within hours. Then Friday's jobs report, showing <strong>162,000 payrolls</strong> against a consensus of just 53,000, shoved those odds back up to roughly 62%. That whipsaw happened in a matter of days. Once the blackout began, there was no official voice to interpret any of it. The market was left holding two conflicting datasets — a strong jobs print and volatile rate expectations — with no Fed official allowed to help reconcile them.</p>
+
+<p>For traders and investors, the blackout period fundamentally shifts where alpha comes from. Under normal conditions, a sophisticated investor tracks the "Fed speak" calendar the way a meteorologist tracks pressure systems — each speech, interview, or Q&amp;A session is a data point that updates the probability distribution of future rate moves. When the blackout descends, that real-time calibration ends. Attention pivots entirely to <strong>hard economic data</strong>. In the September 2025 example, two specific reports became the entire ballgame: <strong>August PPI</strong> (Producer Price Index) on Thursday and <strong>August CPI</strong> (Consumer Price Index) on Friday. As Malik noted, "the data has the floor to itself." Professionals reposition ahead of those prints because they know the prints are now the only legitimate inputs before the Fed votes.</p>
+
+<p>The nuances and common misconceptions are worth unpacking carefully. First, many retail investors assume the blackout means the Fed has made up its mind and is simply waiting to announce. That is not correct. The blackout begins well before the deliberations are finalized. Members may still be genuinely undecided when silence begins. Second, some believe the blackout prevents internal disagreement — it does not. It prevents <em>public</em> disagreement. The internal debate continues behind closed doors. Third, the blackout does not suppress <strong>market-implied probabilities</strong>. Tools like the <strong>CME FedWatch Tool</strong>, which derives rate-hike probabilities from fed funds futures contracts, keep updating in real time throughout the blackout. The market keeps talking; only the Fed goes quiet.</p>
+
+<p>The edge cases and failure modes matter too. Occasionally, a Fed official missteps during the blackout — an off-the-cuff comment in a non-policy context that nonetheless moves markets. These incidents are rare but not unheard of. More structurally problematic is what happens when major data surprises land during the blackout. In the September 2025 case, a jobs report that demolished consensus estimates arrived with no official interpretation available. Markets were left to assign meaning alone, which contributed to the paradoxical Friday selloff where good economic news drove stocks lower. Without a trusted authoritative voice to contextualize the data — to say, for instance, "the committee views this as consistent with a soft landing" — the market defaulted to the most mechanically straightforward interpretation: strong jobs equals higher rates equals lower equity valuations.</p>
+
+<p>The FOMC Blackout Period connects directly to several adjacent concepts you will encounter throughout this guide. It is inseparable from <strong>rate expectations pricing</strong>, because the blackout exposes just how much of an asset's valuation is built on anticipated Fed behavior rather than current fundamentals. It links to the concept of a <strong>discount rate</strong> — as Malik's truth bomb put it, Friday's selloff was "not a growth problem, it is a discount rate problem." Higher expected rates mean future cash flows are worth less today, which reprices growth assets like tech stocks even when their underlying business is accelerating. The blackout also connects to <strong>data dependency</strong>, the Fed's stated framework of letting incoming economic data guide decisions — a framework that becomes the entire market narrative precisely when officials cannot speak for themselves.</p>
+<div class="concept-side">Sources: THE JOBS GUT PUNCH: Why Good News Sold Off Wall Street &amp; Crushed Tech!<br>Related in this category: <a href="pce_inflation_basket.html">PCE Inflation Basket</a>, <a href="jackson_hole_symposium.html">Jackson Hole Symposium</a>, <a href="hawkish_dovish_fed_signaling.html">Hawkish vs. Dovish Fed Signaling</a>, <a href="inflation_breadth.html">Inflation Breadth</a>, <a href="central_bank_credibility.html">Central Bank Credibility</a>, <a href="forward_guidance.html">Forward Guidance</a></div>
+<button class="concept-done" data-slug="fomc_blackout_period" onclick="toggleDone('fomc_blackout_period')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_fomc_blackout_period';</script>
+<script src="../../book.js"></script>
+
+<script>
+(function() {
+  var DONE_KEY = 'fg_done', FILTER_KEY = 'fg_filter';
+  var done = JSON.parse(localStorage.getItem(DONE_KEY) || '{}');
+  var filter = localStorage.getItem(FILTER_KEY) || 'all';
+
+  function visible(flag) {
+    if (filter === 'star') return flag === 'star';
+    if (filter === 'nodeep') return flag !== 'deep';
+    return true;
+  }
+
+  function apply() {
+    var shown = 0, total = 0, hidden = 0;
+    document.querySelectorAll('.concept-row').forEach(function(r) {
+      var slug = r.dataset.slug, flag = r.dataset.flag;
+      total++;
+      if (done[slug]) r.classList.add('done'); else r.classList.remove('done');
+      if (visible(flag)) { r.classList.remove('fg-hidden'); shown++; }
+      else { r.classList.add('fg-hidden'); hidden++; }
+    });
+    document.querySelectorAll('.cat-card').forEach(function(card) {
+      var slugs = card.dataset.slugs ? card.dataset.slugs.split(',') : [];
+      var flags = card.dataset.flags ? card.dataset.flags.split(',') : [];
+      var vis = 0, allDone = slugs.length > 0;
+      slugs.forEach(function(sl, i) {
+        if (visible(flags[i])) vis++;
+        if (!done[sl]) allDone = false;
+      });
+      total += slugs.length; shown += vis;
+      var c = card.querySelector('.cat-count');
+      if (c) c.textContent = vis + (vis !== slugs.length ? ' of ' + slugs.length : '') + ' concepts' +
+        (card.dataset.stars ? ' \u00b7 ' + card.dataset.stars + ' \u2605' : '');
+      if (vis === 0) card.classList.add('fg-empty'); else card.classList.remove('fg-empty');
+      if (allDone) card.classList.add('done'); else card.classList.remove('done');
+    });
+    document.querySelectorAll('[data-filter]').forEach(function(b) {
+      b.classList.toggle('active', b.dataset.filter === filter);
+    });
+    var n = document.getElementById('fgCount');
+    if (n) n.textContent = shown + ' of ' + total + ' shown';
+    var h = document.getElementById('fgHiddenNote');
+    if (h) h.textContent = hidden ? hidden + ' hidden by the filter.' : '';
+    var btn = document.querySelector('.concept-done');
+    if (btn) {
+      var on = !!done[btn.dataset.slug];
+      btn.classList.toggle('on', on);
+      btn.textContent = on ? '\u2713 Completed' : '\u2713 Mark complete';
+    }
+  }
+
+  window.setFilter = function(f) {
+    filter = f; localStorage.setItem(FILTER_KEY, f); apply();
+  };
+  window.toggleDone = function(slug) {
+    if (done[slug]) delete done[slug]; else done[slug] = true;
+    localStorage.setItem(DONE_KEY, JSON.stringify(done));
+    apply();
+  };
+  window.toggleHideDone = function() {
+    document.body.classList.toggle('hide-done');
+  };
+  apply();
+})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Crude Oil Price Benchmarks (WTI and Brent) - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.tier .tier-desc { color: #a08060; font-size: 0.85rem; margin: 0.4rem 0 0.8rem; }
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../commodities-energy.html">&larr; Commodities &amp; Energy</a>
+
+<div class="concept-meta"><span>standard</span><span>Commodities &amp; Energy</span><span>added 2026-09-06</span></div>
+<h4 id="crude_oil_price_benchmarks">Crude Oil Price Benchmarks (WTI and Brent)</h4>
+
+<p>When financial news anchors say "oil closed at $89 today," they're not talking about a single, universal price for all oil everywhere on Earth. Crude oil is not a monolithic commodity — it comes in dozens of varieties from hundreds of sources, each with slightly different chemical compositions and refining costs. To make global pricing coherent, markets settled on two dominant reference points: <strong>West Texas Intermediate (WTI)</strong> and <strong>Brent crude</strong>. Think of these as the S&P 500 of oil — not the only oils that exist, but the standard against which everything else is measured. WTI is the primary benchmark for oil produced and consumed in the Americas, while Brent is the global standard used to price roughly 70–80% of the world's internationally traded crude.</p>
+
+<p>Understanding oil benchmarks matters because crude oil isn't just a fuel — it's an input cost embedded in virtually every layer of the economy. When oil prices rise, the cost of manufacturing, shipping, agriculture, plastics, and heating all rise with them. <strong>Diesel</strong>, which is refined from crude, powers almost every freight truck, cargo ship, and farm tractor on the planet. When Mark Malik said "diesel prices hit a record high" and called it "a cost riding in every truck on every single highway," he wasn't being dramatic — he was describing how a single commodity benchmark translates into higher prices for groceries, furniture, electronics, and anything else that travels from a factory to a store shelf.</p>
+
+<p>Mechanically, WTI and Brent are priced through <strong>futures contracts</strong> traded on exchanges — WTI primarily on the New York Mercantile Exchange (NYMEX) and Brent on the Intercontinental Exchange (ICE) in London. A futures contract represents an agreement to buy or sell a specific quantity of oil (typically 1,000 barrels per contract) at a set price on a future delivery date. Traders — including oil producers, airlines, refiners, speculators, and hedge funds — buy and sell these contracts continuously, and the resulting price discovery process generates the benchmark price you see on financial news. The "spot price" is the current market price for immediate delivery; the futures price reflects where the market expects oil to be at a future date.</p>
+
+<p>The two benchmarks differ in more than geography. <strong>WTI crude</strong> is lighter (lower density) and sweeter (lower sulfur content), which makes it easier and cheaper to refine into gasoline. It is landlocked — delivered to Cushing, Oklahoma, a massive pipeline hub — which means its price can be influenced by domestic storage capacity and US-specific supply dynamics. <strong>Brent crude</strong>, by contrast, is extracted from the North Sea and priced at seaborne delivery, making it more directly sensitive to global shipping routes, geopolitical events affecting ocean trade, and international demand. Because Brent is more globally exposed, it tends to be priced slightly higher than WTI in normal conditions — a relationship called the <strong>Brent-WTI spread</strong>.</p>
+
+<p>The week described in the video is a textbook illustration of geopolitical risk driving both benchmarks simultaneously. WTI closed at $89.38, up 7% on the week — its best weekly performance since July 13th. Brent finished at $93.93. The driver was a US–Iran conflict now seven months old that had dramatically reduced tanker traffic through the <strong>Strait of Hormuz</strong>, the narrow chokepoint between the Persian Gulf and the Gulf of Oman through which roughly 20% of the world's seaborne oil normally flows. On Thursday alone, only four commodity vessels moved through the strait against a 10-day average of approximately 15. That's a reduction of nearly 75% in throughput — a supply shock of extraordinary magnitude translated almost instantly into higher benchmark prices.</p>
+
+<blockquote>"Here's a number that should actually stop you cold. Only four commodity vessels moved through the Strait of Hormuz on Thursday against a 10-day average of about 15. Diesel prices hit a record high. That's not a headline risk. That is a cost riding in every truck on every single highway."</blockquote>
+
+<p>Traders and investors use benchmark oil prices as both a signal and a hedge. Energy sector equities — shares in oil producers, refiners, pipeline operators, and oil-field services companies — tend to rise when WTI and Brent rise, because higher prices mean higher revenues for companies selling crude. That's why the energy sector gained 2.2% the week described in the video while Consumer Discretionary — companies that sell non-essential goods to consumers with suddenly tighter budgets — lost 1.9%. Airlines, trucking companies, and manufacturers that are heavy energy consumers typically move inversely to oil prices. Sophisticated investors use oil futures directly to hedge against energy cost exposure or to speculate on geopolitical developments before they fully flow through to the broader market.</p>
+
+<p>A common misconception is that WTI and Brent always move in lockstep and can be used interchangeably. While they are highly correlated — both respond to the same broad forces of global supply and demand — the spread between them fluctuates and carries its own signal. A widening Brent premium over WTI often suggests international supply stress (like a disrupted shipping lane) affecting globally traded crude more than domestic US supply. A narrowing or inverted spread can signal US export capacity constraints or domestic storage problems at Cushing. Another misconception is that the benchmark price is what consumers pay at the pump — retail gasoline prices also include refining margins, distribution costs, taxes, and retailer markup, so the relationship between crude benchmarks and gas prices is real but not linear or immediate.</p>
+
+<p>The risks and edge cases around oil benchmarks are significant. Price spikes driven by geopolitical supply disruptions — like Hormuz tanker restrictions — can be sharp and fast but also short-lived if diplomatic resolution occurs or alternative routes absorb the lost volume. More dangerous are structural supply reductions that persist for months, embedding higher energy costs into the inflation data that central banks then have to respond to with interest rate policy. This is precisely the feedback loop at work in the video's narrative: higher oil → higher diesel → higher goods costs → higher CPI → more pressure on the Fed to raise rates → higher borrowing costs for everyone. One commodity benchmark, through a chain of causation, ends up influencing mortgage rates, corporate borrowing costs, and stock valuations.</p>
+
+<p>This connects directly to the broader concept of <strong>input cost inflation</strong> and its interaction with monetary policy — the third major thread in the video's weekly recap. When ISM Services Prices climb to 72.6 and manufacturing prices hold at 71.1, oil is rarely absent from the explanation. Energy is embedded in freight, packaging, heating, and the production of almost every manufactured good. A central bank trying to determine whether inflation is truly cooling cannot ignore what oil benchmarks are doing — and neither can a stock market trying to price companies' future earnings. The Brent and WTI prices you see scrolling across a financial news ticker are not just numbers for oil traders. They are forward-looking signals about where costs, inflation, and monetary policy are headed — which ultimately determines what every other asset in the market is worth.</p>
+<div class="concept-side">Sources: THE JOBS GUT PUNCH: Why Good News Sold Off Wall Street &amp; Crushed Tech!<br>Related in this category: <a href="gold_futures.html">Gold Futures</a>, <a href="agricultural_input_cost_inflation.html">Agricultural Input Cost Inflation</a>, <a href="nitrogen_fertilizer_as_commodity.html">Nitrogen Fertilizer Pricing</a>, <a href="potash_supply_concentration_risk.html">Potash Supply Concentration Risk</a>, <a href="commodity_supply_shock.html">Commodity Supply Shock</a>, <a href="strategic_petroleum_reserve.html">Strategic Petroleum Reserve (SPR)</a></div>
+<button class="concept-done" data-slug="crude_oil_price_benchmarks" onclick="toggleDone('crude_oil_price_benchmarks')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_crude_oil_price_benchmarks';</script>
+<script src="../../book.js"></script>
+
+<script>
+(function() {
+  var DONE_KEY = 'fg_done', FILTER_KEY = 'fg_filter';
+  var done = JSON.parse(localStorage.getItem(DONE_KEY) || '{}');
+  var filter = localStorage.getItem(FILTER_KEY) || 'all';
+
+  function visible(flag) {
+    if (filter === 'star') return flag === 'star';
+    if (filter === 'nodeep') return flag !== 'deep';
+    return true;
+  }
+
+  function apply() {
+    var shown = 0, total = 0, hidden = 0;
+    document.querySelectorAll('.concept-row').forEach(function(r) {
+      var slug = r.dataset.slug, flag = r.dataset.flag;
+      total++;
+      if (done[slug]) r.classList.add('done'); else r.classList.remove('done');
+      if (visible(flag)) { r.classList.remove('fg-hidden'); shown++; }
+      else { r.classList.add('fg-hidden'); hidden++; }
+    });
+    document.querySelectorAll('.cat-card').forEach(function(card) {
+      var slugs = card.dataset.slugs ? card.dataset.slugs.split(',') : [];
+      var flags = card.dataset.flags ? card.dataset.flags.split(',') : [];
+      var vis = 0, allDone = slugs.length > 0;
+      slugs.forEach(function(sl, i) {
+        if (visible(flags[i])) vis++;
+        if (!done[sl]) allDone = false;
+      });
+      total += slugs.length; shown += vis;
+      var c = card.querySelector('.cat-count');
+      if (c) c.textContent = vis + (vis !== slugs.length ? ' of ' + slugs.length : '') + ' concepts' +
+        (card.dataset.stars ? ' \u00b7 ' + card.dataset.stars + ' \u2605' : '');
+      if (vis === 0) card.classList.add('fg-empty'); else card.classList.remove('fg-empty');
+      if (allDone) card.classList.add('done'); else card.classList.remove('done');
+    });
+    document.querySelectorAll('[data-filter]').forEach(function(b) {
+      b.classList.toggle('active', b.dataset.filter === filter);
+    });
+    var n = document.getElementById('fgCount');
+    if (n) n.textContent = shown + ' of ' + total + ' shown';
+    var h = document.getElementById('fgHiddenNote');
+    if (h) h.textContent = hidden ? hidden + ' hidden by the filter.' : '';
+    var btn = document.querySelector('.concept-done');
+    if (btn) {
+      var on = !!done[btn.dataset.slug];
+      btn.classList.toggle('on', on);
+      btn.textContent = on ? '\u2713 Completed' : '\u2713 Mark complete';
+    }
+  }
+
+  window.setFilter = function(f) {
+    filter = f; localStorage.setItem(FILTER_KEY, f); apply();
+  };
+  window.toggleDone = function(slug) {
+    if (done[slug]) delete done[slug]; else done[slug] = true;
+    localStorage.setItem(DONE_KEY, JSON.stringify(done));
+    apply();
+  };
+  window.toggleHideDone = function() {
+    document.body.classList.toggle('hide-done');
+  };
+  apply();
+})();
+</script>
+
+</body>
+</html>
