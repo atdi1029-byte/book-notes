@@ -74,20 +74,13 @@
     document.head.appendChild(script);
   }
 
-  // Cloud sync: pull on load
+  // Cloud sync: pull on load — cloud is source of truth
   function syncFromCloud() {
     jsonpFetch(SYNC_URL + '?action=fg_get_done', function(err, data) {
       if (!err && data && data.status === 'ok' && data.fg_done) {
-        // Merge: remote wins for additions, union of both
-        var remote = data.fg_done;
-        var changed = false;
-        for (var k in remote) {
-          if (!done[k]) { done[k] = true; changed = true; }
-        }
-        if (changed) {
-          localStorage.setItem(DONE_KEY, JSON.stringify(done));
-          apply();
-        }
+        done = data.fg_done;
+        localStorage.setItem(DONE_KEY, JSON.stringify(done));
+        apply();
       }
       syncReady = true;
     });
