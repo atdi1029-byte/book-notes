@@ -17,12 +17,12 @@
   }
 
   function apply() {
-    var shown = 0, total = 0, hidden = 0;
+    var shown = 0, total = 0, hidden = 0, doneCount = 0;
     document.querySelectorAll('.concept-row').forEach(function(r) {
       var slug = r.dataset.slug, flag = r.dataset.flag;
       total++;
       if (done[slug]) r.classList.add('done'); else r.classList.remove('done');
-      if (visible(flag)) { r.classList.remove('fg-hidden'); shown++; }
+      if (visible(flag)) { r.classList.remove('fg-hidden'); shown++; if (done[slug]) doneCount++; }
       else { r.classList.add('fg-hidden'); hidden++; }
     });
     document.querySelectorAll('.cat-card').forEach(function(card) {
@@ -31,7 +31,7 @@
       var vis = 0, allDone = slugs.length > 0;
       slugs.forEach(function(sl, i) {
         if (visible(flags[i])) vis++;
-        if (!done[sl]) allDone = false;
+        if (!done[sl]) allDone = false; else if (visible(flags[i])) doneCount++;
       });
       total += slugs.length; shown += vis;
       var c = card.querySelector('.cat-count');
@@ -51,7 +51,8 @@
       hideBtn.textContent = hiding ? 'Show completed' : 'Hide completed';
     }
     var n = document.getElementById('fgCount');
-    if (n) n.textContent = shown + ' of ' + total + ' shown';
+    var remaining = shown - doneCount;
+    if (n) n.textContent = remaining > 0 ? remaining + ' remaining' : 'All done!';
     var h = document.getElementById('fgHiddenNote');
     if (h) h.textContent = hidden ? hidden + ' hidden by the filter.' : '';
     var btn = document.querySelector('.concept-done');
