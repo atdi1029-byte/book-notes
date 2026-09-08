@@ -1,4 +1,4 @@
-// Books & Zercher Sync — Google Apps Script
+// Books, Zercher & Taper Sync — Google Apps Script
 // Deploy as Web App: Execute as Me, Access: Anyone
 // Supports JSONP: add &callback=funcName to any request
 
@@ -245,6 +245,52 @@ function doGet(e) {
     if (isDone) { fgExisting[slug] = true; } else { delete fgExisting[slug]; }
     fgSheet.getRange('F1').setValue(JSON.stringify(fgExisting));
     return jsonpWrap_(JSON.stringify({ status: 'ok', fg_done: fgExisting }), callback);
+  }
+
+  // ── TAPER ──
+  // Settings!G1 stores taper state as JSON blob
+  if (action === 'taper_get') {
+    var tSheet = ss.getSheetByName('Settings');
+    if (!tSheet) tSheet = ss.insertSheet('Settings');
+    var raw = tSheet.getRange('G1').getValue() || '{}';
+    var parsed = {};
+    try { parsed = JSON.parse(raw); } catch(err) {}
+    return jsonpWrap_(JSON.stringify({ status: 'ok', taper: parsed }), callback);
+  }
+
+  if (action === 'taper_save') {
+    var tSheet = ss.getSheetByName('Settings');
+    if (!tSheet) tSheet = ss.insertSheet('Settings');
+    var data = e.parameter.data || '{}';
+    JSON.parse(data); // validate
+    tSheet.getRange('G1').setValue(data);
+    return jsonpWrap_(JSON.stringify({ status: 'ok' }), callback);
+  }
+
+  // Chunked taper save for large datasets
+  if (action === 'taper_save_chunk') {
+    var tSheet = ss.getSheetByName('Settings');
+    if (!tSheet) tSheet = ss.insertSheet('Settings');
+    var idx = parseInt(e.parameter.i || '0');
+    var chunk = e.parameter.cd || '';
+    // Use H column for temp chunks
+    tSheet.getRange('H' + (idx + 1)).setValue(chunk);
+    return jsonpWrap_(JSON.stringify({ ok: true, chunk: idx }), callback);
+  }
+
+  if (action === 'taper_save_done') {
+    var tSheet = ss.getSheetByName('Settings');
+    if (!tSheet) tSheet = ss.insertSheet('Settings');
+    var total = parseInt(e.parameter.n || '1');
+    var fullData = '';
+    for (var i = 0; i < total; i++) {
+      fullData += (tSheet.getRange('H' + (i + 1)).getValue() || '');
+    }
+    tSheet.getRange('G1').setValue(fullData);
+    for (var i = 0; i < total; i++) {
+      tSheet.getRange('H' + (i + 1)).clearContent();
+    }
+    return jsonpWrap_(JSON.stringify({ ok: true }), callback);
   }
 
   // ── ZERCHER ──

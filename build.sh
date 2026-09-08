@@ -1,12 +1,21 @@
 #!/bin/bash
 # Book Notes — Build Script
 # Usage:
-#   ./build.sh scaffold "Book Title" "Author Name" "YEAR" "PAGE_COUNT" "category" "source.pdf"
-#   ./build.sh add-shelf "Book Title" "Author Name" "folder_name" "category" "data-book-id"
+#   ./build.sh scaffold  "Book Title" "Author Name" "YEAR" "PAGE_COUNT" "category" "source.pdf"
+#   ./build.sh process   "/path/to/book.pdf" "Folder" [start] [end] [batch] [sleep] [parallel] [--type=TYPE]
+#   ./build.sh queue     ["/path/to/pdf/folder"] [batch] [sleep] [parallel] [--type=TYPE]
+#   ./build.sh add-shelf "Folder" --category "Category" [--view toread|shelf] [--tier now|soon|later]
+#   ./build.sh thumbs    [--force]        # backfill thumb.jpg for every book that has cover.jpg
+#   ./build.sh finish    "Folder" [finish-book.sh options]
+#
+# Typical flow for one book:
+#   ./build.sh process "/path/to/book.pdf" "My_Book"       # bookai: extraction + gates + audits
+#   (Claude writes summary.md, index.html, coverage_audit.json, debate_ready_report.json)
+#   ./build.sh finish "My_Book" --category "Investing" --tier now --push
 #
 # Examples:
 #   ./build.sh scaffold "The Intelligent Investor" "Benjamin Graham" "1949" "640" "investing" "/path/to/book.pdf"
-#   ./build.sh add-shelf "The Intelligent Investor" "Benjamin Graham" "The_Intelligent_Investor" "Investing" "intelligent-investor"
+#   ./build.sh add-shelf "The_Intelligent_Investor" --category "Investing" --tier now
 
 BOOKS_DIR="$(cd "$(dirname "$0")" && pwd)"
 
@@ -29,19 +38,12 @@ scaffold() {
   # Create directory
   mkdir -p "$DIR"
 
-  # Extract cover from PDF if provided
+  # Extract cover from PDF page 1 and make the shelf thumbnail (thumb.jpg)
   if [ -n "$PDF" ] && [ -f "$PDF" ]; then
-    echo "  Extracting cover from PDF..."
-    pdftoppm -jpeg -f 1 -l 1 -r 300 "$PDF" "$DIR/cover"
-    # Rename pdftoppm output (it adds -01 suffix)
-    if [ -f "$DIR/cover-01.jpg" ]; then
-      mv "$DIR/cover-01.jpg" "$DIR/cover.jpg"
-    elif [ -f "$DIR/cover-1.jpg" ]; then
-      mv "$DIR/cover-1.jpg" "$DIR/cover.jpg"
-    fi
-    echo "  Cover extracted: $DIR/cover.jpg"
+    echo "  Extracting cover + thumb from PDF..."
+    python3 "$BOOKS_DIR/make_thumb.py" "$DIR" --pdf "$PDF"
   else
-    echo "  No PDF provided — add cover.jpg manually"
+    echo "  No PDF provided — add cover.jpg then run: ./build.sh thumbs"
   fi
 
   # Create summary.md from template
@@ -73,55 +75,27 @@ scaffold() {
 
   echo ""
   echo "Done! Next steps:"
-  echo "  1. Fill in $DIR/summary.md with key takeaways"
-  echo "  2. Fill in $DIR/notes.md with chapter notes"
-  echo "  3. Build the HTML content in $DIR/index.html"
-  echo "  4. Run: ./build.sh add-shelf \"$TITLE\" \"$AUTHOR\" \"$FOLDER\" \"$CATEGORY\" \"$BM_KEY\""
+  echo "  1. Extract notes:  ./build.sh process \"$PDF\" \"$FOLDER\""
+  echo "  2. Fill in $DIR/summary.md and build the HTML content in $DIR/index.html"
+  echo "  3. Write coverage_audit.json and debate_ready_report.json"
+  echo "  4. Finish:         ./build.sh finish \"$FOLDER\" --category \"$CATEGORY\""
 }
 
 add_shelf() {
-  local TITLE="$1"
-  local AUTHOR="$2"
-  local FOLDER="$3"
-  local CATEGORY="$4"
-  local DATA_BOOK="$5"
-  local SHELF="$BOOKS_DIR/index.html"
-
-  # HTML for the new book card
-  local CARD="    <a class=\"book\" href=\"${FOLDER}/index.html\" data-book=\"${DATA_BOOK}\">
-      <div class=\"cover-wrap\">
-        <img class=\"book-cover\" src=\"${FOLDER}/cover.jpg\" alt=\"${TITLE}\">
-        <button class=\"mark-read\" onclick=\"toggleRead(event,'${DATA_BOOK}')\" title=\"Mark as read\"></button>
-        <button class=\"read-badge\" onclick=\"toggleRead(event,'${DATA_BOOK}')\" title=\"Read! Click to unmark\">
-          <svg viewBox=\"0 0 24 24\"><path d=\"M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z\"/></svg>
-        </button>
-      </div>
-      <div class=\"book-title\">${TITLE}</div>
-      <div class=\"book-author\">${AUTHOR}</div>
-    </a>"
-
-  echo "Card HTML for $TITLE:"
-  echo ""
-  echo "$CARD"
-  echo ""
-  echo "Add this card inside the appropriate <div class=\"shelf\"> section in index.html"
-  echo "If category '$CATEGORY' doesn't exist, add a new section:"
-  echo "  <h2 class=\"section-title\">$CATEGORY</h2>"
-  echo "  <div class=\"shelf\">"
-  echo "    [paste card here]"
-  echo "  </div>"
+  # Inserts the card into index.html (creates the category section if needed).
+  # Legacy 5-arg form (title author folder category id) still works — only the folder is used.
+  if [ $# -ge 5 ] && [[ "$2" != --* ]] && [[ "$3" != --* ]]; then
+    local FOLDER="$3" CATEGORY="$4"
+    python3 "$BOOKS_DIR/add_to_shelf.py" "$FOLDER" --category "$CATEGORY" --view shelf
+  else
+    python3 "$BOOKS_DIR/add_to_shelf.py" "$@"
+  fi
 }
 
 process() {
-  local PDF="$1"
-  local FOLDER="$2"
-  local START="${3:-1}"
-  local END="${4:-0}"
-  local BATCH="${5:-50}"
-  local SLEEP="${6:-5}"
-  local PARALLEL="${7:-3}"
-
-  "$BOOKS_DIR/process-book.sh" "$PDF" "$FOLDER" "$START" "$END" "$BATCH" "$SLEEP" "$PARALLEL"
+  # Everything goes straight to bookai: it applies type-aware batch/parallel
+  # defaults when the numeric args are omitted, and accepts --type=TYPE anywhere.
+  "$BOOKS_DIR/bookai" "$@"
 }
 
 case "$1" in
@@ -141,11 +115,15 @@ case "$1" in
     shift
     "$BOOKS_DIR/process-queue.sh" "$@"
     ;;
+  thumbs)
+    shift
+    python3 "$BOOKS_DIR/make_thumb.py" --all "$@"
+    ;;
+  finish)
+    shift
+    "$BOOKS_DIR/finish-book.sh" "$@"
+    ;;
   *)
-    echo "Usage:"
-    echo "  ./build.sh scaffold \"Title\" \"Author\" \"Year\" \"Pages\" \"category\" \"source.pdf\""
-    echo "  ./build.sh add-shelf \"Title\" \"Author\" \"folder\" \"category\" \"data-book-id\""
-    echo "  ./build.sh process  \"/path/to/book.pdf\" \"Folder\" [start] [end] [batch] [sleep] [parallel]"
-    echo "  ./build.sh queue    [\"/path/to/pdf/folder\"] [batch] [sleep] [parallel]"
+    sed -n '2,20p' "$0" | sed 's/^# \{0,1\}//'
     ;;
 esac

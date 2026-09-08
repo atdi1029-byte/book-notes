@@ -745,6 +745,18 @@ def extract_shelf_data():
     return book_to_category, book_to_author
 
 
+def read_run_state(book_dir):
+    """Read Book_Folder/.run_state.json (written by bookai/finish-book.sh)."""
+    path = os.path.join(book_dir, '.run_state.json')
+    if not os.path.isfile(path):
+        return {}
+    try:
+        with open(path, 'r', encoding='utf-8') as f:
+            return json.load(f)
+    except Exception:
+        return {}
+
+
 def generate():
     """Main generation logic."""
     shelf_cats, shelf_authors = extract_shelf_data()
@@ -785,13 +797,24 @@ def generate():
         if not author and d in shelf_authors:
             author = shelf_authors[d]
 
+        # Per-book state written by bookai / finish-book.sh
+        # (type, shelf category, To Read tier) — used as fallbacks so
+        # new books don't need the dicts above edited by hand.
+        rs = read_run_state(full)
+
         # Determine category
         category = CATEGORY_OVERRIDES.get(
-            d, shelf_cats.get(d, 'Uncategorized')
+            d,
+            shelf_cats.get(
+                d, rs.get('shelf_update', {}).get('category')
+                or 'Uncategorized'
+            )
         )
 
         # Determine book type
-        book_type = BOOK_TYPES.get(d, 'analytical')
+        book_type = BOOK_TYPES.get(
+            d, rs.get('type') or 'analytical'
+        )
 
         # Use existing ID from shelf HTML to preserve
         # read state and bookmarks
@@ -826,10 +849,13 @@ def generate():
                 'bmkey': plain_bmkey,
             }
 
-        # Queue info
+        # Queue info (hardcoded tiers first, then .run_state.json)
         queue = None
         if d in QUEUE_TIERS:
             queue = {'tier': QUEUE_TIERS[d]}
+        elif rs.get('shelf_update', {}).get('tier') and \
+                rs.get('shelf_update', {}).get('view', 'toread') == 'toread':
+            queue = {'tier': rs['shelf_update']['tier']}
 
         # Content version from file modification time
         content_version = None

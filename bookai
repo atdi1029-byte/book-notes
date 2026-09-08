@@ -1,8 +1,18 @@
 #!/bin/bash
-# process-book.sh — Batch-process a PDF into notes.md using Claude CLI
+# bookai — Batch-process a PDF into notes.md using Claude CLI
 #
 # Runs parallel claude invocations per page range, each writing to a temp file.
-# Merges results in page order after each wave.
+# Merges results in page order after each wave, then: gap-fill → reorder
+# (page order + global nugget IDs) → dedup → verification → quote audit.
+#
+# Quality gates per batch: word/line/bullet minimums, priority tags, per-page
+# acknowledgments, page-image references (visual types), and a fabrication
+# check — every "> quote" is fuzzy-matched against the PDF text of the pages
+# the batch read (verify_quotes.py); a batch where most quotes can't be found
+# is rejected and retried.
+#
+# After this script: Claude writes summary.md / index.html / audits, then
+#   ./finish-book.sh "Book_Folder"   does everything mechanical and commits.
 #
 # Usage:
 #   ./bookai "/path/to/book.pdf" "Book_Folder" [start] [end] [batch] [sleep] [parallel] [--type=TYPE]
@@ -20,7 +30,11 @@
 #   ./bookai "/path/to/book.pdf" "My_Book"              # auto-detect pages, defaults
 #   ./bookai "/path/to/book.pdf" "My_Book" 1 0 20 5 3 --type=technical
 #
-# Requires: macOS (uses mdls for page count detection), claude CLI, python3
+# If --type is omitted the type is auto-suggested from the PDF's table of
+# contents (detect_type.py); in a terminal you get 30s to accept or override.
+#
+# Requires: claude CLI, python3 with PyMuPDF (pip install pymupdf).
+#           mdls is used as a page-count fallback on macOS only.
 
 set -euo pipefail
 
@@ -28,25 +42,46 @@ BOOKS_DIR="$(cd "$(dirname "$0")" && pwd)"
 
 # Parse flags from any position
 BOOK_TYPE="analytical"
+TYPE_GIVEN=false
+TYPE_SOURCE="default"
 POSITIONAL=()
 for arg in "$@"; do
   case "$arg" in
-    --type=*) BOOK_TYPE="${arg#--type=}" ;;
-    --ta) BOOK_TYPE="technical" ;;  # backwards compat
+    --type=*) BOOK_TYPE="${arg#--type=}"; TYPE_GIVEN=true; TYPE_SOURCE="--type" ;;
+    --ta) BOOK_TYPE="technical"; TYPE_GIVEN=true; TYPE_SOURCE="--ta" ;;  # backwards compat
     *) POSITIONAL+=("$arg") ;;
   esac
 done
+
+PDF="${POSITIONAL[0]}"
+RAW_FOLDER="${POSITIONAL[1]}"
+START="${POSITIONAL[2]:-1}"
+END_PAGE="${POSITIONAL[3]:-0}"
+
+[ -f "$PDF" ] || { echo "ERROR: PDF not found: $PDF"; exit 1; }
+
+# Auto-suggest the book type from the PDF's front matter / TOC when --type is omitted
+if [ "$TYPE_GIVEN" = false ] && [ -f "$BOOKS_DIR/detect_type.py" ]; then
+  DETECTED=$(python3 "$BOOKS_DIR/detect_type.py" "$PDF" 2>/dev/null || true)
+  case "$DETECTED" in analytical|narrative|technical|textbook|practical) ;; *) DETECTED="" ;; esac
+  if [ -n "$DETECTED" ]; then
+    if [ -t 0 ]; then
+      ANS=""
+      read -r -t 30 -p "Auto-detected book type: $DETECTED — Enter to accept, or type analytical/narrative/technical/textbook/practical: " ANS || true
+      if [ -n "$ANS" ]; then BOOK_TYPE="$ANS"; TYPE_SOURCE="chosen at prompt"; else BOOK_TYPE="$DETECTED"; TYPE_SOURCE="auto-detected"; fi
+    else
+      BOOK_TYPE="$DETECTED"; TYPE_SOURCE="auto-detected"
+    fi
+  else
+    echo "NOTE: could not auto-detect book type — using 'analytical' (pass --type=... to override)"
+  fi
+fi
 
 # Validate book type
 case "$BOOK_TYPE" in
   analytical|narrative|technical|textbook|practical) ;;
   *) echo "ERROR: Unknown book type '$BOOK_TYPE'. Use: analytical, narrative, technical, textbook, practical"; exit 1 ;;
 esac
-
-PDF="${POSITIONAL[0]}"
-RAW_FOLDER="${POSITIONAL[1]}"
-START="${POSITIONAL[2]:-1}"
-END_PAGE="${POSITIONAL[3]:-0}"
 
 # Adaptive defaults by book type — visual books need smaller batches, fewer parallel
 case "$BOOK_TYPE" in
@@ -82,9 +117,18 @@ fi
 
 # Auto-detect total pages if not specified
 if [ "$END_PAGE" -eq 0 ]; then
-  END_PAGE=$(mdls -name kMDItemNumberOfPages "$PDF" 2>/dev/null | awk '{print $NF}')
-  if [ -z "$END_PAGE" ] || [ "$END_PAGE" = "(null)" ]; then
-    echo "ERROR: Could not detect page count. Specify end_page manually."
+  # PyMuPDF works everywhere; mdls is the macOS-only fallback
+  END_PAGE=$(python3 -c "import sys
+try:
+    import pymupdf as fitz
+except ImportError:
+    import fitz
+print(len(fitz.open(sys.argv[1])))" "$PDF" 2>/dev/null || true)
+  if ! [[ "$END_PAGE" =~ ^[0-9]+$ ]] && command -v mdls >/dev/null 2>&1; then
+    END_PAGE=$(mdls -name kMDItemNumberOfPages "$PDF" 2>/dev/null | awk '{print $NF}')
+  fi
+  if ! [[ "${END_PAGE:-}" =~ ^[0-9]+$ ]] || [ "$END_PAGE" -eq 0 ]; then
+    echo "ERROR: Could not detect page count (pip install pymupdf). Specify end_page manually."
     exit 1
   fi
 fi
@@ -97,7 +141,7 @@ echo "Book PDF Processor — $(date)" | tee -a "$LOG"
 echo "PDF:    $PDF" | tee -a "$LOG"
 echo "Output: $NOTES" | tee -a "$LOG"
 echo "Pages:  $START → $END_PAGE (batch: $BATCH, parallel: $PARALLEL, sleep: ${SLEEP}s)" | tee -a "$LOG"
-echo "Type:   $BOOK_TYPE" | tee -a "$LOG"
+echo "Type:   $BOOK_TYPE ($TYPE_SOURCE)" | tee -a "$LOG"
 echo "========================================" | tee -a "$LOG"
 
 # === PAGE IMAGE RENDERING (technical, practical, textbook) ===
@@ -109,7 +153,8 @@ if [[ "$BOOK_TYPE" == "technical" || "$BOOK_TYPE" == "practical" || "$BOOK_TYPE"
   CHARTS_DIR="$DIR/charts"
   mkdir -p "$CHARTS_DIR"
 
-  EXISTING_PAGES=$(ls "$CHARTS_DIR"/page_*.png 2>/dev/null | wc -l | tr -d ' ')
+  # (find, not ls: an empty glob makes ls fail and pipefail would abort the script)
+  EXISTING_PAGES=$(find "$CHARTS_DIR" -maxdepth 1 -name 'page_*.png' 2>/dev/null | wc -l | tr -d ' ')
 
   if [ "$EXISTING_PAGES" -gt 0 ]; then
     echo "Pages:  $EXISTING_PAGES page images already rendered — skipping" | tee -a "$LOG"
@@ -141,7 +186,7 @@ for page_num in range(start, min(end, len(doc))):
 
 print(f'Rendered {page_count} full-page images')
 EXTRACT_EOF
-    PAGE_IMG_COUNT=$(ls "$CHARTS_DIR"/page_*.png 2>/dev/null | wc -l | tr -d ' ')
+    PAGE_IMG_COUNT=$(find "$CHARTS_DIR" -maxdepth 1 -name 'page_*.png' 2>/dev/null | wc -l | tr -d ' ')
     echo "Pages:  $PAGE_IMG_COUNT full-page images rendered" | tee -a "$LOG"
   fi
 fi
@@ -207,8 +252,11 @@ record_acknowledged_pages() {
 }
 
 # Function: build the prompt for a page range
+# make_prompt READ_START REAL_START END OUT_FILE [CONTEXT]
+#   READ_START..REAL_START-1 are overlap pages: read for context only.
+#   REAL_START..END is the range to extract, mark, and acknowledge.
 make_prompt() {
-  local P_START="$1" P_END="$2" OUT_FILE="$3"
+  local P_START="$1" R_START="$2" P_END="$3" OUT_FILE="$4" CONTEXT="${5:-}"
 
   # Type-specific line targets and content rules
   local LINE_TARGET TYPE_INSTRUCTIONS
@@ -478,7 +526,7 @@ counterarguments, and examples that teach something different.
 READ pages $P_START-$P_END of the PDF at '$PDF'.
 
 WRITE the notes to '$OUT_FILE' using the Write tool. $LINE_TARGET Markdown format:
-- START with: <!-- pp. $P_START-$P_END -->
+- START with: <!-- pp. $R_START-$P_END -->
 - Chapter headers: ## Chapter N: Title
 - Subheadings: ### Topic Name
 - Key points as bullet points (-)
@@ -489,17 +537,20 @@ $TYPE_INSTRUCTIONS
 - Include named individuals, books, or thinkers referenced
 - MANDATORY: Tag important ideas with [MUST KNOW], [SHOULD KNOW], or [NICE TO KNOW]
 - MANDATORY: Assign each tagged nugget a unique sequential ID: [MUST KNOW][N001], [SHOULD KNOW][N002], etc.
-  Continue numbering from where the previous batch left off. IDs enable the coverage audit to track
-  every nugget from extraction through to the finished HTML. Example:
+  Number sequentially within THIS batch starting at [N001] — IDs are renumbered globally in page
+  order after all batches merge. IDs enable the coverage audit to track every nugget from
+  extraction through to the finished HTML. Example:
     - [MUST KNOW][N042] Survivorship bias: Wald showed military was reinforcing where returning planes
       had damage — but the damage on returning planes showed where planes could survive hits...
+- Quotes in > blockquotes MUST be verbatim from the page (they are checked against the PDF text);
+  if you can't quote exactly, paraphrase as a bullet instead of a blockquote
 - Do NOT output preamble — ONLY write the notes
-$(if [ -n "$PREV_BATCH_CONTEXT" ]; then
+$(if [ -n "$CONTEXT" ]; then
 cat <<CONTEXT_EOF
 
 CONTINUITY CONTEXT — the previous batch ended with these notes (for context only):
 ---
-$PREV_BATCH_CONTEXT
+$CONTEXT
 ---
 Use this ONLY for continuity. Do NOT rewrite or repeat this material.
 If the previous batch ended mid-concept, continue seamlessly.
@@ -507,23 +558,26 @@ CONTEXT_EOF
 fi)
 
 PAGE ACKNOWLEDGMENT (MANDATORY):
-For EVERY page in the range $P_START-$P_END, include a marker:
+For EVERY page in the range $R_START-$P_END, include a marker:
   <!-- page NNN: X nuggets --> (if the page has substantive content)
   <!-- page NNN: no content --> (if the page is blank, index, copyright, etc.)
 These markers are used to verify that every individual page was actually examined.
 A batch without page acknowledgments for every page in the range will be rejected.
 
-IMPORTANT: Extract notes for pages $P_START-$P_END. Page acknowledgments and nuggets should cover this range.
-If the batch starts reading from an earlier page (for boundary overlap), use those earlier pages ONLY for
-context continuity — do NOT re-extract or re-tag content from overlap pages.
+IMPORTANT: Extract notes for pages $R_START-$P_END ONLY. Page acknowledgments and nuggets must cover exactly this range.
+$(if [ "$P_START" -lt "$R_START" ]; then
+echo "Pages $P_START-$((R_START - 1)) are OVERLAP from the previous batch: read them for context continuity only —"
+echo "do NOT re-extract, re-tag, quote, or acknowledge them, and do NOT include them in the <!-- pp. --> marker."
+fi)
 This is academic study material — process the content faithfully.
 PROMPT_EOF
 }
 
 # Function: process a single batch with model fallback
 # On content filter errors, immediately tries haiku instead of retrying sonnet.
+# process_batch READ_START REAL_START END TEMP_FILE BATCH_LOG [CONTEXT]
 process_batch() {
-  local B_START="$1" B_END="$2" TEMP_FILE="$3" BATCH_LOG="$4"
+  local B_START="$1" B_REAL="$2" B_END="$3" TEMP_FILE="$4" BATCH_LOG="$5" CONTEXT="${6:-}"
 
   local MODELS=("sonnet" "haiku")
 
@@ -535,7 +589,7 @@ process_batch() {
       fi
 
       local PROMPT
-      PROMPT=$(make_prompt "$B_START" "$B_END" "$TEMP_FILE")
+      PROMPT=$(make_prompt "$B_START" "$B_REAL" "$B_END" "$TEMP_FILE" "$CONTEXT")
       local STDERR_FILE="$DIR/.stderr_${B_START}_${B_END}.tmp"
 
       run_with_timeout "$TIMEOUT" \
@@ -573,38 +627,58 @@ process_batch() {
         if [ "$WORDS" -ge "$MIN_WORDS" ] && [ "$LINES" -ge "$MIN_LINES" ] && [ "$((HAS_MARKERS + HAS_HEADERS))" -ge 1 ] && [ "$HAS_BULLETS" -ge "$MIN_BULLETS" ]; then
           # MANDATORY: Priority tags must be present for coverage audit to work
           if [ "$HAS_TAGS_ANY" -eq 0 ]; then
-            echo "  TAG_FAIL — pp. $B_START-$B_END ($MODEL): no [MUST KNOW]/[SHOULD KNOW]/[NICE TO KNOW] tags — retrying" >> "$BATCH_LOG"
+            echo "  TAG_FAIL — pp. $B_REAL-$B_END ($MODEL): no [MUST KNOW]/[SHOULD KNOW]/[NICE TO KNOW] tags — retrying" >> "$BATCH_LOG"
             rm -f "$TEMP_FILE"
             RETRY=$((RETRY + 1))
             continue
           fi
           # Warn if tags lack nugget IDs (needed for coverage audit)
           if [ "$HAS_TAGS" -eq 0 ] && [ "$HAS_TAGS_ANY" -gt 0 ]; then
-            echo "  ID_WARNING — pp. $B_START-$B_END: tags present but missing nugget IDs [N###]" >> "$BATCH_LOG"
+            echo "  ID_WARNING — pp. $B_REAL-$B_END: tags present but missing nugget IDs [N###]" >> "$BATCH_LOG"
           fi
           # Check per-page acknowledgments (<!-- page NNN: ... -->)
           local PAGE_ACKS=$(grep -cE '<!-- page [0-9]+:' "$TEMP_FILE" 2>/dev/null || true)
-          local EXPECTED_PAGES=$(( B_END - B_START + 1 ))
+          local EXPECTED_PAGES=$(( B_END - B_REAL + 1 ))
           if [ "$PAGE_ACKS" -lt "$EXPECTED_PAGES" ]; then
-            echo "  PAGE_ACK_WARNING — pp. $B_START-$B_END: $PAGE_ACKS/$EXPECTED_PAGES pages acknowledged" >> "$BATCH_LOG"
+            echo "  PAGE_ACK_WARNING — pp. $B_REAL-$B_END: $PAGE_ACKS/$EXPECTED_PAGES pages acknowledged" >> "$BATCH_LOG"
+          fi
+          # Fabrication check — every "> quote" must be findable in the PDF pages this
+          # batch read. Reject (retry) if more than half the quotes are missing; warn otherwise.
+          if [ -f "$BOOKS_DIR/verify_quotes.py" ]; then
+            local QJSON="$DIR/.batch_${B_START}_${B_END}.quotes.json"
+            local QOUT="" QRC=0
+            QOUT=$(python3 "$BOOKS_DIR/verify_quotes.py" --pdf "$PDF" --notes "$TEMP_FILE" \
+                     --start "$B_START" --end "$B_END" --json "$QJSON" --fail-ratio 0.5 2>&1) && QRC=0 || QRC=$?
+            rm -f "$QJSON"
+            if [ "$QRC" -eq 1 ]; then
+              echo "  QUOTE_FAIL — pp. $B_REAL-$B_END ($MODEL): most quotes not found in the PDF — retrying" >> "$BATCH_LOG"
+              echo "$QOUT" | grep -E 'UNVERIFIED|PARAPHRASED|closest' | sed 's/^/  /' >> "$BATCH_LOG"
+              rm -f "$TEMP_FILE"
+              RETRY=$((RETRY + 1))
+              continue
+            elif echo "$QOUT" | grep -q 'UNVERIFIED'; then
+              echo "  QUOTE_WARNING — pp. $B_REAL-$B_END: $(echo "$QOUT" | grep -c 'UNVERIFIED') quote(s) not found in the PDF" >> "$BATCH_LOG"
+              echo "$QOUT" | grep -E 'UNVERIFIED|closest' | sed 's/^/  /' >> "$BATCH_LOG"
+            fi
           fi
           # For visual books: check PAGE IMAGE references exist when page images are present
           if [[ "$BOOK_TYPE" == "technical" || "$BOOK_TYPE" == "practical" || "$BOOK_TYPE" == "textbook" ]]; then
-            local PAGE_IMGS=$(ls "$DIR/charts"/page_*.png 2>/dev/null | sed 's/.*page_\([0-9]*\).*/\1/' | sort -un | awk -v s="$B_START" -v e="$B_END" '$1>=s && $1<=e' | wc -l | tr -d ' ')
+            local PAGE_IMGS
+            PAGE_IMGS=$(find "$DIR/charts" -maxdepth 1 -name 'page_*.png' 2>/dev/null | sed 's/.*page_\([0-9]*\).*/\1/' | sort -un | awk -v s="$B_START" -v e="$B_END" '$1>=s && $1<=e' | wc -l | tr -d ' ')
             local IMG_REFS=$(grep -cE '\[PAGE IMAGE:|IMAGE NOT AVAILABLE:' "$TEMP_FILE" 2>/dev/null || true)
             if [ "$PAGE_IMGS" -gt 3 ] && [ "$IMG_REFS" -eq 0 ]; then
-              echo "  QUALITY_FAIL — pp. $B_START-$B_END ($MODEL): $PAGE_IMGS page images but 0 references" >> "$BATCH_LOG"
+              echo "  QUALITY_FAIL — pp. $B_REAL-$B_END ($MODEL): $PAGE_IMGS page images but 0 references" >> "$BATCH_LOG"
               rm -f "$TEMP_FILE"
               RETRY=$((RETRY + 1))
               continue
             fi
           fi
 
-          echo "  OK — pp. $B_START-$B_END ($MODEL, +$LINES lines, $WORDS words, $HAS_TAGS tags)" >> "$BATCH_LOG"
-          echo "$B_START-$B_END:$MODEL" >> "$MODEL_LOG"
+          echo "  OK — pp. $B_REAL-$B_END ($MODEL, +$LINES lines, $WORDS words, $HAS_TAGS tags)" >> "$BATCH_LOG"
+          echo "$B_REAL-$B_END:$MODEL" >> "$MODEL_LOG"
           return 0
         else
-          echo "  QUALITY_FAIL — pp. $B_START-$B_END ($MODEL): ${WORDS}w, ${HAS_MARKERS}m, ${HAS_HEADERS}h, ${HAS_BULLETS}b" >> "$BATCH_LOG"
+          echo "  QUALITY_FAIL — pp. $B_REAL-$B_END ($MODEL): ${WORDS}w, ${HAS_MARKERS}m, ${HAS_HEADERS}h, ${HAS_BULLETS}b" >> "$BATCH_LOG"
           rm -f "$TEMP_FILE"
           RETRY=$((RETRY + 1))
           continue
@@ -613,19 +687,19 @@ process_batch() {
 
       # Content filter? Skip straight to next model
       if echo "$STDERR_CONTENT" | grep -qiE "content filter|content policy|unable to process"; then
-        echo "  CONTENT_FILTER — pp. $B_START-$B_END ($MODEL)" >> "$BATCH_LOG"
+        echo "  CONTENT_FILTER — pp. $B_REAL-$B_END ($MODEL)" >> "$BATCH_LOG"
         rm -f "$TEMP_FILE"
         break  # break retry loop, try next model
       fi
 
       # Other error — retry same model
       RETRY=$((RETRY + 1))
-      echo "  RETRY $RETRY — pp. $B_START-$B_END ($MODEL)" >> "$BATCH_LOG"
+      echo "  RETRY $RETRY — pp. $B_REAL-$B_END ($MODEL)" >> "$BATCH_LOG"
       rm -f "$TEMP_FILE"
     done
   done
 
-  echo "  FAILED — pp. $B_START-$B_END after all models" >> "$BATCH_LOG"
+  echo "  FAILED — pp. $B_REAL-$B_END after all models" >> "$BATCH_LOG"
   return 1
 }
 
@@ -657,8 +731,8 @@ echo "Batches: $TOTAL (processing $PARALLEL at a time)" | tee -a "$LOG"
 IDX=0
 FAILURES=0
 WAVE_NUM=0
-PREV_BATCH_CONTEXT=""  # last 50 lines of previous batch for continuity
-export PREV_BATCH_CONTEXT
+PREV_BATCH_CONTEXT=""   # last 50 lines of the most recently merged batch
+LAST_MERGED_END=-1      # last page of that batch (-1 = none / last batch failed)
 
 while [ "$IDX" -lt "$TOTAL" ]; do
   WAVE_NUM=$((WAVE_NUM + 1))
@@ -695,7 +769,15 @@ while [ "$IDX" -lt "$TOTAL" ]; do
     else
       echo "  Starting: pp. $B_REAL_START-$B_END" | tee -a "$LOG"
     fi
-    process_batch "$B_READ_START" "$B_END" "$TEMP" "$BATCH_LOG" &
+    # Continuity context only when the immediately preceding batch has actually
+    # been merged (first batch of a wave, or PARALLEL=1). Other batches in the
+    # wave would otherwise receive the previous wave's tail — the wrong
+    # predecessor — so they rely on the 2-page overlap instead.
+    CTX=""
+    if [ -n "$PREV_BATCH_CONTEXT" ] && [ "$LAST_MERGED_END" -eq $((B_REAL_START - 1)) ]; then
+      CTX="$PREV_BATCH_CONTEXT"
+    fi
+    process_batch "$B_READ_START" "$B_REAL_START" "$B_END" "$TEMP" "$BATCH_LOG" "$CTX" &
     PIDS+=($!)
   done
 
@@ -725,9 +807,10 @@ while [ "$IDX" -lt "$TOTAL" ]; do
       echo "" >> "$NOTES"
       # Parse actual page acknowledgments — only count real pages (not overlap)
       UNACKED=$(record_acknowledged_pages "$TEMP" "$B_REAL_START" "$B_END")
-      # Capture last 50 lines for continuity context (used by next batch)
+      # Capture last 50 lines for continuity context (used by the batch that
+      # starts at B_END+1, if it launches after this merge)
       PREV_BATCH_CONTEXT=$(tail -50 "$TEMP")
-      export PREV_BATCH_CONTEXT
+      LAST_MERGED_END=$B_END
       if [ "$UNACKED" -gt 0 ]; then
         echo "  Merged: pp. $B_REAL_START-$B_END ($LINES lines, $UNACKED pages unacknowledged — will retry)" | tee -a "$LOG"
       else
@@ -738,6 +821,7 @@ while [ "$IDX" -lt "$TOTAL" ]; do
       FAILURES=$((FAILURES + 1))
       echo "  FAILED: pp. $B_REAL_START-$B_END" | tee -a "$LOG"
       rm -f "$TEMP"
+      PREV_BATCH_CONTEXT=""; LAST_MERGED_END=-1   # don't hand a stale predecessor to the next batch
     fi
   done
 
@@ -798,7 +882,7 @@ else
     rm -f "$TEMP"
 
     # Reuse the type-specific prompt for gap-fill (not a simplified version)
-    GAP_PROMPT=$(make_prompt "$FP" "$FP" "$TEMP")
+    GAP_PROMPT=$(make_prompt "$FP" "$FP" "$FP" "$TEMP")
 
     GAP_OK=false
     for MODEL in sonnet haiku; do
@@ -854,6 +938,18 @@ else
       fi
     done
   fi
+fi
+
+# === REORDER PASS ===
+# Gap-fill appends single pages to the end of notes.md, and parallel batches
+# each start their own [N###] numbering — put everything back in page order
+# and renumber nugget IDs globally before dedup and verification.
+echo "" | tee -a "$LOG"
+echo "=== REORDER — page order + global nugget IDs ===" | tee -a "$LOG"
+if [ -f "$BOOKS_DIR/reorder_notes.py" ]; then
+  python3 "$BOOKS_DIR/reorder_notes.py" "$NOTES" 2>&1 | tee -a "$LOG"
+else
+  echo "  reorder_notes.py not found — skipping" | tee -a "$LOG"
 fi
 
 # === DEDUPLICATION PASS ===
@@ -1101,10 +1197,35 @@ echo "EXTRACTION DONE — $(date)" | tee -a "$LOG"
 echo "Notes ready for compaction + HTML build." | tee -a "$LOG"
 echo "========================================" | tee -a "$LOG"
 
+# === QUOTE AUDIT — whole notes.md against the PDF ===
+# Per-batch checks only reject batches where most quotes are missing; this
+# pass reports every remaining unverified/paraphrased quote in one place
+# (quote_audit_notes.json) so they can be fixed before the HTML is written.
+echo "" | tee -a "$LOG"
+echo "=== QUOTE AUDIT — notes.md vs PDF ===" | tee -a "$LOG"
+QUOTE_AUDIT="$DIR/quote_audit_notes.json"
+QUOTES_UNVERIFIED=0
+QUOTES_TESTED=0
+if [ -f "$BOOKS_DIR/verify_quotes.py" ]; then
+  python3 "$BOOKS_DIR/verify_quotes.py" --pdf "$PDF" --notes "$NOTES" --check-ids --json "$QUOTE_AUDIT" 2>&1 | tee -a "$LOG" || true
+  if [ -f "$QUOTE_AUDIT" ]; then
+    QUOTES_UNVERIFIED=$(python3 -c "import json;print(json.load(open('$QUOTE_AUDIT'))['summary'].get('unverified',0))" 2>/dev/null || echo 0)
+    QUOTES_TESTED=$(python3 -c "import json;print(json.load(open('$QUOTE_AUDIT'))['summary'].get('tested',0))" 2>/dev/null || echo 0)
+  fi
+  if [ "${QUOTES_UNVERIFIED:-0}" -gt 0 ]; then
+    echo "  *** $QUOTES_UNVERIFIED quote(s) could not be found in the PDF — fix or remove them before writing index.html" | tee -a "$LOG"
+    echo "  *** details: $QUOTE_AUDIT" | tee -a "$LOG"
+  fi
+else
+  echo "  verify_quotes.py not found — skipping" | tee -a "$LOG"
+fi
+
 # === RUN STATE — fail-closed enforcement ===
 # Create .run_state.json tracking every required stage.
-# Claude cannot mark a book COMPLETE without all stages passing.
+# Claude cannot mark a book COMPLETE without all stages passing;
+# finish-book.sh reads and updates this file.
 RUN_STATE="$DIR/.run_state.json"
+PDF_ABS="$(cd "$(dirname "$PDF")" && pwd)/$(basename "$PDF")"
 
 # Count nuggets for the state file
 MUST_COUNT=$(grep -cE '\[MUST KNOW\]' "$NOTES" 2>/dev/null || true)
@@ -1115,8 +1236,9 @@ TOTAL_LINES=$(wc -l < "$NOTES" | tr -d ' ')
 cat > "$RUN_STATE" << STATE_EOF
 {
   "book": "$FOLDER",
-  "pdf": "$PDF",
+  "pdf": "$PDF_ABS",
   "type": "$BOOK_TYPE",
+  "type_source": "$TYPE_SOURCE",
   "pages": { "start": $START, "end": $END_PAGE },
   "extraction": {
     "status": "PASSED",
@@ -1126,7 +1248,13 @@ cat > "$RUN_STATE" << STATE_EOF
     "should_know": $SHOULD_COUNT,
     "nugget_ids": $NUGGET_COUNT,
     "pages_tracked": $(wc -l < "$PAGES_DONE" | tr -d ' '),
-    "batches_failed": $FAILURES
+    "batches_failed": $FAILURES,
+    "reordered": true
+  },
+  "quote_audit": {
+    "notes_tested": ${QUOTES_TESTED:-0},
+    "notes_unverified": ${QUOTES_UNVERIFIED:-0},
+    "report": "quote_audit_notes.json"
   },
   "compaction": { "status": "PENDING" },
   "summary": { "status": "PENDING" },
@@ -1140,7 +1268,9 @@ cat > "$RUN_STATE" << STATE_EOF
     "status": "PENDING",
     "artifact": "debate_ready_report.json"
   },
-  "shelf_update": { "status": "PENDING" },
+  "shelf_update": { "status": "PENDING", "view": "toread", "tier": "later" },
+  "cover": { "status": "PENDING" },
+  "catalog": { "status": "PENDING" },
   "complete": false,
   "completion_gate": "ALL stages must be PASSED and both audit artifacts must exist with zero failures"
 }
@@ -1150,11 +1280,14 @@ echo "" | tee -a "$LOG"
 echo "=== RUN STATE ===" | tee -a "$LOG"
 echo "  Created $RUN_STATE" | tee -a "$LOG"
 echo "  Extraction: PASSED ($MUST_COUNT MUST, $SHOULD_COUNT SHOULD, $NUGGET_COUNT IDs)" | tee -a "$LOG"
-echo "  Remaining: compaction → summary → HTML → coverage_audit.json → debate_ready_report.json → shelf" | tee -a "$LOG"
+echo "  Quotes:     $QUOTES_TESTED tested, $QUOTES_UNVERIFIED unverified" | tee -a "$LOG"
+echo "  Remaining (Claude): compaction (if > 3000 lines) → summary.md → index.html → coverage_audit.json → debate_ready_report.json" | tee -a "$LOG"
+echo "  Then (mechanical):  ./finish-book.sh \"$FOLDER\" --category \"...\" [--tier now|soon|later] [--push]" | tee -a "$LOG"
 echo "" | tee -a "$LOG"
-echo "  *** BOOK IS NOT COMPLETE UNTIL:" | tee -a "$LOG"
+echo "  *** BOOK IS NOT COMPLETE UNTIL finish-book.sh reports DONE:" | tee -a "$LOG"
 echo "  ***   coverage_audit.json exists with 0 MISSING/PARTIAL required nuggets" | tee -a "$LOG"
 echo "  ***   debate_ready_report.json exists and passes" | tee -a "$LOG"
+echo "  ***   every <blockquote> in index.html is found in the PDF" | tee -a "$LOG"
 echo "  ***   .run_state.json shows complete: true" | tee -a "$LOG"
 echo "  *** Do NOT skip these steps. Do NOT mark complete without artifacts." | tee -a "$LOG"
 echo "========================================" | tee -a "$LOG"

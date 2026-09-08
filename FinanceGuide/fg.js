@@ -28,16 +28,17 @@
     document.querySelectorAll('.cat-card').forEach(function(card) {
       var slugs = card.dataset.slugs ? card.dataset.slugs.split(',') : [];
       var flags = card.dataset.flags ? card.dataset.flags.split(',') : [];
-      var vis = 0, allDone = slugs.length > 0;
+      var vis = 0, visDone = 0, allDone = slugs.length > 0;
       slugs.forEach(function(sl, i) {
-        if (visible(flags[i])) vis++;
+        if (visible(flags[i])) { vis++; if (done[sl]) visDone++; }
         if (!done[sl]) allDone = false; else if (visible(flags[i])) doneCount++;
       });
       total += slugs.length; shown += vis;
       var c = card.querySelector('.cat-count');
       if (c) c.textContent = vis + (vis !== slugs.length ? ' of ' + slugs.length : '') + ' concepts' +
         (card.dataset.stars ? ' \u00b7 ' + card.dataset.stars + ' \u2605' : '');
-      if (vis === 0) card.classList.add('fg-empty'); else card.classList.remove('fg-empty');
+      var empty = vis === 0 || (filter === 'star' && vis === visDone);
+      if (empty) card.classList.add('fg-empty'); else card.classList.remove('fg-empty');
       if (allDone) card.classList.add('done'); else card.classList.remove('done');
     });
     document.querySelectorAll('[data-filter]').forEach(function(b) {

@@ -2,30 +2,60 @@
 # process-queue.sh — Process all PDFs in a folder, one after another
 #
 # Scans a PDF directory, scaffolds any missing book folders, and runs
-# process-book.sh on each unfinished book. Uses page markers and .pages_done
+# bookai on each unfinished book. Uses page markers and .pages_done
 # for accurate resume (not line-count guessing).
 #
 # Usage:
-#   ./process-queue.sh [pdf_dir] [batch_size] [sleep_secs] [parallel]
+#   ./process-queue.sh [pdf_dir] [batch_size] [sleep_secs] [parallel] [--type=TYPE]
+#
+# batch/sleep/parallel are optional — when omitted, bookai picks type-aware
+# defaults (technical 10/5/1, textbook 12/5/2, analytical 20/5/3, ...).
+# --type applies to every PDF in the queue; omit it to auto-detect per book.
 #
 # Examples:
-#   ./process-queue.sh                                        # defaults
-#   ./process-queue.sh "/path/to/pdfs" 50 5 3                 # custom settings
+#   ./process-queue.sh                                        # defaults, auto-detect types
+#   ./process-queue.sh "/path/to/pdfs"                        # custom dir
+#   ./process-queue.sh "/path/to/pdfs" 20 5 3 --type=analytical
 
 set -euo pipefail
 
 BOOKS_DIR="$(cd "$(dirname "$0")" && pwd)"
-PDF_DIR="${1:-$HOME/Desktop/Books}"
-BATCH="${2:-50}"
-SLEEP="${3:-5}"
-PARALLEL="${4:-3}"
+
+# Separate --type flag from positionals
+TYPE_FLAG=""
+POS=()
+for arg in "$@"; do
+  case "$arg" in
+    --type=*) TYPE_FLAG="$arg" ;;
+    *) POS+=("$arg") ;;
+  esac
+done
+PDF_DIR="${POS[0]:-$HOME/Desktop/Books}"
+BATCH="${POS[1]:-}"
+SLEEP="${POS[2]:-}"
+PARALLEL="${POS[3]:-}"
 QUEUE_LOG="$BOOKS_DIR/queue.log"
+
+page_count() {
+  # PyMuPDF everywhere; mdls fallback on macOS
+  local N
+  N=$(python3 -c "import sys
+try:
+    import pymupdf as fitz
+except ImportError:
+    import fitz
+print(len(fitz.open(sys.argv[1])))" "$1" 2>/dev/null || true)
+  if ! [[ "$N" =~ ^[0-9]+$ ]] && command -v mdls >/dev/null 2>&1; then
+    N=$(mdls -name kMDItemNumberOfPages "$1" 2>/dev/null | awk '{print $NF}')
+  fi
+  [[ "$N" =~ ^[0-9]+$ ]] && echo "$N" || echo ""
+}
 
 echo "========================================" | tee -a "$QUEUE_LOG"
 echo "Book Queue Processor — $(date)" | tee -a "$QUEUE_LOG"
 echo "PDF dir:  $PDF_DIR" | tee -a "$QUEUE_LOG"
 echo "Books dir: $BOOKS_DIR" | tee -a "$QUEUE_LOG"
-echo "Settings: batch=$BATCH, sleep=$SLEEP, parallel=$PARALLEL" | tee -a "$QUEUE_LOG"
+echo "Settings: batch=${BATCH:-auto}, sleep=${SLEEP:-auto}, parallel=${PARALLEL:-auto}, type=${TYPE_FLAG:-auto-detect}" | tee -a "$QUEUE_LOG"
 echo "========================================" | tee -a "$QUEUE_LOG"
 
 PROCESSED=0
@@ -67,7 +97,9 @@ find_resume_info() {
 # Function: rebuild .pages_done from page markers in notes.md
 rebuild_pages_done() {
   local DIR="$1" NOTES="$2" PAGES_DONE="$DIR/.pages_done"
-  local MARKERS=$(grep -oP '<!-- pp?\. \K[0-9]+(-[0-9]+)?' "$NOTES" 2>/dev/null || true)
+  # (python, not grep -P: macOS grep has no -P)
+  local MARKERS
+  MARKERS=$(python3 -c "import re,sys; print('\n'.join(m.group(1) for m in re.finditer(r'<!--\s*pp?\.\s*([0-9]+(?:\s*-\s*[0-9]+)?)\s*-->', open(sys.argv[1], errors='replace').read())))" "$NOTES" 2>/dev/null | tr -d ' ' || true)
 
   if [ -n "$MARKERS" ]; then
     > "$PAGES_DONE"  # clear
@@ -96,8 +128,8 @@ for PDF in "$PDF_DIR"/*.pdf; do
   NOTES="$DIR/notes.md"
 
   # Get page count
-  PAGES=$(mdls -name kMDItemNumberOfPages "$PDF" 2>/dev/null | awk '{print $NF}')
-  if [ -z "$PAGES" ] || [ "$PAGES" = "(null)" ]; then
+  PAGES=$(page_count "$PDF")
+  if [ -z "$PAGES" ]; then
     echo "  SKIP: $BASENAME — could not detect page count" | tee -a "$QUEUE_LOG"
     FAILED=$((FAILED + 1))
     continue
@@ -126,8 +158,11 @@ for PDF in "$PDF_DIR"/*.pdf; do
   echo "  Progress: $DONE_COUNT/$PAGES pages done, resuming from page $FIRST_MISSING" | tee -a "$QUEUE_LOG"
   START=$FIRST_MISSING
 
-  # Process the book
-  if "$BOOKS_DIR/process-book.sh" "$PDF" "$FOLDER" "$START" "$PAGES" "$BATCH" "$SLEEP" "$PARALLEL" >> "$QUEUE_LOG" 2>&1; then
+  # Process the book with bookai (types, tags, page acks, quote gate, reorder, run state).
+  # Empty batch/sleep/parallel fall through to bookai's type-aware defaults.
+  BOOKAI_ARGS=("$PDF" "$FOLDER" "$START" "$PAGES" "$BATCH" "$SLEEP" "$PARALLEL")
+  [ -n "$TYPE_FLAG" ] && BOOKAI_ARGS+=("$TYPE_FLAG")
+  if "$BOOKS_DIR/bookai" "${BOOKAI_ARGS[@]}" < /dev/null >> "$QUEUE_LOG" 2>&1; then
     # Check verification verdict from process log
     PROCESS_LOG="$DIR/process.log"
     if grep -q "VERDICT: COMPLETE" "$PROCESS_LOG" 2>/dev/null; then
