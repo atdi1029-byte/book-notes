@@ -1,0 +1,3271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#f4efe8">
+<title>The Indicator Grimoire - Notes</title>
+<link rel="stylesheet" href="../book.css?v=8">
+<style>
+.tech {
+  margin: 1.8rem 0 2.2rem;
+  padding: 1rem 0 0.1rem;
+  border-top: 2px solid #3a2e1e;
+}
+.tech h4 {
+  margin: 0 0 0.15rem;
+  font-size: 1.12rem;
+  font-weight: 600;
+}
+.tech .origin {
+  margin: 0 0 0.8rem;
+  font-size: 0.92rem;
+  color: #8a7a60;
+}
+.tech ul {
+  margin: 0 0 1rem;
+  padding-left: 1.25rem;
+}
+.tech li { margin: 0.3rem 0; }
+.tech .trapline {
+  padding: 0.5rem 0.9rem;
+  margin: 0.2rem 0 0.9rem;
+  border-left: 3px solid #7a2e2e;
+  color: #3a2e1e;
+}
+.tech .trapline strong { color: #7a2e2e; }
+.note {
+  margin: 1.4rem 0;
+  padding: 0.9rem 1.1rem;
+  background: #e8e0d0;
+  border-radius: 4px;
+}
+.note p:last-child { margin-bottom: 0; }
+.rules { padding-left: 1.4rem; }
+.rules li { margin: 0.6rem 0; }
+.colophon {
+  margin-top: 4rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #d4c8b0;
+  color: #8a7a60;
+  font-size: 0.95rem;
+}
+.colophon ul { padding-left: 1.2rem; }
+.colophon li { margin: 0.3rem 0; }
+.sig {
+  margin-top: 2.5rem;
+  text-align: center;
+  color: #8a7a60;
+}
+.sig strong {
+  display: block;
+  color: #3a2e1e;
+  font-size: 1.15rem;
+}
+</style>
+</head>
+<body>
+
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+
+<h1>The Indicator Grimoire</h1>
+<p class="subtitle">Obscure indicator techniques and trading setups
+from out-of-print books, old TASC articles, seminar handouts,
+and desk folklore &mdash; with the originator's rules and settings,
+and the trap that comes with each.
+&middot; Built September 2026</p>
+
+<!-- TABLE OF CONTENTS -->
+<nav class="toc">
+<h2>Contents</h2>
+<ol>
+<li><a href="#ch1">How to Use This Guide</a>
+ <span>&mdash; where these come from, and the card format</span></li>
+<li><a href="#ch2">RSI Beyond 70/30</a>
+ <span>&mdash; trendlines on RSI, range shifts, positive
+ and negative reversals, the Composite Index,
+ Connors' RSI(2)</span></li>
+<li><a href="#ch3">Stochastics Reinvented</a>
+ <span>&mdash; the Pop, the Anti, hinges, StochRSI,
+ cycle-tuned lengths</span></li>
+<li><a href="#ch4">Divergence Done Properly</a>
+ <span>&mdash; hidden divergence, three-drive,
+ divergence on volume</span></li>
+<li><a href="#ch5">Oscillators You Have Never Used</a>
+ <span>&mdash; 3-10, TSI, Schaff, Fisher Transform,
+ Laguerre RSI, Woodies CCI, Elder-Ray,
+ Aroon, the 5-35</span></li>
+<li><a href="#ch6">Cycle Tools</a>
+ <span>&mdash; Hurst's FLD and VTL, the half-cycle rule,
+ Ehlers' Sinewave, MAMA, the roofing filter,
+ Lindsay's domed house</span></li>
+<li><a href="#ch7">Trend Filters With Teeth</a>
+ <span>&mdash; efficiency ratio, r&sup2;, Choppiness, GMMA,
+ the ADX hook, the Holy Grail, ASI, DiNapoli,
+ the Alligator, lag-reduced averages,
+ the 52-week high</span></li>
+<li><a href="#ch8">Volatility Setups</a>
+ <span>&mdash; NR7, ID/NR4, the Stretch, the Squeeze,
+ Standard Error and STARC bands, %b,
+ Fisher's ACD</span></li>
+<li><a href="#ch9">Stop Runs and Failed Breakouts</a>
+ <span>&mdash; Turtle Soup, the SFP, springs, smash days,
+ VSA, the 2B, the Ross Hook, liquidity sweeps
+ and order blocks</span></li>
+<li><a href="#ch10">Volume and Order-Flow Indicators</a>
+ <span>&mdash; anchored VWAP, volume profile, the 80% rule,
+ CVD, Weis Wave, footprints, the heatmap,
+ P&amp;F counts</span></li>
+<li><a href="#ch11">DeMark Counts and Lines</a>
+ <span>&mdash; TD Sequential, TDST, Countdown,
+ TD Lines, REI and DeMarker</span></li>
+<li><a href="#ch12">Median Lines and Geometry</a>
+ <span>&mdash; Andrews' pitchfork, Hagopian's rule,
+ Fibonacci clusters, Camarilla pivots,
+ the harmonic zoo</span></li>
+<li><a href="#ch13">Exits Nobody Talks About</a>
+ <span>&mdash; Chandelier, Yo-Yo, DevStop, the bailout,
+ SAR tuning, Maximum Adverse Excursion</span></li>
+<li><a href="#ch14">Short-Term Rhythm Methods</a>
+ <span>&mdash; Taylor's three-day cycle, Momentum Pinball,
+ 80-20s, GSV, Oops!, day-of-week filters</span></li>
+<li><a href="#ch15">Breadth, Sentiment, and Positioning</a>
+ <span>&mdash; Zweig thrust, McClellan, Coppock,
+ COT, VIX term structure</span></li>
+<li><a href="#ch16">Confluence and Timeframes</a>
+ <span>&mdash; triple screen, and the two-family rule</span></li>
+<li><a href="#ch17">The Grimoire Rules</a>
+ <span>&mdash; what survives when you test all of it</span></li>
+</ol>
+</nav>
+
+<!-- ============================================ -->
+<!-- CHAPTER 1 -->
+<!-- ============================================ -->
+<h2 id="ch1">Chapter 1 &mdash; How to Use This Guide</h2>
+
+<p>Every technique here has an author, and most of those authors
+published in places nobody reads anymore: a self-printed book
+that sells for hundreds of dollars used (Crabel), a seminar
+series that was never turned into a book (Cardwell), a 1997
+magazine article (Zamansky and Stendahl), a proprietary manual
+for institutional clients (DeMark), a mimeographed course from
+the 1950s (Taylor). The mainstream trading shelf recycles the
+same forty indicators with the same default settings. This guide
+is the other shelf &mdash; the specific rules the originators
+actually used, which are almost always sharper and stranger than
+the versions that survived into charting software.</p>
+
+<p>Each technique is a card. The <strong>origin</strong> line
+says who and where, so you can check the source. The body says
+what the indicator actually measures &mdash; because an indicator
+whose mechanism you cannot state is one you cannot tell has
+stopped working. The bulleted <strong>rules</strong> are the
+originator's, with their settings. And every card ends with the
+<strong>trap</strong>: the way the technique fails, which is
+usually the way it is taught.</p>
+
+<p>A word on honesty. Very few of these were ever tested with the
+rigor you would want. Some have been (Crabel's patterns, Connors'
+RSI work, the Kaminski-Lo stop analysis); most are practitioner
+claims that worked for the practitioner in the practitioner's
+market. Treat every card as a hypothesis with a pedigree. The
+settings are a starting point for your own data, not a finding.</p>
+
+<!-- ============================================ -->
+<!-- CHAPTER 2 -->
+<!-- ============================================ -->
+<h2 id="ch2">Chapter 2 &mdash; RSI Beyond 70/30</h2>
+
+<p><strong>Wilder</strong> introduced the Relative Strength Index
+in 1978 and the world reduced it to two horizontal lines. Wilder
+himself used it differently, and <strong>Andrew Cardwell</strong>
+&mdash; who taught RSI to institutional desks through the 1980s
+and 90s and never wrote a book &mdash; turned it into a complete
+trend-analysis system. <strong>Constance Brown</strong>, who
+studied under Cardwell, published the pieces in
+<em>Technical Analysis for the Trading Professional</em> (1999),
+which is where most of this chapter lives.</p>
+
+<div class="tech">
+<h4>Trendlines on the RSI</h4>
+<p class="origin">Cardwell, seminars (1980s&ndash;90s);
+Brown (1999).</p>
+<p>RSI is a bounded, smoothed measure of the ratio of up-closes
+to down-closes. A trendline drawn on it connects points of equal
+momentum ratio, and momentum turns before price does &mdash; so
+an RSI trendline usually breaks several bars before the
+equivalent price trendline. The technique is to draw and trade
+the RSI line, not the price line.</p>
+<ul>
+<li>Use the 14-period RSI (Cardwell's setting). Draw trendlines
+across RSI swing lows in an uptrend and RSI swing highs in a
+downtrend, exactly as you would on price. Two touches minimum;
+three is better.</li>
+<li>A break of an RSI trendline is an early warning that the
+price trendline is about to break. Treat it as a "get ready"
+signal, and enter when price confirms &mdash; a close through
+the price line, or a lower low.</li>
+<li>Cardwell's second use: RSI trendlines act as support and
+resistance for the RSI itself. A pullback in RSI to a rising
+RSI trendline that holds is a continuation entry in the
+direction of the trend.</li>
+<li>RSI trendlines are more reliable on higher timeframes
+(4-hour and up) where a swing in RSI represents a genuine
+change in the balance of closes rather than a handful
+of ticks.</li>
+</ul>
+<p class="trapline"><strong>Trap:</strong> Drawing the RSI line
+through minor wiggles. RSI swings are the ones that reach the
+range edges (Chapter 2's next card); a line through three
+mid-range bumps is a line through noise.</p>
+</div>
+
+<div class="tech">
+<h4>RSI range shifts</h4>
+<p class="origin">Cardwell; Brown (1999).</p>
+<p>RSI does not oscillate between 0 and 100 in practice. It
+oscillates inside a <strong>range</strong> that depends on the
+trend. In a bull market RSI holds between roughly 40 and 80
+&mdash; pullbacks bottom near 40 to 50, rallies top near 80
+to 90 &mdash; and a reading of 30 almost never appears. In a
+bear market the range is 20 to 60. This reframes "oversold":
+an RSI of 40 in a bull range is a buy zone, not a warning, and
+an RSI of 60 in a bear range is a sell zone, not strength.</p>
+<ul>
+<li>Identify the range from the last several swings. If RSI has
+been finding support at 40&ndash;50 and topping at 80&ndash;90,
+you are in a bull range regardless of what the price chart
+looks like.</li>
+<li>A <strong>range shift</strong> &mdash; RSI breaking below 40
+and then failing to recover above 60 on the next rally &mdash;
+is the earliest reliable signal of a trend change. The mirror
+(RSI breaking above 60 and then holding 40 on the pullback)
+signals a bear-to-bull shift.</li>
+<li>Trade continuation from the range edges: buy a bull-range
+pullback to 40&ndash;50; sell a bear-range rally
+to 55&ndash;65.</li>
+</ul>
+<p class="trapline"><strong>Trap:</strong> Applying the 70/30
+rules from the software defaults in a trending market. In a bull
+range, "overbought" at 70 is where the strongest legs begin.</p>
+</div>
+
+<div class="tech">
+<h4>Positive and negative reversals</h4>
+<p class="origin">Cardwell; the technique that made
+his name.</p>
+<p>Divergence is the well-known signal: price makes a new high,
+RSI does not, and a reversal is expected. Cardwell discovered
+the opposite pattern, and argued it is more reliable. A
+<strong>positive reversal</strong> is when RSI makes a lower low
+but price makes a higher low. Momentum looks weaker; price is
+actually stronger. It is a bullish continuation signal, and it
+comes with a target. A <strong>negative reversal</strong> is the
+mirror: RSI makes a higher high, price makes a lower high
+&mdash; bearish continuation.</p>
+<ul>
+<li>Find two RSI lows where the second is lower than the first,
+and check that the corresponding price lows have the second
+higher than the first. That is a positive reversal.</li>
+<li>Target: measure the price rise from the first low to the
+highest high between the two lows. Add that distance to the
+second low. Cardwell's "X" measurement.</li>
+<li>Entry: on the second low, with a stop below it. The reversal
+is invalid if price breaks the second low.</li>
+<li>Reversals occur in the direction of the trend and are most
+reliable when RSI stays inside the trend's range (a positive
+reversal with RSI holding above 40 in a bull range).</li>
+</ul>
+<p class="trapline"><strong>Trap:</strong> Confusing a reversal
+with a divergence. Divergence is counter-trend and RSI is
+stronger than price; reversal is with-trend and RSI is weaker
+than price. They look similar and mean opposite things.</p>
+</div>
+
+<div class="tech">
+<h4>Wilder's failure swings</h4>
+<p class="origin">Wilder, <em>New Concepts in Technical Trading
+Systems</em> (1978). In the original book, almost
+never used.</p>
+<p>A failure swing is a divergence signal that lives entirely on
+the RSI, without reference to price, which is what makes it
+unusual. Wilder considered it one of the RSI's strongest
+signals.</p>
+<ul>
+<li>Top failure swing: RSI rises above 70, pulls back, rallies
+again but fails to exceed the first peak, then breaks below
+the pullback low. Sell on that break.</li>
+<li>Bottom failure swing: RSI falls below 30, bounces, drops
+again but holds above the first trough, then breaks above the
+bounce high. Buy on that break.</li>
+<li>In Cardwell's framework, substitute the range edges for
+70 and 30 &mdash; a failure swing at 80&ndash;90 in a bull
+range, or 20&ndash;30 in a bear range.</li>
+</ul>
+<p class="trapline"><strong>Trap:</strong> Failure swings inside
+the middle of the range (between 40 and 60) are meaningless;
+the whole point is that the extreme was reached and could not
+be repeated.</p>
+</div>
+
+<div class="tech">
+<h4>The Composite Index</h4>
+<p class="origin">Constance Brown (1999).</p>
+<p>RSI is a bounded ratio, so it compresses at the extremes: in
+a strong trend it can sit at 85 while momentum is still rising,
+and it cannot show a divergence because it has no room to.
+Brown's fix combines the momentum of the RSI itself with a fast,
+smoothed RSI, producing an unbounded indicator that shows
+divergences the RSI cannot.</p>
+<ul>
+<li>Composite Index = (RSI(14) &minus; RSI(14) nine bars ago) +
+a 3-period average of a 3-period RSI. Plot with 13- and
+33-period simple moving averages of the Composite Index as
+signal lines.</li>
+<li>Look for divergences between the Composite Index and the RSI,
+not just between the index and price. When RSI makes a higher
+high and the Composite does not, momentum has peaked.</li>
+<li>Crosses of the Composite through its 13-period average are
+early entries; the 33-period average is trend direction.</li>
+</ul>
+<p class="trapline"><strong>Trap:</strong> Using it standalone.
+Brown always read it against the RSI and its range. Alone it is
+a fast oscillator with all the whipsaw of one.</p>
+</div>
+
+<div class="tech">
+<h4>Dynamic overbought/oversold zones</h4>
+<p class="origin">Zamansky and Stendahl, "Dynamic Zones,"
+<em>TASC</em>, July 1997.</p>
+<p>Fixed thresholds &mdash; 70/30, 80/20 &mdash; ignore that an
+indicator's distribution changes with the market. Dynamic zones
+replace the fixed lines with rolling percentiles of the
+indicator's own recent history, so "overbought" always means
+"in the top decile of what this indicator has done lately."</p>
+<ul>
+<li>Choose a lookback (70 bars in the original). Each bar,
+compute the 90th and 10th percentiles of the indicator over
+that window. Those are the zones.</li>
+<li>Apply to RSI, stochastic, CCI, or anything bounded or
+semi-bounded. The signal logic is unchanged &mdash; only the
+thresholds move.</li>
+<li>Wider zones in a trending market and tighter zones in a range
+fall out automatically; this is the entire point.</li>
+</ul>
+<p class="trapline"><strong>Trap:</strong> A lookback so short
+that the zones chase the indicator and every bar is "extreme."
+Seventy bars was chosen for a reason.</p>
+</div>
+
+<div class="tech">
+<h4>Connors' RSI(2), Cumulative RSI, and Double 7s</h4>
+<p class="origin">Larry Connors and Cesar Alvarez,
+<em>Short Term Trading Strategies That Work</em> (2008);
+among the few short-term systems published with full
+test statistics.</p>
+<p>A 2-period RSI is so fast it is barely an indicator &mdash;
+it reads near 0 after two down closes and near 100 after two
+up closes. Connors' finding was that on stock indices and liquid
+ETFs, extreme readings of this hypersensitive RSI, taken
+<em>with</em> the long-term trend, produced a consistent
+one-to-five-day reversion edge. The three variants differ only
+in the trigger.</p>
+<ul>
+<li><strong>RSI(2)</strong>: price above its 200-day moving
+average; RSI(2) closes below 10 (below 5 for a stronger
+version). Buy the close. Exit when price closes above its
+5-day moving average, or when RSI(2) exceeds 70.</li>
+<li><strong>Cumulative RSI</strong>: sum the last two days'
+RSI(2) values. Buy when the sum is below 35 (above the
+200-day MA); exit when the sum exceeds 65. Smoother,
+fewer trades.</li>
+<li><strong>Double 7s</strong>: price above the 200-day MA and
+closes at a 7-day low. Buy. Exit on a close at a 7-day high.
+No oscillator at all &mdash; the same logic in
+price terms.</li>
+<li>All three take the mirror side (short) only below the
+200-day MA, and Connors' tests showed the short side was
+markedly weaker.</li>
+</ul>
+<p class="trapline"><strong>Trap:</strong> The originals use no
+stop-loss, and the test statistics depend on that. Adding a tight
+stop destroyed the edge in Connors' own tests, because the
+strategy is a bet on reversion and the stop exits before it.
+Size small enough to survive the occasional 10% adverse
+move instead.</p>
+</div>
+
+<!-- ============================================ -->
+<!-- CHAPTER 3 -->
+<!-- ============================================ -->
+<h2 id="ch3">Chapter 3 &mdash; Stochastics Reinvented</h2>
+
+<p><strong>George Lane</strong>'s stochastic oscillator measures
+where the close sits inside the recent range. Lane's own use of
+it &mdash; divergence, the "hinge," the right-hand crossover
+&mdash; bears little resemblance to the overbought/oversold
+crossover that ships with every platform. The traders who did the
+most with stochastics after Lane were <strong>Jake
+Bernstein</strong> and <strong>Linda Raschke</strong>, and both
+of them used it as a trend tool, not a reversal tool.</p>
+
+<div class="tech">
+<h4>The Stochastic Pop</h4>
+<p class="origin">Jake Bernstein; described in his
+<em>Compleat Day Trader</em> series and seminars (1990s).</p>
+<p>Every textbook says a stochastic above 80 is overbought.
+Bernstein noticed that the strongest, fastest price moves happen
+while the stochastic is above 80, because that is what a market
+closing at the top of its range every bar looks like. So he
+bought the cross above 80 and held while it stayed there.</p>
+<ul>
+<li>14-period stochastic, slow version. When it crosses above 80
+(Bernstein used thresholds in the mid-70s to 80), buy. Exit
+when it crosses back below 80.</li>
+<li>Mirror for shorts: sell the cross below 20, cover on the
+cross back above.</li>
+<li>Filter with a longer-timeframe trend: take Pops only in the
+direction of the weekly or daily trend, depending on your
+bar size.</li>
+</ul>
+<p class="trapline"><strong>Trap:</strong> In a range, the
+stochastic crosses 80 and immediately turns down. The Pop only
+works when the range is expanding; combine with a squeeze
+release (Chapter 8) or an efficiency-ratio filter
+(Chapter 7).</p>
+</div>
+
+<div class="tech">
+<h4>The Anti</h4>
+<p class="origin">Raschke and Connors, <em>Street Smarts</em>
+(1995).</p>
+<p>A pullback entry that uses the two stochastic lines as fast
+and slow trend measures. The slow line (%D) defines the trend;
+the fast line (%K) pulls back against it and then hooks back.
+You enter on the hook, which puts you in the direction of the
+slow trend just as the short-term counter-move ends.</p>
+<ul>
+<li>Settings: 7-period stochastic, %K smoothed by 4, %D as a
+10-period moving average of %K. These are non-standard
+on purpose.</li>
+<li>Setup: %D is rising steadily (uptrend). %K pulls back toward
+or below %D for three to four bars.</li>
+<li>Entry: when %K hooks back up toward %D's direction, buy the
+break of the hook bar's high. Stop below the pullback low.</li>
+<li>Expected hold: a few bars &mdash; the Anti catches the
+resumption, not the whole trend.</li>
+</ul>
+<p class="trapline"><strong>Trap:</strong> Taking the Anti when
+%D is flat. The setup is a pullback within a trend; without a
+trending %D, it is a random crossover.</p>
+</div>
+
+<div class="tech">
+<h4>Lane's hinge and the right-hand cross</h4>
+<p class="origin">George Lane, seminars and <em>TASC</em>
+interviews (1980s).</p>
+<p>Lane's own three rules, in order of the weight he gave them.
+Divergence first (Chapter 4). Then the <strong>hinge</strong>:
+a flattening of the stochastic at an extreme &mdash; the lines
+lose slope while still above 80 or below 20 &mdash; which he
+read as momentum exhaustion before the crossover. Then the
+<strong>right-hand crossover</strong>: %K crossing %D after %D
+has already turned, which he considered far more reliable than
+a "left-hand" crossover where %K crosses a still-rising %D.</p>
+<ul>
+<li>Hinge: watch for the slope of %K to decrease sharply while
+at an extreme. This is the earliest warning; do not act on
+it alone.</li>
+<li>Right-hand cross: wait until %D has turned, then act on %K
+crossing it. The cross should occur on the right side of
+%D's peak.</li>
+<li>Lane's "warning": a stochastic that rises above 80, falls
+below, and then re-rises above 80 without price making a new
+high &mdash; a failure pattern equivalent to Wilder's
+failure swing.</li>
+</ul>
+<p class="trapline"><strong>Trap:</strong> Left-hand crossovers.
+They occur while the slow line is still going the other way and
+are the majority of stochastic whipsaws.</p>
+</div>
+
+<div class="tech">
+<h4>Cycle-tuned stochastic length</h4>
+<p class="origin">Hurst (1970); formalized by Ehlers,
+<em>Cybernetic Analysis for Stocks and Futures</em>
+(2004).</p>
+<p>The default 14 is arbitrary. An oscillator's lookback should
+be tied to the cycle it is trying to catch. Ehlers' rule: set
+the oscillator period to <strong>half the dominant cycle
+length</strong>, because a half-cycle window is what makes the
+indicator's turning points align with the cycle's turning
+points instead of lagging or leading them.</p>
+<ul>
+<li>Measure the dominant cycle: count bars between the last
+several significant swing lows (Hurst's method), or use a
+Hilbert-transform cycle-period indicator (Ehlers').</li>
+<li>Stochastic and RSI period = half that count. A 40-bar cycle
+wants a 20-period oscillator. A 10-bar cycle wants a 5.</li>
+<li>Re-tune as the cycle length changes; a fixed 14 is only
+right when the dominant cycle happens to be 28.</li>
+</ul>
+<p class="trapline"><strong>Trap:</strong> Trusting an automated
+cycle-period reading in a trending market. When there is no
+cycle, the estimate is noise and the tuned oscillator is worse
+than the default.</p>
+</div>
+
+<div class="tech">
+<h4>StochRSI</h4>
+<p class="origin">Chande and Kroll, <em>The New Technical
+Trader</em> (1994).</p>
+<p>The stochastic formula applied to RSI instead of price: where
+the current RSI sits inside its own recent range, scaled 0 to 1.
+It exists to solve the bull-range problem from Chapter 2 &mdash;
+an RSI that spends months between 50 and 75 never reaches 30, so
+its pullbacks are invisible to fixed thresholds. StochRSI reads
+those pullbacks as 0.</p>
+<ul>
+<li>StochRSI = (RSI &minus; lowest RSI over n) / (highest RSI
+over n &minus; lowest RSI over n), with n = 14 for both RSI
+and the range.</li>
+<li>Below 0.2 in a bull range = pullback buy zone; above 0.8 in
+a bear range = rally sell zone. Read the direction from the
+RSI range, the timing from StochRSI.</li>
+<li>Smooth with a 3-period average; the raw version flickers.</li>
+</ul>
+<p class="trapline"><strong>Trap:</strong> Trading StochRSI
+extremes against the RSI range. A StochRSI of 0.9 while RSI sits
+at 62 in a bull range is a strong market, not an
+overbought one.</p>
+</div>
+
+<!-- ============================================ -->
+<!-- CHAPTER 4 -->
+<!-- ============================================ -->
+<h2 id="ch4">Chapter 4 &mdash; Divergence Done Properly</h2>
+
+<p>Divergence is the most-cited and worst-executed signal in
+technical analysis. Most of the failures come from three
+mistakes: trading a divergence without waiting for a trigger,
+ignoring the difference between regular and hidden divergence,
+and looking for it on an indicator that cannot show it
+(Chapter 2's Composite Index card). The cards below
+fix each.</p>
+
+<div class="tech">
+<h4>Hidden divergence as a continuation signal</h4>
+<p class="origin">Popularized by Barbara Star, <em>TASC</em>
+(1990s); the same pattern Cardwell called a reversal.</p>
+<p>Regular divergence: price makes a new extreme, the oscillator
+does not &mdash; reversal warning. <strong>Hidden</strong>
+divergence: price makes a <em>less</em> extreme swing (a higher
+low in an uptrend) while the oscillator makes a <em>more</em>
+extreme one (a lower low). The oscillator has reset while price
+held its structure. It is a with-trend pullback signal, and in
+trending markets it produces more winning entries than regular
+divergence produces winning reversals.</p>
+<ul>
+<li>Uptrend: price higher low, oscillator lower low. Buy the
+pullback, stop below the price low.</li>
+<li>Downtrend: price lower high, oscillator higher high. Sell
+the rally.</li>
+<li>Works on RSI, stochastic, MACD histogram, and &mdash; most
+usefully &mdash; on volume-based oscillators (next chapter
+and Chapter 10).</li>
+</ul>
+<p class="trapline"><strong>Trap:</strong> Hidden divergence
+against the higher-timeframe trend is not hidden divergence; it
+is the first sign of a range.</p>
+</div>
+
+<div class="tech">
+<h4>Three-drive divergence</h4>
+<p class="origin">Elder, <em>Trading for a Living</em> (1993),
+on MACD-histogram divergence; the three-push structure is
+older desk lore.</p>
+<p>A single divergence is a warning. A double divergence &mdash;
+three successive price extremes with the oscillator making
+successively weaker extremes &mdash; is the version Elder called
+the strongest signal in technical analysis, and he applied it
+specifically to the MACD histogram, which measures the
+<em>acceleration</em> of momentum rather than momentum itself.</p>
+<ul>
+<li>Use the MACD histogram (12, 26, 9). Look for price making
+three successively higher highs while the histogram peaks are
+successively lower. The third peak should be barely above zero,
+or the histogram should fail to cross above zero at all.</li>
+<li>Trigger: the histogram ticking down from the third peak.
+Stop above the third price high.</li>
+<li>Elder's rule: the histogram must cross back through zero
+between the divergent peaks. If it does not, it is one
+extended move, not three drives.</li>
+</ul>
+<p class="trapline"><strong>Trap:</strong> Trading the second
+drive because it looks like the third. Three is the number; a
+two-drive divergence is a first warning and fails often.</p>
+</div>
+
+<div class="tech">
+<h4>Divergence on volume indicators</h4>
+<p class="origin">Granville (OBV, 1963); Chaikin
+(Money Flow, 1980s); order-flow desks (CVD, 2010s).</p>
+<p>Price oscillators can only tell you that momentum is fading.
+A volume oscillator diverging from price tells you <em>who</em>
+is fading. On-Balance Volume failing to confirm a price high
+means the high was made on lower participation. Cumulative volume
+delta (Chapter 10) failing to confirm means the high was made
+with fewer aggressive buyers.</p>
+<ul>
+<li>OBV: price new high, OBV lower high &mdash; distribution.
+Granville also drew trendlines on OBV and traded their breaks
+ahead of price.</li>
+<li>Money Flow Index (volume-weighted RSI, 14): divergence at
+the 80/20 extremes is the version to trust; mid-range
+divergence is noise.</li>
+<li>CVD: the most direct. Price higher high, CVD lower high
+&mdash; the buyers who made the second high were passive, not
+aggressive, and passive buyers do not chase.</li>
+</ul>
+<p class="trapline"><strong>Trap:</strong> OBV on a thinly traded
+symbol where a single block trade sets the indicator's level for
+weeks. Use a smoothed version, or CVD from a liquid venue.</p>
+</div>
+
+<!-- ============================================ -->
+<!-- CHAPTER 5 -->
+<!-- ============================================ -->
+<h2 id="ch5">Chapter 5 &mdash; Oscillators You Have Never Used</h2>
+
+<div class="tech">
+<h4>Raschke's 3-10 oscillator</h4>
+<p class="origin">Raschke, from Marty Zweig's work; described in
+<em>Street Smarts</em> and her seminars.</p>
+<p>A MACD built from a 3-period and a 10-period <em>simple</em>
+moving average (not exponential), with a 16-period simple average
+of the oscillator as the slow line. The short lengths make it a
+short-term momentum measure; the slow line makes it a trend
+measure. Raschke used the relationship between them for one
+specific entry.</p>
+<ul>
+<li>The <strong>first cross</strong>: after the 3-10 makes a new
+momentum high (a peak higher than any in the last several
+swings &mdash; trend confirmed), the first time it pulls back
+and crosses below its 16-period slow line, then crosses back
+above, is the buy. The first pullback after a momentum extreme
+is the highest-probability continuation entry.</li>
+<li>Divergence between the 3-10 and price at the second and
+third swings warns the trend is aging.</li>
+<li>Slow line above zero and rising = uptrend; take only buys.
+Below and falling = take only sells.</li>
+</ul>
+<p class="trapline"><strong>Trap:</strong> Taking the second and
+third "first crosses." Each successive pullback after a momentum
+high has lower odds; by the third, the divergence is usually
+already there.</p>
+</div>
+
+<div class="tech">
+<h4>True Strength Index</h4>
+<p class="origin">William Blau, <em>Momentum, Direction, and
+Divergence</em> (1995).</p>
+<p>Momentum is noisy; smoothing it adds lag. Blau's trick was to
+double-smooth both the momentum and its absolute value with
+exponential averages and take the ratio, which produces an
+oscillator with far less lag per unit of smoothing than a MACD,
+bounded roughly between &minus;100 and 100.</p>
+<ul>
+<li>TSI = 100 &times; EMA(EMA(price change, 25), 13) /
+EMA(EMA(|price change|, 25), 13). Signal line: 7- to
+13-period EMA of the TSI.</li>
+<li>Zero-line cross = trend change, with much less lag than a
+25-period MA cross. Signal-line cross = entry within
+the trend.</li>
+<li>Blau's <strong>ergodic</strong> variants apply the same
+double-smoothing to stochastics and to candle bodies; the
+candle-body version (close minus open, double-smoothed) is a
+remarkably clean intrabar momentum measure.</li>
+</ul>
+<p class="trapline"><strong>Trap:</strong> Overbought/oversold
+levels. The TSI is unbounded in practice and Blau never assigned
+thresholds; it is a trend and divergence tool.</p>
+</div>
+
+<div class="tech">
+<h4>Schaff Trend Cycle</h4>
+<p class="origin">Doug Schaff, published 2008.</p>
+<p>A MACD run through a stochastic calculation twice. The MACD
+gives you trend; the double stochastic squashes it into
+0&ndash;100 and sharpens the turns, so you get a trend indicator
+with the responsiveness of a fast oscillator.</p>
+<ul>
+<li>Defaults: MACD(23, 50), stochastic period 10, applied twice
+with 3-bar smoothing.</li>
+<li>Buy when the STC crosses up through 25; sell when it crosses
+down through 75. Schaff's rules &mdash; not 20/80 &mdash;
+because the doubled stochastic saturates fast.</li>
+<li>STC pinned at 100 or 0 is a strong trend, not an overbought
+condition; do not fade a pinned reading.</li>
+</ul>
+<p class="trapline"><strong>Trap:</strong> Using it in a range,
+where it oscillates between 25 and 75 every few bars. It is a
+trend tool wearing an oscillator's clothes.</p>
+</div>
+
+<div class="tech">
+<h4>The Fisher Transform</h4>
+<p class="origin">Ehlers, "Using the Fisher Transform,"
+<em>TASC</em>, November 2002.</p>
+<p>Prices are not normally distributed, which is why oscillators
+built on them have rounded, ambiguous turning points. The Fisher
+Transform maps a bounded input (price normalized to
+&minus;1&hellip;+1 over a short window, or any bounded
+oscillator) onto a near-Gaussian output:
+<code>y = 0.5 &times; ln((1 + x) / (1 &minus; x))</code>.
+The result has sharp, spike-like extremes that make turning
+points unmistakable.</p>
+<ul>
+<li>Default: normalize the median price over 10 bars to
+&minus;1&hellip;+1, apply the transform, plot with a
+one-bar-lagged copy as the signal line.</li>
+<li>Signals: the transform crossing its own lagged value at an
+extreme (above +1.5 or below &minus;1.5) marks a turn. The
+extremes are rare by construction, which is the point.</li>
+<li>Apply it to RSI or stochastic instead of price and you get
+an oscillator whose extremes are statistically meaningful
+instead of arbitrary.</li>
+</ul>
+<p class="trapline"><strong>Trap:</strong> A window so long that
+the transform never reaches an extreme. Ehlers' 10 bars is short
+on purpose.</p>
+</div>
+
+<div class="tech">
+<h4>Laguerre RSI</h4>
+<p class="origin">Ehlers, <em>Cybernetic Analysis for Stocks and
+Futures</em> (2004).</p>
+<p>A conventional RSI trades off responsiveness against whipsaw
+through its period length. The Laguerre filter replaces the
+period with a damping factor (gamma), which lets you get a very
+short-lookback response with heavily suppressed noise &mdash; a
+four-element filter that behaves like a much longer one in the
+flats and a much shorter one at the turns.</p>
+<ul>
+<li>Gamma between 0.5 and 0.8; higher is smoother. Ehlers'
+examples used 0.5 for fast, 0.8 for swing trading.</li>
+<li>Output is 0 to 1. Above 0.8 is strength, below 0.2 is
+weakness. Crosses down through 0.8 and up through 0.2 are
+the signals.</li>
+<li>Its virtue is that it sits pinned at 1 or 0 during a strong
+trend instead of wobbling, so you can hold through the trend
+and exit only on the cross.</li>
+</ul>
+<p class="trapline"><strong>Trap:</strong> Treating a reading of
+1.0 as overbought. Like the Schaff, pinned means trending.</p>
+</div>
+
+<div class="tech">
+<h4>Woodies CCI patterns</h4>
+<p class="origin">Ken Wood, online trading room and free manual
+(early 2000s).</p>
+<p>Wood traded the Commodity Channel Index with the price chart
+hidden, on the theory that price is noise and the CCI is the
+signal. The method is a set of named patterns on two CCIs
+&mdash; a 14-period and a 6-period "turbo" &mdash; plus a strict
+trend definition. It has more jargon than any technique in this
+guide, and under the jargon, three of the patterns are useful.</p>
+<ul>
+<li>Trend: the 14-period CCI has been on one side of zero for at
+least six consecutive bars. No trade until a trend exists.</li>
+<li><strong>Zero-line reject (ZLR)</strong>: in an established
+trend, CCI pulls back to within roughly &plusmn;100 of zero,
+touches or nears it, and turns back in the trend direction.
+Enter on the turn. The zero line is a moving-average pullback
+in disguise.</li>
+<li><strong>Trendline break (TLB)</strong>: a trendline drawn on
+the CCI itself is broken. The same logic as RSI trendlines
+(Chapter 2), on a faster indicator.</li>
+<li><strong>Ghost</strong>: a head-and-shoulders shape on the CCI
+above +100 or below &minus;100 &mdash; an exhaustion pattern.
+Trade the break of the neckline on the indicator.</li>
+</ul>
+<p class="trapline"><strong>Trap:</strong> The other dozen
+patterns (Shamu, Vegas, Famir, HFE) are named whipsaws. The
+hidden-price-chart discipline was Wood's point; the naming was
+his community's.</p>
+</div>
+
+<div class="tech">
+<h4>Elder's Force Index, Elder-Ray, and the Impulse System</h4>
+<p class="origin">Alexander Elder, <em>Trading for a Living</em>
+(1993) and <em>Come Into My Trading Room</em> (2002).</p>
+<p>Three tools that share a design: measure one thing crudely
+and use it as a permission filter, not a trigger. Force Index
+multiplies volume by the change in close &mdash; how much
+conviction moved price. Elder-Ray measures how far the bar's
+high and low sit from a 13-period EMA &mdash; the bulls' and
+bears' reach. The Impulse System combines trend and momentum into
+a three-color permission code.</p>
+<ul>
+<li>Force Index: 2-period EMA for entries &mdash; in an uptrend
+(13-day EMA of price rising), buy when the 2-day Force Index
+dips below zero. 13-period EMA of Force Index for trend
+confirmation and divergence.</li>
+<li>Elder-Ray: bull power = high &minus; EMA(13); bear power =
+low &minus; EMA(13). Buy when the EMA is rising and bear power
+is negative but rising (bears are weakening). Sell when the
+EMA is falling and bull power is positive but falling.</li>
+<li>Impulse: a bar is green when the 13-period EMA and the MACD
+histogram are both rising &mdash; buying permitted; red when
+both falling &mdash; selling permitted; blue otherwise &mdash;
+no new positions. The system censors; it never enters.</li>
+</ul>
+<p class="trapline"><strong>Trap:</strong> Trading the Impulse
+color change as a signal. Elder built it to keep you out of
+counter-trend trades; a green bar is a permission slip,
+not a buy.</p>
+</div>
+
+<div class="tech">
+<h4>Chande's Aroon</h4>
+<p class="origin">Tushar Chande, <em>TASC</em>,
+September 1995.</p>
+<p>Not a momentum measure &mdash; a measure of <em>time since
+the extreme</em>. Aroon Up is the percentage of the lookback
+that has elapsed since the period's high was made; Aroon Down,
+since the low. A fresh high puts Aroon Up at 100; a high that
+is 25 bars old puts it at 0. The two lines read trend age
+directly, which no oscillator does.</p>
+<ul>
+<li>Period 25. Aroon Up = 100 &times; (25 &minus; bars since
+25-bar high) / 25; Aroon Down likewise.</li>
+<li>Up above 70 with Down below 30 = a young, active uptrend.
+Both between 30 and 70 = no recent extreme either way
+&mdash; a range.</li>
+<li>Crossovers are early trend-change warnings; a crossover
+confirmed by the crossing line reaching 100 is the trade.</li>
+</ul>
+<p class="trapline"><strong>Trap:</strong> Both lines pinned low.
+It means the extremes are old, not that the market is quiet
+&mdash; a breakout from that state can be violent.</p>
+</div>
+
+<div class="tech">
+<h4>The Elliott Oscillator (5-35)</h4>
+<p class="origin">Tom Joseph, Advanced GET software (1990s);
+the oscillator is public, the wave-count logic was his.</p>
+<p>A 5-period simple average minus a 35-period simple average of
+price. Joseph's use of it was not as a momentum indicator but as
+a wave-counting instrument: in a five-wave move, the oscillator
+peaks in wave three, returns to (or through) zero in wave four,
+and diverges in wave five. Those three behaviors identify the
+waves without subjective counting.</p>
+<ul>
+<li>Wave 3: the oscillator makes its largest reading of the
+sequence. If the current peak is the largest, you are in or
+near wave 3.</li>
+<li>Wave 4: the oscillator retraces 90% to 140% of its wave-3
+peak, back to zero or slightly past. A fourth wave that does
+not bring the oscillator to zero is not a fourth wave.</li>
+<li>Wave 5: price makes a new high while the oscillator makes a
+lower peak. The divergence is the ending signal.</li>
+<li>Joseph's rule of thumb: the 5-35 settings assume roughly
+100 to 150 bars of the move are on screen. Rescale for
+other windows.</li>
+</ul>
+<p class="trapline"><strong>Trap:</strong> Using it without the
+five-wave hypothesis. As a plain oscillator it is a slow MACD;
+its value is entirely in the wave-4 zero-return rule.</p>
+</div>
+
+<!-- ============================================ -->
+<!-- CHAPTER 6 -->
+<!-- ============================================ -->
+<h2 id="ch6">Chapter 6 &mdash; Cycle Tools</h2>
+
+<p><strong>J.M. Hurst</strong>'s 1970 book
+<em>The Profit Magic of Stock Transaction Timing</em> is the
+source for most cycle analysis, and two of its tools &mdash;
+the FLD and the VTL &mdash; are still almost unknown outside a
+small circle. <strong>John Ehlers</strong> spent thirty years
+building the digital-signal-processing version. Between them
+they cover cycle identification, targets, and confirmation.</p>
+
+<div class="tech">
+<h4>The Future Line of Demarcation (FLD)</h4>
+<p class="origin">Hurst (1970); revived by David Hickson and
+the Sentient Trader community (2000s).</p>
+<p>Take a centered moving average whose period equals the cycle
+you are tracking, and shift it <em>forward</em> by half that
+period. That is the FLD. Because the average is centered on the
+cycle, the forward shift puts it where the cycle's midpoint
+<em>will</em> be, so price crossing the FLD marks the halfway
+point of the cycle's move &mdash; which gives you a
+projected target.</p>
+<ul>
+<li>Choose a cycle (say 40 bars). Plot a 40-period simple moving
+average displaced 20 bars into the future.</li>
+<li>When price crosses above the FLD after a cycle trough, the
+move is roughly half done. Target = crossing price + (crossing
+price &minus; trough). Mirror for downside crosses after
+a peak.</li>
+<li>FLD crosses of successive cycle lengths (the 20-bar FLD, the
+40, the 80) nesting in the same direction confirm a
+larger-degree move; a short-cycle cross that fails to reach the
+next FLD warns of a larger-cycle peak.</li>
+</ul>
+<p class="trapline"><strong>Trap:</strong> Applying an FLD to a
+market with no measurable cycle. The projection is only as real
+as the periodicity behind it.</p>
+</div>
+
+<div class="tech">
+<h4>The Valid Trend Line (VTL)</h4>
+<p class="origin">Hurst (1970).</p>
+<p>Not every trendline is a Hurst trendline. A VTL connects two
+consecutive troughs of the <em>same</em> cycle &mdash; two
+40-bar troughs, say &mdash; and no others. Its purpose is not
+support; it is confirmation. When price breaks a VTL, the peak
+of the <strong>next longer cycle</strong> has formed. That is a
+precise and testable statement, unlike "the trendline broke."</p>
+<ul>
+<li>Identify troughs of a chosen cycle (they should be roughly
+the cycle length apart). Draw the line through the
+last two.</li>
+<li>A close below the VTL confirms that the peak of the
+next-longer cycle (the 80-bar, if you drew a 40-bar VTL)
+is in.</li>
+<li>Combine with the FLD: a VTL break plus a downside FLD cross
+of the same cycle is Hurst's highest-confidence sell.</li>
+</ul>
+<p class="trapline"><strong>Trap:</strong> Drawing a VTL through
+troughs of different cycles. The confirmation logic only holds
+when both points belong to one periodicity.</p>
+</div>
+
+<div class="tech">
+<h4>Ehlers' Sinewave indicator</h4>
+<p class="origin">Ehlers, <em>Rocket Science for Traders</em>
+(2001).</p>
+<p>The Sinewave computes the phase of the dominant cycle and
+plots two lines: the sine of the phase and the sine of the phase
+advanced by 45 degrees (the "lead sine"). In cycle mode the
+lines cross at every turn, and they cross <em>before</em> the
+price turn because of the lead. In trend mode the two lines
+flatten and stop crossing &mdash; which is the indicator's second
+job: telling you which mode you are in.</p>
+<ul>
+<li>Cycle mode: buy when the lead sine crosses above the sine
+near a trough; sell at the mirror crossing near a peak.</li>
+<li>Trend mode: when the lines run roughly parallel without
+crossing for more than half a cycle, stop taking cycle trades
+and switch to trend tools.</li>
+<li>Ehlers' rule of thumb: if the dominant cycle period exceeds
+about 40 bars, the market is trending at your timeframe and
+the cycle trades will fail.</li>
+</ul>
+<p class="trapline"><strong>Trap:</strong> Taking cycle-mode
+signals during the transition to trend mode. The first
+non-crossing is the warning; the trade that ignores it is the
+one that gets run over.</p>
+</div>
+
+<div class="tech">
+<h4>MESA Adaptive Moving Average (MAMA / FAMA)</h4>
+<p class="origin">Ehlers, <em>TASC</em>, September 2001.</p>
+<p>A moving average whose smoothing factor adapts to the rate of
+change of the dominant cycle's phase: it moves fast when the
+cycle is turning, and slow when it is not. FAMA is a slower,
+following version of MAMA. Because MAMA ratchets rather than
+lags, the crossover happens once per cycle turn instead of
+several times.</p>
+<ul>
+<li>Defaults: fast limit 0.5, slow limit 0.05.</li>
+<li>Buy MAMA crossing above FAMA; sell the reverse. Ehlers'
+claim, and it holds up reasonably in testing, is that the pair
+produces markedly fewer whipsaws than any fixed-length
+crossover.</li>
+<li>The gap between MAMA and FAMA is a trend-strength measure;
+a widening gap in your direction is confirmation.</li>
+</ul>
+<p class="trapline"><strong>Trap:</strong> Expecting it to be
+early. It is a crossover; its virtue is fewer false signals,
+not faster ones.</p>
+</div>
+
+<div class="tech">
+<h4>The Detrended Price Oscillator for cycle length</h4>
+<p class="origin">Standard in Bressert's work; the technique of
+using it to <em>measure</em> cycles rather than trade them is
+less known.</p>
+<p>The DPO subtracts a displaced moving average from price,
+which removes the trend and leaves the cycle. Set the period to
+roughly the cycle you suspect, and the DPO's troughs land on the
+cycle's troughs with little lag. Its most useful role is not as
+a signal but as a ruler.</p>
+<ul>
+<li>Period n; the moving average is displaced back by n/2 + 1
+bars. Count bars between DPO troughs; that is the dominant
+cycle at this timeframe.</li>
+<li>Use the count to set the FLD and VTL, and to tune your
+oscillators (Chapter 3).</li>
+<li>Re-measure every few cycles; the length drifts.</li>
+</ul>
+<p class="trapline"><strong>Trap:</strong> A period set far from
+the true cycle produces DPO troughs that are artifacts of the
+period, not the market. Try several and look for the one whose
+troughs are evenly spaced.</p>
+</div>
+
+<div class="tech">
+<h4>Ehlers' roofing filter and the indicators built on it</h4>
+<p class="origin">John Ehlers, <em>Cycle Analytics for
+Traders</em> (2013).</p>
+<p>Ehlers' argument is that most indicators are ruined by two
+things they were never designed to handle: the trend (spectral
+content longer than your trading horizon) and aliasing noise
+(content shorter than about ten bars). A <strong>roofing
+filter</strong> removes both &mdash; a high-pass filter strips
+out cycles longer than about 48 bars, and a <strong>Super
+Smoother</strong> (a two-pole low-pass with almost no lag) strips
+out everything shorter than about 10. What is left is the
+tradeable band. Any indicator computed on the roofed series is
+sharper than the same indicator on raw price.</p>
+<ul>
+<li>Roofing filter: high-pass at 48 bars, Super Smoother at 10
+bars. Apply a stochastic or RSI to the output &mdash; Ehlers'
+"My Stochastic" &mdash; and the turns are sharp and the false
+extremes rare.</li>
+<li><strong>Center of Gravity</strong> oscillator: the weighted
+center of prices over a window, which by construction has zero
+lag. Signals are crossings with its one-bar delay.</li>
+<li><strong>FRAMA</strong>: a moving average whose smoothing
+tracks the fractal dimension of price &mdash; fast in trends,
+slow in chop. <strong>Instantaneous Trendline</strong>: a
+trend proxy computed from the dominant cycle rather than a
+fixed length.</li>
+</ul>
+<p class="trapline"><strong>Trap:</strong> The parameters are
+cycle lengths in bars, and they assume your bars carry a cycle
+of that length. On a timeframe where the dominant cycle is
+200 bars, a 48-bar high-pass removes the signal.</p>
+</div>
+
+<div class="tech">
+<h4>Lindsay's Three Peaks and a Domed House</h4>
+<p class="origin">George Lindsay, newsletters and privately
+published papers (1950s&ndash;70s); compiled by Ed Carlson,
+<em>George Lindsay and the Art of Technical Analysis</em>
+(2011).</p>
+<p>A 23-point pattern describing how a major top forms: three
+peaks of roughly equal height (points 1&ndash;7), a
+<strong>separating decline</strong> (8&ndash;10), then the
+<strong>domed house</strong> &mdash; a rally that builds a base,
+a wall, a rounded roof, and a final decline back through the
+base (11&ndash;23). Lindsay used it on stock indices, and the
+remarkable claim was about timing: the top of the domed house
+tends to arrive a set interval after the separating decline's
+low &mdash; his rule of thumb was about seven months
+and ten days.</p>
+<ul>
+<li>Identify three peaks of similar height over several months.
+The decline that follows must go below the lowest point between
+the peaks &mdash; that is the separating decline.</li>
+<li>From the separating decline's low, expect a rally to a new
+high (the domed house). Mark the projected top from Lindsay's
+interval.</li>
+<li>The completion: a decline that breaks the base of the domed
+house (point 14's level) confirms the pattern; the target is
+below the separating decline's low.</li>
+</ul>
+<p class="trapline"><strong>Trap:</strong> With enough peaks on a
+chart, three of them are always similar. The pattern is only
+meaningful when the separating decline is unambiguous, and
+Lindsay himself misidentified it on occasion.</p>
+</div>
+
+<!-- ============================================ -->
+<!-- CHAPTER 7 -->
+<!-- ============================================ -->
+<h2 id="ch7">Chapter 7 &mdash; Trend Filters With Teeth</h2>
+
+<p>The difference between a technique that works and one that
+does not is often just a filter that keeps it out of the wrong
+market. These are the filters that actually measure trendiness,
+as opposed to a moving-average slope.</p>
+
+<div class="tech">
+<h4>Kaufman's Efficiency Ratio</h4>
+<p class="origin">Perry Kaufman, <em>Smarter Trading</em>
+(1995); the engine inside KAMA.</p>
+<p>Net price change over a window divided by the sum of absolute
+bar-to-bar changes over the same window. A straight-line move
+scores 1; a random walk scores near 0. It is the cleanest
+single-number answer to "is this trending."</p>
+<ul>
+<li>ER(10) = |close &minus; close 10 bars ago| /
+&Sigma;|daily changes over 10 bars|.</li>
+<li>Kaufman's Adaptive Moving Average uses ER to blend a
+2-period and a 30-period smoothing constant; the average speeds
+up when ER is high and flattens when it is low.</li>
+<li>As a filter: take trend entries only when ER exceeds roughly
+0.3; take reversion entries only below roughly 0.2. The band
+between is no-man's-land.</li>
+</ul>
+<p class="trapline"><strong>Trap:</strong> ER is backward-looking
+by exactly its window. A 10-bar ER spikes after the trend, not
+before; use it to stay in or stay out, not to enter.</p>
+</div>
+
+<div class="tech">
+<h4>Chande's r&sup2; and the regression slope</h4>
+<p class="origin">Tushar Chande and Stanley Kroll,
+<em>The New Technical Trader</em> (1994).</p>
+<p>Regress price on time over a window. The slope tells you
+direction; the r&sup2; tells you how much of the price variation
+is explained by that straight line &mdash; which is trend
+strength in the statistical sense. Chande's insight was that
+r&sup2; is a better trend filter than any oscillator because it
+directly measures the thing.</p>
+<ul>
+<li>Window 14 to 20 bars. Plot r&sup2; and slope separately.</li>
+<li>r&sup2; above 0.5 with a positive slope = trend to trade;
+r&sup2; below 0.3 = range; slope changing sign while r&sup2;
+is high = a sharp turn.</li>
+<li>Chande's rule: r&sup2; rising through 0.5 is the entry
+filter; r&sup2; falling below 0.5 after having been above 0.8
+is the exit filter.</li>
+</ul>
+<p class="trapline"><strong>Trap:</strong> Long windows produce
+high r&sup2; for almost any drift. Match the window to your
+holding period, not to what makes the chart look clean.</p>
+</div>
+
+<div class="tech">
+<h4>The Choppiness Index</h4>
+<p class="origin">E.W. Dreiss, Australian commodity trader,
+1990s.</p>
+<p>The sum of true ranges over a window divided by the total
+range over that window, log-scaled to 0&ndash;100. If every
+bar's range adds up to far more than the net range, the market
+has been chopping; if the sum of ranges is close to the net
+range, it has been trending. It is the Efficiency Ratio's cousin,
+built from ranges instead of closes, so it sees intrabar chop
+that ER misses.</p>
+<ul>
+<li>Period 14.
+<code>CHOP = 100 &times; log10(&Sigma; ATR(1) /
+(max high &minus; min low)) / log10(14)</code>.</li>
+<li>Above 61.8: choppy &mdash; stand aside from breakouts. Below
+38.2: trending &mdash; stand aside from fades. The Fibonacci
+thresholds were Dreiss's; they are not sacred.</li>
+<li>A reading above 61.8 that begins to fall is the earliest
+sign a range is resolving; pair it with a squeeze
+(Chapter 8).</li>
+</ul>
+<p class="trapline"><strong>Trap:</strong> Reading Choppiness as
+directional. It says trend or no trend; it never says
+which way.</p>
+</div>
+
+<div class="tech">
+<h4>Guppy Multiple Moving Average</h4>
+<p class="origin">Daryl Guppy, <em>Trend Trading</em>
+(2004).</p>
+<p>Two ribbons of exponential averages: a short group (3, 5, 8,
+10, 12, 15) representing traders, and a long group (30, 35, 40,
+45, 50, 60) representing investors. Guppy read the
+<em>spacing</em> within each ribbon, not the crossovers. A
+compressed ribbon means agreement about price &mdash; and the
+market is about to disagree.</p>
+<ul>
+<li>Long group well separated and parallel = investors committed;
+a pullback in the short group into the long group that holds
+is the buy.</li>
+<li>Short group compressing while the long group stays spread =
+pause within the trend, not a reversal.</li>
+<li>Both groups compressing together = the trend is over; a
+breakout from full compression starts the next one.</li>
+</ul>
+<p class="trapline"><strong>Trap:</strong> Reading a single
+crossover between the two groups as a signal. Guppy explicitly
+warned against it; the information is in the width.</p>
+</div>
+
+<div class="tech">
+<h4>Wilder's ADX hook</h4>
+<p class="origin">Wilder (1978); the hook rule is the part of
+the book nobody read.</p>
+<p>ADX measures the strength of the trend regardless of
+direction. Everyone knows "above 25 is trending." Wilder's
+actual rules were about the <em>turn</em> in ADX, and they
+are better.</p>
+<ul>
+<li>ADX rising from below 20 with +DI crossing above &minus;DI
+is the start of a trend. Wilder's "extreme point rule": enter
+on a break of the extreme (high or low) of the bar on which
+the DI cross occurred, not on the cross itself.</li>
+<li>ADX above 40 and turning down &mdash; the hook &mdash; means
+the trend is losing thrust. Wilder's rule: stop adding,
+tighten stops. The reversal often does not come for many bars,
+but the easy part of the move is over.</li>
+<li>ADX turning up from a hook while +DI remains above &minus;DI
+is a continuation; ADX turning up while the DIs have crossed
+is a new trend the other way.</li>
+</ul>
+<p class="trapline"><strong>Trap:</strong> Shorting the hook. ADX
+turning down from 45 says the uptrend is decelerating, not that
+a downtrend has started. Traders who short there get run over by
+the last leg.</p>
+</div>
+
+<div class="tech">
+<h4>Raschke's Holy Grail</h4>
+<p class="origin">Raschke and Connors, <em>Street Smarts</em>
+(1995). The name is her joke about traders looking for one.</p>
+<p>The cleanest pullback entry in the pattern literature: a
+strong trend, measured by ADX, pulls back to a 20-period EMA,
+and you buy the resumption. Nothing about it is exotic; its edge
+is the strictness of the trend condition, which keeps it out of
+the ranges where every pullback entry dies.</p>
+<ul>
+<li>Condition: 14-period ADX above 30 <em>and rising</em>. The
+rising part is not optional.</li>
+<li>Wait for price to pull back and touch the 20-period EMA.</li>
+<li>Entry: a buy stop above the high of the bar that touched the
+EMA. Stop below the pullback's swing low.</li>
+<li>Target: a retest of the prior swing high; trail from there.
+If the first entry is stopped out, Raschke allowed one
+re-entry on the next touch.</li>
+</ul>
+<p class="trapline"><strong>Trap:</strong> ADX above 30 but
+falling. That is the hook from the previous card, and the
+pullback you are buying is the start of the range.</p>
+</div>
+
+<div class="tech">
+<h4>Wilder's Accumulation Swing Index</h4>
+<p class="origin">Wilder (1978). The most-ignored chapter of the
+most-read book in technical analysis.</p>
+<p>The Swing Index compresses each bar's open, high, low, and
+close, together with the previous bar's, into a single number
+that Wilder intended as the "real" price of the bar &mdash;
+weighting the close-to-close change most, and adjusting for gaps
+and range. The ASI is its running sum. Wilder's claim: the ASI
+makes a cleaner chart than price, its swing points are
+unambiguous, and trendlines drawn on it break before
+price does.</p>
+<ul>
+<li>Compute the Swing Index per Wilder's formula (any platform
+has it); the limit-move parameter should be set to a large
+multiple of ATR for markets without limits.</li>
+<li>Mark high swing points (HSP) and low swing points (LSP) on
+the ASI. Draw trendlines through them.</li>
+<li>Wilder's confirmation rule: a price breakout is valid only if
+the ASI also breaks its corresponding swing point. Price up,
+ASI not up = false breakout.</li>
+<li>An ASI trendline break with price still inside its line is
+the early entry, as with RSI and OBV lines.</li>
+</ul>
+<p class="trapline"><strong>Trap:</strong> The limit-move
+parameter. Wilder wrote it for commodities with daily limits, and
+a badly chosen value distorts every bar. Set it to something like
+5 &times; ATR and forget it.</p>
+</div>
+
+<div class="tech">
+<h4>DiNapoli levels: displaced averages and the Double Repo</h4>
+<p class="origin">Joe DiNapoli, <em>Trading with DiNapoli
+Levels</em> (1998).</p>
+<p>DiNapoli used simple moving averages <em>displaced
+forward</em> &mdash; plotted several bars into the future &mdash;
+so that the current price is compared against an average that
+has not yet "seen" the latest bars. Three of them: the 3&times;3
+(3-period, displaced 3 bars), the 7&times;5, and the
+25&times;5. The 3&times;3 is his short-term trend line; a close
+through it is a trend-change signal that fires far earlier than
+any conventional crossover. His MACD and stochastic settings were
+deliberately odd (MACD 8.3896 / 17.5185 / 9.0503; stochastic 8,
+3, 3) and his Fibonacci targets were named.</p>
+<ul>
+<li>Trend: price above a rising 3&times;3 = up; the 25&times;5
+for the larger trend. Trade in the direction of the 25&times;5
+using the 3&times;3 for timing.</li>
+<li><strong>Double Repo</strong>: after a thrust, price closes
+through the 3&times;3 twice within a few bars (a "double
+repenetration"). The second penetration signals the thrust has
+failed; trade in the direction of the penetration with a stop
+beyond the thrust extreme. DiNapoli's highest-confidence
+pattern.</li>
+<li>Targets: expansions of the prior swing &mdash; COP (0.618),
+OP (1.0), XOP (1.618) &mdash; projected from the retracement
+low. Confluence of a COP with a retracement of a larger swing
+is a "Fibnode" and a place to take profit.</li>
+</ul>
+<p class="trapline"><strong>Trap:</strong> Treating a single
+3&times;3 crossing as a signal. The 3&times;3 is crossed
+constantly; the Double Repo is the pattern, and it needs a
+preceding thrust to mean anything.</p>
+</div>
+
+<div class="tech">
+<h4>Bill Williams' Alligator, Awesome Oscillator,
+and fractals</h4>
+<p class="origin">Bill Williams, <em>Trading Chaos</em> (1995)
+and <em>New Trading Dimensions</em> (1998).</p>
+<p>Under a great deal of chaos-theory decoration, a coherent
+trend-following kit. The <strong>Alligator</strong> is three
+smoothed moving averages of the median price, each displaced
+forward: the jaw (13, shifted 8), teeth (8, shifted 5), and
+lips (5, shifted 3). Intertwined lines mean the alligator is
+asleep &mdash; a range; separated and ordered lines mean it is
+feeding &mdash; a trend. A <strong>fractal</strong> is a five-bar
+pattern with the highest high in the middle. The
+<strong>Awesome Oscillator</strong> is a 5-period minus 34-period
+average of the median price.</p>
+<ul>
+<li>Entry: a buy stop above an up fractal that sits above the
+alligator's teeth, while the lines are separating. Fractals
+below the teeth are ignored.</li>
+<li>AO confirms: a "saucer" (two red bars then a green one,
+above zero) or a zero-line cross in the trend direction adds
+size; AO divergence at a fractal warns.</li>
+<li>Exit: a close through the alligator's teeth, or the lines
+re-crossing.</li>
+</ul>
+<p class="trapline"><strong>Trap:</strong> The displacement makes
+the alligator look prescient on a static chart because the lines
+appear to lead price. They are shifted, not forecast; read them
+where they sit today.</p>
+</div>
+
+<div class="tech">
+<h4>Lag-reduced averages: Hull, T3, McGinley Dynamic,
+ZLEMA</h4>
+<p class="origin">Alan Hull (2005); Tim Tillson, <em>TASC</em>
+(January 1998); John McGinley (1990s); Ehlers and Way,
+<em>TASC</em> (2010).</p>
+<p>Every moving average trades lag against smoothness. These four
+attack the lag from different directions, and each has a specific
+use rather than being a "better MA."</p>
+<ul>
+<li><strong>Hull</strong>: HMA = WMA(2 &times; WMA(n/2)
+&minus; WMA(n), &radic;n). Extrapolates the recent slope, so
+it turns almost with price. Use its turn as a trigger, never
+as support &mdash; it overshoots.</li>
+<li><strong>T3</strong>: a six-fold EMA with a "volume factor"
+(Tillson's default 0.7) that lets it hug price without the
+Hull's overshoot. The smoothest of the four; use as a
+trend line.</li>
+<li><strong>McGinley Dynamic</strong>: MD = MD&#8321; + (P
+&minus; MD&#8321;) / (0.6 &times; N &times; (P /
+MD&#8321;)&#8308;). The fourth power makes it speed up when
+price runs away and slow down when price is near &mdash; it
+tracks fast markets and refuses to whipsaw in slow ones. The
+best of the four as a trailing trend line.</li>
+<li><strong>ZLEMA</strong>: an EMA applied to price plus (price
+&minus; price lagged), which cancels most of the lag. A fast
+crossover pair (ZLEMA 10/30) whipsaws far less than the
+EMA equivalent.</li>
+</ul>
+<p class="trapline"><strong>Trap:</strong> Less lag means more
+overshoot, always. A Hull crossover system will have more,
+faster, and worse signals than a plain EMA system in
+a range.</p>
+</div>
+
+<div class="tech">
+<h4>The 52-week-high effect</h4>
+<p class="origin">Thomas George and Chuan-Yang Hwang,
+<em>Journal of Finance</em> (2004).</p>
+<p>The only technique in this chapter that comes from a
+peer-reviewed paper, and it is a good one. George and Hwang found
+that a stock's <em>nearness to its 52-week high</em> &mdash;
+current price divided by the trailing 52-week high &mdash;
+predicted subsequent returns better than past returns did, and
+that the effect did not reverse the way momentum does. Their
+explanation is anchoring: traders are reluctant to buy near a
+salient high, so good news is under-reacted to there, and the
+price drifts up as the reluctance fades.</p>
+<ul>
+<li>Nearness = price / 52-week high. Rank the universe; the top
+decile has historically outperformed the bottom decile over the
+next six to twelve months.</li>
+<li>Single-asset version: a breakout to a new 52-week high,
+especially after a long consolidation near it, is a with-trend
+entry with a known behavioral mechanism behind it.</li>
+<li>Combine with Chapter 7's trend filters; the effect is
+strongest when the broad market is also near its highs.</li>
+</ul>
+<p class="trapline"><strong>Trap:</strong> Evidence is from
+equities, cross-sectionally. On a single futures contract or
+currency the anchoring story is weaker and the 52-week high is
+just a level.</p>
+</div>
+
+<!-- ============================================ -->
+<!-- CHAPTER 8 -->
+<!-- ============================================ -->
+<h2 id="ch8">Chapter 8 &mdash; Volatility Setups</h2>
+
+<p>Range contraction precedes range expansion. That sentence is
+the entire content of a body of work by <strong>Toby
+Crabel</strong>, <strong>John Bollinger</strong>, and
+<strong>Larry Williams</strong>, and it has held up better in
+testing than almost anything else in pattern-based trading. The
+specific patterns matter, though, because "range contraction"
+can be measured in a dozen ways and they are not equivalent.</p>
+
+<div class="tech">
+<h4>NR7 and ID/NR4</h4>
+<p class="origin">Toby Crabel, <em>Day Trading with Short Term
+Price Patterns and Opening Range Breakout</em> (1990). Out of
+print; used copies sell for several hundred dollars.</p>
+<p>NR7: the bar with the narrowest range of the last seven.
+ID/NR4: an <em>inside</em> bar (high below the prior high, low
+above the prior low) that is also the narrowest of the last four.
+Both are precise definitions of contraction, and Crabel tested
+them on daily futures data with the discipline of a statistician.
+The finding: the bar after an NR7 or ID/NR4 has a substantially
+wider range than average, and the direction of the breakout tends
+to persist for the session.</p>
+<ul>
+<li>Identify the pattern at the close. Place a buy stop just
+above its high and a sell stop just below its low for the
+next bar.</li>
+<li>When one fills, cancel the other and use the opposite extreme
+as the stop. Exit at the close of the session (Crabel's
+version) or trail with a volatility stop (Chapter 13).</li>
+<li>Crabel found ID/NR4 stronger than NR7, and NR7 following two
+or more consecutive narrowing days strongest of all &mdash;
+the "NR7 after NR7" is rare and worth waiting for.</li>
+</ul>
+<p class="trapline"><strong>Trap:</strong> Trading the pattern in
+a market that has been quiet for weeks. Contraction is relative;
+an NR7 inside a dead range is just a dead bar.</p>
+</div>
+
+<div class="tech">
+<h4>The Stretch and the Opening Range Breakout</h4>
+<p class="origin">Crabel (1990).</p>
+<p>Crabel's second contribution was a volatility-scaled
+definition of "breakout from the open." The
+<strong>Stretch</strong> is the ten-day average of the smaller
+of (high &minus; open) and (open &minus; low) &mdash; the
+typical amount of adverse excursion from the open before the
+day's real move. An ORB entry is placed at the open plus or
+minus the Stretch.</p>
+<ul>
+<li>Stretch = average over 10 sessions of min(high &minus; open,
+open &minus; low).</li>
+<li>Buy stop at open + Stretch; sell stop at open &minus;
+Stretch. First fill wins; the other side becomes the stop.</li>
+<li>Crabel's finding: an ORB taken on the day after an NR7 or
+ID/NR4 has the strongest edge. The contraction pattern picks
+the day; the Stretch picks the level.</li>
+<li>In a 24-hour market, define the open yourself &mdash; the
+London open or the New York open are the usual anchors; test
+which one your symbols respect.</li>
+</ul>
+<p class="trapline"><strong>Trap:</strong> A Stretch computed
+over a period that included one enormous day. Crabel used ten
+days precisely because it was short enough to adapt and long
+enough to resist a single outlier; do not "improve"
+it to fifty.</p>
+</div>
+
+<div class="tech">
+<h4>The Squeeze and the head fake</h4>
+<p class="origin">Bollinger, <em>Bollinger on Bollinger
+Bands</em> (2001); the TTM Squeeze variant by John Carter
+(2000s).</p>
+<p>Bandwidth &mdash; (upper &minus; lower) / middle &mdash; at
+its lowest level in six months is Bollinger's Squeeze. His second
+rule is the one that matters: the first move out of a Squeeze is
+frequently a <strong>head fake</strong> &mdash; a break in one
+direction that reverses within a few bars and then makes the real
+move the other way.</p>
+<ul>
+<li>Bollinger's Squeeze: 20-period, 2&sigma; bands; bandwidth at
+a 125-bar low. Wait for the bands to begin expanding; enter in
+the direction of the expansion, but be prepared to reverse on
+the head fake.</li>
+<li>Carter's TTM Squeeze: bands (20, 2) inside a Keltner channel
+(20, 1.5 ATR) = squeeze on. When the bands exit the channel,
+the squeeze fires; take direction from a momentum histogram at
+that bar.</li>
+<li>The head-fake rule in practice: if the first breakout bar
+closes back inside the bands, take the opposite side on the
+next bar's break.</li>
+</ul>
+<p class="trapline"><strong>Trap:</strong> Entering on the
+squeeze itself. A squeeze is a condition, not a signal; the trade
+is the release, and the release can take weeks.</p>
+</div>
+
+<div class="tech">
+<h4>Volatility breakout</h4>
+<p class="origin">Larry Williams, <em>Long-Term Secrets to
+Short-Term Trading</em> (1999); versions trace to
+the 1980s.</p>
+<p>The simplest expansion entry there is: buy if price moves a
+fixed fraction of yesterday's range above today's open. Because
+the threshold is scaled to recent range, it adapts automatically,
+and because it requires a move before entry, it filters the dead
+sessions out.</p>
+<ul>
+<li>Buy stop at open + k &times; (previous range), k between
+0.5 and 0.7. Sell stop at open &minus; k &times; range.
+Williams' preferred k was around 0.6 for stock indices.</li>
+<li>Combine with a directional filter &mdash; Williams used the
+prior day's close relative to its open, or a short-term trend
+&mdash; and take only the side the filter favors.</li>
+<li>Exit at the close, or at the first profitable open
+(Chapter 13).</li>
+</ul>
+<p class="trapline"><strong>Trap:</strong> k too small in a
+market with a large session-open range. The order fills on noise
+and the stop on the other side fills on more noise.</p>
+</div>
+
+<div class="tech">
+<h4>Standard Error Bands</h4>
+<p class="origin">Jon Andersen, <em>TASC</em>,
+September 1996.</p>
+<p>Bollinger Bands are built around a moving average and widen
+with volatility. Standard Error Bands are built around a
+<strong>linear regression line</strong> and widen with the
+<em>scatter around the trend</em>. That inverts the reading:
+tight bands mean price is hugging a trend (strong), and wide
+bands mean price is scattered around it (weak or turning). They
+answer "how orderly is this move" rather than "how volatile
+is it."</p>
+<ul>
+<li>21-period linear regression of the close. Bands at &plusmn;2
+standard errors of the regression, each smoothed with a
+3-period average.</li>
+<li>Bands narrowing while the regression slopes = an orderly
+trend; hold. Bands widening = the trend is losing coherence;
+tighten stops.</li>
+<li>Price breaking outside a narrow band is a shock to the trend
+&mdash; treat it as the start of a new regime, not as an
+extreme to fade.</li>
+</ul>
+<p class="trapline"><strong>Trap:</strong> Reading them like
+Bollinger Bands. A touch of the upper Standard Error Band in a
+tight, sloping channel is confirmation, not exhaustion.</p>
+</div>
+
+<div class="tech">
+<h4>STARC bands</h4>
+<p class="origin">Manning Stoller, 1980s; "Stoller Average Range
+Channel."</p>
+<p>A short simple average with bands at a multiple of ATR.
+Stoller's reading was risk-based rather than signal-based: a
+purchase made near the lower band has a small distance to the
+stop and a large distance to the upper band, so its
+reward-to-risk is favorable regardless of what happens next. He
+traded the bands as places where the odds were acceptable, not
+as predictions.</p>
+<ul>
+<li>SMA(5 or 6) &plusmn; 2 &times; ATR(15). STARC+ is the upper
+band, STARC&minus; the lower.</li>
+<li>Buy near STARC&minus; with a stop just beyond it; take profit
+toward the average or STARC+. Mirror at STARC+.</li>
+<li>In a trend, only take the with-trend band: STARC&minus; buys
+in an uptrend, STARC+ sells in a downtrend. The counter-trend
+band is where you exit, not enter.</li>
+</ul>
+<p class="trapline"><strong>Trap:</strong> Fading STARC+ in a
+trend. The bands are narrow (2 ATR) and a trending market rides
+the upper one for days.</p>
+</div>
+
+<div class="tech">
+<h4>Widner's projection bands and projection oscillator</h4>
+<p class="origin">Mel Widner, <em>TASC</em>, July 1995.</p>
+<p>Donchian channels use the raw highest high and lowest low,
+which lag by construction. Widner's bands project each of the
+last n bars' highs and lows forward along the current regression
+slope before taking the maximum and minimum &mdash; so a rising
+market's band rises with it instead of waiting for a new high.
+The projection oscillator is %R computed inside those bands.</p>
+<ul>
+<li>Period 14. Upper band = max over n of (high + slope &times;
+bars ago); lower band = min of (low + slope &times; bars ago),
+where slope is the n-period regression slope.</li>
+<li>Projection oscillator = (close &minus; lower) /
+(upper &minus; lower) &times; 100. Read as a stochastic with
+much less lag; 80/20 extremes, and divergences.</li>
+<li>Its virtue in a trend: the oscillator does not pin at 100 the
+way %R does, because the band moves with the trend. Pullbacks
+register as pullbacks.</li>
+</ul>
+<p class="trapline"><strong>Trap:</strong> In a sharp reversal
+the projection is wrong by the full slope, and the bands lag more
+than Donchian's for a few bars. Do not use it for the first bars
+after a break.</p>
+</div>
+
+<div class="tech">
+<h4>Bollinger's %b and the W-bottom</h4>
+<p class="origin">Bollinger (2001).</p>
+<p>%b is where the close sits relative to the bands: 1 at the
+upper band, 0 at the lower, above 1 outside. Bollinger's use of
+it was to identify a specific bottom: a <strong>W</strong> in
+which the second low is lower in price but <em>higher in
+%b</em>, because the bands have moved down with it. Price made a
+new low; relative to the volatility envelope, it did not.</p>
+<ul>
+<li>W-bottom: first low at or below the lower band (%b near or
+below 0). Rally. Second low, lower in price, but with %b
+higher than at the first low (inside the band). Buy the break
+of the intervening high.</li>
+<li>M-top: mirror &mdash; second high higher in price, lower
+in %b.</li>
+<li>"Walking the band": consecutive closes with %b above 0.8 is
+a trend, and Bollinger's rule was never to sell a walk. The
+first close with %b below 0.5 after a walk is the exit.</li>
+</ul>
+<p class="trapline"><strong>Trap:</strong> Buying the second low
+on the %b reading alone. The trigger is the break of the middle
+high; without it, the W is a downtrend with a bounce in it.</p>
+</div>
+
+<div class="tech">
+<h4>Fisher's ACD</h4>
+<p class="origin">Mark Fisher, <em>The Logical Trader</em>
+(2002). The house method at MBF Clearing, one of the largest
+floor operations in New York.</p>
+<p>An opening-range framework with a scoring system attached. The
+<strong>opening range</strong> is the first few minutes of the
+session (Fisher used five to thirty depending on the market).
+<strong>A-levels</strong> sit a fixed distance above and below
+it, scaled to the market's recent range; a move through an
+A-level that holds is an <strong>A-up</strong> or
+<strong>A-down</strong>, and the day's bias follows it.
+<strong>C-levels</strong> are wider and apply later in the
+session. The <strong>pivot range</strong> from the previous
+session is the reference for whether the A-up is meaningful. The
+<strong>number line</strong> scores each day's outcome and sums
+over 30 days to produce a longer-term bias.</p>
+<ul>
+<li>A-up = opening-range high + A value; A-down = opening-range
+low &minus; A value. Fisher set the A value at a fraction of
+the average daily range, roughly a tenth for most markets.</li>
+<li>An A-up that holds for a set time (a few minutes on a fast
+market, half an hour on a slow one) = long bias for the day,
+stop below the opening-range low. A <strong>failed A</strong>
+&mdash; price makes the A-up and then trades back through the
+opening range &mdash; is a reversal signal, and often the best
+trade of the day.</li>
+<li>Pivot range: pivot = (H + L + C) / 3; second number =
+(H + L) / 2; range = pivot &plusmn; |pivot &minus; second
+number|. An A-up above the pivot range is stronger than one
+below it.</li>
+<li>Number line: score each day +1/+2 for A-ups and C-ups,
+&minus;1/&minus;2 for downs, sum the last 30 days. A sum at
+&plusmn;9 marks an extreme with a strong directional bias in
+Fisher's markets.</li>
+</ul>
+<p class="trapline"><strong>Trap:</strong> Copying Fisher's
+opening-range durations and A values from his examples. They were
+tuned per market by hand; yours must be too.</p>
+</div>
+
+<!-- ============================================ -->
+<!-- CHAPTER 9 -->
+<!-- ============================================ -->
+<h2 id="ch9">Chapter 9 &mdash; Stop Runs and Failed Breakouts</h2>
+
+<p>A breakout that fails is more informative than one that
+succeeds, because it tells you the buyers who chased it are now
+trapped. The patterns in this chapter are all the same pattern
+with different names: price exceeds an obvious level, triggers
+the stops and the breakout entries sitting there, and then
+reverses through the level. <strong>Osler</strong>'s order-book
+research showed why &mdash; stop orders cluster just past round
+numbers and prior extremes &mdash; and these techniques are the
+trades built on it.</p>
+
+<div class="tech">
+<h4>Turtle Soup and Turtle Soup Plus One</h4>
+<p class="origin">Raschke and Connors, <em>Street Smarts</em>
+(1995). Named for the Turtles' 20-day breakout system, which
+it fades.</p>
+<ul>
+<li>Setup: today makes a new 20-bar low, and the previous 20-bar
+low occurred at least four bars ago (so the level is
+established, not fresh).</li>
+<li>Entry: place a buy stop a small distance above the
+<em>previous</em> 20-bar low. If today's break reverses back
+through that level, you are long with the breakout traders
+trapped below.</li>
+<li>Stop: just below today's low. Target: Raschke held for two
+to six bars or trailed; the pattern is a reversal of the day's
+excess, not a trend call.</li>
+<li>Plus One: the same setup, but the entry is placed on the day
+<em>after</em> the new low. Slightly slower, noticeably fewer
+false triggers.</li>
+</ul>
+<p class="trapline"><strong>Trap:</strong> Turtle Soup in a
+genuine trend. When the 20-bar low breaks and does not reverse,
+that was the breakout, and the fade is the wrong side of the
+biggest move of the month. The four-bar rule and a
+higher-timeframe range condition exist to keep you out.</p>
+</div>
+
+<div class="tech">
+<h4>The Swing Failure Pattern</h4>
+<p class="origin">Trading-desk and forum folklore; the same
+logic as Turtle Soup on a single bar, and a close cousin of
+Sperandeo's 2B pattern.</p>
+<p>Price wicks above a prior swing high (taking the stops and
+triggering the breakout buys) and then closes back below it, on
+the same bar. The bar's close is the tell: the market tried to
+hold the new high and could not.</p>
+<ul>
+<li>Bearish SFP: bar high exceeds a prior swing high; bar close
+is below that swing high. Short on the close or on a break of
+the bar's low; stop above the wick.</li>
+<li>Bullish SFP: mirror at a swing low.</li>
+<li>Higher-timeframe SFPs (daily, weekly) are far more reliable
+than intraday ones, because the stops taken are larger.</li>
+</ul>
+<p class="trapline"><strong>Trap:</strong> An SFP on a bar that
+closes only marginally back inside. The pattern needs a decisive
+close; a close a few ticks back is a level being tested,
+not rejected.</p>
+</div>
+
+<div class="tech">
+<h4>Wyckoff springs and upthrusts</h4>
+<p class="origin">Richard Wyckoff, course materials (1930s);
+systematized by Hank Pruden, <em>The Three Skills of Top
+Trading</em> (2007).</p>
+<p>A spring is a break below a trading range's support that
+fails and reverses. The Wyckoff addition is
+<strong>volume</strong>: a spring on low volume means there was
+no real supply below support &mdash; the break was a stop run
+&mdash; and the subsequent test on even lower volume confirms it.
+An upthrust is the mirror at resistance.</p>
+<ul>
+<li>Range identified (Wyckoff's accumulation phases). Price
+breaks support. Watch volume on the break bar: low = spring;
+high with a close back inside = a spring with "stopping
+volume."</li>
+<li>Entry: the test &mdash; price revisiting the spring low on
+lower volume and holding. Stop below the spring low.</li>
+<li>The "sign of strength": a wide-range up bar on expanding
+volume leaving the range; Wyckoff's confirmation that markup
+has begun.</li>
+</ul>
+<p class="trapline"><strong>Trap:</strong> A spring on high
+volume that closes at the low. That is not a spring; it is a
+breakdown with participation.</p>
+</div>
+
+<div class="tech">
+<h4>Larry Williams' Smash Day</h4>
+<p class="origin">Williams (1999).</p>
+<p>A bar that closes below the prior bar's low is a "smash"
+&mdash; it looks like a breakdown. Williams' observation: if the
+next bar trades back above the smash bar's high, the breakdown
+has failed and the trapped sellers fuel a reversal.</p>
+<ul>
+<li>Down smash: close below prior bar's low. Buy stop at the
+smash bar's high for the next bar; stop below the smash
+bar's low.</li>
+<li>Up smash: close above prior bar's high. Sell stop at the
+smash bar's low.</li>
+<li>Williams' "hidden smash": a bar that closes in the bottom
+quarter of its range but above the prior low. Same
+trade, weaker.</li>
+</ul>
+<p class="trapline"><strong>Trap:</strong> Smash days at the
+start of a trend rather than the end of a move. Williams took
+them after extended moves, where the "smash" was the
+last spasm.</p>
+</div>
+
+<div class="tech">
+<h4>Volume Spread Analysis</h4>
+<p class="origin">Tom Williams, <em>The Undeclared Secrets That
+Drive the Stock Market</em> (1993); later
+<em>Master the Markets</em>.</p>
+<p>VSA reads three things per bar &mdash; range (the "spread"),
+close position within the range, and volume &mdash; and infers
+what professional money did. It is Wyckoff with
+a vocabulary.</p>
+<ul>
+<li><strong>No demand</strong>: an up bar with a narrow range on
+volume lower than the previous two bars. The rally has no
+buyers behind it; bearish in a downtrend.</li>
+<li><strong>Stopping volume</strong>: a wide down bar on very
+high volume that closes off its low. Someone absorbed the
+selling; bullish if followed by a test.</li>
+<li><strong>Upthrust</strong>: a bar that trades above the prior
+high and closes near its low on high volume.
+Distribution.</li>
+<li><strong>Test</strong>: a narrow down bar on low volume after
+stopping volume. No supply left; buy.</li>
+</ul>
+<p class="trapline"><strong>Trap:</strong> Reading VSA bars in
+isolation. Every signal is conditional on the background &mdash;
+the same bar means different things in an uptrend and after
+a climax.</p>
+</div>
+
+<div class="tech">
+<h4>Sperandeo's 1-2-3 and 2B</h4>
+<p class="origin">Victor Sperandeo, <em>Trader Vic: Methods of a
+Wall Street Master</em> (1991).</p>
+<p>Two of the most cited and least attributed patterns in
+trading. The <strong>1-2-3</strong> is a trend-change definition:
+(1) the trendline breaks, (2) price tests the prior extreme and
+fails to exceed it, (3) price breaks the intervening swing. All
+three must occur; two of three is a warning. The
+<strong>2B</strong> is a stop-run reversal: in an uptrend, price
+makes a new high, fails to follow through, and drops back below
+the previous high. Sperandeo's 2B is the daily-bar ancestor of
+every "sweep" pattern.</p>
+<ul>
+<li>1-2-3 top: trendline broken; rally fails to make a new high;
+break below the low between the high and the failed rally. Sell
+on (3), stop above (2).</li>
+<li>2B top: new high, then a close (or a trade, on short
+timeframes) back below the prior high. Sell there, stop above
+the new high. Sperandeo's timing rule: on daily bars the 2B
+should resolve within a day or two; on intermediate swings,
+within three to five days.</li>
+<li>The 2B works because the breakout buyers and the stops above
+the old high are both trapped by the same move.</li>
+</ul>
+<p class="trapline"><strong>Trap:</strong> A 2B that takes a week
+to fail. If price holds above the old high for many bars, it is a
+breakout consolidating, and the eventual dip through the level is
+a pullback, not a 2B.</p>
+</div>
+
+<div class="tech">
+<h4>The Ross Hook and the Traders Trick Entry</h4>
+<p class="origin">Joe Ross, <em>Trading by the Book</em> (1991)
+and <em>Trading the Ross Hook</em> (1996).</p>
+<p>After a breakout &mdash; from a 1-2-3, a ledge, or a trading
+range &mdash; the first bar that fails to make a new high in the
+direction of the breakout is a <strong>Ross Hook</strong>. Ross's
+observation was that the breakout of the hook is the most
+reliable continuation entry, and that everyone knows it, so the
+stop orders sit just above the hook and the fill is bad. The
+<strong>Traders Trick Entry</strong> enters during the
+correction, before the hook breaks, so that the crowd's breakout
+entry becomes your first profit.</p>
+<ul>
+<li>Identify the hook: the first bar after a breakout whose high
+is below the prior bar's high (for an uptrend).</li>
+<li>The correction that follows must be short &mdash; Ross
+allowed no more than three bars. Longer, and the setup
+is void.</li>
+<li>TTE: on any correction bar, place a buy stop above that
+bar's high. Stop below the correction's low. When the hook
+itself breaks, the crowd's entry runs your position into
+profit; take partial there.</li>
+</ul>
+<p class="trapline"><strong>Trap:</strong> Taking the TTE on the
+fourth correction bar. Ross's three-bar limit is the whole
+filter; a longer correction is a range forming, and the hook
+breakout fails.</p>
+</div>
+
+<div class="tech">
+<h4>Liquidity sweeps, order blocks, and fair value gaps</h4>
+<p class="origin">Michael Huddleston ("ICT"), free online
+lectures (2010s onward), originally for forex. The largest body
+of trading technique that has never been in a book &mdash; and
+never formally tested.</p>
+<p>Strip the vocabulary and the framework is three mechanical
+claims: (1) price is drawn to <strong>liquidity</strong> &mdash;
+clusters of stops above equal highs and below equal lows &mdash;
+and sweeps it before reversing; (2) the last opposing candle
+before an impulsive move (an <strong>order block</strong>) marks
+where the institution accumulated, and price returns to it;
+(3) a three-candle move that leaves a gap between candle one's
+high and candle three's low (a <strong>fair value gap</strong>)
+is an imbalance that price tends to revisit. Each is testable,
+and each is a restatement of Osler's stop clustering, the
+retest, and gap-fill logic.</p>
+<ul>
+<li>Sweep: equal highs (within a tick or two) mark resting
+buy-stops. A wick through them followed by a close back below,
+then a break of the most recent swing low (a "market structure
+shift"), is the short. Identical to an SFP with a
+confirmation step.</li>
+<li>Order block: after the structure shift, mark the last
+up-candle before the impulsive drop. The retest of that
+candle's range is the entry; stop above it.</li>
+<li>Fair value gap: mark the three-candle gap on the impulse.
+Price returning to fill half or all of it is the
+alternative entry.</li>
+<li>Huddleston's timing overlay &mdash; "kill zones" around the
+London and New York opens, and a "Judas swing" false move at
+the open &mdash; is the session-anchor logic of Chapter 8 in
+different words.</li>
+</ul>
+<p class="trapline"><strong>Trap:</strong> Hindsight. Every chart
+has equal highs, opposing candles, and three-candle gaps
+somewhere, and the community's examples are selected after the
+fact. Before trading any of it, measure the fill rate of fair
+value gaps and the retest rate of order blocks on your own data,
+with a null built from random levels.</p>
+</div>
+
+<!-- ============================================ -->
+<!-- CHAPTER 10 -->
+<!-- ============================================ -->
+<h2 id="ch10">Chapter 10 &mdash; Volume and Order-Flow
+Indicators</h2>
+
+<div class="tech">
+<h4>Anchored VWAP</h4>
+<p class="origin">Brian Shannon, <em>Maximum Trading Gains with
+Anchored VWAP</em> (2023); the technique circulated in his work
+for a decade before.</p>
+<p>A session VWAP resets every day, which makes it meaningless
+for anything longer. An anchored VWAP starts at a moment you
+choose &mdash; a swing low, a swing high, an earnings release,
+an IPO, a year boundary &mdash; and represents the average price
+paid by everyone who has traded since that moment. Price above
+the AVWAP from a low means the average buyer since the low is in
+profit; price falling through it means they are not, and their
+behavior changes.</p>
+<ul>
+<li>Anchor at the most significant recent swing low and swing
+high. Price between them is contested; price above the
+high-anchored AVWAP is in a position where even the top-tickers
+are back in profit.</li>
+<li><strong>The pinch</strong>: when the AVWAP from a high and
+the AVWAP from a low converge, the average buyer and average
+seller are at the same price. Breakouts from a pinch are
+directional and fast.</li>
+<li>Pullbacks to a rising AVWAP from a major low are the
+swing-trade buy; the first close below it after a long uptrend
+is the swing-trade exit.</li>
+</ul>
+<p class="trapline"><strong>Trap:</strong> Anchoring to arbitrary
+points. The anchor has to be a moment when a large group of
+participants entered; a random Tuesday is not one.</p>
+</div>
+
+<div class="tech">
+<h4>VWAP standard-deviation bands</h4>
+<p class="origin">Floor and institutional desks; formalized in
+Brett Steenbarger's and others' intraday work (2000s).</p>
+<p>Bands at one and two standard deviations of price around the
+session (or anchored) VWAP. Unlike Bollinger Bands, which are
+centered on a moving average, these are centered on the actual
+volume-weighted average price, so a touch of the second band
+means the market is two deviations from where the average
+participant transacted.</p>
+<ul>
+<li>Intraday reversion: fade the second band back toward VWAP
+when the session is range-bound (Choppiness above 61.8 or
+Efficiency Ratio low).</li>
+<li>Intraday trend: price holding above the first band all
+session is a trend day; do not fade it.</li>
+<li>The first band acts as support on trend days &mdash; buy the
+pullback to +1&sigma;, stop below VWAP.</li>
+</ul>
+<p class="trapline"><strong>Trap:</strong> Fading the second band
+on a trend day. The bands expand with the trend and the fade is a
+fade of the day's entire direction.</p>
+</div>
+
+<div class="tech">
+<h4>Volume Profile: POC, value area, naked POC</h4>
+<p class="origin">Peter Steidlmayer's Market Profile (CBOT,
+1980s); Jim Dalton, <em>Mind Over Markets</em> (1990).</p>
+<p>A histogram of volume by price instead of by time. The
+<strong>point of control</strong> (POC) is the price with the
+most volume; the <strong>value area</strong> is the range
+containing 70% of the volume around it. High-volume nodes are
+prices the market agreed on; low-volume nodes are prices it
+rejected &mdash; and price moves fast through rejected zones and
+slow through accepted ones.</p>
+<ul>
+<li>Session profile: trade rotations inside the value area; treat
+its edges as the reference levels.</li>
+<li><strong>Naked POC</strong>: a prior session's POC that price
+has not revisited. It acts as a magnet &mdash; a large fraction
+of naked POCs get tested within a few sessions.</li>
+<li>Low-volume nodes between two high-volume nodes are the fast
+lanes; a breakout through one usually runs to the next
+high-volume node before pausing.</li>
+<li>Composite profiles over weeks identify the big value areas
+that daily traders cannot see.</li>
+</ul>
+<p class="trapline"><strong>Trap:</strong> A profile built from a
+single venue's volume in a market where volume is spread across a
+dozen. Aggregate first, or use the venue that leads.</p>
+</div>
+
+<div class="tech">
+<h4>The 80% rule</h4>
+<p class="origin">Dalton (1990), from Market Profile
+floor practice.</p>
+<p>If a session opens outside the previous session's value area
+and then re-enters it, and holds inside for two consecutive
+half-hour periods, there is roughly an 80% chance (Dalton's
+figure, from floor observation) that price traverses the entire
+value area to the opposite side. The logic: the open outside
+value was a failed auction; the return to value means the market
+has accepted the old range, and it rotates through it.</p>
+<ul>
+<li>Requires: open outside prior value area; price re-enters;
+two consecutive 30-minute bars close inside.</li>
+<li>Entry on the second close inside; target the far edge of the
+value area; stop back outside the near edge.</li>
+<li>For 24-hour markets, define the "session" by your chosen
+anchor (Chapter 8) and use the prior session's profile as the
+value area.</li>
+</ul>
+<p class="trapline"><strong>Trap:</strong> Applying it after the
+first bar back inside. The two-period acceptance is the whole
+rule; one bar inside is often a probe before the
+trend resumes.</p>
+</div>
+
+<div class="tech">
+<h4>Cumulative Volume Delta: absorption and exhaustion</h4>
+<p class="origin">Order-flow desks and footprint-chart
+practitioners (2010s); Bookmap and Sierra Chart
+communities.</p>
+<p>Delta is the volume executed at the ask (aggressive buys)
+minus the volume executed at the bid (aggressive sells), per bar.
+CVD is its running total. It tells you who is
+<em>initiating</em>. Price tells you who is winning. When they
+disagree, something is being absorbed.</p>
+<ul>
+<li><strong>Absorption</strong>: CVD rising sharply while price
+does not advance. Aggressive buyers are hitting a wall of
+passive sellers. Bearish &mdash; when the aggressors give up,
+there is nothing holding price.</li>
+<li><strong>Exhaustion</strong>: a very large delta spike at a
+new extreme followed by no follow-through. The last aggressive
+participants have entered. Reversal setup, especially with an
+SFP (Chapter 9).</li>
+<li><strong>Divergence</strong>: price higher high, CVD lower
+high. The second high was made with fewer aggressors.
+Weakness.</li>
+<li>Build CVD from spot trades on a liquid venue, where the
+taker side is reported per trade.</li>
+</ul>
+<p class="trapline"><strong>Trap:</strong> CVD from a venue where
+you cannot tell taker side reliably. Tick-rule classification
+(uptick = buy) is a poor substitute in a market that prints
+inside the spread.</p>
+</div>
+
+<div class="tech">
+<h4>OBV trendlines</h4>
+<p class="origin">Joseph Granville, <em>Granville's New Key to
+Stock Market Profits</em> (1963).</p>
+<p>On-Balance Volume adds the bar's volume on up-closes and
+subtracts it on down-closes. Granville's actual technique was not
+divergence; it was drawing trendlines and support/resistance on
+OBV itself and trading their breaks, on the theory that volume
+leads price. He was frequently right and frequently early.</p>
+<ul>
+<li>Draw trendlines on OBV as on price. An OBV trendline break
+with price still inside its own line is the signal; expect
+price to follow within a few bars.</li>
+<li>OBV making a new high while price is still below its prior
+high is Granville's strongest buy &mdash; accumulation
+completed before the breakout.</li>
+<li>Smooth OBV with a short moving average on thin symbols to
+prevent one block from dominating.</li>
+</ul>
+<p class="trapline"><strong>Trap:</strong> OBV's level is
+path-dependent and arbitrary; only its shape and slope mean
+anything. Never compare OBV values across symbols or across a
+data gap.</p>
+</div>
+
+<div class="tech">
+<h4>Weis Wave</h4>
+<p class="origin">David Weis, <em>Trades About to Happen</em>
+(2013); Wyckoff's "wave volume" made mechanical.</p>
+<p>Bar volume is noise. Weis accumulated volume across each
+<em>swing</em> &mdash; every up-wave and down-wave defined by a
+zigzag &mdash; and compared the totals. Effort (wave volume)
+versus result (wave length) is Wyckoff's central idea, and the
+Weis Wave is the only indicator that measures it directly.</p>
+<ul>
+<li>Define waves with a zigzag of a chosen reversal size (an ATR
+multiple). Sum the volume within each wave; plot as a
+histogram, up-waves and down-waves distinguished.</li>
+<li>Shrinking volume on successive up-waves in a rally: demand is
+fading. Large volume on a down-wave that travels a short
+distance: absorption &mdash; buyers are taking the supply.</li>
+<li>The largest wave volume of the move at a new extreme with
+little price progress is the climax. Expect a test on lower
+wave volume.</li>
+</ul>
+<p class="trapline"><strong>Trap:</strong> A zigzag threshold
+that is too small produces a wave for every wiggle and the volume
+comparison means nothing. Size the reversal to your trading
+timeframe's swings.</p>
+</div>
+
+<div class="tech">
+<h4>Market Profile: initial balance, day types, and
+unfinished business</h4>
+<p class="origin">Steidlmayer; Dalton, <em>Mind Over
+Markets</em> (1990) and <em>Markets in Profile</em>
+(2007).</p>
+<p>Beyond the POC and value area (previous cards), the profile
+carries a set of structural tells about who is participating and
+what is left undone.</p>
+<ul>
+<li><strong>Initial balance</strong>: the range of the first
+hour. A day that extends beyond it has "other-timeframe"
+participation; the size and direction of the extension classify
+the day.</li>
+<li><strong>Day types</strong>: normal (wide IB, little
+extension), trend (narrow IB, one-directional extension all day
+&mdash; do not fade), neutral (extension both ways &mdash; fade
+the edges), double-distribution (two value areas separated by
+single prints &mdash; trade the gap between them).</li>
+<li><strong>P and b shapes</strong>: a profile shaped like a P is
+short covering (volume concentrated high after a rally); a b is
+long liquidation. Both are one-sided auctions that tend to be
+followed by a return toward the thin side.</li>
+<li><strong>Single prints</strong>: a stretch of the profile only
+one TPO wide &mdash; price moved through it fast. It is likely
+to be revisited. <strong>Poor highs and lows</strong>: a flat
+extreme with several TPOs at the same price &mdash; an
+unfinished auction, likely to be repaired.
+<strong>Excess</strong>: a single-print tail at the extreme
+&mdash; a finished auction, likely to hold.</li>
+</ul>
+<p class="trapline"><strong>Trap:</strong> Trading a poor high as
+a target on the same day it forms. Repairs happen, but on their
+own schedule; the poor high is a level to carry forward, not
+a promise.</p>
+</div>
+
+<div class="tech">
+<h4>Footprint patterns: stacked imbalances and unfinished
+auctions</h4>
+<p class="origin">Order-flow practitioners on footprint charts
+(2010s).</p>
+<p>A footprint bar shows volume traded at the bid and at the ask,
+per price level. Two patterns have earned their reputation.</p>
+<ul>
+<li><strong>Stacked imbalances</strong>: at three or more
+consecutive price levels, ask volume exceeds the diagonally
+adjacent bid volume by 300% or more (or the reverse).
+Aggressive participants stepped in with size across several
+ticks. The zone acts as support on a retest; if it fails, those
+participants are trapped and the move accelerates.</li>
+<li><strong>Unfinished auction</strong>: the bar's high (or low)
+has volume on both sides &mdash; no zero print at the extreme.
+The auction did not complete; price tends to return to that
+level. A finished auction has a zero on the ask at the
+high.</li>
+<li><strong>Delta at the extreme</strong>: a bar closing at its
+high with negative delta &mdash; aggressive sellers, and price
+rose anyway &mdash; is absorption by passive buyers. Bullish.
+The mirror is bearish.</li>
+</ul>
+<p class="trapline"><strong>Trap:</strong> The imbalance
+threshold. 300% at a level with 12 contracts is noise; at 1,200
+it is a participant. Require a minimum absolute size.</p>
+</div>
+
+<div class="tech">
+<h4>Reading the order-book heatmap</h4>
+<p class="origin">Bookmap and Jigsaw communities (2010s).</p>
+<p>A heatmap plots resting limit-order size at each price over
+time. It is the only view that shows <em>intent</em> &mdash;
+what participants are willing to do &mdash; rather than what they
+did. Most of that intent is theater, which is what makes
+it readable.</p>
+<ul>
+<li><strong>Walls</strong> that appear as price approaches and
+vanish as it arrives are spoofs; the tell is the pull. Walls
+that stay and absorb are real, and price usually rejects them
+on first contact.</li>
+<li><strong>Icebergs</strong>: executed volume at a level far
+exceeds what was displayed, and the displayed size refreshes.
+Someone is working a large order passively. Price tends to hold
+that level until the iceberg is done, then move fast.</li>
+<li><strong>Vacuum</strong>: a stretch of price with almost no
+resting orders. When price enters it, it moves through fast
+&mdash; the low-volume node of the profile, seen from the
+book side.</li>
+</ul>
+<p class="trapline"><strong>Trap:</strong> Trading against a wall
+because it "must" hold. Walls are pulled in milliseconds. Trade
+the pull (a fade of the level fails) or the absorption (executed
+volume with no movement), never the display.</p>
+</div>
+
+<div class="tech">
+<h4>Point and Figure counts</h4>
+<p class="origin">Victor de Villiers (1933); A.W. Cohen (1947);
+Thomas Dorsey, <em>Point and Figure Charting</em> (1995).</p>
+<p>Point and Figure removes time entirely and records only
+reversals of a chosen size. Its unique contribution is the
+<strong>count</strong> &mdash; a price target derived from the
+size of the base, on the principle that the energy stored in a
+consolidation is proportional to its width.</p>
+<ul>
+<li>Box size: 1&ndash;3% of price, or an ATR fraction. Reversal:
+three boxes.</li>
+<li><strong>Vertical count</strong>: after a bottom, count the
+boxes in the first up-column. Target = low + (boxes &times; 3
+&times; box size).</li>
+<li><strong>Horizontal count</strong>: measure the width of the
+base in columns. Target = low + (columns &times; 3 &times; box
+size). The horizontal count is the one Cohen trusted for
+large moves.</li>
+<li>A count is activated on the breakout above the base and
+cancelled if price breaks the base's low.</li>
+</ul>
+<p class="trapline"><strong>Trap:</strong> Counting a base that
+is not one. The horizontal count needs a clean, bounded
+consolidation; a sloping mess of columns produces a number with
+no meaning.</p>
+</div>
+
+<!-- ============================================ -->
+<!-- CHAPTER 11 -->
+<!-- ============================================ -->
+<h2 id="ch11">Chapter 11 &mdash; DeMark Counts and Lines</h2>
+
+<p><strong>Tom DeMark</strong>'s indicators were built for
+institutional clients and published in <em>The New Science of
+Technical Analysis</em> (1994) and <em>DeMark on Day Trading
+Options</em> (1999), both dense and expensive. TD Sequential in
+particular has spread widely through social-media chart analysis,
+usually with the rules garbled. These are the actual rules.</p>
+
+<div class="tech">
+<h4>TD Sequential &mdash; Setup</h4>
+<p class="origin">DeMark (1994).</p>
+<p>A trend-exhaustion count. A <strong>buy setup</strong> is nine
+consecutive bars, each closing below the close four bars earlier.
+A <strong>sell setup</strong> is nine consecutive closes above the
+close four bars earlier. The count measures persistence of
+directional closing, not magnitude, and completes when the
+persistence has run long enough to be unusual.</p>
+<ul>
+<li>Count begins after a "price flip": a close below the close
+four bars earlier that follows a close above the close four
+bars earlier (for a buy setup).</li>
+<li>Nine consecutive qualifying closes complete the setup.
+Interrupted counts restart.</li>
+<li><strong>Perfection</strong>: a buy setup is perfected when the
+low of bar 8 or bar 9 is below the lows of bars 6 and 7.
+Unperfected setups often extend.</li>
+<li>A completed 9 is a pause-or-reverse warning, not an entry.
+Most 9s produce a one-to-four-bar reaction. Trade the reaction;
+do not assume the trend has ended.</li>
+</ul>
+<p class="trapline"><strong>Trap:</strong> Treating every 9 as a
+reversal. DeMark's statistics show the 9 is a reaction signal;
+the reversal signal is the 13.</p>
+</div>
+
+<div class="tech">
+<h4>TDST and Countdown</h4>
+<p class="origin">DeMark (1994).</p>
+<p><strong>TDST</strong> (TD Setup Trend) is the extreme of the
+completed setup: the highest high of a buy setup's nine bars is
+TDST resistance; the lowest low of a sell setup is TDST support.
+A close beyond TDST means the trend has continued through
+exhaustion &mdash; and cancels the setup's reversal implication.
+<strong>Countdown</strong> begins after a completed setup and is
+the real exhaustion count.</p>
+<ul>
+<li>Buy countdown: after a buy setup completes, count bars that
+close at or below the <em>low two bars earlier</em>. Bars need
+not be consecutive. Thirteen completes it.</li>
+<li>Countdown 13 is DeMark's reversal signal. Enter on a
+subsequent price flip (close above the close four bars earlier)
+or on a TD Sequential "9-13-9" &mdash; a new setup in the
+opposite direction.</li>
+<li>Cancellation: a close above TDST resistance during a buy
+countdown cancels it. A new sell setup completing also
+cancels it.</li>
+<li>TD Combo: the same count starting from bar 1 of the setup
+with stricter conditions (close below prior close, low below
+prior low, close below low two bars earlier). Faster,
+rarer.</li>
+</ul>
+<p class="trapline"><strong>Trap:</strong> Counting Countdown as
+consecutive bars. It is not; the 13 can take fifty bars to
+arrive, and that is when it matters most.</p>
+</div>
+
+<div class="tech">
+<h4>TD Lines</h4>
+<p class="origin">DeMark (1994).</p>
+<p>Conventional trendlines are subjective. TD Lines are drawn
+through <strong>TD Points</strong> &mdash; a TD Point Low is a
+low with a higher low on each side (level 1); level 2 requires
+two higher lows on each side. A TD Demand Line connects the two
+most recent TD Point Lows, drawn from right to left, so it
+always uses the most recent structure. TD Supply Lines connect
+TD Point Highs.</p>
+<ul>
+<li>Draw only through the two most recent TD Points of the chosen
+level. When a new TD Point forms, redraw.</li>
+<li><strong>Breakout qualifiers</strong>: DeMark accepted an
+upside break of a supply line only if, for example, the
+previous bar's close was a down close (the break comes from
+weakness, trapping shorts), or the open gapped above the line
+and above the prior close. Unqualified breaks are ignored.</li>
+<li>Price objective: the distance from the line to the lowest low
+beneath it (for a supply-line break), projected from the
+breakout point.</li>
+</ul>
+<p class="trapline"><strong>Trap:</strong> Drawing TD Lines
+through level-1 points on a noisy timeframe. Level 2 or higher
+on daily bars is where the objectivity actually reduces
+false breaks.</p>
+</div>
+
+<div class="tech">
+<h4>TD REI and DeMarker</h4>
+<p class="origin">DeMark (1994).</p>
+<p>Two DeMark oscillators built from bar-to-bar range comparisons
+rather than closes. The <strong>Range Expansion Index</strong>
+sums the changes in highs and lows over five bars, with a
+condition that suppresses the reading in a fast trend so that it
+does not register overbought while price is running. The
+<strong>DeMarker</strong> compares the sum of upward high-to-high
+moves against the total of up and down moves over 13 bars.
+DeMark's distinctive rule for both is about
+<em>duration</em>.</p>
+<ul>
+<li>REI: readings above roughly +45 are overbought, below
+&minus;45 oversold. A reading that stays past the threshold for
+six bars or more is a trend, and the signal is the <em>exit</em>
+from the zone, not the entry into it.</li>
+<li>DeMarker: 13 periods; 0.30 and 0.70. Same duration rule:
+brief extremes reverse; prolonged extremes trend.</li>
+<li>Both are meant to be read with TD Sequential &mdash; an REI
+extreme coinciding with a setup 9 is the confluence DeMark
+looked for.</li>
+</ul>
+<p class="trapline"><strong>Trap:</strong> Fading a prolonged
+reading. DeMark's whole point with these two was that an
+oscillator stuck at an extreme is the strongest trend signal
+there is.</p>
+</div>
+
+<!-- ============================================ -->
+<!-- CHAPTER 12 -->
+<!-- ============================================ -->
+<h2 id="ch12">Chapter 12 &mdash; Median Lines and Geometry</h2>
+
+<div class="tech">
+<h4>Andrews' Pitchfork and Hagopian's rule</h4>
+<p class="origin">Alan Andrews, "Action-Reaction" course
+(1960s&ndash;70s); documented by Patrick Mikula,
+<em>The Best Trendline Methods of Alan Andrews</em>
+(2002).</p>
+<p>Three pivots: A (a significant extreme), B and C (the next
+swing high and low, or low and high). The median line runs from A
+through the midpoint of BC; parallels through B and C form the
+fork. Andrews' claim was that price returns to the median line
+about 80% of the time &mdash; which makes the median line the
+target, and the failure to reach it the more interesting
+signal.</p>
+<ul>
+<li>Draw A-B-C on the timeframe of the move you are trading. The
+median line is the expected path of the trend's center.</li>
+<li>Price reaching the median line: expect a reaction. Price
+reaching the upper parallel: expect a larger reaction or
+a break.</li>
+<li><strong>Hagopian's rule</strong> (George Hagopian, Andrews'
+student): if price fails to reach the median line and reverses,
+it will travel <em>farther</em> in the reverse direction than
+it moved before the failure. The failure to reach is
+a trade.</li>
+<li><strong>Warning lines</strong>: parallels at one and two
+fork-widths beyond the outer parallels, for markets that
+overshoot the fork.</li>
+<li>Schiff variant: shift A halfway toward B (in price) for
+steep moves; modified Schiff shifts it halfway in both price
+and time.</li>
+</ul>
+<p class="trapline"><strong>Trap:</strong> Choosing pivots to
+make the fork fit. The pivots are the last three significant
+swings, chosen before you look at whether the fork "works."</p>
+</div>
+
+<div class="tech">
+<h4>Fibonacci confluence clusters</h4>
+<p class="origin">Desk practice; systematized by Robert Fischer,
+<em>Fibonacci Applications and Strategies for Traders</em>
+(1993), and Carolyn Boroden's work (2000s).</p>
+<p>A single retracement level is a coin flip. A price where a
+retracement of one swing, an extension of another, and a prior
+structural level all fall within a small band is not &mdash;
+because participants using each of the three methods converge
+there. The technique is the cluster, not the ratio.</p>
+<ul>
+<li>Compute 0.382/0.5/0.618/0.786 retracements of the last two
+or three swings, and 1.272/1.618 extensions of the last
+completed swing. Overlay prior swing highs and lows and the
+AVWAPs (Chapter 10).</li>
+<li>A cluster is three or more levels within roughly half an ATR.
+Trade the cluster with a stop beyond the far edge of
+the band.</li>
+<li>Boroden's timing addition: project Fibonacci ratios of the
+<em>duration</em> of prior swings forward in time; a price
+cluster arriving at a time cluster is the highest-confidence
+version.</li>
+</ul>
+<p class="trapline"><strong>Trap:</strong> Enough swings produce
+a level everywhere. Limit the swings to the last two or three
+significant ones on your trading timeframe, and require a
+structural level in the cluster, not just ratios.</p>
+</div>
+
+<div class="tech">
+<h4>Measured moves and AB=CD</h4>
+<p class="origin">Old chartist practice; the AB=CD form from
+H.M. Gartley, <em>Profits in the Stock Market</em> (1935),
+revived by Scott Carney.</p>
+<p>Corrective swings tend to reproduce the size of the prior
+impulse. AB=CD: a swing AB, a retracement BC, and a projected
+swing CD equal in length to AB (or 1.272 or 1.618 times it). The
+pattern gives a target for the trend and a reversal zone at
+its end.</p>
+<ul>
+<li>Identify AB (impulse) and BC (retracement of
+0.382&ndash;0.786). Project CD = AB from C.</li>
+<li>Completion zone: where CD = AB coincides with a cluster
+(previous card). That is the reversal zone; Gartley's version
+adds a 0.786 retracement of the larger XA leg at D.</li>
+<li>Time symmetry: Gartley expected CD to take roughly as long as
+AB. A CD that arrives much faster tends to overshoot to 1.272
+or 1.618.</li>
+</ul>
+<p class="trapline"><strong>Trap:</strong> Trading the completion
+zone without a reversal trigger. The zone is where to look for an
+SFP or a VSA bar; it is not the entry by itself.</p>
+</div>
+
+<div class="tech">
+<h4>Floor pivots and the Camarilla equation</h4>
+<p class="origin">Floor pivots: CBOT floor tradition. Camarilla:
+Nick Scott (1989).</p>
+<p>Both derive intraday levels from the prior session's high,
+low, and close. Floor pivots are the ones every platform draws.
+The Camarilla levels are less known and were built for a
+different purpose: the inner levels are for <em>fading</em>, the
+outer levels for breakouts.</p>
+<ul>
+<li>Floor: P = (H + L + C) / 3; R1 = 2P &minus; L;
+S1 = 2P &minus; H; R2 = P + (H &minus; L);
+S2 = P &minus; (H &minus; L). Trade rotations between S1 and
+R1 on range days; a break of R2 or S2 is a trend day.</li>
+<li>Camarilla: H3 = C + (H &minus; L) &times; 1.1 / 4;
+H4 = C + (H &minus; L) &times; 1.1 / 2; L3 and L4 mirror.
+Scott's rules: sell at H3 with a stop above H4; buy at L3 with
+a stop below L4. If H4 breaks, go long the breakout; if L4
+breaks, short it.</li>
+<li>The 1.1 factor and the 4 and 2 divisors are Scott's; they
+place H3/L3 at about 27% of the prior range from the close and
+H4/L4 at about 55%.</li>
+</ul>
+<p class="trapline"><strong>Trap:</strong> Fading H3 on a day
+that opens above it. Scott's levels assume the open is inside the
+H3&ndash;L3 band; an open outside it is already
+a breakout.</p>
+</div>
+
+<div class="tech">
+<h4>The harmonic zoo: Bat, Butterfly, Crab</h4>
+<p class="origin">Scott Carney, <em>The Harmonic Trader</em>
+(1999) and <em>Harmonic Trading</em> (2004&ndash;2010),
+extending Gartley.</p>
+<p>Carney's contribution was to notice that the Gartley's ratios
+were one case of a family, and to catalogue the others by where
+point D &mdash; the completion &mdash; falls relative to the XA
+leg. Each pattern is a five-point structure (X-A-B-C-D) with a
+specific B retracement and a specific D completion.</p>
+<ul>
+<li><strong>Bat</strong>: B retraces 0.382&ndash;0.50 of XA; D
+completes at 0.886 of XA. The shallowest B; D lands just short
+of X.</li>
+<li><strong>Butterfly</strong>: B at 0.786 of XA; D
+<em>extends</em> beyond X to 1.27 (up to 1.618) of XA. A
+failed-breakout structure.</li>
+<li><strong>Crab</strong>: B at 0.382&ndash;0.618; D at 1.618 of
+XA &mdash; the most extreme extension, and Carney's
+highest-reward pattern because the reversal zone is so far from
+the structure.</li>
+<li>All complete at a cluster (Chapter 12's confluence card) and
+all require a reversal trigger at D &mdash; an SFP, a VSA bar,
+or a divergence &mdash; before entry.</li>
+</ul>
+<p class="trapline"><strong>Trap:</strong> Ratio-fitting. With
+tolerances of a few percent on four ratios, some pattern matches
+almost any five swings. Carney's own rule was that the B ratio
+must be precise; if B is wrong, the pattern is not there.</p>
+</div>
+
+<!-- ============================================ -->
+<!-- CHAPTER 13 -->
+<!-- ============================================ -->
+<h2 id="ch13">Chapter 13 &mdash; Exits Nobody Talks About</h2>
+
+<p><strong>Chuck LeBeau</strong> spent his career arguing that
+exits matter more than entries and that almost nobody studies
+them. He was right on both counts. These are the exits from his
+work and from <strong>Cynthia Kase</strong>'s, plus
+<strong>Larry Williams</strong>' single most useful
+contribution.</p>
+
+<div class="tech">
+<h4>The Chandelier exit</h4>
+<p class="origin">Chuck LeBeau, <em>Technical Traders Guide to
+Computer Analysis of the Futures Market</em> (1992) and
+later newsletters.</p>
+<p>A trailing stop hung from the highest high since entry, at a
+multiple of ATR below it. Because it hangs from the extreme
+rather than from the close, it does not tighten on a single wide
+up-bar and it never moves down.</p>
+<ul>
+<li>Stop = highest high since entry &minus; 3 &times; ATR(22).
+LeBeau's default; he tested 2.5 to 4.</li>
+<li>Recalculate each bar; the stop only ratchets upward.</li>
+<li>For a mean-reversion trade, do not use it; for trend trades
+it is the best general-purpose trailing exit in the
+literature.</li>
+</ul>
+<p class="trapline"><strong>Trap:</strong> A multiple below 2.5
+in a volatile market. Normal pullbacks in a healthy trend run two
+to three ATRs, and a tight chandelier exits on every one.</p>
+</div>
+
+<div class="tech">
+<h4>The Yo-Yo exit</h4>
+<p class="origin">LeBeau.</p>
+<p>The Chandelier's blind spot: a sudden reversal from a high
+that does not reach the stop for many bars while the trend is
+clearly over. The Yo-Yo hangs the stop from the most recent
+<em>close</em> instead of the highest high, so a sharp adverse
+bar exits immediately.</p>
+<ul>
+<li>Stop = previous close &minus; 2 &times; ATR(10) (for longs).
+Recomputed each bar from that bar's close; it can move down as
+well as up.</li>
+<li>Run it alongside the Chandelier and exit on whichever
+triggers first. The Chandelier catches the slow bleed; the
+Yo-Yo catches the shock.</li>
+</ul>
+<p class="trapline"><strong>Trap:</strong> Using the Yo-Yo alone.
+Because it can move down, it is not a trailing stop and will let
+a slow reversal run.</p>
+</div>
+
+<div class="tech">
+<h4>Kase DevStop</h4>
+<p class="origin">Cynthia Kase, <em>Trading With the Odds</em>
+(1996).</p>
+<p>Kase's observation: the adverse excursion of a trend, measured
+over two-bar ranges, is roughly normally distributed once you
+correct for skew. So the stop should sit at one, two, or three
+standard deviations of that excursion below the trend &mdash;
+with the number of deviations set by how much you are willing to
+be shaken out.</p>
+<ul>
+<li>Compute the two-bar true range over a 30-bar window; take its
+mean and standard deviation. Stops at mean + 1&sigma;, +
+2&sigma;, + 3&sigma; below the highest close (longs).</li>
+<li>Kase's warning line at 1&sigma;: reduce size. The 2&sigma;
+stop for normal exits; the 3&sigma; stop as the never-cross
+line.</li>
+<li>The skew correction (Kase applied a factor for the log-normal
+shape) is what makes the 3&sigma; line rarely hit
+by noise.</li>
+</ul>
+<p class="trapline"><strong>Trap:</strong> Placing full size at
+the 1&sigma; line. Kase designed the ladder for scaling out, not
+for a single exit.</p>
+</div>
+
+<div class="tech">
+<h4>The bailout exit</h4>
+<p class="origin">Larry Williams (1999).</p>
+<p>For short-term pattern trades (Chapters 8, 9, 14), Williams'
+rule was to exit at the <strong>first profitable open</strong>
+&mdash; the first session that opens above your entry. It sounds
+too simple. It works because short-term patterns capture a
+one-to-two-bar edge, and holding past the first profitable open
+is holding for a different, weaker edge.</p>
+<ul>
+<li>Enter on the pattern. At each subsequent session open, if the
+trade is profitable, exit at the open.</li>
+<li>If not yet profitable, hold with the pattern's stop. Williams
+also used a time stop of a few bars.</li>
+<li>In a 24-hour market, define the "open" as your session anchor
+(Chapter 8).</li>
+</ul>
+<p class="trapline"><strong>Trap:</strong> Using the bailout on a
+trend entry. It will exit every trend trade on bar two.</p>
+</div>
+
+<div class="tech">
+<h4>Parabolic SAR tuning and Wilder's Volatility System</h4>
+<p class="origin">Wilder (1978).</p>
+<p>The Parabolic SAR is a stop that accelerates: it starts a set
+distance from the entry extreme and moves toward price faster the
+longer the trend runs, on the theory that time in a trend is
+borrowed. The defaults (acceleration 0.02, step 0.02, maximum
+0.20) are Wilder's for commodities in the 1970s. Wilder's
+less-known <strong>Volatility System</strong> is simpler and, in
+his own tests, better.</p>
+<ul>
+<li>SAR tuning: lower the maximum (0.10) for swing trades that
+should survive pullbacks; raise the initial step
+(0.03&ndash;0.04) for markets that trend fast and reverse fast.
+The maximum is the parameter that matters.</li>
+<li>Volatility System: ARC = 3 &times; ATR(7) (Wilder tested
+2.8&ndash;3.1). The stop is the most extreme close in your
+favor since entry, minus the ARC (for longs). Reverse
+when hit.</li>
+<li>Wilder ran both always-in &mdash; the stop was also the
+reversal entry. Modern use is to take the stop and re-enter on
+a separate signal.</li>
+</ul>
+<p class="trapline"><strong>Trap:</strong> Parabolic SAR in a
+range. It reverses every few bars by design and will lose on
+nearly all of them; it is a trend-only exit.</p>
+</div>
+
+<div class="tech">
+<h4>Maximum Adverse Excursion</h4>
+<p class="origin">John Sweeney, <em>Maximum Adverse Excursion:
+Analyzing Price Fluctuations for Trading Management</em>
+(1996).</p>
+<p>The stop level should come from your own trades, not from the
+chart. Sweeney's method: for every closed trade, record the worst
+point it reached against you before it closed (the MAE). Plot the
+MAEs of winners and losers separately. Winners cluster at small
+MAEs &mdash; they rarely go far against you before working.
+Beyond some MAE, almost no winners exist. That is your stop, and
+it was derived from evidence rather than from a swing low.</p>
+<ul>
+<li>Log MAE (and its mirror, maximum favorable excursion) in ATR
+units for every trade. Needs at least a hundred trades to be
+meaningful.</li>
+<li>Find the MAE beyond which fewer than, say, 10% of winners
+went. Place the stop there. Trades exceeding it were
+overwhelmingly going to lose anyway.</li>
+<li>MFE gives the target the same way: the level most winners
+reached before giving back. Set a scale-out there.</li>
+<li>Rerun the analysis per setup; the Turtle Soup has a different
+MAE profile from the Holy Grail.</li>
+</ul>
+<p class="trapline"><strong>Trap:</strong> Mixing regimes. An MAE
+distribution built in a quiet year sets stops that get hit by
+noise in a volatile one. Express it in ATR units and rebuild
+it periodically.</p>
+</div>
+
+<!-- ============================================ -->
+<!-- CHAPTER 14 -->
+<!-- ============================================ -->
+<h2 id="ch14">Chapter 14 &mdash; Short-Term Rhythm Methods</h2>
+
+<p>These are the methods built around a recurring one-to-three-bar
+rhythm: the tendency of a session that extends hard in one
+direction to be followed by a session that gives some of it back,
+and the tendency of that rhythm to persist for a few cycles. The
+oldest is <strong>George Douglass Taylor</strong>'s, from a course
+he mimeographed in 1950. Most of the others descend from it.</p>
+
+<div class="tech">
+<h4>The Taylor Trading Technique</h4>
+<p class="origin">George Douglass Taylor, <em>The Taylor Trading
+Technique</em> (1950); reinterpreted by Raschke and by George
+Angell.</p>
+<p>Taylor's premise was that markets rotate through a
+three-session rhythm &mdash; a <strong>Buy day</strong>, a
+<strong>Sell day</strong>, and a <strong>Sell-Short day</strong>
+&mdash; driven by the way large operators accumulate on weakness
+and distribute on strength. The count is kept in a "book" and
+re-anchored to the rhythm of lows. The method is dense; the
+usable core is this:</p>
+<ul>
+<li>Buy day: expect a low early in the session, ideally after
+price violates the prior session's low and fails to follow
+through. Buy that failure. Objective: a rally toward the
+prior high.</li>
+<li>Sell day: sell the long into strength, ideally above the Buy
+day's high. Do not initiate shorts.</li>
+<li>Sell-Short day: expect a high early, ideally after price
+exceeds the Sell day's high and fails. Short the failure. Cover
+on a decline toward the Buy day's low.</li>
+<li>Recount when the rhythm breaks: the next session that makes a
+low first, then rallies, is a new Buy day.</li>
+</ul>
+<p class="trapline"><strong>Trap:</strong> Forcing the count.
+Taylor's own book is full of exceptions; the method is a rhythm
+to read, not a calendar to obey, and it fails outright in strong
+trends.</p>
+</div>
+
+<div class="tech">
+<h4>Momentum Pinball</h4>
+<p class="origin">Raschke and Connors, <em>Street Smarts</em>
+(1995).</p>
+<p>A Taylor-style two-day pattern with a mechanical trigger. The
+indicator is a 3-period RSI of the one-day rate of change &mdash;
+Raschke called it the LBR/RSI &mdash; which is deliberately
+hypersensitive. An extreme reading identifies a session whose
+excess is likely to be given back the following session.</p>
+<ul>
+<li>Compute the one-bar rate of change; compute a 3-period RSI of
+that series.</li>
+<li>Reading below 30 at the close: buy setup for the next
+session. Buy a break above the first sub-period's high (Raschke
+used the first hour on daily bars); stop below that
+sub-period's low.</li>
+<li>Reading above 70: sell setup, mirror.</li>
+<li>Exit at the close of the entry session, or hold overnight and
+exit at the first profitable open (Chapter 13) if the session
+closed strongly in your favor.</li>
+</ul>
+<p class="trapline"><strong>Trap:</strong> Trading the setup
+without the trigger. The reading identifies the session; the
+break of the first sub-period is what confirms the excess is
+reversing rather than continuing.</p>
+</div>
+
+<div class="tech">
+<h4>The 80-20s</h4>
+<p class="origin">Raschke and Connors (1995), building on Taylor
+and on Steve Moore's statistical work.</p>
+<p>A session that opens in the top 20% of its range and closes in
+the bottom 20% (or the reverse) has traveled nearly its whole
+range in one direction. Moore's statistics showed that the next
+session frequently reverses part of that move &mdash; but only
+after first extending it, which is the trap for early faders and
+the setup for this trade.</p>
+<ul>
+<li>Setup bar: open in the top 20% of the range, close in the
+bottom 20%, and the range should be larger than average.</li>
+<li>Next session: wait for price to trade a small amount
+<em>below</em> the setup bar's low. Then place a buy stop at
+the setup bar's low. You are buying the failure of
+the continuation.</li>
+<li>Stop below the new session's low. Exit at the close.</li>
+<li>Mirror for the sell side: open in the bottom 20%, close in
+the top 20%.</li>
+</ul>
+<p class="trapline"><strong>Trap:</strong> Buying the close of
+the setup bar. The edge is in the failed extension the next
+session, not in the setup bar's exhaustion.</p>
+</div>
+
+<div class="tech">
+<h4>Greatest Swing Value</h4>
+<p class="origin">Larry Williams (1999).</p>
+<p>Williams' answer to "how far above the open is a real
+breakout": look at the recent sessions that closed <em>down</em>,
+and measure how far they rallied above their open before failing.
+The average of those failed rallies is the noise. A move beyond
+it, by a margin, is signal.</p>
+<ul>
+<li>Buy swing value: for each of the last four sessions that
+closed below their open, take (high &minus; open). Average
+them.</li>
+<li>Buy stop for the next session at open + 1.8 &times; buy swing
+value. Williams' multiplier; he tested 1.5 to 2.</li>
+<li>Sell swing value: on sessions that closed above the open,
+(open &minus; low). Sell stop at open &minus; 1.8 &times; sell
+swing value.</li>
+<li>Filter with a trend or day-of-week bias and exit at the
+bailout.</li>
+</ul>
+<p class="trapline"><strong>Trap:</strong> Using all sessions
+instead of only the down-closing ones for the buy side. The point
+is to measure how far <em>failed</em> rallies go; including the
+successful ones inflates the threshold.</p>
+</div>
+
+<div class="tech">
+<h4>Larry Williams' Oops!</h4>
+<p class="origin">Williams, <em>How I Made One Million Dollars
+Last Year Trading Commodities</em> (1973); restated
+in 1999.</p>
+<p>A gap-reversal pattern for markets with a session gap. Price
+opens below yesterday's low &mdash; the public sees a breakdown
+and sells the open. If price then trades back <em>above</em>
+yesterday's low, everyone who sold the open is wrong at once, and
+the covering carries price. Williams named it for the sound
+they make.</p>
+<ul>
+<li>Buy Oops: open below the prior session's low. Place a buy
+stop at the prior low. If filled, stop below the session's low;
+exit at the close or the first profitable open.</li>
+<li>Sell Oops: open above the prior high; sell stop at the
+prior high.</li>
+<li>Williams' filter: the gap should be against the direction of
+the prior day's close, and the pattern is stronger on specific
+days of the week per market (next card).</li>
+</ul>
+<p class="trapline"><strong>Trap:</strong> Large gaps. A small gap
+through yesterday's low is a stop run; a large one is news, and
+the Oops entry gets hit and run over.</p>
+</div>
+
+<div class="tech">
+<h4>Trading day of week and day of month</h4>
+<p class="origin">Williams, <em>Long-Term Secrets to Short-Term
+Trading</em> (1999); the "TDW" and "TDM" filters.</p>
+<p>Williams never traded a pattern without first asking which
+days it worked on. His tables showed that short-term patterns in
+stock index futures, bonds, and currencies had markedly different
+results by day of week &mdash; some patterns only paid on two of
+the five &mdash; and by position in the month, with the first few
+and last few trading days behaving differently from the middle.
+The technique is not a trade; it is a filter applied to every
+other card in this guide.</p>
+<ul>
+<li>For any pattern, tabulate results by day of week. If the edge
+is concentrated in two days, trade only those days. A pattern
+that works uniformly across the week is rarer than one that
+does not.</li>
+<li>Repeat by trading day of month (1st through last). Month-end
+and month-start effects persist because of institutional flows
+that do not care about your pattern.</li>
+<li>Combine: Williams' best stock-index results came from a
+specific pattern on a specific weekday in a specific part of
+the month.</li>
+</ul>
+<p class="trapline"><strong>Trap:</strong> Five weekdays times
+twenty-two month-days is 110 cells, and some will look good by
+chance. Require the effect to persist across separate years, and
+keep an honest count of the cells you looked at.</p>
+</div>
+
+<!-- ============================================ -->
+<!-- CHAPTER 15 -->
+<!-- ============================================ -->
+<h2 id="ch15">Chapter 15 &mdash; Breadth, Sentiment,
+and Positioning</h2>
+
+<p>Indicators built from the market rather than from one chart.
+Breadth measures how many issues participate in a move; sentiment
+measures what the crowd is paying for; positioning measures what
+the commercials and the large speculators actually hold. All
+three are slow, all three are equity- or futures-specific, and
+all three catch turns that no single-instrument indicator
+can see.</p>
+
+<div class="tech">
+<h4>Zweig Breadth Thrust</h4>
+<p class="origin">Martin Zweig, <em>Winning on Wall Street</em>
+(1986).</p>
+<p>A 10-day exponential average of the daily ratio of advancing
+issues to advancing plus declining issues. A thrust occurs when
+the average goes from below 0.40 (fewer than 40% of issues
+rising &mdash; a washed-out market) to above 0.615 within ten
+trading days. It is rare &mdash; a few dozen signals since the
+1940s &mdash; and it has one of the best forward-return records
+of any published indicator.</p>
+<ul>
+<li>Compute the ratio daily on NYSE (or the relevant exchange)
+advances and declines; 10-day EMA.</li>
+<li>Signal: the EMA crosses from below 0.40 to above 0.615
+within ten sessions. The window is strict; a slower recovery
+does not count.</li>
+<li>Forward returns after a thrust have historically been
+strongly positive over six to twelve months. Zweig's rule was
+to be fully invested after one.</li>
+</ul>
+<p class="trapline"><strong>Trap:</strong> Thrusts computed on an
+index with few constituents, or on a sector. Zweig's statistics
+are for the broad market.</p>
+</div>
+
+<div class="tech">
+<h4>McClellan Oscillator and Summation Index</h4>
+<p class="origin">Sherman and Marian McClellan (1969); Tom
+McClellan's later work.</p>
+<p>The difference between a 19-day and a 39-day EMA of net
+advances (advances minus declines), usually ratio-adjusted for
+the number of issues. It is a breadth MACD. The Summation Index
+is its running total and measures the market's longer-term
+breadth trend.</p>
+<ul>
+<li>Oscillator above +100: overbought breadth &mdash; but also,
+after a decline, a <strong>breadth thrust</strong> that marks
+the start of a new advance rather than its end. Below
+&minus;100: oversold; a spike below &minus;150 has historically
+marked washouts.</li>
+<li>Divergence: the index at a new high with the oscillator at a
+lower high means fewer stocks are carrying the advance. The
+classic top warning.</li>
+<li>Summation Index: crossing above zero confirms an uptrend in
+breadth; a Summation Index above +1,000 (ratio-adjusted) is a
+strong, broad market.</li>
+</ul>
+<p class="trapline"><strong>Trap:</strong> Reading +100 as a sell
+when it comes off a low. Context decides: the same reading is a
+thrust after a washout and an extreme after a long rally.</p>
+</div>
+
+<div class="tech">
+<h4>The Coppock Curve</h4>
+<p class="origin">Edwin Coppock, <em>Barron's</em>
+(October 1962); commissioned by the Episcopal Church to identify
+long-term buying opportunities.</p>
+<p>Coppock reasoned that bear markets are like bereavements and
+that the average mourning period is eleven to fourteen months.
+So: the sum of an 11-month and a 14-month rate of change,
+smoothed with a 10-month weighted moving average. A buy signal is
+the curve turning up from below zero. It was designed to give
+only buy signals, and it has caught most major bottoms since it
+was published, usually a few months late.</p>
+<ul>
+<li>Monthly closes. Coppock = 10-month WMA of
+(ROC(14) + ROC(11)).</li>
+<li>Buy when the curve turns up from a negative value. Ignore
+turns above zero.</li>
+<li>Variants on weekly and daily data exist; the monthly is the
+one with the track record.</li>
+</ul>
+<p class="trapline"><strong>Trap:</strong> Using it for exits.
+Coppock did not, and the curve's turn down from a high has no
+reliable record.</p>
+</div>
+
+<div class="tech">
+<h4>The Hindenburg Omen</h4>
+<p class="origin">Jim Miekka (1995), building on Norman Fosback's
+split-market work.</p>
+<p>A crash-warning pattern with a memorable name and a poor
+record, included because it is asked about constantly and the
+underlying idea &mdash; a "split market" in which many issues
+make new highs and many make new lows on the same day &mdash; is
+sound even if the trigger is not.</p>
+<ul>
+<li>Conditions (one version): NYSE new 52-week highs and new lows
+each exceed 2.2% of issues; new highs are no more than twice
+new lows; the 50-day average of the index is rising; the
+McClellan Oscillator is negative. Two occurrences within 36
+days confirm.</li>
+<li>Historical record: nearly every crash was preceded by an
+Omen; the great majority of Omens were followed by nothing. It
+is a necessary-not-sufficient condition.</li>
+<li>Use the split-market reading as a risk gauge &mdash; reduce
+size, tighten stops &mdash; and never as a short signal.</li>
+</ul>
+<p class="trapline"><strong>Trap:</strong> Acting on it. Its
+false-positive rate would bankrupt anyone who shorted on every
+signal.</p>
+</div>
+
+<div class="tech">
+<h4>The COT Index</h4>
+<p class="origin">Larry Williams, <em>Trade Stocks and
+Commodities with the Insiders</em> (2005); Steve Briese,
+<em>The Commitments of Traders Bible</em> (2008).</p>
+<p>The CFTC publishes weekly positions of commercial hedgers,
+large speculators, and small traders in every US futures market.
+Commercials are the producers and users of the commodity; they
+are net short most of the time as a hedge, and when their net
+position becomes unusually <em>long</em>, they are seeing
+something. The COT Index normalizes their net position against
+its own history.</p>
+<ul>
+<li>COT Index = (current net &minus; lowest net over the lookback)
+/ (highest net &minus; lowest net) &times; 100. Williams used
+26 weeks; Briese used up to three years.</li>
+<li>Commercial index above 80 = commercials unusually long =
+bullish setup; below 20 = bearish. The large-speculator index
+reads the opposite way.</li>
+<li>It is a setup, not a trigger. Williams paired it with a
+trend-following entry on the price chart; the COT reading told
+him which direction to take breakouts in.</li>
+</ul>
+<p class="trapline"><strong>Trap:</strong> Timing. Commercials
+are early by weeks or months, and an extreme reading can persist
+through a large continuation of the move they are positioned
+against.</p>
+</div>
+
+<div class="tech">
+<h4>Put/call extremes and the VIX term structure</h4>
+<p class="origin">Options-desk practice; Larry McMillan and Jason
+Goepfert (SentimenTrader) on the put/call ratio; the
+term-structure reading from volatility traders (2000s).</p>
+<p>Options prices are the crowd's bill for protection and for
+speculation. Two readings have earned a place.</p>
+<ul>
+<li><strong>Equity-only put/call ratio</strong>, 10-day average:
+readings at the top of its yearly range (heavy put buying) mark
+fear and have preceded rallies; readings at the bottom mark
+complacency. Use percentiles of the last year, not fixed
+numbers &mdash; the ratio's range drifts.</li>
+<li><strong>VIX term structure</strong>: the ratio of the 30-day
+VIX to the 3-month VIX (VIX3M). Above 1 &mdash; backwardation
+&mdash; means near-term fear exceeds longer-term fear;
+historically these readings cluster at panics and resolve
+upward for equities. Deep contango (ratio well below 0.9) marks
+complacency.</li>
+<li><strong>The VIX spike rule</strong>: a VIX that has fallen
+20% or more from a recent spike high has, historically, marked
+the point at which the panic is over. A trigger for the fear
+readings above.</li>
+</ul>
+<p class="trapline"><strong>Trap:</strong> Fixed thresholds on the
+put/call ratio. Structural changes in options volume (index
+products, weekly expiries, retail flows) move its baseline; a
+reading that was extreme in 2010 is ordinary now.</p>
+</div>
+
+<!-- ============================================ -->
+<!-- CHAPTER 16 -->
+<!-- ============================================ -->
+<h2 id="ch16">Chapter 16 &mdash; Confluence and Timeframes</h2>
+
+<div class="tech">
+<h4>Elder's Triple Screen</h4>
+<p class="origin">Alexander Elder, <em>Trading for a Living</em>
+(1993).</p>
+<p>The rule that organizes everything else in this guide. Decide
+the trend on a timeframe one order of magnitude above your
+trading timeframe; look for a counter-trend pullback on your
+trading timeframe with an oscillator; enter on a timeframe below
+it with a breakout trigger. Each screen filters the one
+below.</p>
+<ul>
+<li>Screen 1 (weekly, if you trade daily): trend direction from a
+slow indicator &mdash; Elder used the MACD histogram's slope.
+Only trade in that direction.</li>
+<li>Screen 2 (daily): an oscillator pullback against the weekly
+trend &mdash; a stochastic or Force Index dip in
+an uptrend.</li>
+<li>Screen 3 (intraday or the next daily bar): a trailing buy
+stop above the previous bar's high, moved down each bar until
+filled.</li>
+</ul>
+<p class="trapline"><strong>Trap:</strong> Collapsing the screens.
+The technique's entire value is that no single timeframe is
+allowed to decide alone.</p>
+</div>
+
+<div class="tech">
+<h4>The two-family rule</h4>
+<p class="origin">Desk practice; a synthesis rather than
+an attribution.</p>
+<p>Indicators come in families that measure the same thing:
+momentum (RSI, stochastic, MACD, TSI, Schaff all measure the
+rate of change of closes), volume (OBV, CVD, MFI, profile),
+structure (trendlines, TD Lines, pitchforks, clusters, AVWAP),
+and volatility (bands, ATR, Choppiness, NR patterns). Confluence
+within a family is not confluence &mdash; an RSI divergence
+confirmed by a stochastic divergence is one signal
+read twice.</p>
+<ul>
+<li>Require agreement from at least two different families before
+entry. Momentum plus volume. Structure plus volatility.</li>
+<li>Structure family for the level, volatility family for the
+timing, momentum or volume family for the confirmation, is the
+most robust three-family template.</li>
+<li>Count families, not indicators, when you assess a setup's
+strength.</li>
+</ul>
+<p class="trapline"><strong>Trap:</strong> Five momentum
+oscillators on one chart all saying "oversold." That is one
+opinion, loudly.</p>
+</div>
+
+<div class="tech">
+<h4>Timeframe-tuned settings</h4>
+<p class="origin">Ehlers; Hurst; common practice at
+cycle-oriented desks.</p>
+<p>The dominant cycle differs by timeframe, so an indicator's
+correct length differs by timeframe too &mdash; and it is rarely
+the default. A 14-period RSI on a 4-hour chart and a 14-period
+RSI on a daily chart are measuring different fractions of their
+respective cycles, and one of them is mistuned.</p>
+<ul>
+<li>Measure the dominant cycle on each timeframe you use
+(Chapter 6, DPO card). Set oscillators to half of it.</li>
+<li>Set moving averages to the full cycle or a whole multiple of
+it, so that a single cycle averages out.</li>
+<li>Keep a table of tuned settings per symbol per timeframe and
+re-measure monthly.</li>
+</ul>
+<p class="trapline"><strong>Trap:</strong> Tuning to a cycle that
+does not exist on that timeframe. When the measurement is
+unstable across windows, use the default and move on.</p>
+</div>
+
+<!-- ============================================ -->
+<!-- CHAPTER 17 -->
+<!-- ============================================ -->
+<h2 id="ch17">Chapter 17 &mdash; The Grimoire Rules</h2>
+
+<ol class="rules">
+<li><strong>Read RSI by its range, not by 70/30.</strong> Bull
+range 40&ndash;80, bear range 20&ndash;60. The range shift is the
+trend change. Trade the reversals with the trend and the
+divergences against it.</li>
+<li><strong>Draw trendlines on the indicator.</strong> RSI, OBV,
+and the 3-10 all break their lines before price breaks
+its own.</li>
+<li><strong>Pinned means trending.</strong> A stochastic above 80,
+a Laguerre RSI at 1, a Schaff at 100 &mdash; none of these are
+overbought. Bernstein bought them.</li>
+<li><strong>Tune the length to the cycle.</strong> Oscillator
+period equals half the dominant cycle; moving-average period
+equals the full cycle. Remeasure.</li>
+<li><strong>Filter every setup with a trendiness measure</strong>
+&mdash; Efficiency Ratio, r&sup2;, or Choppiness &mdash; that is
+not a moving-average slope.</li>
+<li><strong>Contraction picks the day; the Stretch picks the
+level.</strong> NR7 and ID/NR4 into an opening-range breakout is
+the most-tested pattern in this guide.</li>
+<li><strong>A failed breakout is a trade.</strong> Turtle Soup,
+SFP, spring, smash day, upthrust &mdash; one pattern, five names.
+Wait for the close back through the level.</li>
+<li><strong>Anchor the VWAP to a moment that mattered.</strong>
+The pinch and the pullback to a rising AVWAP are the two swing
+trades it gives you.</li>
+<li><strong>Delta tells you who initiated; price tells you who
+won.</strong> When they disagree, someone is absorbing.</li>
+<li><strong>A DeMark 9 is a reaction; the 13 is the
+reversal.</strong> TDST cancels both.</li>
+<li><strong>Trade the failure to reach the median line.</strong>
+Hagopian's rule is the pitchfork's best signal.</li>
+<li><strong>Hang trend exits from the high; hang shock exits from
+the close.</strong> Chandelier and Yo-Yo together. Bail out
+short-term patterns at the first profitable open.</li>
+<li><strong>Two families or no trade.</strong> Momentum, volume,
+structure, volatility. Confluence inside one family is one
+signal repeated.</li>
+<li><strong>Set stops from your MAE distribution, not from the
+chart.</strong> Sweeney's method turns your own trade log into
+the stop level.</li>
+<li><strong>A 2B, a sweep, and an Oops are the same
+trade.</strong> The public breaks a level; the level holds; the
+public is trapped. Sperandeo, Huddleston, and Williams named it
+three times.</li>
+<li><strong>Breadth thrusts are regime changes.</strong> Zweig and
+McClellan readings off a washout are starts, not extremes.</li>
+<li><strong>Every card is a hypothesis with a pedigree.</strong>
+The settings were the originator's, on the originator's market.
+Test on yours, with an honest count of what you tried.</li>
+</ol>
+
+<!-- ============================================ -->
+<!-- COLOPHON / SOURCES -->
+<!-- ============================================ -->
+<section class="colophon">
+<h3>Sources</h3>
+<p>The Indicator Grimoire draws on the originators' own
+publications where they exist:</p>
+<ul>
+<li>Wilder, <em>New Concepts in Technical Trading Systems</em>
+(1978). Brown, <em>Technical Analysis for the Trading
+Professional</em> (1999), for Cardwell's RSI work and the
+Composite Index. Zamansky and Stendahl, "Dynamic Zones,"
+<em>TASC</em> (July 1997).</li>
+<li>Raschke and Connors, <em>Street Smarts</em> (1995), for the
+Anti, Turtle Soup, Momentum Pinball, 80-20s, and the 3-10
+oscillator. Bernstein's Stochastic Pop from his seminar and
+newsletter material.</li>
+<li>Elder, <em>Trading for a Living</em> (1993). Blau,
+<em>Momentum, Direction, and Divergence</em> (1995). Schaff
+Trend Cycle (2008). Ehlers, "Using the Fisher Transform,"
+<em>TASC</em> (2002); <em>Rocket Science for Traders</em>
+(2001); <em>Cybernetic Analysis for Stocks and Futures</em>
+(2004); "MESA Adaptive Moving Averages," <em>TASC</em>
+(2001).</li>
+<li>Hurst, <em>The Profit Magic of Stock Transaction Timing</em>
+(1970). Kaufman, <em>Smarter Trading</em> (1995). Chande and
+Kroll, <em>The New Technical Trader</em> (1994). Guppy,
+<em>Trend Trading</em> (2004). Dreiss's Choppiness Index from
+his 1990s newsletters.</li>
+<li>Crabel, <em>Day Trading with Short Term Price Patterns and
+Opening Range Breakout</em> (1990). Bollinger, <em>Bollinger on
+Bollinger Bands</em> (2001). Williams, <em>Long-Term Secrets to
+Short-Term Trading</em> (1999). Tom Williams,
+<em>Master the Markets</em>. Pruden, <em>The Three Skills of
+Top Trading</em> (2007).</li>
+<li>Shannon, <em>Maximum Trading Gains with Anchored VWAP</em>
+(2023). Dalton, <em>Mind Over Markets</em> (1990). Granville,
+<em>New Key to Stock Market Profits</em> (1963). DeMark,
+<em>The New Science of Technical Analysis</em> (1994).</li>
+<li>Connors and Alvarez, <em>Short Term Trading Strategies That
+Work</em> (2008). Ken Wood's Woodies CCI manual. Chande,
+"Aroon," <em>TASC</em> (1995). Tom Joseph's Advanced GET
+documentation. Ehlers, <em>Cycle Analytics for Traders</em>
+(2013). Carlson, <em>George Lindsay and the Art of Technical
+Analysis</em> (2011).</li>
+<li>DiNapoli, <em>Trading with DiNapoli Levels</em> (1998). Bill
+Williams, <em>Trading Chaos</em> (1995). Hull (2005); Tillson,
+<em>TASC</em> (1998); McGinley; Ehlers and Way, <em>TASC</em>
+(2010). George and Hwang, "The 52-Week High and Momentum
+Investing," <em>Journal of Finance</em> (2004).</li>
+<li>Andersen, "Standard Error Bands," <em>TASC</em> (1996).
+Widner, "Projection Bands," <em>TASC</em> (1995). Fisher,
+<em>The Logical Trader</em> (2002). Sperandeo,
+<em>Trader Vic</em> (1991). Ross, <em>Trading by the Book</em>
+(1991). Huddleston's ICT lecture series (online). Weis,
+<em>Trades About to Happen</em> (2013). Dorsey, <em>Point and
+Figure Charting</em> (1995). Carney, <em>Harmonic Trading</em>
+(2004&ndash;2010). Sweeney, <em>Maximum Adverse Excursion</em>
+(1996).</li>
+<li>Zweig, <em>Winning on Wall Street</em> (1986). McClellan
+(1969). Coppock, <em>Barron's</em> (1962). Miekka (1995).
+Williams, <em>Trade Stocks and Commodities with the Insiders</em>
+(2005); Briese, <em>The Commitments of Traders Bible</em>
+(2008).</li>
+<li>Mikula, <em>The Best Trendline Methods of Alan Andrews</em>
+(2002). Fischer, <em>Fibonacci Applications and Strategies for
+Traders</em> (1993). Gartley, <em>Profits in the Stock
+Market</em> (1935). LeBeau and Lucas, <em>Technical Traders
+Guide to Computer Analysis of the Futures Market</em> (1992).
+Kase, <em>Trading With the Odds</em> (1996). Taylor,
+<em>The Taylor Trading Technique</em> (1950).</li>
+</ul>
+<p><em>This guide is for educational purposes only and does not
+constitute investment advice. The techniques here were developed
+on other markets in other decades by traders whose results you
+cannot audit. Test every one on your own data before risking
+capital. Market-structure details reflect conditions as of
+mid-2026.</em></p>
+</section>
+
+<p class="sig"><strong>The Indicator Grimoire</strong>
+Obscure Techniques, With the Originators' Rules<br>
+Built September 2026</p>
+
+<script>var BM_KEY = 'bm_indicator_grimoire';</script>
+<script src="../book.js?v=42"></script>
+</body>
+</html>
