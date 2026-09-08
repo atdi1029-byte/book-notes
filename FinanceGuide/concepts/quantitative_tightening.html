@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Quantitative Tightening (QT) - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.tier .tier-desc { color: #a08060; font-size: 0.85rem; margin: 0.4rem 0 0.8rem; }
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done,
+body.hide-done .cat-card.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../monetary-policy-central-banking.html">&larr; Monetary Policy &amp; Central Banking</a>
+
+<div class="concept-meta"><span><span class="star">&#9733;</span> must-know</span><span>Monetary Policy &amp; Central Banking</span><span>added 2026-09-08</span></div>
+<h4 id="quantitative_tightening">Quantitative Tightening (QT)</h4>
+
+<p>
+  <strong>Quantitative tightening</strong> is the process by which a central bank — in the United States, that's the <strong>Federal Reserve</strong> — deliberately shrinks the size of its own balance sheet. To understand QT, you first need to understand its opposite: <strong>quantitative easing (QE)</strong>, the policy the Fed used aggressively after the 2008 financial crisis and again during COVID-19. In QE, the Fed creates new money and uses it to buy government bonds and mortgage-backed securities, injecting liquidity into the financial system, pushing interest rates down, and encouraging borrowing and investment. QT is the reversal of that process. Instead of buying assets and expanding, the Fed stops reinvesting the proceeds from maturing bonds and lets its portfolio shrink. It is, in plain terms, the Fed pulling money back out of the system.
+</p>
+
+<p>
+  The stakes of QT reach far beyond Wall Street trading desks. When the Fed holds a massive portfolio of Treasury bonds and mortgage-backed securities, it is acting as a giant, permanent buyer in those markets — one that is indifferent to price and never panic-sells. That persistent demand suppresses yields, which in turn keeps borrowing costs lower for everyone: homeowners, car buyers, small businesses, and corporations. When QT begins and the Fed steps back from that buyer role, someone else has to absorb the supply — and that someone is usually a private market investor who demands a higher yield to compensate for the risk of lending long. Higher yields mean higher <strong>mortgage rates</strong>, costlier corporate debt, and tighter financial conditions across the entire economy. QT is, effectively, a slow-motion interest rate hike delivered through the plumbing of the bond market rather than through a headline rate decision.
+</p>
+
+<p>
+  The mechanism works in two ways. The first is simple non-reinvestment: when a Treasury bond the Fed holds matures and the government repays the principal, the Fed simply lets that cash disappear from its balance sheet rather than deploying it to buy a new bond. The second involves <strong>mortgage-backed securities (MBS)</strong>, which are slightly more complex because homeowners prepay and refinance unpredictably — so the Fed sets a cap on how much MBS runoff it will allow per month. Any proceeds above that cap get reinvested. Any below it reduce the balance sheet. Both channels drain <strong>bank reserves</strong> from the financial system, because the government has to fund those maturing bonds by pulling cash from the banking system, tightening the overall supply of money available for lending, risk-taking, and market-making.
+</p>
+
+<p>
+  The most instructive recent example runs from 2022 through late 2025. After inflating its balance sheet to nearly $9 trillion during the COVID era, the Fed began QT in June 2022, initially allowing up to $47.5 billion per month to roll off, then accelerating to $95 billion per month. Over the course of roughly three and a half years, the Fed shrank its portfolio by more than <strong>$2.2 trillion</strong>. The autumn of 2023 produced what analysts called a <strong>bond tantrum</strong>: the 10-year Treasury yield sprinted from under 4% in July to roughly 5% on October 19th — a move of about 115 basis points in just two and a half months, which the Fed's own researchers placed above the 99th percentile of all yield moves since 1990. When they decomposed the move, roughly 85% was attributed not to changes in rate expectations but to <strong>term premium</strong>.
+</p>
+
+<p>
+  <strong>Term premium</strong> is the extra yield investors demand simply for accepting the risk of locking up their money for a longer period. It is the market's answer to the question: "How much more do I need to be paid to hold a 10-year bond rather than rolling over 10 consecutive one-year bonds?" During most of the 2010s, term premium was actually <em>negative</em> — investors paid for the privilege of owning long bonds because they were seen as the ultimate safe haven in a low-growth, low-inflation world. QT directly pressures term premium upward. When the Fed is no longer absorbing duration — the sensitivity of bond prices to rate changes — private investors must hold more of it, and they demand compensation. The 2023 tantrum ended when Treasury moderated its planned long-dated issuance and economic data cooled, relieving two of the three pressures the Fed itself identified as culprits: QT, heavier Treasury supply, and outlook uncertainty.
+</p>
+
+<blockquote>
+  "Quantitative tightening is over. It has been over since December 1st of 2025. The Fed shrank its portfolio by more than $2.2 trillion, and then it completely stopped. Today the Fed rolls over every dollar of maturing Treasury principal right back into the auction and it takes the cash coming off its mortgage bonds and puts that into Treasury bills. The biggest seller of the last three years pretty much went away. The Fed is not draining the bond market anymore. It is a buyer again."
+</blockquote>
+
+<p>
+  For traders and investors, the practical lesson is to track QT not as a binary on/off switch but as a flow variable with market consequences. The signals to watch include the size of the Fed's balance sheet (published weekly in the <strong>H.4.1 statistical release</strong>), the pace of Treasury and MBS runoff, and — crucially — any shift in reinvestment policy. When QT ended in December 2025 and the Fed began reinvesting all maturing Treasury principal back into new auctions, it became a marginal buyer again. That mattered because bond yields in September 2026 were still near three-year highs at roughly 4.79–4.81% on the 10-year, even though QT was over and coupon issuance was flat. The persistence of elevated yields despite the removal of a major seller tells you the market is pricing something structural — not just supply and demand — which is exactly where term premium re-enters the story.
+</p>
+
+<p>
+  The most common misconception about QT is conflating it with raising the <strong>federal funds rate</strong>. They are related but distinct tools. The fed funds rate is the overnight borrowing cost between banks — it directly controls the short end of the yield curve. QT operates on the long end, by changing who holds duration and at what price. This is why the Fed can cut the overnight rate and mortgage rates can <em>rise</em> simultaneously — exactly what happened in late 2024. Mortgages are priced off the 10-year Treasury, not the overnight rate. If QT is pushing term premium up while the Fed is cutting rates, these forces partially cancel out. Many retail borrowers, watching the Fed cut and expecting their mortgage rate to follow, are blindsided because they don't understand which end of the curve actually drives their borrowing cost.
+</p>
+
+<p>
+  The failure mode of QT isn't subtle — it is sudden and disorderly. The 2019 episode is instructive: the Fed pushed QT too far and drained reserves to a level where the <strong>repo market</strong> — where banks and funds borrow overnight against Treasury collateral — experienced a seizure. Overnight repo rates briefly spiked above 10% in September 2019, forcing the Fed to inject emergency liquidity. Today, that vulnerability looks different but arguably larger. By end of 2025, hedge funds held roughly <strong>$2 trillion</strong> of Treasury securities — nearly three times what they held five years earlier, representing about 7% of all marketable Treasury debt. Much of this supports the <strong>basis trade</strong>, an arbitrage between cash Treasuries and futures contracts. These funds borrow overnight in the repo market to finance long bond positions. If repo rates spike or margin requirements jump, forced unwinding could amplify volatility across cash and futures markets simultaneously — exactly the fragility the Office of Financial Research flagged explicitly.
+</p>
+
+<p>
+  QT connects directly to several other critical concepts that move your money. It is the primary transmission mechanism through which the Fed's balance sheet decisions flow into <strong>mortgage rates</strong>, corporate bond spreads, and ultimately equity valuations — because a higher long rate is a higher <strong>discount rate</strong>, which compresses the present value of future earnings most severely for long-duration assets like high-growth tech stocks. It interacts with <strong>Treasury issuance policy</strong>: when QT and heavy supply overlap, the market must absorb both the Fed's retreat and new government paper simultaneously, a double pressure that made the 2023 tantrum so violent. And it links to geopolitical capital flows — when Japanese bond yields reached 3.0% for the first time since 1996 in September 2026, Japanese institutions no longer needed to ship capital to New York for yield, removing a structural buyer that had underpinned the Treasury market for decades. Understanding QT is understanding who holds the long end of the American yield curve — and what happens when those holders change.
+</p>
+<div class="concept-side">Sources: FORGET THE DEBT FLOOD: Why Yields Hit 3-Year Highs as Treasury Buys Its Own Debt!<br>Related in this category: <a href="pce_inflation_basket.html">PCE Inflation Basket</a>, <a href="jackson_hole_symposium.html">Jackson Hole Symposium</a>, <a href="hawkish_dovish_fed_signaling.html">Hawkish vs. Dovish Fed Signaling</a>, <a href="inflation_breadth.html">Inflation Breadth</a>, <a href="central_bank_credibility.html">Central Bank Credibility</a>, <a href="forward_guidance.html">Forward Guidance</a></div>
+<button class="concept-done" data-slug="quantitative_tightening" onclick="toggleDone('quantitative_tightening')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_quantitative_tightening';</script>
+<script src="../../book.js"></script>
+<script src="../fg.js"></script>
+</body>
+</html>

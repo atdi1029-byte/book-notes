@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Indirect Bidders (Treasury Auction Demand Metric) - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.tier .tier-desc { color: #a08060; font-size: 0.85rem; margin: 0.4rem 0 0.8rem; }
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done,
+body.hide-done .cat-card.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../fixed-income-bonds.html">&larr; Fixed Income &amp; Bonds</a>
+
+<div class="concept-meta"><span>standard</span><span>Fixed Income &amp; Bonds</span><span>added 2026-09-08</span></div>
+<h4 id="indirect_bidders">Indirect Bidders (Treasury Auction Demand Metric)</h4>
+
+<p>When the U.S. Treasury needs to borrow money, it holds auctions where it sells bonds to the public. The buyers at these auctions get sorted into three categories: <strong>primary dealers</strong> (the big banks legally obligated to bid), <strong>direct bidders</strong> (institutions buying straight from Treasury for their own accounts), and <strong>indirect bidders</strong>. Indirect bidders place their bids through primary dealers but are acting on behalf of someone else — most importantly, foreign central banks, sovereign wealth funds, and large international institutions. When a central bank in Tokyo, Beijing, or Riyadh wants to park money in U.S. Treasuries, their purchase typically shows up in this indirect bidder bucket. It is the market's best public window into whether the world still wants to lend America money.</p>
+
+<p>The indirect bidder share matters enormously because it is the closest thing we have to a real-time foreign demand gauge. The United States runs persistent fiscal deficits, which means it constantly needs new buyers for its debt. For decades, foreign governments and central banks were willing — even eager — buyers, recycling trade surpluses into U.S. Treasuries as the world's reserve asset. That appetite kept long-term interest rates suppressed and cheap financing available across the entire economy. Mortgages, car loans, corporate bonds, and small business credit lines are all priced, directly or indirectly, off that long end of the yield curve. When foreign demand softens, the yield has to rise to attract whoever is left standing — and that cost ripples through every corner of the economy that depends on borrowing.</p>
+
+<p>Here is the mechanical reality of how a Treasury auction works. Treasury announces it will sell, say, $42 billion in 10-year notes on a Wednesday. Primary dealers must submit bids. Other institutions — domestic and foreign — submit bids through those same dealers. After the auction closes, Treasury tallies who bought what. The <strong>indirect bidder percentage</strong> is simply the share of the total auction that went to those foreign and institutional accounts routing through dealers. A high indirect share — typically above 65–70% for 10-year notes in recent history — signals robust demand from international buyers. A slipping indirect share, especially across consecutive auctions, suggests those buyers are pulling back. Treasury then publishes these numbers the same day, which is why sophisticated bond market watchers have it circled on their calendar every single auction week.</p>
+
+<p>The video gives us a precise, high-stakes example of why this number matters so much right now. As of early September 2026, the 10-year Treasury yield had climbed to 4.79–4.81%, the highest level since October 2023. Simultaneously, in June 2026, total foreign holdings of U.S. Treasuries fell $72.1 billion to $9.29 trillion. Japan alone dropped $26.4 billion to $1.116 trillion. China fell $25.9 billion to $633.4 billion — down 13% from a year prior. The reason is straightforward: the Japanese 10-year government bond reached 3.0% for the first time since 1996. A Japanese pension fund that previously had to send capital to New York just to earn a real yield can now stay home, take 3% in yen, and avoid currency hedging costs entirely. That shift is showing up — or rather, disappearing — in the indirect bidder column.</p>
+
+<p>Traders and professional investors use the indirect bidder share as a signal in a very specific way. They don't just watch the number in isolation — they watch it in context. The critical diagnostic the video describes is this: observe the indirect share on Wednesday's 10-year reopening and Thursday's 30-year reopening, and simultaneously note what Treasury itself is doing in the buyback market. In September 2026, Treasury doubled its long-end buyback operations from $2 billion per operation to at least $4 billion, specifically in the 10-to-20-year and 20-to-30-year maturity buckets. If indirects are slipping while Treasury is simultaneously having to step in and buy its own bonds back, the message is unambiguous: the official sector is papering over a real demand gap, not a temporary supply blip.</p>
+
+<blockquote>"If the share slips while Treasury is simultaneously doubling its own buybacks, that tells you the private market is setting the price right now."</blockquote>
+
+<p>The most important nuance to understand — and the one the video hammers hardest — is the difference between a <strong>supply problem</strong> and a <strong>demand problem</strong>. The story most financial media tells during any bond selloff is simple: too much supply is flooding the market and driving prices down. That story feels intuitive and fits neatly in a headline. But it breaks down when you check the data. In this case, coupon auction sizes were held completely flat — $58 billion in 3-year notes, $42 billion in 10-year notes, $25 billion in 30-year bonds, the same as the prior quarter. Treasury explicitly guided those sizes as steady for at least several more quarters. Primary dealers didn't expect any size increase until early 2027. When supply is flat and yields are still rising, blaming supply is simply wrong. The indirect bidder share is the tool that forces you to ask the right question instead.</p>
+
+<p>The concept breaks down — and becomes genuinely dangerous — when the buyer of last resort changes character. Historically, if foreign central banks stepped back, domestic institutions (pension funds, insurance companies, banks) would absorb the slack. But banks are currently carrying $326.7 billion in unrealized losses on their securities books, with $216.9 billion sitting in held-to-maturity portfolios. A bank already underwater on its last batch of long bonds is not going to volunteer for more duration risk. That leaves <strong>hedge funds</strong>, which by end of 2025 held roughly $2 trillion in cash Treasuries — nearly three times their holdings five years earlier, representing about 7% of all marketable Treasury debt. These funds run <strong>basis trades</strong>, buying cash bonds and shorting futures, funded overnight in the repo market. They are not permanent holders. They are renters. If repo rates spike or margin calls hit, they unwind fast — and disorderly unwinding in a $2 trillion position amplifies volatility across both cash and futures markets in ways that can dwarf anything a sovereign seller produces.</p>
+
+<p>The indirect bidder share connects directly to <strong>term premium</strong>, which is the additional yield investors demand simply for the risk of locking up money for a long period rather than rolling short-term paper. For most of the 2010s, term premium was actually negative — investors accepted lower yields on long bonds than short ones, partly because of massive foreign central bank buying that suppressed long rates. In August 2026, term premium was running around 87 basis points. The Fed's own researchers found that the 2023 bond selloff — when the 10-year ran from under 4% to roughly 5% in two and a half months — was attributed roughly 85% to term premium expansion, not changing expectations about Fed rate cuts. When foreign demand structurally retreats and the indirect bidder share trends lower over time, term premium rises to compensate whoever is left buying. That term premium then flows directly into your mortgage rate, your car loan, your business line of credit, and the discount rate applied to every growth stock in your portfolio. Indirect bidders are not an abstraction. They are the invisible hand setting the price of money for everyone.</p>
+<div class="concept-side">Sources: FORGET THE DEBT FLOOD: Why Yields Hit 3-Year Highs as Treasury Buys Its Own Debt!<br>Related in this category: <a href="two_year_treasury_yield.html">Two-Year Treasury Yield</a>, <a href="thirty_year_treasury_bond.html">30-Year Treasury Bond</a>, <a href="interest_coverage_ratio.html">Interest Coverage Ratio</a>, <a href="debt_rollover_risk.html">Debt Rollover Risk</a>, <a href="farm_debt_to_asset_ratio.html">Farm Debt-to-Asset Ratio</a>, <a href="farm_debt_service_ratio.html">Farm Debt Service Ratio</a></div>
+<button class="concept-done" data-slug="indirect_bidders" onclick="toggleDone('indirect_bidders')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_indirect_bidders';</script>
+<script src="../../book.js"></script>
+<script src="../fg.js"></script>
+</body>
+</html>

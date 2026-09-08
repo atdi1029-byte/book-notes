@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>On-the-Run vs. Off-the-Run Treasuries - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.tier .tier-desc { color: #a08060; font-size: 0.85rem; margin: 0.4rem 0 0.8rem; }
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done,
+body.hide-done .cat-card.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../fixed-income-bonds.html">&larr; Fixed Income &amp; Bonds</a>
+
+<div class="concept-meta"><span>standard</span><span>Fixed Income &amp; Bonds</span><span>added 2026-09-08</span></div>
+<h4 id="on_the_run_off_the_run">On-the-Run vs. Off-the-Run Treasuries</h4>
+
+<p>When the U.S. Treasury needs to borrow money, it holds auctions where it sells brand-new bonds to investors. The most recently issued Treasury bond for any given maturity — the fresh-off-the-press 10-year note, the new 30-year bond — is called the <strong>on-the-run Treasury</strong>. Every previous issue of that same maturity, no matter how similar in yield or structure, becomes an <strong>off-the-run Treasury</strong> the moment the new one is auctioned. Think of it like a newspaper: today's edition is on-the-run, yesterday's and everything before it are off-the-run. This distinction sounds almost trivially technical, but it sits at the foundation of how bond markets function, how prices are set, and how the government manages the $28-trillion-plus pile of debt it carries.</p>
+
+<p>The reason this distinction matters is <strong>liquidity</strong> — the ease with which you can buy or sell a security without moving its price. On-the-run Treasuries are the most actively traded instruments in the entire global financial system. Every dealer, hedge fund, foreign central bank, and pension manager benchmarks to them. They appear in the most futures contracts, they serve as collateral in the <strong>repo market</strong> (overnight lending), and they are the bonds quoted on every Bloomberg terminal and financial news ticker. Off-the-run bonds, despite being virtually identical in credit quality, trade far less frequently. Their <strong>bid-ask spreads</strong> widen, meaning you pay more to enter or exit a position. For most of the market, they are simply inconvenient to hold.</p>
+
+<p>Here is the mechanical reality: when the Treasury auctions a new 10-year note, the old 10-year — issued just three months ago — immediately loses its preferred status. It does not disappear; it still pays its coupon, it still matures on schedule, and the U.S. government still owes every dollar. But the trading community moves on. Volume concentrates in the new issue. Primary dealers — the roughly two dozen large financial institutions legally obligated to bid at every Treasury auction — make tight markets in on-the-run paper because they know they can always find a buyer or seller. For off-the-run bonds, they demand a premium to take on the <strong>inventory risk</strong> of holding something harder to move. This liquidity gap creates a persistent pricing difference between the two classes even when their cash flows are nearly identical.</p>
+
+<p>The <strong>on-the-run/off-the-run spread</strong> is itself a closely watched indicator. In normal markets, an on-the-run 10-year note might yield two to five basis points less than an off-the-run note of almost identical maturity and coupon — simply because investors are willing to accept a slightly lower yield in exchange for the convenience of owning the liquid benchmark. During periods of market stress, that spread can blow out dramatically. In March 2020, when COVID-19 triggered a dash for cash, even Treasury bonds — supposedly the safest assets on earth — saw their markets seize up. Off-the-run bonds became nearly untradeable for a period of days. The Federal Reserve had to intervene with massive purchases just to restore basic market function.</p>
+
+<p>The Treasury's <strong>buyback program</strong> — which became a centerpiece of market discussion in late 2025 and into 2026 — is designed specifically to address the problem of off-the-run illiquidity. Here is the sequence: the Treasury holds its regular coupon auction, raising, say, $42 billion by selling a brand-new 10-year note. Simultaneously, it uses a portion of the proceeds to go into the secondary market and repurchase older off-the-run bonds that are sitting in dealer inventories or investor portfolios where they generate friction. As the video explains, in September 2026, Treasury doubled the size of these operations from $2 billion per operation to at least $4 billion, focused specifically on the 10-to-20-year and 20-to-30-year maturity buckets. The government authorized up to $38 billion in total <strong>liquidity buybacks</strong> for the quarter.</p>
+
+<blockquote>"A buyback is not debt reduction. Treasury is not paying down the deficit. It issues new liquid paper at auction and uses the proceeds to repurchase older off-the-run bonds that nobody wants to trade. The debt stays. What changes is where the duration sits and who's holding it."</blockquote>
+
+<p>That quote captures the single most important misconception to eliminate. When people hear "the government is buying back its own bonds," they often assume the deficit is shrinking. It is not. Total debt is unchanged. What changes is the <strong>composition</strong> of that debt — specifically, its distribution across the liquidity spectrum. The Treasury retires illiquid, hard-to-trade off-the-run paper and replaces it with fresh on-the-run paper that the market can actually use as collateral, as a hedging instrument, and as a price benchmark. Think of it as a car manufacturer taking old, rusted vehicles off the road and issuing new models: the total number of cars stays the same, but the fleet functions better. The practical effect is to reduce <strong>duration concentration risk</strong> in illiquid instruments and to lower the friction cost for the entire market.</p>
+
+<p>For traders and investors, the on-the-run/off-the-run distinction creates specific strategic opportunities. A classic trade is the <strong>on-the-run/off-the-run spread trade</strong>: buy the cheaper, higher-yielding off-the-run bond and short the on-the-run bond of similar maturity, betting that the liquidity premium will compress over time as the on-the-run bond itself ages into off-the-run status. Hedge funds — particularly those running <strong>basis trades</strong> between cash Treasuries and Treasury futures — often prefer on-the-run bonds because they are the cheapest-to-deliver in futures contracts and the easiest to finance in repo. The video flags that by end of 2025, hedge funds held roughly $2 trillion in cash Treasuries, nearly three times their holdings five years earlier — much of this concentrated in on-the-run paper used as collateral for leveraged positions.</p>
+
+<p>The nuance that most retail commentary misses is that buybacks change <strong>where duration sits</strong> in the system without changing how much duration exists. Duration — the sensitivity of a bond's price to changes in interest rates — is not destroyed when the Treasury buys back an off-the-run 30-year bond. That duration simply moves from a private holder's balance sheet back onto the government's books, while newly issued on-the-run paper distributes fresh duration more broadly. This matters for <strong>term premium</strong> — the extra yield investors demand for lending long rather than rolling short-term debt. The video notes that in mid-2026, term premium was running near 87 basis points, compared to negative values for most of the previous decade. Even with buybacks doubling and the Fed reinvesting maturing securities, the 10-year yield pushed to its highest level since October 2023, around 4.79-4.81%.</p>
+
+<p>What happens when the on-the-run/off-the-run system breaks down is not theoretical — it happened in 2020 and came close again during the 2023 rate spike. The failure mode works like this: if the repo market — where dealers finance their on-the-run inventory overnight — seizes up, dealers cannot hold positions. They stop making markets. Bid-ask spreads explode. Even on-the-run bonds become difficult to trade. Hedge funds running basis trades get margin calls and must sell into a falling market, amplifying the decline. The Office of Financial Research explicitly warned that a disorderly unwind of leveraged basis trades "could amplify volatility across the cash and futures markets." When the marginal buyer of U.S. government debt is a leveraged fund financing overnight rather than a pension fund holding to maturity, the entire distinction between on-the-run and off-the-run becomes less meaningful — everything can become illiquid at once.</p>
+
+<p>This concept connects directly to how monetary policy transmits to the real economy. The 30-year mortgage is priced off the long end of the Treasury curve — specifically, it tracks yields of on-the-run 10-year and 30-year Treasuries. When on-the-run yields rise, as they did to 4.81% in September 2026, mortgage rates follow. The Freddie Mac survey showed 30-year rates at 6.71%, with daily lender quotes near 6.89%. The Fed funds rate — the overnight rate the Fed controls — was sitting at 3.5-3.75%, a full 130 basis points below the 10-year yield. This divergence — the <strong>yield curve steepness</strong> — reflects the market demanding greater compensation for duration risk. Buybacks may smooth market function at the margin, but if the underlying structural repricing of term premium continues, the practical cost of long-term borrowing for homebuyers, businesses, and commercial property owners rises regardless of what the Fed does at its next meeting.</p>
+<div class="concept-side">Sources: FORGET THE DEBT FLOOD: Why Yields Hit 3-Year Highs as Treasury Buys Its Own Debt!<br>Related in this category: <a href="two_year_treasury_yield.html">Two-Year Treasury Yield</a>, <a href="thirty_year_treasury_bond.html">30-Year Treasury Bond</a>, <a href="interest_coverage_ratio.html">Interest Coverage Ratio</a>, <a href="debt_rollover_risk.html">Debt Rollover Risk</a>, <a href="farm_debt_to_asset_ratio.html">Farm Debt-to-Asset Ratio</a>, <a href="farm_debt_service_ratio.html">Farm Debt Service Ratio</a></div>
+<button class="concept-done" data-slug="on_the_run_off_the_run" onclick="toggleDone('on_the_run_off_the_run')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_on_the_run_off_the_run';</script>
+<script src="../../book.js"></script>
+<script src="../fg.js"></script>
+</body>
+</html>

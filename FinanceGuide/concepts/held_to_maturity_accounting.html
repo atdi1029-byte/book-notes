@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Held-to-Maturity (HTM) Securities Accounting - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.tier .tier-desc { color: #a08060; font-size: 0.85rem; margin: 0.4rem 0 0.8rem; }
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done,
+body.hide-done .cat-card.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../accounting-financial-statements.html">&larr; Accounting &amp; Financial Statements</a>
+
+<div class="concept-meta"><span>standard</span><span>Accounting &amp; Financial Statements</span><span>added 2026-09-08</span></div>
+<h4 id="held_to_maturity_accounting">Held-to-Maturity (HTM) Securities Accounting</h4>
+
+<p>When a bank buys a bond, it has to make a decision that most people outside of accounting never think about: how am I going to report this on my books? One option is to classify it as <strong>held-to-maturity (HTM)</strong>, which means the bank is formally committing to hold that bond until it matures and gets paid back at face value. This is a legal and accounting designation, not just a preference. Once a bond goes into the HTM bucket, the bank is locked in — it cannot sell it without triggering serious regulatory and accounting consequences. The alternative classifications are <strong>available-for-sale (AFS)</strong> and <strong>trading securities</strong>, both of which require the bank to mark the value of the bond to whatever the market currently says it's worth.</p>
+
+<p>The reason this matters — really matters — is what happens to those valuations when interest rates move. When interest rates rise, the prices of existing bonds fall. That's a mathematical certainty. A bond paying 2% interest becomes less attractive when new bonds are paying 4.5%, so the market discounts its price. If a bank holds that bond as AFS, it has to write down the value on its balance sheet, creating an <strong>unrealized loss</strong> that flows through <strong>other comprehensive income (OCI)</strong> and reduces the bank's equity. But if the bank classified the bond as HTM, it does not have to mark it to market at all. The bond stays on the books at its <strong>amortized cost</strong> — essentially what the bank paid for it — regardless of what the market currently says it's worth.</p>
+
+<p>Mechanically, here is how the HTM designation works step by step. First, the bank purchases a bond and makes a formal election at the time of purchase to classify it as HTM. From that point forward, the bond is carried on the balance sheet at its amortized cost — the original purchase price adjusted gradually over time as any premium or discount to face value is absorbed. Each accounting period, the bank records interest income based on the <strong>effective interest rate</strong>, not the current market rate. If the market value of the bond drops dramatically, that loss simply does not appear on the income statement or even in OCI. It exists in reality — the bond is worth less than what the books say — but it is invisible to anyone reading the financial statements. This is what accountants call an <strong>unrealized loss</strong> that is permanently hidden from view so long as the bank never sells.</p>
+
+<p>The practical consequence is that HTM accounting creates a divergence between what a bank says it owns and what those assets would actually fetch in a fire sale. This divergence was catastrophically illustrated in March 2023 with the collapse of Silicon Valley Bank. SVB had loaded up on long-duration mortgage-backed securities and Treasuries during the low-rate era of 2020–2021. When rates surged in 2022 and 2023, those securities lost enormous market value. SVB had classified many of them as AFS, meaning the losses were visible on its balance sheet. When the bank tried to raise capital and disclosed the losses, depositors panicked, and the bank run began. Banks with more exposure in HTM portfolios avoided that specific trigger — their losses were hidden — but the underlying economic reality was identical.</p>
+
+<p>The video makes this devastatingly concrete with real Q2 numbers. American banks were carrying <strong>$326.7 billion in unrealized losses</strong> on their securities books as of the second quarter of the reporting period. Of that staggering figure, <strong>$216.9 billion sat specifically in HTM portfolios</strong>, representing roughly <strong>10.5% of the advertised cost</strong> of those holdings. In plain English: banks had officially valued those bonds at a certain number on their books, and the real market value was approximately 10.5% lower than that. The losses are real. They are enormous. They are simply not being shown in the headline financial statements that most investors and depositors would ever read.</p>
+
+<blockquote>"A bank that is still underwater on the last round of duration is not volunteering for the next one."</blockquote>
+
+<p>This observation from the video is the most important practical implication for anyone watching bond markets. A bank sitting on $216.9 billion in hidden HTM losses has zero appetite to go buy more long-duration bonds — the same kind of bonds the Treasury is trying to sell at auction. The psychology is straightforward: the institution already burned itself reaching for yield in a low-rate environment. Management knows those losses exist even if the accounting rules let them hide from investors. The risk committee knows. The regulators know. No rational treasury department is going to add more duration exposure while still digesting the last round. This is why domestic banks have largely vacated the long-end bid in Treasury auctions, contributing to the yield pressure the video documents.</p>
+
+<p>The gotcha that trips up most people is conflating "hidden" with "gone." The losses in HTM portfolios are not resolved by the accounting treatment — they are deferred. The bank will ultimately receive face value at maturity, so if it truly holds the bond to the end, the economic loss never fully crystallizes (assuming no default). But the bank is trapped by this logic in a very real sense. Selling the bond before maturity forces the loss to be recognized immediately on the income statement. This is called <strong>tainting the HTM portfolio</strong> — if a bank sells even one HTM security without meeting narrow exceptions, the accounting rules require it to reclassify its entire HTM portfolio to AFS, making all of those previously hidden unrealized losses suddenly visible. The accounting rules are designed to make sure the HTM designation is a genuine commitment, not a convenience.</p>
+
+<p>The systemic risk emerges when you aggregate these frozen portfolios across the banking sector. Banks that are locked into underwater HTM holdings cannot easily rebalance. They cannot take profits elsewhere to offset losses here. They cannot rotate into higher-yielding new issuance without triggering recognition events. Their <strong>net interest margin</strong> — the spread between what they earn on assets and what they pay on deposits — gets squeezed because they are stuck earning 2% on bonds while paying competitive rates to keep deposits from fleeing to money market funds. The hidden losses also reduce the bank's true economic capital, even if regulatory capital ratios look fine on paper, creating a gap between reported strength and real resilience.</p>
+
+<p>HTM accounting connects directly to several other critical concepts in bond markets. <strong>Duration risk</strong> is the underlying exposure — long-duration bonds lose more market value per unit of interest rate increase, which is why the HTM problem is concentrated in the bonds banks bought during the zero-rate era. <strong>Term premium</strong>, the extra yield investors demand for lending long, is now running at elevated levels partly because the buyers who used to absorb that duration — domestic banks and foreign central banks — have stepped back for precisely the reasons the video explains. The marginal buyer has shifted to leveraged hedge funds running <strong>basis trades</strong>, funded in overnight repo markets, an arrangement far more fragile than a pension fund or a bank holding bonds for decades. Understanding HTM accounting is therefore not just an accounting question — it is the key to understanding who is missing from the long-end bid, why yields are at three-year highs despite flat supply, and where the next dislocation may come from.</p>
+<div class="concept-side">Sources: FORGET THE DEBT FLOOD: Why Yields Hit 3-Year Highs as Treasury Buys Its Own Debt!<br>Related in this category: <a href="earnings_quality.html">Earnings Quality</a>, <a href="gross_margin.html">Gross Margin</a>, <a href="free_cash_flow.html">Free Cash Flow (FCF)</a></div>
+<button class="concept-done" data-slug="held_to_maturity_accounting" onclick="toggleDone('held_to_maturity_accounting')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_held_to_maturity_accounting';</script>
+<script src="../../book.js"></script>
+<script src="../fg.js"></script>
+</body>
+</html>

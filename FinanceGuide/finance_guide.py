@@ -285,6 +285,19 @@ def download_transcript(video_id):
             break
 
     if not srt_path.exists():
+        # Fallback: youtube_transcript_api (handles cases where yt-dlp fails)
+        try:
+            from youtube_transcript_api import YouTubeTranscriptApi
+            ytt = YouTubeTranscriptApi()
+            t = ytt.fetch(video_id)
+            text = " ".join(s.text for s in t.snippets)
+            text = re.sub(r"\s+", " ", text).strip()
+            if text:
+                txt_path.write_text(text)
+                log(f"  Transcript via youtube_transcript_api: {len(text)} chars")
+                return text
+        except Exception as e:
+            log(f"  youtube_transcript_api fallback failed: {e}")
         log(f"  No subtitles found for {video_id}")
         return None
 
@@ -952,14 +965,10 @@ def rebuild_html(concepts):
             )
         if not cards:
             cards.append('<p class="tier-empty">No concepts filed here yet.</p>')
-        em = ""
-        if empty and len(empty) < len(t["cats"]):
-            em = ('<p class="tier-empty">Also in this tier, nothing filed yet: '
-                  + ", ".join(_esc(n) for n in empty) + "</p>")
         tiers_html.append(
             f'<div class="tier"><h2>{_esc(t["name"])}</h2>'
             f'<p class="tier-desc">{_esc(t["desc"])}</p>'
-            f'{"".join(cards)}{em}</div>'
+            f'{"".join(cards)}</div>'
         )
 
     recent = _recent_concepts(concepts)
