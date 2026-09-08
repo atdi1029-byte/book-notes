@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Credit Spread - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.tier .tier-desc { color: #a08060; font-size: 0.85rem; margin: 0.4rem 0 0.8rem; }
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done,
+body.hide-done .cat-card.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../fixed-income-bonds.html">&larr; Fixed Income &amp; Bonds</a>
+
+<div class="concept-meta"><span><span class="star">&#9733;</span> must-know</span><span>Fixed Income &amp; Bonds</span><span>added 2026-09-07</span></div>
+<h4 id="credit_spread">Credit Spread</h4>
+
+<p>A <strong>credit spread</strong> is the difference in yield between two bonds of similar maturity but different credit quality — most commonly the gap between a corporate bond and a comparable U.S. Treasury bond. Treasury bonds are considered risk-free because the U.S. government can always print dollars to pay its debts. Corporate bonds carry the possibility of default, so investors demand extra yield as compensation for taking on that risk. That extra yield — measured in <strong>basis points</strong>, where 100 basis points equals 1 percentage point — is the credit spread. If a 10-year Treasury yields 4.5% and a 10-year Ford bond yields 7.0%, the credit spread is 250 basis points. That 2.5% premium is the market's price tag on Ford's ability to repay its debt.</p>
+
+<p>Credit spreads matter far beyond the bond market because they function as the economy's real-time stress gauge. When spreads are tight — meaning corporate bonds yield only slightly more than Treasuries — it signals that investors are confident businesses can service their debt. Credit is flowing freely, expansion is cheap, and risk appetite is high. When spreads <strong>blow out</strong> — meaning they widen dramatically — it signals distress. Lenders are suddenly demanding much higher compensation to hold corporate debt, which means borrowing costs spike for every company in that sector. This can trigger a self-reinforcing cycle: higher borrowing costs squeeze cash flows, which makes default more likely, which pushes spreads wider still, which tightens credit further. Entire industries can freeze when spreads blow out badly enough.</p>
+
+<p>The mechanical process works through supply and demand in the bond market. When investors grow nervous about a sector — say, auto parts manufacturers — they sell those corporate bonds. Bond prices fall. Because bond yields move inversely to prices, falling prices push yields higher. Meanwhile, nervous investors often flee into the safety of Treasuries, buying them and pushing Treasury yields lower. Both forces — rising corporate yields and falling Treasury yields — widen the spread simultaneously. The spread also reflects <strong>credit default swap</strong> pricing in derivatives markets, where traders can essentially buy insurance against a company defaulting. As CDS premiums rise, they feed back into cash bond spreads, amplifying the move. The market is voting in real time on the probability that debt gets repaid.</p>
+
+<p>The video's warning about automotive supply chains gives a textbook illustration. Mid-size auto parts suppliers — companies that manufacture brake assemblies, wire harnesses, and chassis stampings for Volkswagen, Ford, and GM — are carrying floating-rate bank debt at 7% and 8%. <strong>Floating-rate debt</strong> means their interest payments reset periodically with market rates rather than being locked in. When Volkswagen announced it was cutting its model lineup from 150 vehicles to 75, it effectively destroyed half of a typical supplier's revenue overnight. With revenues collapsing and interest costs already elevated, these suppliers look dramatically riskier to lenders. The credit spreads on their debt — and on regional bank loans extended to them — would blow out sharply, making refinancing nearly impossible at any manageable rate.</p>
+
+<blockquote>"When credit spreads blow out in automotive supply chains over the next 18 months, regional lenders will be caught holding the note."</blockquote>
+
+<p>Investors and traders use credit spreads as both a signal and a positioning tool. A portfolio manager watching spreads widen in a specific sector — auto suppliers, regional banks, commercial real estate — treats it as an early warning system, often well ahead of equity markets. Equity investors tend to focus on earnings; credit markets focus on survival. Historically, credit spreads have turned negative months before stock prices collapsed in the same sector. Traders can express a view directly by <strong>shorting high-yield bond ETFs</strong>, buying credit default swaps on vulnerable issuers, or rotating out of corporate bonds into Treasuries. The video's tactical advice to audit supply chain and parts vendor exposure is exactly this kind of credit-spread-driven risk management applied to an equity portfolio.</p>
+
+<p>A common misconception is that a company with a good reputation or a recognizable brand name will always have tight credit spreads. Brand does not pay interest — cash flow does. The video makes this precise point about Volkswagen's tier-one and tier-two suppliers: household names in the parts industry can carry dangerously leveraged balance sheets. Another misconception is that credit spreads only matter to bond investors. In reality, they set the cost of capital for every business in a sector. When regional banks see the credit spreads on auto supplier loans blow out, they tighten lending standards across the board, cutting off credit to even healthy companies nearby. The damage radiates outward far beyond the original distressed borrowers.</p>
+
+<p>When credit spreads break down — meaning they blow out violently and rapidly — the consequences can cascade in ways that no single participant anticipated. <strong>Contagion</strong> is the central risk: investors stop distinguishing between fundamentally weak and fundamentally sound companies in the same sector and sell everything. Liquidity evaporates because market makers widen their bid-ask spreads and pull back from intermediating trades. Regional banks that are heavily concentrated in auto supplier lending — the institutions the video identifies as "holding the note" — suddenly face mark-to-market losses on their loan portfolios, potentially triggering regulatory capital requirements that force them to restrict new lending further. This is precisely how a sector-level credit spread blowout metastasizes into a broader regional banking stress event, exactly as the video warns.</p>
+
+<p>Credit spreads connect directly to several other foundational concepts. The <strong>yield curve</strong> sets the baseline from which spreads are measured; a steep yield curve can mask emerging spread pressure by making all bonds look attractive in nominal terms. <strong>Leverage ratios</strong> on corporate balance sheets determine how vulnerable a company is when spreads widen — a firm with modest debt can refinance at higher rates and survive, while one drowning in floating-rate obligations cannot. <strong>Duration risk</strong> determines how much a bond's price falls when yields rise. And credit spreads are intimately linked to <strong>liquidity risk</strong>: in normal markets, the spread partly compensates for the fact that corporate bonds are harder to sell quickly than Treasuries. Understanding credit spreads means understanding the entire architecture of risk pricing across every debt market in the economy.</p>
+<div class="concept-side">Sources: DETROIT'S NIGHTMARE: The 50,000 Job Cut Shock Wave Hitting American Automakers<br>Related in this category: <a href="two_year_treasury_yield.html">Two-Year Treasury Yield</a>, <a href="thirty_year_treasury_bond.html">30-Year Treasury Bond</a>, <a href="interest_coverage_ratio.html">Interest Coverage Ratio</a>, <a href="debt_rollover_risk.html">Debt Rollover Risk</a>, <a href="farm_debt_to_asset_ratio.html">Farm Debt-to-Asset Ratio</a>, <a href="farm_debt_service_ratio.html">Farm Debt Service Ratio</a></div>
+<button class="concept-done" data-slug="credit_spread" onclick="toggleDone('credit_spread')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_credit_spread';</script>
+<script src="../../book.js"></script>
+<script src="../fg.js"></script>
+</body>
+</html>

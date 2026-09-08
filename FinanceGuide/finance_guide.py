@@ -1255,8 +1255,11 @@ def main():
                 run_once()
             except Exception as e:
                 log(f"ERROR in run_once: {e}")
-            log(f"Sleeping {CHECK_INTERVAL // 3600}h until next check...")
-            time.sleep(CHECK_INTERVAL)
+            next_run = time.time() + CHECK_INTERVAL
+            log(f"Next check at {time.strftime('%H:%M', time.localtime(next_run))}")
+            # Sleep in short intervals so lid-close doesn't freeze the timer
+            while time.time() < next_run:
+                time.sleep(60)  # wake every 60s to check wall clock
     finally:
         lock_file.unlink(missing_ok=True)
 

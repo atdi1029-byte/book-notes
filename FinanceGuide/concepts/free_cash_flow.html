@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Free Cash Flow (FCF) - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.tier .tier-desc { color: #a08060; font-size: 0.85rem; margin: 0.4rem 0 0.8rem; }
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done,
+body.hide-done .cat-card.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../accounting-financial-statements.html">&larr; Accounting &amp; Financial Statements</a>
+
+<div class="concept-meta"><span><span class="star">&#9733;</span> must-know</span><span>Accounting &amp; Financial Statements</span><span>added 2026-09-07</span></div>
+<h4 id="free_cash_flow">Free Cash Flow (FCF)</h4>
+
+<p>
+<strong>Free cash flow (FCF)</strong> is the money a company has left over after it has paid for everything it needs to keep running and growing — specifically, after covering its operating expenses and its <strong>capital expenditures (CapEx)</strong>, meaning the spending on factories, equipment, tooling, and other long-lived assets. Think of it as the corporate equivalent of your take-home pay after taxes, rent, and all your fixed obligations are met. Whatever remains is genuinely yours — you can save it, invest it, pay down debt, or hand it back to shareholders as dividends or buybacks. For a company, that same logic applies. FCF is the number that tells you whether a business actually generates real money or merely generates accounting profits that never materialize as spendable cash.
+</p>
+
+<p>
+The reason FCF matters so deeply is that accounting profit — what appears on the <strong>income statement</strong> as net income — can be heavily massaged by non-cash items like depreciation, amortization, deferred taxes, and creative revenue recognition. A company can report a healthy profit while simultaneously hemorrhaging cash. FCF cuts through all of that. It answers one blunt question: after all the real money went out the door for operations and investment, how much actual cash did this business produce? Lenders care about it because cash services debt. Investors care about it because cash funds dividends and buybacks. Analysts care about it because it is the foundation of <strong>discounted cash flow (DCF) valuation</strong>, the dominant method for estimating what a business is actually worth.
+</p>
+
+<p>
+Mechanically, FCF is calculated in two steps. First, you take <strong>operating cash flow</strong> — found on the <strong>cash flow statement</strong>, not the income statement — which is net income adjusted for all non-cash charges and changes in <strong>working capital</strong> (accounts receivable, inventory, accounts payable, and so on). This tells you how much cash the core business generated from its actual operations. Second, you subtract capital expenditures — the spending on property, plant, and equipment. What remains is free cash flow. The formula is simply: <em>FCF = Operating Cash Flow − Capital Expenditures</em>. Some analysts refine this further by distinguishing <strong>maintenance CapEx</strong> (spending just to keep existing assets running) from <strong>growth CapEx</strong> (spending to expand capacity), because only maintenance CapEx is truly unavoidable — but the basic formula is universally recognized.
+</p>
+
+<p>
+The auto industry crisis described in the video offers a precise real-world illustration of why this calculation matters so much. Volkswagen reported a first-half operating profit of 3.1 billion euros — a number that sounds substantial in isolation. But when you examine the cash flows underneath that figure, the picture collapses. VW spent tens of billions of euros over a decade retooling four flagship factories — Emden, Zwickau, Hanover, and Audi Neckarsulm — into dedicated battery-electric hubs. That CapEx was enormous. Meanwhile, Chinese domestic producers captured 9.2% of the European market in six months by leveraging vertical supply chain ownership that gives them a structural 30–40% cost advantage per unit. When sales in China fell 20%, the cash engine that funded those CapEx programs cut out, leaving VW with insufficient FCF to sustain its ambitions.
+</p>
+
+<p>
+For investors, FCF is used as both a valuation anchor and a warning signal. The most common valuation multiple built on it is the <strong>price-to-free-cash-flow ratio (P/FCF)</strong>, which compares a company's market capitalization to its annual FCF much the same way the price-to-earnings ratio compares it to net income. A declining P/FCF, especially when driven by shrinking FCF rather than a rising stock price, is an early indicator of deteriorating financial health. Investors also track <strong>FCF yield</strong> — FCF divided by market cap — to assess how much cash return they are actually receiving relative to what they paid. When FCF yield drops below the yield available on risk-free Treasury bonds, owning that equity becomes increasingly difficult to justify on pure return grounds.
+</p>
+
+<blockquote>
+"Demand to see vehicles' free cash flows that do not rely on internal combustion profits defending loss-making business divisions."
+</blockquote>
+
+<p>
+This quote from the video highlights the single most important nuance in applying FCF analysis to modern automakers: <strong>segment-level cash flow cross-subsidization</strong>. Ford's Model E electric division has lost billions annually — figures Ford discloses publicly in its segment reporting. Those losses are covered by the torrential FCF produced by gas-powered F-150 trucks and large SUVs. On a consolidated basis, Ford looks adequately cash-generative. But that consolidated number obscures the fact that one division is essentially on life support, kept alive by another. When you demand FCF broken out by business unit, you see that the electric division produces deeply negative free cash flow while the combustion division produces all of it. Consolidation hides the fault line; segment FCF exposes it.
+</p>
+
+<p>
+The scenario breaks down catastrophically when the subsidizing division faces its own revenue shock — which is precisely what the video warns is coming for Detroit. VW's China operations were the FCF engine that funded German wages, pensions, and electric vehicle R&D for four decades. When Chinese domestic EV makers slashed VW's market share by 20%, that subsidy engine stalled. Management then faced a brutal arithmetic reality: the FCF that had masked years of structural underperformance was no longer there to mask anything. The result was 100,000 job cuts, the cancellation of half the model lineup, and the shutdown of the very factories VW had spent billions converting to prove it could lead the electric transition. Negative FCF, deferred long enough by external subsidies, always resolves violently when the subsidy disappears.
+</p>
+
+<p>
+There are several gotchas that trip up even experienced readers of cash flow statements. First, high CapEx is not inherently bad — a company aggressively investing in genuinely profitable growth will show temporarily suppressed FCF that later explodes higher as those investments pay off. The question is whether the CapEx generates <strong>return on invested capital (ROIC)</strong> above the company's <strong>cost of capital (WACC)</strong>. Second, companies can temporarily inflate FCF by slashing CapEx below the maintenance threshold, allowing their asset base to decay. This makes current FCF look strong while quietly destroying future earnings power — a common tactic before an acquisition or management exit. Third, working capital management can swing FCF substantially quarter to quarter without reflecting any real change in underlying business health, which is why trailing twelve-month FCF figures are more reliable than any single quarter in isolation.
+</p>
+
+<p>
+FCF connects directly to several adjacent concepts that together form a complete picture of corporate financial health. <strong>EBITDA</strong> (earnings before interest, taxes, depreciation, and amortization) is a rougher proxy for cash generation that deliberately excludes CapEx — which is why FCF is considered a more honest measure for capital-intensive industries like automotive, semiconductor, and infrastructure. <strong>Levered FCF</strong> factors in debt interest payments, showing what remains for equity holders specifically after creditors are paid. <strong>Unlevered FCF</strong> strips out financing effects entirely, isolating the cash the underlying business operations generate independent of capital structure — the number most commonly used in DCF models. For anyone analyzing companies that carry heavy debt loads, as every legacy automaker does, the distinction between levered and unlevered FCF determines whether that debt level is manageable or existential.
+</p>
+<div class="concept-side">Sources: DETROIT'S NIGHTMARE: The 50,000 Job Cut Shock Wave Hitting American Automakers<br>Related in this category: <a href="earnings_quality.html">Earnings Quality</a>, <a href="gross_margin.html">Gross Margin</a></div>
+<button class="concept-done" data-slug="free_cash_flow" onclick="toggleDone('free_cash_flow')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_free_cash_flow';</script>
+<script src="../../book.js"></script>
+<script src="../fg.js"></script>
+</body>
+</html>
