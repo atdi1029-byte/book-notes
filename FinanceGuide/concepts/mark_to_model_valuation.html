@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Mark-to-Model Valuation (Private Asset Fair Value) - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.tier .tier-desc { color: #a08060; font-size: 0.85rem; margin: 0.4rem 0 0.8rem; }
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done,
+body.hide-done .cat-card.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../accounting-financial-statements.html">&larr; Accounting &amp; Financial Statements</a>
+
+<div class="concept-meta"><span>standard</span><span>Accounting &amp; Financial Statements</span><span>added 2026-09-10</span></div>
+<h4 id="mark_to_model_valuation">Mark-to-Model Valuation (Private Asset Fair Value)</h4>
+
+<p>When you own a stock listed on the New York Stock Exchange, its value is simple: whatever the last trade was. Someone bought it at $47.32 a minute ago, so that's what it's worth. But most of the world's financial assets don't trade on exchanges. Private loans, real estate partnerships, venture equity stakes, and leveraged credit instruments have no live ticker. So how do you know what they're worth? The answer is <strong>mark-to-model valuation</strong>, sometimes called <strong>fair value accounting</strong>: you build a mathematical model using a set of assumptions — interest rates, default probabilities, revenue growth, industry comparables — and whatever that model spits out becomes the official "value" on the fund's books. The name comes from the contrast with <strong>mark-to-market</strong>, where prices come from actual trades in liquid markets.</p>
+
+<p>This matters enormously because fund managers report their performance, collect management fees, and pay dividends based on whatever values sit on their books. If a private credit fund holds a loan it originated at $100 and the model says it's worth $95, the fund reports a $5 unrealized loss. If the model says it's still worth $100 despite deteriorating borrower conditions, investors see no warning sign — right up until they do. For retail investors in <strong>Business Development Companies (BDCs)</strong> and <strong>interval funds</strong> — the vehicles that package private credit into something ordinary people can buy — the gap between what the model says and what the loan would actually fetch in a distressed sale is the gap between a comfortable retirement and a surprise loss.</p>
+
+<p>Here's how the mechanism works in practice. When a private credit fund originates a loan, it engages a third-party <strong>valuation firm</strong> — an independent specialist whose job is to estimate what a willing buyer would pay for that loan if it traded today. The firm inputs variables: the borrower's revenue trajectory, EBITDA margins, comparable transaction multiples, the loan's seniority in the capital structure, and the prevailing spread environment. The resulting number is the loan's <strong>fair value</strong>, expressed as a percentage of face value — say, 97 cents on the dollar. Every quarter, this process repeats. When one or more inputs change — maybe comparable companies are now trading at lower multiples, or the borrower's revenue growth slowed — the model produces a lower number, and the fund must "mark down" the loan. Critically, this markdown can happen even if the borrower is still making every scheduled payment on time.</p>
+
+<p>That last point is the beating heart of what's happening in private credit right now. <strong>Bank for International Settlements (BIS)</strong> data shows fewer than 1% of software borrowers are actually behind on contracted payments. Yet by mid-2026, one major portfolio valuation firm had marked down 81% of the software loan books held by private credit funds. Eighty-one percent written down; less than one percent in actual default. The loans are current. The cash is arriving. But the <em>models</em> have been updated to reflect a structural change in the businesses underlying those loans — the collapse of <strong>per-seat Software-as-a-Service (SaaS) pricing</strong> driven by AI automation. The marks moved because the assumptions moved, not because the cash stopped.</p>
+
+<blockquote>"Private credit did not suffer a cash flow crisis. It suffered an underwriting breakdown."</blockquote>
+
+<p>Consider how this played out at the loan level. Between 2021 and 2024, private credit lenders extended roughly $115 billion into <strong>horizontal and workflow software companies</strong> — project management tools, workforce platforms, automation software. The underwriting assumption was that these firms had durable, annuity-like revenue: if a corporation licenses 10,000 seats of a project management tool, that $10,000-a-month check arrives forever. Models were built on that premise, with spreads that gave lenders essentially no additional compensation for the risk that the seat count might collapse. When AI agents began replacing the humans who occupied those seats, the revenue model cracked — and the valuation models had to be rebuilt from scratch, producing dramatically lower fair values even for loans with perfect payment histories.</p>
+
+<p>Sophisticated investors use mark-to-model signals as an early warning system, which is why the current data is so alarming to institutional risk desks. The ratio of fair value to original cost across 44 BDCs tracked by Reuters moved from roughly 99 cents on the dollar to about 97-98 cents in just 180 days through Q2 2026. At the same time, <strong>non-accrual rates</strong> — loans where interest payments have actually stopped — climbed from 2.5% to 3.4% of cost basis. Non-accruals lag model markdowns because accounting rules require observable payment failure before a loan goes non-accrual, while models can incorporate forward-looking threats immediately. Traders therefore watch the spread between model markdowns and non-accruals: a widening gap suggests that actual defaults are still catching up to what the models already know. That gap is currently very wide.</p>
+
+<p>One of the most important nuances to understand about mark-to-model is its susceptibility to <strong>incentive bias</strong>. The fund manager pays the valuation firm. The fund manager earns fees on assets under management. Higher valuations mean larger AUM and larger fees. Marking assets down aggressively is financially painful for the fund itself. This creates a structural pressure — often subtle, rarely explicit — toward optimistic assumptions. Regulations and auditors push back, but the models still involve judgment calls at every step: which comparable transactions to include, what discount rate to apply, how much credit to give projected cost cuts. Two equally credentialed valuation firms can produce meaningfully different fair values for the identical loan. This subjectivity is not a flaw that can be engineered away; it is inherent to valuing illiquid assets.</p>
+
+<p>The model-to-reality gap creates especially dangerous dynamics when combined with <strong>Payment-in-Kind (PIK)</strong> structures. In a PIK loan, a borrower who cannot generate enough cash to service interest simply adds the unpaid interest to the outstanding loan balance instead of writing a check. From the fund's perspective, that accrued interest appears on the income statement as earned revenue — and the fund can distribute it to investors as a dividend yield — even though no actual cash ever arrived. Federal Reserve Bank of Boston research shows PIK usage in private credit surged from roughly 6% of loans in early 2022 to over 10% by early 2026. So you have a two-sided accounting distortion: the asset side of the balance sheet looks better than reality because models haven't yet caught up to fundamental deterioration, and the income statement looks better than reality because PIK accruals masquerade as cash earnings.</p>
+
+<p>When mark-to-model breaks down at scale, the failure typically arrives in waves rather than all at once. The first wave is exactly what's happening now: models get updated and fair values drop, but borrowers are still current, so there's no formal default event. The second wave arrives when companies that were marginally viable at inflated valuations can no longer refinance their debt — because new lenders look at current market conditions, not historical model values, when deciding whether to roll a loan. At Aries Capital, the world's largest BDC, just two individual software exposures accounted for more than one-third of the firm's entire net unrealized losses in 2026. At that concentration, a single borrower's deterioration can meaningfully impair a fund's reported net asset value — which directly affects the share price retail investors see on their brokerage statements.</p>
+
+<p>Mark-to-model connects directly to several other concepts worth understanding together. <strong>Liquidity risk</strong> is the silent partner: because these loans don't trade, there's no market mechanism to force honest price discovery the way a stock selloff would. <strong>Redemption gates</strong> — quarterly limits on how much investors can withdraw — exist precisely because in a crisis, a fund cannot sell illiquid loans fast enough to pay everyone out. The Fed's financial stability report noted that in Q1 2026, accepted redemption requests across semi-liquid private credit vehicles exceeded new investor inflows for the first time ever. When that happens inside a vehicle holding assets valued by models rather than markets, the investors who move first get out near model value; the investors who wait get out at whatever distressed reality eventually forces the model to admit. Understanding mark-to-model isn't abstract finance theory — it's the difference between knowing you're in line and realizing you've been standing there the whole time.</p>
+<div class="concept-side">Sources: THE $115B TECH DEBT TRAP: Why Wall Street Is Dumping Bad Loans Into Your 401(k)!<br>Related in this category: <a href="earnings_quality.html">Earnings Quality</a>, <a href="gross_margin.html">Gross Margin</a>, <a href="free_cash_flow.html">Free Cash Flow (FCF)</a>, <a href="held_to_maturity_accounting.html">Held-to-Maturity (HTM) Securities Accounting</a></div>
+<button class="concept-done" data-slug="mark_to_model_valuation" onclick="toggleDone('mark_to_model_valuation')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_mark_to_model_valuation';</script>
+<script src="../../book.js"></script>
+<script src="../fg.js"></script>
+</body>
+</html>

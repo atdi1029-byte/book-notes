@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Payment-in-Kind (PIK) Interest - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.tier .tier-desc { color: #a08060; font-size: 0.85rem; margin: 0.4rem 0 0.8rem; }
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done,
+body.hide-done .cat-card.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../fixed-income-bonds.html">&larr; Fixed Income &amp; Bonds</a>
+
+<div class="concept-meta"><span>standard</span><span>Fixed Income &amp; Bonds</span><span>added 2026-09-10</span></div>
+<h4 id="payment_in_kind_pik">Payment-in-Kind (PIK) Interest</h4>
+
+<p>When you borrow money, the deal is simple: the lender gives you cash, and you pay back cash — principal plus interest. <strong>Payment-in-kind (PIK) interest</strong> breaks that second half of the bargain. Instead of paying interest in cash, the borrower is allowed to add the unpaid interest directly onto the loan balance. You owe $10 million at 12% interest, and instead of writing a $1.2 million check, you simply now owe $11.2 million. The debt grows. No cash changes hands. On the surface this sounds like a borrower-friendly flexibility, but it is one of the most important warning signals in credit markets — a flare gun fired by companies that cannot generate enough cash to service their debts in the normal way.</p>
+
+<p>PIK matters because it obscures the true health of a loan. In traditional lending, a missed interest payment is an immediate, visible event — the borrower is in default or on nonaccrual status and the lender must acknowledge the problem. PIK eliminates that moment of reckoning. The loan stays "performing" on paper, the interest obligation never vanishes, and the lender's books show income even though no dollar ever arrived. This quiet concealment matters enormously when these loans sit inside funds that millions of ordinary investors hold in their retirement accounts. A fund can report strong earnings and pay out a healthy dividend even when the underlying borrowers are silently drowning in compounding debt. The performance looks fine right up until it doesn't.</p>
+
+<p>The mechanics work like this. A private credit lender — often a <strong>business development company (BDC)</strong> — extends a loan with a PIK toggle clause written into the credit agreement. When the borrower triggers PIK, the period's interest is calculated normally (say 12% annualized on $10M = $1.2M) and simply added to the outstanding principal. In the next period, interest accrues on $11.2M. Each cycle the base compounds upward. Meanwhile, the lender books that $1.2M as <strong>accrued income</strong> on its income statement — real revenue, recognized under accounting rules — even though the cash never arrived. The fund then uses that paper income to justify paying dividends to its own investors. Cash flows out to shareholders while cash never flowed in from borrowers.</p>
+
+<p>The video's host described this mechanism with unusual bluntness:</p>
+
+<blockquote>"The fund rolls that IOU onto its ledger as crude revenue. And the fund cuts you a 10% dividend yield. And no cash ever moved. That is not an investment vehicle. That is an accounting maneuver."</blockquote>
+
+<p>That framing cuts to the core problem. Accounting rules permit PIK income recognition because the debt obligation is legally real — the borrower does owe that money eventually. But "legally owed" and "actually collectable" are very different things, especially when the borrower's business model is deteriorating. The dividend paid to retail investors in a BDC comes from income that exists only as a growing number on a loan schedule, not as cash in a bank account.</p>
+
+<p>For a concrete, real-world illustration, consider what the Federal Reserve Bank of Boston documented: <strong>PIK usage across private credit loans surged from roughly 6% in early 2022 to over 10% by early 2026</strong> — a 66% increase in just three years. That surge coincides precisely with the period when AI-driven pricing disruption began hitting software companies that had borrowed heavily on the premise that their per-seat subscription revenue was permanent and predictable. Middle-market software firms leveraged at seven times EBITDA and paying 12% floating interest could not generate the cash to service those loans as enterprise customers began canceling seats. PIK was the pressure valve — it kept defaults off the books while the underlying businesses weakened quarter by quarter.</p>
+
+<p>For investors trying to evaluate BDCs or <strong>interval funds</strong> — the semi-liquid retail vehicles that now hold roughly $425 billion in private credit assets — PIK percentage is one of the most actionable diagnostic metrics available. The video's host offers a direct rule of thumb: if PIK represents more than 5% of a fund's total investment income, that fund is manufacturing yield by borrowing against the future. You can find this data in the <strong>Schedule of Investments</strong> buried in SEC filings — typically far from the glossy cover page. Sophisticated institutional investors watch PIK ratios as a leading indicator of credit stress, often well before nonaccrual rates or formal default rates begin to rise, because PIK is what companies reach for before they reach for a restructuring attorney.</p>
+
+<p>The most dangerous misconception about PIK is conflating legal performance with economic health. A loan on PIK is technically "performing" — the borrower is not in default. Rating agencies, fund NAV calculations, and regulatory classifications may all treat it as a current, healthy asset. But economically, a PIK loan is a borrower telling you they cannot pay. The interest obligation hasn't disappeared; it has metastasized. A $10M loan at 12% PIK for three years becomes a $14M loan. If the business was already struggling to generate cash at $10M of debt, it will struggle even more at $14M. PIK buys time, but it does not create cash flow where none existed. Investors who read only the headline yield and dividend number without checking PIK composition are evaluating the paint job on a car with no engine.</p>
+
+<p>When PIK structures break, they tend to break catastrophically and all at once. Because the debt balance has been compounding upward throughout the PIK period, the eventual reckoning involves a far larger obligation than the original loan. Simultaneously, the borrower's business has typically continued deteriorating during the same period — that is why they were on PIK in the first place. Recovery rates on PIK loans in distressed situations are therefore often substantially lower than on cash-pay loans of comparable original size. For fund investors, the collapse plays out through <strong>NAV markdowns</strong> — the fund's stated net asset value drops as valuations are revised — followed by dividend cuts as the manufactured income stream can no longer be sustained. This sequence is not hypothetical: by mid-2026, valuation firms had already marked down 81% of private credit software portfolios, even as formal default rates remained superficially low. PIK was the bridge between those two facts.</p>
+
+<p>PIK connects directly to several broader concepts worth understanding together. <strong>Nonaccrual loans</strong> are where a lender stops recognizing interest income because repayment is doubtful — the step beyond PIK when the fiction can no longer hold. <strong>Redemption gates</strong> in interval funds and perpetual BDCs become critical when PIK-inflated income collapses: investors who try to exit simultaneously discover that quarterly repurchase limits (often 5% of shares) mean they must queue for years. And the proposed Department of Labor safe harbor rule — which would allow private credit to be packaged inside 401(k) target-date funds — means the population of investors exposed to PIK risk is potentially about to expand from sophisticated institutions to tens of millions of ordinary retirement savers who have no idea what a Schedule of Investments even is. Understanding PIK is not an advanced topic. It is now a basic act of financial self-defense.</p>
+<div class="concept-side">Sources: THE $115B TECH DEBT TRAP: Why Wall Street Is Dumping Bad Loans Into Your 401(k)!<br>Related in this category: <a href="two_year_treasury_yield.html">Two-Year Treasury Yield</a>, <a href="thirty_year_treasury_bond.html">30-Year Treasury Bond</a>, <a href="interest_coverage_ratio.html">Interest Coverage Ratio</a>, <a href="debt_rollover_risk.html">Debt Rollover Risk</a>, <a href="farm_debt_to_asset_ratio.html">Farm Debt-to-Asset Ratio</a>, <a href="farm_debt_service_ratio.html">Farm Debt Service Ratio</a></div>
+<button class="concept-done" data-slug="payment_in_kind_pik" onclick="toggleDone('payment_in_kind_pik')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_payment_in_kind_pik';</script>
+<script src="../../book.js"></script>
+<script src="../fg.js"></script>
+</body>
+</html>
