@@ -3,16 +3,23 @@
 Finance Guide Bot — pulls YouTube transcripts, extracts finance concepts,
 builds a living book on the Books shelf.
 
-Runs like rhythm_bot: nohup python3 finance_guide.py &
+Preferred: run under launchd so it starts at login and is restarted if it
+dies (see install_launchd.sh).  Manual: nohup python3 finance_guide.py &
 Checks channels every 6 hours for new videos.
+
+  python3 finance_guide.py --status   # is it alive? what did it last do?
+  python3 finance_guide.py --once     # one check-and-process cycle, then exit
 """
 
+import fcntl
 import json
 import os
 import re
+import signal
 import subprocess
 import sys
 import time
+import traceback
 from datetime import datetime, timedelta
 from pathlib import Path
 
@@ -31,6 +38,7 @@ HTML_FILE = BASE_DIR / "index.html"
 LOG_FILE = BASE_DIR / "bot.log"
 
 CHECK_INTERVAL = 6 * 3600  # 6 hours between checks
+WAKE_GAP = 5 * 60          # a 60s nap that takes >5 min wall-clock = machine slept -> check now
 MAX_VIDEOS_PER_RUN = 0     # 0 = no limit, process all new videos
 BOOKS_DIR = BASE_DIR.parent
 
@@ -191,19 +199,37 @@ def get_channel_videos(channel_url, limit=30):
         result = subprocess.run(
             ["yt-dlp", "--flat-playlist", "--print", "id", "--print", "title",
              "--playlist-end", str(limit), channel_url],
-            capture_output=True, text=True, timeout=60
+            capture_output=True, text=True, timeout=120
         )
-        lines = result.stdout.strip().split("\n")
-        videos = []
-        for i in range(0, len(lines) - 1, 2):
-            vid_id = lines[i].strip()
-            title = lines[i + 1].strip()
-            if vid_id and title:
-                videos.append({"id": vid_id, "title": title})
-        return videos
+    except FileNotFoundError:
+        log("  ERROR yt-dlp not found on PATH — install it or fix the PATH "
+            "block at the top of this script")
+        return []
     except Exception as e:
         log(f"  ERROR pulling channel: {e}")
         return []
+
+    # yt-dlp breaks whenever YouTube changes its page layout.  It exits
+    # non-zero and prints the reason to stderr; treat that as a real error,
+    # not "the channel has no videos".
+    if result.returncode != 0:
+        log(f"  ERROR yt-dlp exit {result.returncode}: "
+            f"{(result.stderr or '').strip()[-300:]}")
+        log("  -> try: pip3 install -U yt-dlp   (or: brew upgrade yt-dlp)")
+        return []
+
+    lines = result.stdout.strip().split("\n")
+    videos = []
+    for i in range(0, len(lines) - 1, 2):
+        vid_id = lines[i].strip()
+        title = lines[i + 1].strip()
+        if vid_id and title:
+            videos.append({"id": vid_id, "title": title})
+    if not videos:
+        log(f"  WARNING yt-dlp returned 0 videos for {channel_url}: "
+            f"{(result.stderr or '').strip()[-300:] or 'no stderr'}")
+        log("  -> yt-dlp is probably out of date: pip3 install -U yt-dlp")
+    return videos
 
 
 def _needs_processing(vid_id, processed):
@@ -259,68 +285,24 @@ def find_new_videos():
 # === STEP 2: Download transcript ===
 def download_transcript(video_id):
     """Download auto-captions and clean to plain text."""
-    srt_path = TRANSCRIPTS_DIR / f"{video_id}.en.srt"
     txt_path = TRANSCRIPTS_DIR / f"{video_id}.txt"
 
     if txt_path.exists():
         return txt_path.read_text()
 
     try:
-        subprocess.run(
-            ["yt-dlp", "--write-auto-subs", "--sub-langs", "en",
-             "--skip-download", "--convert-subs", "srt",
-             "-o", str(TRANSCRIPTS_DIR / f"{video_id}"),
-             f"https://www.youtube.com/watch?v={video_id}"],
-            capture_output=True, text=True, timeout=60
-        )
+        from youtube_transcript_api import YouTubeTranscriptApi
+        ytt = YouTubeTranscriptApi()
+        t = ytt.fetch(video_id)
+        text = " ".join(s.text for s in t.snippets)
+        text = re.sub(r"\s+", " ", text).strip()
+        if text:
+            txt_path.write_text(text)
+            return text
     except Exception as e:
-        log(f"  ERROR downloading subs for {video_id}: {e}")
-        return None
+        log(f"  Transcript download failed for {video_id}: {e}")
 
-    # Find the SRT file (yt-dlp adds .en.srt)
-    if not srt_path.exists():
-        # Try alternate naming
-        for f in TRANSCRIPTS_DIR.glob(f"{video_id}*.srt"):
-            srt_path = f
-            break
-
-    if not srt_path.exists():
-        # Fallback: youtube_transcript_api (handles cases where yt-dlp fails)
-        try:
-            from youtube_transcript_api import YouTubeTranscriptApi
-            ytt = YouTubeTranscriptApi()
-            t = ytt.fetch(video_id)
-            text = " ".join(s.text for s in t.snippets)
-            text = re.sub(r"\s+", " ", text).strip()
-            if text:
-                txt_path.write_text(text)
-                log(f"  Transcript via youtube_transcript_api: {len(text)} chars")
-                return text
-        except Exception as e:
-            log(f"  youtube_transcript_api fallback failed: {e}")
-        log(f"  No subtitles found for {video_id}")
-        return None
-
-    # Clean SRT to plain text
-    content = srt_path.read_text()
-    lines = []
-    for line in content.split("\n"):
-        line = line.strip()
-        if not line:
-            continue
-        if re.match(r"^\d+$", line):
-            continue
-        if re.match(r"\d{2}:\d{2}:\d{2}", line):
-            continue
-        if line not in lines[-1:]:  # dedup consecutive
-            lines.append(line)
-
-    text = " ".join(lines)
-    text = re.sub(r"\s+", " ", text).strip()
-
-    txt_path.write_text(text)
-    srt_path.unlink()  # clean up SRT
-    return text
+    return None
 
 
 # === Claude CLI helper ===
@@ -1239,42 +1221,154 @@ def run_once():
     log("=== Done ===\n")
 
 
-def main():
-    # Lock file — prevent duplicate instances
-    lock_file = BASE_DIR / ".bot.lock"
-    if lock_file.exists():
+# === LOCK ===
+# An OS-level advisory lock (flock) instead of a PID file.  The kernel
+# releases it the instant the holding process dies — kill -9, reboot,
+# power loss, anything — so it can never go stale.  The old PID-file
+# scheme left .bot.lock behind on any non-Ctrl-C exit, and on the next
+# start `os.kill(pid, 0)` would either find an unrelated process that had
+# reused the PID ("already running", exit) or hit a root-owned one and
+# crash with PermissionError.  Either way the bot silently never started.
+LOCK_FILE = BASE_DIR / ".bot.lock"
+
+
+def acquire_lock():
+    """Return an open file handle holding the lock, or None if another
+    instance holds it.  Keep the handle alive for the life of the process."""
+    fh = open(LOCK_FILE, "a+")
+    try:
+        fcntl.flock(fh, fcntl.LOCK_EX | fcntl.LOCK_NB)
+    except (BlockingIOError, OSError):
+        fh.close()
+        return None
+    fh.seek(0)
+    fh.truncate()
+    fh.write(str(os.getpid()))   # informational only — not used for checks
+    fh.flush()
+    return fh
+
+
+def lock_holder_pid():
+    """PID of the running bot, or None if no instance holds the lock."""
+    if not LOCK_FILE.exists():
+        return None
+    with open(LOCK_FILE, "r") as fh:
         try:
-            pid = int(lock_file.read_text().strip())
-            # Check if process is still running
-            os.kill(pid, 0)
-            print(f"Bot already running (PID {pid}). Exiting.")
-            sys.exit(1)
-        except (ProcessLookupError, ValueError):
-            pass  # stale lock, take over
+            fcntl.flock(fh, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except (BlockingIOError, OSError):
+            try:
+                return int(fh.read().strip() or 0) or "?"
+            except ValueError:
+                return "?"
+        fcntl.flock(fh, fcntl.LOCK_UN)
+    return None
 
-    lock_file.write_text(str(os.getpid()))
 
-    log("Finance Guide Bot starting")
-    log(f"Check interval: {CHECK_INTERVAL // 3600}h")
+def status():
+    """Answer 'is the bot alive and what did it last do?' in one screen."""
+    pid = lock_holder_pid()
+    print(f"Bot running:      {'yes (PID ' + str(pid) + ')' if pid else 'NO'}")
+
+    try:
+        v = subprocess.run(["yt-dlp", "--version"], capture_output=True,
+                           text=True, timeout=15).stdout.strip()
+    except Exception as e:
+        v = f"NOT FOUND ({e})"
+    print(f"yt-dlp version:   {v}")
+
+    processed = load_json(PROCESSED_FILE)
+    done = sorted(((v.get("processed", ""), k, v) for k, v in processed.items()
+                   if not v.get("skipped")), reverse=True)
+    if done:
+        ts, vid, v = done[0]
+        print(f"Last video done:  {ts}  {vid}  {v.get('title', '')[:60]}")
+    pending = [k for k, v in processed.items() if v.get("retry")]
+    if pending:
+        print(f"Awaiting caption: {len(pending)} video(s) queued for retry")
+
+    if LOG_FILE.exists():
+        lines = LOG_FILE.read_text().splitlines()
+        checks = [l for l in lines if "Finance Guide check" in l]
+        if checks:
+            print(f"Last check:       {checks[-1][1:20]}")
+        errs = [l for l in lines[-400:] if "ERROR" in l or "WARNING" in l]
+        if errs:
+            print(f"Recent errors:    {len(errs)} in last 400 log lines")
+        print("\n--- last 15 log lines ---")
+        print("\n".join(lines[-15:]))
+    else:
+        print(f"No log file at {LOG_FILE}")
+
+
+def main():
+    lock = acquire_lock()
+    if lock is None:
+        log(f"Bot already running (PID {lock_holder_pid()}). Exiting.")
+        sys.exit(1)
+
+    # `kill <pid>` sends SIGTERM, which Python ignores by default — the
+    # loop would only stop on Ctrl-C.  Turn it into a clean exit so the
+    # log records the stop and launchd/nohup restarts behave predictably.
+    def _stop(signum, frame):
+        log(f"Received signal {signum} — stopping")
+        sys.exit(0)
+    signal.signal(signal.SIGTERM, _stop)
+    signal.signal(signal.SIGHUP, _stop)
+
+    log(f"Finance Guide Bot starting (PID {os.getpid()})")
+    log(f"Check interval: {CHECK_INTERVAL // 3600}h, plus a check on every wake from sleep")
     log(f"Channels: {CHANNELS_FILE}")
 
     try:
         while True:
             try:
                 run_once()
-            except Exception as e:
-                log(f"ERROR in run_once: {e}")
+            except Exception:
+                # Full traceback, not just the message — a one-line
+                # "ERROR in run_once: 'x'" is undebuggable a day later.
+                log("ERROR in run_once:\n" + traceback.format_exc())
             next_run = time.time() + CHECK_INTERVAL
-            log(f"Next check at {time.strftime('%H:%M', time.localtime(next_run))}")
-            # Sleep in short intervals so lid-close doesn't freeze the timer
+            log(f"Next check at {time.strftime('%H:%M', time.localtime(next_run))} "
+                f"(or on wake)")
+            # Sleep in short intervals.  If a single 60s nap takes much
+            # longer than 60s of wall-clock time, the machine was asleep:
+            # the lid was closed and just reopened.  Check right away so
+            # "open the laptop" == "look for new videos".
+            last_tick = time.time()
             while time.time() < next_run:
-                time.sleep(60)  # wake every 60s to check wall clock
+                time.sleep(60)
+                now = time.time()
+                if now - last_tick > WAKE_GAP:
+                    log(f"Woke from sleep ({int(now - last_tick) // 60} min "
+                        f"gap) — checking now")
+                    break
+                last_tick = now
     finally:
-        lock_file.unlink(missing_ok=True)
+        log("Finance Guide Bot stopped")
+        lock.close()   # releases the flock
 
 
 if __name__ == "__main__":
-    if "--once" in sys.argv:
-        run_once()
+    if "--status" in sys.argv:
+        status()
+    elif "--once" in sys.argv:
+        lock = acquire_lock()
+        if lock is None:
+            print(f"Bot is already running (PID {lock_holder_pid()}); "
+                  f"it will pick up new videos on its next check or on wake. "
+                  f"To force one now: launchctl kickstart -k gui/$(id -u)/com.a.financeguide")
+            sys.exit(1)
+        try:
+            run_once()
+        finally:
+            lock.close()
     else:
-        main()
+        try:
+            main()
+        except SystemExit:
+            raise
+        except Exception:
+            # Startup crashes used to go only to nohup.out, where nobody
+            # looks.  Put them in the real log too.
+            log("FATAL at startup:\n" + traceback.format_exc())
+            raise

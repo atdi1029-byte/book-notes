@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Shrinkflation - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.tier .tier-desc { color: #a08060; font-size: 0.85rem; margin: 0.4rem 0 0.8rem; }
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done,
+body.hide-done .cat-card.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../economics-fundamentals.html">&larr; Economics Fundamentals</a>
+
+<div class="concept-meta"><span><span class="star">&#9733;</span> must-know</span><span>Economics Fundamentals</span><span>added 2026-09-09</span></div>
+<h4 id="shrinkflation">Shrinkflation</h4>
+
+<p>
+<strong>Shrinkflation</strong> is the practice of reducing the size, weight, or quantity of a consumer product while keeping its price the same — or sometimes even raising it slightly. The word is a portmanteau of "shrink" and "inflation," coined to describe a form of hidden price increase that never shows up as a sticker shock at checkout. Instead of charging you more for your bag of coffee, the manufacturer quietly drops it from 12 ounces to 10.5 ounces and redesigns the packaging so you barely notice. You pay the same. You get less. Your per-unit cost has risen, but nothing in the official price data necessarily captures that change the way a straightforward price hike would.
+</p>
+
+<p>
+It matters for several interconnected reasons. First, it distorts the <strong>Consumer Price Index (CPI)</strong>, the government's primary gauge of inflation. The CPI tracks the price of a fixed basket of goods over time, but when product sizes quietly shrink, the basket itself changes without the BLS always catching every adjustment in real time. That means the official inflation number can look cooler than the lived experience at the grocery store. Second, it matters for corporate profit margins. Shrinkflation is a margin-protection strategy — companies absorb rising input costs by giving you less product rather than eating the cost themselves. For investors watching <strong>consumer packaged goods (CPG)</strong> companies, the shift from shrinkflation to outright price hikes is a critical inflection signal in the cost structure of the business.
+</p>
+
+<p>
+The mechanics work like this. A CPG company — say, a coffee roaster or a cereal maker — faces rising commodity input costs. Green coffee beans cost more. Wheat costs more. Corn costs more. The company has a few choices: absorb the cost (hurting margins), pass it on as a visible price increase (risking consumer backlash and volume loss), or quietly reduce the amount of product in each package (protecting the sticker price while reducing the cost to produce each unit). Option three, shrinkflation, tends to be the path of least resistance because most consumers anchor on price, not weight. People notice when a $6 bag of coffee becomes a $7 bag. Fewer people notice — or at least fewer immediately protest — when a 12-ounce bag becomes an 11-ounce bag at the same $6 price point.
+</p>
+
+<p>
+The video provides a vivid real-world illustration of why this strategy has limits. As of August 31st, <strong>ICE-certified Arabica coffee stocks</strong> — the physical bags of coffee sitting in exchange warehouses, graded and ready for delivery against a futures contract — fell to 223,976 bags, their lowest level since 1999. That is a 27-year low in usable, deliverable inventory. At the same time, Brazil was tracking toward a record crop of over 71 million bags. On paper, supply looked abundant. In reality, the deliverable physical supply that actually backs the futures market was at a generational floor. CPG companies had spent years shrinking the coffee bag to avoid raising the sticker price, but that buffer was running out at exactly the moment warehouse stocks offered no additional cushion.
+</p>
+
+<blockquote>
+"The companies that make your cereal and your ground coffee have spent the last few years shrinking the box instead of raising the price. That's a trick, and that trick has a physical limit. You can't keep shrinking a bag of coffee without consumers ultimately finally noticing. When physical warehouse buffers break a 27-year low like Arabica just did, the next move is not a smaller bag, it's a higher sticker price on the shelf."
+</blockquote>
+
+<p>
+For traders and investors, shrinkflation functions as a leading indicator of a coming phase transition in corporate pricing behavior. When you observe CPG companies aggressively shrinking package sizes across multiple product categories simultaneously, it tells you two things: input costs are rising faster than management wants to admit publicly, and the companies are not yet confident enough in demand elasticity to raise prices openly. That is a warning sign for margins down the road. Conversely, when shrinkflation reaches its practical physical limit — you cannot sell a one-ounce coffee bag — the company must raise prices. That inflection point is where margin pressure and CPI surprises collide. Sophisticated investors watch unit pricing data from retail scanner services and commodity warehouse inventory reports precisely to anticipate this moment before it shows up in an earnings call.
+</p>
+
+<p>
+There are important nuances and common misconceptions to keep in mind. The first is that shrinkflation is not always nefarious or even necessarily deceptive — sometimes it is the least disruptive way to adjust to a commodity cost spike, and consumers who pay close attention to unit pricing (the price per ounce posted on the shelf tag) are never truly hidden from the math. The second misconception is that shrinkflation means inflation is understated by a fixed, knowable amount. In reality, the BLS does attempt to adjust for size changes through a process called <strong>quality adjustment</strong> and <strong>unit price tracking</strong>, but these adjustments lag the actual changes in stores and do not catch everything. The gap between measured CPI and experienced inflation is real but imprecise, not a clean conspiracy.
+</p>
+
+<p>
+When the shrinkflation strategy fails or breaks down, the consequences move in multiple directions at once. The most direct consequence is <strong>margin compression</strong> in CPG stocks. Once a company has no more packaging to shrink and must raise sticker prices, it faces both the raw input cost and the risk of losing volume as consumers trade down to private-label alternatives or reduce consumption entirely. The stock market reaction to this moment can be severe, particularly for companies that have guided investors to stable-margin assumptions on the back of quiet shrinkflation rather than acknowledged input cost pressure. The second-order consequence, documented in the video, is that a hot <strong>headline CPI</strong> print — the one that includes food and energy, which is the number ordinary households actually experience — can shift the political and market pressure on the Federal Reserve even when core CPI looks tame.
+</p>
+
+<p>
+This connects directly to monetary policy and interest rates, the larger arc of the video's argument. The Fed officially targets <strong>core PCE</strong> (Personal Consumption Expenditures excluding food and energy), so technically the coffee and orange juice situation should not drive Fed decisions. But the headline CPI number is what the public sees, what politicians respond to, and what shapes the environment in which the Fed operates. As the video lays out, a strong August jobs report — payrolls rising 162,000 against forecasts of 56,000 — already had markets pricing a 50–60% probability of a 25-basis-point rate hike at the September 15–16 Fed meeting. A hot headline CPI, driven by food costs that are themselves being forced upward by the end of shrinkflation's runway, could be the data point that tips a divided committee. That is the chain: warehouse inventories deplete → shrinkflation hits physical limits → sticker prices rise → headline CPI runs hot → Fed leans hawkish → the 10-year Treasury yield rises → mortgage rates, auto loans, and credit card rates all move higher. What starts as a quietly smaller coffee bag ends as a broader borrowing cost story for every household in the country.
+</p>
+
+<p>
+The orange juice market in the same video underscores that shrinkflation and supply constraint are not coffee-specific phenomena. <strong>FCOJ (Frozen Concentrated Orange Juice) futures</strong> had crashed more than 70% from their September 2024 all-time high of $5.89 per pound, bottoming near $1.36 before turning back up. The structural cause — citrus greening disease spreading through Brazilian groves, and Florida producing its smallest crop since 1930 — never resolved. These are what the video calls "plumbing problems, not weather headlines." The same logic applies to shrinkflation broadly: the underlying input cost pressures that drove companies to shrink packages in the first place do not disappear because the packaging trick bought a few quarters of earnings stability. When the trick runs out, the plumbing problem is still there, and now it must be priced openly into the shelf tag, the CPI report, and ultimately the interest rate environment that governs how much everything else in the economy costs to finance.
+</p>
+<div class="concept-side">Sources: THE BREAKFAST SHOCK: Why Your Morning Coffee Could Force a Fed Rate Hike!<br>Related in this category: <a href="vertical_integration.html">Vertical Integration</a></div>
+<button class="concept-done" data-slug="shrinkflation" onclick="toggleDone('shrinkflation')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_shrinkflation';</script>
+<script src="../../book.js"></script>
+<script src="../fg.js"></script>
+</body>
+</html>
