@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Yield Curve Steepening - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.tier .tier-desc { color: #a08060; font-size: 0.85rem; margin: 0.4rem 0 0.8rem; }
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done,
+body.hide-done .cat-card.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../fixed-income-bonds.html">&larr; Fixed Income &amp; Bonds</a>
+
+<div class="concept-meta"><span>standard</span><span>Fixed Income &amp; Bonds</span><span>added 2026-09-10</span></div>
+<h4 id="yield_curve_steepening">Yield Curve Steepening</h4>
+
+<p>The <strong>yield curve</strong> is a simple graph with a powerful message. On the horizontal axis you place the maturity of a bond — from a 3-month Treasury bill all the way out to a 30-year Treasury bond. On the vertical axis you place the <strong>yield</strong>, meaning the annualized interest rate investors demand to lend money for that length of time. Connect the dots and you get a line — the yield curve. <strong>Yield curve steepening</strong> happens when the gap between short-term and long-term yields widens. In practical terms, the long end of the curve rises faster than the short end, or the short end falls while the long end holds steady. The shape shifts from flat to pitched, like a hill getting steeper. That slope is not decorative. It is the market's real-time opinion about growth, inflation, and fiscal risk compressed into a single picture.</p>
+
+<p>Why does this matter to someone who has never bought a bond in their life? Because the Treasury yield curve is the <strong>benchmark pricing spine</strong> of virtually every borrowing rate in America. Your 30-year fixed mortgage is not priced in a vacuum — it is priced as a spread above the 10- or 30-year Treasury yield. Auto loans, home equity lines, small business credit, even the rate your bank offers on a certificate of deposit all move with that curve. When the long end steepens — when 10- and 30-year yields rise — lenders immediately reprice their products upward. The effect reaches your kitchen table whether you own a single bond or not. Steepening is not an abstraction for portfolio managers. It is a tax on every American who borrows money.</p>
+
+<p>Here is the mechanical sequence, step by step. The government needs to borrow money, so the Treasury <strong>issues bonds</strong> — it sells debt to investors. When the supply of bonds increases, basic supply-and-demand applies: more bonds chasing the same pool of buyers means prices must fall to attract those buyers. <strong>Bond prices and yields move in opposite directions</strong> — this is the single most important mechanical fact in fixed income. When a bond's price falls, its yield rises, because the fixed coupon payment now represents a higher percentage return on the lower price paid. So more supply → lower prices → higher yields. If most of that new supply lands in long-dated maturities (10-year, 30-year), the long end of the curve rises while the short end, anchored by the Federal Reserve's policy rate, barely moves. The curve steepens.</p>
+
+<p>The video hands us a precise, real-world snapshot. On a Wednesday afternoon following President Trump's $5,000 dividend proposal in Dallas, the <strong>2-year Treasury</strong> sat at 4.43%, the <strong>10-year</strong> at 4.83%, and the <strong>30-year</strong> at roughly 5.28–5.32%. By the time the video was recorded the following morning, the 10-year had already climbed to approximately 4.92% — its highest since October 2023 — and the 30-year had ticked up to 5.32%. The short end barely twitched. The proposal implied up to $1.35 trillion in new Treasury issuance, and the bond market started pricing that possibility immediately, before any legislation existed, before any eligibility rule was written. Long yields moved. Short yields did not. That divergence is steepening in real time.</p>
+
+<blockquote>"Notice which end of the curve is doing all the worrying. The market is not especially frightened of next quarter. It is charging a premium for the next three decades."</blockquote>
+
+<p>That quote captures exactly how traders read a steepening curve. When the short end is calm but the long end is rising, the market is not worried about an imminent recession or a near-term policy shock. It is worried about something slower and heavier: <strong>fiscal sustainability over decades</strong>, persistent inflation, or chronic oversupply of long-dated debt. Professional fixed income investors use the <strong>2s/10s spread</strong> (the difference between the 10-year and 2-year yield) as a standard dashboard metric. A widening spread signals that long-term investors are demanding more compensation — a larger <strong>term premium</strong> — to commit their capital for years rather than months. Traders who anticipate steepening will go <strong>long the short end and short the long end</strong>, a trade called a <strong>steepener</strong>, to profit from the spread widening.</p>
+
+<p>The mortgage arithmetic in the video makes the real-economy impact concrete. The 30-year fixed mortgage average was already sitting at approximately 6.71%, a 2026 high, with daily quotes near 6.80% — before any of the trillion-dollar proposal had been formally priced. On a $400,000 loan at 6.71%, the monthly principal-and-interest payment runs about $2,584. Move the rate just half a point to 7.21% — a move well within range if the 30-year Treasury yield continues rising — and that payment climbs to roughly $2,718. That is $134 extra per month. Over the life of a 30-year loan, that is approximately $48,000 in additional interest paid. The $5,000 dividend is a one-time number you can see. The mortgage is a flow that bleeds quietly, $134 at a time, for 360 months. Steepening makes that flow worse before a single check is ever mailed.</p>
+
+<p>A common misconception is that steepening is always bad news. It is not. The nuance depends entirely on which side of the lending relationship you occupy. If you are a <strong>borrower</strong> — carrying a mortgage, planning to buy a car, refinancing a business line of credit — steepening raises your cost of funds, sometimes dramatically. But if you are a <strong>saver</strong>, particularly a retiree living off a ladder of Treasuries or CDs, steepening is a raise. Higher long-term yields mean your next rollover earns more. The video makes this explicit: the same half-point move that costs the borrower $134 per month pays the saver a higher coupon. Markets are not moral actors. They redistribute, they do not destroy. The question is only which side of the trade you are on — and whether you know it.</p>
+
+<p>A second misconception is that steepening requires the Federal Reserve to act. The Fed controls the <strong>federal funds rate</strong>, which most directly anchors very short-term rates — overnight lending, 3-month bills, 2-year notes. The long end of the curve is set by the market: by the collective judgment of pension funds, insurers, foreign central banks, and bond desks pricing risk over decades. The Fed can influence long rates through tools like <strong>quantitative easing</strong> (buying long-dated bonds to push yields down), but it cannot dictate them. This is why the video's observation is so pointed: the short end was calm because the Fed had not moved, but the long end was already repricing because the market had. That divergence — policy rate stable, long yields climbing — is precisely the steepening pattern that signals fiscal worry rather than monetary tightening.</p>
+
+<p>Steepening can fail as a signal in certain edge cases. During periods of extreme stress, investors flood into long-dated Treasuries as a <strong>safe haven</strong>, driving long yields down even as short rates rise — producing an <strong>inverted curve</strong>, the opposite of steepening and historically a recession indicator. A steepener can also be distorted by foreign central bank intervention, by Federal Reserve asset purchase programs, or by technical factors like pension fund demand for long-duration assets. And the market can price risk that never materializes: if the $5,000 dividend proposal quietly dies in Congress, long yields could retrace, and borrowers who locked in rates at the peak would have paid the premium for a risk that never arrived. The bond market prices <strong>probability</strong>, not certainty — which means it is sometimes wrong, and being wrong is expensive for whoever is on the wrong side.</p>
+
+<p>Yield curve steepening connects directly to several adjacent concepts worth understanding. <strong>Term premium</strong> is the extra yield investors demand to hold a long-dated bond rather than rolling over a series of short-term bonds — steepening usually signals a rising term premium. <strong>Fiscal dominance</strong> is the condition where government borrowing needs become so large they begin to override monetary policy, and a persistently steep long end is one early symptom. <strong>Demand-pull inflation</strong> — the kind created when consumers have extra money and bid up goods prices — is relevant here because a $1.35 trillion injection of spending power would likely push inflation higher, making the Fed more likely to tighten, which would suppress the short end while the long end, worried about years of elevated prices, stays elevated or climbs further. The curve steepens from both directions simultaneously. Understanding yield curve steepening means understanding that bond investors are not passive accountants. They are the market's most credible real-time verdict on whether a government's fiscal promises add up over time.</p>
+<div class="concept-side">Sources: THE $5,000 CHECK TRAP: Why That Proposed Trump Dividend Will Cost You $48,000!<br>Related in this category: <a href="two_year_treasury_yield.html">Two-Year Treasury Yield</a>, <a href="thirty_year_treasury_bond.html">30-Year Treasury Bond</a>, <a href="interest_coverage_ratio.html">Interest Coverage Ratio</a>, <a href="debt_rollover_risk.html">Debt Rollover Risk</a>, <a href="farm_debt_to_asset_ratio.html">Farm Debt-to-Asset Ratio</a>, <a href="farm_debt_service_ratio.html">Farm Debt Service Ratio</a></div>
+<button class="concept-done" data-slug="yield_curve_steepening" onclick="toggleDone('yield_curve_steepening')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_yield_curve_steepening';</script>
+<script src="../../book.js"></script>
+<script src="../fg.js"></script>
+</body>
+</html>

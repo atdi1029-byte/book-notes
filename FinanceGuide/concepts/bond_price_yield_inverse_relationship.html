@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Bond Price–Yield Inverse Relationship - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.tier .tier-desc { color: #a08060; font-size: 0.85rem; margin: 0.4rem 0 0.8rem; }
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done,
+body.hide-done .cat-card.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../fixed-income-bonds.html">&larr; Fixed Income &amp; Bonds</a>
+
+<div class="concept-meta"><span><span class="star">&#9733;</span> must-know</span><span>Fixed Income &amp; Bonds</span><span>added 2026-09-10</span></div>
+<h4 id="bond_price_yield_inverse_relationship">Bond Price–Yield Inverse Relationship</h4>
+
+<p>At its core, the <strong>bond price–yield inverse relationship</strong> is one of the most fundamental laws in all of finance: when the price of a bond goes up, its yield goes down, and when the price goes down, its yield goes up. Always. Without exception. If you've never owned a bond in your life, this might sound like an abstraction — something for traders on Wall Street to worry about. But this single mechanical relationship is the hidden lever behind your mortgage rate, your car loan, your savings account interest, and the federal government's ability to borrow money affordably. Understanding it isn't optional for a financially literate person. It's foundational. Everything else in fixed income builds on top of it.</p>
+
+<p>To understand why the relationship exists, start with what a bond actually is. A <strong>bond</strong> is a loan you make to a government or corporation. In exchange, they promise to pay you a fixed dollar amount — called the <strong>coupon</strong> — at regular intervals, and to return your original investment, called the <strong>principal</strong> or <strong>face value</strong>, at the end of a set period. The coupon is fixed in dollar terms the moment the bond is issued. A $1,000 bond paying $50 per year pays exactly $50 per year no matter what happens to interest rates, inflation, or the price of the bond in the secondary market. That immovability is everything. It's what makes the math work the way it does.</p>
+
+<p>Here's where the mechanics click into place. Suppose you buy that $1,000 bond for $1,000 and it pays $50 per year. Your <strong>yield</strong> — essentially the return you're earning on your investment — is 5%. Now suppose interest rates in the economy rise and new bonds being issued are paying $60 per year. Suddenly, your old bond is less attractive. Nobody will pay you $1,000 for it when they can get a better deal elsewhere. To sell it, you have to lower your price — say to $900. Now a buyer pays $900 and still receives $50 per year. Their yield is now $50 divided by $900, which is roughly 5.56%. The coupon didn't change. The price dropped. The yield rose. That's the whole engine in three sentences.</p>
+
+<p>Run that same logic in reverse and you'll see the other side. If interest rates fall and new bonds are only paying $40 per year, your bond paying $50 suddenly looks fantastic. Everyone wants it. Buyers will bid up the price — maybe to $1,100 or $1,200. A buyer who pays $1,200 for that $50 annual coupon earns only $50 divided by $1,200, or roughly 4.17%. Price rose. Yield fell. This is why long-term bondholders can make dramatic capital gains when interest rates decline, and why they suffer painful losses when rates rise. The <strong>secondary market</strong> — where bonds trade after they're first issued — reprices bonds constantly, every trading day, to reflect current interest rate reality. The arithmetic never bends.</p>
+
+<p>Now apply this to the real world the video describes so vividly. A proposal to send $5,000 checks to every adult American would require the U.S. Treasury to raise somewhere between $870 billion and $1.35 trillion, depending on how eligibility is defined. That money is raised by issuing new Treasury bonds — flooding the market with new supply. As the video puts it bluntly:</p>
+
+<blockquote>"Supply rises, price falls, yields rise. That is not ideology. That is plain old economic arithmetic. It's the same stuff that has worked the same way for 400 years."</blockquote>
+
+<p>When Treasury dumps a trillion dollars' worth of new bonds onto the market, existing bondholders see the value of their holdings decline as buyers gain more options. New buyers demand higher yields to absorb all that new supply. In the video's snapshot, the 10-year Treasury yield had already climbed to around 4.92% — its highest since October 2023 — and the 30-year sat at approximately 5.32%. Markets didn't wait for a bill to pass. They priced the risk of massive future issuance the moment the proposal hit the news. That's how powerful this mechanism is: it operates on probability, not certainty.</p>
+
+<p>Traders and investors read the <strong>yield curve</strong> — the line connecting yields on Treasury bonds from short maturities (like the 2-year) to long maturities (like the 30-year) — the way a doctor reads a patient's vital signs. A <strong>steepening yield curve</strong>, where long-term yields rise faster than short-term ones, signals that markets expect higher inflation, more borrowing, or more economic risk in the distant future. In the video's scenario, the 2-year yield sat at 4.43% while the 30-year was at 5.32% — a steep gap. Sophisticated investors watching that divergence know the market isn't frightened of next quarter; it's charging a premium for the next three decades. When you see the long end of the curve rising while the short end is relatively stable, you're watching the bond market render its verdict on long-term fiscal credibility.</p>
+
+<p>The reason this matters to someone who has never bought a bond in their life is the <strong>Treasury yield curve's role as the benchmark</strong> for nearly every borrowing rate in America. Mortgage lenders don't set rates in a vacuum. They price home loans at a spread above Treasury yields because Treasuries represent the baseline "risk-free" rate — the floor beneath all other lending. When Treasury yields rise, mortgage rates follow. The video provides a brutally concrete example: a $400,000 mortgage at 6.71% costs $2,584 per month in principal and interest. Move that rate just half a point higher to 7.21% — a plausible move given the yield pressure described — and the payment becomes $2,718. That's $134 more per month, $1,600 more per year, and roughly $48,000 more across the life of a 30-year loan. The $5,000 check is visible. The $48,000 in extra mortgage cost is invisible — paid out $134 at a time over 360 months.</p>
+
+<p>One of the most common misconceptions about this relationship is that higher yields are purely bad news. They are not — it entirely depends on which side of the transaction you're standing on. As the video carefully acknowledges, if you're a saver, a retiree living off a <strong>Treasury ladder</strong> or <strong>certificates of deposit (CDs)</strong>, rising yields are a raise. You earn more on new money you park in fixed income. The same yield move that punishes a borrower rewards a lender. The other common confusion is treating yield and interest rate as identical concepts. They're related but not the same. The <strong>coupon rate</strong> is set at issuance. The <strong>yield</strong> — sometimes called <strong>yield to maturity</strong> — is the actual return you earn based on the price you paid today, accounting for all future coupon payments and the return of principal. A bond can have a 4% coupon and a 6% yield simultaneously, if you bought it below face value.</p>
+
+<p>There are also edge cases where the intuitive logic gets complicated. In a crisis — a genuine flight to safety — investors will pile into Treasury bonds so aggressively that prices spike and yields collapse even when the government is borrowing heavily. In March 2020, Treasury yields crashed to historic lows despite exploding deficit spending, because fear drove capital into the safest assets on the planet regardless of supply. This is why the phrase "Treasuries are a safe haven" carries real meaning: in moments of global panic, the demand side can overwhelm the supply side, temporarily breaking the usual cause-and-effect chain. The inverse relationship doesn't disappear in these moments — it's still operating — but the dominant force driving prices shifts from supply to demand in a way that can surprise investors who treat the relationship mechanically without accounting for sentiment and risk appetite.</p>
+
+<p>The bond price–yield relationship also connects intimately to central bank policy, inflation expectations, and fiscal credibility — which is why the video frames the proposed dividend as a collision between two arms of government pointing in opposite directions. The <strong>Federal Reserve</strong> controls the short end of the yield curve through its <strong>federal funds rate</strong> target. But the long end — the 10-year and 30-year — is set by the market itself, based on expectations of future inflation, future growth, and the supply of bonds that will need to be absorbed over coming years. When fiscal policy (Congress spending) and monetary policy (the Fed raising rates) conflict, the bond market becomes the arena where that disagreement gets priced. As the video puts it, the bond market started collecting its invoice the moment the words left the stage in Dallas — not when a bill passed, not when checks were mailed, but the instant the probability of massive new issuance entered the world. That is the power of the inverse relationship understood fully: it doesn't just describe what has already happened. It prices what might.</p>
+<div class="concept-side">Sources: THE $5,000 CHECK TRAP: Why That Proposed Trump Dividend Will Cost You $48,000!<br>Related in this category: <a href="two_year_treasury_yield.html">Two-Year Treasury Yield</a>, <a href="thirty_year_treasury_bond.html">30-Year Treasury Bond</a>, <a href="interest_coverage_ratio.html">Interest Coverage Ratio</a>, <a href="debt_rollover_risk.html">Debt Rollover Risk</a>, <a href="farm_debt_to_asset_ratio.html">Farm Debt-to-Asset Ratio</a>, <a href="farm_debt_service_ratio.html">Farm Debt Service Ratio</a></div>
+<button class="concept-done" data-slug="bond_price_yield_inverse_relationship" onclick="toggleDone('bond_price_yield_inverse_relationship')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_bond_price_yield_inverse_relationship';</script>
+<script src="../../book.js"></script>
+<script src="../fg.js"></script>
+</body>
+</html>

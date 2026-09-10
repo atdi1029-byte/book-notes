@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Loan Amortization - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.tier .tier-desc { color: #a08060; font-size: 0.85rem; margin: 0.4rem 0 0.8rem; }
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done,
+body.hide-done .cat-card.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../personal-finance-basics.html">&larr; Personal Finance Basics</a>
+
+<div class="concept-meta"><span><span class="star">&#9733;</span> must-know</span><span>Personal Finance Basics</span><span>added 2026-09-10</span></div>
+<h4 id="loan_amortization">Loan Amortization</h4>
+
+<p>When you borrow money to buy a house, you don't just pay back what you borrowed. You pay back the loan <em>plus</em> interest, and the way that repayment is structured over time has a name: <strong>loan amortization</strong>. The word comes from the Latin <em>amort</em> — to kill off — and that's exactly what you're doing: gradually killing off the debt through a series of regular payments. Each payment you make chips away at what you owe, but not in equal parts. At the start of a loan, the vast majority of your payment goes toward interest. Near the end, almost all of it goes toward principal. Understanding this schedule — how your payments are divided, month by month — is one of the most practically important things you can learn about personal finance.</p>
+
+<p>Amortization matters because it exposes the true cost of borrowing — a cost that almost nobody thinks about when they're signing papers. Most people focus on the purchase price of a home, a car, or any other financed asset. That's <strong>sticker-price thinking</strong>, and it's natural: humans are wired to notice lump sums. What we're not wired to notice is a slow, steady drain — a recurring monthly payment that quietly extracts tens of thousands of dollars over decades. This is not a small distinction. Over the life of a 30-year mortgage, many borrowers pay nearly as much in interest as they do in principal. The amortization schedule is where that full cost lives, written out row by row, month by month. Nobody hands you that table at the closing table and asks you to really read it.</p>
+
+<p>Here's how the mechanics actually work. When you take out a fixed-rate mortgage, your lender calculates a monthly payment that will, if paid consistently, reduce your balance to exactly zero at the end of the loan term. That payment is calculated using three inputs: the <strong>principal</strong> (the amount you borrowed), the <strong>interest rate</strong> (expressed as an annual percentage, divided by 12 for monthly use), and the <strong>loan term</strong> (typically 360 months for a 30-year mortgage). The formula produces a fixed monthly payment. But here's the key: the split between interest and principal inside that fixed payment changes every single month. In month one, interest is calculated on the full remaining balance — so most of your payment goes to interest. In month two, the balance is slightly lower, so slightly less goes to interest and slightly more goes to principal. This process repeats, gradually shifting, for every month of the loan.</p>
+
+<p>To make this concrete: on a $400,000 mortgage at 6.71% over 30 years, your monthly payment works out to approximately $2,584 in principal and interest. In the very first payment, roughly $2,237 of that goes to interest — the bank's cut — and only about $347 actually reduces your loan balance. By month 180 (year fifteen), the split is closer to even. By month 350, almost all of your payment is principal. This is why the early years of a mortgage feel so unproductive: you're writing large checks and watching your balance barely move. It's not a scam — it's the mathematical consequence of how compound interest interacts with a fixed payment schedule. The lender earns interest on whatever balance remains, and at the start, the balance is at its highest.</p>
+
+<p>The video that inspired this chapter makes a crucial real-world application of this concept. At the time of recording, the 30-year fixed mortgage rate was approximately 6.71%, and a proposed government policy — a $5,000 dividend payment to every adult American — was already moving bond markets upward before any legislation had even been drafted. The concern: funding such a payment would require issuing new Treasury bonds, increasing supply, pushing yields higher, and dragging mortgage rates up with them. The calculation the video walks through is this: move the rate half a point higher, from 6.71% to 7.21%, and the monthly payment on that same $400,000 loan jumps from $2,584 to approximately $2,718. That's $134 more per month — a number that sounds manageable until you run it across 360 months.</p>
+
+<blockquote>"The $5,000 is the sticker price. The mortgage is the cost per use. One arrives once... the other leaves quietly $134 at a time for 360 months."</blockquote>
+
+<p>That $134-per-month difference compounds into something staggering over a full loan term. Across 360 months, $134 extra per month totals roughly $48,000. A borrower who accepted a mortgage at the higher rate — perhaps without even realizing rates had moved, or because they had no choice — would pay $48,000 more over the life of that loan than a borrower who locked in just weeks earlier. This is the practical power of understanding amortization: a seemingly small change in the interest rate, multiplied across hundreds of monthly payments, becomes a number that dwarfs the original headline. The $5,000 "dividend" the video discusses is more than consumed — three times over — by the invisible interest cost embedded in a single rate increase that the policy helped cause.</p>
+
+<p>For investors and financial professionals, the amortization schedule is a live signal, not just a repayment tool. Mortgage-backed securities — bonds built from pools of home loans — are priced partly based on <strong>prepayment risk</strong>, the likelihood that borrowers will pay off their loans early. When rates fall, borrowers refinance, prepaying their old mortgages and wiping out the interest income investors expected. When rates rise, borrowers are locked in place, continuing to pay at their older, lower rates — which is valuable for holders of those securities. Understanding amortization helps you read these dynamics. It also informs decisions about whether to pay extra toward principal (shortening the loan and saving interest), or to refinance (resetting the amortization clock, which can be costly in its own way if you've already moved past the heavy-interest early years).</p>
+
+<p>One of the most common misconceptions about amortization is that making payments means you're building equity proportionally. You're not — at least not at first. In the early years of a 30-year mortgage, equity builds extremely slowly because almost every dollar of your payment is going to interest. A borrower who sells a home after five years may be surprised to discover how little principal they've actually paid down. A related misconception is that a lower monthly payment always means a better deal. A longer loan term reduces the monthly payment but dramatically increases total interest paid. A 15-year mortgage at the same rate as a 30-year mortgage will have higher monthly payments, but the total interest paid over the life of the loan will be roughly half. The amortization math is unambiguous on this point.</p>
+
+<p>The risks and edge cases of amortization become most visible when borrowers make choices that disrupt the standard schedule — sometimes without realizing it. <strong>Negative amortization</strong> occurs when the monthly payment is set so low that it doesn't cover the interest due, causing the loan balance to actually grow over time. Certain adjustable-rate mortgages and exotic loan products from the pre-2008 era allowed exactly this, and the resulting balance shock — when the loan "recast" to a fully amortizing schedule — contributed significantly to the foreclosure crisis. <strong>Interest-only loans</strong> are another variant: the borrower pays only interest for a set period, building zero equity, and then faces a sharp payment increase when principal repayment begins. These structures aren't inherently fraudulent, but they require a borrower to fully understand what the amortization schedule actually looks like — which, historically, many did not.</p>
+
+<p>Amortization connects directly to several other foundational concepts in finance. It is inseparable from the <strong>time value of money</strong> — the principle that a dollar today is worth more than a dollar in the future, which is precisely why lenders charge interest and why early payments are so interest-heavy. It is also tied tightly to <strong>Treasury yields and the yield curve</strong>, because mortgage rates are typically set as a spread above the 10-year Treasury yield. When yields rise — as the video describes happening in real time in response to a policy announcement — mortgage rates follow, and every existing borrower who hasn't locked a rate, and every future borrower, faces a new amortization reality. The bond market doesn't wait for the policy to pass. It prices the probability immediately. The result is that a political speech can, within hours, alter the amortization schedule — and the lifetime cost — of every home loan written in the weeks that follow.</p>
+<div class="concept-side">Sources: THE $5,000 CHECK TRAP: Why That Proposed Trump Dividend Will Cost You $48,000!<br>Related in this category: <a href="credit_score.html">Credit Score (FICO / VantageScore)</a>, <a href="used_vehicle_resale_value.html">Used Vehicle Resale Value (Residual Value)</a>, <a href="erisa_fiduciary_safe_harbor.html">ERISA Fiduciary Safe Harbor</a></div>
+<button class="concept-done" data-slug="loan_amortization" onclick="toggleDone('loan_amortization')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_loan_amortization';</script>
+<script src="../../book.js"></script>
+<script src="../fg.js"></script>
+</body>
+</html>

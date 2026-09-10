@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Lump-Sum vs. Ongoing-Cost Bias - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.tier .tier-desc { color: #a08060; font-size: 0.85rem; margin: 0.4rem 0 0.8rem; }
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done,
+body.hide-done .cat-card.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../behavioral-finance-psychology.html">&larr; Behavioral Finance &amp; Psychology</a>
+
+<div class="concept-meta"><span>standard</span><span>Behavioral Finance &amp; Psychology</span><span>added 2026-09-10</span></div>
+<h4 id="lump_sum_vs_cashflow_bias">Lump-Sum vs. Ongoing-Cost Bias</h4>
+
+<p>At its core, <strong>lump-sum vs. ongoing-cost bias</strong> is a cognitive quirk in how human beings process money depending on how it arrives — or departs. When a sum of money lands all at once, it feels real, tangible, and significant. When that same amount of money trickles out (or in) over months and years, the brain largely ignores it. This is not a character flaw or a sign of poor financial literacy. It is a deeply wired feature of human psychology, one that researchers in <strong>behavioral finance</strong> have documented across cultures and income levels. The dramatic event captures attention; the quiet, recurring flow does not. A $5,000 check feels like a windfall. The $134 it costs you every month for thirty years feels like nothing — until you do the math and discover it was $48,000.</p>
+
+<p>This bias matters enormously in the real economy because virtually every major financial decision you will ever make involves a tradeoff between a visible lump sum and an invisible flow. Mortgages, car loans, insurance premiums, subscription services, and government spending programs all exploit the same asymmetry: the upfront number gets the headline, and the long-term cost gets buried in the fine print. At the policy level, the stakes scale accordingly. When a government announces a one-time payment to citizens, the public debates the sticker price. The <strong>financing cost</strong> — the bond issuance, the yield movement, the ripple effect through every borrowing rate in the economy — begins accumulating before the ink is dry on any legislation, and most people never connect the two events at all.</p>
+
+<p>The mechanism works in steps, each one invisible to the casual observer. Step one: a large, visible promise is made — say, a trillion-dollar spending proposal. Step two: bond markets, which do not wait for legislation, begin pricing the probability of that issuance immediately. <strong>Treasury yields</strong> rise because buyers of government debt demand higher returns when they anticipate a surge in supply. Step three: because nearly every consumer lending rate in America is benchmarked off the Treasury yield curve, mortgage rates, auto loan rates, and business credit lines all drift higher. Step four: borrowers start paying more on every loan they carry or take out — not as a lump sum, but as a slightly larger monthly payment, invisible against the backdrop of daily life. The lump-sum promise triggered a flow cost that most people will never trace back to its source.</p>
+
+<p>The video provides a precise, numbers-grounded example of exactly this sequence. In the summer of 2026, President Trump proposed a $5,000 dividend to every adult American at a rally in Dallas. Before any bill was drafted, before any eligibility rules were set, the bond market moved. The 10-year Treasury yield climbed toward 4.92%, its highest since October 2023. The 30-year yield touched 5.32%. On a $400,000 mortgage, moving the rate just half a point — from 6.71% to 7.21% — raises the monthly payment from roughly $2,584 to $2,718. That is $134 per month. Across a 30-year loan, $134 per month totals approximately $48,000. The $5,000 check, if it ever arrives, costs the average new borrower nearly ten times its face value — paid out in flows so small they barely register.</p>
+
+<blockquote>"We pay attention to the lump sum. We don't pay attention to the flow. The $5,000 is the sticker price. The mortgage is the cost per wearing, per use. One arrives once and you can see it sitting in the account. The other leaves quietly $134 at a time for 360 months. That's not a conspiracy. That is simply how human beings experience lump sums against flows."</blockquote>
+
+<p>Sophisticated traders and investors use lump-sum bias as a signal rather than a trap. When a large fiscal announcement hits — a stimulus package, a tax cut, a government dividend — a bond desk's first question is not whether the policy will pass. It is: what is the worst-case size of the issuance, and how should we price the uncertainty? Markets consistently price the <strong>tail risk</strong> of the largest plausible version of a proposal, because uncertainty itself is a cost. Watching the long end of the <strong>yield curve</strong> — specifically the 30-year Treasury — tells you whether the market believes the spending is real and durable. If the long end steepens while the short end holds flat, that is the bond market voting that it believes the issuance is coming, regardless of what any politician says at a podium. It is one of the cleanest real-time signals available.</p>
+
+<p>The most common misconception about this bias is that it is primarily a problem for unsophisticated retail investors. In reality, it operates at every level of the system. Politicians of every ideological stripe have understood and deployed lump-sum framing for generations — announcing the benefit as a single number while the financing costs diffuse invisibly across millions of households and decades of time. A subtler misconception is that the bias only harms borrowers. Higher yields benefit savers: someone living off a ladder of Treasuries or <strong>certificates of deposit</strong> receives a higher income when rates rise. The same $134-per-month increase that costs a new borrower also pays a saver something extra. The bias does not pick sides economically — it just ensures that most people only notice one side of the ledger.</p>
+
+<p>The bias breaks down, or at least loses its grip, when the flow becomes impossible to ignore. Hyperinflation is the most dramatic example: when prices change daily, people stop anchoring to lump sums and start tracking flows obsessively. A more common edge case is when rates rise so sharply that the monthly payment on a new loan dwarfs what a buyer planned to spend — at that point, the flow cost forces itself into awareness and demand collapses, sometimes abruptly. The other failure mode is political. If a government makes a large lump-sum promise, then the associated rate increases arrive before the checks do — as the video explicitly warns can happen — public trust erodes in a particularly corrosive way. People may pay the financing cost without ever receiving the benefit.</p>
+
+<p>Lump-sum vs. ongoing-cost bias connects directly to several adjacent concepts in behavioral finance. <strong>Present bias</strong> is a close relative: the tendency to weight immediate rewards more heavily than future costs, even when the future costs are mathematically larger. <strong>Salience bias</strong> is the broader category — we over-weight information that is vivid and underweight information that is abstract or spread out. In macroeconomics, this bias is one reason why <strong>fiscal and monetary policy</strong> so often pull in opposite directions: fiscal policy announces a lump-sum benefit to win votes, while monetary policy responds to the inflationary flow that benefit creates by raising rates. The two policies are not coordinated; they are responding to the same event from opposite ends of the salience spectrum. Understanding this loop is what separates people who watch cable panels from people who watch the 30-year bond.</p>
+<div class="concept-side">Sources: THE $5,000 CHECK TRAP: Why That Proposed Trump Dividend Will Cost You $48,000!<br>Related in this category: <a href="restructuring_rally.html">Restructuring Rally</a>, <a href="exit_liquidity.html">Exit Liquidity</a></div>
+<button class="concept-done" data-slug="lump_sum_vs_cashflow_bias" onclick="toggleDone('lump_sum_vs_cashflow_bias')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_lump_sum_vs_cashflow_bias';</script>
+<script src="../../book.js"></script>
+<script src="../fg.js"></script>
+</body>
+</html>
