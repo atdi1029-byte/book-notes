@@ -287,8 +287,9 @@
 
   function countWords() {
     // Count words in main content only — skip UI chrome
+    // Skip <article> — some books use it for individual entries, not page wrapper
     var container = document.querySelector(
-      'main, article, .content'
+      'main, .content'
     ) || document.body;
     var clone = container.cloneNode(true);
     // Remove UI elements that aren't reading content
@@ -312,7 +313,7 @@
 
   function buildWordMap() {
     var container = document.querySelector(
-      'main, article, .content'
+      'main, .content'
     ) || document.body;
     var els = container.querySelectorAll(
       'p, li, td, th, blockquote, h1, h2, h3, h4, h5, h6, figcaption, dt, dd'
