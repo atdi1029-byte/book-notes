@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Base Effect (Year-over-Year Comparison Baseline) - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.tier .tier-desc { color: #a08060; font-size: 0.85rem; margin: 0.4rem 0 0.8rem; }
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done,
+body.hide-done .cat-card.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../economic-indicators.html">&larr; Economic Indicators</a>
+
+<div class="concept-meta"><span>standard</span><span>Economic Indicators</span><span>added 2026-09-12</span></div>
+<h4 id="base_effect">Base Effect (Year-over-Year Comparison Baseline)</h4>
+
+<p>The <strong>base effect</strong> is one of the most misunderstood forces in economic data interpretation — and it's one the financial media almost never explains clearly. At its core, the base effect describes how a current measurement looks artificially high or low depending on what it's being compared against. When economists report that inflation rose 3.4% "over the year," that percentage is calculated by dividing today's price level by the price level from exactly twelve months ago. That prior-year number is called the <strong>base</strong>, and its size dramatically shapes how the current reading appears. A high base makes today's number look small; a low base makes it look large. The number on your screen is always relative, never absolute.</p>
+
+<p>This matters enormously because financial markets, policy decisions, and public sentiment all respond to the headline percentage — not the underlying price level. When the Federal Reserve is weighing whether to raise interest rates, when bond traders are pricing 10-year yields, when a journalist writes "inflation cools to lowest in five years," every one of those conclusions depends on year-over-year math. If the base was unusually high due to a prior spike, a calm-looking reading today doesn't mean prices are cheap or even stable. It may simply mean you're comparing against a period when prices shot up dramatically. The base effect lets a genuinely painful price environment wear the costume of relief — and that disguise can mislead millions of financial decisions simultaneously.</p>
+
+<p>Mechanically, the calculation is straightforward. Take today's price index value — say the <strong>Consumer Price Index</strong> or <strong>CPI</strong> reads 315 this August. Twelve months ago, August's reading was 305. The year-over-year inflation rate is (315 − 305) ÷ 305 × 100 = 3.28%. Now imagine that instead of 305, last August's reading was 312 — maybe because there was a price surge that year. Now the same current reading of 315 yields only (315 − 312) ÷ 312 × 100 = 0.96%. Nothing about today's prices changed. The underlying cost of living is identical. But the reported inflation rate dropped from 3.28% to under 1% purely because the denominator — the base — got larger. The base effect is a denominator problem masquerading as real-world signal.</p>
+
+<p>The video provides a textbook real-world example in the shelter category. During 2021 and 2022, rents across the United States surged sharply as pandemic-era demand, supply constraints, and stimulus money collided. Those elevated rent levels became the base against which 2023 and later readings would be measured. As the video explains, shelter "disinflated as the 2021 and 2022 rent spike rolls out of the annual comparison." This means that when August's CPI report showed shelter rising only 0.3% — a seemingly tame number — it wasn't because rents had become affordable. It was because current rents were being compared against the already-elevated levels set during that prior spike. Shelter costs remained punishingly high in absolute terms; the math simply made the increase look small.</p>
+
+<blockquote>"The CPI number is not telling you inflation is beaten. It's telling you one enormous component is cooling and it happens to own a third of the index."</blockquote>
+
+<p>Traders and sophisticated investors use base effect awareness as a filter to strip out statistical noise from genuine economic signal. When a category like shelter carries roughly 34% of the CPI basket, a base-effect-driven cooldown in that single component can drag the entire headline number lower — even if every other price in the economy is accelerating. A skilled analyst asks: "Why is this reading soft — is it real deceleration or is it the base?" In the August report discussed in the video, bond market traders clearly asked exactly that question. Within minutes of the CPI release, they priced an 87% probability of a rate hike at the next Fed meeting. They recognized that the soft shelter reading was a mathematical artifact, not evidence of genuine disinflation across the economy.</p>
+
+<p>The most dangerous misconception about the base effect is conflating a lower rate of increase with actual price relief. <strong>Disinflation</strong> — a slowing in the rate of price increases — is fundamentally different from <strong>deflation</strong>, where prices actually fall. When shelter disinflates from a base-effect tailwind, rents don't drop. They simply rise more slowly than they did during the comparison period. For a household struggling to pay rent today, an annual shelter reading of 0.3% is cold comfort when rents have already doubled since 2019. The percentage on television reflects the speed of change, not the destination. People anchored to pre-spike price expectations are experiencing real hardship that the softening year-over-year number completely obscures.</p>
+
+<p>The base effect breaks down as a reliable signal in two important edge cases. First, when the prior-year base was distorted by a one-time shock — like a wireless telephone price war in 2017 that temporarily crushed that category's index, or the pandemic-era rent explosion — the comparison becomes meaningless for forward-looking analysis. The video notes that in March 2017, wireless services fell 7% in a single month due to unlimited data pricing wars, briefly dragging core CPI negative. Analysts who traded that reading got "steamrolled" because the Fed correctly looked through it. Second, when the base effect is rolling off — when those high prior-year readings are no longer in the annual comparison window — the statistical tailwind disappears and the headline number can re-accelerate sharply, catching markets unprepared.</p>
+
+<p>The base effect connects directly to the critical distinction between CPI and <strong>PCE</strong> — the <strong>Personal Consumption Expenditures price index</strong> — which is the Federal Reserve's actual inflation target. Because shelter carries 34% of CPI but only 16% of PCE, the base-effect tailwind from the rent spike provided a massive boost to CPI's softening that PCE barely felt. Core CPI came in at 2.4% year-over-year while core PCE sat at 3.3% — an 80-basis-point gap running in the opposite direction of historical norms, where PCE typically runs 30–40 basis points below CPI. The base effect, operating through shelter's oversized CPI weight, created the illusion that the Fed's preferred inflation gauge was also cooling when it emphatically was not. Understanding the base effect means never taking a single index reading at face value — always ask what the comparison period looked like, what weights are at play, and whether the math is telling you something true or something temporary.</p>
+<div class="concept-side">Sources: WARSH DROPS THE HAMMER: Why The Softest CPI in 5 Years Forces a Rate Hike!<br>Related in this category: <a href="non_farm_payroll_report.html">Non-Farm Payroll (NFP) Report</a>, <a href="u6_unemployment_rate.html">U6 Unemployment Rate (Broad Labor Underutilization)</a>, <a href="adp_employment_report.html">ADP National Employment Report</a>, <a href="payroll_data_revision.html">Payroll Data Revision (BLS Benchmark Revision)</a>, <a href="challenger_gray_christmas_layoff_report.html">Challenger, Gray &amp; Christmas Job Cut Report</a>, <a href="average_hourly_earnings.html">Average Hourly Earnings (Wage Growth)</a></div>
+<button class="concept-done" data-slug="base_effect" onclick="toggleDone('base_effect')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_base_effect';</script>
+<script src="../../book.js"></script>
+<script src="../fg.js"></script>
+</body>
+</html>

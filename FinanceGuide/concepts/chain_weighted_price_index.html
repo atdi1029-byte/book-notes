@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Chain-Weighted vs. Fixed-Basket Price Index - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.tier .tier-desc { color: #a08060; font-size: 0.85rem; margin: 0.4rem 0 0.8rem; }
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done,
+body.hide-done .cat-card.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../economic-indicators.html">&larr; Economic Indicators</a>
+
+<div class="concept-meta"><span>standard</span><span>Economic Indicators</span><span>added 2026-09-12</span></div>
+<h4 id="chain_weighted_price_index">Chain-Weighted vs. Fixed-Basket Price Index</h4>
+
+<p>When the government measures inflation, it needs to track how prices change over time. The most intuitive method is to pick a set of goods and services — a "basket" — and track what that exact basket costs month after month. That is a <strong>fixed-basket price index</strong>, and it is essentially what the <strong>Consumer Price Index (CPI)</strong> does. The Bureau of Labor Statistics surveys households to find out what Americans buy, freezes that snapshot in time, and reprices it every month. Simple, transparent, and easy to explain on television. The problem is that people do not behave like a frozen snapshot. When beef prices spike, people eat more chicken. A fixed basket pretends they keep buying beef anyway, overstating how much their cost of living actually rose.</p>
+
+<p>The alternative is a <strong>chain-weighted price index</strong>, which is the methodology behind the <strong>Personal Consumption Expenditure (PCE) price index</strong>, the Federal Reserve's official inflation target. Instead of locking the basket in place, a chain-weighted index continuously updates the basket weights based on what consumers actually purchase. If steak gets expensive and shoppers switch to chicken, the index reflects that substitution. The term "chain-weighted" comes from the way the index links — or chains — each period's calculation to the previous one using updated spending shares. The result is a dynamic measure that tracks the real cost of maintaining a given standard of living, not just repricing a static list of goods from a survey conducted years ago.</p>
+
+<p>Why does this methodological difference matter? Because the gap between CPI and PCE can be significant enough to completely change the policy conclusion. The Fed has an official 2% inflation target defined in terms of PCE, not CPI. If CPI reads 2.4% and PCE reads 3.3% simultaneously — as was the case in the data discussed in the video — then CPI could be flashing "mission accomplished" while PCE is screaming "problem not solved." The bond market, which trades on what the Fed will actually do rather than what cable news reports, reads PCE. When those two numbers diverge sharply, investors betting on Fed policy using CPI as their guide are trading on the wrong scoreboard, and they will get run over by rate decisions they didn't see coming.</p>
+
+<p>Mechanically, here is how the substitution effect works inside a chain-weighted index. Imagine coffee and tea are both in the basket at roughly equal weights because that's how consumers split their spending last year. This year, coffee prices jump 30%. Fixed-basket CPI reprices the original coffee weight and records the full price shock. Chain-weighted PCE notices that consumers responded by drinking more tea and less coffee, so next period it assigns more weight to tea (which didn't rise) and less to coffee. The measured price increase is lower — not because inflation is fake, but because the index is capturing the actual cost of maintaining a living standard, which rational consumers partly protected by substituting. This is not a trick. It reflects the real behavior that blunts the damage of any single price spike.</p>
+
+<p>The real-world illustration from the video is concrete and striking. In the August CPI report, core CPI (excluding food and energy) came in at 2.4% year-over-year — the lowest reading since the inflation surge began in 2021. That number generated headlines about inflation finally cooling. But core PCE for the same period was running at 3.3% — nearly a full percentage point higher. That 80-to-90-basis-point gap is extraordinary. Under normal conditions, PCE runs <em>below</em> CPI by about 30 to 40 basis points, precisely because the chain-weighting substitution effect tends to shave the PCE number down. PIMCO described the reversal of that relationship as one of the largest since 1985. When the historically softer index is suddenly the hotter one, something structural has changed.</p>
+
+<p>The structural reason in this case is shelter weighting. <strong>Shelter</strong> — rent and the equivalent for homeowners — carries roughly 34% of the CPI basket but only about 16% of the PCE basket. Shelter was genuinely disinflating as the 2021–2022 rent spike rolled out of the annual comparison. Because CPI overweights shelter, every month that rent cools gives CPI a massive tailwind. PCE barely notices. Meanwhile, the categories that remain stubbornly hot — healthcare, financial services, portfolio management fees — carry much heavier weight in PCE. PCE also captures medical spending paid by employers and the government, which CPI excludes entirely since CPI only counts out-of-pocket consumer spending. A chain-weighted index that reflects the total consumption picture will naturally pick up these systemic costs that a household-survey-based basket misses.</p>
+
+<p>For traders and investors, the practical application is about knowing which index actually drives the Fed's trigger finger. When PCE is running hotter than CPI, and especially when it is running hotter than its usual relationship would predict, the bond market reads that as a signal that the inflation problem is broad and durable — not concentrated in one category consumers can dodge. The video captures this precisely:
+
+<blockquote>"When the flexible index runs hotter than the rigid one, the pressure isn't coming from one stubborn category consumers can dodge. It is broad."</blockquote>
+
+A hot CPI driven by one quirky component — like wireless phone bills jumping 5.9% in a single month — can be dismissed as noise. But if even the chain-weighted PCE, which automatically adjusts away from whatever got expensive, is still running hot, there is nowhere left to hide. That is the kind of inflation signal that forces rate hikes regardless of the headline CPI print.</p>
+
+<p>The common misconception worth correcting is that PCE is simply a "nicer" or "easier" version of CPI that the Fed uses so it can declare victory sooner. That framing is wrong in both directions. PCE is not softer by political design — it is softer by structural logic, because substitution behavior genuinely reduces the cost-of-living impact of any single price shock. But that same logic means that when PCE is <em>hot</em>, it is a more alarming signal than hot CPI, not less. A CPI spike can be a shelter or gasoline story. A PCE spike that comes through despite consumers substituting away from expensive categories means the price pressure is pervasive enough that substitution cannot rescue you. The "friendly" index turning unfriendly is the most honest possible warning that inflation has become a systemic condition, not a sectoral one.</p>
+
+<p>The edge case that exposes how these indexes can mislead involves the financial market feedback loop embedded in PCE. PCE includes <strong>portfolio management fees</strong>, which rise mechanically when asset prices rise. This creates a reflexive circuit: the Fed sees rising markets as inflationary (through PCE), raises rates to cool inflation, which should pressure markets, which should reduce portfolio fee revenue and nudge PCE down. But if the long end of the yield curve rises on rate-hike expectations and equity multiples compress while underlying corporate earnings hold, the feedback can delay or complicate the cooling. As the video notes, "a rising market literally feeds the inflation gauge that justifies the next hike." That loop does not exist in CPI at all. A fixed-basket consumer goods index is blind to financial asset dynamics.</p>
+
+<p>Chain-weighting connects directly to several other critical concepts. It links to <strong>producer price index (PPI)</strong> dynamics because pipeline inflation at the wholesale level eventually shows up in consumer prices regardless of which basket you use — it just lands differently depending on which categories carry more weight. It connects to <strong>inflation expectations</strong> because if households believe prices will keep rising broadly, they stop substituting and start hoarding or accelerating purchases, which itself removes the substitution buffer that makes chain-weighting work. An expectations-unanchored environment is one where the behavioral assumption baked into PCE's methodology breaks down. Finally, it connects to <strong>monetary policy credibility</strong> because when the public debates inflation using CPI while the Fed targets PCE, and the gap between the two widens to 40-year extremes, the entire communication framework that central banks depend on begins to fracture — and markets, as the bond market showed in this episode, will price the reality long before the headlines catch up.</p>
+<div class="concept-side">Sources: WARSH DROPS THE HAMMER: Why The Softest CPI in 5 Years Forces a Rate Hike!<br>Related in this category: <a href="non_farm_payroll_report.html">Non-Farm Payroll (NFP) Report</a>, <a href="u6_unemployment_rate.html">U6 Unemployment Rate (Broad Labor Underutilization)</a>, <a href="adp_employment_report.html">ADP National Employment Report</a>, <a href="payroll_data_revision.html">Payroll Data Revision (BLS Benchmark Revision)</a>, <a href="challenger_gray_christmas_layoff_report.html">Challenger, Gray &amp; Christmas Job Cut Report</a>, <a href="average_hourly_earnings.html">Average Hourly Earnings (Wage Growth)</a></div>
+<button class="concept-done" data-slug="chain_weighted_price_index" onclick="toggleDone('chain_weighted_price_index')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_chain_weighted_price_index';</script>
+<script src="../../book.js"></script>
+<script src="../fg.js"></script>
+</body>
+</html>
