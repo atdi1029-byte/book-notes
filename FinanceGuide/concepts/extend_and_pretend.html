@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Extend and Pretend (Loan Maturity Extension Strategy) - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.tier .tier-desc { color: #a08060; font-size: 0.85rem; margin: 0.4rem 0 0.8rem; }
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done,
+body.hide-done .cat-card.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../real-estate.html">&larr; Real Estate</a>
+
+<div class="concept-meta"><span>standard</span><span>Real Estate</span><span>added 2026-09-13</span></div>
+<h4 id="extend_and_pretend">Extend and Pretend (Loan Maturity Extension Strategy)</h4>
+
+<p><strong>Extend and pretend</strong> is a crisis-management strategy used by lenders — most often banks — when a borrower can no longer meet the original terms of a loan. Instead of forcing a painful reckoning (foreclosure, forced sale, public write-down), the bank quietly agrees to push the loan's maturity date forward, typically by 12 to 24 months, and pretends the underlying problem has been resolved. The borrower gets more time. The bank avoids recognizing a loss on its books. Both parties effectively agree to defer the day of reckoning and hope that market conditions improve enough in the interim to make the original loan viable again. It is not a solution — it is a gamble dressed up as a modification.</p>
+
+<p>The reason extend and pretend matters so much is that it operates invisibly. When a bank forecloses on a property, the loss shows up immediately in earnings, capital ratios, and regulatory reports. When a bank extends a loan, nothing dramatic appears in the financials — the loan is still classified as performing, the collateral is still carried at book value, and the public balance sheet looks healthy. This gap between what the balance sheet says and what economic reality actually is creates what analysts call <strong>hidden credit risk</strong>. That hidden risk doesn't disappear — it accumulates behind the curtain, growing larger with every extension granted, until the calendar finally forces a resolution that the market was never warned about.</p>
+
+<p>Mechanically, the process works like this. A borrower took out a commercial real estate loan in 2021 — say a five-year floating-rate bridge loan on an apartment complex. The loan matures in 2026, but by 2024 the property's value has dropped 25%, rents haven't grown as projected, and the <strong>loan-to-value ratio</strong> (LTV) now exceeds what any new lender will accept for refinancing. The borrower can't pay off the loan at maturity and can't refinance it without injecting substantial new equity. Foreclosure would force the bank to write the loan down to current market value. So instead, both parties sign a modification agreement: extend the maturity by 18 months, adjust the interest rate slightly, and revisit the situation in late 2027. The clock resets — but the underlying problem does not.</p>
+
+<p>The strategy gained its name because both parties are pretending the loan is healthy when it isn't. For extend and pretend to actually work — rather than simply delay failure — several things need to happen during the extension window. Property values need to recover. Rents need to rise. Interest rates need to fall enough that the borrower can qualify for a new loan at maturity. In the 2023–2025 cycle, lenders were specifically betting that the <strong>Federal Reserve</strong> would continue cutting rates, which would lower <strong>SOFR</strong> (the Secured Overnight Financing Rate, the benchmark that most floating-rate commercial loans are tied to) and make refinancing feasible. For a period, that bet was paying off — the Fed did cut through parts of 2025. But the window was narrow and the assumptions were fragile.</p>
+
+<p>The video provides a concrete illustration of how this played out in the Sunbelt apartment market. Syndicators purchased apartment complexes in Phoenix, Atlanta, Dallas, and Tampa during 2020–2022 using short-term floating-rate <strong>bridge loans</strong>. To protect themselves from rising rates, they purchased <strong>interest rate caps</strong> — financial contracts that capped their effective borrowing cost near 3.5% to 4% even if SOFR climbed higher. When rates rose sharply in 2022–2023, those caps provided real protection: the borrowers paid a capped rate while the benchmark climbed above 5%. Banks extended maturities, the caps held, and the crisis was deferred. But those caps have finite terms, typically two to three years. As they expire in 2026, borrowers suddenly face the full overnight benchmark — now pinned above 5.3% — without the protection they had been counting on, at precisely the moment their extended loans are coming due again.</p>
+
+<blockquote>"Extend and pretend was never a good solution. It was a clock, and the clock is about to run out at the worst possible moment right now."</blockquote>
+
+<p>For investors and traders, extend and pretend creates two distinct monitoring opportunities. First, it is a leading indicator of future distress — if you know that a large volume of commercial real estate loans was extended during a specific window, you can anticipate when those extensions expire and position accordingly. <strong>CMBS</strong> (commercial mortgage-backed securities) delinquency reports, published monthly by firms like TREPP, show which loans are past maturity with no repayment or formal resolution. When that number rises sharply — TREPP reported roughly 25% of CMBS loans sitting past maturity in 2026, a level not seen since post-2008 — it signals that extend and pretend has reached its limits. Second, regional bank concentration ratios (commercial real estate loans as a percentage of total risk-based capital) are disclosed in quarterly filings and identify which institutions are most exposed when the extensions start breaking down.</p>
+
+<p>A critical nuance that many observers miss: extend and pretend converts a <strong>pricing problem into a calendar problem</strong>. In 2023, the core issue was that commercial property values had fallen too far for loans to be refinanced at par. That is a pricing problem — it might self-correct if values recover, or it might require a haircut. By granting extensions, banks transformed that into a calendar problem: the loans are fine for now, but a specific date is coming when they won't be. This transformation looks like progress on the surface, but it actually concentrates risk rather than dispersing it. Instead of losses trickling through the system over time as individual properties fail, you now have a synchronized maturity wall — the video's "$1.5 trillion in commercial real estate debt coming due" — hitting at roughly the same moment, in the same rate environment, with the same limited pool of available capital to absorb it.</p>
+
+<p>The failure mode for extend and pretend is abrupt and contagious. When enough extensions expire simultaneously and borrowers begin handing properties back to lenders — a process called <strong>deed-in-lieu of foreclosure</strong>, where a borrower surrenders the property rather than endure formal foreclosure — banks are forced to recognize losses publicly. The cascade works like this: a regional bank takes back an office park at a value well below its book value, triggers a visible write-down, and spooks equity investors. Those investors don't wait to determine which other regional banks have similar exposure — they sell the entire sector. As the video notes, this is exactly what happened with Silicon Valley Bank and Signature Bank in 2023, where a problem specific to a few institutions repriced the entire regional banking group within days. The difference now is that 54.8% of regional banks sit above the 300% CRE concentration threshold that triggers heightened regulatory supervision — making the pool of potentially affected institutions dramatically larger than in 2023.</p>
+
+<p>Extend and pretend connects directly to several other concepts in real estate and credit markets. The <strong>maturity wall</strong> is the aggregate consequence — when many loans extended simultaneously come due at the same time. The <strong>loan-to-value reset</strong> problem explains why simply extending isn't enough: if values have fallen, the borrower may need to inject cash just to qualify for a new loan, which many can't do. The dynamics of <strong>interest rate cap expiration</strong> explain the specific timing pressure described in the video. And the broader concept of <strong>regulatory capital concentration</strong> explains why this stress stays contained to regional banks rather than spreading to money-center banks, which actively reduced their commercial real estate exposure over the past decade. Understanding extend and pretend means understanding all of these pieces as a system — not a collection of isolated risks, but a set of interlocking timers counting down toward the same moment.</p>
+<div class="concept-side">Sources: THE $1.5T REAL ESTATE CLIFF: Why Regional Banks Are About to Take the Keys!<br>Related in this category: <a href="fixed_rate_mortgage_insulation.html">Fixed-Rate Mortgage Insulation</a>, <a href="30_year_fixed_mortgage_rate.html">30-Year Fixed Mortgage Rate</a>, <a href="mortgage_spread.html">Mortgage Spread (Treasury-to-Mortgage Rate)</a>, <a href="loan_to_value_ratio.html">Loan-to-Value (LTV) Ratio</a>, <a href="cash_in_refinance.html">Cash-In Refinance (Equity Recapture Requirement)</a>, <a href="cre_concentration_ratio.html">CRE Concentration Ratio (Bank Regulatory Threshold)</a></div>
+<button class="concept-done" data-slug="extend_and_pretend" onclick="toggleDone('extend_and_pretend')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_extend_and_pretend';</script>
+<script src="../../book.js"></script>
+<script src="../fg.js"></script>
+</body>
+</html>

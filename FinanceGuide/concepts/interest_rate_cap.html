@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Interest Rate Cap (Floating-Rate Debt Hedge) - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.tier .tier-desc { color: #a08060; font-size: 0.85rem; margin: 0.4rem 0 0.8rem; }
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done,
+body.hide-done .cat-card.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../options-derivatives.html">&larr; Options &amp; Derivatives</a>
+
+<div class="concept-meta"><span>standard</span><span>Options &amp; Derivatives</span><span>added 2026-09-13</span></div>
+<h4 id="interest_rate_cap">Interest Rate Cap (Floating-Rate Debt Hedge)</h4>
+
+<p>An <strong>interest rate cap</strong> is a derivative contract that sets a ceiling on the interest rate a borrower must pay on a floating-rate loan. When you borrow money at a floating rate, your interest payment rises and falls with a benchmark index — and a cap is the insurance policy that says "no matter how high that benchmark climbs, I will never pay more than X%." The borrower pays an upfront premium to purchase the cap from a counterparty (typically a large bank or derivatives dealer), and in return, any time the benchmark rate exceeds the strike price, the cap seller pays the borrower the difference. The cap doesn't eliminate interest expense; it just guarantees a maximum.</p>
+
+<p>Interest rate caps matter enormously because <strong>floating-rate debt</strong> is a core tool of commercial real estate finance, corporate lending, and leveraged buyouts. When interest rates are low and stable, floating-rate loans offer cheaper borrowing costs than fixed-rate alternatives — and sponsors take advantage of that. But floating-rate debt introduces a fundamental vulnerability: if benchmark rates spike, debt service can balloon overnight. Caps exist to bridge that gap — they allow borrowers to access the cheaper floating-rate market while removing the catastrophic tail risk of runaway rates. When caps work, they're invisible. When they expire or fail, they can turn a profitable investment into a forced liquidation with stunning speed.</p>
+
+<p>Mechanically, here is exactly how a cap works. The borrower and the cap seller agree on three things: a <strong>strike rate</strong> (the ceiling, say 4%), a <strong>reference rate</strong> (the floating benchmark the loan is tied to, typically <strong>SOFR</strong> — the Secured Overnight Financing Rate), and a <strong>notional amount</strong> (the loan balance the protection applies to). Each period — monthly or quarterly — the reference rate is observed. If SOFR is 3.8%, below the strike, nothing happens. If SOFR is 5.5%, above the 4% strike, the cap seller pays the borrower the difference: 1.5% annualized on the notional. That payment flows directly to offset the borrower's elevated interest bill, keeping effective borrowing costs capped. The borrower's net rate never exceeds the strike, regardless of where the benchmark goes.</p>
+
+<p>The upfront premium is not trivial, and it varies dramatically with market conditions. A cap's cost depends on the strike relative to current rates, the length of coverage, and the <strong>implied volatility</strong> of interest rates. During 2020–2022, when the Federal Reserve had pushed rates near zero and SOFR was trading below 0.1%, caps struck at 3.5–4% were dirt cheap — the market considered it wildly unlikely that rates would ever reach those levels before the cap expired. Sunbelt apartment syndicators loading up on two- and three-year floating-rate bridge loans during that era bought those caps for relatively modest premiums, locking in what felt like generous headroom. They were buying fire insurance at a moment when nobody thought the neighborhood would burn.</p>
+
+<blockquote>"The interest rate caps that borrowers purchased to artificially cap their floating rate debt near 3 and 1/2 and 4%... are now expiring. It exposes them now to an overnight benchmark pinned above 5.3% at the worst possible moment."</blockquote>
+
+<p>That is the precise mechanism of the current commercial real estate crisis. Those caps — purchased during 2020, 2021, and 2022 on two- to three-year terms — have been expiring en masse throughout 2024 and 2025. While they were active, a syndicator who borrowed at SOFR + 2.5% with a 4% SOFR cap faced a maximum effective rate of roughly 6.5%. With SOFR above 5.3%, the cap was actively paying out, suppressing their real cost. The moment that cap expires and is not replaced, the same borrower immediately faces SOFR + 2.5% with no ceiling — an effective rate above 7.8%. That is not a gradual increase. It is an overnight step-change in cash-flow requirements on a property whose rental income has not moved commensurately.</p>
+
+<p>Traders and investors use caps in several ways beyond basic debt protection. <strong>Cap spreads</strong> — buying one cap and selling another at a higher strike — reduce the upfront premium while retaining partial protection. Real estate private equity sponsors model cap costs explicitly into their deal underwriting, treating the premium as a carry cost that affects returns. Interest rate <strong>cap volatility</strong> (the implied volatility priced into these instruments) is itself a market signal — when cap premiums surge, it reflects the market pricing in higher rate uncertainty, and that repricing cascades into underwriting assumptions across the entire commercial real estate market. When cap costs double or triple, deals that worked at old premium levels suddenly fail to pencil, effectively freezing new origination.</p>
+
+<p>A critical nuance: caps protect against rate levels, not rate trends, and they expire. This is where most people misunderstand the instrument. A cap does not hedge the <strong>refinancing risk</strong> of a loan maturing into a higher-rate environment — it only controls the floating rate cost during its term. Borrowers who purchased caps assuming they would refinance into a fixed-rate loan before expiration were making two bets simultaneously: one on rates staying manageable, and one on the availability of favorable refinancing terms. The "extend and pretend" strategy that lenders ran from 2023 through 2025 — granting 12-to-24-month maturity extensions rather than forcing painful refinancings — kicked the refinancing problem down the road without extending the cap coverage. Many deals now face expired caps and approaching maturity dates simultaneously.</p>
+
+<p>When a cap expires unhedged and rates remain elevated, the transmission to property-level distress is rapid and arithmetic. Consider a $20 million floating-rate apartment loan at SOFR + 2.5%. With a 4% SOFR cap in place and SOFR at 5.3%, the cap pays out 1.3% on $20 million — roughly $260,000 per year that the borrower receives to offset excess interest. When the cap expires, that $260,000 annual subsidy disappears and the borrower's interest bill rises by the same amount. On a property generating $1.4 million in net operating income with a prior debt service coverage ratio already thin at 1.15x, that additional cost drops coverage below 1.0x. The loan is now technically in default on its covenant tests — triggering lender notifications, potential acceleration clauses, and ultimately the mechanics described elsewhere in this guide: the loan-to-value breach, the cash-in refinancing requirement, and the rational decision to hand the keys back.</p>
+
+<p>The interest rate cap connects directly to the broader architecture of <strong>SOFR-linked debt</strong>, <strong>bridge lending</strong>, and the commercial mortgage-backed securities (<strong>CMBS</strong>) market. SOFR replaced LIBOR as the dominant U.S. floating-rate benchmark, and virtually all floating-rate commercial real estate debt originated after 2022 references SOFR directly. Because SOFR is mechanically tied to the Federal Reserve's overnight policy rate, every Fed rate decision is simultaneously a decision about the cost of unhedged floating-rate real estate debt. That is why the video focuses so sharply on the September 15–16 Fed meeting: a rate hike in that environment doesn't just affect new borrowing — it immediately raises the cash-flow burden on every unprotected floating-rate loan already outstanding, accelerating the distress timeline for borrowers who believed their window for refinancing had not yet closed.</p>
+<div class="concept-side">Sources: THE $1.5T REAL ESTATE CLIFF: Why Regional Banks Are About to Take the Keys!</div>
+<button class="concept-done" data-slug="interest_rate_cap" onclick="toggleDone('interest_rate_cap')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_interest_rate_cap';</script>
+<script src="../../book.js"></script>
+<script src="../fg.js"></script>
+</body>
+</html>
