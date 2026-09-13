@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Housing Starts - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.tier .tier-desc { color: #a08060; font-size: 0.85rem; margin: 0.4rem 0 0.8rem; }
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done,
+body.hide-done .cat-card.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../economic-indicators.html">&larr; Economic Indicators</a>
+
+<div class="concept-meta"><span>standard</span><span>Economic Indicators</span><span>added 2026-09-13</span></div>
+<h4 id="housing_starts">Housing Starts</h4>
+
+<p><strong>Housing starts</strong> is a monthly economic indicator published by the U.S. Census Bureau that counts the number of new residential construction projects that broke ground during the previous month. "Breaking ground" means construction has literally begun — the foundation work has started on a new home, apartment building, or multi-family structure. The report is released around the 17th of each month covering the prior month's activity, and it is one of the earliest hard-data signals we get about the health of the housing sector. It covers single-family homes, which are counted individually, and multi-family buildings like apartment complexes, which are counted by unit. When analysts say "housing starts came in at 1.4 million," they mean 1.4 million units began construction that month, expressed at an annualized rate.</p>
+
+<p>Housing starts matter enormously because residential construction is one of the most <strong>economically multiplied</strong> sectors in the entire economy. Building a home is not just a transaction between a buyer and a seller — it sets off a chain reaction across dozens of industries. Lumber mills, concrete suppliers, electricians, plumbers, appliance manufacturers, furniture retailers, and mortgage lenders all feel the impact of a single housing start. Economists estimate that one new home constructed generates roughly three jobs and contributes approximately $90,000 in tax revenue across local, state, and federal governments. When housing starts are rising, they signal that builders are confident in future demand, that credit is available, and that consumers feel financially secure enough to commit to 30-year mortgages. A falling trend in housing starts is often an early warning of economic slowdown.</p>
+
+<p>Mechanically, the process that leads to a housing start begins months before the data appears in the report. First, a developer or homebuilder must acquire land. Then they apply for a <strong>building permit</strong> — which is a separate indicator released alongside housing starts and is actually a leading signal, since permits precede starts by weeks or months. Once the permit is approved and the builder chooses to proceed, ground is broken and the project enters the housing starts count. After construction is complete, the unit becomes a <strong>housing completion</strong>, which is the third data point in the series. Think of permits as the intention, starts as the action, and completions as the result. Watching all three together gives you a pipeline view of housing supply — how much is coming, how much is being built, and how much has arrived.</p>
+
+<p>The relationship between housing starts and <strong>interest rates</strong> is the most critical mechanical link for market participants. Mortgage rates are heavily influenced by the 10-year Treasury yield, and when rates rise sharply, the monthly payment on a new home jumps dramatically. A 1% increase in mortgage rates on a $400,000 home adds roughly $250 per month to the payment — a number that can price a significant portion of buyers out of the market. When buyers pull back, builders stop starting new projects. This is why housing starts are watched so closely during periods of Federal Reserve tightening: they serve as a real-time readout of how much the rate increases are actually biting into real economic activity, not just financial markets.</p>
+
+<p>In the context of the video, housing starts were listed on the calendar for the Thursday following an FOMC meeting where the market was pricing an <strong>85% probability</strong> of a 25 basis point rate hike. The Fed's target range was already at 3.5 to 3.75%, and the two-year Treasury yield had already moved 26 basis points higher — before the Fed even met — precisely because bond markets anticipated further tightening. In that environment, housing starts data arriving the day after a rate decision would answer a critical question: has the prior year of rate hikes already cooled construction activity enough, or are builders still pushing forward? A weak housing starts print in that context would validate the view that monetary policy is working. A strong print would suggest the economy remains resilient enough to absorb another hike.</p>
+
+<blockquote>"Thursday well that brings our weekly jobless claims number and we get the beginning of a rash of housing numbers and we get housing starts."</blockquote>
+
+<p>For traders and investors, housing starts function as both a <strong>coincident indicator</strong> and an early signal for related asset classes. Homebuilder stocks — companies like D.R. Horton, Lennar, and PulteGroup — react directly to the print. A beat on expectations tends to lift the entire homebuilder ETF (ticker: XHB) in pre-market trading. Beyond equities, housing starts ripple into commodity markets: strong starts push lumber futures higher, boost demand for copper wiring and steel rebar, and increase orders for appliances. Fixed-income traders watch starts because a strong housing sector reduces the urgency for Fed rate cuts, supporting higher yields. Conversely, a collapse in starts can accelerate bets on rate cuts, flattening or inverting the yield curve as markets price in economic weakness ahead.</p>
+
+<p>The most important nuance in reading housing starts is the distinction between <strong>single-family starts</strong> and <strong>multi-family starts</strong>. These two components often move in opposite directions and tell different stories. Single-family starts reflect confidence among individual homebuyers and builders in the for-sale market. Multi-family starts (typically apartment buildings of five or more units) reflect developer confidence in the rental market. During periods of high mortgage rates, single-family starts can collapse while multi-family starts hold up — because high rates push potential buyers into renting, which in turn encourages developers to build more apartments. Looking only at the headline number and missing this split is one of the most common analytical errors. Month-to-month volatility is also high due to weather, so economists typically look at three-month moving averages and year-over-year comparisons before drawing conclusions.</p>
+
+<p>Housing starts can break down as an indicator in two important edge cases. First, during <strong>credit crunches</strong>, builders may have permits and willing buyers but cannot access construction financing — so starts collapse not because demand disappeared but because the banking system seized up. This happened dramatically in 2008-2009, when housing starts fell from over 2 million annualized units to below 500,000, a collapse driven as much by lender insolvency as by buyer retreat. Second, in supply-constrained markets where zoning and permitting delays are structural, housing starts chronically understate actual demand. A low starts number in a city with severe zoning restrictions tells you about regulatory barriers, not consumer appetite. Understanding what is driving the number — demand, financing, or supply constraints — is essential to interpreting it correctly and using it to make sound investment decisions.</p>
+
+<p>Housing starts connect directly to several other indicators discussed in this guide, forming a web of <strong>leading and lagging relationships</strong> that serious market participants track together. Building permits lead starts by four to eight weeks, so watching permit issuance gives you a preview. Starts themselves lead employment in construction trades, which feeds into the monthly <strong>nonfarm payrolls</strong> report. Housing completions feed into shelter inflation — specifically <strong>owners' equivalent rent</strong> — which is the stickiest component of core CPI, the very metric that caused so much anxiety in the video when it re-accelerated. More completions generally mean more rental supply, which over time pushes shelter inflation down. This is why the video's narrator specifically highlighted shelter as "the last bit of sticky inflation that gets everybody nervous." Housing starts, tracked patiently over a 12-to-18 month horizon, are one of the earliest signals of whether that shelter inflation will eventually resolve — or whether it will remain the Fed's stubborn final problem.</p>
+<div class="concept-side">Sources: THE BOND MARKET REVOLT: Yields Surge 26 bps as Hike Odds Hit 85%!<br>Related in this category: <a href="non_farm_payroll_report.html">Non-Farm Payroll (NFP) Report</a>, <a href="u6_unemployment_rate.html">U6 Unemployment Rate (Broad Labor Underutilization)</a>, <a href="adp_employment_report.html">ADP National Employment Report</a>, <a href="payroll_data_revision.html">Payroll Data Revision (BLS Benchmark Revision)</a>, <a href="challenger_gray_christmas_layoff_report.html">Challenger, Gray &amp; Christmas Job Cut Report</a>, <a href="average_hourly_earnings.html">Average Hourly Earnings (Wage Growth)</a></div>
+<button class="concept-done" data-slug="housing_starts" onclick="toggleDone('housing_starts')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_housing_starts';</script>
+<script src="../../book.js"></script>
+<script src="../fg.js"></script>
+</body>
+</html>

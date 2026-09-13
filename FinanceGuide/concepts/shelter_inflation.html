@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Shelter Inflation (OER / Rent CPI Component) - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.tier .tier-desc { color: #a08060; font-size: 0.85rem; margin: 0.4rem 0 0.8rem; }
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done,
+body.hide-done .cat-card.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../economic-indicators.html">&larr; Economic Indicators</a>
+
+<div class="concept-meta"><span>standard</span><span>Economic Indicators</span><span>added 2026-09-13</span></div>
+<h4 id="shelter_inflation">Shelter Inflation (OER / Rent CPI Component)</h4>
+
+<p>When economists and investors talk about <strong>shelter inflation</strong>, they're referring to the portion of the Consumer Price Index (CPI) that tracks what Americans pay to keep a roof over their heads. This is one of the largest single components in the CPI basket — it accounts for roughly one-third of the overall index and an even larger share of <strong>core CPI</strong> (the version that strips out food and energy). Shelter inflation includes two main sub-components: actual rent paid by renters, and something called <strong>Owners' Equivalent Rent (OER)</strong>, which is a hypothetical estimate of what homeowners would pay if they were renting their own homes instead of owning them. That second one is the weird one — and it's the source of enormous confusion, even among experienced market watchers.</p>
+
+<p>Why does shelter inflation matter so much? Because housing is the one expense almost nobody can cut. You can skip a vacation, cook at home instead of dining out, or delay buying a new car. You cannot easily skip paying rent or the mortgage. This gives shelter costs a stickiness that most other price categories don't have. When shelter inflation rises, it doesn't just hurt household budgets — it signals to the Federal Reserve that inflation is becoming entrenched in the part of the economy that is most resistant to higher interest rates. That's precisely why the host of the video flagged it as <em>"the last bit of sticky inflation that gets everybody nervous."</em> Shelter doesn't respond quickly to Fed tightening, which makes it a persistent thorn in the side of anyone trying to declare victory over inflation.</p>
+
+<p>Here's how OER works mechanically, because this is where most people get lost. The Bureau of Labor Statistics (BLS) doesn't track home prices to calculate OER. Instead, it surveys homeowners every six months and asks them: "If someone were to rent your home today, how much do you think it would rent for?" That self-reported estimate is then used to calculate a price for the housing services that homeowners are consuming. The logic is defensible — economists argue that owning a home is partly a form of consumption, and OER attempts to capture that — but the methodology introduces a significant lag. Because the surveys are infrequent and rents on new leases change faster than existing leases, <strong>OER tends to trail real-world rent conditions by 12 to 18 months</strong>. This lag is one of the most important structural quirks in the entire inflation data ecosystem.</p>
+
+<p>The actual rent component — sometimes called <strong>Rent of Primary Residence</strong> — follows the same lagged logic. The BLS surveys renters about what they're currently paying, which means it captures a blend of old leases and new ones. In a fast-moving rental market, the average lease currently being paid can look very different from what a new tenant would pay today. Private-sector rent indexes, like those published by Zillow or Apartment List, tend to show real-time conditions far more accurately. During 2021 and 2022, for example, private-sector data was showing rent growth of 15–25% annually while the official CPI shelter component was still showing single-digit increases. Markets and the Fed were essentially flying with a lagged instrument, and by the time CPI shelter caught up, real-world rents had already started cooling.</p>
+
+<p>The real-world example from the video makes the stakes concrete. In the August CPI report being discussed, <strong>headline CPI rose 0.4% on the month and 3.4% year-over-year</strong>, both in line with expectations. Nobody panicked at the headline. The trouble came from core CPI, which came in at 0.3% month-over-month against expectations of 0.2% — a single tenth of a percentage point hotter than expected. Shelter was the culprit, <strong>accelerating to 0.3% from 0.1% the prior month</strong>. That single data point — a 0.2 percentage point pickup in one subcategory of one index — was enough to shift the market's expectation of a Federal Reserve rate hike at the upcoming meeting from roughly a coin flip (around 50%) to "mid to high 80s," and at one point as high as 90%. One month of shelter data moved rate expectations by roughly 35 percentage points. That's the power of this number.</p>
+
+<blockquote>"That's the last bit of sticky inflation that gets everybody nervous. We don't like to see that go up even though it was just one month."</blockquote>
+
+<p>How do traders and investors actually use shelter CPI data? The most direct application is in <strong>Fed funds futures pricing</strong> — the market-based bets on where the Federal Reserve will set its benchmark interest rate. When shelter inflation surprises to the upside, traders immediately reprice the probability of rate hikes (or delay rate cuts), which is exactly what happened in this video. Bond traders, who had already sent the 2-year Treasury yield from 4.37% to 4.63% in four sessions, were responding to this repricing in real time. Equity traders can use shelter data as a leading signal for sectors that are sensitive to interest rates: small-cap stocks (which borrow at floating rates and suffer quickly when yields rise), real estate investment trusts, and homebuilders are all acutely exposed. The Russell 2000's 2.4% drop in the episode described was a direct consequence of this shelter-driven rate repricing.</p>
+
+<p>There are important gotchas here that trip up even sophisticated readers of CPI data. The biggest one is the lag problem already described — by the time CPI shelter is showing rising rent inflation, real-world rents may have already peaked. Conversely, when shelter CPI is still showing high readings, actual market rents may have been falling for a year. This means that shelter inflation is nearly always telling you what <em>was</em> happening, not what <em>is</em> happening. A savvy investor watches both the official CPI shelter data and real-time private-sector indexes like Zillow's Observed Rent Index or the Apartment List National Rent Report. When these diverge sharply from CPI shelter, it tells you something about where CPI is likely to go in the coming months — making it one of the few cases where you can see an official government statistic's future direction before it gets there.</p>
+
+<p>Another nuance: OER doesn't just lag — it also <strong>amplifies</strong>. Because homeowners represent a large share of the surveyed population and their estimates of rental values tend to track local market conditions, a surge in home prices can eventually feed into OER even if rental markets themselves have cooled. This happened during the post-pandemic period when home price appreciation of 20%+ per year eventually showed up in OER readings, keeping shelter inflation elevated long after the housing market had started to slow. This dynamic created a genuine policy dilemma for the Federal Reserve: the shelter component of CPI was mechanically pushing inflation readings higher while actual housing affordability was being crushed by the very high rates the Fed had imposed to fight that same inflation. It was a feedback loop built into the measurement system itself.</p>
+
+<p>Shelter inflation connects tightly to several other concepts covered in this guide. It's one of the primary reasons why <strong>core CPI</strong> can diverge so dramatically from the lived experience of ordinary people — when real rents are falling but OER is still climbing, the index looks hotter than reality. It's also closely tied to <strong>monetary policy transmission</strong>: the Fed raises rates to cool housing demand, but the measured impact on CPI shelter can take well over a year to show up, creating a dangerous temptation to keep hiking even after the real-world brake has already been applied. Finally, shelter inflation directly connects to the <strong>wage-price spiral</strong> the video describes — if workers see shelter costs rising in the official CPI, they demand higher wages, employers raise prices to protect margins, and the spiral tightens. Understanding shelter inflation isn't optional for anyone trying to anticipate what central banks will do next. It is, in many ways, the inflation number beneath the inflation number.</p>
+<div class="concept-side">Sources: THE BOND MARKET REVOLT: Yields Surge 26 bps as Hike Odds Hit 85%!<br>Related in this category: <a href="non_farm_payroll_report.html">Non-Farm Payroll (NFP) Report</a>, <a href="u6_unemployment_rate.html">U6 Unemployment Rate (Broad Labor Underutilization)</a>, <a href="adp_employment_report.html">ADP National Employment Report</a>, <a href="payroll_data_revision.html">Payroll Data Revision (BLS Benchmark Revision)</a>, <a href="challenger_gray_christmas_layoff_report.html">Challenger, Gray &amp; Christmas Job Cut Report</a>, <a href="average_hourly_earnings.html">Average Hourly Earnings (Wage Growth)</a></div>
+<button class="concept-done" data-slug="shelter_inflation" onclick="toggleDone('shelter_inflation')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_shelter_inflation';</script>
+<script src="../../book.js"></script>
+<script src="../fg.js"></script>
+</body>
+</html>

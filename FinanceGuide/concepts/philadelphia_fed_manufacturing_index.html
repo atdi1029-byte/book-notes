@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Philadelphia Fed Manufacturing Index (Philly Fed) - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.tier .tier-desc { color: #a08060; font-size: 0.85rem; margin: 0.4rem 0 0.8rem; }
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done,
+body.hide-done .cat-card.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../economic-indicators.html">&larr; Economic Indicators</a>
+
+<div class="concept-meta"><span>deep cut</span><span>Economic Indicators</span><span>added 2026-09-13</span></div>
+<h4 id="philadelphia_fed_manufacturing_index">Philadelphia Fed Manufacturing Index (Philly Fed)</h4>
+
+<p>The <strong>Philadelphia Fed Manufacturing Index</strong> — commonly called the <strong>Philly Fed</strong> — is a monthly survey-based economic indicator produced by the Federal Reserve Bank of Philadelphia. It measures the health of manufacturing activity in the Third Federal Reserve District, which covers eastern Pennsylvania, southern New Jersey, and Delaware. Each month, the Philadelphia Fed surveys manufacturing executives and asks them whether business conditions have improved, worsened, or stayed the same across a range of categories: new orders, shipments, employment, prices paid, prices received, delivery times, and general business activity. The results are compiled into a diffusion index, where readings above zero indicate expansion and readings below zero signal contraction.</p>
+
+<p>Despite being a regional survey covering a relatively small slice of the country, the Philly Fed punches well above its geographic weight in financial markets. It is one of the earliest hard data points on manufacturing conditions that arrives each month — typically released on the third Thursday — which makes it a <strong>leading indicator</strong> for the broader national manufacturing picture. Markets use it as a preview of what the <strong>ISM Manufacturing Index</strong>, the more comprehensive national survey, might show when it arrives days later. Because manufacturing feeds into GDP, employment, and corporate earnings, any early warning from the Philly Fed about a slowdown or acceleration matters to bond traders, equity investors, and Fed watchers alike.</p>
+
+<p>Mechanically, the index works as a diffusion calculation. Survey respondents choose one of three responses for each question: better, same, or worse. The index value is computed by taking the percentage of respondents who said "better" and subtracting the percentage who said "worse." If 40% said conditions improved and 15% said they worsened, the index reads +25. This design means the number is not a percentage of anything tangible — it's a net sentiment reading. A reading of zero means equal numbers of firms are seeing improvement and deterioration. Positive numbers mean more optimists than pessimists; negative numbers mean the reverse. Each sub-component — new orders, employment, prices paid — gets its own diffusion score, giving analysts a layered picture of what's driving or dragging the headline number.</p>
+
+<p>The video provides a perfect real-world backdrop for understanding why the Philly Fed matters in context. The host is walking through a week dominated by inflation data — August PPI came in with an annual rate climbing to 5.4%, and core CPI ran a tenth hotter than expected at 0.3% month-over-month. Those two prints pushed the probability of an FOMC rate hike from roughly 50-50 to 85% or higher. In that environment, the host flags the Philly Fed as part of the critical data cluster arriving Thursday — the same day as weekly jobless claims and housing starts — right after the FOMC decision on Wednesday. That sequencing matters: the Philly Fed would arrive as the market is still digesting the Fed's rate decision and dot plot, adding another data point to the inflation-versus-growth debate already raging in bond markets.</p>
+
+<blockquote>"We get the Philly Fed index, right? That is a regional Fed indicator."</blockquote>
+
+<p>For traders and investors, the Philly Fed is most useful as a <strong>sentiment barometer</strong> for the industrial economy. When the index prints well above zero, it signals that manufacturers are seeing strong demand, adding workers, and running plants hard — all conditions that support corporate earnings and employment. When it collapses below zero, it can flag an industrial recession forming beneath the surface before it shows up in GDP or payroll reports. Options traders watch the release for volatility triggers. Bond traders pay attention to the prices-paid sub-component specifically, because rising input costs at the factory level can bleed into <strong>producer price inflation</strong>, which then feeds into consumer prices — exactly the chain the video describes playing out with the PPI report that week.</p>
+
+<p>The most important nuance to grasp is that the Philly Fed is a <strong>survey of sentiment</strong>, not a direct measurement of output or orders in dollar terms. Executives answer based on how they <em>feel</em> about conditions relative to last month. This makes the index fast to produce and early to arrive, but also susceptible to mood swings that don't always match underlying reality. A sudden geopolitical shock, an energy price spike, or even a single terrible week of news can drive sentiment sharply negative even if order books are still full. Conversely, animal spirits can keep the index elevated even as actual shipments plateau. Always cross-reference the headline number with the new orders sub-index — that component is the most forward-looking piece of the report and often diverges from the headline in informative ways.</p>
+
+<p>The index can also break down or mislead in edge cases. During the COVID pandemic, regional manufacturing surveys swung between historic lows and historic highs within months, rendering the diffusion arithmetic almost uninterpretable. Supply chain dislocations meant that "better" and "worse" were being measured against an abnormal baseline. Similarly, the Philly Fed's geographic scope is a real limitation: the Third District has a particular industrial mix — pharmaceuticals, chemicals, industrial machinery — that may not represent the Sun Belt's aerospace or the Midwest's auto manufacturing. A sector-specific shock hitting Philadelphia-area chemicals could move the Philly Fed hard without reflecting anything nationwide. This is why savvy analysts treat it as one early data point in a constellation, not a definitive verdict on American manufacturing.</p>
+
+<p>The Philly Fed connects most directly to three other indicators you'll encounter in market commentary. First, the <strong>ISM Manufacturing PMI</strong>, the national benchmark it often previews. Second, <strong>durable goods orders</strong>, which translate the sentiment in the Philly Fed into actual dollar-denominated order data. Third, and critically in the context of the video, the <strong>FOMC's policy rate decisions</strong>. The host explicitly asks: "If the Fed hikes into a sentiment reading of 47.8" — referencing a separate consumer sentiment gauge that week — "how many more hikes does the dot plot show?" The Philly Fed slots into that same question. A central bank tightening into deteriorating regional manufacturing conditions risks overtightening into a slowdown it can't see in real time. That tension — between sticky inflation data and softening activity surveys — is precisely what makes regional Fed indicators worth watching in a rate-hike cycle.</p>
+<div class="concept-side">Sources: THE BOND MARKET REVOLT: Yields Surge 26 bps as Hike Odds Hit 85%!<br>Related in this category: <a href="non_farm_payroll_report.html">Non-Farm Payroll (NFP) Report</a>, <a href="u6_unemployment_rate.html">U6 Unemployment Rate (Broad Labor Underutilization)</a>, <a href="adp_employment_report.html">ADP National Employment Report</a>, <a href="payroll_data_revision.html">Payroll Data Revision (BLS Benchmark Revision)</a>, <a href="challenger_gray_christmas_layoff_report.html">Challenger, Gray &amp; Christmas Job Cut Report</a>, <a href="average_hourly_earnings.html">Average Hourly Earnings (Wage Growth)</a></div>
+<button class="concept-done" data-slug="philadelphia_fed_manufacturing_index" onclick="toggleDone('philadelphia_fed_manufacturing_index')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_philadelphia_fed_manufacturing_index';</script>
+<script src="../../book.js"></script>
+<script src="../fg.js"></script>
+</body>
+</html>

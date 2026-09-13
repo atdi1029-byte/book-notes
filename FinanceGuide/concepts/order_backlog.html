@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Order Backlog (Contract Backlog) - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.tier .tier-desc { color: #a08060; font-size: 0.85rem; margin: 0.4rem 0 0.8rem; }
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done,
+body.hide-done .cat-card.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../accounting-financial-statements.html">&larr; Accounting &amp; Financial Statements</a>
+
+<div class="concept-meta"><span>standard</span><span>Accounting &amp; Financial Statements</span><span>added 2026-09-13</span></div>
+<h4 id="order_backlog">Order Backlog (Contract Backlog)</h4>
+
+<p>An <strong>order backlog</strong> — sometimes called a <strong>contract backlog</strong> or simply <strong>backlog</strong> — is the total value of orders a company has received from customers but has not yet fulfilled or recognized as revenue. Think of it as a pipeline of confirmed, signed business sitting between "we got the deal" and "we delivered and got paid." When a company signs a contract to deliver servers over three years, or to provide cloud computing services over five years, that entire contract value enters the backlog. Revenue only flows out of the backlog and onto the income statement as the company actually delivers the goods or services. Until then, it lives in that holding zone — real, contracted, but not yet earned.</p>
+
+<p>Backlog matters enormously because it gives investors a window into a company's <strong>revenue visibility</strong> — how confident management and analysts can be about future income streams. A company with six months of backlog is in a very different position than one living entirely on next month's sales cycle. For businesses that sell large, complex systems — data center hardware, enterprise software, aerospace equipment, defense contracts — backlog can represent years of future revenue. That predictability commands a premium from markets. Investors are willing to pay a higher <strong>price-to-earnings multiple</strong> for a revenue dollar they can see coming than for one that still needs to be won, quoted, negotiated, and closed. Visibility reduces risk, and markets price risk constantly.</p>
+
+<p>Mechanically, here is how backlog moves. Step one: a customer signs a legally binding purchase order or contract. The full contract value is added to the backlog figure, even though no cash or revenue has changed hands yet. Step two: as the company delivers product or performs services, that portion of the contract converts into recognized revenue under <strong>revenue recognition</strong> accounting rules (governed in the US by ASC 606). Step three: the backlog number shrinks by that recognized amount. Step four: new signed contracts replenish the backlog. The net change — new bookings minus revenue recognized — tells you whether the pipeline is growing or shrinking. A backlog growing faster than revenue means the company is winning business faster than it can fulfill it. That is generally a strong signal.</p>
+
+<p>The video gives us two perfect real-world illustrations. <strong>Hewlett Packard Enterprise (HPE)</strong> reported $12.2 billion in revenue for its quarter ending September 2nd — up 34% year over year — and disclosed a record <strong>$7.6 billion AI backlog</strong>. That backlog number told the market that HPE had already won AI infrastructure contracts it hadn't yet shipped. The stock jumped over 12% on a single day — not because of earnings it had reported, but because of revenue it had already locked in but not yet delivered. Investors were paying for visibility. The backlog was essentially the market saying: "We know what the next few quarters look like, and we like what we see." That confidence, not current earnings, drove the price.</p>
+
+<p>The Oracle case is even more instructive — and more cautionary. Oracle reported fiscal Q1 2027 results with revenue up 30% to $19.3 billion and a headline-grabbing <strong>$664 billion backlog</strong>, up $29 billion from a year ago. At first glance, that sounds extraordinary. Traders and investors use backlog as a signal of <strong>demand quality</strong> — signed contracts with real customers are far more credible than management guidance or analyst projections. A large, growing backlog typically signals pricing power, customer stickiness, and a long runway of growth. Sophisticated investors compare backlog growth rates to revenue growth rates, calculate <strong>book-to-bill ratios</strong> (new bookings divided by revenue recognized), and look for acceleration or deceleration as leading indicators of where revenue is heading in coming quarters.</p>
+
+<p>But here is where the nuance matters — and where Oracle's Friday session became the lesson. The market opened Oracle up 7.5%, touched 8.5%, and then spent the rest of the day reading past the backlog headline. What they found: capital expenditure of <strong>$28.5 billion in a single quarter</strong>, compared to $8.5 billion a year prior. Full-year capex guidance of $90–95 billion against $55.7 billion the prior fiscal year. And free cash flow of negative $5.4 billion. The backlog was real. The contracts were signed. But to fulfill that $664 billion backlog, Oracle had to spend enormous amounts of money it didn't yet have — building data centers, buying chips, laying fiber. The backlog was a promise; the capex was already a bill. Markets don't pay a premium for revenue that requires massive financing to unlock.</p>
+
+<blockquote>"Backlog is a promise and 28.5 billion of capex in 90 days. That is simply, my friend, a bill. The market pays a premium for revenue it can see. It doesn't pay for revenue that has to be financed first."</blockquote>
+
+<p>This is the most common misconception about backlog, and it trips up retail investors repeatedly: <strong>backlog is not cash, not revenue, and not profit</strong>. It is a contractual obligation from a customer, but it carries real risks. Customers can cancel contracts, especially in long-dated government or enterprise deals where termination-for-convenience clauses are common. Technology can shift, making contracted products obsolete before delivery. The company may fail to deliver on time or at spec, opening penalty clauses. And critically, as Oracle illustrated, the cost to fulfill the backlog may be so capital-intensive that even a massive backlog generates little or no free cash flow. A $664 billion backlog sounds better than it is if you need to spend $90 billion a year just to work through it.</p>
+
+<p>Backlog connects directly to several other financial concepts worth understanding together. <strong>Deferred revenue</strong> is closely related — it's what appears on the balance sheet when a customer has already paid but the company hasn't yet delivered; backlog, by contrast, often precedes payment. <strong>Remaining performance obligations (RPO)</strong> is the formal accounting term under ASC 606 for the contracted revenue not yet recognized — essentially the GAAP version of backlog. The <strong>book-to-bill ratio</strong> is the key operating metric derived from backlog: above 1.0 means orders are growing faster than fulfillment (healthy); below 1.0 means the pipeline is being drawn down (watch carefully). And backlog feeds directly into <strong>forward revenue guidance</strong> — companies with strong backlogs can guide with more confidence, which itself commands a valuation premium. Understanding backlog means understanding the difference between a company that is winning and a company that is merely promising.</p>
+<div class="concept-side">Sources: THE BOND MARKET REVOLT: Yields Surge 26 bps as Hike Odds Hit 85%!<br>Related in this category: <a href="earnings_quality.html">Earnings Quality</a>, <a href="gross_margin.html">Gross Margin</a>, <a href="free_cash_flow.html">Free Cash Flow (FCF)</a>, <a href="held_to_maturity_accounting.html">Held-to-Maturity (HTM) Securities Accounting</a>, <a href="mark_to_model_valuation.html">Mark-to-Model Valuation (Private Asset Fair Value)</a>, <a href="capital_expenditure.html">Capital Expenditure (CapEx)</a></div>
+<button class="concept-done" data-slug="order_backlog" onclick="toggleDone('order_backlog')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_order_backlog';</script>
+<script src="../../book.js"></script>
+<script src="../fg.js"></script>
+</body>
+</html>

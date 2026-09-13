@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Retail Sales Report (Census Bureau) - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.tier .tier-desc { color: #a08060; font-size: 0.85rem; margin: 0.4rem 0 0.8rem; }
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done,
+body.hide-done .cat-card.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../economic-indicators.html">&larr; Economic Indicators</a>
+
+<div class="concept-meta"><span><span class="star">&#9733;</span> must-know</span><span>Economic Indicators</span><span>added 2026-09-13</span></div>
+<h4 id="retail_sales_report">Retail Sales Report (Census Bureau)</h4>
+
+<p>The <strong>Retail Sales Report</strong> is a monthly economic release published by the U.S. Census Bureau that measures the total receipts of retail stores — essentially, how much money American consumers spent at businesses that sell goods directly to the public. It covers everything from car dealerships and gas stations to grocery stores, clothing retailers, and online merchants. Released roughly two weeks after the reference month, it gives economists, policymakers, and investors one of the fastest and most direct reads on <strong>consumer spending</strong>, which accounts for roughly two-thirds of U.S. gross domestic product. Think of it as the nation's monthly shopping receipt — a raw, unfiltered look at whether Americans are opening their wallets or keeping them shut.</p>
+
+<p>Why does it matter so deeply? Because consumer spending is the engine of the American economy, and the Retail Sales Report is the first major gauge of whether that engine is accelerating or stalling. When retail sales grow steadily, businesses invest more, hire more, and produce more. When they shrink, the contraction ripples outward: inventories pile up, orders to manufacturers fall, and employers start cutting hours. Beyond the real economy, financial markets treat this report as a live signal of economic momentum. Bond yields, equity futures, and currency markets all move in response to the headline number, often within seconds of publication at 8:30 a.m. Eastern Time. It is especially powerful when it arrives just hours before a major policy decision, as the video's host makes clear.</p>
+
+<p>Mechanically, the Census Bureau collects data from a sample of roughly 5,500 retail and food service firms across the country, then extrapolates to national estimates. The report is released in two versions: a preliminary "advance" estimate and a revised "final" figure published the following month. The headline number is the <strong>month-over-month percentage change</strong> in total retail sales. Alongside it, analysts closely watch two sub-measures: <strong>retail sales ex-autos</strong> (removing car purchases, which are large and lumpy) and <strong>retail sales ex-autos and gas</strong> (the so-called "control group"), which strips out the two most volatile categories to expose the underlying trend in discretionary consumer spending. That control group feeds directly into GDP calculations, making it especially valuable to economists.</p>
+
+<p>The video illustrates perfectly why the control group matters so much. In the August report discussed, gasoline prices surged 3.9% for the month and accounted for more than a third of the overall monthly CPI increase. If total retail sales look solid on the surface, but gas spending is responsible for the bulk of that gain, the number is misleading — consumers aren't spending more because they feel confident; they're being forced to spend more just to fill their tanks. The host frames this tension precisely: <em>"Can retail sales hold up when gasoline ate a third of the month's inflation?"</em> Strip out the gas stations, and you get a very different picture of whether real discretionary spending — on clothes, electronics, restaurants — is healthy or quietly deteriorating.</p>
+
+<blockquote>"Can retail sales hold up when gasoline ate a third of the month's inflation?"</blockquote>
+
+<p>Traders and investors use the Retail Sales Report as a forward-looking signal for both corporate earnings and Federal Reserve policy. A stronger-than-expected number typically lifts consumer discretionary stocks and pressures bond prices (pushing yields higher), because it implies the economy can handle tighter financial conditions. A miss, on the other hand, can spark a rally in Treasuries as investors price in slower growth and a more cautious Fed. The timing of the August release — scheduled for 8:30 a.m., roughly five and a half hours before the Fed's rate decision — made it extraordinarily consequential. A strong retail print alongside a hot CPI would reinforce the case for a hike; a weak one might give the Fed political cover to pause, even with inflation still elevated.</p>
+
+<p>One of the most important nuances is the difference between <strong>nominal</strong> and <strong>real</strong> retail sales. The Census Bureau reports figures in current dollars — meaning they are not adjusted for inflation. If gasoline costs 10% more this month than last, and consumers buy the same number of gallons, retail sales at gas stations will rise 10% in the report even though no additional economic activity occurred. This is precisely the trap the host is flagging. A headline retail sales beat driven by energy price inflation can look like consumer strength when it is actually consumer strain — people spending more money to get the same goods. Real retail sales, adjusted for price changes, can be flat or even negative when nominal figures look healthy. Always check what's driving the number.</p>
+
+<p>The report can break down or become genuinely misleading in specific environments. During periods of extreme price volatility — energy shocks, supply chain disruptions, or rapid disinflation — the nominal figures can whipsaw in ways that obscure the true state of consumer demand. Seasonal adjustment is another source of noise: the Census Bureau applies statistical factors to smooth out patterns like holiday shopping or back-to-school spending, and those adjustments are periodically revised, sometimes significantly. Weather events can also suppress spending in ways that make one month look abnormally weak. The advance estimate is famously subject to large revisions; traders have learned to treat the first print as directional rather than precise, knowing the final number may tell a different story a month later.</p>
+
+<p>The Retail Sales Report sits at the center of a web of interconnected economic indicators, and understanding those connections deepens its value. It links directly to the <strong>Consumer Price Index (CPI)</strong> — the video's central theme — because if consumers are spending more despite higher prices, it signals that demand is still strong enough to support continued inflation. It feeds into <strong>GDP estimates</strong> through the control group. It connects to <strong>Producer Prices (PPI)</strong> because what consumers buy today tells manufacturers what to produce tomorrow. And it shapes <strong>Federal Reserve policy</strong>, because the Fed is watching whether its rate hikes are actually cooling the spending that drives prices higher. In the video's framework: energy was the input, the bond market was the transmission, and the consumer — revealed each month through this report — is always the final verdict.</p>
+<div class="concept-side">Sources: THE BOND MARKET REVOLT: Yields Surge 26 bps as Hike Odds Hit 85%!<br>Related in this category: <a href="non_farm_payroll_report.html">Non-Farm Payroll (NFP) Report</a>, <a href="u6_unemployment_rate.html">U6 Unemployment Rate (Broad Labor Underutilization)</a>, <a href="adp_employment_report.html">ADP National Employment Report</a>, <a href="payroll_data_revision.html">Payroll Data Revision (BLS Benchmark Revision)</a>, <a href="challenger_gray_christmas_layoff_report.html">Challenger, Gray &amp; Christmas Job Cut Report</a>, <a href="average_hourly_earnings.html">Average Hourly Earnings (Wage Growth)</a></div>
+<button class="concept-done" data-slug="retail_sales_report" onclick="toggleDone('retail_sales_report')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_retail_sales_report';</script>
+<script src="../../book.js"></script>
+<script src="../fg.js"></script>
+</body>
+</html>
