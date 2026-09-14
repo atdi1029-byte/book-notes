@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>FOMC Voting Mechanics - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.tier .tier-desc { color: #a08060; font-size: 0.85rem; margin: 0.4rem 0 0.8rem; }
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done,
+body.hide-done .cat-card.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../monetary-policy-central-banking.html">&larr; Monetary Policy &amp; Central Banking</a>
+
+<div class="concept-meta"><span>standard</span><span>Monetary Policy &amp; Central Banking</span><span>added 2026-09-14</span></div>
+<h4 id="fomc_voting_mechanics">FOMC Voting Mechanics</h4>
+
+<p>The <strong>Federal Open Market Committee (FOMC)</strong> is the twelve-member body inside the Federal Reserve that sets the United States' benchmark interest rate — the <strong>federal funds rate</strong>. When you hear "the Fed raised rates" or "the Fed held steady," what actually happened is that these twelve people cast votes. The committee is made up of two distinct groups: the seven members of the <strong>Board of Governors</strong>, who are presidential appointees confirmed by the Senate and serve in Washington D.C., and five of the twelve <strong>Reserve Bank presidents</strong>, who rotate on and off voting seats annually (except for the New York Fed president, who votes permanently). Understanding who votes and why is the foundation of reading every Fed decision correctly.</p>
+
+<p>Why does this matter to you personally? Because the federal funds rate is the gravity well around which all borrowing costs orbit. When the FOMC raises its target range, the <strong>prime rate</strong> — the benchmark banks use to price consumer credit — moves in lockstep, typically sitting at exactly three percentage points above the top of the Fed's target range. That means your <strong>variable-rate credit card APR</strong>, your home equity line of credit, your margin loan, and most small business lines of credit reprice almost immediately. This isn't a slow, grinding transmission like you see with mortgage rates tied to long-term Treasuries. The adjustment happens inside a single billing cycle. The FOMC vote is the lever; your monthly statement is the impact.</p>
+
+<p>Mechanically, here is how a vote works. The FOMC meets eight times per year on a scheduled calendar, with emergency meetings possible in a crisis. At each meeting, the Federal Reserve staff presents economic data, then committee members discuss their views in a round-robin format. The <strong>Fed chair</strong> then proposes a specific policy action — raise, cut, or hold — and the committee votes. You need <strong>seven votes out of twelve</strong> to pass a measure. Dissents are recorded by name in the official statement released immediately after the meeting. The full discussion is captured in the <strong>meeting minutes</strong>, published approximately three weeks later, and those minutes often reveal more nuanced positions — including conditional statements from non-dissenters — that the simple vote tally completely obscures.</p>
+
+<p>The July 29th meeting is a perfect case study in why vote math matters more than the headline result. The committee voted <strong>nine to three to hold rates steady</strong> at the 3.5–3.75% target range. The three dissenters — <strong>Beth Hammack</strong> of the Cleveland Fed, <strong>Neel Kashkari</strong> of Minneapolis, and <strong>Lorie Logan</strong> of Dallas — all wanted an immediate quarter-point hike. Several major media outlets misidentified these three as governors; they are Reserve Bank presidents, a distinction that matters because their voting eligibility rotates. More importantly, this was the first time since <strong>September 2016</strong> that three policymakers dissented in the same direction — a full decade without this kind of unified hawkish pressure. That is not noise. That is a faction with a formed position.</p>
+
+<blockquote>"The hike camp doesn't need to be invented. It already exists and it already lost once. It needs four more votes — just four more votes."</blockquote>
+
+<p>For investors and traders, the vote split is a forward-looking signal that raw rate decisions cannot provide on their own. A hold with three hawkish dissents tells you the dovish majority is thin and fragile. A unanimous decision in either direction tells you the next move is either well-telegraphed or genuinely off the table. The <strong>dot plot</strong> — the chart of individual rate projections published quarterly — layers on top of the vote to show where the whole committee expects rates to go over the next several years. Sophisticated market participants read the vote split alongside the dot plot: a hike with three dovish dissents signals a one-and-done; a hike with a near-unanimous vote and an elevated dot plot signals a new tightening cycle, which is an entirely different risk environment for equities, bonds, and currencies.</p>
+
+<p>The most common misconception about FOMC voting is that the chair controls the outcome. In practice, a Fed chair almost never loses a vote — but not because the vote is ceremonial. The chair controls it by controlling what gets proposed. The chair sets the policy option that is formally put to a vote, which means the chair can structure the choice to favor their preferred outcome before anyone raises their hand. This is why reading the chair's public statements — speeches, congressional testimony, press conference language — functions as a preview of what the chair intends to propose. When Chair Warsh stated publicly and repeatedly that inflation is too high and that policy is not actually restricting borrowing outside of housing, he was not expressing uncertainty. He was telegraphing a proposal.</p>
+
+<p>The system can break down, and history shows it has. In <strong>1986</strong>, Paul Volcker — arguably the most powerful central banker of the twentieth century — was outvoted by his own Board of Governors on the discount rate. That episode is a reminder that the vote is a real mechanism, not theater, and that internal coalitions can override even a dominant chair under the right circumstances. The deeper systemic risk is <strong>fiscal dominance</strong> — the condition where a government's debt burden becomes so large that the central bank faces de facto political pressure to keep rates low simply so the government can afford its interest payments. The U.S. federal interest cost hit $1.25 trillion in 2025, representing 18.5% of all federal revenue. When that dynamic takes hold, the FOMC's nominal independence becomes strained between its mandate and the fiscal math surrounding it.</p>
+
+<p>FOMC voting mechanics connect directly to several other critical concepts. The <strong>yield curve</strong> responds to the vote split — specifically, watch whether long-end yields like the 30-year Treasury rise or fall after a hike, because that tells you whether the bond market trusts the Fed's inflation-fighting credibility or suspects fiscal dominance is winning. The <strong>meeting minutes</strong> released three weeks post-meeting are underread by retail investors and overread by professionals precisely because conditional statements buried in paragraph four can move markets when the conditions are subsequently met. And the <strong>prime rate</strong> transmission mechanism means that every consumer borrowing decision — from carrying a credit card balance to drawing on a home equity line — is directly downstream of how twelve people voted on a Tuesday afternoon in Washington.</p>
+<div class="concept-side">Sources: cRsq3V97GYQ<br>Related in this category: <a href="pce_inflation_basket.html">PCE Inflation Basket</a>, <a href="jackson_hole_symposium.html">Jackson Hole Symposium</a>, <a href="hawkish_dovish_fed_signaling.html">Hawkish vs. Dovish Fed Signaling</a>, <a href="inflation_breadth.html">Inflation Breadth</a>, <a href="central_bank_credibility.html">Central Bank Credibility</a>, <a href="forward_guidance.html">Forward Guidance</a></div>
+<button class="concept-done" data-slug="fomc_voting_mechanics" onclick="toggleDone('fomc_voting_mechanics')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_fomc_voting_mechanics';</script>
+<script src="../../book.js"></script>
+<script src="../fg.js"></script>
+</body>
+</html>
