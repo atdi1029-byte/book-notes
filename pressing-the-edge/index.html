@@ -1,0 +1,1268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"
+  content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style"
+  content="black-translucent">
+<meta name="theme-color" content="#f4efe8">
+<title>Pressing the Edge</title>
+<link rel="stylesheet" href="../book.css?v=8">
+<style>
+.source {
+  margin: -1rem 0 2rem;
+  padding: 0.9rem 1.1rem;
+  background: #e8e0d0;
+  border-radius: 4px;
+  font-size: 0.92rem;
+  color: #5a4a30;
+}
+.source p:last-child { margin-bottom: 0; }
+.note {
+  margin: 1.4rem 0;
+  padding: 0.9rem 1.1rem;
+  background: #e8e0d0;
+  border-radius: 4px;
+}
+.note p:last-child { margin-bottom: 0; }
+.formula {
+  margin: 1rem 0 1.2rem;
+  padding: 0.8rem 1.1rem;
+  background: #ede7da;
+  border-left: 3px solid #6b8f8b;
+  border-radius: 0 4px 4px 0;
+  font-family: 'Courier New', monospace;
+  font-size: 0.92rem;
+  line-height: 1.6;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  white-space: pre;
+}
+code {
+  font-family: 'Courier New', monospace;
+  font-size: 0.9em;
+  background: #ede7da;
+  padding: 0 0.3rem;
+  border-radius: 3px;
+}
+.formula code { background: none; padding: 0; }
+.stage-table td:first-child { white-space: nowrap; }
+.danger-list { padding-left: 1.4rem; }
+.danger-list li { margin: 0.6rem 0; }
+.danger-list strong { color: #7a2e2e; }
+.trapline {
+  padding: 0.5rem 0.9rem;
+  margin: 1rem 0 1.2rem;
+  border-left: 3px solid #7a2e2e;
+}
+.trapline strong { color: #7a2e2e; }
+.rules { padding-left: 1.4rem; }
+.rules li { margin: 0.6rem 0; }
+.diagram svg { min-width: 600px; }
+.sig {
+  margin-top: 2.5rem;
+  text-align: center;
+  color: #8a7a60;
+  font-size: 0.9rem;
+  font-style: italic;
+}
+</style>
+</head>
+<body>
+
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar"
+  style="display:none" onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+    onclick="event.stopPropagation();clearBookmark()">
+    Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+
+<h1>Pressing the Edge</h1>
+<p class="subtitle">
+Exploiting Profit and Adding to Size &mdash;
+How a Low Win Rate Becomes a Large Account</p>
+
+<div class="source">
+<p>Framework from Matt (&ldquo;PAX Trader&rdquo;, former
+CME pit trader), interviewed by Jason Shapiro on
+<em>Crowded Market Report</em>. The three-stage model,
+the scratch-versus-break-even distinction and the
+core ideas are his. The mechanics, the arithmetic,
+the diagrams and the rule set are worked out from
+them.</p>
+</div>
+
+<!-- TABLE OF CONTENTS -->
+<nav class="toc">
+<h2>Contents</h2>
+<ol>
+  <li><a href="#stages">The Three Stages</a>
+    &mdash; which part of the P&amp;L each one controls</li>
+  <li><a href="#meaning">What Exploiting Profit Means</a>
+    &mdash; leave it, lock it, spend it</li>
+  <li><a href="#mechanics">The Mechanics</a>
+    &mdash; adding size without adding risk, worked example</li>
+  <li><a href="#cost">What the Add Costs</a>
+    &mdash; the continuation bet, the inverted pyramid</li>
+  <li><a href="#where-add">Where to Add</a>
+    &mdash; triggers, strength vs. pullback, trend age</li>
+  <li><a href="#where-take">Where to Take Profit</a>
+    &mdash; the other half of the question, events</li>
+  <li><a href="#unwind">Unwinding the Pyramid</a>
+    &mdash; one stop or last-in, first-out</li>
+  <li><a href="#swing">The Swing at Full Size</a>
+    &mdash; the part that is actually hard</li>
+  <li><a href="#scratch">Scratch Stop vs. Break-Even Stop</a></li>
+  <li><a href="#reentry">Re-entry After a Scratch</a></li>
+  <li><a href="#expenses">Losses as Business Expenses</a></li>
+  <li><a href="#trade-less">Trade Less to Make More</a></li>
+  <li><a href="#account">Adding to Size at the Account
+    Level</a> &mdash; raising R itself</li>
+  <li><a href="#codify">Codifying It</a>
+    &mdash; parameters, pseudo-rules, what to measure</li>
+  <li><a href="#dangers">Dangers</a></li>
+  <li><a href="#rules">The Rule Sheet</a></li>
+</ol>
+</nav>
+
+<hr>
+
+<!-- ══════════════════════════════════════════════ -->
+<!-- 1. THE THREE STAGES -->
+<!-- ══════════════════════════════════════════════ -->
+
+<h2 id="stages">1. The Three Stages, and Which Part of
+the P&amp;L Each One Controls</h2>
+
+<div class="table-wrap">
+<table class="stage-table">
+<tr><th>Stage</th><th>Skill</th><th>What it governs</th>
+<th>Where it gets you</th></tr>
+<tr><td>1</td><td>Managing risk</td>
+<td>The left tail &mdash; how bad a bad trade gets</td>
+<td>Break-even</td></tr>
+<tr><td>2</td><td>Managing profit</td>
+<td>The middle &mdash; how much of an ordinary winner
+you keep</td><td>Consistently profitable</td></tr>
+<tr><td>3</td><td>Exploiting profit</td>
+<td>The right tail &mdash; how big a great trade
+becomes</td><td>Outsized returns</td></tr>
+</table>
+</div>
+
+<p>Stage 1 is defensive: fixed stops, fixed risk per
+trade, no blow-ups. It stops the bleeding but adds
+nothing. Stage 2 is where most profitable traders
+live: trailing stops, scaling out, knowing when a
+winner is done. Stage 3 is the rare one, because it
+asks you to do something that feels wrong &mdash;
+put profit you have already secured back to work
+while the trade is still open.</p>
+
+<div class="diagram">
+<svg viewBox="0 0 700 335" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="P&amp;L distribution with the three stages" font-family="Georgia, 'Times New Roman', serif" font-size="13" fill="#3a2e1e">
+<line x1="60.0" y1="235.0" x2="670.0" y2="235.0" stroke="#d4c8b0" stroke-width="1" stroke-linecap="butt"/>
+<rect x="62.5" y="212.2" width="35.7" height="22.8" fill="#7a2e2e" stroke="none" rx="2" opacity="0.85"/>
+<text x="80.3" y="251.0" font-size="11" fill="#8a7a60" text-anchor="middle" font-weight="normal" font-style="normal">-2R</text>
+<rect x="103.2" y="98.5" width="35.7" height="136.5" fill="#7a2e2e" stroke="none" rx="2" opacity="0.85"/>
+<text x="121.0" y="251.0" font-size="11" fill="#8a7a60" text-anchor="middle" font-weight="normal" font-style="normal">-1R</text>
+<rect x="143.8" y="46.5" width="35.7" height="188.5" fill="#c5a55a" stroke="none" rx="2" opacity="0.85"/>
+<text x="161.7" y="251.0" font-size="11" fill="#8a7a60" text-anchor="middle" font-weight="normal" font-style="normal">0</text>
+<rect x="184.5" y="157.0" width="35.7" height="78.0" fill="#c5a55a" stroke="none" rx="2" opacity="0.85"/>
+<text x="202.3" y="251.0" font-size="11" fill="#8a7a60" text-anchor="middle" font-weight="normal" font-style="normal">+1R</text>
+<rect x="225.2" y="192.8" width="35.7" height="42.2" fill="#c5a55a" stroke="none" rx="2" opacity="0.85"/>
+<text x="243.0" y="251.0" font-size="11" fill="#8a7a60" text-anchor="middle" font-weight="normal" font-style="normal">+2R</text>
+<rect x="265.8" y="205.8" width="35.7" height="29.2" fill="#6b8f8b" stroke="none" rx="2" opacity="0.85"/>
+<text x="283.7" y="251.0" font-size="11" fill="#8a7a60" text-anchor="middle" font-weight="normal" font-style="normal">+3R</text>
+<rect x="306.5" y="212.2" width="35.7" height="22.8" fill="#6b8f8b" stroke="none" rx="2" opacity="0.85"/>
+<text x="324.3" y="251.0" font-size="11" fill="#8a7a60" text-anchor="middle" font-weight="normal" font-style="normal">+4R</text>
+<rect x="347.2" y="215.5" width="35.7" height="19.5" fill="#6b8f8b" stroke="none" rx="2" opacity="0.85"/>
+<text x="365.0" y="251.0" font-size="11" fill="#8a7a60" text-anchor="middle" font-weight="normal" font-style="normal">+5R</text>
+<rect x="387.8" y="218.8" width="35.7" height="16.2" fill="#6b8f8b" stroke="none" rx="2" opacity="0.85"/>
+<text x="405.7" y="251.0" font-size="11" fill="#8a7a60" text-anchor="middle" font-weight="normal" font-style="normal">+6R</text>
+<rect x="428.5" y="221.3" width="35.7" height="13.7" fill="#6b8f8b" stroke="none" rx="2" opacity="0.85"/>
+<text x="446.3" y="251.0" font-size="11" fill="#8a7a60" text-anchor="middle" font-weight="normal" font-style="normal">+7R</text>
+<rect x="469.2" y="223.3" width="35.7" height="11.7" fill="#6b8f8b" stroke="none" rx="2" opacity="0.85"/>
+<text x="487.0" y="251.0" font-size="11" fill="#8a7a60" text-anchor="middle" font-weight="normal" font-style="normal">+8R</text>
+<rect x="509.8" y="224.9" width="35.7" height="10.1" fill="#6b8f8b" stroke="none" rx="2" opacity="0.85"/>
+<text x="527.7" y="251.0" font-size="11" fill="#8a7a60" text-anchor="middle" font-weight="normal" font-style="normal">+9R</text>
+<rect x="550.5" y="226.2" width="35.7" height="8.8" fill="#6b8f8b" stroke="none" rx="2" opacity="0.85"/>
+<text x="568.3" y="251.0" font-size="11" fill="#8a7a60" text-anchor="middle" font-weight="normal" font-style="normal">+10R</text>
+<rect x="591.2" y="227.5" width="35.7" height="7.5" fill="#6b8f8b" stroke="none" rx="2" opacity="0.85"/>
+<text x="609.0" y="251.0" font-size="11" fill="#8a7a60" text-anchor="middle" font-weight="normal" font-style="normal">+11R</text>
+<rect x="631.8" y="228.5" width="35.7" height="6.5" fill="#6b8f8b" stroke="none" rx="2" opacity="0.85"/>
+<text x="649.7" y="251.0" font-size="11" fill="#8a7a60" text-anchor="middle" font-weight="normal" font-style="normal">+12R</text>
+<line x1="62.5" y1="265.0" x2="138.8" y2="265.0" stroke="#7a2e2e" stroke-width="1.5" stroke-linecap="butt"/><line x1="62.5" y1="265.0" x2="62.5" y2="260.0" stroke="#7a2e2e" stroke-width="1.5" stroke-linecap="butt"/><line x1="138.8" y1="265.0" x2="138.8" y2="260.0" stroke="#7a2e2e" stroke-width="1.5" stroke-linecap="butt"/><text x="100.7" y="282.0" font-size="13" fill="#7a2e2e" text-anchor="middle" font-weight="bold" font-style="normal">Stage 1</text><text x="100.7" y="297.0" font-size="12" fill="#7a2e2e" text-anchor="middle" font-weight="normal" font-style="normal">manage risk</text><text x="100.7" y="312.0" font-size="12" fill="#8a7a60" text-anchor="middle" font-weight="normal" font-style="italic">cap the left tail</text>
+<line x1="143.8" y1="265.0" x2="260.8" y2="265.0" stroke="#8a6a2a" stroke-width="1.5" stroke-linecap="butt"/><line x1="143.8" y1="265.0" x2="143.8" y2="260.0" stroke="#8a6a2a" stroke-width="1.5" stroke-linecap="butt"/><line x1="260.8" y1="265.0" x2="260.8" y2="260.0" stroke="#8a6a2a" stroke-width="1.5" stroke-linecap="butt"/><text x="202.3" y="282.0" font-size="13" fill="#8a6a2a" text-anchor="middle" font-weight="bold" font-style="normal">Stage 2</text><text x="202.3" y="297.0" font-size="12" fill="#8a6a2a" text-anchor="middle" font-weight="normal" font-style="normal">manage profit</text><text x="202.3" y="312.0" font-size="12" fill="#8a7a60" text-anchor="middle" font-weight="normal" font-style="italic">keep the middle</text>
+<line x1="265.8" y1="265.0" x2="667.5" y2="265.0" stroke="#4a7872" stroke-width="1.5" stroke-linecap="butt"/><line x1="265.8" y1="265.0" x2="265.8" y2="260.0" stroke="#4a7872" stroke-width="1.5" stroke-linecap="butt"/><line x1="667.5" y1="265.0" x2="667.5" y2="260.0" stroke="#4a7872" stroke-width="1.5" stroke-linecap="butt"/><text x="466.7" y="282.0" font-size="13" fill="#4a7872" text-anchor="middle" font-weight="bold" font-style="normal">Stage 3</text><text x="466.7" y="297.0" font-size="12" fill="#4a7872" text-anchor="middle" font-weight="normal" font-style="normal">exploit profit</text><text x="466.7" y="312.0" font-size="12" fill="#8a7a60" text-anchor="middle" font-weight="normal" font-style="italic">stretch the right tail</text>
+<text x="60.0" y="26.0" font-size="12" fill="#8a7a60" text-anchor="start" font-weight="normal" font-style="normal">Trades</text>
+<text x="670.0" y="26.0" font-size="12" fill="#8a7a60" text-anchor="end" font-weight="normal" font-style="italic">Outcome in R, 25% win rate</text>
+<text x="664.0" y="155.0" font-size="12" fill="#4a7872" text-anchor="end" font-weight="normal" font-style="italic">pyramiding moves</text>
+<text x="664.0" y="171.0" font-size="12" fill="#4a7872" text-anchor="end" font-weight="normal" font-style="italic">winners this way &#8594;</text>
+</svg>
+<p class="diagram-caption">Where each stage acts on the distribution of trade outcomes. Most trades are small expenses; the account is made in the right tail.</p>
+</div>
+
+<h3>Why the third stage is the whole game at a low
+win rate</h3>
+
+<p>Matt wins roughly 20&ndash;30% of his trades.
+Expectancy per trade is
+<code>p &times; avgWin &minus; (1 &minus; p) &times; avgLoss</code>.
+At a 25% win rate with an average losing trade of
+0.7R (a mix of scratches and full stops):</p>
+
+<div class="table-wrap">
+<table>
+<tr><th>Average winner</th><th>Expectancy per trade</th></tr>
+<tr><td>2R</td><td>&minus;0.03R</td></tr>
+<tr><td>3R</td><td>+0.23R</td></tr>
+<tr><td>5R</td><td>+0.73R</td></tr>
+<tr><td>8R</td><td>+1.48R</td></tr>
+</table>
+</div>
+
+<p>Capped at 2R, a 25%-win-rate trader is break-even
+no matter how clean the risk management is. Nothing
+about stages 1 and 2 changes the win rate; the only
+lever left is the size of the average winner, and
+pyramiding is how a 3R move becomes an 8R trade.</p>
+
+<!-- ══════════════════════════════════════════════ -->
+<!-- 2. WHAT EXPLOITING PROFIT MEANS -->
+<!-- ══════════════════════════════════════════════ -->
+
+<h2 id="meaning">2. What &ldquo;Exploiting Profit&rdquo;
+Means</h2>
+
+<p><strong>Exploiting profit is converting a winning
+trade&rsquo;s open profit into additional position, so
+the payoff grows faster than the move itself.</strong>
+It is not &ldquo;letting it run&rdquo; (that is
+passive) and it is not &ldquo;adding risk&rdquo;
+(that is stage zero).</p>
+
+<p>The mental shift Matt describes: the instant a
+trade starts working, the questions he asks are
+<em>where do I add</em> and <em>where do I take
+profit</em> &mdash; together, not in sequence. They
+are the same question, because profit that is taken,
+or locked by a raised stop, is the budget that pays
+for the add.</p>
+
+<p>Three things you can do with open profit:</p>
+
+<ol>
+  <li><strong>Leave it open</strong> &mdash; let the
+    trade run. Passive.</li>
+  <li><strong>Lock it</strong> &mdash; raise the stop,
+    or bank a slice. This is stage 2.</li>
+  <li><strong>Spend it</strong> &mdash; use the locked
+    amount to fund a larger position. This is stage 3,
+    and it is only possible after step 2 has created
+    a budget to spend.</li>
+</ol>
+
+<!-- ══════════════════════════════════════════════ -->
+<!-- 3. THE MECHANICS -->
+<!-- ══════════════════════════════════════════════ -->
+
+<h2 id="mechanics">3. The Mechanics: Adding Size
+Without Adding Risk</h2>
+
+<p><strong>Definitions.</strong> <code>E</code> is the
+entry price of a unit, <code>S</code> the current stop
+(shared by all units, never lowered), <code>Q</code>
+the size of a unit, and <code>R</code> the dollar
+risk you accepted on the first unit.</p>
+
+<p><strong>Risk-at-stop</strong> is what the whole
+position is worth if the stop fills:
+<code>&Sigma; Q<sub>i</sub> &times; (S &minus; E<sub>i</sub>)</code>.
+Units entered below the stop contribute a locked
+gain; units entered above it contribute risk.</p>
+
+<p><strong>The rule.</strong> Before any add, raise the
+stop. Then size the add so that risk-at-stop for the
+whole position stays within budget:</p>
+
+<div class="formula">Q_add  &le;  (B + L) / (E_add &minus; S)
+
+L = profit locked on existing units at the new stop
+  = &Sigma; Q_i &times; (S &minus; E_i)
+B = the risk you are willing to carry at the stop</div>
+
+<p>Two variants of <code>B</code>:</p>
+
+<ul>
+  <li><strong>Constant-risk pyramid</strong> &mdash;
+    <code>B = R</code>. Total risk at the stop never
+    exceeds the risk on the original trade.</li>
+  <li><strong>Zero-risk pyramid</strong> &mdash;
+    <code>B = 0</code>. Adds are funded entirely by
+    locked profit; a stop-out returns you to flat.</li>
+</ul>
+
+<h3>Worked example</h3>
+
+<p>$100k account, 1% risk = $1,000 per trade. Entry
+100, stop 96, so 250 shares. Rule: constant-risk, but
+no single add larger than two initial units.</p>
+
+<div class="table-wrap">
+<table>
+<tr><th>Leg</th><th>Price</th><th>Stop</th>
+<th>Locked on existing units</th><th>Add</th>
+<th>Position</th><th>Avg entry</th>
+<th>Risk at stop</th></tr>
+<tr><td>0</td><td>100</td><td>96</td><td>&mdash;</td>
+<td>250 @ 100</td><td>250</td><td>100.0</td>
+<td>&minus;$1,000</td></tr>
+<tr><td>1</td><td>108</td><td>102</td><td>+$500</td>
+<td>250 @ 108</td><td>500</td><td>104.0</td>
+<td>&minus;$1,000</td></tr>
+<tr><td>2</td><td>116</td><td>110</td><td>+$3,000</td>
+<td>500 @ 116</td><td>1,000</td><td>110.0</td>
+<td>$0</td></tr>
+</table>
+</div>
+
+<div class="diagram">
+<svg viewBox="0 0 700 400" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Worked pyramid: price path, adds, stops and average entry" font-family="Georgia, 'Times New Roman', serif" font-size="13" fill="#3a2e1e">
+<line x1="64.0" y1="350.0" x2="505.0" y2="350.0" stroke="#d4c8b0" stroke-width="1" stroke-linecap="butt"/>
+<text x="56.0" y="354.0" font-size="11" fill="#8a7a60" text-anchor="end" font-weight="normal" font-style="normal">92</text>
+<line x1="64.0" y1="304.0" x2="505.0" y2="304.0" stroke="#d4c8b0" stroke-width="1" stroke-linecap="butt"/>
+<text x="56.0" y="308.0" font-size="11" fill="#8a7a60" text-anchor="end" font-weight="normal" font-style="normal">98</text>
+<line x1="64.0" y1="258.0" x2="505.0" y2="258.0" stroke="#d4c8b0" stroke-width="1" stroke-linecap="butt"/>
+<text x="56.0" y="262.0" font-size="11" fill="#8a7a60" text-anchor="end" font-weight="normal" font-style="normal">104</text>
+<line x1="64.0" y1="212.0" x2="505.0" y2="212.0" stroke="#d4c8b0" stroke-width="1" stroke-linecap="butt"/>
+<text x="56.0" y="216.0" font-size="11" fill="#8a7a60" text-anchor="end" font-weight="normal" font-style="normal">110</text>
+<line x1="64.0" y1="166.0" x2="505.0" y2="166.0" stroke="#d4c8b0" stroke-width="1" stroke-linecap="butt"/>
+<text x="56.0" y="170.0" font-size="11" fill="#8a7a60" text-anchor="end" font-weight="normal" font-style="normal">116</text>
+<line x1="64.0" y1="120.0" x2="505.0" y2="120.0" stroke="#d4c8b0" stroke-width="1" stroke-linecap="butt"/>
+<text x="56.0" y="124.0" font-size="11" fill="#8a7a60" text-anchor="end" font-weight="normal" font-style="normal">122</text>
+<line x1="64.0" y1="74.0" x2="505.0" y2="74.0" stroke="#d4c8b0" stroke-width="1" stroke-linecap="butt"/>
+<text x="56.0" y="78.0" font-size="11" fill="#8a7a60" text-anchor="end" font-weight="normal" font-style="normal">128</text>
+<line x1="64.0" y1="28.0" x2="505.0" y2="28.0" stroke="#d4c8b0" stroke-width="1" stroke-linecap="butt"/>
+<text x="56.0" y="32.0" font-size="11" fill="#8a7a60" text-anchor="end" font-weight="normal" font-style="normal">134</text>
+<line x1="64.0" y1="28.0" x2="64.0" y2="350.0" stroke="#d4c8b0" stroke-width="1" stroke-linecap="butt"/>
+<text x="56.0" y="20.0" font-size="11" fill="#8a7a60" text-anchor="end" font-weight="normal" font-style="normal">Price</text>
+<line x1="64.0" y1="319.3" x2="199.7" y2="319.3" stroke="#7a2e2e" stroke-width="2.2" stroke-linecap="butt"/>
+<line x1="199.7" y1="273.3" x2="335.4" y2="273.3" stroke="#7a2e2e" stroke-width="2.2" stroke-linecap="butt"/>
+<line x1="335.4" y1="212.0" x2="505.0" y2="212.0" stroke="#7a2e2e" stroke-width="2.2" stroke-linecap="butt"/>
+<line x1="199.7" y1="319.3" x2="199.7" y2="273.3" stroke="#7a2e2e" stroke-width="1.2" stroke-dasharray="3,3" stroke-linecap="butt"/>
+<line x1="335.4" y1="273.3" x2="335.4" y2="212.0" stroke="#7a2e2e" stroke-width="1.2" stroke-dasharray="3,3" stroke-linecap="butt"/>
+<line x1="64.0" y1="288.7" x2="199.7" y2="288.7" stroke="#c5a55a" stroke-width="2" stroke-dasharray="6,4" stroke-linecap="butt"/>
+<line x1="199.7" y1="258.0" x2="335.4" y2="258.0" stroke="#c5a55a" stroke-width="2" stroke-dasharray="6,4" stroke-linecap="butt"/>
+<line x1="335.4" y1="212.0" x2="505.0" y2="212.0" stroke="#c5a55a" stroke-width="2" stroke-dasharray="6,4" stroke-linecap="butt"/>
+<path d="M 64.0 288.7 L 97.9 265.7 L 131.8 281.0 L 165.8 242.7 L 199.7 227.3 L 233.6 242.7 L 267.5 196.7 L 301.5 208.2 L 335.4 166.0 L 369.3 189.0 L 403.2 135.3 L 437.2 150.7 L 471.1 89.3 L 505.0 58.7" fill="none" stroke="#4a7872" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="64.0" cy="288.7" r="6" fill="#5a3e1a" stroke="#f4efe8" stroke-width="1.5"/>
+<text x="73.0" y="260.7" font-size="12" fill="#5a3e1a" text-anchor="start" font-weight="bold" font-style="normal">250 @ 100</text>
+<circle cx="199.7" cy="227.3" r="6" fill="#5a3e1a" stroke="#f4efe8" stroke-width="1.5"/>
+<text x="208.7" y="218.3" font-size="12" fill="#5a3e1a" text-anchor="start" font-weight="bold" font-style="normal">+250 @ 108</text>
+<circle cx="335.4" cy="166.0" r="6" fill="#5a3e1a" stroke="#f4efe8" stroke-width="1.5"/>
+<text x="344.4" y="157.0" font-size="12" fill="#5a3e1a" text-anchor="start" font-weight="bold" font-style="normal">+500 @ 116</text>
+<text x="68.0" y="334.3" font-size="11" fill="#7a2e2e" text-anchor="start" font-weight="normal" font-style="normal">stop 96</text>
+<text x="203.7" y="288.3" font-size="11" fill="#7a2e2e" text-anchor="start" font-weight="normal" font-style="normal">stop 102 &#8212; locks $500</text>
+<text x="339.4" y="227.0" font-size="11" fill="#7a2e2e" text-anchor="start" font-weight="normal" font-style="normal">stop 110 = avg entry: risk-at-stop $0</text>
+<text x="203.7" y="253.0" font-size="11" fill="#8a6a2a" text-anchor="start" font-weight="normal" font-style="normal">avg entry 104</text>
+<circle cx="505.0" cy="58.7" r="5" fill="#4a7872" stroke="#f4efe8" stroke-width="1.5"/>
+<text x="515.0" y="52.7" font-size="12" fill="#4a7872" text-anchor="start" font-weight="bold" font-style="normal">exit at 130</text>
+<text x="515.0" y="68.7" font-size="11" fill="#3a2e1e" text-anchor="start" font-weight="normal" font-style="normal">with adds: +$20,000 (20R)</text>
+<text x="515.0" y="82.7" font-size="11" fill="#8a7a60" text-anchor="start" font-weight="normal" font-style="normal">no adds: +$7,500 (7.5R)</text>
+<line x1="70.0" y1="372.0" x2="96.0" y2="372.0" stroke="#4a7872" stroke-width="2.4" stroke-linecap="butt"/>
+<text x="102.0" y="376.0" font-size="11" fill="#3a2e1e" text-anchor="start" font-weight="normal" font-style="normal">price</text>
+<line x1="150.0" y1="372.0" x2="176.0" y2="372.0" stroke="#7a2e2e" stroke-width="2.2" stroke-linecap="butt"/>
+<text x="182.0" y="376.0" font-size="11" fill="#3a2e1e" text-anchor="start" font-weight="normal" font-style="normal">stop (whole position)</text>
+<line x1="330.0" y1="372.0" x2="356.0" y2="372.0" stroke="#c5a55a" stroke-width="2" stroke-dasharray="6,4" stroke-linecap="butt"/>
+<text x="362.0" y="376.0" font-size="11" fill="#3a2e1e" text-anchor="start" font-weight="normal" font-style="normal">average entry</text>
+<circle cx="470.0" cy="372.0" r="5" fill="#5a3e1a" stroke="#f4efe8" stroke-width="1.5"/>
+<text x="480.0" y="376.0" font-size="11" fill="#3a2e1e" text-anchor="start" font-weight="normal" font-style="normal">buy</text>
+</svg>
+<p class="diagram-caption">The worked example as a price path. The stop steps up before each add; by leg 2 the average entry has climbed to meet it.</p>
+</div>
+
+<p><strong>Leg 1.</strong> The stop at 102 locks $500
+on unit 1. Budget = $1,000 + $500 = $1,500. Risk on a
+new share with entry 108 and stop 102 is $6, so up to
+250 shares fit. The position doubles; risk is
+unchanged.</p>
+
+<p><strong>Leg 2.</strong> The stop at 110 locks
+$2,500 on unit 1 and $500 on unit 2. Budget = $4,000,
+which would allow 666 shares; the two-unit cap says
+500. Risk at stop is now zero &mdash; 1,000 shares,
+four times the original position, with nothing at
+risk if the stop fills at 110.</p>
+
+<div class="note">
+<p><strong>The payoff.</strong> If price reaches 130:
+no adds = $7,500 (7.5R). With adds = $20,000 (20R).
+Same entry, same stop discipline, same move &mdash;
+2.7&times; the result.</p>
+</div>
+
+<div class="note">
+<p><strong>The short side.</strong> Everything here is
+written long. A short pyramid uses the same
+arithmetic with the signs flipped, with two
+asymmetries: the loss on a short is unbounded, and
+squeezes move faster than declines. Late adds on the
+short side are more dangerous for it, and the noise
+floor in the next section should be wider.</p>
+</div>
+
+<!-- ══════════════════════════════════════════════ -->
+<!-- 4. WHAT THE ADD COSTS -->
+<!-- ══════════════════════════════════════════════ -->
+
+<h2 id="cost">4. What the Add Actually Costs</h2>
+
+<p>Look at leg 2 again. Before the add, the stop at
+110 guaranteed $3,000. After it, the stop at 110
+guarantees $0. The add spent $3,000 of locked profit
+to buy 500 shares of continuation exposure &mdash;
+which pays an extra $7,000 if price reaches 130, and
+more beyond.</p>
+
+<div class="diagram">
+<svg viewBox="0 0 700 340" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Payoff versus exit price for the three position sizes" font-family="Georgia, 'Times New Roman', serif" font-size="13" fill="#3a2e1e">
+<line x1="70.0" y1="269.6" x2="490.0" y2="269.6" stroke="#d4c8b0" stroke-width="1" stroke-linecap="butt"/>
+<text x="62.0" y="273.6" font-size="11" fill="#8a7a60" text-anchor="end" font-weight="normal" font-style="normal">$0</text>
+<line x1="70.0" y1="217.5" x2="490.0" y2="217.5" stroke="#d4c8b0" stroke-width="1" stroke-linecap="butt"/>
+<text x="62.0" y="221.5" font-size="11" fill="#8a7a60" text-anchor="end" font-weight="normal" font-style="normal">$5,000</text>
+<line x1="70.0" y1="165.4" x2="490.0" y2="165.4" stroke="#d4c8b0" stroke-width="1" stroke-linecap="butt"/>
+<text x="62.0" y="169.4" font-size="11" fill="#8a7a60" text-anchor="end" font-weight="normal" font-style="normal">$10,000</text>
+<line x1="70.0" y1="113.3" x2="490.0" y2="113.3" stroke="#d4c8b0" stroke-width="1" stroke-linecap="butt"/>
+<text x="62.0" y="117.3" font-size="11" fill="#8a7a60" text-anchor="end" font-weight="normal" font-style="normal">$15,000</text>
+<line x1="70.0" y1="61.2" x2="490.0" y2="61.2" stroke="#d4c8b0" stroke-width="1" stroke-linecap="butt"/>
+<text x="62.0" y="65.2" font-size="11" fill="#8a7a60" text-anchor="end" font-weight="normal" font-style="normal">$20,000</text>
+<line x1="70.0" y1="280.0" x2="70.0" y2="284.0" stroke="#8a7a60" stroke-width="1" stroke-linecap="butt"/>
+<text x="70.0" y="297.0" font-size="11" fill="#8a7a60" text-anchor="middle" font-weight="normal" font-style="normal">110</text>
+<line x1="108.2" y1="280.0" x2="108.2" y2="284.0" stroke="#8a7a60" stroke-width="1" stroke-linecap="butt"/>
+<text x="108.2" y="297.0" font-size="11" fill="#8a7a60" text-anchor="middle" font-weight="normal" font-style="normal">112</text>
+<line x1="146.4" y1="280.0" x2="146.4" y2="284.0" stroke="#8a7a60" stroke-width="1" stroke-linecap="butt"/>
+<text x="146.4" y="297.0" font-size="11" fill="#8a7a60" text-anchor="middle" font-weight="normal" font-style="normal">114</text>
+<line x1="184.5" y1="280.0" x2="184.5" y2="284.0" stroke="#8a7a60" stroke-width="1" stroke-linecap="butt"/>
+<text x="184.5" y="297.0" font-size="11" fill="#8a7a60" text-anchor="middle" font-weight="normal" font-style="normal">116</text>
+<line x1="222.7" y1="280.0" x2="222.7" y2="284.0" stroke="#8a7a60" stroke-width="1" stroke-linecap="butt"/>
+<text x="222.7" y="297.0" font-size="11" fill="#8a7a60" text-anchor="middle" font-weight="normal" font-style="normal">118</text>
+<line x1="260.9" y1="280.0" x2="260.9" y2="284.0" stroke="#8a7a60" stroke-width="1" stroke-linecap="butt"/>
+<text x="260.9" y="297.0" font-size="11" fill="#8a7a60" text-anchor="middle" font-weight="normal" font-style="normal">120</text>
+<line x1="299.1" y1="280.0" x2="299.1" y2="284.0" stroke="#8a7a60" stroke-width="1" stroke-linecap="butt"/>
+<text x="299.1" y="297.0" font-size="11" fill="#8a7a60" text-anchor="middle" font-weight="normal" font-style="normal">122</text>
+<line x1="337.3" y1="280.0" x2="337.3" y2="284.0" stroke="#8a7a60" stroke-width="1" stroke-linecap="butt"/>
+<text x="337.3" y="297.0" font-size="11" fill="#8a7a60" text-anchor="middle" font-weight="normal" font-style="normal">124</text>
+<line x1="375.5" y1="280.0" x2="375.5" y2="284.0" stroke="#8a7a60" stroke-width="1" stroke-linecap="butt"/>
+<text x="375.5" y="297.0" font-size="11" fill="#8a7a60" text-anchor="middle" font-weight="normal" font-style="normal">126</text>
+<line x1="413.6" y1="280.0" x2="413.6" y2="284.0" stroke="#8a7a60" stroke-width="1" stroke-linecap="butt"/>
+<text x="413.6" y="297.0" font-size="11" fill="#8a7a60" text-anchor="middle" font-weight="normal" font-style="normal">128</text>
+<line x1="451.8" y1="280.0" x2="451.8" y2="284.0" stroke="#8a7a60" stroke-width="1" stroke-linecap="butt"/>
+<text x="451.8" y="297.0" font-size="11" fill="#8a7a60" text-anchor="middle" font-weight="normal" font-style="normal">130</text>
+<line x1="490.0" y1="280.0" x2="490.0" y2="284.0" stroke="#8a7a60" stroke-width="1" stroke-linecap="butt"/>
+<text x="490.0" y="297.0" font-size="11" fill="#8a7a60" text-anchor="middle" font-weight="normal" font-style="normal">132</text>
+<line x1="70.0" y1="280.0" x2="490.0" y2="280.0" stroke="#8a7a60" stroke-width="1" stroke-linecap="butt"/>
+<text x="280.0" y="314.0" font-size="12" fill="#8a7a60" text-anchor="middle" font-weight="normal" font-style="italic">exit price</text>
+<text x="62.0" y="20.0" font-size="11" fill="#8a7a60" text-anchor="end" font-weight="normal" font-style="normal">P&amp;L</text>
+<path d="M 70.0 243.5 L 490.0 186.2" fill="none" stroke="#8a7a60" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="5,4"/>
+<text x="498.0" y="190.2" font-size="12" fill="#8a7a60" text-anchor="start" font-weight="bold" font-style="normal">no adds (250 sh)</text>
+<path d="M 70.0 238.3 L 490.0 123.8" fill="none" stroke="#c5a55a" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/>
+<text x="498.0" y="127.8" font-size="12" fill="#c5a55a" text-anchor="start" font-weight="bold" font-style="normal">after leg 1 (500 sh)</text>
+<path d="M 70.0 269.6 L 490.0 40.4" fill="none" stroke="#4a7872" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/>
+<text x="498.0" y="44.4" font-size="12" fill="#4a7872" text-anchor="start" font-weight="bold" font-style="normal">full pyramid (1,000 sh)</text>
+<line x1="70.0" y1="30.0" x2="70.0" y2="280.0" stroke="#7a2e2e" stroke-width="1.2" stroke-dasharray="4,3" stroke-linecap="butt"/>
+<text x="75.0" y="42.0" font-size="11" fill="#7a2e2e" text-anchor="start" font-weight="normal" font-style="normal">stop</text>
+<circle cx="70.0" cy="238.3" r="4.5" fill="#c5a55a" stroke="#f4efe8" stroke-width="1.5"/>
+<circle cx="70.0" cy="243.5" r="4.5" fill="#8a7a60" stroke="#f4efe8" stroke-width="1.5"/>
+<circle cx="70.0" cy="269.6" r="4.5" fill="#4a7872" stroke="#f4efe8" stroke-width="1.5"/>
+<text x="115.8" y="45.6" font-size="12" fill="#3a2e1e" text-anchor="start" font-weight="bold" font-style="normal">If the stop fills at 110:</text>
+<circle cx="120.8" cy="59.6" r="4" fill="#c5a55a" stroke="#f4efe8" stroke-width="1.5"/>
+<text x="130.8" y="63.6" font-size="11" fill="#3a2e1e" text-anchor="start" font-weight="normal" font-style="normal">$3,000 &#8212; after leg 1 (locked)</text>
+<circle cx="120.8" cy="75.6" r="4" fill="#8a7a60" stroke="#f4efe8" stroke-width="1.5"/>
+<text x="130.8" y="79.6" font-size="11" fill="#3a2e1e" text-anchor="start" font-weight="normal" font-style="normal">$2,500 &#8212; no adds</text>
+<circle cx="120.8" cy="91.6" r="4" fill="#4a7872" stroke="#f4efe8" stroke-width="1.5"/>
+<text x="130.8" y="95.6" font-size="11" fill="#3a2e1e" text-anchor="start" font-weight="normal" font-style="normal">$0 &#8212; full pyramid: the add spent the cushion</text>
+<circle cx="133.6" cy="234.9" r="4" fill="#3a2e1e" stroke="#f4efe8" stroke-width="1.5"/>
+<line x1="133.6" y1="240.9" x2="133.6" y2="256.0" stroke="#3a2e1e" stroke-width="1" stroke-dasharray="2,2" stroke-linecap="butt"/>
+<text x="131.6" y="270.0" font-size="11" fill="#3a2e1e" text-anchor="start" font-weight="normal" font-style="normal">pyramid overtakes no-adds at 113.3</text>
+<circle cx="451.8" cy="191.5" r="4.5" fill="#8a7a60" stroke="#f4efe8" stroke-width="1.5"/>
+<circle cx="451.8" cy="134.2" r="4.5" fill="#c5a55a" stroke="#f4efe8" stroke-width="1.5"/>
+<circle cx="451.8" cy="61.2" r="4.5" fill="#4a7872" stroke="#f4efe8" stroke-width="1.5"/>
+<line x1="451.8" y1="61.2" x2="451.8" y2="280.0" stroke="#d4c8b0" stroke-width="1" stroke-dasharray="2,3" stroke-linecap="butt"/>
+<text x="451.8" y="51.2" font-size="11" fill="#3a2e1e" text-anchor="middle" font-weight="normal" font-style="normal">130</text>
+</svg>
+<p class="diagram-caption">What each position size pays at every possible exit price, as of the leg-2 add. The pyramid gives up $3,000 at the stop to buy the steepest line.</p>
+</div>
+
+<p>So the add is a bet: <strong>stake 3R of secured
+profit to win 7R if the trend continues.</strong> As
+a rough lens, that bet needs continuation odds above
+about 30% to be worth taking. The honest framing of
+&ldquo;zero added risk&rdquo; is not &ldquo;free&rdquo;
+&mdash; it is &ldquo;I have chosen to spend my cushion
+on optionality.&rdquo;</p>
+
+<p>This has a consequence people miss:
+<strong>pyramiding is a bet on continuation.</strong>
+It only has positive expectancy in instruments and
+regimes where moves persist. In a mean-reverting
+market it systematically buys tops and sells bottoms
+with your largest size, and every pyramid resolves to
+a scratch.</p>
+
+<h3>The inverted pyramid</h3>
+
+<p>Notice the average entry after leg 2 is 110 &mdash;
+exactly the stop. Adding big late pulls the
+position&rsquo;s break-even up toward the current
+price, so an ordinary pullback stops out the
+<em>entire</em> position at flat, after you had been
+up $6,000 open. The classical advice (Livermore, the
+Turtles) &mdash; largest unit first, each add smaller
+&mdash; exists to keep the average entry low so the
+pyramid survives normal noise. Matt&rsquo;s version
+sizes up harder, funded by the cushion. The
+reconciliation:</p>
+
+<ul>
+  <li>Size the add from the budget (Section 3),
+    <strong>and</strong></li>
+  <li>Check that the stop sits beyond normal noise. If
+    the position&rsquo;s break-even is within roughly
+    1.5&ndash;2 ATR of price, you have built something
+    a random day will knock over. Either add less or
+    wait for a bigger cushion.</li>
+</ul>
+
+<!-- ══════════════════════════════════════════════ -->
+<!-- 5. WHERE TO ADD -->
+<!-- ══════════════════════════════════════════════ -->
+
+<h2 id="where-add">5. Where to Add</h2>
+
+<p>The trigger has to be mechanical. Common designs:</p>
+
+<ul>
+  <li><strong>Fixed increments.</strong> Add every
+    k&nbsp;&times;&nbsp;ATR (or every 1R) of favorable
+    movement. The Turtle version: one unit at entry,
+    one more every &frac12;N, maximum four units, stop
+    trailed 2N behind the most recent add.</li>
+  <li><strong>Structural.</strong> Add when the trend
+    re-proves itself &mdash; a breakout from a
+    consolidation inside the trend, a new high after a
+    higher low, a close beyond the prior swing.</li>
+  <li><strong>On strength vs. on pullback.</strong>
+    Adding on strength (new highs) keeps you in sync
+    with the trend, and the previous unit is always in
+    profit when you add. Adding on pullbacks gets a
+    better price but means adding while the position
+    is moving against you.</li>
+</ul>
+
+<div class="trapline">
+<p><strong>One rule separates a pullback add from
+averaging down:</strong> never add below the entry of
+your last unit. Above it is a pyramid; below it is
+averaging down with a nicer name.</p>
+</div>
+
+<p>Hard caps: a maximum number of units, and an add
+only fires if the previous unit is in profit and the
+original trend condition still holds.</p>
+
+<h3>Trend age</h3>
+
+<p>The odds on the fourth add are worse than on the
+first. The further a move has run without
+consolidating, the nearer the reversal, and late adds
+are the ones that build the inverted pyramid of
+Section 4. The max-unit cap handles this bluntly. The
+direct rule: no adds once price is more than N ATR
+from the base &mdash; the entry, or the moving average
+the trend is measured against &mdash; or once the move
+has run a set distance without a rest. Add on the
+resumption after a consolidation, not on the
+extension.</p>
+
+<!-- ══════════════════════════════════════════════ -->
+<!-- 6. WHERE TO TAKE PROFIT -->
+<!-- ══════════════════════════════════════════════ -->
+
+<h2 id="where-take">6. Where to Take Profit</h2>
+
+<p>The other half of the question. Taking profit is
+not the opposite of adding &mdash; it is what funds
+it.</p>
+
+<ul>
+  <li><strong>A raised stop locks unrealized
+    profit.</strong> It holds only if the stop fills
+    where you placed it. A gap or a flash move through
+    it turns &ldquo;zero risk&rdquo; into real risk, and
+    the bigger the final position, the bigger that
+    exposure.</li>
+  <li><strong>A partial exit banks realized
+    profit.</strong> That cushion cannot be taken back.
+    Realized dollars are harder currency for funding
+    adds than a trailed stop.</li>
+</ul>
+
+<p>A workable structure: bank a fixed slice of the
+first unit at a fixed multiple (say a third at 2R),
+trail the rest, and treat the banked slice plus the
+locked amount as the add budget. The scale-out
+schedule and the add schedule are one plan written
+from both ends.</p>
+
+<p><strong>Scheduled events.</strong> Earnings, a
+central-bank decision, a major data release &mdash;
+these are where the gap in the first bullet lives.
+The standard rule: reduce to the core unit before the
+event and re-add on the trigger after it. A pyramid
+held through a binary event is not a zero-risk
+position; it is a large bet on the print.</p>
+
+<!-- ══════════════════════════════════════════════ -->
+<!-- 7. UNWINDING THE PYRAMID -->
+<!-- ══════════════════════════════════════════════ -->
+
+<h2 id="unwind">7. Unwinding the Pyramid</h2>
+
+<p>The trailing stop in Section 3 treats the pyramid
+as one position: everything exits at 110. That is the
+simplest design, and it is a cliff. The units are not
+equal, though. At 116, unit 1 has 16 points of
+cushion, unit 2 has 8, unit 3 has none. The last unit
+in has the worst price and the thinnest cushion, so
+it is the natural first unit out.</p>
+
+<div class="diagram">
+<svg viewBox="0 0 700 250" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Unwinding a pyramid last-in, first-out" font-family="Georgia, 'Times New Roman', serif" font-size="13" fill="#3a2e1e">
+<rect x="60.0" y="30.0" width="300.0" height="58.0" fill="#c9d8d6" stroke="#f4efe8" rx="4" opacity="1"/>
+<text x="74.0" y="54.0" font-size="14" fill="#5a3e1a" text-anchor="start" font-weight="bold" font-style="normal">Unit 3</text>
+<text x="74.0" y="74.0" font-size="12" fill="#3a2e1e" text-anchor="start" font-weight="normal" font-style="normal">500 @ 116 &#183; cushion at 116: none</text>
+<line x1="376.0" y1="59.0" x2="410.0" y2="59.0" stroke="#5a3e1a" stroke-width="1.6" stroke-linecap="butt"/>
+<polygon points="410.0,54.0 420.0,59.0 410.0,64.0" fill="#5a3e1a"/>
+<text x="428.0" y="63.0" font-size="13" fill="#5a3e1a" text-anchor="start" font-weight="bold" font-style="normal">first out</text>
+<rect x="60.0" y="94.0" width="300.0" height="58.0" fill="#a6bfbc" stroke="#f4efe8" rx="4" opacity="1"/>
+<text x="74.0" y="118.0" font-size="14" fill="#5a3e1a" text-anchor="start" font-weight="bold" font-style="normal">Unit 2</text>
+<text x="74.0" y="138.0" font-size="12" fill="#3a2e1e" text-anchor="start" font-weight="normal" font-style="normal">250 @ 108 &#183; cushion at 116: 8 pts</text>
+<line x1="376.0" y1="123.0" x2="410.0" y2="123.0" stroke="#5a3e1a" stroke-width="1.6" stroke-linecap="butt"/>
+<polygon points="410.0,118.0 420.0,123.0 410.0,128.0" fill="#5a3e1a"/>
+<text x="428.0" y="127.0" font-size="13" fill="#5a3e1a" text-anchor="start" font-weight="bold" font-style="normal">second out</text>
+<rect x="60.0" y="158.0" width="300.0" height="58.0" fill="#84a4a0" stroke="#f4efe8" rx="4" opacity="1"/>
+<text x="74.0" y="182.0" font-size="14" fill="#5a3e1a" text-anchor="start" font-weight="bold" font-style="normal">Unit 1</text>
+<text x="74.0" y="202.0" font-size="12" fill="#3a2e1e" text-anchor="start" font-weight="normal" font-style="normal">250 @ 100 &#183; cushion at 116: 16 pts</text>
+<line x1="376.0" y1="187.0" x2="410.0" y2="187.0" stroke="#5a3e1a" stroke-width="1.6" stroke-linecap="butt"/>
+<polygon points="410.0,182.0 420.0,187.0 410.0,192.0" fill="#5a3e1a"/>
+<text x="428.0" y="191.0" font-size="13" fill="#5a3e1a" text-anchor="start" font-weight="normal" font-style="normal">runs on the wide trailing stop</text>
+<text x="60.0" y="20.0" font-size="12" fill="#8a7a60" text-anchor="start" font-weight="normal" font-style="italic">Position at 116, top to bottom = last in, first out</text>
+<text x="60.0" y="240.0" font-size="12" fill="#8a7a60" text-anchor="start" font-weight="normal" font-style="normal">Each peel lowers the position&#8217;s break-even and cuts size before the stop, not at it.</text>
+</svg>
+<p class="diagram-caption">The pyramid at 116, newest unit on top. Peeling from the top removes the thinnest cushion first.</p>
+</div>
+
+<p><strong>Last in, first out.</strong> Set a weakness
+trigger tighter than the position stop &mdash; a
+close below the prior swing low, or a give-back of
+one ATR from the high &mdash; and peel the newest unit
+on the first trigger, the next-newest on the second,
+leaving the original unit on the wide trailing stop.
+One cliff becomes a staircase.</p>
+
+<p>In the example: price fails at 116 and closes at
+113. LIFO sells unit 3 (500 @ 116) at 113 for
+&minus;$1,500. The remaining 500 shares have an
+average of 104 and the stop at 110, so the worst case
+for the trade is now +$3,000 &minus; $1,500 = +$1,500,
+against $0 if everything rode down to 110. If the
+trend resumes, unit 3 goes back on at the next
+trigger; the peel cost an expense, not the trade.</p>
+
+<p><strong>The trade-off.</strong> LIFO cuts the
+largest exposure early, so it lowers give-back, but it
+also cuts exposure right where continuation would
+have paid most, and each peel-and-re-add is another
+expense. In a trend with routine 1-ATR pullbacks, a
+1-ATR trigger peels a unit on every one of them. Set
+the trigger wider than the instrument&rsquo;s typical
+pullback inside a trend, and tighter than the
+position stop.</p>
+
+<p>Two designs, then: a single position-level stop
+(simple, cliff-edged, Turtle style), or staggered
+unit-level stops that produce LIFO automatically
+&mdash; each unit&rsquo;s stop sits m&nbsp;ATR below
+its own entry, so the newest unit always has the
+tightest one. Pick one and write it down. The failure
+mode is deciding during the pullback.</p>
+
+<!-- ══════════════════════════════════════════════ -->
+<!-- 8. THE SWING AT FULL SIZE -->
+<!-- ══════════════════════════════════════════════ -->
+
+<h2 id="swing">8. The Swing at Full Size</h2>
+
+<p>At 250 shares a $3 move was $750 &mdash;
+three-quarters of R, an ordinary day. At 1,000 shares
+the same $3 is $3,000: three R, in an afternoon, in a
+position that was up $6,000 an hour earlier. Nothing
+about the trade has changed. The size has, and with
+it the meaning of ordinary noise.</p>
+
+<p>This is the part of stage 3 that is rare. The math
+of adding fits in a spreadsheet; sitting through a
+normal pullback with four times your usual size does
+not. Traders who get this far mostly fail by
+flinching: they cut the pyramid on a routine dip,
+book a fraction of what the rule would have
+delivered, and conclude that pyramiding does not work
+for them.</p>
+
+<div class="trapline">
+<p><strong>Size the pyramid to the swing you can
+hold.</strong> Before the add, compute the one-ATR
+swing at the new size (position &times; ATR) and
+express it in R. If a one-ATR day at full size is a
+number you would not sit through, the pyramid is
+bigger than your nerves, whatever risk-at-stop says.
+Cap it there.</p>
+</div>
+
+<p>Rules that help:</p>
+
+<ul>
+  <li><strong>Decide the exit design before the
+    add</strong> (Section 7), never during the
+    pullback.</li>
+  <li><strong>Watch the stop level, not the
+    P&amp;L.</strong> The stop is the decision; the
+    P&amp;L is noise about the decision.</li>
+  <li><strong>Count in R, not dollars.</strong>
+    $3,000 is a number that makes people act; 3R on a
+    trade whose worst case is zero is not.</li>
+  <li><strong>Reduce screen time at full size.</strong>
+    A pit trader saw one price at a time; a screen
+    shows the open profit ticking, which is the
+    flinch made visible.</li>
+  <li><strong>Do not re-ask the entry question.</strong>
+    &ldquo;Would I put this position on here, at this
+    price?&rdquo; always answers no at full size after
+    a run. The only question is whether an exit rule
+    has fired.</li>
+</ul>
+
+<!-- ══════════════════════════════════════════════ -->
+<!-- 9. SCRATCH VS BREAK-EVEN -->
+<!-- ══════════════════════════════════════════════ -->
+
+<h2 id="scratch">9. Scratch Stop vs. Break-Even
+Stop</h2>
+
+<p>Matt draws this distinction, and pyramids make it
+matter.</p>
+
+<ul>
+  <li><strong>Scratch stop</strong> &mdash; a
+    unit&rsquo;s stop moved to that unit&rsquo;s own
+    entry. If hit, that unit exits flat, less
+    commission and slippage: an expense, not a
+    loss.</li>
+  <li><strong>Break-even stop</strong> &mdash; a stop
+    placed so the <em>whole trade</em> exits at zero.
+    With locked or banked profit as a buffer, the
+    remaining position&rsquo;s stop can sit below
+    scratch and the trade as a whole is still
+    flat.</li>
+</ul>
+
+<p>For a single unit these are the same price. For a
+pyramid they diverge, and confusing them is how
+traders lose money on a trade they thought was
+&ldquo;risk-free&rdquo;:</p>
+
+<div class="diagram">
+<svg viewBox="0 0 700 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Price ladder: entries, stops, scratch and break-even levels" font-family="Georgia, 'Times New Roman', serif" font-size="13" fill="#3a2e1e">
+<line x1="50.0" y1="120.0" x2="650.0" y2="120.0" stroke="#8a7a60" stroke-width="1.5" stroke-linecap="butt"/>
+<line x1="50.0" y1="116.0" x2="50.0" y2="124.0" stroke="#8a7a60" stroke-width="1" stroke-linecap="butt"/>
+<text x="50.0" y="138.0" font-size="11" fill="#8a7a60" text-anchor="middle" font-weight="normal" font-style="normal">94</text>
+<line x1="100.0" y1="116.0" x2="100.0" y2="124.0" stroke="#8a7a60" stroke-width="1" stroke-linecap="butt"/>
+<text x="100.0" y="138.0" font-size="11" fill="#8a7a60" text-anchor="middle" font-weight="normal" font-style="normal">96</text>
+<line x1="150.0" y1="116.0" x2="150.0" y2="124.0" stroke="#8a7a60" stroke-width="1" stroke-linecap="butt"/>
+<text x="150.0" y="138.0" font-size="11" fill="#8a7a60" text-anchor="middle" font-weight="normal" font-style="normal">98</text>
+<line x1="200.0" y1="116.0" x2="200.0" y2="124.0" stroke="#8a7a60" stroke-width="1" stroke-linecap="butt"/>
+<text x="200.0" y="138.0" font-size="11" fill="#8a7a60" text-anchor="middle" font-weight="normal" font-style="normal">100</text>
+<line x1="250.0" y1="116.0" x2="250.0" y2="124.0" stroke="#8a7a60" stroke-width="1" stroke-linecap="butt"/>
+<text x="250.0" y="138.0" font-size="11" fill="#8a7a60" text-anchor="middle" font-weight="normal" font-style="normal">102</text>
+<line x1="300.0" y1="116.0" x2="300.0" y2="124.0" stroke="#8a7a60" stroke-width="1" stroke-linecap="butt"/>
+<text x="300.0" y="138.0" font-size="11" fill="#8a7a60" text-anchor="middle" font-weight="normal" font-style="normal">104</text>
+<line x1="350.0" y1="116.0" x2="350.0" y2="124.0" stroke="#8a7a60" stroke-width="1" stroke-linecap="butt"/>
+<text x="350.0" y="138.0" font-size="11" fill="#8a7a60" text-anchor="middle" font-weight="normal" font-style="normal">106</text>
+<line x1="400.0" y1="116.0" x2="400.0" y2="124.0" stroke="#8a7a60" stroke-width="1" stroke-linecap="butt"/>
+<text x="400.0" y="138.0" font-size="11" fill="#8a7a60" text-anchor="middle" font-weight="normal" font-style="normal">108</text>
+<line x1="450.0" y1="116.0" x2="450.0" y2="124.0" stroke="#8a7a60" stroke-width="1" stroke-linecap="butt"/>
+<text x="450.0" y="138.0" font-size="11" fill="#8a7a60" text-anchor="middle" font-weight="normal" font-style="normal">110</text>
+<line x1="500.0" y1="116.0" x2="500.0" y2="124.0" stroke="#8a7a60" stroke-width="1" stroke-linecap="butt"/>
+<text x="500.0" y="138.0" font-size="11" fill="#8a7a60" text-anchor="middle" font-weight="normal" font-style="normal">112</text>
+<line x1="550.0" y1="116.0" x2="550.0" y2="124.0" stroke="#8a7a60" stroke-width="1" stroke-linecap="butt"/>
+<text x="550.0" y="138.0" font-size="11" fill="#8a7a60" text-anchor="middle" font-weight="normal" font-style="normal">114</text>
+<line x1="600.0" y1="116.0" x2="600.0" y2="124.0" stroke="#8a7a60" stroke-width="1" stroke-linecap="butt"/>
+<text x="600.0" y="138.0" font-size="11" fill="#8a7a60" text-anchor="middle" font-weight="normal" font-style="normal">116</text>
+<line x1="650.0" y1="116.0" x2="650.0" y2="124.0" stroke="#8a7a60" stroke-width="1" stroke-linecap="butt"/>
+<text x="650.0" y="138.0" font-size="11" fill="#8a7a60" text-anchor="middle" font-weight="normal" font-style="normal">118</text>
+<line x1="100.0" y1="114.0" x2="100.0" y2="104.0" stroke="#7a2e2e" stroke-width="1.4" stroke-linecap="butt"/>
+<circle cx="100.0" cy="120.0" r="4.5" fill="#7a2e2e" stroke="#f4efe8" stroke-width="1.5"/>
+<text x="100.0" y="98.0" font-size="11" fill="#7a2e2e" text-anchor="middle" font-weight="normal" font-style="normal">initial stop</text>
+<line x1="200.0" y1="114.0" x2="200.0" y2="82.0" stroke="#c5a55a" stroke-width="1.4" stroke-linecap="butt"/>
+<circle cx="200.0" cy="120.0" r="4.5" fill="#c5a55a" stroke="#f4efe8" stroke-width="1.5"/>
+<text x="200.0" y="76.0" font-size="11" fill="#c5a55a" text-anchor="middle" font-weight="normal" font-style="normal">unit 1 scratch stop</text>
+<line x1="200.0" y1="144.0" x2="200.0" y2="152.0" stroke="#5a3e1a" stroke-width="1.4" stroke-linecap="butt"/>
+<circle cx="200.0" cy="120.0" r="4.5" fill="#5a3e1a" stroke="#f4efe8" stroke-width="1.5"/>
+<text x="200.0" y="164.0" font-size="11" fill="#5a3e1a" text-anchor="middle" font-weight="normal" font-style="normal">unit 1 entry</text>
+<line x1="250.0" y1="144.0" x2="250.0" y2="174.0" stroke="#7a2e2e" stroke-width="1.4" stroke-linecap="butt"/>
+<circle cx="250.0" cy="120.0" r="4.5" fill="#7a2e2e" stroke="#f4efe8" stroke-width="1.5"/>
+<text x="250.0" y="186.0" font-size="11" fill="#7a2e2e" text-anchor="middle" font-weight="normal" font-style="normal">stop after leg 1</text>
+<line x1="300.0" y1="114.0" x2="300.0" y2="104.0" stroke="#8a6a2a" stroke-width="1.4" stroke-linecap="butt"/>
+<circle cx="300.0" cy="120.0" r="4.5" fill="#8a6a2a" stroke="#f4efe8" stroke-width="1.5"/>
+<text x="300.0" y="98.0" font-size="11" fill="#8a6a2a" text-anchor="middle" font-weight="normal" font-style="normal">position break-even after leg 1</text>
+<line x1="400.0" y1="144.0" x2="400.0" y2="152.0" stroke="#5a3e1a" stroke-width="1.4" stroke-linecap="butt"/>
+<circle cx="400.0" cy="120.0" r="4.5" fill="#5a3e1a" stroke="#f4efe8" stroke-width="1.5"/>
+<text x="400.0" y="164.0" font-size="11" fill="#5a3e1a" text-anchor="middle" font-weight="normal" font-style="normal">unit 2 entry</text>
+<line x1="450.0" y1="114.0" x2="450.0" y2="82.0" stroke="#7a2e2e" stroke-width="1.4" stroke-linecap="butt"/>
+<circle cx="450.0" cy="120.0" r="4.5" fill="#7a2e2e" stroke="#f4efe8" stroke-width="1.5"/>
+<text x="450.0" y="76.0" font-size="11" fill="#7a2e2e" text-anchor="middle" font-weight="normal" font-style="normal">stop after leg 2 = position break-even</text>
+<line x1="600.0" y1="144.0" x2="600.0" y2="152.0" stroke="#5a3e1a" stroke-width="1.4" stroke-linecap="butt"/>
+<circle cx="600.0" cy="120.0" r="4.5" fill="#5a3e1a" stroke="#f4efe8" stroke-width="1.5"/>
+<text x="600.0" y="164.0" font-size="11" fill="#5a3e1a" text-anchor="middle" font-weight="normal" font-style="normal">unit 3 entry</text>
+</svg>
+<p class="diagram-caption">Every level that matters in the worked example. The scratch stop for unit 1 and the position's break-even are ten points apart by leg 2.</p>
+</div>
+
+<div class="table-wrap">
+<table>
+<tr><th>Stop level in the example</th>
+<th>What it means</th></tr>
+<tr><td>100</td><td>Unit 1 scratch. Position is red if
+units 2 and 3 are on.</td></tr>
+<tr><td>104</td><td>Position break-even after
+leg 1</td></tr>
+<tr><td>110</td><td>Position break-even after
+leg 2</td></tr>
+</table>
+</div>
+
+<p>Know which one you have set. &ldquo;My stop is at
+scratch&rdquo; and &ldquo;the position is at
+break-even&rdquo; are different claims once you have
+added.</p>
+
+<!-- ══════════════════════════════════════════════ -->
+<!-- 10. RE-ENTRY -->
+<!-- ══════════════════════════════════════════════ -->
+
+<h2 id="reentry">10. Re-entry After a Scratch</h2>
+
+<p>The scenario: the pyramid is stopped at 110 for a
+flat trade. Three days later the market takes out the
+high and runs to 135 without you. At a 25% win rate
+this happens often, and the traders who never
+re-enter are the ones who were right about the trend
+and made nothing from it.</p>
+
+<p><strong>A scratch resets the trade, not the
+thesis.</strong> If the original entry condition fires
+again &mdash; a new breakout, a higher low that holds
+&mdash; re-enter with unit 1 at the full initial R, as
+a new trade. Not with the old pyramid&rsquo;s size;
+the cushion that justified that size is gone. This is
+Livermore&rsquo;s probing: small until the market
+proves the idea, then sized.</p>
+
+<p>The re-entry often has a better stop than the
+first entry. The shakeout low is now a reference
+point that did not exist before, and a stop beneath
+it is tighter than the original: same R, smaller
+distance, more shares.</p>
+
+<p><strong>Guardrails.</strong> Each re-entry is a
+full expense, so cap them &mdash; two or three per
+trend. A third scratch is the market saying it is not
+trending; stand aside until new structure forms. Keep
+re-entries in the accounting alongside the scratches,
+so the cost of persistence stays visible.</p>
+
+<!-- ══════════════════════════════════════════════ -->
+<!-- 11. LOSSES AS EXPENSES -->
+<!-- ══════════════════════════════════════════════ -->
+
+<h2 id="expenses">11. Losses as Business Expenses</h2>
+
+<p>A stop that fills where you planned it is a cost
+of doing business &mdash; commission, slippage, the
+small planned loss. A <em>loss</em> is what happens
+when the stop is moved, ignored, or sized wrong. The
+distinction is not semantic: expenses are bounded and
+budgeted; losses are not.</p>
+
+<p>At a 25% win rate, three of every four trades are
+expenses. The business is profitable only if the
+fourth is exploited. Two things follow:</p>
+
+<ul>
+  <li>The expense line must stay <strong>small and
+    boring</strong> &mdash; stage 1 discipline, every
+    time, especially on trades that feel like they
+    will turn around.</li>
+  <li>Scratching a trade early is not failure. It is a
+    cheaper expense than the full stop, and it frees
+    the risk budget for the next attempt.</li>
+</ul>
+
+<!-- ══════════════════════════════════════════════ -->
+<!-- 12. TRADE LESS -->
+<!-- ══════════════════════════════════════════════ -->
+
+<h2 id="trade-less">12. Trade Less to Make More</h2>
+
+<p>Adds consume two scarce resources: risk budget and
+attention. Both have to be <em>available</em> when
+the trade that deserves to be pressed shows up.
+Twenty mediocre positions fragment the budget into
+pieces too small to press with, and fragment focus so
+the press is late or missed.</p>
+
+<p>Portfolio-level rules that follow:</p>
+
+<ul>
+  <li>Cap total open risk across all positions. Adds
+    draw from the same cap.</li>
+  <li>Correlated winners are one bet &mdash;
+    pyramiding three positions that move together is
+    one large pyramid, not three small ones.</li>
+  <li>Reserve part of the budget for adds so the
+    winner is not starved by new entries.</li>
+</ul>
+
+<p>Fewer positions, bigger when right.</p>
+
+<!-- ══════════════════════════════════════════════ -->
+<!-- 13. ACCOUNT LEVEL -->
+<!-- ══════════════════════════════════════════════ -->
+
+<h2 id="account">13. Adding to Size at the Account
+Level</h2>
+
+<p>&ldquo;Adding to size&rdquo; has a second meaning.
+Everything above happens inside a trade. Across a
+career, the same idea is raising <code>R</code>
+itself &mdash; the base risk per trade &mdash; as the
+account and the evidence grow. This is what turns
+stage 3 into financial freedom rather than one good
+year.</p>
+
+<p>Fixed-fraction sizing already scales: at 1% of
+equity, R in dollars grows with the account on its
+own. Sizing up means raising the fraction, and that
+is a different decision from watching the dollars
+grow.</p>
+
+<h3>Why it has to be slow</h3>
+
+<p>With a 25% win rate, losing streaks are long. The
+chance of ten losses in a row is 0.75<sup>10</sup>,
+about 5.6%, and over 500 trades the longest losing
+streak you should expect is around 20. At R = 1% with
+0.7R average losses, a 20-loss streak costs about
+13%. At R = 3%, about 35%.</p>
+
+<p>Kelly gives the ceiling. For p = 0.25 and a
+win/loss ratio of 7 (5R against 0.7R), full Kelly is
+about 14% per trade &mdash; a number no one survives
+in practice, because the inputs are estimates and the
+streaks are real. Quarter-Kelly, around 3.5%, is where
+the ceiling sits; most traders should live well below
+it.</p>
+
+<div class="diagram">
+<svg viewBox="0 0 700 400" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Base risk per trade stepping with the equity curve" font-family="Georgia, 'Times New Roman', serif" font-size="13" fill="#3a2e1e">
+<line x1="64.0" y1="158.9" x2="620.0" y2="158.9" stroke="#d4c8b0" stroke-width="1" stroke-linecap="butt"/>
+<text x="56.0" y="162.9" font-size="11" fill="#8a7a60" text-anchor="end" font-weight="normal" font-style="normal">100</text>
+<line x1="64.0" y1="126.7" x2="620.0" y2="126.7" stroke="#d4c8b0" stroke-width="1" stroke-linecap="butt"/>
+<text x="56.0" y="130.7" font-size="11" fill="#8a7a60" text-anchor="end" font-weight="normal" font-style="normal">120</text>
+<line x1="64.0" y1="94.4" x2="620.0" y2="94.4" stroke="#d4c8b0" stroke-width="1" stroke-linecap="butt"/>
+<text x="56.0" y="98.4" font-size="11" fill="#8a7a60" text-anchor="end" font-weight="normal" font-style="normal">140</text>
+<line x1="64.0" y1="62.2" x2="620.0" y2="62.2" stroke="#d4c8b0" stroke-width="1" stroke-linecap="butt"/>
+<text x="56.0" y="66.2" font-size="11" fill="#8a7a60" text-anchor="end" font-weight="normal" font-style="normal">160</text>
+<line x1="64.0" y1="30.0" x2="620.0" y2="30.0" stroke="#d4c8b0" stroke-width="1" stroke-linecap="butt"/>
+<text x="56.0" y="34.0" font-size="11" fill="#8a7a60" text-anchor="end" font-weight="normal" font-style="normal">180</text>
+<text x="56.0" y="22.0" font-size="11" fill="#8a7a60" text-anchor="end" font-weight="normal" font-style="normal">equity</text>
+<line x1="64.0" y1="290.0" x2="620.0" y2="290.0" stroke="#d4c8b0" stroke-width="1" stroke-linecap="butt"/>
+<text x="56.0" y="294.0" font-size="11" fill="#4a7872" text-anchor="end" font-weight="normal" font-style="normal">1.00%</text>
+<line x1="64.0" y1="265.0" x2="620.0" y2="265.0" stroke="#d4c8b0" stroke-width="1" stroke-linecap="butt"/>
+<text x="56.0" y="269.0" font-size="11" fill="#4a7872" text-anchor="end" font-weight="normal" font-style="normal">1.25%</text>
+<line x1="64.0" y1="240.0" x2="620.0" y2="240.0" stroke="#d4c8b0" stroke-width="1" stroke-linecap="butt"/>
+<text x="56.0" y="244.0" font-size="11" fill="#4a7872" text-anchor="end" font-weight="normal" font-style="normal">1.50%</text>
+<text x="64.0" y="207.0" font-size="11" fill="#4a7872" text-anchor="start" font-weight="normal" font-style="normal">R per trade</text>
+<line x1="258.6" y1="117.0" x2="258.6" y2="265.0" stroke="#d4c8b0" stroke-width="1" stroke-dasharray="3,3" stroke-linecap="butt"/>
+<line x1="397.6" y1="125.1" x2="397.6" y2="290.0" stroke="#d4c8b0" stroke-width="1" stroke-dasharray="3,3" stroke-linecap="butt"/>
+<line x1="481.0" y1="92.8" x2="481.0" y2="265.0" stroke="#d4c8b0" stroke-width="1" stroke-dasharray="3,3" stroke-linecap="butt"/>
+<line x1="592.2" y1="57.4" x2="592.2" y2="240.0" stroke="#d4c8b0" stroke-width="1" stroke-dasharray="3,3" stroke-linecap="butt"/>
+<path d="M 64.0 158.9 L 91.8 152.4 L 119.6 155.7 L 147.4 144.4 L 175.2 136.3 L 203.0 141.2 L 230.8 126.7 L 258.6 117.0 L 286.4 121.8 L 314.2 108.9 L 342.0 99.3 L 369.8 112.2 L 397.6 125.1 L 425.4 120.2 L 453.2 105.7 L 481.0 92.8 L 508.8 81.6 L 536.6 86.4 L 564.4 70.3 L 592.2 57.4 L 620.0 46.1" fill="none" stroke="#8a7a60" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="258.6" cy="117.0" r="4" fill="#4a7872" stroke="#f4efe8" stroke-width="1.5"/>
+<circle cx="397.6" cy="125.1" r="4" fill="#7a2e2e" stroke="#f4efe8" stroke-width="1.5"/>
+<circle cx="481.0" cy="92.8" r="4" fill="#4a7872" stroke="#f4efe8" stroke-width="1.5"/>
+<circle cx="592.2" cy="57.4" r="4" fill="#4a7872" stroke="#f4efe8" stroke-width="1.5"/>
+<path d="M 64.0 290.0 L 91.8 290.0 L 119.6 290.0 L 147.4 290.0 L 175.2 290.0 L 203.0 290.0 L 230.8 290.0 L 258.6 290.0 L 258.6 265.0 L 286.4 265.0 L 314.2 265.0 L 342.0 265.0 L 369.8 265.0 L 397.6 265.0 L 397.6 290.0 L 425.4 290.0 L 453.2 290.0 L 481.0 290.0 L 481.0 265.0 L 508.8 265.0 L 536.6 265.0 L 564.4 265.0 L 592.2 265.0 L 592.2 240.0 L 620.0 240.0" fill="none" stroke="#4a7872" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="258.6" cy="265.0" r="4.5" fill="#4a7872" stroke="#f4efe8" stroke-width="1.5"/>
+<text x="258.6" y="253.0" font-size="11" fill="#4a7872" text-anchor="middle" font-weight="normal" font-style="normal">new high 25% above the last step: R up</text>
+<circle cx="397.6" cy="290.0" r="4.5" fill="#7a2e2e" stroke="#f4efe8" stroke-width="1.5"/>
+<text x="397.6" y="312.0" font-size="11" fill="#7a2e2e" text-anchor="middle" font-weight="normal" font-style="normal">&#8722;10% from peak: R down a step</text>
+<circle cx="481.0" cy="265.0" r="4.5" fill="#4a7872" stroke="#f4efe8" stroke-width="1.5"/>
+<text x="489.0" y="287.0" font-size="11" fill="#4a7872" text-anchor="start" font-weight="normal" font-style="normal">old peak regained: step restored</text>
+<circle cx="592.2" cy="240.0" r="4.5" fill="#4a7872" stroke="#f4efe8" stroke-width="1.5"/>
+<text x="588.2" y="228.0" font-size="11" fill="#4a7872" text-anchor="end" font-weight="normal" font-style="normal">next threshold: up again</text>
+<text x="342.0" y="337.0" font-size="12" fill="#8a7a60" text-anchor="middle" font-weight="normal" font-style="italic">trades &#8594;</text>
+<text x="64.0" y="361.0" font-size="12" fill="#8a7a60" text-anchor="start" font-weight="normal" font-style="normal">Slow up, fast down: size follows the equity curve, not the last trade.</text>
+</svg>
+<p class="diagram-caption">Base risk stepping with the equity curve: up on evidence, down on drawdown, restored on recovery.</p>
+</div>
+
+<h3>The rules</h3>
+
+<ul>
+  <li><strong>Step on evidence, not on streaks.</strong>
+    Raise R only after a defined sample at the current
+    size &mdash; fifty to a hundred trades &mdash; with
+    expectancy holding. A hot month is not a
+    sample.</li>
+  <li><strong>Tie the step to equity.</strong> Raise R
+    by a fixed increment (0.25%) when equity makes a
+    new high a set distance above the equity at the
+    last step-up (say 25%). Step down one notch on a
+    defined drawdown from peak (10%), and restore only
+    when the old peak is regained. Slow up, fast
+    down.</li>
+  <li><strong>Scalable means liquid.</strong>
+    Matt&rsquo;s third process requirement: a rule
+    that works at 250 shares must work at 2,500. Check
+    slippage and fill quality at the next size before
+    stepping, and drop the instruments that stop
+    scaling before you drop R.</li>
+  <li><strong>Never step mid-trade.</strong> R changes
+    between trades, on a schedule. Changing it while a
+    pyramid is on is adding risk under another
+    name.</li>
+</ul>
+
+<!-- ══════════════════════════════════════════════ -->
+<!-- 14. CODIFYING IT -->
+<!-- ══════════════════════════════════════════════ -->
+
+<h2 id="codify">14. Codifying It</h2>
+
+<p>Matt&rsquo;s process requirement &mdash;
+consistent, repeatable, scalable &mdash; translates
+directly into parameters:</p>
+
+<div class="table-wrap">
+<table>
+<tr><th>Parameter</th><th>Meaning</th></tr>
+<tr><td><code>R</code></td><td>Risk per trade as % of
+equity</td></tr>
+<tr><td><code>k</code></td><td>Add spacing, in ATR (or
+R) of favorable move</td></tr>
+<tr><td><code>m</code></td><td>Trail distance, in ATR,
+below the highest close (or below the last
+add)</td></tr>
+<tr><td><code>B</code></td><td>Risk budget at the stop:
+<code>R</code> (constant-risk) or <code>0</code>
+(zero-risk)</td></tr>
+<tr><td><code>Q_max</code></td><td>Largest single add,
+in initial units</td></tr>
+<tr><td><code>U</code></td><td>Maximum units per
+position</td></tr>
+<tr><td><code>noise_floor</code></td><td>Minimum
+distance from price to position break-even, in
+ATR</td></tr>
+<tr><td><code>ext_max</code></td><td>No adds beyond
+this distance from the base, in ATR (trend
+age)</td></tr>
+<tr><td><code>swing_max</code></td><td>Largest one-ATR
+swing at full size you will hold, in R</td></tr>
+<tr><td><code>x</code></td><td>LIFO weakness trigger,
+in ATR of give-back (or per-unit stops
+instead)</td></tr>
+<tr><td><code>re_max</code></td><td>Re-entries allowed
+per trend after a scratch</td></tr>
+<tr><td><code>step_up</code>, <code>step_down</code></td>
+<td>Equity thresholds and trade-count sample for
+changing base R</td></tr>
+</table>
+</div>
+
+<div class="formula">each bar:
+  if flat and entry_signal and re_entries &lt; re_max:
+      Q0 = R / (E &minus; S0); buy Q0; S = S0; units = 1
+  if in position:
+      S = max(S, trail(price, m))          # stop never lowered
+      if price &ge; last_add + k&middot;ATR and units &lt; U and trend_filter
+         and price &minus; base &le; ext_max&middot;ATR:
+          L = &Sigma; Q_i&middot;(S &minus; E_i)
+          Q_add = min((B + L) / (price &minus; S), Q_max)
+          if Q_add &gt; 0
+             and break_even_after_add &le; price &minus; noise_floor&middot;ATR
+             and (Q_total + Q_add)&middot;ATR &le; swing_max&middot;R:
+              buy Q_add; units += 1
+      if lifo and weakness_trigger(x) and units &gt; 1:
+          sell newest unit; units &minus;= 1
+      if price &le; S: exit all
+
+between trades, never mid-trade:
+  if equity &ge; 1.25 &times; equity_at_last_step and trades_since_step &ge; 50:
+      R += 0.25%
+  if equity &le; 0.90 &times; peak_equity:
+      R &minus;= 0.25%   # restore when the peak is regained</div>
+
+<p>What to measure, beyond expectancy:</p>
+
+<ul>
+  <li><strong>Tail capture</strong> &mdash; on the
+    top-decile trades, realized R divided by the R
+    available from entry to peak. This is the number
+    stage 3 exists to raise.</li>
+  <li><strong>Give-back</strong> &mdash; (max open
+    profit &minus; realized profit) &divide; max open
+    profit. Pyramids raise this; you want the
+    trade-off, not a blowout.</li>
+  <li><strong>P&amp;L attribution by unit</strong>
+    &mdash; how much comes from units 2..U. If it is
+    small or negative, the adds are not earning their
+    cost.</li>
+  <li><strong>MAE after adds</strong> &mdash; how far
+    trades go against you once the position is at
+    full size.</li>
+  <li><strong>Peel churn</strong> &mdash; how often the
+    LIFO trigger fires and the peeled unit is re-added
+    within a few bars. A high number means the trigger
+    sits inside the noise.</li>
+  <li><strong>Re-entry cost</strong> &mdash; expenses
+    spent on re-entries per trend actually
+    captured.</li>
+  <li><strong>Slippage at full size</strong> &mdash;
+    the last unit is where fills are worst and gaps
+    hurt most.</li>
+</ul>
+
+<div class="note">
+<p><strong>Warning.</strong> <code>k</code>,
+<code>m</code>, <code>x</code> and <code>B</code>
+interact strongly and overfit easily &mdash; optimize
+them together and test them across regimes, including
+flat ones, to see the damage. Pyramiding rules that
+look wonderful in a trending sample can be net
+negative over a full cycle.</p>
+</div>
+
+<!-- ══════════════════════════════════════════════ -->
+<!-- 15. DANGERS -->
+<!-- ══════════════════════════════════════════════ -->
+
+<h2 id="dangers">15. Dangers</h2>
+
+<ul class="danger-list">
+  <li><strong>The inverted pyramid</strong> &mdash; adds
+    so large that the position&rsquo;s break-even
+    chases price, and normal noise scratches the whole
+    thing.</li>
+  <li><strong>Late adds</strong> &mdash; adding on the
+    extension rather than the resumption. The fourth
+    add in a run is where the odds are worst.</li>
+  <li><strong>Averaging down in disguise</strong>
+    &mdash; adding on a pullback below the last
+    unit&rsquo;s entry.</li>
+  <li><strong>Gap and flash-move risk</strong> &mdash;
+    scales with final size. &ldquo;Zero risk at the
+    stop&rdquo; assumes the stop fills.</li>
+  <li><strong>Events at full size</strong> &mdash;
+    holding the whole pyramid through a scheduled
+    binary event. That is a bet on the print, not a
+    zero-risk position.</li>
+  <li><strong>The flinch</strong> &mdash; cutting a
+    rule-based pyramid on a routine pullback because
+    the dollar swing is new (Section 8).</li>
+  <li><strong>Correlated pyramids</strong> &mdash;
+    several pressed positions in the same factor are
+    one very large bet.</li>
+  <li><strong>Regime mismatch</strong> &mdash; pressing
+    continuation in a mean-reverting market.</li>
+  <li><strong>The euphoria add</strong> &mdash; adding
+    because the trade feels great rather than because
+    the rule fired. And its mirror: refusing to add
+    because you are &ldquo;up enough,&rdquo; which is
+    stage 2 masquerading as prudence.</li>
+  <li><strong>Spending the cushion twice</strong>
+    &mdash; counting the same locked profit against two
+    separate adds.</li>
+  <li><strong>Stepping up R on a hot streak</strong>
+    &mdash; raising base size on a month rather than a
+    sample. The twenty-loss streak arrives
+    eventually.</li>
+</ul>
+
+<!-- ══════════════════════════════════════════════ -->
+<!-- 16. RULE SHEET -->
+<!-- ══════════════════════════════════════════════ -->
+
+<h2 id="rules">16. The Rule Sheet</h2>
+
+<ol class="rules">
+  <li>Raise the stop before every add. Never lower
+    it.</li>
+  <li>Size the add from the budget:
+    <code>Q_add &le; (B + L) / (E_add &minus; S)</code>.</li>
+  <li>Never add below the last unit&rsquo;s entry.</li>
+  <li>Only add if the previous unit is in profit and
+    the trend condition still holds.</li>
+  <li>Add on the resumption after a rest, not on the
+    extension. No adds beyond <code>ext_max</code> ATR
+    from the base.</li>
+  <li>Keep the position&rsquo;s break-even beyond
+    normal noise (at least 1.5&ndash;2 ATR from
+    price).</li>
+  <li>Size the pyramid to the one-ATR swing you can
+    sit through, not only to risk-at-stop.</li>
+  <li>Cap units per position and size per add.</li>
+  <li>Decide the unwind design before the add: one
+    stop, or last-in, first-out.</li>
+  <li>Know whether your stop is a scratch stop or a
+    position break-even.</li>
+  <li>Prefer realized profit as the add budget where
+    gaps are possible.</li>
+  <li>Reduce to the core unit before scheduled binary
+    events.</li>
+  <li>A scratch resets the trade, not the thesis:
+    re-enter with unit 1 when the setup re-triggers,
+    capped at two or three tries per trend.</li>
+  <li>Cap total portfolio risk; correlated winners
+    count as one.</li>
+  <li>Raise base R on a sample of trades and an equity
+    threshold; step it down on a drawdown; never
+    mid-trade.</li>
+  <li>Every planned stop is an expense. Only unplanned
+    ones are losses.</li>
+</ol>
+
+<p class="sig"><strong>Pressing the Edge</strong><br>
+Exploiting Profit and Adding to Size<br>
+Built September 2026</p>
+
+<script>var BM_KEY = 'bm_pressing_the_edge';</script>
+<script src="../book.js?v=42"></script>
+</body>
+</html>
