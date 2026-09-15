@@ -81,7 +81,10 @@
     label.textContent = 'Resume: ' + d.title;
     showToast('Bookmark saved \u2014 available offline');
     // Sync to backend
-    jsonpFetch(SYNC_URL + '?action=set_bookmark&key=' + encodeURIComponent(BM_KEY) + '&data=' + encodeURIComponent(JSON.stringify(d)), function(){});
+    jsonpFetch(SYNC_URL + '?action=set_bookmark&key=' + encodeURIComponent(BM_KEY) + '&data=' + encodeURIComponent(JSON.stringify(d)), function(err, resp) {
+      if (err) console.warn('[BM SYNC] set_bookmark FAILED:', err);
+      else console.log('[BM SYNC] set_bookmark OK', resp);
+    });
     document.querySelectorAll('.bm-btn').forEach(function(b) { b.classList.remove('active'); });
     var activeBtn = el.querySelector('.bm-btn');
     if (activeBtn) activeBtn.classList.add('active');
@@ -202,6 +205,10 @@
       } catch(e) {}
 
       var remote = json.bookmarks[BM_KEY];
+
+      console.log('[BM SYNC] local:', local ? {title: local.title, ts: local.ts, age: Math.round((Date.now() - (local.ts||0))/1000) + 's'} : null);
+      console.log('[BM SYNC] remote:', remote ? {title: remote.title, ts: remote.ts, age: Math.round((Date.now() - (remote.ts||0))/1000) + 's'} : null);
+      console.log('[BM SYNC] winner:', remote && (!local || (remote.ts||0) > (local.ts||0)) ? 'REMOTE' : 'LOCAL');
 
       if (remote && (!local || (remote.ts || 0) > (local.ts || 0))) {
         localStorage.setItem(BM_KEY, JSON.stringify(remote));
