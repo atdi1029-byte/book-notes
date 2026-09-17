@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Bid-to-Cover Ratio - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.tier .tier-desc { color: #a08060; font-size: 0.85rem; margin: 0.4rem 0 0.8rem; }
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done,
+body.hide-done .cat-card.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../fixed-income-bonds.html">&larr; Fixed Income &amp; Bonds</a>
+
+<div class="concept-meta"><span><span class="star">&#9733;</span> must-know</span><span>Fixed Income &amp; Bonds</span><span>added 2026-09-16</span></div>
+<h4 id="bid_to_cover_ratio">Bid-to-Cover Ratio</h4>
+
+<p>The <strong>bid-to-cover ratio</strong> is one of the simplest and most revealing numbers in the U.S. Treasury market — and almost nobody outside of fixed income desks pays attention to it. When the U.S. government needs to borrow money, it holds a <strong>Treasury auction</strong>, inviting buyers to submit bids for newly issued bonds. The bid-to-cover ratio is calculated by dividing the total dollar amount of bids submitted by the total dollar amount of bonds actually sold. If the Treasury offered $16 billion in 20-year bonds and received $41 billion in bids, the bid-to-cover is 2.57×. That number tells you, at a glance, how many dollars of demand showed up for every dollar of supply. The higher the ratio, the more oversubscribed the auction — meaning the government could have sold more debt than it did.</p>
+
+<p>Why does this matter outside of a bond trading desk? Because U.S. Treasury yields set the cost of money across the entire economy. The 10-year Treasury is the benchmark for corporate borrowing. The 30-year is the anchor for pension fund liabilities. And the rate you get on a 30-year mortgage is priced directly off the same yield curve that Treasury auctions establish. When demand at auction is weak — reflected in a low bid-to-cover — the government has to offer a higher yield to attract enough buyers. That higher yield ripples outward: corporate bonds get more expensive, auto loans tighten, and by Friday afternoon the mortgage rate lock in Ohio is 10 or 15 basis points higher than it would have been. The auction isn't abstract. It is the price-setting mechanism for debt across the whole economy.</p>
+
+<p>Mechanically, here is how a Treasury auction works. The Treasury announces in advance how much debt it intends to sell and at what maturity — say, $16 billion in 20-year bonds. Buyers submit competitive bids specifying the yield they require and the amount they want. The Treasury accepts bids starting from the lowest yield (highest price) and works up until the full $16 billion is sold. The yield at which the last accepted bid clears is called the <strong>stop-out rate</strong> or <strong>high yield</strong>. All accepted bidders pay that same clearing yield, regardless of what they bid. The bid-to-cover ratio is then calculated from all submitted bids — accepted and rejected — divided by the amount sold. It is a demand snapshot taken at a single moment in time, measuring competitive appetite for that particular maturity of government debt.</p>
+
+<p>The specific auction that illustrates all of this ran on a Wednesday afternoon at 1:00 p.m., just 25 hours before the Federal Reserve was scheduled to announce its rate decision. The Treasury sold 20-year bonds at a <strong>high yield of 5.42%</strong>. Right before the deadline, the same bonds were trading in the secondary market at around 5.40%. That two-basis-point gap — where the auction had to price at a higher yield than where the market was already trading — is called a <strong>tail</strong>. It means the Treasury had to pay up to get the deal done. The bid-to-cover came in at 2.57×, against a six-auction trailing average of 2.65×. On the surface that sounds close enough. But the gap, combined with the tail, meant the market was communicating something specific: demand was thinner than normal, and buyers wanted to be compensated for showing up.</p>
+
+<p>Traders and analysts don't look at the bid-to-cover in isolation — they combine it with two other data points to build a <strong>composite read on auction quality</strong>. The first is the tail, which measures whether the Treasury had to pay a premium over market. The second is the <strong>buyer composition</strong>: who actually submitted the winning bids. Every Treasury auction has three buckets of buyers. <strong>Indirect bidders</strong> are mostly foreign central banks and overseas money managers bidding through intermediaries — they represent global demand for U.S. debt. <strong>Direct bidders</strong> are domestic institutions submitting bids for their own accounts. And <strong>primary dealers</strong> — the large banks with an obligation to participate — take whatever is left after the other two groups have been satisfied. When an experienced analyst sees a below-average bid-to-cover alongside a tail, the first follow-up question is always: which bucket held it up?</p>
+
+<p>This is where the nuance gets important, and where the auction in the video becomes a case study in how a headline number can obscure the real story. The bid-to-cover of 2.57× looked passable — not great, not catastrophic. But the direct-bidder share came in at <strong>30.7%</strong>, nearly nine percentage points above its six-auction average of 21.4%. On the surface, high direct participation sounds like strong domestic institutional demand. In reality, it means the cover ratio was being held up by one narrow category of buyer rather than by broad, diversified demand. When domestic institutions are filling a gap that foreign buyers left open, the headline ratio flatters the underlying picture. As the video puts it plainly: <em>"The headline number looks passable. What's underneath it is thinner than it looks."</em></p>
+
+<blockquote>"The auction that tailed at 1:00 yesterday told you more than the Fed will tell you at 2:00 today."</blockquote>
+
+<p>The most common misconception about the bid-to-cover ratio is treating it as a standalone pass/fail grade. A ratio of 2.57× sounds solid because it means more than twice as many dollars chased the bonds as were available to buy. But context destroys that comfort. A 2.57× in a historically strong auction environment reads very differently from a 2.57× that is 0.08 below the six-auction trailing average during a period of rising yields and geopolitical supply stress. The ratio also says nothing about <em>where</em> the demand came from, at what yields bids were clustered, or whether the auction tail suggests buyers extracted a concession. Using the bid-to-cover in isolation is like judging a restaurant by how full the parking lot is without checking whether half the cars belong to the staff.</p>
+
+<p>The ratio can also fail as a signal during periods of structural dysfunction. The <strong>20-year bond</strong> is what traders call the "orphan of the yield curve." Pension funds prefer 30-year bonds because the duration matches their long-dated liabilities. Active traders and foreign buyers prefer the 10-year because of its liquidity and benchmark status. The 20-year sits in the middle with no natural institutional home, which means its bid-to-cover is structurally lower than auctions at more popular maturities. Comparing a 20-year bid-to-cover to a 10-year bid-to-cover without adjusting for this difference would be misleading. The same auction that looks weak for a 10-year might be average or even strong for a 20-year, and vice versa. This is why analysts always compare against the rolling average for <em>that specific maturity</em>, not across maturities.</p>
+
+<p>When auction quality deteriorates persistently — low bid-to-cover ratios, consistent tails, primary dealers absorbing an outsized share — the consequences compound. Primary dealers are required to bid, but they don't hold the bonds: they turn around and sell them into the secondary market. A market flooded with dealer inventory suppresses bond prices, which pushes yields up further. Higher yields then make the <em>next</em> auction even more expensive for the Treasury to execute, which can attract even less demand from buyers who expect yields to keep rising. This feedback loop is why a sequence of weak auctions can become self-reinforcing and why bond market professionals watch the trailing average so carefully — one bad print is noise, but a trend in bid-to-cover across three or four consecutive auctions is a genuine signal that the market's appetite for duration is shifting.</p>
+
+<p>The bid-to-cover ratio connects directly to several other concepts that matter for anyone tracking the bond market. It ties to <strong>yield curve dynamics</strong> — weak long-end auctions steepen the curve as long yields rise relative to short ones. It connects to <strong>inflation expectations</strong>, because the entire reason a buyer at a 20-year auction demands a higher yield is that they're making a two-decade bet on purchasing power. When physical commodity markets — like crude oil grades that avoid the Strait of Hormuz suddenly trading at a $19 premium to Brent — signal embedded inflation risk, that fear arrives at Treasury auctions before it shows up in any official data. The bid-to-cover, the tail, and the buyer composition are the market's real-time referendum on whether the risk premium embedded in long-term government debt is adequate. Understanding all three together gives you a reading that is more honest than any press release issued at 2 p.m.</p>
+<div class="concept-side">Sources: THE BOND MARKET REVOLT: Why Yields Hit 52-Week Highs Before the Fed Vote!<br>Related in this category: <a href="two_year_treasury_yield.html">Two-Year Treasury Yield</a>, <a href="thirty_year_treasury_bond.html">30-Year Treasury Bond</a>, <a href="interest_coverage_ratio.html">Interest Coverage Ratio</a>, <a href="debt_rollover_risk.html">Debt Rollover Risk</a>, <a href="farm_debt_to_asset_ratio.html">Farm Debt-to-Asset Ratio</a>, <a href="farm_debt_service_ratio.html">Farm Debt Service Ratio</a></div>
+<button class="concept-done" data-slug="bid_to_cover_ratio" onclick="toggleDone('bid_to_cover_ratio')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_bid_to_cover_ratio';</script>
+<script src="../../book.js"></script>
+<script src="../fg.js"></script>
+</body>
+</html>
