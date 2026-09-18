@@ -5,7 +5,9 @@ builds a living book on the Books shelf.
 
 Preferred: run under launchd so it starts at login and is restarted if it
 dies (see install_launchd.sh).  Manual: nohup python3 finance_guide.py &
-Checks channels every 6 hours for new videos.
+Checks channels every 6 hours, and whenever the Mac wakes from sleep
+(after waiting for Wi-Fi to come back).  A failed check is retried in
+10 minutes instead of 6 hours.
 
   python3 finance_guide.py --status   # is it alive? what did it last do?
   python3 finance_guide.py --once     # one check-and-process cycle, then exit
@@ -16,6 +18,7 @@ import json
 import os
 import re
 import signal
+import socket
 import subprocess
 import sys
 import time
@@ -39,6 +42,10 @@ LOG_FILE = BASE_DIR / "bot.log"
 
 CHECK_INTERVAL = 6 * 3600  # 6 hours between checks
 WAKE_GAP = 5 * 60          # a 60s nap that takes >5 min wall-clock = machine slept -> check now
+RETRY_INTERVAL = 10 * 60   # after a check that failed (network, yt-dlp, claude), try again
+                           # this soon; doubles on each further failure, capped at CHECK_INTERVAL
+NETWORK_WAIT = 3 * 60      # after login/wake, wait up to this long for Wi-Fi before checking
+CAPTION_RETRY = 60 * 60    # a new video is up but has no captions yet: check again this soon
 MAX_VIDEOS_PER_RUN = 0     # 0 = no limit, process all new videos
 BOOKS_DIR = BASE_DIR.parent
 
@@ -192,9 +199,47 @@ def save_json(path, data):
         json.dump(data, f, indent=2)
 
 
+# === NETWORK ===
+class NetworkError(Exception):
+    """The network was down, not the data.  Never counts against a video."""
+
+
+def network_up(host="www.youtube.com", port=443, timeout=5):
+    """True if we can actually open a TCP connection to YouTube.  A plain
+    DNS lookup is not enough: right after wake, macOS can answer from its
+    cache while the Wi-Fi interface is still coming up."""
+    try:
+        with socket.create_connection((host, port), timeout=timeout):
+            return True
+    except OSError:
+        return False
+
+
+def wait_for_network(max_wait=NETWORK_WAIT):
+    """After login or wake, Wi-Fi takes a few seconds to come back.  Poll
+    until it does instead of firing yt-dlp into a dead network — that was
+    logging a DNS error and then, worse, resetting the 6-hour timer as if
+    the check had succeeded."""
+    if network_up():
+        return True
+    log("  Network not up yet — waiting for Wi-Fi")
+    deadline = time.time() + max_wait
+    while time.time() < deadline:
+        time.sleep(5)
+        if network_up():
+            log("  Network is up")
+            return True
+    log(f"  Network still down after {max_wait // 60} min — will retry")
+    return False
+
+
 # === STEP 1: Pull new video IDs from channels ===
 def get_channel_videos(channel_url, limit=30):
-    """Pull recent video IDs and titles from a YouTube channel."""
+    """Pull recent video IDs and titles from a YouTube channel.
+
+    Returns a list of videos, or None if the check itself failed (yt-dlp
+    missing, crashed, or the network was down).  None must never be
+    treated as "the channel has no new videos"."""
     try:
         result = subprocess.run(
             ["yt-dlp", "--flat-playlist", "--print", "id", "--print", "title",
@@ -204,19 +249,22 @@ def get_channel_videos(channel_url, limit=30):
     except FileNotFoundError:
         log("  ERROR yt-dlp not found on PATH — install it or fix the PATH "
             "block at the top of this script")
-        return []
+        return None
     except Exception as e:
         log(f"  ERROR pulling channel: {e}")
-        return []
+        return None
 
     # yt-dlp breaks whenever YouTube changes its page layout.  It exits
     # non-zero and prints the reason to stderr; treat that as a real error,
     # not "the channel has no videos".
     if result.returncode != 0:
-        log(f"  ERROR yt-dlp exit {result.returncode}: "
-            f"{(result.stderr or '').strip()[-300:]}")
-        log("  -> try: pip3 install -U yt-dlp   (or: brew upgrade yt-dlp)")
-        return []
+        err = (result.stderr or '').strip()
+        log(f"  ERROR yt-dlp exit {result.returncode}: {err[-300:]}")
+        if re.search(r"resolve|nodename|servname|getaddrinfo|network|connection|timed out|unreachable", err, re.I):
+            log("  -> looks like the network, not yt-dlp; will retry soon")
+        else:
+            log("  -> try: pip3 install -U yt-dlp   (or: brew upgrade yt-dlp)")
+        return None
 
     lines = result.stdout.strip().split("\n")
     videos = []
@@ -229,6 +277,7 @@ def get_channel_videos(channel_url, limit=30):
         log(f"  WARNING yt-dlp returned 0 videos for {channel_url}: "
             f"{(result.stderr or '').strip()[-300:] or 'no stderr'}")
         log("  -> yt-dlp is probably out of date: pip3 install -U yt-dlp")
+        return None
     return videos
 
 
@@ -238,7 +287,8 @@ def _needs_processing(vid_id, processed):
 
 
 def find_new_videos():
-    """Check all channels, return videos not yet processed.
+    """Check all channels.  Returns (videos_not_yet_processed, ok) where
+    ok is False if any channel could not be checked.
 
     First run for a channel: marks all existing videos as processed
     (backlog skip) so only future uploads get picked up.
@@ -250,9 +300,17 @@ def find_new_videos():
     seen_channels = load_json(BASE_DIR / "seen_channels.json")
 
     new_videos = []
+    ok = True
     for channel in channels:
         log(f"  Checking: {channel['name']}")
         videos = get_channel_videos(channel["url"])
+        if videos is None:
+            # Skip, don't guess.  In particular a NEW channel must not get
+            # an empty backlog recorded, or its whole history floods in on
+            # the next good check.
+            log(f"  Could not check {channel['name']} — will retry")
+            ok = False
+            continue
 
         # First time seeing this channel? Mark backlog as processed
         if channel["name"] not in seen_channels:
@@ -279,7 +337,9 @@ def find_new_videos():
         new_videos.extend(picked)
         log(f"  Found {len(videos)} total, {len(picked)} new/retry")
 
-    return new_videos if MAX_VIDEOS_PER_RUN == 0 else new_videos[:MAX_VIDEOS_PER_RUN]
+    if MAX_VIDEOS_PER_RUN:
+        new_videos = new_videos[:MAX_VIDEOS_PER_RUN]
+    return new_videos, ok
 
 
 # === STEP 2: Download transcript ===
@@ -300,6 +360,12 @@ def download_transcript(video_id):
             txt_path.write_text(text)
             return text
     except Exception as e:
+        # A dead network must not burn one of the video's 4 "no captions"
+        # attempts — after 4 wakes with Wi-Fi still connecting, the video
+        # would be skipped forever.
+        if re.search(r"Connection|Timeout|resolve|nodename|servname|getaddrinfo|Name or service|unreachable",
+                     f"{type(e).__name__} {e}", re.I):
+            raise NetworkError(str(e)[:200])
         log(f"  Transcript download failed for {video_id}: {e}")
 
     return None
@@ -823,6 +889,43 @@ body.hide-done .cat-card.done { display: none; }
   color: #a08060; text-decoration: none; font-size: 0.9rem;
 }
 .back-link:hover { color: #d4a574; }
+.vid-tab {
+  margin: 0 0 1.2rem; background: #e8e0d0; border: 1px solid #d4c8b0;
+  border-radius: 8px; overflow: hidden;
+}
+.vid-tab summary {
+  padding: 0.6rem 0.9rem; cursor: pointer; font-size: 0.85rem;
+  color: #3a2a1a; list-style: none; user-select: none;
+}
+.vid-tab summary::-webkit-details-marker { display: none; }
+.vid-tab summary::before {
+  content: '\u25b6'; display: inline-block; margin-right: 0.5rem;
+  font-size: 0.7rem; transition: transform 0.2s;
+}
+.vid-tab[open] summary::before { transform: rotate(90deg); }
+.vid-tab .vid-status {
+  float: right; font-size: 0.75rem; padding: 0.15rem 0.5rem;
+  border-radius: 3px; margin-left: 0.5rem;
+}
+.vid-tab .vid-ok { background: #4ade8040; color: #2d6a4f; }
+.vid-tab .vid-err { background: #f8717140; color: #9b2c2c; }
+.vid-tab .vid-list {
+  padding: 0 0.9rem 0.7rem; margin: 0;
+  list-style: none; font-size: 0.8rem;
+}
+.vid-tab .vid-list li {
+  padding: 0.35rem 0; border-top: 1px solid #d4c8b0;
+  display: flex; justify-content: space-between; gap: 8px;
+}
+.vid-tab .vid-list .vid-date {
+  color: #a08060; white-space: nowrap; flex: none;
+}
+.vid-tab .vid-list .vid-concepts {
+  color: #a08060; white-space: nowrap; flex: none; font-size: 0.75rem;
+}
+.vid-tab .vid-none {
+  padding: 0.4rem 0.9rem 0.7rem; color: #a08060; font-size: 0.8rem;
+}
 """
 
 # Shared JS is now in fg.js — loaded as external script
@@ -912,6 +1015,64 @@ def _concept_rows(items, href_prefix):
     )
 
 
+def _videos_this_week_html(processed):
+    """Build a collapsible tab showing videos processed in the last 7 days."""
+    now = datetime.now()
+    cutoff = (now - timedelta(days=7)).strftime("%Y-%m-%d")
+    week_vids = []
+    for vid_id, v in processed.items():
+        if v.get("skipped"):
+            continue
+        ts = v.get("processed", "")
+        if ts >= cutoff:
+            week_vids.append(v)
+    week_vids.sort(key=lambda v: v.get("processed", ""), reverse=True)
+
+    # Check bot health: last successful run
+    last_run = ""
+    for v in processed.values():
+        ts = v.get("processed", "")
+        if ts > last_run and not v.get("skipped"):
+            last_run = ts
+    if last_run:
+        try:
+            lr = datetime.strptime(last_run, "%Y-%m-%d %H:%M")
+            hours_ago = (now - lr).total_seconds() / 3600
+            if hours_ago < 24:
+                status = f'<span class="vid-status vid-ok">bot ok</span>'
+            else:
+                status = (f'<span class="vid-status vid-err">'
+                          f'last run {int(hours_ago)}h ago</span>')
+        except ValueError:
+            status = ""
+    else:
+        status = '<span class="vid-status vid-err">no runs</span>'
+
+    count = len(week_vids)
+    label = f"Videos this week ({count})" if count else "Videos this week"
+
+    if not week_vids:
+        inner = '<p class="vid-none">No videos processed this week.</p>'
+    else:
+        rows = []
+        for v in week_vids:
+            ts = v.get("processed", "")[:10]
+            title = _esc(v.get("title", "?"))
+            n = v.get("concepts_extracted", 0)
+            ctext = f"{n} concept{'s' if n != 1 else ''}" if n else "0 new"
+            rows.append(
+                f'<li><span>{title}</span>'
+                f'<span class="vid-concepts">{ctext}</span>'
+                f'<span class="vid-date">{ts}</span></li>'
+            )
+        inner = f'<ul class="vid-list">{"".join(rows)}</ul>'
+
+    return f"""<details class="vid-tab">
+<summary>{status}{label}</summary>
+{inner}
+</details>"""
+
+
 def rebuild_html(concepts):
     """Rebuild the site: index (tiers -> categories) -> category pages ->
     one page per concept, plus recent.html.  Layout follows the Master
@@ -954,11 +1115,13 @@ def rebuild_html(concepts):
         )
 
     recent = _recent_concepts(concepts)
+    vid_tab = _videos_this_week_html(processed)
     body = f"""
 <h1>Finance Guide</h1>
 <p class="subtitle">A living book &middot; {total} concepts
  &middot; {videos_done} videos &middot;
  <a href="recent.html" style="color:#a08060">Added this week ({len(recent)})</a></p>
+{vid_tab}
 {FILTER_BAR}
 {"".join(tiers_html)}"""
     HTML_FILE.write_text(_page_wrap("Finance Guide", body, css_path="../book.css",
@@ -1085,14 +1248,22 @@ def git_push():
 
 # === MAIN LOOP ===
 def run_once():
-    """Single check-and-process cycle."""
+    """Single check-and-process cycle.
+
+    Returns "ok" if the cycle completed cleanly (including "nothing new"),
+    "waiting" if it was clean but a new video has no captions yet (worth a
+    look again in an hour), or "failed" if something broke and is worth
+    retrying soon rather than in 6 hours: the channel check, a transcript
+    fetch, a Claude call.
+    """
     log("=== Finance Guide check ===")
 
     # Find new videos
-    new_videos = find_new_videos()
+    new_videos, ok = find_new_videos()
     if not new_videos:
-        log("  No new videos found")
-        return
+        log("  No new videos found" if ok else "  Channel check failed")
+        return "ok" if ok else "failed"
+    waiting = False
 
     log(f"  Processing {len(new_videos)} new videos")
 
@@ -1108,7 +1279,12 @@ def run_once():
         log(f"  Video: {title}")
 
         # Download transcript
-        transcript = download_transcript(vid_id)
+        try:
+            transcript = download_transcript(vid_id)
+        except NetworkError as e:
+            log(f"    Network error fetching transcript ({e}) — will retry soon")
+            ok = False
+            continue
         if not transcript:
             # Captions often appear a few hours after upload — leave the
             # video unprocessed so it is retried, but give up after a while.
@@ -1126,6 +1302,7 @@ def run_once():
                 entry["no_transcript_attempts"] = attempts
                 entry["retry"] = True
                 processed[vid_id] = entry
+                waiting = True
             save_json(PROCESSED_FILE, processed)
             continue
 
@@ -1135,7 +1312,8 @@ def run_once():
         # unprocessed so the next cycle retries it.
         result = extract_concepts(vid_id, title, transcript, concepts)
         if result is None:
-            log(f"    Extraction FAILED — will retry next cycle")
+            log(f"    Extraction FAILED — will retry soon")
+            ok = False
             continue
         new_concepts = result["new"]
         log(f"    Extracted: {len(new_concepts)} candidates, "
@@ -1161,16 +1339,15 @@ def run_once():
                 continue
 
             # Dedup layers: fuzzy title match, then LLM judge
-            status, match = resolve_candidate(concept, concepts)
-            if status is None:
+            verdict, match = resolve_candidate(concept, concepts)
+            if verdict is None:
                 failed += 1
                 continue
-            if status == "dup":
+            if verdict == "dup":
                 merge_into(match, concept["title"], vid_id, concepts)
                 save_json(CONCEPTS_FILE, concepts)
                 merged += 1
                 continue
-
             log(f"    Writing: {concept['title']}")
             chapter_html = write_chapter(concept, title, transcript)
 
@@ -1195,6 +1372,7 @@ def run_once():
             # Concepts that did get written are saved and will be skipped
             # next time; the video stays unprocessed so the rest get retried.
             log(f"    {failed} chapter(s) failed — video left for retry")
+            ok = False
             continue
 
         # Mark video as processed.  Health metric: over time a channel's
@@ -1219,6 +1397,7 @@ def run_once():
         log("  Nothing completed this cycle")
 
     log("=== Done ===\n")
+    return "failed" if not ok else ("waiting" if waiting else "ok")
 
 
 # === LOCK ===
@@ -1275,6 +1454,7 @@ def status():
     except Exception as e:
         v = f"NOT FOUND ({e})"
     print(f"yt-dlp version:   {v}")
+    print(f"Network:          {'up' if network_up() else 'DOWN (cannot reach youtube.com)'}")
 
     processed = load_json(PROCESSED_FILE)
     done = sorted(((v.get("processed", ""), k, v) for k, v in processed.items()
@@ -1319,15 +1499,32 @@ def main():
     log(f"Check interval: {CHECK_INTERVAL // 3600}h, plus a check on every wake from sleep")
     log(f"Channels: {CHANNELS_FILE}")
 
+    failures = 0
     try:
         while True:
-            try:
-                run_once()
-            except Exception:
-                # Full traceback, not just the message — a one-line
-                # "ERROR in run_once: 'x'" is undebuggable a day later.
-                log("ERROR in run_once:\n" + traceback.format_exc())
-            next_run = time.time() + CHECK_INTERVAL
+            # At login and right after wake, Wi-Fi is usually still
+            # reconnecting.  Wait for it; a check into a dead network is
+            # worse than no check because it used to reset the 6h timer.
+            outcome = "failed"
+            if wait_for_network():
+                try:
+                    outcome = run_once()
+                except Exception:
+                    # Full traceback, not just the message — a one-line
+                    # "ERROR in run_once: 'x'" is undebuggable a day later.
+                    log("ERROR in run_once:\n" + traceback.format_exc())
+            if outcome == "failed":
+                failures += 1
+                delay = min(RETRY_INTERVAL * 2 ** (failures - 1), CHECK_INTERVAL)
+                log(f"Check did not complete — retrying in {delay // 60} min")
+            else:
+                failures = 0
+                if outcome == "waiting":
+                    delay = CAPTION_RETRY
+                    log(f"New video has no captions yet — checking again in {delay // 60} min")
+                else:
+                    delay = CHECK_INTERVAL
+            next_run = time.time() + delay
             log(f"Next check at {time.strftime('%H:%M', time.localtime(next_run))} "
                 f"(or on wake)")
             # Sleep in short intervals.  If a single 60s nap takes much
