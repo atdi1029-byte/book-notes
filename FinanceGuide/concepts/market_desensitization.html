@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Market Desensitization (Alert Fatigue) - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.tier .tier-desc { color: #a08060; font-size: 0.85rem; margin: 0.4rem 0 0.8rem; }
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done,
+body.hide-done .cat-card.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../behavioral-finance-psychology.html">&larr; Behavioral Finance &amp; Psychology</a>
+
+<div class="concept-meta"><span>standard</span><span>Behavioral Finance &amp; Psychology</span><span>added 2026-09-17</span></div>
+<h4 id="market_desensitization">Market Desensitization (Alert Fatigue)</h4>
+
+<p><strong>Market desensitization</strong> — sometimes called <strong>alert fatigue</strong> — is what happens when a market receives the same type of headline so many times that it stops processing each new instance as genuinely new information. Instead of evaluating each event on its own merits, traders develop a reflexive discount: they've seen this before, it didn't matter before, therefore it doesn't matter now. The result is a market that looks at a genuinely significant event and responds as though it were routine noise. This is not stupidity. It's a learned behavior, and under most conditions it's actually efficient. The danger comes when a routine-looking headline contains something categorically different hiding inside it.</p>
+
+<p>Desensitization matters because financial markets are, at their core, <strong>information-processing machines</strong>. Their entire function is to take new information and reprice assets to reflect it. When that function breaks down — when the processing reflex misfires — you get a price that doesn't match reality. In efficient markets, those gaps close quickly. But in the hours and days immediately after a misread event, real money moves on wrong prices. For individuals, this creates both danger and opportunity: danger if you take the market's initial reaction as a verdict, opportunity if you can spot the gap between what the market priced and what actually happened. The Petrol Line episode in September 2026 is one of the clearest examples of this gap in recent memory.</p>
+
+<p>Mechanically, the process works in three stages. First, a category of headline repeats often enough that traders build a <strong>pattern response</strong> — a mental shortcut that says "headline type X historically moved markets Y percent, and most of those moves reversed." Second, new headlines in that category get routed through the shortcut rather than through genuine analysis. The shortcut fires before the details are read. Third, and most critically, the shortcut assigns a probability distribution to outcomes based on historical precedent — without checking whether the current event actually belongs in the same category as the historical ones. By the time anyone asks "wait, is this one different?", the initial price move has already happened and anchoring bias makes it harder to reverse.</p>
+
+<p>The Petrol Line attack on September 10–11, 2026, is the textbook case. Drones had been hitting Gulf infrastructure with regularity for months. Every attack generated a headline. Most moves partially reversed. Traders had built exactly the muscle memory described: <em>attack on Saudi infrastructure, nod, next</em>. So when the Petrol Line — the <strong>East-West crude pipeline</strong> running 1,200 kilometers from Abqaiq to Yanbu — was shut down as a precautionary measure, crude oil went <em>down</em>. WTI settled at $100.05, off 2.4%. Brent fell 2.8% to $104.61. The market applied its drone-headline discount to an event that was not a drone headline in any meaningful sense. This was not an attack on production capacity. This was an attack on the only major bypass around the Strait of Hormuz.</p>
+
+<blockquote>
+  "The market has been — has seen so many drone headlines out of the Gulf that it's built up what I would call muscle memory. Attack on Saudi infrastructure. Nod. Next. What it hadn't processed is that this one was categorically different."
+</blockquote>
+
+<p>The practical lesson for traders and investors is that desensitization creates a systematic gap between <strong>futures pricing</strong> and <strong>physical market pricing</strong>. The futures screen operates on pattern-matched reflexes and is vulnerable to alert fatigue. The physical market — the people who actually need to move barrels of oil — cannot afford that luxury. They have to price reality. By Monday morning after the Friday selloff, Brent had traded above $108 in Asian hours. The <strong>prompt month spread</strong> blew out to $5.39 and the three-month spread reached $14 — meaning the near barrel cost $14 more than the barrel for delivery three months out. That kind of <strong>backwardation</strong> is not sentiment or speculation. It is someone who needs oil this month paying up to get it. When you see the physical market diverge sharply from the futures market after a headline, that divergence is worth examining closely.</p>
+
+<p>The most important nuance here is the distinction between <em>magnitude</em> and <em>category</em>. Most alert fatigue analysis focuses on magnitude: traders discount an attack because previous attacks of similar size didn't matter much. But the Petrol Line situation was a category error, not a magnitude error. Previous drone attacks hit production nodes. This one hit the <strong>hedge itself</strong> — the bypass that existed specifically to route oil around the risk that the other attacks represented. The presenter uses a vivid analogy: a building with two fire escapes, both bolted into the same wall. Two exits that share a single point of failure are not two exits. They are a decoration. Recognizing category differences within a superficially similar headline stream is the core analytical skill that alert fatigue training should build.</p>
+
+<p>Alert fatigue becomes especially dangerous when it compounds with <strong>stale data</strong>. The market's drone-headline discount was already aggressive, but it was made worse by the fact that most reporting quoted Petrol Line's capacity at 4–5 million barrels a day — a figure from the spring, when Saudis had pushed the line hard. Ship-tracking data from KPLR showed westbound flows running at roughly 2 million barrels a day in August, the lowest since January. Houthi pressure in the Red Sea had already cut Yanbu loading by more than half. The bypass was already running at half speed before the drones arrived. So the market was discounting an attack on a hedge it thought was running at full capacity, when in reality it was a near-broken hedge that the world had been quietly depending on for six months. Two compounding errors, not one.</p>
+
+<p>When desensitization breaks — when the market finally reprices — the move tends to be fast and overshooting. This is because the gap between the misfired price and the correct price can accumulate for hours or days while the reflex holds. Once something breaks the reflex (physical market signals, follow-on news, a major analyst reversing a call), the repricing happens all at once. The Petrol Line case resolved over a weekend: Friday's futures market took the reflex discount, the physical market worked through the weekend, and by Monday Asian hours the price had moved nearly $8. The investors who recognized the alert fatigue on Friday afternoon — who read the physical spread signals over the weekend — had a narrow window before the futures market caught up. Understanding desensitization is not just about avoiding the trap. It's about recognizing that when the trap springs, the corrective move is often sharper and faster than the original misread.</p>
+
+<p>Market desensitization connects directly to several related behavioral concepts. <strong>Availability bias</strong> explains why the last dozen drone-headline non-events are so salient in a trader's mind that they overwhelm the analysis of the current event. <strong>Anchoring bias</strong> explains why the initial Friday close of $100 became a reference point that made the weekend repricing feel like an overreaction rather than a correction. And the split between futures pricing and physical pricing maps onto the broader concept of <strong>informed vs. uninformed order flow</strong>: the people moving physical barrels are by definition informed, because their P&amp;L depends on getting the price right. When their behavior diverges sharply from the futures screen, the futures screen is usually the one that's wrong. In any market where there is a liquid derivatives layer sitting above a physical settlement layer, watching for that divergence after major headlines is one of the cleanest signals available that alert fatigue may have misfired.</p>
+<div class="concept-side">Sources: THE SAUDI PIPELINE BLIND-SIDE: Why $108 Oil Just Destroyed the Hormuz Bypass!<br>Related in this category: <a href="restructuring_rally.html">Restructuring Rally</a>, <a href="exit_liquidity.html">Exit Liquidity</a>, <a href="lump_sum_vs_cashflow_bias.html">Lump-Sum vs. Ongoing-Cost Bias</a></div>
+<button class="concept-done" data-slug="market_desensitization" onclick="toggleDone('market_desensitization')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_market_desensitization';</script>
+<script src="../../book.js"></script>
+<script src="../fg.js"></script>
+</body>
+</html>

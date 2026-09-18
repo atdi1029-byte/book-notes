@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Backwardation and Contango (Futures Curve Structure) - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.tier .tier-desc { color: #a08060; font-size: 0.85rem; margin: 0.4rem 0 0.8rem; }
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done,
+body.hide-done .cat-card.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../commodities-energy.html">&larr; Commodities &amp; Energy</a>
+
+<div class="concept-meta"><span><span class="star">&#9733;</span> must-know</span><span>Commodities &amp; Energy</span><span>added 2026-09-17</span></div>
+<h4 id="backwardation_contango">Backwardation and Contango (Futures Curve Structure)</h4>
+
+<p>When you buy oil — or any commodity — you can buy it today for immediate delivery, or you can buy a <strong>futures contract</strong> that obligates someone to deliver it to you next month, three months from now, or even a year out. The collection of prices across all those delivery dates forms a shape called the <strong>futures curve</strong>. That shape has a name depending on which way it slopes. When prices for near-term delivery are <em>higher</em> than prices for later delivery, the market is in <strong>backwardation</strong>. When near-term prices are <em>lower</em> than later prices — the more "normal" peacetime condition — the market is in <strong>contango</strong>. These aren't just technical labels. They tell you something fundamental about whether the world has enough of that commodity <em>right now</em>.</p>
+
+<p>The shape of the futures curve matters because it encodes real economic information that a single spot price cannot. A commodity's spot price tells you what it costs today. The curve tells you what the market collectively believes about supply and demand across time — who has it, who needs it, and how urgently. In tight physical markets, the curve flips into backwardation because buyers who actually need the commodity this month will pay a premium over buyers who can wait. That premium is a distress signal from the physical world. In comfortable markets with ample storage and supply, the curve sits in contango, and the price you pay for future delivery is higher than today's price, partly to compensate whoever is storing the commodity in the meantime.</p>
+
+<p>The mechanical explanation starts with a concept called the <strong>cost of carry</strong>. If oil is sitting in a tank somewhere, someone is paying to store it — tank rental, insurance, financing costs, and the opportunity cost of capital. In a well-supplied market, a seller of a futures contract for delivery three months out needs to charge you more than the spot price to cover those carrying costs. That premium is why contango is the default in peacetime: it reflects storage economics. Backwardation inverts this logic entirely. When near-term supply is critically short, the urgency to get physical barrels <em>now</em> overpowers storage economics. Buyers are so desperate for immediate delivery that they bid up near-term contracts above future ones. The storage premium collapses; physical scarcity takes over.</p>
+
+<p>The <strong>prompt-month spread</strong> is the most commonly watched measure of curve structure. It is simply the price difference between the front-month futures contract — the one expiring soonest, representing the most immediate delivery — and the next month's contract. In a calm market, this spread is small. In a stressed physical market, it explodes. The <strong>three-month spread</strong> compares the front month to the contract three months out, giving a broader view of how far the scarcity premium extends through time. Wide spreads in backwardation mean the market believes the shortage is real and near-term, not just a momentary blip. Narrow or negative spreads suggest buyers expect relief to arrive before long.</p>
+
+<p>The video provides one of the most dramatic real-world examples of backwardation in action. After drone strikes shut down Saudi Arabia's East-West pipeline — the Petroline, the only major crude route that bypasses the Strait of Hormuz — Brent crude's prompt-month spread blew out to <strong>$5.39</strong>, and the three-month spread reached <strong>$14</strong>. That means a barrel needed for delivery this month cost $14 more than a barrel slated for delivery three months later. The presenter is explicit about what that signal represents:</p>
+
+<blockquote>"That is not sentiment and it is not speculation — that is somebody who actually needs oil this month paying up to get it."</blockquote>
+
+<p>The physical traders — the refiners, shippers, and industrial buyers who move actual barrels — worked through the weekend while futures markets were closed. By Monday morning, Brent had traded above <strong>$108</strong> in Asian hours. The curve told the story the spot price had initially missed: whatever the headlines said, the people whose businesses depend on having oil in their tanks right now were treating this as a genuine emergency. They were paying $14 more per barrel for near-term delivery. That is not a number driven by algorithms or sentiment traders guessing about future prices. It is a cash offer from a physical buyer who cannot wait.</p>
+
+<p>Traders and investors use curve structure as a directional indicator with real predictive power. A market moving deeper into backwardation — spreads widening — is a signal of tightening physical supply, often a precursor to further spot price strength. Rolling a long futures position in a backwardated market actually earns you money over time: you sell the expiring near-month contract at its premium price and replace it with a cheaper far-month contract, capturing the <strong>roll yield</strong>. Contango, by contrast, destroys value for passive long holders — you repeatedly sell cheap near-month contracts and buy more expensive far-month ones. This is why commodity ETFs that hold futures in a contango market consistently underperform the spot price. The curve structure is not a footnote; for a commodity investor, it can determine whether you make or lose money even if you correctly predict the direction of prices.</p>
+
+<p>The most important misconception to discard is that backwardation means the market expects prices to fall. Many first-time readers of futures curves make this mistake: if the three-month price is lower than today's price, they conclude the market must be forecasting a decline. That misreads the mechanism. Backwardation says nothing predictive about where prices will be in three months. It says something descriptive about where supply is <em>right now</em>. The far-month price is lower because the physical urgency is lower for those future barrels, not because traders expect a crash. Conversely, contango does not predict rising prices — it reflects current comfort with near-term supply. The curve is a snapshot of the physical market's current stress, not a forecast. Confusing the two leads to badly misread positions.</p>
+
+<p>Backwardation can fail as a signal when the physical market and the paper futures market become structurally disconnected — exactly what happened in the video's scenario. Futures markets closed Friday with a relatively orderly price. The curve structure that screamed emergency emerged over the weekend when physical traders, who cannot simply close a screen and stop needing oil, began transacting among themselves. By the time futures reopened Monday, the reality had to be priced in all at once. This lag between physical reality and futures pricing creates both danger and opportunity. The danger is for participants who read Friday's futures settlement as the full story; they had no idea how much the curve had shifted over 48 hours of physical trading. The opportunity belongs to whoever understood, as the video's presenter argues, that the pipeline had already been running at half capacity for six weeks before the drones hit — meaning the physical stress was deeper and more structural than any single headline could capture.</p>
+
+<p>Backwardation and contango connect directly to several adjacent concepts. <strong>Inventory levels</strong> are the fundamental driver: when inventories are critically low, backwardation intensifies; when storage is full, contango deepens. <strong>OPEC spare capacity</strong> functions as a futures-curve moderator — the knowledge that 2 million barrels a day can be turned on quickly prevents extreme backwardation even in a supply disruption. The video's alarming detail is that effective spare capacity had fallen to roughly <strong>220,000 barrels per day</strong> — a rounding error, not a cushion — which is precisely why the physical market's panic was rational. Understanding the curve also connects to <strong>refinery margin analysis</strong>, <strong>storage trade economics</strong>, and even monetary policy: a commodity locked in severe backwardation becomes an inflation input the Fed literally cannot affect with interest rates, because the price is being set by a drone strike, not by credit demand.</p>
+<div class="concept-side">Sources: THE SAUDI PIPELINE BLIND-SIDE: Why $108 Oil Just Destroyed the Hormuz Bypass!<br>Related in this category: <a href="gold_futures.html">Gold Futures</a>, <a href="agricultural_input_cost_inflation.html">Agricultural Input Cost Inflation</a>, <a href="nitrogen_fertilizer_as_commodity.html">Nitrogen Fertilizer Pricing</a>, <a href="potash_supply_concentration_risk.html">Potash Supply Concentration Risk</a>, <a href="commodity_supply_shock.html">Commodity Supply Shock</a>, <a href="strategic_petroleum_reserve.html">Strategic Petroleum Reserve (SPR)</a></div>
+<button class="concept-done" data-slug="backwardation_contango" onclick="toggleDone('backwardation_contango')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_backwardation_contango';</script>
+<script src="../../book.js"></script>
+<script src="../fg.js"></script>
+</body>
+</html>

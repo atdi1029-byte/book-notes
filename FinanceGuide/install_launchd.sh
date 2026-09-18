@@ -30,9 +30,9 @@ if [[ "${1:-}" == "--remove" ]]; then
   exit 0
 fi
 
-# Real interpreter (not a pyenv/asdf shim) — the one that has
-# youtube_transcript_api installed, since that's the python3 you use.
-PY="$(python3 -c 'import sys; print(sys.executable)')"
+# Use Apple's universal python3 — the Intel-only installs (3.9 Framework,
+# 3.12 /usr/local) crash with "Bad CPU type" on Apple Silicon.
+PY="/usr/bin/python3"
 
 # Build a PATH that includes wherever claude and yt-dlp actually live.
 # launchd does NOT load your shell profile, so a bare PATH would miss them.

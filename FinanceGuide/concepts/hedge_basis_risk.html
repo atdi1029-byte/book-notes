@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Hedge Basis Risk (Correlated Hedge Failure) - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.tier .tier-desc { color: #a08060; font-size: 0.85rem; margin: 0.4rem 0 0.8rem; }
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done,
+body.hide-done .cat-card.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../risk-management-position-sizing.html">&larr; Risk Management &amp; Position Sizing</a>
+
+<div class="concept-meta"><span>standard</span><span>Risk Management &amp; Position Sizing</span><span>added 2026-09-17</span></div>
+<h4 id="hedge_basis_risk">Hedge Basis Risk (Correlated Hedge Failure)</h4>
+
+<p>A <strong>hedge</strong> is any position, asset, or infrastructure you hold specifically to offset losses from another risk you're exposed to. You own oil and buy put options — that's a hedge. You run a pipeline through a war zone and build a bypass route — that's a hedge too. But a hedge only works if the thing protecting you can survive whatever destroys the thing it's protecting. <strong>Hedge basis risk</strong> is the danger that your hedge and your primary exposure are vulnerable to the same shock — that the correlation between them breaks down exactly when you need it most. More precisely: you thought you had two independent things, but you actually had one thing with two names.</p>
+
+<p>The reason this matters so much is that hedges create confidence, and confidence shapes behavior. Traders size positions larger. Governments don't build alternative infrastructure. Portfolio managers tell clients the risk is "managed." When the hedge is real, that confidence is earned. When the hedge is correlated to the underlying risk, that confidence is borrowed against a promise that cannot be kept. The failure arrives suddenly, in exactly the moment the hedge was supposed to perform, and the loss is compounded by the false security that preceded it. You don't just lose the position — you lose the position <em>and</em> discover that what you thought was protection was, in the presenter's phrase, a decoration bolted to the same wall.</p>
+
+<p>Mechanically, here is how correlated hedge failure unfolds. Step one: an original risk exists — a pipeline, a stock position, a currency exposure. Step two: a hedge is constructed that appears structurally independent — a bypass route, a put option, a short on a correlated asset. Step three: over time, the two converge in their vulnerability to some shared underlying factor — geography, liquidity, counterparty, or regime. Step four: the triggering event hits the underlying risk. Step five: the same event, or a consequence of the same event, disables the hedge simultaneously. Step six: losses from the underlying position arrive with no offsetting gain, and the full unhedged exposure materializes all at once. The gap between what traders assumed they were exposed to and what they were actually exposed to is called the <strong>basis</strong> — and when it blows out catastrophically, you have basis risk realized.</p>
+
+<p>The Saudi case on September 10–11 is the cleanest real-world illustration of this failure mode in recent memory. Saudi Arabia's <strong>Petrol Line</strong> — 1,200 kilometers of steel running from Abqaiq in the Eastern Province to Yanbu on the Red Sea — existed for exactly one purpose: to move crude onto tankers without those tankers ever approaching the <strong>Strait of Hormuz</strong>. It had a nameplate capacity of 7 million barrels per day. For six months it had been carrying the world's energy security, rerouting flows that would normally pass through Hormuz. Then drones launched from Mysan province in southeastern Iraq hit pumping stations near Riyadh and Medina. The Saudi energy ministry shut the entire line as a precautionary measure. The world's only significant Hormuz bypass went offline. And crude oil went <em>down</em> 2.4% on the day. The market hadn't priced the hedge failure — it had priced the headline as routine.</p>
+
+<p>But the drone strike wasn't even the main story. The more important revelation was that the hedge had already been silently degrading for six weeks before anyone flew anything at it. KPLER ship-tracking data — which monitors actual tanker loadings at Yanbu — showed westbound flows running at roughly 2 million barrels per day in August. The headline number repeated in every news article was 4–5 million barrels per day, which was accurate for the spring when Saudi Arabia pushed the line hard. By August, <strong>Houthi pressure</strong> around the Red Sea and Bab-el-Mandeb had already cut Yanbu loading by more than half. The bypass was running at less than 30% of nameplate capacity before the attack. The hedge had degraded to near-uselessness before the risk it was hedging ever materialized, and nobody was checking. This is the second failure mode embedded in basis risk: silent decay. The correlation between your hedge and your exposure can shift gradually while you're watching something else.
+
+<blockquote>"The bypass was already broken before the drones smashed it last week. The suspenders were not snapped on Friday. They'd been fraying since late July, and nobody noticed because everyone was staring at the belt."</blockquote>
+</p>
+
+<p>For traders and portfolio managers, the practical application of this concept runs in both directions — as a diagnostic and as a signal. On the diagnostic side: before placing confidence in any hedge, you must verify that the hedge and the underlying exposure are genuinely independent, not just structurally different. Ask: what single event could disable both simultaneously? What geographic radius, what liquidity condition, what counterparty failure, what regulatory change would impair the hedge at the same moment it's supposed to perform? On the signal side: when a market prices a hedge disruption as routine and the underlying asset moves the wrong direction, that's a mispricing worth examining. WTI falling 2.4% on the day the world's only Hormuz bypass went offline was not a rational price. It was muscle memory — markets habituated to Gulf drone headlines that had previously moved nothing important. The physical market understood this by Monday morning: Brent traded above $108 in Asian hours, and the <strong>prompt-month spread</strong> blew out to $5.39.</p>
+
+<p>The most common misconception about hedge basis risk is that it only matters when the hedge fails completely. In reality, partial degradation is far more dangerous, because it's invisible. A hedge that goes from 7 million barrels per day capacity to 2 million is still nominally "operational." Status boards still show it as active. Models still count it as protection. Analysts still cite the 4–5 million barrel figure because that's what the wires published last spring. The IEA's September report — published the same Friday as the attack — showed Saudi crude production had fallen to 5.97 million barrels per day in August from 8.24 million in July, and effective OPEC-plus spare capacity had collapsed to 220,000 barrels per day. That is not a buffer. But because no single event announced the degradation, none of it was priced. Silent basis drift — the gradual convergence of a hedge's vulnerability with the underlying risk — is the version of this failure that kills portfolios, because it happens too slowly to trigger any alarm and too surely to reverse when the moment arrives.</p>
+
+<p>When correlated hedges fail simultaneously, the downstream effects cascade well beyond the original position. In the Saudi case, the consequences moved from crude oil into <strong>headline CPI</strong> (gasoline up 3.9% in August, accounting for over one-third of the monthly CPI increase), into <strong>consumer sentiment</strong> (University of Michigan survey at 47.8, the second-lowest reading in survey history), and into <strong>Fed policy expectations</strong> (odds of a rate hike jumping from 72% to 87% in a single day). The bond market's response was equally telling: the 10-year Treasury crossed 5% for the first time since October 2023, and the <strong>yield curve steepened</strong> — not because the bond market endorsed a rate hike, but because it was demanding more compensation to hold duration through an inflation shock that monetary policy cannot reach. Drones hitting a pumping station in a desert repriced every bond fund in America. That transmission — from physical infrastructure failure to financial market repricing — is what makes hedge basis risk a systemic concept, not just a risk-management footnote. A hedge nobody checked is not a hedge. It is a fire escape bolted to the same wall as the one that's on fire.
+
+<blockquote>"You don't own a hedge if the same drone can reach both of them."</blockquote>
+</p>
+
+<p>Hedge basis risk connects directly to several adjacent concepts worth understanding together. <strong>Concentration risk</strong> is the broader category — when your supposed diversification actually clusters around a single factor. <strong>Liquidity correlation</strong> is a financial-market version of the same failure: assets that appear uncorrelated in normal markets become highly correlated during crises, precisely because forced sellers liquidate everything simultaneously. <strong>Counterparty risk</strong> carries the same structure — your credit default swap protects you until your swap counterparty fails alongside the bond you're hedging. And <strong>contango versus backwardation</strong> in commodity futures markets is how traders read whether the physical market has already priced a supply disruption that the futures screen hasn't caught yet. The prompt-month spread blowing to $5.39 and the three-month spread going to $14 was the physical market screaming what the Friday close had whispered: the hedge was gone, the cushion was gone, and someone who actually needed oil this month was paying whatever it took to get it.</p>
+<div class="concept-side">Sources: THE SAUDI PIPELINE BLIND-SIDE: Why $108 Oil Just Destroyed the Hormuz Bypass!<br>Related in this category: <a href="platform_obsolescence.html">Platform Obsolescence Risk</a>, <a href="redemption_gate.html">Redemption Gate</a></div>
+<button class="concept-done" data-slug="hedge_basis_risk" onclick="toggleDone('hedge_basis_risk')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_hedge_basis_risk';</script>
+<script src="../../book.js"></script>
+<script src="../fg.js"></script>
+</body>
+</html>
