@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>FOMC Meeting Minutes - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.tier .tier-desc { color: #a08060; font-size: 0.85rem; margin: 0.4rem 0 0.8rem; }
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done,
+body.hide-done .cat-card.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+.vid-tab {
+  margin: 0 0 1.2rem; background: #e8e0d0; border: 1px solid #d4c8b0;
+  border-radius: 8px; overflow: hidden;
+}
+.vid-tab summary {
+  padding: 0.6rem 0.9rem; cursor: pointer; font-size: 0.85rem;
+  color: #3a2a1a; list-style: none; user-select: none;
+}
+.vid-tab summary::-webkit-details-marker { display: none; }
+.vid-tab summary::before {
+  content: '▶'; display: inline-block; margin-right: 0.5rem;
+  font-size: 0.7rem; transition: transform 0.2s;
+}
+.vid-tab[open] summary::before { transform: rotate(90deg); }
+.vid-tab .vid-status {
+  float: right; font-size: 0.75rem; padding: 0.15rem 0.5rem;
+  border-radius: 3px; margin-left: 0.5rem;
+}
+.vid-tab .vid-ok { background: #4ade8040; color: #2d6a4f; }
+.vid-tab .vid-err { background: #f8717140; color: #9b2c2c; }
+.vid-tab .vid-list {
+  padding: 0 0.9rem 0.7rem; margin: 0;
+  list-style: none; font-size: 0.8rem;
+}
+.vid-tab .vid-list li {
+  padding: 0.35rem 0; border-top: 1px solid #d4c8b0;
+  display: flex; justify-content: space-between; gap: 8px;
+}
+.vid-tab .vid-list .vid-date {
+  color: #a08060; white-space: nowrap; flex: none;
+}
+.vid-tab .vid-list .vid-concepts {
+  color: #a08060; white-space: nowrap; flex: none; font-size: 0.75rem;
+}
+.vid-tab .vid-none {
+  padding: 0.4rem 0.9rem 0.7rem; color: #a08060; font-size: 0.8rem;
+}
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../monetary-policy-central-banking.html">&larr; Monetary Policy &amp; Central Banking</a>
+
+<div class="concept-meta"><span>standard</span><span>Monetary Policy &amp; Central Banking</span><span>added 2026-09-19</span></div>
+<h4 id="fomc_meeting_minutes">FOMC Meeting Minutes</h4>
+
+<p>The <strong>FOMC Meeting Minutes</strong> are the detailed written record of what happened during a <strong>Federal Open Market Committee</strong> meeting — the body inside the Federal Reserve that sets U.S. interest rate policy. While the Fed releases a brief <strong>policy statement</strong> on the day of the meeting itself, the minutes come out roughly three weeks later and contain far more: the full debate among members, the economic reasoning behind the decision, dissenting views, and crucially, the names of the individuals who voted for or against each action. Think of the statement as a headline and the minutes as the full article. Markets, analysts, and serious investors pay attention to both, but for very different reasons.</p>
+
+<p>Why do the minutes matter so much? Because interest rate decisions don't happen in a vacuum — they emerge from genuine disagreement, evolving forecasts, and competing economic interpretations inside the committee room. The policy statement tells you what the Fed decided. The minutes tell you <em>how confident</em> they were, which members pushed back, what data they were most worried about, and what conditions might change their minds. That information is enormously valuable for anyone trying to anticipate the next move. Bond traders price duration risk based on it. Mortgage lenders adjust their rate sheets. Currency desks recalibrate. A single paragraph in the minutes can shift billions in capital because it reveals the internal temperature of the most powerful monetary body on Earth.</p>
+
+<p>Mechanically, the process works like this. The FOMC meets eight times per year, typically over two days. On the second day, the committee votes and releases a statement within minutes of the decision. That statement includes the rate target, a brief justification, and — historically — a roster listing which members voted for the action and which dissented. Three weeks later, the full minutes are published. Staff economists present their analysis, members debate the outlook, and the chair synthesizes a consensus or records disagreement. Those deliberations get transcribed, lightly edited for clarity, and released to the public. Separately, the Fed releases full <strong>transcripts</strong> with a five-year lag — so the verbatim conversation from 2021 meetings only becomes public in 2026.</p>
+
+<p>The video highlights a specific and important change that illustrates just how significant the minutes can be. At the September 2026 meeting, the FOMC raised the <strong>federal funds rate</strong> to a target range of 3.75–4% by a vote of 12 to 0 — unanimous. But when the policy statement was released, it gave only the tally. It did not name who the 12 voters were, breaking with decades of established practice. As the host explained, the names of those 12 voters would not be officially confirmed until the October minutes were published.
+
+<blockquote>"We don't officially know who the 12 were until the minutes actually come out in October. Then we're going to find out. That, my friends, is the regime change."</blockquote>
+
+That shift — removing voter names from the statement — transformed the October minutes from a routine disclosure into the primary data release of the cycle.</p>
+
+<p>Why does knowing <em>who</em> voted matter, not just how many? Because the FOMC is not a monolith. Its 12 voting members rotate among the 19 eligible participants — the seven Fed governors plus five of the twelve regional Fed presidents on a rotating basis. Some members are perennially hawkish (favoring higher rates to fight inflation) and others are dovish (preferring lower rates to support employment). When you know which individuals voted, you can read the room. A unanimous vote that includes known doves signals something very different from a unanimous vote of only hawks. Without the names, you're reading the score without knowing which players were on the field. That information gap is precisely what the minutes close.</p>
+
+<p>Traders and investors use the minutes in several concrete ways. <strong>Fixed income</strong> desks parse the language around inflation and employment to position on <strong>Treasury yields</strong> — if the minutes show more concern about inflation persistence than the statement implied, the front end of the curve (2-year notes) will sell off. <strong>Equity strategists</strong> look for signals about the pace of future hikes or cuts, since rate expectations are embedded in the <strong>discount rate</strong> used to value stocks. Mortgage lenders and <strong>real estate investors</strong> watch for any language about neutral rate estimates, since those feed into long-run mortgage pricing models. And macro hedge funds scrutinize dissents — a single dissenting vote buried in the minutes can reveal a fault line that becomes a market-moving split at the next meeting.</p>
+
+<p>The most common misconception about the minutes is treating them as a simple confirmation of the statement. They aren't. The minutes can introduce entirely new information — an emerging concern that wasn't in the statement, a close call that nearly went the other way, or a member's framing that recontextualizes what the vote actually meant. In the September 2026 case, the bigger story wasn't the rate hike itself; it was that <strong>Chair Kevin Walsh</strong> publicly disowned the <strong>Summary of Economic Projections</strong> from the podium, calling them "the forecasts of my 18 colleagues" and declining to submit his own dot. That context, combined with the missing voter names, made the upcoming minutes not a trailing footnote but the lead document for understanding where policy was actually headed.</p>
+
+<p>The minutes can also mislead if read superficially. Three weeks is a long time in markets. By the time the minutes drop, two more weeks of data have arrived — payrolls, CPI, retail sales — and the committee members' views may already have evolved. The minutes describe what people thought in the meeting room, not what they think today. This is why the Fed also uses <strong>Fedspeak</strong> — speeches, interviews, and public remarks by individual members between meetings — to update the market in real time. A member who sounded hawkish in the September minutes might give a speech in October signaling a change of heart based on softer jobs data. Experienced Fed-watchers triangulate across all of these sources rather than treating any single document as definitive.</p>
+
+<p>The minutes connect directly to several other market concepts worth understanding together. The <strong>dot plot</strong> (Summary of Economic Projections) is released at the same quarterly meetings that generate the most consequential minutes, and the two documents inform each other — the minutes explain the reasoning behind where those dots landed. The <strong>yield curve</strong> often reacts to minutes releases, particularly the spread between the 2-year and 10-year Treasury, which compresses or steepens based on revised rate-path expectations. And the minutes are the primary mechanism through which <strong>forward guidance</strong> operates — or, as the September 2026 episode demonstrated, through which a Fed chair can signal the deliberate <em>end</em> of forward guidance. When the departure board goes dark, the minutes become the last official window into what the committee actually believes.</p>
+<div class="concept-side">Sources: THE MISSING DOT: What Wall Street Missed in the Fed’s Unanimous Rate Hike!<br>Related in this category: <a href="pce_inflation_basket.html">PCE Inflation Basket</a>, <a href="jackson_hole_symposium.html">Jackson Hole Symposium</a>, <a href="hawkish_dovish_fed_signaling.html">Hawkish vs. Dovish Fed Signaling</a>, <a href="inflation_breadth.html">Inflation Breadth</a>, <a href="central_bank_credibility.html">Central Bank Credibility</a>, <a href="forward_guidance.html">Forward Guidance</a></div>
+<button class="concept-done" data-slug="fomc_meeting_minutes" onclick="toggleDone('fomc_meeting_minutes')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_fomc_meeting_minutes';</script>
+<script src="../../book.js"></script>
+<script src="../fg.js"></script>
+</body>
+</html>
