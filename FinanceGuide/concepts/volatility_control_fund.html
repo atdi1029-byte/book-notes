@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Volatility Control Fund - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.tier .tier-desc { color: #a08060; font-size: 0.85rem; margin: 0.4rem 0 0.8rem; }
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done,
+body.hide-done .cat-card.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+.vid-tab {
+  margin: 0 0 1.2rem; background: #e8e0d0; border: 1px solid #d4c8b0;
+  border-radius: 8px; overflow: hidden;
+}
+.vid-tab summary {
+  padding: 0.6rem 0.9rem; cursor: pointer; font-size: 0.85rem;
+  color: #3a2a1a; list-style: none; user-select: none;
+}
+.vid-tab summary::-webkit-details-marker { display: none; }
+.vid-tab summary::before {
+  content: '▶'; display: inline-block; margin-right: 0.5rem;
+  font-size: 0.7rem; transition: transform 0.2s;
+}
+.vid-tab[open] summary::before { transform: rotate(90deg); }
+.vid-tab .vid-status {
+  float: right; font-size: 0.75rem; padding: 0.15rem 0.5rem;
+  border-radius: 3px; margin-left: 0.5rem;
+}
+.vid-tab .vid-ok { background: #4ade8040; color: #2d6a4f; }
+.vid-tab .vid-err { background: #f8717140; color: #9b2c2c; }
+.vid-tab .vid-list {
+  padding: 0 0.9rem 0.7rem; margin: 0;
+  list-style: none; font-size: 0.8rem;
+}
+.vid-tab .vid-list li {
+  padding: 0.35rem 0; border-top: 1px solid #d4c8b0;
+  display: flex; justify-content: space-between; gap: 8px;
+}
+.vid-tab .vid-list .vid-date {
+  color: #a08060; white-space: nowrap; flex: none;
+}
+.vid-tab .vid-list .vid-concepts {
+  color: #a08060; white-space: nowrap; flex: none; font-size: 0.75rem;
+}
+.vid-tab .vid-none {
+  padding: 0.4rem 0.9rem 0.7rem; color: #a08060; font-size: 0.8rem;
+}
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../quantitative-algorithmic-trading.html">&larr; Quantitative &amp; Algorithmic Trading</a>
+
+<div class="concept-meta"><span>standard</span><span>Quantitative &amp; Algorithmic Trading</span><span>added 2026-09-18</span></div>
+<h4 id="volatility_control_fund">Volatility Control Fund</h4>
+
+<p>A <strong>volatility control fund</strong> is an investment fund — typically a large institutional vehicle like a pension sleeve, insurance general account, or structured product — whose governing rules require it to maintain a <em>fixed level of risk</em> rather than a fixed amount of stock. That distinction sounds small but it rewires everything about how the fund behaves. Most investors think in terms of dollar allocations: "I own 60% equities." A volatility control fund thinks in terms of risk units: "I carry X units of realized portfolio risk." As long as markets are calm, those two framings produce similar portfolios. The moment markets get choppy, they diverge — dramatically and mechanically — because the same pile of stocks now generates more risk than it did yesterday, purely because prices are moving around more.</p>
+
+<p>These funds matter because they are enormous. <strong>Systematic flows</strong> — money movements driven by rules rather than human judgment — represent hundreds of billions of dollars in aggregate assets. <strong>Bank of America's Systematic Flows Monitor</strong>, a weekly research note from their derivatives and quant desk, estimated that a single week of declining markets could trigger roughly $163 billion in combined systematic selling across volatility control funds, <strong>commodity trading advisors (CTAs)</strong>, and <strong>risk parity</strong> funds. Even if that figure is debated — Goldman's comparable estimate ran over a month rather than a week — the scale is real enough that it can amplify a garden-variety pullback into something that feels structural. Understanding these funds means understanding one of the dominant feedback loops in modern equity markets.</p>
+
+<p>The mechanism works like this. The fund's mandate specifies a target <strong>realized volatility</strong> — say, 10% annualized. Every day, the risk management system measures the actual volatility of the portfolio, typically using a rolling window of recent daily returns. When markets are quiet, a $10 billion equity allocation might produce exactly 10% realized volatility, so the fund is fully invested. Now imagine a cluster of sharp daily moves — the kind that follows a rate surprise or a geopolitical shock. The same $10 billion in stocks now generates 14% realized volatility. The mandate says 10%. The fund is over its risk budget by 40%. The spreadsheet doesn't negotiate. It calculates the position size that would return the portfolio to its target volatility and issues sell orders for the difference. No analyst meeting, no macro thesis, no earnings review. The math runs, the order fires.</p>
+
+<p>The video's anchor example comes directly from the September 11th, 2026 edition of the BofA Systematic Flows Monitor. The note contained what the host called "the thing that nobody actually printed": a specific <strong>trigger band</strong> of <strong>S&P 500 futures levels between 7,349 and 7,558</strong>. With the index trading around 7,620 at the time of publication, that meant the selling machinery would begin firing at roughly a 0.8% decline from current levels and would be fully activated by a 3.5% decline. These aren't arbitrary lines — they're the levels at which the model calculates that realized volatility would breach the thresholds embedded in the funds' mandates. The note estimated $157 billion in net selling if the market fell over the following week, versus $15–20 billion in buying if it rose. The asymmetry is the point.</p>
+
+<blockquote>
+  "When the market gets choppier, the same pile of stock now carries more risk than the mandate allows and the fund must now shrink the pile. It's not an option. It's not an opinion. Nobody calls a meeting. The spreadsheet says sell and somebody sells."
+</blockquote>
+
+<p>Traders and active investors use this framework as a <strong>level-watching discipline</strong>. Once you know that the volatility control complex starts reducing equity exposure at a specific index level, that level becomes a meaningful reference point — not a guaranteed floor or ceiling, but a zone where the probability distribution of price action changes. If the index drifts toward 7,558, a trader can reasonably anticipate that mechanical selling will create headwinds, compress rallies, and widen <strong>bid-ask spreads</strong> as liquidity thins. Some traders use this information to reduce their own exposure ahead of the trigger band, effectively front-running the machines. Others watch the <strong>VIX</strong> — the implied volatility index — as a leading indicator, since rising implied volatility is often a precursor to the rising realized volatility that forces these funds to sell.</p>
+
+<p>The most common misconception is that volatility control selling is coordinated, conspiratorial, or sinister. It isn't. The video's delivery truck analogy captures it perfectly: four trucks from four different companies arrive on the same block at the same moment because they all read the same traffic data through similar routing algorithms. No one called a meeting. None of them knew the others were coming. <strong>Synchronized behavior emerges from identical rules applied to identical data</strong> — that's crowding, not conspiracy. A second misconception is that a trigger band is a "trap." It's the opposite. A trap is hidden. These levels are published in a weekly note available to any institutional subscriber. The only thing that makes a known level dangerous is that everyone now knows it's there, which can create self-fulfilling dynamics as traders pre-position around it.</p>
+
+<p>Where volatility control mechanisms genuinely can break down is during <strong>liquidity crises</strong> — moments when the normal relationship between realized volatility and tradeable liquidity fractures. In a typical pullback, the fund sells equities and the market absorbs those sales without much disruption. In a cascade — March 2020 being the modern archetype — volatility spikes so fast that the rebalancing calculation demands sells faster than markets can absorb them. Each sale pushes prices down, which increases realized volatility, which triggers the next round of sells. This is a <strong>volatility spiral</strong> or <strong>forced deleveraging loop</strong>. The BofA note's one-week conditional estimate implicitly assumes markets function normally — that $157 billion in selling pressure doesn't itself cause the kind of dislocation that would require even more selling. During genuine liquidity events, that assumption fails.</p>
+
+<p>Volatility control funds are one spoke in a larger wheel of systematic strategies that all interact with market structure. <strong>Risk parity funds</strong> operate on similar logic — they target equal risk contributions across asset classes and rebalance mechanically when correlations shift. <strong>CTAs</strong> (trend-following funds) approach from the opposite direction: they hold positions because trends are intact, but they exit those positions when price crosses a trend-break threshold. All three strategies can share the same exit door simultaneously, which is exactly the crowding problem the video describes. Understanding volatility control funds in isolation is useful. Understanding them as one node in a network of rule-based strategies that all respond to the same price signals — and therefore amplify each other — is the level of understanding that actually matters for navigating modern markets.</p>
+<div class="concept-side">Sources: THE $163B ALGO SELLOFF: The Secret Market Level That Triggers the Machines!</div>
+<button class="concept-done" data-slug="volatility_control_fund" onclick="toggleDone('volatility_control_fund')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_volatility_control_fund';</script>
+<script src="../../book.js"></script>
+<script src="../fg.js"></script>
+</body>
+</html>

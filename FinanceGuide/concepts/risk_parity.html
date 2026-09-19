@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Risk Parity - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.tier .tier-desc { color: #a08060; font-size: 0.85rem; margin: 0.4rem 0 0.8rem; }
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done,
+body.hide-done .cat-card.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+.vid-tab {
+  margin: 0 0 1.2rem; background: #e8e0d0; border: 1px solid #d4c8b0;
+  border-radius: 8px; overflow: hidden;
+}
+.vid-tab summary {
+  padding: 0.6rem 0.9rem; cursor: pointer; font-size: 0.85rem;
+  color: #3a2a1a; list-style: none; user-select: none;
+}
+.vid-tab summary::-webkit-details-marker { display: none; }
+.vid-tab summary::before {
+  content: '▶'; display: inline-block; margin-right: 0.5rem;
+  font-size: 0.7rem; transition: transform 0.2s;
+}
+.vid-tab[open] summary::before { transform: rotate(90deg); }
+.vid-tab .vid-status {
+  float: right; font-size: 0.75rem; padding: 0.15rem 0.5rem;
+  border-radius: 3px; margin-left: 0.5rem;
+}
+.vid-tab .vid-ok { background: #4ade8040; color: #2d6a4f; }
+.vid-tab .vid-err { background: #f8717140; color: #9b2c2c; }
+.vid-tab .vid-list {
+  padding: 0 0.9rem 0.7rem; margin: 0;
+  list-style: none; font-size: 0.8rem;
+}
+.vid-tab .vid-list li {
+  padding: 0.35rem 0; border-top: 1px solid #d4c8b0;
+  display: flex; justify-content: space-between; gap: 8px;
+}
+.vid-tab .vid-list .vid-date {
+  color: #a08060; white-space: nowrap; flex: none;
+}
+.vid-tab .vid-list .vid-concepts {
+  color: #a08060; white-space: nowrap; flex: none; font-size: 0.75rem;
+}
+.vid-tab .vid-none {
+  padding: 0.4rem 0.9rem 0.7rem; color: #a08060; font-size: 0.8rem;
+}
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../portfolio-management-asset-allocation.html">&larr; Portfolio Management &amp; Asset Allocation</a>
+
+<div class="concept-meta"><span>standard</span><span>Portfolio Management &amp; Asset Allocation</span><span>added 2026-09-18</span></div>
+<h4 id="risk_parity">Risk Parity</h4>
+
+<p><strong>Risk parity</strong> is a portfolio construction strategy that allocates capital based on equal risk contribution from each asset class rather than equal dollar amounts. In a traditional 60/40 portfolio, 60% of the dollars go into stocks and 40% into bonds — but because stocks are roughly three to four times more volatile than bonds, that "balanced" portfolio derives nearly 90% of its risk from the equity sleeve alone. Risk parity corrects for this by asking a different question: not "how much money is in each bucket?" but "how much risk is each bucket contributing?" The goal is for every asset class — equities, bonds, commodities, real assets — to contribute an equal share of the portfolio's total volatility. To achieve this, low-volatility assets like bonds get levered up, while high-volatility assets like stocks get trimmed down.</p>
+
+<p>The concept matters because risk parity funds manage enormous amounts of capital — hundreds of billions of dollars globally — and they operate on <strong>rule-based mandates</strong> that are largely transparent and predictable. This is precisely why Bank of America's <strong>Systematic Flows Monitor</strong>, produced by their derivatives and quant research desk, models them alongside <strong>CTAs</strong> (commodity trading advisors) and <strong>volatility control funds</strong> as the three dominant categories of mechanical, rules-driven market participants. When a risk parity fund must rebalance — and it will rebalance when volatility shifts — it doesn't pick up the phone and call anyone. It executes. That mechanical certainty is what makes these funds legible to analysts and dangerous to overleveraged markets at the same time.</p>
+
+<p>The mechanism works as follows. A risk parity manager targets a specific level of portfolio volatility — say, 10% annualized. Each asset class is sized so its contribution to that 10% is equal. Because bonds historically carry 5–7% annualized volatility versus 15–20% for equities, the fund must lever the bond position — often two to four times — to make it a meaningful risk contributor alongside stocks. Commodities and real assets round out the mix. The fund then continuously monitors realized volatility. When market turbulence rises, the <em>same dollar amount of stock</em> now represents <em>more risk</em> than the mandate allows. The spreadsheet detects the breach. The fund sells stock. This is not discretionary. It is automatic, proportional, and contractually obligated by the fund's own rules.</p>
+
+<p>The video's core example makes this concrete. Bank of America's September 11th Systematic Flows Monitor estimated that if the S&amp;P 500 fell over the following week, mechanical funds including risk parity would sell approximately <strong>$157 billion</strong> in aggregate — and the selling was modeled to accelerate once the index entered a specific trigger band between <strong>7,349 and 7,558 on the S&amp;P futures</strong>. With the index trading around 7,620 at the time, that represented roughly a 0.8% decline to reach the top of the band and about 3.5% to reach the bottom. What made this striking wasn't the size — it was the precision. The machines had effectively published their own stop-loss ladder. The rungs were printed in a research note anyone could read.</p>
+
+<p>For traders and investors, risk parity funds generate two distinct types of actionable intelligence. First, they create <strong>predictable selling pressure</strong> at known volatility thresholds. When the <strong>VIX</strong> spikes or realized volatility picks up sharply, you can model with reasonable confidence that risk parity funds will be selling equities and potentially bonds too — especially if the spike is correlated across asset classes, which reduces the diversification benefit that justifies their leverage in the first place. Second, the same mechanism works in reverse. When volatility compresses, risk parity funds must buy more risk assets to maintain their target exposure. The BofA note estimated that in a flat or rising market, these same mechanical funds would be net buyers of $15–20 billion — providing a tailwind that is equally automatic and equally rule-driven.</p>
+
+<p>The most important misconception about risk parity is that it is simply a "balanced" strategy. It is not. The leverage embedded in the bond sleeve means that a simultaneous rise in both equity volatility and interest rates — a scenario that seemed nearly impossible before 2022 — can cause devastating losses across the entire portfolio at once. Normally bonds rally when stocks fall, providing the cushion that makes the leverage tolerable. But in a genuine <strong>inflationary selloff</strong>, both asset classes decline together. Risk parity's diversification assumption breaks exactly when you need it most. The strategy's intellectual architecture is built on historical correlations that can and do shift, sometimes permanently. That is not a minor footnote. It is the strategy's central vulnerability.</p>
+
+<p>When risk parity breaks down at scale, the consequences ripple far beyond the funds themselves. Consider what happens when every risk parity fund simultaneously detects elevated volatility in a falling market. Each fund independently runs the same rule — reduce risk — and each independently sells the same assets at roughly the same time. No coordination, no conspiracy, just identical rules producing synchronized behavior. The video's delivery truck metaphor captures this perfectly: four trucks from different companies arrive at the same city block at the same moment because they all read the same traffic data. The resulting <strong>crowded exit</strong> amplifies the very volatility that triggered the selling in the first place, creating a feedback loop. Falling prices increase measured volatility, which forces more mechanical selling, which drives prices lower, which raises volatility further.</p>
+
+<p>Risk parity sits at the intersection of several related concepts that compound its market impact. Its selling pressure overlaps with <strong>volatility control funds</strong>, which mechanically reduce equity exposure as realized volatility rises — the same trigger, the same direction. It also interacts with <strong>gamma exposure</strong> dynamics, because options dealers who are short gamma must also sell into falling markets to hedge their books, adding a third layer of mechanical pressure at the same price levels. The BofA Systematic Flows Monitor groups all three — risk parity, volatility control, and CTAs — precisely because their mandates are public, their triggers are estimable, and their behavior converges at moments of market stress. Understanding risk parity in isolation misses half the picture. The real risk is the simultaneity.</p>
+
+<blockquote>
+"These aren't people making judgment calls. They're rule books. And because the rule books are public and similar, you can estimate what they're going to do."
+<cite>— Wall Street Truth Bombs</cite>
+</blockquote>
+
+<p>The practical takeaway for any investor is this: risk parity funds are not a conspiracy, and they are not unpredictable. They are a known force operating on a published schedule. When you see the VIX rising sharply, when realized volatility is climbing, when a key index level is approaching a band that shows up in institutional research, you are watching the preconditions for mechanical selling align. The mature response is not panic — it is awareness. Know the trigger levels, watch the volatility readings, and understand that the selling, if it comes, is a structural feature of how modern portfolios are constructed. A published stop-loss ladder is less frightening than a ghost precisely because you can see exactly where the rungs are.</p>
+<div class="concept-side">Sources: THE $163B ALGO SELLOFF: The Secret Market Level That Triggers the Machines!<br>Related in this category: <a href="etf_fund_flows.html">ETF Fund Flows</a>, <a href="valuation_multiples_rate_sensitivity.html">Valuation Multiples and Rate Sensitivity</a>, <a href="money_market_funds.html">Money Market Funds</a>, <a href="russell_2000_small_cap_index.html">Russell 2000 Small Cap Index</a>, <a href="algorithmic_trading_repricing.html">Algorithmic Trading and Instant Repricing</a>, <a href="leverage_amplification.html">Leverage Amplification in Trading</a></div>
+<button class="concept-done" data-slug="risk_parity" onclick="toggleDone('risk_parity')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_risk_parity';</script>
+<script src="../../book.js"></script>
+<script src="../fg.js"></script>
+</body>
+</html>

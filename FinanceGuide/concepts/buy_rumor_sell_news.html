@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Buy the Rumor, Sell the News - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.tier .tier-desc { color: #a08060; font-size: 0.85rem; margin: 0.4rem 0 0.8rem; }
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done,
+body.hide-done .cat-card.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+.vid-tab {
+  margin: 0 0 1.2rem; background: #e8e0d0; border: 1px solid #d4c8b0;
+  border-radius: 8px; overflow: hidden;
+}
+.vid-tab summary {
+  padding: 0.6rem 0.9rem; cursor: pointer; font-size: 0.85rem;
+  color: #3a2a1a; list-style: none; user-select: none;
+}
+.vid-tab summary::-webkit-details-marker { display: none; }
+.vid-tab summary::before {
+  content: '▶'; display: inline-block; margin-right: 0.5rem;
+  font-size: 0.7rem; transition: transform 0.2s;
+}
+.vid-tab[open] summary::before { transform: rotate(90deg); }
+.vid-tab .vid-status {
+  float: right; font-size: 0.75rem; padding: 0.15rem 0.5rem;
+  border-radius: 3px; margin-left: 0.5rem;
+}
+.vid-tab .vid-ok { background: #4ade8040; color: #2d6a4f; }
+.vid-tab .vid-err { background: #f8717140; color: #9b2c2c; }
+.vid-tab .vid-list {
+  padding: 0 0.9rem 0.7rem; margin: 0;
+  list-style: none; font-size: 0.8rem;
+}
+.vid-tab .vid-list li {
+  padding: 0.35rem 0; border-top: 1px solid #d4c8b0;
+  display: flex; justify-content: space-between; gap: 8px;
+}
+.vid-tab .vid-list .vid-date {
+  color: #a08060; white-space: nowrap; flex: none;
+}
+.vid-tab .vid-list .vid-concepts {
+  color: #a08060; white-space: nowrap; flex: none; font-size: 0.75rem;
+}
+.vid-tab .vid-none {
+  padding: 0.4rem 0.9rem 0.7rem; color: #a08060; font-size: 0.8rem;
+}
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../behavioral-finance-psychology.html">&larr; Behavioral Finance &amp; Psychology</a>
+
+<div class="concept-meta"><span><span class="star">&#9733;</span> must-know</span><span>Behavioral Finance &amp; Psychology</span><span>added 2026-09-18</span></div>
+<h4 id="buy_rumor_sell_news">Buy the Rumor, Sell the News</h4>
+
+<p><strong>Buy the rumor, sell the news</strong> is one of the oldest and most reliable patterns in financial markets. The idea is simple: prices move in anticipation of events, not in response to them. When traders expect something good — a rate cut, a strong earnings report, a merger announcement — they buy ahead of the confirmation. By the time the news actually hits the wire, the price has already moved. The people who bought early take their profits, and the latecomers who bought on the headline get stuck holding an asset that immediately reverses. The news itself, even when positive, becomes the trigger for selling rather than continued buying. Understanding this pattern is the difference between being early and being right, or being on-time and being wrong.</p>
+
+<p>This matters because it inverts the intuition most people bring to markets. Common sense says: good news = higher prices, bad news = lower prices. Markets don't work that way. Markets are forward-looking discounting machines — they price in expected outcomes continuously, long before those outcomes are confirmed. By the time something is obvious to everyone, it's already in the price. The phrase you'll hear on trading desks is <strong>"it's priced in."</strong> That phrase is doing enormous work. A stock that runs up 20% in the month before a blowout earnings report may fall on the actual report, not because the earnings were bad, but because the price had already traveled to a destination that assumed they would be good. The report confirmed what the market had already decided.</p>
+
+<p>Mechanically, here is how it unfolds. First, a rumor, leak, or expectation circulates — sometimes formally through analyst forecasts, sometimes informally through positioning and chatter. Early buyers accumulate. As the expected event gets closer and probability of the outcome rises, more participants pile in, driving the price higher. Momentum traders see the trend and join. By the time the event arrives, you have a crowded trade where nearly everyone who intended to buy has already bought. At that point, the event serves as a liquidity moment — a known date when holders can exit into a volume spike. The news releases the pressure that had been building. Sellers hit bids, early buyers take gains, and the price falls even as the headlines look favorable. The calendar date becomes the exit door, not the entry.</p>
+
+<p>The video illustrates this with extraordinary clarity around the Federal Reserve rate decision. With futures markets pricing better than 90% odds of a rate hike, nearly every participant who wanted to position for that outcome had already done so. The trade was consensus. The machines — <strong>commodity trading advisors (CTAs)</strong>, <strong>volatility control funds</strong>, and <strong>risk parity funds</strong> — had already incorporated the expected Fed action into their models. When 90% probability becomes 100% reality, almost nothing changes in those models. There is no new information, no new buying signal. What there is, however, is a crowd that has been holding a position and now has a clean moment to exit. The Fed doing exactly what everyone expected becomes, paradoxically, a sell signal — not because the outcome was bad, but because the consensus was too crowded to sustain itself once the catalyst passed.</p>
+
+<p>Traders use this pattern as both a timing tool and a risk management framework. On the long side, the discipline is to buy <em>before</em> the event is widely anticipated — when odds are still uncertain, when positioning is light, when the story hasn't yet appeared in the financial press. On the short side, or simply as a reason to exit, the discipline is to sell <em>into</em> the news event itself, using the volume and price strength that accompanies the confirmation as an exit opportunity. A practical signal is the <strong>implied probability</strong> in options and futures markets. When those probabilities pass 80–90%, the rumor phase is likely over. The people who were going to buy have bought. Chasing the last 10% of probability-to-certainty conversion is where amateurs get hurt.</p>
+
+<p>The most dangerous misconception is conflating the quality of the news with the likely market reaction. Traders ask the wrong question: "Was this a good number?" The right question is: "Was this better or worse than what the market had already priced?" A company can report record profits and fall 10% on the day — not fraud, not accounting tricks, just a price that had already traveled to a destination that assumed exactly that result, or better. This is why experienced traders talk about <strong>relative surprise</strong> rather than absolute outcomes. The Fed raising rates by 25 basis points is not good or bad in isolation — it's only meaningful relative to what was expected. If 90% of participants expected it and got it, the marginal information content of that announcement is close to zero, and markets frequently drift lower simply from the removal of pre-event buying pressure.</p>
+
+<p>The pattern breaks in two meaningful ways. First, when the actual outcome <em>genuinely</em> surprises the consensus — either better or worse than the near-unanimous expectation. If the Fed had cut rates when 90% of the market expected a hike, that reprices everything, and the rumor-sell dynamic is overwhelmed by actual new information. Second, when positioning is <em>not</em> actually as crowded as it appears. The video cites Scott Rubner at Goldman Sachs, who argued that "positioning is not stretched" even as the headline $163 billion algorithm story circulated. If the crowd is smaller than assumed, there are fewer sellers waiting at the exit, and the post-news selloff may not materialize or may be shallow. The danger is assuming consensus when the actual positioning data tells a more nuanced story. Stale numbers — like the August 28th figure that went viral versus the updated September 11th figure — can create false certainty about crowdedness.</p>
+
+<p>This concept connects directly to the mechanics of <strong>systematic funds</strong> described throughout the video. CTAs and volatility control funds don't read news — they read prices. A Fed decision that produces no price movement generates no signal in their models. They aren't reacting to the rate hike; they're reacting to whatever the price does afterward. This means the "buy the rumor, sell the news" dynamic can trigger a secondary mechanical cascade: the consensus selloff after a known event pushes prices through technical thresholds, which then activates rule-based selling from funds that have nothing to do with the Fed at all. In the video's framing, the level range of 7,349 to 7,558 on S&amp;P futures represents exactly this — a <strong>stop-loss ladder</strong> where systematic selling begins to fire, not because the machines have an opinion about monetary policy, but because price has crossed a threshold their rulebooks were written to respond to. The news is the pebble; the cascade is the avalanche.</p>
+
+<blockquote>
+  "The dangerous trade this week is not the one where the Fed surprises you. It's the one where the Fed does exactly what everyone expects and the market sells off anyway — because when you find out the machines were never reacting to the Fed at all, that's what you've got to pay attention to."
+  <cite>— Wall Street Truth Bombs</cite>
+</blockquote>
+
+<p>Putting it all together: buy the rumor, sell the news is not a trading strategy so much as a description of how information gets absorbed by markets before it becomes official. The implication for any investor is that timing relative to consensus expectation matters at least as much as the direction of the news itself. When a catalyst is widely anticipated — a Fed meeting, an earnings date, a regulatory ruling — the relevant question is not "what will happen?" but "what has already been priced, by how many people, with how much conviction?" A 90% implied probability is a near-certainty. Near-certainties don't move markets when confirmed. They move markets when they fail to confirm, or when the crowd positioned around them decides the moment of confirmation is the cleanest moment to exit. In that sense, the most dangerous trades aren't the ones that surprise you. They're the ones that go exactly as planned.</p>
+<div class="concept-side">Sources: THE $163B ALGO SELLOFF: The Secret Market Level That Triggers the Machines!<br>Related in this category: <a href="restructuring_rally.html">Restructuring Rally</a>, <a href="exit_liquidity.html">Exit Liquidity</a>, <a href="lump_sum_vs_cashflow_bias.html">Lump-Sum vs. Ongoing-Cost Bias</a>, <a href="market_desensitization.html">Market Desensitization (Alert Fatigue)</a></div>
+<button class="concept-done" data-slug="buy_rumor_sell_news" onclick="toggleDone('buy_rumor_sell_news')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_buy_rumor_sell_news';</script>
+<script src="../../book.js"></script>
+<script src="../fg.js"></script>
+</body>
+</html>
