@@ -1104,6 +1104,12 @@ FILTER_BAR = """
 </div>"""
 
 
+def _words(c):
+    """Approximate reading length of a concept's chapter (words)."""
+    txt = re.sub(r"<[^>]+>", " ", c.get("chapter_html") or c.get("summary") or "")
+    return len(txt.split())
+
+
 def _esc(t):
     return (str(t).replace("&", "&amp;").replace("<", "&lt;")
             .replace(">", "&gt;").replace('"', "&quot;"))
@@ -1171,7 +1177,7 @@ def _concept_rows(items, href_prefix):
                                           x[1]["title"].lower()))
     return "".join(
         f'<a class="concept-row" href="{href_prefix}{slug}.html"'
-        f' data-slug="{slug}" data-flag="{concept_flag(c)}">'
+        f' data-slug="{slug}" data-flag="{concept_flag(c)}" data-words="{_words(c)}">'
         f'{_mark(concept_flag(c))}'
         f'<span class="ctitle">{_esc(c["title"])}</span></a>'
         for slug, c in items
@@ -1432,6 +1438,16 @@ def _progress_html(m, concepts):
 </div>"""
 
     flags = Counter(concept_flag(c) for c in concepts.values())
+    total_words = sum(_words(c) for c in concepts.values())
+    avg_words = total_words / max(1, len(concepts))
+    WPM = 230
+    done_slugs = get_done_slugs() or set()
+    unread_words = sum(_words(c) for sl, c in concepts.items() if sl not in done_slugs)
+    unfound_words = avg_words * m["remaining"]
+
+    def _hm(words):
+        mins = words / WPM
+        return f"{int(mins // 60)}h {int(mins % 60):02d}m" if mins >= 60 else f"{int(round(mins))} min"
     wk1 = f"~{m['days_to_lt1'] / 7:.0f} wk" if m["days_to_lt1"] is not None else "&mdash;"
     wk05 = f"~{m['days_to_lt05'] / 7:.0f} wk" if m["days_to_lt05"] is not None else "&mdash;"
     stats = f"""
@@ -1442,6 +1458,11 @@ def _progress_html(m, concepts):
  <div class="prog-stat"><span class="n">{m['rate_now']:.1f}</span><span class="l">new per video right now</span></div>
  <div class="prog-stat"><span class="n">{m['videos_to_lt1']}</span><span class="l">videos until &lt;1 new/video ({wk1})</span></div>
  <div class="prog-stat"><span class="n">{m['videos_to_lt05']}</span><span class="l">videos until it's a trickle ({wk05})</span></div>
+</div>
+<div class="prog-stats">
+ <div class="prog-stat"><span class="n">{_hm(unread_words)}</span><span class="l">to read what's written and not yet completed ({len(concepts) - len([s for s in done_slugs if s in concepts])} concepts)</span></div>
+ <div class="prog-stat"><span class="n">~{_hm(unfound_words)}</span><span class="l">more for the ~{m['remaining']} concepts still to be found</span></div>
+ <div class="prog-stat"><span class="n">~{_hm(unread_words + unfound_words)}</span><span class="l">total reading left, at {WPM} wpm &middot; ~{avg_words:.0f} words/concept</span></div>
 </div>"""
 
     n_lt1 = m["n_now"] + m["videos_to_lt1"]
@@ -1532,10 +1553,11 @@ def rebuild_html(concepts):
                 continue
             slugs = ",".join(sl for sl, _ in items)
             flags = ",".join(concept_flag(c) for _, c in items)
+            words = ",".join(str(_words(c)) for _, c in items)
             stars = sum(1 for _, c in items if concept_flag(c) == "star")
             cards.append(
                 f'<a class="cat-card" href="{cat["slug"]}.html"'
-                f' data-slugs="{slugs}" data-flags="{flags}" data-stars="{stars}">'
+                f' data-slugs="{slugs}" data-flags="{flags}" data-words="{words}" data-stars="{stars}">'
                 f'<span class="cat-name">{_esc(cat["name"])}</span>'
                 f'<span class="cat-count">{len(items)} concepts &middot; {stars} &#9733;</span></a>'
             )

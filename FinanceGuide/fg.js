@@ -16,21 +16,37 @@
     return true;
   }
 
+  var WPM = 230;
+  function readTime(words) {
+    var m = Math.round(words / WPM);
+    if (m < 1) return '<1 min';
+    if (m < 60) return m + ' min';
+    var h = Math.floor(m / 60), r = m % 60;
+    return h + 'h' + (r ? ' ' + (r < 10 ? '0' : '') + r + 'm' : '');
+  }
+
   function apply() {
-    var shown = 0, total = 0, hidden = 0, doneCount = 0;
+    var shown = 0, total = 0, hidden = 0, doneCount = 0, leftWords = 0;
     document.querySelectorAll('.concept-row').forEach(function(r) {
       var slug = r.dataset.slug, flag = r.dataset.flag;
       total++;
       if (done[slug]) r.classList.add('done'); else r.classList.remove('done');
-      if (visible(flag)) { r.classList.remove('fg-hidden'); shown++; if (done[slug]) doneCount++; }
+      if (visible(flag)) {
+        r.classList.remove('fg-hidden'); shown++;
+        if (done[slug]) doneCount++; else leftWords += parseInt(r.dataset.words || '0', 10);
+      }
       else { r.classList.add('fg-hidden'); hidden++; }
     });
     document.querySelectorAll('.cat-card').forEach(function(card) {
       var slugs = card.dataset.slugs ? card.dataset.slugs.split(',') : [];
       var flags = card.dataset.flags ? card.dataset.flags.split(',') : [];
+      var words = card.dataset.words ? card.dataset.words.split(',') : [];
       var vis = 0, visDone = 0, allDone = slugs.length > 0;
       slugs.forEach(function(sl, i) {
-        if (visible(flags[i])) { vis++; if (done[sl]) visDone++; }
+        if (visible(flags[i])) {
+          vis++;
+          if (done[sl]) visDone++; else leftWords += parseInt(words[i] || '0', 10);
+        }
         if (!done[sl]) allDone = false; else if (visible(flags[i])) doneCount++;
       });
       total += slugs.length; shown += vis;
@@ -53,7 +69,9 @@
     }
     var n = document.getElementById('fgCount');
     var remaining = shown - doneCount;
-    if (n) n.textContent = remaining > 0 ? remaining + ' remaining' : 'All done!';
+    if (n) n.textContent = remaining > 0
+      ? remaining + ' remaining \u00b7 ~' + readTime(leftWords) + ' to read'
+      : 'All done!';
     var h = document.getElementById('fgHiddenNote');
     if (h) h.textContent = hidden ? hidden + ' hidden by the filter.' : '';
     var btn = document.querySelector('.concept-done');
