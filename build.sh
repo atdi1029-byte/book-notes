@@ -18,6 +18,7 @@
 #   ./build.sh add-shelf "The_Intelligent_Investor" --category "Investing" --tier now
 
 BOOKS_DIR="$(cd "$(dirname "$0")" && pwd)"
+. "$BOOKS_DIR/_python.sh"
 
 scaffold() {
   local TITLE="$1"

@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>AI Capital Expenditure Supply Chain (Compute Buildout) - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.tier .tier-desc { color: #a08060; font-size: 0.85rem; margin: 0.4rem 0 0.8rem; }
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done,
+body.hide-done .cat-card.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+.vid-tab {
+  margin: 0 0 1.2rem; background: #e8e0d0; border: 1px solid #d4c8b0;
+  border-radius: 8px; overflow: hidden;
+}
+.vid-tab summary {
+  padding: 0.6rem 0.9rem; cursor: pointer; font-size: 0.85rem;
+  color: #3a2a1a; list-style: none; user-select: none;
+}
+.vid-tab summary::-webkit-details-marker { display: none; }
+.vid-tab summary::before {
+  content: '▶'; display: inline-block; margin-right: 0.5rem;
+  font-size: 0.7rem; transition: transform 0.2s;
+}
+.vid-tab[open] summary::before { transform: rotate(90deg); }
+.vid-tab .vid-status {
+  float: right; font-size: 0.75rem; padding: 0.15rem 0.5rem;
+  border-radius: 3px; margin-left: 0.5rem;
+}
+.vid-tab .vid-ok { background: #4ade8040; color: #2d6a4f; }
+.vid-tab .vid-err { background: #f8717140; color: #9b2c2c; }
+.vid-tab .vid-list {
+  padding: 0 0.9rem 0.7rem; margin: 0;
+  list-style: none; font-size: 0.8rem;
+}
+.vid-tab .vid-list li {
+  padding: 0.35rem 0; border-top: 1px solid #d4c8b0;
+  display: flex; justify-content: space-between; gap: 8px;
+}
+.vid-tab .vid-list .vid-date {
+  color: #a08060; white-space: nowrap; flex: none;
+}
+.vid-tab .vid-list .vid-concepts {
+  color: #a08060; white-space: nowrap; flex: none; font-size: 0.75rem;
+}
+.vid-tab .vid-none {
+  padding: 0.4rem 0.9rem 0.7rem; color: #a08060; font-size: 0.8rem;
+}
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../macro-investing-geopolitics.html">&larr; Macro Investing &amp; Geopolitics</a>
+
+<div class="concept-meta"><span><span class="star">&#9733;</span> must-know</span><span>Macro Investing &amp; Geopolitics</span><span>added 2026-09-20</span></div>
+<h4 id="ai_capex_supply_chain">AI Capital Expenditure Supply Chain (Compute Buildout)</h4>
+
+<p>The <strong>AI capital expenditure supply chain</strong> is the
+chain of spending that runs from a lab's decision to train a bigger
+AI model all the way down to the factories, power plants, and
+construction crews that make that training possible. It starts with
+demand for smarter models, which turns into orders for
+<strong>chips</strong> (GPUs and custom AI accelerators), which turns
+into orders for the equipment that makes those chips, which turns
+into contracts for the electricity and buildings that run them. Every
+link in that chain is a company you can buy stock in: Nvidia designs
+the chips, Lam Research and ASML make the tools that manufacture
+them, and companies like <strong>CoreWeave</strong> lease the data
+centers and power contracts that keep the chips running. Understanding
+this chain means understanding that "AI spending" is not one thing —
+it is a sequence of dependent purchase decisions, each one only
+happening if the step before it justifies the expense.</p>
+
+<p>This concept matters because it is the mechanism that explains
+violently different stock reactions to the same news. When a single
+essay from Anthropic's CEO can erase a trillion dollars of market value
+before breakfast, the reason is not that investors think AI stopped
+working — it's that they re-priced how much hardware gets bought
+along the chain. Semiconductor names like <strong>Nvidia</strong>,
+<strong>AMD</strong>, and <strong>Marvell</strong> are pure bets on
+capital expenditure continuing to accelerate. Software and security
+names like <strong>CrowdStrike</strong> and <strong>Palo Alto
+Networks</strong> are bets on AI already existing and needing to be
+deployed and secured. The supply chain concept is what tells you why
+the exact same piece of news can be bearish for one group and bullish
+for the other on the very same morning.</p>
+
+<p>Mechanically, the chain works like this. Step one: an AI lab
+decides how ambitious its next model will be — how many parameters,
+how much training data, how long to train. Step two: that ambition
+sets a compute budget, meaning a number of GPU-hours needed. Step
+three: the lab or its cloud partner (Microsoft, Amazon, CoreWeave,
+etc.) places chip orders with Nvidia or AMD, often years in advance.
+Step four: those chipmakers place orders with foundries and equipment
+makers — Lam Research, ASML, TSMC — to actually manufacture the
+silicon. Step five: someone has to build or lease a physical data
+center and sign a multi-year power contract to run the finished chips,
+because a GPU without electricity is a paperweight. Slow the process
+down at step one — a "<strong>pacing the frontier</strong>" decision
+— and every downstream step gets smaller, but the earlier contracts
+already signed can't be un-signed.</p>
+
+<p>The video's real-world trigger is a clean case study. Over one
+weekend, <strong>Dario Amodei</strong> (Anthropic's CEO) published an
+essay arguing the industry should slow model development, <strong>Sam
+Altman</strong> (OpenAI) publicly agreed, and Elon Musk posted three
+words: "Dario is right." No law changed, no earnings were released —
+just three executives publicly aligning. By Monday, chip-adjacent
+stocks were hammered: Nvidia down roughly 2.9%, AMD down about 4.8%,
+Marvell down 5.9%, Lam Research down 7.1%, and the semiconductor ETF
+off nearly 5%. Meanwhile CrowdStrike rose about 15% and Palo Alto
+Networks rose about 12% in the same session. The market wasn't
+selling AI — it was selling the picks-and-shovels layer of the supply
+chain while buying the layer that profits from AI already being
+deployed.</p>
+
+<p>Traders and investors use this supply chain framework as a map for
+figuring out which part of an AI-driven move actually applies to a
+given stock. If you hear news that suggests labs will train bigger,
+more frequent models, that's bullish for the upstream hardware
+names — chipmakers, equipment makers, and power infrastructure. If you
+hear news that suggests the frontier is slowing but existing models
+are being used more heavily, that's bullish for the downstream
+software and services layer — security, auditing, deployment tools,
+and platforms that manage existing AI rather than train new AI. The
+practical skill is asking, for any AI headline: does this change how
+much gets spent building new compute, or does it change how much
+existing compute gets used? Those are different trades.</p>
+
+<p>The biggest gotcha is mistaking a single company's spending
+slowdown for the whole chain slowing down, or mistaking a sector
+rotation for a full risk-off event in AI. The video makes this point
+explicitly: the Monday selloff wasn't purely about the pacing essay.
+Oil was trading above $108 a barrel, the 10-year Treasury briefly
+crossed 5% for the first time since October 2023, and markets were
+pricing a near-90% chance of a Federal Reserve rate hike — all on the
+same morning. A true panic about AI itself would have hit the whole
+market broadly; instead the Dow was down only a quarter of a percent
+and the Russell 2000 actually rose. That pattern — narrow damage
+concentrated in one part of the chain, broader indices barely
+moving — is the signature of a supply-chain repricing, not a crisis of
+confidence in AI as a technology.</p>
+
+<p>Where this breaks down is in the contracts that can't be
+unwound. Chips have a resale market — if training demand drops,
+GPUs can be resold or repurposed. But a twenty-year power contract
+signed in a rural county to support a data center has no such
+exit. The video highlights <strong>Bernstein's</strong> analysis of
+CoreWeave, finding that about 25% of its active U.S. power sits in
+smaller "tier three and tier four" markets, and roughly 74% of its
+contracted power does. That's the real fragility in the chain: an
+obligation to pay for electricity in a place nobody else wants it,
+against demand that hasn't been sold yet. </p>
+
+<blockquote>"Chips have a resale market. A 20-year power contract in
+a tier 4 county doesn't."<cite> — Wall Street Truth Bombs</cite>
+</blockquote>
+
+<p>This is the single point where a slowdown in the compute buildout
+stops being an abstract repricing and turns into a real balance-sheet
+problem — a fixed cost with no offsetting revenue.</p>
+
+<p>This concept connects directly to <strong>sector rotation</strong>
+and <strong>duration risk</strong> analysis: the same news can create
+opposite trades within one theme, and macro conditions (rates, oil)
+can amplify or fully explain a move that headlines attribute to a
+single cause. It also connects to how investors should think about
+company-specific <strong>revenue-versus-valuation</strong> checks —
+the video notes Anthropic's revenue reportedly grew from about $787
+million in Q2 of the prior year to roughly $11.5 billion in Q2 of this
+year, alongside a reported valuation markup from $965 billion in May
+to $2 trillion by October. Distinguishing real revenue growth from
+pure valuation inflation is the same discipline needed to judge
+whether compute-buildout spending is justified or a bubble waiting for
+a pacing announcement to pop it.</p>
+<div class="concept-side">Sources: THE AI SLOWDOWN SHOCK: Why Tech Giants Just Agreed to Hit the Brakes!<br>Related in this category: <a href="opportunity_cost_non_yielding_assets.html">Opportunity Cost of Non-Yielding Assets</a>, <a href="national_debt_debt_ceiling.html">National Debt</a>, <a href="debt_servicing_cost.html">Debt Servicing Cost</a>, <a href="fiscal_monetary_policy_conflict.html">Fiscal-Monetary Policy Conflict</a>, <a href="treasury_bond_buyback_program.html">Treasury Bond Buyback Program</a>, <a href="hard_assets_inflation_hedge.html">Hard Assets as Inflation Hedges</a></div>
+<button class="concept-done" data-slug="ai_capex_supply_chain" onclick="toggleDone('ai_capex_supply_chain')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_ai_capex_supply_chain';</script>
+<script src="../../book.js"></script>
+<script src="../fg.js"></script>
+</body>
+</html>

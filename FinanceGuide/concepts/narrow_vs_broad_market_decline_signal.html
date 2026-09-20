@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Narrow vs. Broad Market Decline as a Diagnostic Signal - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.tier .tier-desc { color: #a08060; font-size: 0.85rem; margin: 0.4rem 0 0.8rem; }
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done,
+body.hide-done .cat-card.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+.vid-tab {
+  margin: 0 0 1.2rem; background: #e8e0d0; border: 1px solid #d4c8b0;
+  border-radius: 8px; overflow: hidden;
+}
+.vid-tab summary {
+  padding: 0.6rem 0.9rem; cursor: pointer; font-size: 0.85rem;
+  color: #3a2a1a; list-style: none; user-select: none;
+}
+.vid-tab summary::-webkit-details-marker { display: none; }
+.vid-tab summary::before {
+  content: '▶'; display: inline-block; margin-right: 0.5rem;
+  font-size: 0.7rem; transition: transform 0.2s;
+}
+.vid-tab[open] summary::before { transform: rotate(90deg); }
+.vid-tab .vid-status {
+  float: right; font-size: 0.75rem; padding: 0.15rem 0.5rem;
+  border-radius: 3px; margin-left: 0.5rem;
+}
+.vid-tab .vid-ok { background: #4ade8040; color: #2d6a4f; }
+.vid-tab .vid-err { background: #f8717140; color: #9b2c2c; }
+.vid-tab .vid-list {
+  padding: 0 0.9rem 0.7rem; margin: 0;
+  list-style: none; font-size: 0.8rem;
+}
+.vid-tab .vid-list li {
+  padding: 0.35rem 0; border-top: 1px solid #d4c8b0;
+  display: flex; justify-content: space-between; gap: 8px;
+}
+.vid-tab .vid-list .vid-date {
+  color: #a08060; white-space: nowrap; flex: none;
+}
+.vid-tab .vid-list .vid-concepts {
+  color: #a08060; white-space: nowrap; flex: none; font-size: 0.75rem;
+}
+.vid-tab .vid-none {
+  padding: 0.4rem 0.9rem 0.7rem; color: #a08060; font-size: 0.8rem;
+}
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../trading-technical-analysis.html">&larr; Trading &amp; Technical Analysis</a>
+
+<div class="concept-meta"><span>standard</span><span>Trading &amp; Technical Analysis</span><span>added 2026-09-20</span></div>
+<h4 id="narrow_vs_broad_market_decline_signal">Narrow vs. Broad Market Decline as a Diagnostic Signal</h4>
+
+<p>When a market sells off, the first question a serious investor asks
+isn't "how much did it fall?" It's "what fell, and what didn't?" A
+<strong>narrow decline</strong> is a sell-off concentrated in one sector,
+theme, or handful of stocks while the rest of the market shrugs or even
+rises. A <strong>broad decline</strong> is one where nearly everything
+falls together — small caps, large caps, cyclicals, defensives, all of
+it. The breadth of a decline is a diagnostic tool: it tells you whether
+the market is repricing a specific risk (a business, a sector, a
+capital-spending assumption) or whether it's pricing in something
+systemic like a recession, a credit crunch, or a shock to interest
+rates. Same headline number on the S&P 500 can mean two completely
+different stories depending on what's underneath it.</p>
+
+<p>This matters because narrow and broad declines call for opposite
+responses. A broad decline is a macro event — it usually means the cost
+of capital just rose, growth expectations just fell, or liquidity just
+tightened, and it will eventually touch every asset that depends on
+those conditions, including the ones that looked fine on day one. A
+narrow decline is usually a repricing of a specific bet — a sector's
+customers just told the market they're spending less, or a business
+model just got more expensive to run. If you can't tell the difference,
+you'll either panic-sell a portfolio that isn't actually at risk, or
+you'll stay calm through a real systemic event because "only tech is
+down." Reading breadth correctly is how you avoid both mistakes.</p>
+
+<p>Mechanically, you check breadth by comparing indexes that are built
+differently. The <strong>Dow Jones Industrial Average</strong> is 30
+large, diversified industrial and consumer names — it barely moves on a
+sector-specific shock. The <strong>Russell 2000</strong> tracks small-cap
+domestic companies with little direct exposure to global capital-spending
+cycles like AI infrastructure — if it's flat or up while a specific
+sector craters, that sector's problem isn't the market's problem yet.
+Sector ETFs (like a semiconductor fund) show you the epicenter. You're
+essentially triangulating: if the epicenter is down hard but the broad,
+diversified benchmarks are barely moved, the selling is targeted. If
+everything is down together — small caps, industrials, semis, software,
+all of it — you're looking at something that touches the whole cost of
+capital, like a rate shock or an oil shock.</p>
+
+<p>The video gives a clean, textbook example of this diagnostic in
+action. On the Monday after Dario Amodei's "We Must Pace the Frontier"
+essay, semiconductor names were hammered — Lam Research down 7.1%,
+Marvell down 5.9%, AMD down 4.8%, the semiconductor ETF off nearly 5%,
+and the Nasdaq down over 1%. That looks like panic if you only watch
+tech headlines. But the narrator points out the tell:
+<blockquote><cite>The Dow was only down about a quarter of a percent and
+the Russell 2000 was actually up.</cite></blockquote>
+Meanwhile CrowdStrike was up 15% and Palo Alto Networks up 12% on the
+same morning — a 20-point spread inside the same broad "AI" trade. That
+combination — semis crushed, security software rallying, the Dow barely
+scratched, small caps green — is the signature of a narrow, targeted
+repricing, not a market-wide panic.</p>
+
+<p>Traders and analysts use this check constantly, almost as a
+first-response triage step whenever a scary headline number hits the
+tape. The routine is simple: see the big index number, then immediately
+pull up two or three other benchmarks with different composition —
+small caps, an equal-weight index, a sector ETF, maybe credit spreads or
+the VIX — and see if they agree. If they all move together, you treat
+it as systemic and start asking macro questions: what happened to rates,
+credit, or growth expectations. If they diverge sharply, you go looking
+for the specific catalyst inside the narrow group, because that's where
+the actual information is. This is also how professionals decide whether
+to hedge a whole portfolio or just trim a single position — broad risk
+gets a broad hedge, narrow risk gets addressed at the source.</p>
+
+<p>The biggest nuance, and the one the video is careful to flag, is that
+breadth signals can be contaminated by other events happening at the
+same time, and a narrow read can hide a broader force lurking underneath
+it. In this case, the AI-slowdown essay landed on a market that was
+already under pressure from an oil shock (Brent crude above $108) and a
+rate shock (the 10-year Treasury pushing through 5%, with markets
+pricing a high chance of a Fed hike). The narrator calls this a
+<strong>duration sell-off</strong> — a decline driven by rising rates
+disproportionately hitting long-duration, high-multiple growth stocks
+like the AI infrastructure names, rather than a fear specifically about
+artificial intelligence. A narrow-looking decline in one sector can
+still be a symptom of a broad macro shock; you have to check whether the
+sector getting hit is simply the most rate-sensitive part of the market,
+not immune from the macro story at all.</p>
+
+<p>The signal breaks down, or at least gets harder to read, when
+sector-specific and systemic forces hit at the same moment, which is
+exactly the situation described here. You can't cleanly separate "AI
+capex repricing" from "rate shock" just by looking at which stocks fell
+hardest, because rate-sensitive growth stocks and AI infrastructure
+stocks are largely the same stocks. This is why the narrator proposes a
+follow-up test rather than trusting the breadth read alone: watch
+whether the rotation — money moving out of chips and into security
+software — survives once the Fed event passes. If the rotation holds
+after the macro noise clears, it confirms this was a real, narrow
+re-rating of AI spending. If everything snaps back together once rates
+stabilize, the "narrow decline" was actually the macro shock wearing a
+sector costume the whole time.</p>
+
+<p>This diagnostic connects directly to other core ideas in market
+analysis: sector rotation, where capital moves between industries rather
+than leaving the market entirely; duration risk, which explains why
+long-dated cash-flow stories like AI infrastructure are more sensitive
+to interest rates than short-duration businesses; and the general
+practice of using multiple, differently-constructed benchmarks rather
+than a single headline index to judge market health. It's also a
+reminder that a single number — "the market was down 1%" — is almost
+meaningless without knowing its composition. The real information isn't
+in how far the index moved; it's in which parts of the market moved
+together and which parts didn't, because that's what tells you whether
+you're looking at a business problem or an economy problem.</p>
+<div class="concept-side">Sources: THE AI SLOWDOWN SHOCK: Why Tech Giants Just Agreed to Hit the Brakes!<br>Related in this category: <a href="stop_loss_cascade.html">Stop-Loss Cascade (Stop-Loss Ladder)</a>, <a href="multi_causal_market_move_attribution.html">Multi-Causal Market Move Attribution</a></div>
+<button class="concept-done" data-slug="narrow_vs_broad_market_decline_signal" onclick="toggleDone('narrow_vs_broad_market_decline_signal')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_narrow_vs_broad_market_decline_signal';</script>
+<script src="../../book.js"></script>
+<script src="../fg.js"></script>
+</body>
+</html>

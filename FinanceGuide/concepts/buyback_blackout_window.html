@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Buyback Blackout Window - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.tier .tier-desc { color: #a08060; font-size: 0.85rem; margin: 0.4rem 0 0.8rem; }
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done,
+body.hide-done .cat-card.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+.vid-tab {
+  margin: 0 0 1.2rem; background: #e8e0d0; border: 1px solid #d4c8b0;
+  border-radius: 8px; overflow: hidden;
+}
+.vid-tab summary {
+  padding: 0.6rem 0.9rem; cursor: pointer; font-size: 0.85rem;
+  color: #3a2a1a; list-style: none; user-select: none;
+}
+.vid-tab summary::-webkit-details-marker { display: none; }
+.vid-tab summary::before {
+  content: '▶'; display: inline-block; margin-right: 0.5rem;
+  font-size: 0.7rem; transition: transform 0.2s;
+}
+.vid-tab[open] summary::before { transform: rotate(90deg); }
+.vid-tab .vid-status {
+  float: right; font-size: 0.75rem; padding: 0.15rem 0.5rem;
+  border-radius: 3px; margin-left: 0.5rem;
+}
+.vid-tab .vid-ok { background: #4ade8040; color: #2d6a4f; }
+.vid-tab .vid-err { background: #f8717140; color: #9b2c2c; }
+.vid-tab .vid-list {
+  padding: 0 0.9rem 0.7rem; margin: 0;
+  list-style: none; font-size: 0.8rem;
+}
+.vid-tab .vid-list li {
+  padding: 0.35rem 0; border-top: 1px solid #d4c8b0;
+  display: flex; justify-content: space-between; gap: 8px;
+}
+.vid-tab .vid-list .vid-date {
+  color: #a08060; white-space: nowrap; flex: none;
+}
+.vid-tab .vid-list .vid-concepts {
+  color: #a08060; white-space: nowrap; flex: none; font-size: 0.75rem;
+}
+.vid-tab .vid-none {
+  padding: 0.4rem 0.9rem 0.7rem; color: #a08060; font-size: 0.8rem;
+}
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../value-investing-equities.html">&larr; Value Investing &amp; Equities</a>
+
+<div class="concept-meta"><span>standard</span><span>Value Investing &amp; Equities</span><span>added 2026-09-19</span></div>
+<h4 id="buyback_blackout_window">Buyback Blackout Window</h4>
+
+<p>A <strong>buyback blackout window</strong> is a legally mandated quiet period during which a publicly traded company is prohibited from repurchasing its own shares on the open market. This restriction kicks in before the company releases its quarterly earnings — typically starting about three to five weeks ahead of the announcement and ending roughly two days after. The rule exists because the company's executives, at that point, possess material non-public information about upcoming financial results. Buying back shares while sitting on that knowledge would amount to insider trading. So regulators, specifically the SEC under <strong>Rule 10b-18</strong>, require companies to step away from the market entirely. The company goes quiet. Its repurchase program pauses. The checkbook closes.</p>
+
+<p>To understand why this matters, you first need to appreciate how significant corporate buybacks have become as a source of stock market demand. Companies across the S&amp;P 500 collectively spend enormous sums repurchasing their own shares — <strong>Goldman Sachs</strong> estimated roughly <strong>$1.4 trillion in annual buyback activity</strong>, against about $700 billion in new share issuance, making corporate America a significant net buyer of equities. Every trading day the window is open, that demand is active in the market. Buyback desks are placing orders, absorbing selling pressure, and providing a steady bid underneath prices. When the blackout window arrives and all of that demand disappears simultaneously across hundreds of companies, a meaningful source of buying simply evaporates.</p>
+
+<p>The mechanism works like this. A company's board authorizes a share repurchase program — say, $10 billion over two years. The company's treasury desk then executes purchases through the open market on a regular schedule, often through a <strong>10b5-1 plan</strong>, which is a pre-set trading program that provides legal cover. These plans spell out in advance how much stock to buy, at what price levels, and on what schedule. As the earnings date approaches, the plan halts automatically. No discretion is required — the calendar triggers the stop. Every major company in the index faces the same calendar roughly at the same time each quarter, because earnings seasons cluster. So the blackout isn't one company stepping away. It's hundreds of companies stepping away within the same two-to-three-week window.</p>
+
+<p>A concrete example comes directly from the video's context. The analyst <strong>Scott Rubner at Citadel Securities</strong> estimated that active buyback programs contribute roughly <strong>$5 billion per day</strong> in market demand when the window is open. He noted that the blackout window began accelerating around <strong>September 12th</strong> of the year in question — meaning that by mid-September, the bulk of S&amp;P 500 companies had already shut their repurchase programs down ahead of third-quarter earnings. That $5 billion daily bid had been thinning out for days before any of the algorithmic selling discussed in the broader video even became relevant. The largest marginal buyer didn't vanish in a single day — it drained out steadily as company after company crossed into its own quiet period.</p>
+
+<p>Traders who track the buyback calendar use it as a seasonal signal for market vulnerability. The logic is straightforward: remove a consistent source of demand, and the market becomes more sensitive to selling pressure from other sources. Professional flow desks publish <strong>buyback blackout calendars</strong> that map out when the window opens and closes for the index's largest constituents. Sophisticated traders watch for periods when the blackout coincides with other known sources of supply — <strong>systematic fund rebalancing</strong>, options expirations, or macro catalysts. When those events stack on top of a buyback blackout, the absence of corporate buying means that any selling pressure faces a thinner bid. Prices can move further and faster than they would if the buyback desks were active.</p>
+
+<p>Here is where the important nuance lives, and the video makes this point forcefully. The narrative that buyback blackouts meaningfully destabilize markets is much weaker than it sounds. <strong>State Street</strong> actually ran the statistical regressions. Raw buyback dollars do correlate with the index at around <strong>77%</strong> — which sounds alarming until you ask the right question. When you normalize buybacks as a share of total market capitalization, which is the only intellectually honest way to measure their impact, the correlation collapses to roughly <strong>5%</strong>. State Street then tested market behavior specifically in the periods before, during, and after earnings blackout windows and found no statistically significant difference. Their conclusion: the blackout effect on prices is noise.</p>
+
+<blockquote>
+  "Tear them up and throw them in the garbage... they called it noise. I just told you what to do with it."
+  <cite>— Wall Street Truth Bombs</cite>
+</blockquote>
+
+<p>The intuitive reason the correlation is weaker than it looks is that buybacks are a flow, not a price-setter. Markets are vast, liquid, and full of competing participants. When corporations pull back, other buyers — institutions rebalancing, retail investors deploying cash, options market makers hedging — fill the gap. A $5 billion daily bid sounds enormous in isolation. Against a market where trillions of dollars in equities change hands each week, it represents a fraction of total volume. The market does not have one buyer holding the whole thing up. It has thousands. Removing one of them creates a marginal change, not a structural collapse. The blackout creates a slightly thinner tape, not a vacuum.</p>
+
+<p>The real risk during a blackout window isn't the absence of buybacks in isolation — it's the interaction effect when the blackout coincides with other simultaneous pressures. This is exactly the scenario the video describes: a <strong>buyback blackout</strong> arriving at the same moment that <strong>volatility control funds</strong> and <strong>commodity trading advisors (CTAs)</strong> approach their mechanical sell thresholds. None of these forces coordinate with each other. The corporate treasury desks aren't talking to the quant funds. But they all respond to the same market conditions and the same calendar. Like delivery trucks routed by the same traffic algorithm, they arrive at the same place at the same time — and the result is synchronized behavior that looks coordinated but isn't. Understanding the blackout window means understanding it as one ingredient in a recipe, not the whole dish.</p>
+
+<p>The concept also connects directly to <strong>earnings season seasonality</strong> and how experienced investors position themselves around it. The window closing — meaning buybacks resuming after earnings are published — is itself a bullish signal that many flow-aware traders watch. When hundreds of corporate repurchase programs restart within a short window after earnings season wraps up, that concentrated demand can provide meaningful support or even lift. This is sometimes called the <strong>buyback reopening effect</strong>. Investors who understand the blackout calendar can anticipate both the vulnerability window (blackout open) and the potential support window (blackout close), giving them a structured framework for thinking about short-term market supply and demand that has nothing to do with fundamentals — and everything to do with the mechanics of how money moves.</p>
+<div class="concept-side">Sources: THE $163B ALGO SELLOFF: The Secret Market Level That Triggers the Machines!<br>Related in this category: <a href="comparable_store_sales.html">Comparable Store Sales (Same-Store Sales)</a>, <a href="economic_moat.html">Economic Moat (Competitive Moat)</a>, <a href="earnings_guidance.html">Earnings Guidance (Forward Guidance — Corporate)</a>, <a href="discounted_cash_flow_valuation.html">Discounted Cash Flow (DCF) Valuation</a>, <a href="corporate_stock_buybacks.html">Corporate Stock Buybacks (Share Repurchase Programs)</a></div>
+<button class="concept-done" data-slug="buyback_blackout_window" onclick="toggleDone('buyback_blackout_window')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_buyback_blackout_window';</script>
+<script src="../../book.js"></script>
+<script src="../fg.js"></script>
+</body>
+</html>

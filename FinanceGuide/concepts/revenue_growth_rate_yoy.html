@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Year-over-Year Revenue Growth Rate - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.tier .tier-desc { color: #a08060; font-size: 0.85rem; margin: 0.4rem 0 0.8rem; }
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done,
+body.hide-done .cat-card.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+.vid-tab {
+  margin: 0 0 1.2rem; background: #e8e0d0; border: 1px solid #d4c8b0;
+  border-radius: 8px; overflow: hidden;
+}
+.vid-tab summary {
+  padding: 0.6rem 0.9rem; cursor: pointer; font-size: 0.85rem;
+  color: #3a2a1a; list-style: none; user-select: none;
+}
+.vid-tab summary::-webkit-details-marker { display: none; }
+.vid-tab summary::before {
+  content: '▶'; display: inline-block; margin-right: 0.5rem;
+  font-size: 0.7rem; transition: transform 0.2s;
+}
+.vid-tab[open] summary::before { transform: rotate(90deg); }
+.vid-tab .vid-status {
+  float: right; font-size: 0.75rem; padding: 0.15rem 0.5rem;
+  border-radius: 3px; margin-left: 0.5rem;
+}
+.vid-tab .vid-ok { background: #4ade8040; color: #2d6a4f; }
+.vid-tab .vid-err { background: #f8717140; color: #9b2c2c; }
+.vid-tab .vid-list {
+  padding: 0 0.9rem 0.7rem; margin: 0;
+  list-style: none; font-size: 0.8rem;
+}
+.vid-tab .vid-list li {
+  padding: 0.35rem 0; border-top: 1px solid #d4c8b0;
+  display: flex; justify-content: space-between; gap: 8px;
+}
+.vid-tab .vid-list .vid-date {
+  color: #a08060; white-space: nowrap; flex: none;
+}
+.vid-tab .vid-list .vid-concepts {
+  color: #a08060; white-space: nowrap; flex: none; font-size: 0.75rem;
+}
+.vid-tab .vid-none {
+  padding: 0.4rem 0.9rem 0.7rem; color: #a08060; font-size: 0.8rem;
+}
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../accounting-financial-statements.html">&larr; Accounting &amp; Financial Statements</a>
+
+<div class="concept-meta"><span><span class="star">&#9733;</span> must-know</span><span>Accounting &amp; Financial Statements</span><span>added 2026-09-20</span></div>
+<h4 id="revenue_growth_rate_yoy">Year-over-Year Revenue Growth Rate</h4>
+
+<p><strong>Year-over-year revenue growth rate</strong> (often shortened
+to YoY growth) measures how much a company's sales increased or
+decreased compared to the same period one year earlier. It's expressed
+as a percentage: take the current period's revenue, subtract the same
+period's revenue from a year ago, divide by that prior-year figure,
+and multiply by 100. If a company made $787 million in Q2 of one year
+and $11.5 billion in Q2 the following year, the growth isn't just
+"a lot bigger" — it's a specific, calculable multiple. In this case
+$11.5 billion divided by $787 million is roughly 14.6, meaning revenue
+grew by about 1,360%. That's the arithmetic behind the video's claim
+that Anthropic was "more than 14 times bigger in just 12 months."</p>
+
+<p>This number matters because it's one of the cleanest ways to
+separate <strong>real demand</strong> from hype. Anyone can write a
+press release claiming their product is popular. Revenue is money that
+already changed hands — customers signed contracts, paid invoices, and
+kept paying. When a growth rate is this extreme and sustained over a
+full quarter rather than a single spike, it tells you something
+structural is happening in the market, not just a marketing push. It's
+also the number that ultimately has to justify a valuation. A company
+can't be worth $2 trillion on vibes forever; eventually the growth rate
+either supports the price tag or it doesn't, and investors watch this
+metric closely to judge which way that's heading.</p>
+
+<p>Mechanically, calculating YoY growth requires comparing identical,
+non-overlapping time periods — same quarter, same month, or same year,
+just twelve months apart. This matters because revenue is often
+<strong>seasonal</strong>: a retailer's Q4 (holiday shopping) will
+always dwarf its Q2, so comparing Q4 to Q2 tells you nothing about
+underlying growth. Comparing Q2-to-Q2, as the video does with
+Anthropic's $787 million versus $11.5 billion, strips out seasonality
+and isolates the actual trend. The formula itself is simple —
+(Current − Prior) ÷ Prior × 100 — but the discipline is in choosing
+comparable periods and using consistent revenue definitions (gross vs.
+net, GAAP vs. adjusted) so you're not comparing apples to oranges.</p>
+
+<p>The Anthropic example from the video is about as dramatic a
+real-world case as exists in corporate history. Bloomberg reported,
+based on internal documents, that Anthropic generated approximately
+$11.5 billion in Q2 revenue against roughly $787 million in the same
+quarter a year prior. That's not incremental improvement — it's a
+company that got more than fourteen times bigger while simultaneously
+posting, reportedly, its first quarter of positive adjusted operating
+income. The video uses this figure deliberately to counter the
+narrative that AI valuations are pure speculation: </p>
+
+<blockquote>"This isn't 1999. The revenue actually showed up this
+time."</blockquote>
+
+<p>The comparison to the 1999 dot-com bubble is precise use of this
+metric — many dot-com companies had impressive growth rates off tiny
+or nonexistent revenue bases, or grew revenue while burning cash with
+no path to profitability. Anthropic's growth rate paired with positive
+operating income is a fundamentally different signal.</p>
+
+<p>Traders and investors use YoY growth rate as a first-pass filter
+for whether a company (or an entire sector) deserves its valuation.
+A high growth rate can justify a high <strong>price-to-sales
+multiple</strong> because the market is pricing in future revenue, not
+just current revenue. Analysts also watch the <strong>trend in the
+growth rate itself</strong> — is it accelerating, decelerating, or
+holding steady? A company growing 1,360% one year but projected to
+grow only 40% the next is decelerating fast, even though both numbers
+sound impressive in isolation, and that deceleration curve often
+matters more to a stock price than the absolute growth number. In the
+context of the video, the reported jump from a ~$965 billion valuation
+in May to a rumored $2 trillion valuation by October — a 107% markup
+in five months — only holds together as rational pricing if revenue
+growth like the Q2 figures continues or investors believe it will.</p>
+
+<p>The biggest gotcha with YoY growth rate is the <strong>base effect</strong>.
+Extreme percentage growth is far easier to achieve off a small starting
+number than a large one. Going from $787 million to $11.5 billion is
+mathematically dramatic, but growing an already-massive $100 billion
+revenue base by even 20% is an enormous absolute dollar increase that
+would never look as flashy as a percentage. This is why maturing
+companies naturally see their YoY growth rates decline over time — not
+because something is wrong, but because the denominator keeps getting
+bigger. Another nuance: reported figures from unnamed sources, as the
+video is careful to flag ("the company hasn't confirmed it... treat it
+as reporting and not as a filing just yet"), aren't the same as audited
+financial statements. Growth rates calculated from leaked or unofficial
+numbers deserve more skepticism than those from SEC filings or earnings
+calls.</p>
+
+<p>YoY growth rate breaks down as a useful signal in a few specific
+ways. First, if revenue growth comes from one-time events — a bulk
+prepayment, a single mega-contract, an accounting reclassification —
+the rate can spike without reflecting a durable trend, and the next
+year's comparison can look artificially weak or even negative by
+contrast. Second, extremely high percentage growth rates are
+mathematically unsustainable forever; a company can't grow 1,360% every
+year without eventually exceeding the size of the entire global
+economy, so investors should expect the rate to compress even if the
+business is healthy. Third, revenue growth alone says nothing about
+profitability or cash burn — a company can post explosive YoY growth
+while losing more money than ever if costs (like the massive
+infrastructure and power contracts discussed elsewhere in the video)
+are growing even faster. That's why the video specifically notes
+Anthropic's positive operating income alongside its revenue growth;
+either number alone would be a less convincing story.</p>
+
+<p>YoY revenue growth connects directly to the video's broader theme of
+distinguishing genuine demand from speculative excess. It pairs with
+concepts like <strong>valuation multiples</strong> (the price investors
+are willing to pay per dollar of revenue or earnings), <strong>capital
+expenditure</strong> commitments (the power contracts and chip
+purchases that revenue growth is supposed to eventually justify), and
+<strong>operating income</strong> (whether growth is translating into
+actual profit). When a company's revenue growth rate outpaces its
+spending growth, that's a sign of a business finding real product-market
+fit. When spending outpaces revenue growth for too long, that's the
+setup for exactly the kind of "timing mismatch between what you
+promised to pay for and when the revenue actually shows up" that the
+video warns is the real risk hiding underneath the AI boom.</p>
+<div class="concept-side">Sources: THE AI SLOWDOWN SHOCK: Why Tech Giants Just Agreed to Hit the Brakes!<br>Related in this category: <a href="earnings_quality.html">Earnings Quality</a>, <a href="gross_margin.html">Gross Margin</a>, <a href="free_cash_flow.html">Free Cash Flow (FCF)</a>, <a href="held_to_maturity_accounting.html">Held-to-Maturity (HTM) Securities Accounting</a>, <a href="mark_to_model_valuation.html">Mark-to-Model Valuation (Private Asset Fair Value)</a>, <a href="capital_expenditure.html">Capital Expenditure (CapEx)</a></div>
+<button class="concept-done" data-slug="revenue_growth_rate_yoy" onclick="toggleDone('revenue_growth_rate_yoy')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_revenue_growth_rate_yoy';</script>
+<script src="../../book.js"></script>
+<script src="../fg.js"></script>
+</body>
+</html>

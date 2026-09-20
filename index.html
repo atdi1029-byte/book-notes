@@ -3401,10 +3401,6 @@
       if (got >= 3) {
         syncReady = true;
         render();
-        // Pre-cache reading books after sync completes
-        if (typeof precacheReadingBooks === 'function') {
-          precacheReadingBooks();
-        }
       }
     }
     jsonpFetch(SYNC_URL + '?action=get_read', function(err, readData) {
@@ -3459,10 +3455,15 @@
             });
             if (local.sessions.length > 50) local.sessions = local.sessions.slice(-50);
           }
-          // Sync reader model — take the one with more samples
+          // Sync reader model — newest updatedAt wins (so a reset can
+          // propagate); legacy models without timestamps fall back to
+          // "more samples wins"
           if (remote.reader) {
-            if (!local.reader || (remote.reader.samples || 0) > (local.reader.samples || 0)) {
-              local.reader = remote.reader;
+            var lr = local.reader, rr = remote.reader;
+            var rt = rr.updatedAt || 0, lt = lr ? (lr.updatedAt || 0) : 0;
+            var takeRemote = !lr || ((rt || lt) ? rt > lt : (rr.samples || 0) > (lr.samples || 0));
+            if (takeRemote) {
+              local.reader = rr;
               changed = true;
             }
           }
@@ -3702,7 +3703,7 @@
 
     // Reset corrupted WPM (one-time fix for outlier spikes)
     if (data.reader && (data.reader.averageWPM > 500 || data.reader.averageWPM < 80)) {
-      data.reader = { averageWPM: 225, samples: 0 };
+      data.reader = { averageWPM: 225, samples: 0, updatedAt: Date.now() };
       localStorage.setItem(RS_KEY, JSON.stringify(data));
     }
 
@@ -3822,42 +3823,12 @@
 </script>
 
 <script>
-// Register service worker for offline reading
+// Offline caching was removed (service-worker.js has been empty since July
+// 2026); unregister any worker left over from older versions of the site.
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('./service-worker.js', {
-    updateViaCache: 'none'
-  }).then(function(reg) {
-    // Check for updates immediately on every page load
-    reg.update();
-  });
-}
-
-// Called after bookmark sync completes to pre-cache reading books
-function precacheReadingBooks() {
-  if (!navigator.serviceWorker) return;
-  navigator.serviceWorker.ready.then(function(reg) {
-    var sw = reg.active || reg.installing || reg.waiting;
-    if (!sw) return;
-    var cached = 0;
-    document.querySelectorAll('.book[data-bmkey]')
-      .forEach(function(el) {
-        var bmkey = el.dataset.bmkey;
-        if (bmkey && activeBookmarks[bmkey]) {
-          var href = el.getAttribute('href');
-          if (href) {
-            sw.postMessage({
-              type: 'cache-book',
-              path: './' + href
-            });
-            cached++;
-          }
-        }
-      });
-    if (cached > 0) {
-      console.log('[SW] Pre-caching ' + cached +
-        ' reading books for offline');
-    }
-  });
+  navigator.serviceWorker.getRegistrations().then(function(regs) {
+    regs.forEach(function(r) { r.unregister(); });
+  }).catch(function() {});
 }
 </script>
 

@@ -14,10 +14,21 @@
     var cbName = '_bmCb_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5);
     var script = document.createElement('script');
     var done = false;
-    window[cbName] = function(resp) { done = true; delete window[cbName]; script.remove(); cb(null, resp); };
+    function finish(err, resp) {
+      if (done) return;
+      done = true;
+      // Leave a no-op behind so a late response can't call an undefined global.
+      window[cbName] = function() {};
+      script.remove();
+      // The backend reports failures as {status:'error', message} instead of
+      // an HTML error page (which used to surface only as a 15 s timeout).
+      if (!err && resp && resp.status === 'error') err = resp.message || 'Server error';
+      cb(err, resp);
+    }
+    window[cbName] = function(resp) { finish(null, resp); };
     script.src = url + (url.includes('?') ? '&' : '?') + 'callback=' + cbName;
-    script.onerror = function() { if (!done) { delete window[cbName]; script.remove(); cb('Failed'); } };
-    setTimeout(function() { if (!done) { delete window[cbName]; script.remove(); cb('Timeout'); } }, 15000);
+    script.onerror = function() { finish('Failed'); };
+    setTimeout(function() { finish('Timeout'); }, 15000);
     document.head.appendChild(script);
   }
 
@@ -79,22 +90,23 @@
     localStorage.setItem('books_bookmarks', JSON.stringify(all));
     bar.style.display = 'flex';
     label.textContent = 'Resume: ' + d.title;
-    showToast('Bookmark saved \u2014 available offline');
-    // Sync to backend
+    showToast('Bookmark saved');
+    // Sync to backend \u2014 say so when the cloud write fails instead of
+    // silently claiming success.
     jsonpFetch(SYNC_URL + '?action=set_bookmark&key=' + encodeURIComponent(BM_KEY) + '&data=' + encodeURIComponent(JSON.stringify(d)), function(err, resp) {
-      if (err) console.warn('[BM SYNC] set_bookmark FAILED:', err);
-      else console.log('[BM SYNC] set_bookmark OK', resp);
+      if (err) {
+        console.warn('[BM SYNC] set_bookmark FAILED:', err);
+        showToast('Saved on this device \u2014 cloud sync failed');
+      } else if (resp && resp.ignored) {
+        console.log('[BM SYNC] set_bookmark ignored by server:', resp.reason);
+      } else {
+        console.log('[BM SYNC] set_bookmark OK', resp);
+        showToast('Bookmark synced');
+      }
     });
     document.querySelectorAll('.bm-btn').forEach(function(b) { b.classList.remove('active'); });
     var activeBtn = el.querySelector('.bm-btn');
     if (activeBtn) activeBtn.classList.add('active');
-    // Cache this book for offline reading
-    if (navigator.serviceWorker && navigator.serviceWorker.controller) {
-      navigator.serviceWorker.controller.postMessage({
-        type: 'cache-book',
-        path: location.pathname
-      });
-    }
   };
 
   window.jumpToBookmark = function() {
@@ -106,26 +118,32 @@
     else window.scrollTo({ top: d.y, behavior: 'smooth' });
   };
 
-  window.clearBookmark = function() {
+  function forgetLocalBookmark() {
     localStorage.removeItem(BM_KEY);
+    var all = {};
+    try { all = JSON.parse(localStorage.getItem('books_bookmarks')) || {}; } catch(e) {}
+    delete all[BM_KEY];
+    localStorage.setItem('books_bookmarks', JSON.stringify(all));
     bar.style.display = 'none';
     document.querySelectorAll('.bm-btn').forEach(function(b) { b.classList.remove('active'); });
+  }
+
+  window.clearBookmark = function() {
+    forgetLocalBookmark();
     showToast('Bookmark cleared');
-    // Sync clear to backend
-    jsonpFetch(SYNC_URL + '?action=set_bookmark&key=' + encodeURIComponent(BM_KEY) + '&data=', function(){});
-    // Remove this book from offline cache
-    if (navigator.serviceWorker && navigator.serviceWorker.controller) {
-      navigator.serviceWorker.controller.postMessage({
-        type: 'uncache-book',
-        path: location.pathname
-      });
-    }
+    // Sync clear to backend (the server keeps a tombstone so other devices
+    // drop their copy instead of pushing it back).
+    jsonpFetch(SYNC_URL + '?action=set_bookmark&key=' + encodeURIComponent(BM_KEY) + '&data=', function(err) {
+      if (err) { console.warn('[BM SYNC] clear FAILED:', err); showToast('Cleared here — cloud sync failed'); }
+    });
   };
 
+  var _toastTimer = null;
   function showToast(msg) {
     toast.textContent = msg;
     toast.classList.add('show');
-    setTimeout(function() { toast.classList.remove('show'); }, 1500);
+    clearTimeout(_toastTimer);
+    _toastTimer = setTimeout(function() { toast.classList.remove('show'); }, 1800);
   }
 
   // Progress bar
@@ -198,37 +216,50 @@
   // Single sync request — handles both bookmarks and reading data
   jsonpFetch(SYNC_URL + '?action=get_bookmarks', function(err, json) {
     if (!err && json && json.status === 'ok' && json.bookmarks) {
-      // Bookmark restore — keep newest by timestamp
+      // Bookmark restore — newest timestamp wins, including a "cleared"
+      // tombstone from another device (json.deleted[key] = clear time).
       var local = null;
       try {
         local = JSON.parse(localStorage.getItem(BM_KEY));
       } catch(e) {}
 
       var remote = json.bookmarks[BM_KEY];
+      var clearedAt = (json.deleted && json.deleted[BM_KEY]) || 0;
+      var localTs = local ? (local.ts || 0) : -1;
+      var remoteTs = remote ? (remote.ts || 0) : -1;
 
       console.log('[BM SYNC] local:', local ? {title: local.title, ts: local.ts, age: Math.round((Date.now() - (local.ts||0))/1000) + 's'} : null);
-      console.log('[BM SYNC] remote:', remote ? {title: remote.title, ts: remote.ts, age: Math.round((Date.now() - (remote.ts||0))/1000) + 's'} : null);
-      console.log('[BM SYNC] winner:', remote && (!local || (remote.ts||0) > (local.ts||0)) ? 'REMOTE' : 'LOCAL');
+      console.log('[BM SYNC] remote:', remote ? {title: remote.title, ts: remote.ts, age: Math.round((Date.now() - (remote.ts||0))/1000) + 's'} : null,
+        'clearedAt:', clearedAt || null);
 
-      if (remote && (!local || (remote.ts || 0) > (local.ts || 0))) {
+      if (clearedAt && clearedAt > localTs && clearedAt > remoteTs) {
+        // Cleared on another device after anything this device knows about.
+        console.log('[BM SYNC] winner: CLEARED elsewhere');
+        if (local) forgetLocalBookmark();
+      } else if (remote && remoteTs > localTs) {
+        console.log('[BM SYNC] winner: REMOTE');
         localStorage.setItem(BM_KEY, JSON.stringify(remote));
         applyBookmark(remote);
       } else if (local) {
+        console.log('[BM SYNC] winner: LOCAL');
         applyBookmark(local);
-        // Push newer local bookmark back to server
-        jsonpFetch(
-          SYNC_URL +
-          '?action=set_bookmark' +
-          '&key=' + encodeURIComponent(BM_KEY) +
-          '&data=' + encodeURIComponent(JSON.stringify(local)),
-          function(){}
-        );
+        // Push a newer local bookmark back to the server
+        if (localTs > remoteTs) {
+          jsonpFetch(
+            SYNC_URL +
+            '?action=set_bookmark' +
+            '&key=' + encodeURIComponent(BM_KEY) +
+            '&data=' + encodeURIComponent(JSON.stringify(local)),
+            function(e2) { if (e2) console.warn('[BM SYNC] push-back FAILED:', e2); }
+          );
+        }
       }
       // Reading speed merge (shared from same response)
       window._bmSyncJson = json;
     } else {
-      var local = localStorage.getItem(BM_KEY);
-      if (local) applyBookmark(JSON.parse(local));
+      if (err) console.warn('[BM SYNC] get_bookmarks FAILED:', err);
+      var localRaw = localStorage.getItem(BM_KEY);
+      if (localRaw) { try { applyBookmark(JSON.parse(localRaw)); } catch(e) {} }
     }
   });
 
@@ -280,11 +311,6 @@
   // Initialize progress bar on load
   setTimeout(updateProgress, 100);
 
-  // Register service worker from book pages too
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('../service-worker.js');
-  }
-
   // ── Reading Speed Tracker ──
   // Content-based word tracking: counts words per DOM element,
   // determines words read from viewport position (not scroll %).
@@ -326,16 +352,19 @@
       'p, li, td, th, blockquote, h1, h2, h3, h4, h5, h6, figcaption, dt, dd'
     );
     var map = [];
+    var mapped = new Set();
     var cumulative = 0;
     for (var i = 0; i < els.length; i++) {
       var el = els[i];
       // Skip UI chrome
       if (el.closest('nav, .toc, .bookmark-bar, #bookmarkBar, #bmToast, .bm-toast')) continue;
       if (el.classList.contains('bm-btn')) continue;
-      // Don't double-count nested elements (li inside td, etc.)
+      // Don't double-count nested elements (li inside td, etc.): an ancestor
+      // already in the map always precedes its descendants in document
+      // order, so walking up the parents is enough (was O(n^2) per page).
       var dominated = false;
-      for (var j = 0; j < map.length; j++) {
-        if (map[j].el.contains(el)) { dominated = true; break; }
+      for (var anc = el.parentElement; anc && anc !== container; anc = anc.parentElement) {
+        if (mapped.has(anc)) { dominated = true; break; }
       }
       if (dominated) continue;
       // Count direct text words (exclude bookmark button text)
@@ -347,6 +376,7 @@
       if (words === 0) continue;
       cumulative += words;
       map.push({ el: el, words: words, cumWords: cumulative });
+      mapped.add(el);
     }
     _wordMap = map;
     _totalMappedWords = cumulative;
@@ -366,25 +396,35 @@
     var vpH = window.innerHeight;
     var readingY = vpH * READING_LINE; // px from top of viewport
 
-    // Find the element that crosses the reading line
-    for (var i = _wordMap.length - 1; i >= 0; i--) {
-      var rect = _wordMap[i].el.getBoundingClientRect();
-      // Element top is above the reading line
-      if (rect.top <= readingY) {
-        // Estimate word position within this element
-        var elH = Math.max(1, rect.height);
-        var fraction = Math.min(1, Math.max(0,
-          (readingY - rect.top) / elH
-        ));
-        var wordsIntoEl = Math.round(_wordMap[i].words * fraction);
-        var prevCum = i > 0 ? _wordMap[i - 1].cumWords : 0;
-        return Math.min(
-          _totalMappedWords,
-          prevCum + wordsIntoEl
-        );
+    // Elements are in document order, so their tops are monotonic: binary-
+    // search for the last one above the reading line instead of measuring
+    // every element on every scroll event (thousands of layout reads per
+    // second near the top of a long book).
+    var lo = 0, hi = _wordMap.length - 1, found = -1;
+    while (lo <= hi) {
+      var mid = (lo + hi) >> 1;
+      if (_wordMap[mid].el.getBoundingClientRect().top <= readingY) {
+        found = mid;
+        lo = mid + 1;
+      } else {
+        hi = mid - 1;
       }
     }
-    return 0;
+    if (found < 0) return 0;
+    // Guard for layouts where DOM order != vertical order (flex/grid):
+    // step forward a little while the next element is also above the line.
+    var guard = 0;
+    while (guard++ < 8 && found + 1 < _wordMap.length &&
+           _wordMap[found + 1].el.getBoundingClientRect().top <= readingY) {
+      found++;
+    }
+    var rect = _wordMap[found].el.getBoundingClientRect();
+    // Estimate word position within this element
+    var elH = Math.max(1, rect.height);
+    var fraction = Math.min(1, Math.max(0, (readingY - rect.top) / elH));
+    var wordsIntoEl = Math.round(_wordMap[found].words * fraction);
+    var prevCum = found > 0 ? _wordMap[found - 1].cumWords : 0;
+    return Math.min(_totalMappedWords, prevCum + wordsIntoEl);
   }
 
   // Check if user has reached the actual end of the document
@@ -403,11 +443,18 @@
 
   function getBookPath() {
     var p = location.pathname;
+    if (p.charAt(p.length - 1) === '/') p += 'index.html';
     var parts = p.split('/');
     if (parts.length >= 2) {
       return parts.slice(-2).join('/');
     }
     return p;
+  }
+
+  // Reading progress is only tracked for real book pages: the shelf can't
+  // show anything else, and every extra record bloated the sync store.
+  function isBookPage(path) {
+    return /^[^\/]+\/(index|plain)\.html$/.test(path);
   }
 
   function loadSpeedData() {
@@ -445,15 +492,21 @@
       SYNC_URL + '?action=set_bookmark&key=' +
       encodeURIComponent(RS_KEY) + '&data=' +
       encodeURIComponent(JSON.stringify(lite)),
-      function() {}
+      function(err) { if (err) console.warn('[RS SYNC] progress sync FAILED:', err); }
     );
   }
+
+  // One shared in-memory copy. The tracker below and the remote merge must
+  // work on the SAME object: the merge lands after the tracker has started,
+  // and a merge into a separate copy was overwritten by the tracker's next
+  // save (progress made on another device was lost that way).
+  var speedData = loadSpeedData();
 
   // Merge remote reading data — reuse the bookmark sync response
   function mergeRemoteReadingData(json) {
     if (!json || !json.bookmarks || !json.bookmarks[RS_KEY]) return;
     var remote = json.bookmarks[RS_KEY];
-    var local = loadSpeedData();
+    var local = speedData;
     var changed = false;
 
     if (remote.books) {
@@ -507,9 +560,10 @@
       }
     }
 
-    // Sync reader model — take the one with more samples
+    // Sync reader model — newest updatedAt wins (so a reset propagates);
+    // legacy models without timestamps fall back to "more samples wins".
     if (remote.reader) {
-      if (!local.reader || (remote.reader.samples || 0) > (local.reader.samples || 0)) {
+      if (readerIsNewer(remote.reader, local.reader)) {
         local.reader = remote.reader;
         changed = true;
       }
@@ -517,7 +571,15 @@
 
     if (changed) {
       localStorage.setItem(RS_KEY, JSON.stringify(local));
+      if (window._rsOnRemoteMerge) window._rsOnRemoteMerge();
     }
+  }
+
+  function readerIsNewer(inc, ex) {
+    if (!ex) return true;
+    var it = inc.updatedAt || 0, et = ex.updatedAt || 0;
+    if (it || et) return it > et;
+    return (inc.samples || 0) > (ex.samples || 0);
   }
 
   // If sync already completed, merge now; otherwise poll briefly
@@ -538,15 +600,18 @@
 
   (function initReadingTracker() {
     var bookPath = getBookPath();
-    var data = loadSpeedData();
+    if (!isBookPage(bookPath)) return;
+    var data = speedData;
 
     if (!data.books[bookPath]) {
+      // Deliberately no updatedAt: a brand-new empty record must never
+      // out-rank progress already saved from another device (the merge is
+      // newest-wins, and this record is pushed to the server right away).
       data.books[bookPath] = {
         words: 0,
         maxScroll: 0,
         maxWordsRead: 0,
-        title: document.title,
-        updatedAt: Date.now()
+        title: document.title
       };
     }
 
@@ -687,13 +752,20 @@
       etaEl.textContent = percent + '% read \u2022 ' + formatEta(minutesLeft);
     }
 
-    // ── Single scroll listener for everything ──
+    // ── Single scroll listener for everything (one layout read per frame) ──
     var _scrollSaveTimer = null;
+    var _scrollPending = false;
     window.addEventListener('scroll', function() {
+      markActivity();
+      if (_scrollPending) return;
+      _scrollPending = true;
+      requestAnimationFrame(onScrollFrame);
+    }, { passive: true });
+
+    function onScrollFrame() {
+      _scrollPending = false;
       // Progress bar (still scroll-based — that's fine for the bar)
       updateProgress();
-      // Activity tracking
-      markActivity();
 
       // Update maxWordsRead from location-based position
       var wordPos = getCurrentWordPosition();
@@ -734,7 +806,7 @@
           saveSpeedData(data);
         }, 2000);
       }
-    });
+    }
 
     // Non-scroll activity signals
     window.addEventListener('keydown', markActivity);
@@ -760,12 +832,14 @@
     // ETA updates via the 1-second dwell ticker above
 
     // ── Reader model (Kindle-style EMA) ──
+    // updatedAt lets a reset win the merge against an older model that
+    // merely has more samples (the old rule kept resurrecting a 71 wpm outlier).
     if (data.reader && (data.reader.averageWPM > 500 || data.reader.averageWPM < 80)) {
-      data.reader = { averageWPM: 225, samples: 0 };
+      data.reader = { averageWPM: 225, samples: 0, updatedAt: Date.now() };
       saveSpeedData(data);
     }
     if (!data.reader) {
-      data.reader = { averageWPM: 225, samples: 0 };
+      data.reader = { averageWPM: 225, samples: 0, updatedAt: Date.now() };
       if (data.sessions && data.sessions.length > 0) {
         var recent = data.sessions.slice(-10);
         var tw = 0, tm = 0;
@@ -801,6 +875,7 @@
       }
       r.samples++;
       r.averageWPM = Math.round(r.averageWPM);
+      r.updatedAt = Date.now();
     }
 
     // ── Session save (content-based) ──
@@ -865,6 +940,22 @@
         saveSession();
       }
     }, 15000);
+
+    // Remote progress arrived after we started (another device read further):
+    // adopt it without counting it as words read in this session.
+    window._rsOnRemoteMerge = function() {
+      var rec = data.books[bookPath];
+      if (!rec) return;
+      var mw = rec.maxWordsRead || 0;
+      if (mw > lastSavedWords) {
+        lastSavedWords = mw;
+        sessionWordsStart = mw;
+        _lastSnapshotWords = mw;
+        _lastWordPos = Math.max(_lastWordPos, mw);
+        _snapshots = [{ words: mw, time: activeTime }];
+      }
+      updateEta();
+    };
 
     // ── Reset reading progress button ──
     var resetBtn = document.createElement('button');

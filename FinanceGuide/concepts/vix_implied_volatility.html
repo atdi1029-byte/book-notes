@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>VIX / Implied Volatility - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.tier .tier-desc { color: #a08060; font-size: 0.85rem; margin: 0.4rem 0 0.8rem; }
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done,
+body.hide-done .cat-card.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+.vid-tab {
+  margin: 0 0 1.2rem; background: #e8e0d0; border: 1px solid #d4c8b0;
+  border-radius: 8px; overflow: hidden;
+}
+.vid-tab summary {
+  padding: 0.6rem 0.9rem; cursor: pointer; font-size: 0.85rem;
+  color: #3a2a1a; list-style: none; user-select: none;
+}
+.vid-tab summary::-webkit-details-marker { display: none; }
+.vid-tab summary::before {
+  content: '▶'; display: inline-block; margin-right: 0.5rem;
+  font-size: 0.7rem; transition: transform 0.2s;
+}
+.vid-tab[open] summary::before { transform: rotate(90deg); }
+.vid-tab .vid-status {
+  float: right; font-size: 0.75rem; padding: 0.15rem 0.5rem;
+  border-radius: 3px; margin-left: 0.5rem;
+}
+.vid-tab .vid-ok { background: #4ade8040; color: #2d6a4f; }
+.vid-tab .vid-err { background: #f8717140; color: #9b2c2c; }
+.vid-tab .vid-list {
+  padding: 0 0.9rem 0.7rem; margin: 0;
+  list-style: none; font-size: 0.8rem;
+}
+.vid-tab .vid-list li {
+  padding: 0.35rem 0; border-top: 1px solid #d4c8b0;
+  display: flex; justify-content: space-between; gap: 8px;
+}
+.vid-tab .vid-list .vid-date {
+  color: #a08060; white-space: nowrap; flex: none;
+}
+.vid-tab .vid-list .vid-concepts {
+  color: #a08060; white-space: nowrap; flex: none; font-size: 0.75rem;
+}
+.vid-tab .vid-none {
+  padding: 0.4rem 0.9rem 0.7rem; color: #a08060; font-size: 0.8rem;
+}
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../options-derivatives.html">&larr; Options &amp; Derivatives</a>
+
+<div class="concept-meta"><span><span class="star">&#9733;</span> must-know</span><span>Options &amp; Derivatives</span><span>added 2026-09-19</span></div>
+<h4 id="vix_implied_volatility">VIX / Implied Volatility</h4>
+
+<p>The <strong>VIX</strong>, formally called the <strong>CBOE Volatility Index</strong>, is Wall Street's most-watched fear gauge. It measures how much volatility the options market expects in the S&P 500 over the next 30 days, expressed as an annualized percentage. When the VIX reads 15, the market is pricing in roughly 15% annualized swings — calm, orderly conditions. When it spikes to 30 or 40, the market is bracing for sharp, violent moves. The VIX doesn't tell you which direction prices will move. It tells you how violently the crowd expects them to move. Think of it as the market's collective anxiety reading — a single number that summarizes how much uncertainty is baked into option prices right now.</p>
+
+<p>Understanding the VIX requires understanding <strong>implied volatility</strong> first, because the VIX is essentially implied volatility averaged across dozens of S&P 500 options. When you buy an option — a contract giving you the right to buy or sell a stock at a fixed price — its value depends on several inputs: the current stock price, the strike price, time to expiration, interest rates, and volatility. Every other input is observable in real time. Volatility is the one unknown that traders have to estimate. <strong>Implied volatility</strong> is the market's answer to that unknown — it's the volatility number that, when plugged into an option pricing formula, produces exactly the price that buyers and sellers agree on right now. It's the volatility that's <em>implied</em> by the current market price.</p>
+
+<p>The mechanism works through supply and demand for options. When investors get nervous, they rush to buy <strong>put options</strong> — contracts that pay off if the market falls — as insurance against a crash. This surge in demand bids up the price of puts. Since the only variable in the pricing formula that can explain the higher price is higher volatility, implied volatility rises. The VIX captures this across a wide basket of S&P 500 puts and calls, weighting them to produce a single composite reading. A VIX in the low teens signals complacency — few people are buying crash insurance. A VIX above 20 signals elevated concern. Above 30 signals genuine fear. The record close was 82.69 in November 2008 during the heart of the financial crisis.</p>
+
+<p>Here's where implied volatility stops being just a number and starts moving real money. <strong>Volatility-control funds</strong> — a category of systematic, rule-following institutional funds — don't hold a fixed dollar amount of stocks. They hold a fixed <em>level of risk</em>. When markets are calm and the VIX is low, a given pile of stocks carries relatively little risk, so these funds can hold a lot of them. But when volatility spikes, the same pile of stocks suddenly carries far more risk than their mandate allows. The fund's rules don't ask for a vote. The spreadsheet recalculates and issues a sell order. Nobody calls a meeting. As the video explains: <blockquote>"It's not an option. It's not an opinion. Nobody calls a meeting. The spreadsheet says sell and somebody sells."</blockquote> This is the mechanical link between a VIX spike and forced equity selling — completely automatic and entirely predictable if you know the rules.</p>
+
+<p>The Bank of America <strong>Systematic Flows Monitor</strong> — a weekly research note from their derivatives and quant team — models exactly this behavior. In the August 28th edition, their model estimated that a down-market scenario over the following week would trigger roughly $163 billion in mechanical selling by systematic funds: volatility-control funds, <strong>commodity trading advisors (CTAs)</strong> that follow price trends, and <strong>risk parity</strong> funds that balance risk across asset classes. That $163 billion figure went viral online. But the September 11th edition — the most recent one at the time — revised the down-market estimate to $157 billion while showing that in a flat or rising market, the same funds would buy $15–20 billion. The imbalance had actually improved, not worsened. The headline number was three weeks stale.</p>
+
+<p>These funds don't operate in secret, and that's the counterintuitive part. Their rules are largely public. Volatility-control funds publish their mandates. CTAs disclose their trend-following methodology. Because their rules are similar and they all read the same price data, they tend to reach the same conclusion at the same moment — not through coordination, but through convergence. The video's delivery-truck analogy captures this perfectly: four trucks from different companies, routed by different software, all reading the same traffic data, all arriving on the same block simultaneously. No conspiracy — just identical inputs producing identical outputs. The Bank of America model even published the specific <strong>trigger band</strong>: S&P futures in the range of 7,349 to 7,558. With the index around 7,620 at the time, reaching the top of that band required only a 0.8% decline. The bottom of the band was about 3.5% away.</p>
+
+<p>Traders watch implied volatility for several practical signals. The <strong>VIX term structure</strong> — how implied volatility differs across near-term versus longer-dated options — tells you whether fear is acute and immediate or diffuse and longer-lasting. A <strong>VIX spike</strong> into the 25–30 range has historically marked short-term capitulation points and been a contrarian buy signal, because extreme fear tends to be short-lived. <strong>Volatility skew</strong> — the difference in implied volatility between out-of-the-money puts and calls — tells you how much extra premium the market is paying to hedge downside versus upside. A steep skew means professional money is aggressively buying downside protection. Options traders also watch the ratio of the VIX to <strong>realized volatility</strong> (how much the market actually moved recently) — when implied volatility is much higher than realized, options are expensive and selling premium is attractive.</p>
+
+<p>The most common misconception about the VIX is that a high reading predicts a crash. It doesn't. A high VIX means options are expensive, which means the market <em>has already priced in</em> significant turbulence. Markets often rally sharply when the VIX is elevated, precisely because so much bad news is already reflected in prices. Conversely, a low VIX does not mean the market is safe — it means the market is complacent, which is often when risks are accumulating quietly beneath the surface. The more subtle misconception is that the $163 billion mechanical-selling figure represents money that <em>will</em> sell. It represents money that <em>would</em> sell under a specific down-market scenario. The Bank of America note offered three scenarios — down, flat, up — and the market's path determines which number actually materializes.</p>
+
+<p>When implied volatility breaks down as a predictive tool, it's usually because the event driving fear is genuinely unprecedented — the kind of shock that no historical option-pricing model has ever encountered. In a true liquidity crisis, bid-ask spreads on options blow out so wide that implied volatility readings become unreliable. During the March 2020 COVID crash, implied volatility moved faster than pricing models could absorb, and the VIX hit 85.47 intraday. The deeper structural risk highlighted by the systematic-fund story is a <strong>feedback loop</strong>: a VIX spike forces volatility-control funds to sell, which pushes prices lower, which raises volatility further, which forces more selling. This loop can self-amplify. The 2018 "Volmageddon" episode — when short-volatility products imploded in a single afternoon — showed how quickly a volatility shock can cascade through interlinked systematic strategies. The known level doesn't protect you from the cascade; it just tells you where the cascade starts.</p>
+
+<p>The VIX connects directly to broader market structure concepts worth understanding together. <strong>Risk parity</strong> funds lever up low-volatility assets and hold less of high-volatility ones, so a volatility spike forces simultaneous selling across multiple asset classes — stocks, bonds, commodities — all at once. This is why VIX spikes often correlate with bond market disruptions that seem unrelated to equities. <strong>Gamma exposure</strong> — the sensitivity of options market makers' hedges to price moves — can either dampen or amplify volatility depending on whether dealers are net long or short gamma. When dealers are short gamma, they must sell into falling markets to stay hedged, adding fuel to the fire. The VIX sits at the intersection of all these flows, which is why professionals treat it not as a prediction but as a real-time map of how the market's risk machinery is positioned — and where the trip wires are already drawn.</p>
+<div class="concept-side">Sources: THE $163B ALGO SELLOFF: The Secret Market Level That Triggers the Machines!<br>Related in this category: <a href="interest_rate_cap.html">Interest Rate Cap (Floating-Rate Debt Hedge)</a></div>
+<button class="concept-done" data-slug="vix_implied_volatility" onclick="toggleDone('vix_implied_volatility')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_vix_implied_volatility';</script>
+<script src="../../book.js"></script>
+<script src="../fg.js"></script>
+</body>
+</html>

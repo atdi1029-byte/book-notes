@@ -20,6 +20,7 @@
 set -euo pipefail
 
 BOOKS_DIR="$(cd "$(dirname "$0")" && pwd)"
+. "$BOOKS_DIR/_python.sh"
 
 # Separate --type flag from positionals
 TYPE_FLAG=""
