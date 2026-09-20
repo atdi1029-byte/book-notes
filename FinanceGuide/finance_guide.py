@@ -606,10 +606,48 @@ Output ONLY JSON: {{"verdict": "same|instance|new", "match_slug": "<slug or null
     return {"verdict": "new", "match_slug": None}
 
 
+FG_SYNC_URL = ("https://script.google.com/macros/s/"
+               "AKfycbwt438APIycBc534W6T66O3IgtxLUU9cczw-PZAN6Mc9p2xfU2ySsND_"
+               "wEMJDHUvrXyUg/exec")
+
+_done_cache = None
+_done_fetched = 0
+
+
+def get_done_slugs():
+    """Fetch completed concept slugs from Apps Script (cached 1 hour)."""
+    global _done_cache, _done_fetched
+    if _done_cache is not None and time.time() - _done_fetched < 3600:
+        return _done_cache
+    try:
+        import urllib.request
+        url = FG_SYNC_URL + "?action=fg_get_done"
+        # JSONP comes back as callback({...}), extract the JSON
+        req = urllib.request.Request(url)
+        with urllib.request.urlopen(req, timeout=15) as resp:
+            text = resp.read().decode()
+        m = re.search(r"\{.*\}", text, re.DOTALL)
+        if m:
+            data = json.loads(m.group())
+            if data.get("status") == "ok" and data.get("fg_done"):
+                _done_cache = set(data["fg_done"].keys())
+                _done_fetched = time.time()
+                return _done_cache
+    except Exception as e:
+        log(f"    Could not fetch done list: {e}")
+    if _done_cache is None:
+        _done_cache = set()
+        _done_fetched = time.time()
+    return _done_cache
+
+
 def enrich_chapter(existing_slug, candidate, video_title, transcript,
                    concepts):
     """When an instance is merged, append an 'In practice' paragraph to
     the existing chapter so the applied insight isn't lost."""
+    if existing_slug in get_done_slugs():
+        log(f"    Skip enrich (completed): {concepts[existing_slug]['title']}")
+        return
     c = concepts[existing_slug]
     chapter = c.get("chapter_html", "")
     if not chapter:
