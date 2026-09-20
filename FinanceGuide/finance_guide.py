@@ -938,6 +938,46 @@ Structure:
 
 # Shared CSS for all pages (on top of the site's book.css)
 PAGE_CSS = """
+.prog-stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(112px,1fr));
+  gap:10px; margin:1rem 0 1.5rem; }
+.prog-stat { background:#e8e0d0; border:1px solid #d4c8b0; border-radius:8px;
+  padding:0.7rem 0.9rem; }
+.prog-stat .n { display:block; font-size:1.5rem; color:#5a3e1a; line-height:1.1; }
+.prog-stat .l { display:block; font-size:0.75rem; color:#8a7a60; margin-top:0.2rem; }
+.prog-chart { position:relative; margin:0.5rem 0 0.4rem; }
+.prog-chart svg { width:100%; height:auto; display:block; overflow:visible; }
+.prog-chart .grid { stroke:#ddd3c0; stroke-width:1; }
+.prog-chart .axis { stroke:#c8bca4; stroke-width:1; }
+.prog-chart .tick { fill:#8a7a60; font-size:11px; }
+.prog-chart .ylab { fill:#8a7a60; font-size:11px; }
+.prog-chart .actual { fill:none; stroke:#9a5a22; stroke-width:2; stroke-linejoin:round; }
+.prog-chart .actual-dot { fill:#9a5a22; stroke:#f4efe8; stroke-width:2; }
+.prog-chart .model { fill:none; stroke:#0e9488; stroke-width:2; stroke-dasharray:6 4; }
+.prog-chart .ceiling { stroke:#8a7a60; stroke-width:1; stroke-dasharray:2 4; }
+.prog-chart .here { stroke:#9a5a22; stroke-width:1; stroke-dasharray:2 3; opacity:0.6; }
+.prog-chart .dlabel { font-size:11px; fill:#3a2e1e; }
+.prog-chart .bar { fill:#9a5a22; opacity:0.75; }
+.prog-chart .bar-model { fill:none; stroke:#0e9488; stroke-width:2; stroke-dasharray:6 4; }
+.prog-chart .hit { fill:transparent; cursor:crosshair; }
+.prog-tip { position:absolute; pointer-events:none; display:none;
+  background:#3a2e1e; color:#f4efe8; font-size:12px; line-height:1.4;
+  padding:6px 9px; border-radius:6px; white-space:nowrap; z-index:5; }
+.prog-legend { display:flex; gap:1.2rem; font-size:0.8rem; color:#5a3e1a;
+  margin:0 0 1.5rem; flex-wrap:wrap; }
+.prog-legend span::before { content:""; display:inline-block; width:18px; height:0;
+  border-top:2px solid; margin-right:6px; vertical-align:middle; }
+.prog-legend .lg-actual::before { border-color:#9a5a22; }
+.prog-legend .lg-model::before { border-color:#0e9488; border-top-style:dashed; }
+.prog-legend .lg-ceiling::before { border-color:#8a7a60; border-top-style:dotted; }
+.prog-eq { background:#e8e0d0; border:1px solid #d4c8b0; border-radius:8px;
+  padding:0.9rem 1.1rem; font-family:Georgia,serif; font-size:1.05rem; color:#3a2e1e;
+  margin:1rem 0; }
+.prog-eq .sub { display:block; font-size:0.85rem; color:#8a7a60; margin-top:0.4rem;
+  font-family:inherit; }
+.prog-note { font-size:0.85rem; color:#8a7a60; }
+.prog-link { font-size:0.85rem; margin:-0.8rem 0 1.2rem; }
+.prog-link a { color:#0e9488; }
+table.prog-table { font-size:0.85rem; margin:1rem 0; }
 .fg-bar {
   display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
   margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
@@ -1196,6 +1236,276 @@ def _videos_this_week_html(processed):
 </details>"""
 
 
+
+# === PROGRESS: "how close is the guide to running out?" ===
+def _video_series(processed, concepts):
+    """Chronological (date, new_concepts) per processed video, counting the
+    concepts that actually exist in the guide today (each credited to its
+    earliest source video), so the curve matches the shelf count even after
+    manual pruning or merges.  A concept with no known source is credited to
+    the first video."""
+    vids = sorted(((v["processed"], k) for k, v in processed.items()
+                   if not v.get("skipped") and v.get("processed")))
+    if not vids:
+        return []
+    order = {k: i for i, (_, k) in enumerate(vids)}
+    counts = [0] * len(vids)
+    for c in concepts.values():
+        hits = [order[x] for x in c.get("sources", []) if x in order]
+        counts[min(hits) if hits else 0] += 1
+    return [(ts, n) for (ts, _), n in zip(vids, counts)]
+
+
+def _fit_saturation(cum):
+    """Fit total(n) = K * (1 - exp(-n / tau)) to cumulative points
+    [(n, total), ...] by least squares.  Coarse grid then a fine pass;
+    cheap enough to run on every rebuild.  Returns (K, tau) or None."""
+    import math
+    if len(cum) < 5:
+        return None
+    last = cum[-1][1]
+
+    def sse(K, tau):
+        return sum((K * (1 - math.exp(-n / tau)) - t) ** 2 for n, t in cum)
+
+    best = None
+    for K in range(max(last, 50), max(last * 6, 200) + 1, 10):
+        for tau in range(4, 301, 4):
+            e = sse(K, tau)
+            if best is None or e < best[0]:
+                best = (e, K, tau)
+    _, K0, t0 = best
+    for K in range(max(last, K0 - 10), K0 + 11):
+        for tau in range(max(2, t0 - 4), t0 + 5):
+            e = sse(K, tau)
+            if e < best[0]:
+                best = (e, K, tau)
+    return best[1], best[2]
+
+
+def _progress_model(processed, concepts):
+    """Everything the progress page and index teaser need, or None."""
+    import math
+    series = _video_series(processed, concepts)
+    if len(series) < 5:
+        return None
+    cum, total = [], 0
+    for i, (ts, n) in enumerate(series, 1):
+        total += n
+        cum.append((i, total))
+    fit = _fit_saturation(cum)
+    if not fit:
+        return None
+    K, tau = fit
+    n_now = len(series)
+    rate_now = (K / tau) * math.exp(-n_now / tau)          # new concepts per video today
+    # first video count at which the model rate drops below 1, then 0.5
+    n_lt1 = max(n_now, math.ceil(tau * math.log(K / tau))) if K > tau else n_now
+    n_lt05 = max(n_now, math.ceil(tau * math.log(2 * K / tau))) if 2 * K > tau else n_now
+    first = datetime.strptime(series[0][0][:10], "%Y-%m-%d")
+    last = datetime.strptime(series[-1][0][:10], "%Y-%m-%d")
+    days = max(1, (last - first).days)
+    per_day = n_now / days
+    return {
+        "series": series, "cum": cum, "K": K, "tau": tau, "n_now": n_now,
+        "total": total, "remaining": max(0, K - total), "rate_now": rate_now,
+        "videos_to_lt1": max(0, n_lt1 - n_now), "videos_to_lt05": max(0, n_lt05 - n_now),
+        "per_day": per_day,
+        "days_to_lt1": (n_lt1 - n_now) / per_day if per_day else None,
+        "days_to_lt05": (n_lt05 - n_now) / per_day if per_day else None,
+        "n_end": max(n_lt05 + 5, n_now + 10),
+    }
+
+
+def _progress_teaser(m):
+    if not m:
+        return ""
+    wk = f" &middot; ~{m['days_to_lt1'] / 7:.0f} weeks until &lt;1 new per video" \
+        if m["days_to_lt1"] is not None else ""
+    return (f'<p class="prog-link"><a href="progress.html">Running out? &rarr;</a> '
+            f'est. ceiling ~{m["K"]} concepts, ~{m["remaining"]} to go{wk}</p>')
+
+
+def _progress_html(m, concepts):
+    """Progress page body: stats, the saturation chart, the equation and a
+    plain-English explanation.  Fully static SVG; a little JS for hover."""
+    import math
+    from collections import Counter
+    W, H = 720, 320
+    L, R, T, B = 48, 16, 16, 30
+    pw, ph = W - L - R, H - T - B
+    K, tau = m["K"], m["tau"]
+    n_end = m["n_end"]
+    y_max = max(K * 1.05, m["total"] * 1.05)
+
+    def X(n):
+        return L + pw * n / n_end
+
+    def Y(v):
+        return T + ph * (1 - v / y_max)
+
+    # gridlines: ~5 nice y ticks
+    step = 10 ** math.floor(math.log10(y_max / 5))
+    for mult in (1, 2, 5, 10):
+        if y_max / (step * mult) <= 6:
+            step *= mult
+            break
+    grid = []
+    v = 0
+    while v <= y_max:
+        grid.append(f'<line class="grid" x1="{L}" x2="{W - R}" y1="{Y(v):.1f}" y2="{Y(v):.1f}"/>'
+                    f'<text class="ylab" x="{L - 6}" y="{Y(v) + 4:.1f}" text-anchor="end">{int(v)}</text>')
+        v += step
+    xt = []
+    xstep = 10 if n_end <= 120 else 25
+    for n in range(0, n_end + 1, xstep):
+        xt.append(f'<text class="tick" x="{X(n):.1f}" y="{H - 8}" text-anchor="middle">{n}</text>')
+
+    # model curve, ceiling, actual
+    model_pts = " ".join(f"{X(n):.1f},{Y(K * (1 - math.exp(-n / tau))):.1f}"
+                         for n in range(0, n_end + 1))
+    actual_pts = " ".join(f"{X(n):.1f},{Y(t):.1f}" for n, t in m["cum"])
+    dots, hits = [], []
+    for (n, t), (ts, new) in zip(m["cum"], m["series"]):
+        dots.append(f'<circle class="actual-dot" cx="{X(n):.1f}" cy="{Y(t):.1f}" r="3.5"/>')
+        hits.append(f'<rect class="hit" x="{X(n) - pw / n_end / 2:.1f}" y="{T}" '
+                    f'width="{pw / n_end:.1f}" height="{ph}" '
+                    f'data-tip="Video {n} &middot; {ts[:10]}&lt;br&gt;+{new} new &middot; {t} total'
+                    f'&lt;br&gt;model: {K * (1 - math.exp(-n / tau)):.0f}"/>')
+    n_now = m["n_now"]
+    chart = f"""
+<div class="prog-chart" id="progChart">
+<svg viewBox="0 0 {W} {H}" role="img"
+ aria-label="Cumulative concepts per video: actual points versus fitted saturation curve">
+{"".join(grid)}
+<line class="axis" x1="{L}" x2="{W - R}" y1="{Y(0):.1f}" y2="{Y(0):.1f}"/>
+{"".join(xt)}
+<line class="ceiling" x1="{L}" x2="{W - R}" y1="{Y(K):.1f}" y2="{Y(K):.1f}"/>
+<text class="dlabel" x="{W - R}" y="{Y(K) - 5:.1f}" text-anchor="end">ceiling K = {K}</text>
+<polyline class="model" points="{model_pts}"/>
+<polyline class="actual" points="{actual_pts}"/>
+<line class="here" x1="{X(n_now):.1f}" x2="{X(n_now):.1f}" y1="{T}" y2="{Y(0):.1f}"/>
+<text class="dlabel" x="{X(n_now) + 5:.1f}" y="{Y(m['total']) + 18:.1f}">you are here: {m['total']} after {n_now} videos</text>
+{"".join(dots)}
+{"".join(hits)}
+</svg>
+<div class="prog-tip" id="progTip"></div>
+</div>
+<div class="prog-legend">
+ <span class="lg-actual">Actual concepts (cumulative)</span>
+ <span class="lg-model">Model: K&middot;(1&minus;e<sup>&minus;n/&tau;</sup>)</span>
+ <span class="lg-ceiling">Estimated ceiling</span>
+</div>"""
+
+    # new-per-video bars + model rate
+    H2, B2 = 150, 26
+    ph2 = H2 - T - B2
+    r_max = max([n for _, n in m["series"]] + [K / tau]) * 1.1
+
+    def Y2(v):
+        return T + ph2 * (1 - v / r_max)
+
+    bars = []
+    bw = max(2, pw / n_end - 2)
+    for (n, t), (ts, new) in zip(m["cum"], m["series"]):
+        bars.append(f'<rect class="bar" x="{X(n) - bw / 2:.1f}" y="{Y2(new):.1f}" '
+                    f'width="{bw:.1f}" height="{max(0, Y2(0) - Y2(new)):.1f}" rx="2"/>')
+    rate_pts = " ".join(f"{X(n):.1f},{Y2((K / tau) * math.exp(-n / tau)):.1f}"
+                        for n in range(1, n_end + 1))
+    one_y = Y2(1)
+    chart2 = f"""
+<div class="prog-chart">
+<svg viewBox="0 0 {W} {H2}" role="img" aria-label="New concepts per video, actual bars and model rate">
+<line class="grid" x1="{L}" x2="{W - R}" y1="{one_y:.1f}" y2="{one_y:.1f}"/>
+<text class="ylab" x="{L - 6}" y="{one_y + 4:.1f}" text-anchor="end">1</text>
+<text class="ylab" x="{L - 6}" y="{Y2(r_max / 2) + 4:.1f}" text-anchor="end">{int(r_max / 2)}</text>
+<text class="ylab" x="{L - 6}" y="{T + 8}" text-anchor="end">{int(r_max)}</text>
+<line class="axis" x1="{L}" x2="{W - R}" y1="{Y2(0):.1f}" y2="{Y2(0):.1f}"/>
+{"".join(f'<text class="tick" x="{X(n):.1f}" y="{H2 - 6}" text-anchor="middle">{n}</text>' for n in range(0, n_end + 1, xstep))}
+{"".join(bars)}
+<polyline class="bar-model" points="{rate_pts}"/>
+</svg>
+</div>
+<div class="prog-legend">
+ <span class="lg-actual">New concepts per video</span>
+ <span class="lg-model">Model rate (K/&tau;)&middot;e<sup>&minus;n/&tau;</sup></span>
+</div>"""
+
+    flags = Counter(concept_flag(c) for c in concepts.values())
+    wk1 = f"~{m['days_to_lt1'] / 7:.0f} wk" if m["days_to_lt1"] is not None else "&mdash;"
+    wk05 = f"~{m['days_to_lt05'] / 7:.0f} wk" if m["days_to_lt05"] is not None else "&mdash;"
+    stats = f"""
+<div class="prog-stats">
+ <div class="prog-stat"><span class="n">{m['total']}</span><span class="l">concepts so far</span></div>
+ <div class="prog-stat"><span class="n">~{K}</span><span class="l">estimated ceiling</span></div>
+ <div class="prog-stat"><span class="n">~{m['remaining']}</span><span class="l">left to find</span></div>
+ <div class="prog-stat"><span class="n">{m['rate_now']:.1f}</span><span class="l">new per video right now</span></div>
+ <div class="prog-stat"><span class="n">{m['videos_to_lt1']}</span><span class="l">videos until &lt;1 new/video ({wk1})</span></div>
+ <div class="prog-stat"><span class="n">{m['videos_to_lt05']}</span><span class="l">videos until it's a trickle ({wk05})</span></div>
+</div>"""
+
+    n_lt1 = m["n_now"] + m["videos_to_lt1"]
+    body = f"""
+<h1>Is it running out?</h1>
+<p class="subtitle">{m['n_now']} videos &middot; {m['per_day']:.1f} videos/day
+ &middot; {flags.get('star', 0)} &#9733; must-know &middot; {flags.get('plain', 0)} standard
+ &middot; {flags.get('deep', 0)} deep cuts &middot; refit on every rebuild</p>
+{stats}
+<h2 id="curve">Concepts found vs. videos watched</h2>
+{chart}
+<h2 id="rate">New concepts per video</h2>
+{chart2}
+<h2 id="equation">The equation</h2>
+<div class="prog-eq">
+ total(n) = K &middot; (1 &minus; e<sup>&minus;n/&tau;</sup>)
+ <span class="sub">n = videos processed &middot; K = {K} (ceiling) &middot; &tau; = {tau} videos
+ &middot; fitted by least squares to the {m['n_now']} points above</span>
+</div>
+<p>Finance has a big but finite vocabulary, and this channel draws from one
+bag of it. Picture a bag of K marbles: every video grabs a handful, but
+only the ones you don't already own count as new. Early on nearly every
+grab is new; later almost every grab is a repeat. That produces a curve
+that climbs fast and flattens toward K, and the formula above is the
+standard shape for it. &tau; ("tau") is how many videos it takes to burn
+through about 63% of the bag.</p>
+<p>The bot refits K and &tau; every time it rebuilds this page: it tries
+every plausible pair and keeps the one whose curve sits closest to the real
+dots. Everything else falls out of those two numbers. The rate of new
+concepts at video n is (K/&tau;)&middot;e<sup>&minus;n/&tau;</sup>, which is
+{m['rate_now']:.1f} today; it drops below one per video at video
+{n_lt1}. At the channel's pace of {m['per_day']:.1f} videos a day, that
+is roughly {wk1} away.</p>
+<p class="prog-note">Caveats: this is one channel's vocabulary fitted with two
+parameters, so treat it as a trend line, not a promise. If the presenter
+starts a new topic series the ceiling moves up. The tail is mostly deep
+cuts, so the must-know material will feel finished a week or two before
+the bot literally goes quiet. When a few weeks pass with nothing new
+starred or standard, the goal is met &mdash; turn on "Hide deep cuts",
+finish what's left, and go read books.</p>
+<h2 id="table">The data</h2>
+<table class="prog-table" role="presentation">
+<tr><th>#</th><th>Date</th><th>New</th><th>Total</th><th>Model</th></tr>
+{"".join(f"<tr><td>{n}</td><td>{ts[:10]}</td><td>{new}</td><td>{t}</td><td>{K * (1 - math.exp(-n / tau)):.0f}</td></tr>" for (n, t), (ts, new) in zip(m['cum'], m['series']))}
+</table>
+<script>
+(function(){{
+  var c=document.getElementById('progChart'), tip=document.getElementById('progTip');
+  if(!c||!tip) return;
+  c.querySelectorAll('.hit').forEach(function(h){{
+    h.addEventListener('mousemove',function(e){{
+      var r=c.getBoundingClientRect();
+      tip.innerHTML=h.getAttribute('data-tip');
+      tip.style.display='block';
+      tip.style.left=Math.min(e.clientX-r.left+12, r.width-tip.offsetWidth-4)+'px';
+      tip.style.top=(e.clientY-r.top-tip.offsetHeight-8)+'px';
+    }});
+    h.addEventListener('mouseleave',function(){{ tip.style.display='none'; }});
+  }});
+}})();
+</script>"""
+    return body
+
+
 def rebuild_html(concepts):
     """Rebuild the site: index (tiers -> categories) -> category pages ->
     one page per concept, plus recent.html.  Layout follows the Master
@@ -1239,11 +1549,13 @@ def rebuild_html(concepts):
 
     recent = _recent_concepts(concepts)
     vid_tab = _videos_this_week_html(processed)
+    prog = _progress_model(processed, concepts)
     body = f"""
 <h1>Finance Guide</h1>
 <p class="subtitle">A living book &middot; {total} concepts
  &middot; {videos_done} videos &middot;
  <a href="recent.html" style="color:#a08060">Added this week ({len(recent)})</a></p>
+{_progress_teaser(prog)}
 {vid_tab}
 {FILTER_BAR}
 {"".join(tiers_html)}"""
@@ -1281,6 +1593,15 @@ def rebuild_html(concepts):
                                bm_key="fg_recent", extra_js=PAGE_JS))
     written.add(path)
 
+    # ---- progress page: saturation fit, "is it running out?" ----
+    if prog:
+        path = BASE_DIR / "progress.html"
+        path.write_text(_page_wrap("Is it running out?", _progress_html(prog, concepts),
+                                   css_path="../book.css", back_href="index.html",
+                                   back_label="Finance Guide", bm_key="fg_progress",
+                                   extra_js=PAGE_JS))
+        written.add(path)
+
     # ---- one page per concept ----
     cdir = BASE_DIR / "concepts"
     cdir.mkdir(exist_ok=True)
@@ -1314,6 +1635,7 @@ def rebuild_html(concepts):
     # ---- remove pages the bot owns but no longer generates ----
     owned = {BASE_DIR / f"{c['slug']}.html" for c in CATEGORIES.values()}
     owned.add(BASE_DIR / "recent.html")
+    owned.add(BASE_DIR / "progress.html")
     for stale in list(owned) + list(cdir.glob("*.html")):
         if stale.exists() and stale not in written:
             stale.unlink()

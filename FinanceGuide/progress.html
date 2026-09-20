@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Is it running out? - Finance Guide</title>
+<link rel="stylesheet" href="../book.css">
+<style>
+.prog-stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(112px,1fr));
+  gap:10px; margin:1rem 0 1.5rem; }
+.prog-stat { background:#e8e0d0; border:1px solid #d4c8b0; border-radius:8px;
+  padding:0.7rem 0.9rem; }
+.prog-stat .n { display:block; font-size:1.5rem; color:#5a3e1a; line-height:1.1; }
+.prog-stat .l { display:block; font-size:0.75rem; color:#8a7a60; margin-top:0.2rem; }
+.prog-chart { position:relative; margin:0.5rem 0 0.4rem; }
+.prog-chart svg { width:100%; height:auto; display:block; overflow:visible; }
+.prog-chart .grid { stroke:#ddd3c0; stroke-width:1; }
+.prog-chart .axis { stroke:#c8bca4; stroke-width:1; }
+.prog-chart .tick { fill:#8a7a60; font-size:11px; }
+.prog-chart .ylab { fill:#8a7a60; font-size:11px; }
+.prog-chart .actual { fill:none; stroke:#9a5a22; stroke-width:2; stroke-linejoin:round; }
+.prog-chart .actual-dot { fill:#9a5a22; stroke:#f4efe8; stroke-width:2; }
+.prog-chart .model { fill:none; stroke:#0e9488; stroke-width:2; stroke-dasharray:6 4; }
+.prog-chart .ceiling { stroke:#8a7a60; stroke-width:1; stroke-dasharray:2 4; }
+.prog-chart .here { stroke:#9a5a22; stroke-width:1; stroke-dasharray:2 3; opacity:0.6; }
+.prog-chart .dlabel { font-size:11px; fill:#3a2e1e; }
+.prog-chart .bar { fill:#9a5a22; opacity:0.75; }
+.prog-chart .bar-model { fill:none; stroke:#0e9488; stroke-width:2; stroke-dasharray:6 4; }
+.prog-chart .hit { fill:transparent; cursor:crosshair; }
+.prog-tip { position:absolute; pointer-events:none; display:none;
+  background:#3a2e1e; color:#f4efe8; font-size:12px; line-height:1.4;
+  padding:6px 9px; border-radius:6px; white-space:nowrap; z-index:5; }
+.prog-legend { display:flex; gap:1.2rem; font-size:0.8rem; color:#5a3e1a;
+  margin:0 0 1.5rem; flex-wrap:wrap; }
+.prog-legend span::before { content:""; display:inline-block; width:18px; height:0;
+  border-top:2px solid; margin-right:6px; vertical-align:middle; }
+.prog-legend .lg-actual::before { border-color:#9a5a22; }
+.prog-legend .lg-model::before { border-color:#0e9488; border-top-style:dashed; }
+.prog-legend .lg-ceiling::before { border-color:#8a7a60; border-top-style:dotted; }
+.prog-eq { background:#e8e0d0; border:1px solid #d4c8b0; border-radius:8px;
+  padding:0.9rem 1.1rem; font-family:Georgia,serif; font-size:1.05rem; color:#3a2e1e;
+  margin:1rem 0; }
+.prog-eq .sub { display:block; font-size:0.85rem; color:#8a7a60; margin-top:0.4rem;
+  font-family:inherit; }
+.prog-note { font-size:0.85rem; color:#8a7a60; }
+.prog-link { font-size:0.85rem; margin:-0.8rem 0 1.2rem; }
+.prog-link a { color:#0e9488; }
+table.prog-table { font-size:0.85rem; margin:1rem 0; }
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.tier .tier-desc { color: #a08060; font-size: 0.85rem; margin: 0.4rem 0 0.8rem; }
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done,
+body.hide-done .cat-card.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+.vid-tab {
+  margin: 0 0 1.2rem; background: #e8e0d0; border: 1px solid #d4c8b0;
+  border-radius: 8px; overflow: hidden;
+}
+.vid-tab summary {
+  padding: 0.6rem 0.9rem; cursor: pointer; font-size: 0.85rem;
+  color: #3a2a1a; list-style: none; user-select: none;
+}
+.vid-tab summary::-webkit-details-marker { display: none; }
+.vid-tab summary::before {
+  content: '▶'; display: inline-block; margin-right: 0.5rem;
+  font-size: 0.7rem; transition: transform 0.2s;
+}
+.vid-tab[open] summary::before { transform: rotate(90deg); }
+.vid-tab .vid-status {
+  float: right; font-size: 0.75rem; padding: 0.15rem 0.5rem;
+  border-radius: 3px; margin-left: 0.5rem;
+}
+.vid-tab .vid-ok { background: #4ade8040; color: #2d6a4f; }
+.vid-tab .vid-err { background: #f8717140; color: #9b2c2c; }
+.vid-tab .vid-list {
+  padding: 0 0.9rem 0.7rem; margin: 0;
+  list-style: none; font-size: 0.8rem;
+}
+.vid-tab .vid-list li {
+  padding: 0.35rem 0; border-top: 1px solid #d4c8b0;
+  display: flex; justify-content: space-between; gap: 8px;
+}
+.vid-tab .vid-list .vid-date {
+  color: #a08060; white-space: nowrap; flex: none;
+}
+.vid-tab .vid-list .vid-concepts {
+  color: #a08060; white-space: nowrap; flex: none; font-size: 0.75rem;
+}
+.vid-tab .vid-none {
+  padding: 0.4rem 0.9rem 0.7rem; color: #a08060; font-size: 0.8rem;
+}
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="index.html">&larr; Finance Guide</a>
+
+<h1>Is it running out?</h1>
+<p class="subtitle">26 videos &middot; 1.3 videos/day
+ &middot; 70 &#9733; must-know &middot; 159 standard
+ &middot; 55 deep cuts &middot; refit on every rebuild</p>
+
+<div class="prog-stats">
+ <div class="prog-stat"><span class="n">284</span><span class="l">concepts so far</span></div>
+ <div class="prog-stat"><span class="n">~442</span><span class="l">estimated ceiling</span></div>
+ <div class="prog-stat"><span class="n">~158</span><span class="l">left to find</span></div>
+ <div class="prog-stat"><span class="n">6.2</span><span class="l">new per video right now</span></div>
+ <div class="prog-stat"><span class="n">46</span><span class="l">videos until &lt;1 new/video (~5 wk)</span></div>
+ <div class="prog-stat"><span class="n">64</span><span class="l">videos until it's a trickle (~7 wk)</span></div>
+</div>
+<h2 id="curve">Concepts found vs. videos watched</h2>
+
+<div class="prog-chart" id="progChart">
+<svg viewBox="0 0 720 320" role="img"
+ aria-label="Cumulative concepts per video: actual points versus fitted saturation curve">
+<line class="grid" x1="48" x2="704" y1="290.0" y2="290.0"/><text class="ylab" x="42" y="294.0" text-anchor="end">0</text><line class="grid" x1="48" x2="704" y1="231.0" y2="231.0"/><text class="ylab" x="42" y="235.0" text-anchor="end">100</text><line class="grid" x1="48" x2="704" y1="171.9" y2="171.9"/><text class="ylab" x="42" y="175.9" text-anchor="end">200</text><line class="grid" x1="48" x2="704" y1="112.9" y2="112.9"/><text class="ylab" x="42" y="116.9" text-anchor="end">300</text><line class="grid" x1="48" x2="704" y1="53.8" y2="53.8"/><text class="ylab" x="42" y="57.8" text-anchor="end">400</text>
+<line class="axis" x1="48" x2="704" y1="290.0" y2="290.0"/>
+<text class="tick" x="48.0" y="312" text-anchor="middle">0</text><text class="tick" x="117.1" y="312" text-anchor="middle">10</text><text class="tick" x="186.1" y="312" text-anchor="middle">20</text><text class="tick" x="255.2" y="312" text-anchor="middle">30</text><text class="tick" x="324.2" y="312" text-anchor="middle">40</text><text class="tick" x="393.3" y="312" text-anchor="middle">50</text><text class="tick" x="462.3" y="312" text-anchor="middle">60</text><text class="tick" x="531.4" y="312" text-anchor="middle">70</text><text class="tick" x="600.4" y="312" text-anchor="middle">80</text><text class="tick" x="669.5" y="312" text-anchor="middle">90</text>
+<line class="ceiling" x1="48" x2="704" y1="29.0" y2="29.0"/>
+<text class="dlabel" x="704" y="24.0" text-anchor="end">ceiling K = 442</text>
+<polyline class="model" points="48.0,290.0 54.9,279.8 61.8,269.9 68.7,260.5 75.6,251.4 82.5,242.7 89.4,234.3 96.3,226.3 103.2,218.5 110.1,211.1 117.1,204.0 124.0,197.1 130.9,190.5 137.8,184.2 144.7,178.1 151.6,172.3 158.5,166.6 165.4,161.3 172.3,156.1 179.2,151.1 186.1,146.3 193.0,141.7 199.9,137.3 206.8,133.0 213.7,129.0 220.6,125.0 227.5,121.3 234.4,117.7 241.3,114.2 248.3,110.9 255.2,107.6 262.1,104.6 269.0,101.6 275.9,98.8 282.8,96.0 289.7,93.4 296.6,90.9 303.5,88.5 310.4,86.1 317.3,83.9 324.2,81.7 331.1,79.7 338.0,77.7 344.9,75.8 351.8,73.9 358.7,72.2 365.6,70.5 372.5,68.9 379.5,67.3 386.4,65.8 393.3,64.4 400.2,63.0 407.1,61.6 414.0,60.4 420.9,59.1 427.8,58.0 434.7,56.8 441.6,55.7 448.5,54.7 455.4,53.7 462.3,52.7 469.2,51.8 476.1,50.9 483.0,50.0 489.9,49.2 496.8,48.4 503.7,47.7 510.7,46.9 517.6,46.2 524.5,45.6 531.4,44.9 538.3,44.3 545.2,43.7 552.1,43.1 559.0,42.6 565.9,42.0 572.8,41.5 579.7,41.0 586.6,40.6 593.5,40.1 600.4,39.7 607.3,39.3 614.2,38.9 621.1,38.5 628.0,38.1 634.9,37.8 641.9,37.4 648.8,37.1 655.7,36.8 662.6,36.5 669.5,36.2 676.4,35.9 683.3,35.6 690.2,35.4 697.1,35.1 704.0,34.9"/>
+<polyline class="actual" points="54.9,275.2 61.8,275.2 68.7,264.6 75.6,255.8 82.5,249.9 89.4,239.8 96.3,232.7 103.2,223.3 110.1,213.2 117.1,200.3 124.0,192.0 130.9,185.5 137.8,182.5 144.7,174.9 151.6,169.0 158.5,166.0 165.4,160.1 172.3,152.4 179.2,147.1 186.1,143.0 193.0,141.8 199.9,139.5 206.8,136.5 213.7,130.6 220.6,127.6 227.5,122.3"/>
+<line class="here" x1="227.5" x2="227.5" y1="16" y2="290.0"/>
+<text class="dlabel" x="232.5" y="140.3">you are here: 284 after 26 videos</text>
+<circle class="actual-dot" cx="54.9" cy="275.2" r="3.5"/><circle class="actual-dot" cx="61.8" cy="275.2" r="3.5"/><circle class="actual-dot" cx="68.7" cy="264.6" r="3.5"/><circle class="actual-dot" cx="75.6" cy="255.8" r="3.5"/><circle class="actual-dot" cx="82.5" cy="249.9" r="3.5"/><circle class="actual-dot" cx="89.4" cy="239.8" r="3.5"/><circle class="actual-dot" cx="96.3" cy="232.7" r="3.5"/><circle class="actual-dot" cx="103.2" cy="223.3" r="3.5"/><circle class="actual-dot" cx="110.1" cy="213.2" r="3.5"/><circle class="actual-dot" cx="117.1" cy="200.3" r="3.5"/><circle class="actual-dot" cx="124.0" cy="192.0" r="3.5"/><circle class="actual-dot" cx="130.9" cy="185.5" r="3.5"/><circle class="actual-dot" cx="137.8" cy="182.5" r="3.5"/><circle class="actual-dot" cx="144.7" cy="174.9" r="3.5"/><circle class="actual-dot" cx="151.6" cy="169.0" r="3.5"/><circle class="actual-dot" cx="158.5" cy="166.0" r="3.5"/><circle class="actual-dot" cx="165.4" cy="160.1" r="3.5"/><circle class="actual-dot" cx="172.3" cy="152.4" r="3.5"/><circle class="actual-dot" cx="179.2" cy="147.1" r="3.5"/><circle class="actual-dot" cx="186.1" cy="143.0" r="3.5"/><circle class="actual-dot" cx="193.0" cy="141.8" r="3.5"/><circle class="actual-dot" cx="199.9" cy="139.5" r="3.5"/><circle class="actual-dot" cx="206.8" cy="136.5" r="3.5"/><circle class="actual-dot" cx="213.7" cy="130.6" r="3.5"/><circle class="actual-dot" cx="220.6" cy="127.6" r="3.5"/><circle class="actual-dot" cx="227.5" cy="122.3" r="3.5"/>
+<rect class="hit" x="51.5" y="16" width="6.9" height="274" data-tip="Video 1 &middot; 2026-08-31&lt;br&gt;+25 new &middot; 25 total&lt;br&gt;model: 17"/><rect class="hit" x="58.4" y="16" width="6.9" height="274" data-tip="Video 2 &middot; 2026-08-31&lt;br&gt;+0 new &middot; 25 total&lt;br&gt;model: 34"/><rect class="hit" x="65.3" y="16" width="6.9" height="274" data-tip="Video 3 &middot; 2026-08-31&lt;br&gt;+18 new &middot; 43 total&lt;br&gt;model: 50"/><rect class="hit" x="72.2" y="16" width="6.9" height="274" data-tip="Video 4 &middot; 2026-09-01&lt;br&gt;+15 new &middot; 58 total&lt;br&gt;model: 65"/><rect class="hit" x="79.1" y="16" width="6.9" height="274" data-tip="Video 5 &middot; 2026-09-02&lt;br&gt;+10 new &middot; 68 total&lt;br&gt;model: 80"/><rect class="hit" x="86.0" y="16" width="6.9" height="274" data-tip="Video 6 &middot; 2026-09-03&lt;br&gt;+17 new &middot; 85 total&lt;br&gt;model: 94"/><rect class="hit" x="92.9" y="16" width="6.9" height="274" data-tip="Video 7 &middot; 2026-09-04&lt;br&gt;+12 new &middot; 97 total&lt;br&gt;model: 108"/><rect class="hit" x="99.8" y="16" width="6.9" height="274" data-tip="Video 8 &middot; 2026-09-05&lt;br&gt;+16 new &middot; 113 total&lt;br&gt;model: 121"/><rect class="hit" x="106.7" y="16" width="6.9" height="274" data-tip="Video 9 &middot; 2026-09-06&lt;br&gt;+17 new &middot; 130 total&lt;br&gt;model: 134"/><rect class="hit" x="113.6" y="16" width="6.9" height="274" data-tip="Video 10 &middot; 2026-09-06&lt;br&gt;+22 new &middot; 152 total&lt;br&gt;model: 146"/><rect class="hit" x="120.5" y="16" width="6.9" height="274" data-tip="Video 11 &middot; 2026-09-07&lt;br&gt;+14 new &middot; 166 total&lt;br&gt;model: 157"/><rect class="hit" x="127.4" y="16" width="6.9" height="274" data-tip="Video 12 &middot; 2026-09-08&lt;br&gt;+11 new &middot; 177 total&lt;br&gt;model: 168"/><rect class="hit" x="134.3" y="16" width="6.9" height="274" data-tip="Video 13 &middot; 2026-09-09&lt;br&gt;+5 new &middot; 182 total&lt;br&gt;model: 179"/><rect class="hit" x="141.2" y="16" width="6.9" height="274" data-tip="Video 14 &middot; 2026-09-10&lt;br&gt;+13 new &middot; 195 total&lt;br&gt;model: 190"/><rect class="hit" x="148.1" y="16" width="6.9" height="274" data-tip="Video 15 &middot; 2026-09-10&lt;br&gt;+10 new &middot; 205 total&lt;br&gt;model: 199"/><rect class="hit" x="155.0" y="16" width="6.9" height="274" data-tip="Video 16 &middot; 2026-09-11&lt;br&gt;+5 new &middot; 210 total&lt;br&gt;model: 209"/><rect class="hit" x="161.9" y="16" width="6.9" height="274" data-tip="Video 17 &middot; 2026-09-12&lt;br&gt;+10 new &middot; 220 total&lt;br&gt;model: 218"/><rect class="hit" x="168.8" y="16" width="6.9" height="274" data-tip="Video 18 &middot; 2026-09-13&lt;br&gt;+13 new &middot; 233 total&lt;br&gt;model: 227"/><rect class="hit" x="175.7" y="16" width="6.9" height="274" data-tip="Video 19 &middot; 2026-09-13&lt;br&gt;+9 new &middot; 242 total&lt;br&gt;model: 235"/><rect class="hit" x="182.7" y="16" width="6.9" height="274" data-tip="Video 20 &middot; 2026-09-14&lt;br&gt;+7 new &middot; 249 total&lt;br&gt;model: 243"/><rect class="hit" x="189.6" y="16" width="6.9" height="274" data-tip="Video 21 &middot; 2026-09-15&lt;br&gt;+2 new &middot; 251 total&lt;br&gt;model: 251"/><rect class="hit" x="196.5" y="16" width="6.9" height="274" data-tip="Video 22 &middot; 2026-09-16&lt;br&gt;+4 new &middot; 255 total&lt;br&gt;model: 259"/><rect class="hit" x="203.4" y="16" width="6.9" height="274" data-tip="Video 23 &middot; 2026-09-17&lt;br&gt;+5 new &middot; 260 total&lt;br&gt;model: 266"/><rect class="hit" x="210.3" y="16" width="6.9" height="274" data-tip="Video 24 &middot; 2026-09-18&lt;br&gt;+10 new &middot; 270 total&lt;br&gt;model: 273"/><rect class="hit" x="217.2" y="16" width="6.9" height="274" data-tip="Video 25 &middot; 2026-09-19&lt;br&gt;+5 new &middot; 275 total&lt;br&gt;model: 279"/><rect class="hit" x="224.1" y="16" width="6.9" height="274" data-tip="Video 26 &middot; 2026-09-20&lt;br&gt;+9 new &middot; 284 total&lt;br&gt;model: 286"/>
+</svg>
+<div class="prog-tip" id="progTip"></div>
+</div>
+<div class="prog-legend">
+ <span class="lg-actual">Actual concepts (cumulative)</span>
+ <span class="lg-model">Model: K&middot;(1&minus;e<sup>&minus;n/&tau;</sup>)</span>
+ <span class="lg-ceiling">Estimated ceiling</span>
+</div>
+<h2 id="rate">New concepts per video</h2>
+
+<div class="prog-chart">
+<svg viewBox="0 0 720 150" role="img" aria-label="New concepts per video, actual bars and model rate">
+<line class="grid" x1="48" x2="704" y1="120.1" y2="120.1"/>
+<text class="ylab" x="42" y="124.1" text-anchor="end">1</text>
+<text class="ylab" x="42" y="74.0" text-anchor="end">13</text>
+<text class="ylab" x="42" y="24" text-anchor="end">27</text>
+<line class="axis" x1="48" x2="704" y1="124.0" y2="124.0"/>
+<text class="tick" x="48.0" y="144" text-anchor="middle">0</text><text class="tick" x="117.1" y="144" text-anchor="middle">10</text><text class="tick" x="186.1" y="144" text-anchor="middle">20</text><text class="tick" x="255.2" y="144" text-anchor="middle">30</text><text class="tick" x="324.2" y="144" text-anchor="middle">40</text><text class="tick" x="393.3" y="144" text-anchor="middle">50</text><text class="tick" x="462.3" y="144" text-anchor="middle">60</text><text class="tick" x="531.4" y="144" text-anchor="middle">70</text><text class="tick" x="600.4" y="144" text-anchor="middle">80</text><text class="tick" x="669.5" y="144" text-anchor="middle">90</text>
+<rect class="bar" x="52.5" y="25.8" width="4.9" height="98.2" rx="2"/><rect class="bar" x="59.4" y="124.0" width="4.9" height="0.0" rx="2"/><rect class="bar" x="66.3" y="53.3" width="4.9" height="70.7" rx="2"/><rect class="bar" x="73.2" y="65.1" width="4.9" height="58.9" rx="2"/><rect class="bar" x="80.1" y="84.7" width="4.9" height="39.3" rx="2"/><rect class="bar" x="87.0" y="57.2" width="4.9" height="66.8" rx="2"/><rect class="bar" x="93.9" y="76.9" width="4.9" height="47.1" rx="2"/><rect class="bar" x="100.8" y="61.2" width="4.9" height="62.8" rx="2"/><rect class="bar" x="107.7" y="57.2" width="4.9" height="66.8" rx="2"/><rect class="bar" x="114.6" y="37.6" width="4.9" height="86.4" rx="2"/><rect class="bar" x="121.5" y="69.0" width="4.9" height="55.0" rx="2"/><rect class="bar" x="128.4" y="80.8" width="4.9" height="43.2" rx="2"/><rect class="bar" x="135.3" y="104.4" width="4.9" height="19.6" rx="2"/><rect class="bar" x="142.2" y="72.9" width="4.9" height="51.1" rx="2"/><rect class="bar" x="149.1" y="84.7" width="4.9" height="39.3" rx="2"/><rect class="bar" x="156.0" y="104.4" width="4.9" height="19.6" rx="2"/><rect class="bar" x="162.9" y="84.7" width="4.9" height="39.3" rx="2"/><rect class="bar" x="169.8" y="72.9" width="4.9" height="51.1" rx="2"/><rect class="bar" x="176.7" y="88.7" width="4.9" height="35.3" rx="2"/><rect class="bar" x="183.7" y="96.5" width="4.9" height="27.5" rx="2"/><rect class="bar" x="190.6" y="116.1" width="4.9" height="7.9" rx="2"/><rect class="bar" x="197.5" y="108.3" width="4.9" height="15.7" rx="2"/><rect class="bar" x="204.4" y="104.4" width="4.9" height="19.6" rx="2"/><rect class="bar" x="211.3" y="84.7" width="4.9" height="39.3" rx="2"/><rect class="bar" x="218.2" y="104.4" width="4.9" height="19.6" rx="2"/><rect class="bar" x="225.1" y="88.7" width="4.9" height="35.3" rx="2"/>
+<polyline class="bar-model" points="54.9,57.3 61.8,59.9 68.7,62.4 75.6,64.8 82.5,67.2 89.4,69.4 96.3,71.5 103.2,73.6 110.1,75.6 117.1,77.5 124.0,79.3 130.9,81.0 137.8,82.7 144.7,84.3 151.6,85.9 158.5,87.4 165.4,88.8 172.3,90.2 179.2,91.5 186.1,92.8 193.0,94.0 199.9,95.2 206.8,96.3 213.7,97.4 220.6,98.5 227.5,99.5 234.4,100.4 241.3,101.3 248.3,102.2 255.2,103.1 262.1,103.9 269.0,104.7 275.9,105.5 282.8,106.2 289.7,106.9 296.6,107.5 303.5,108.2 310.4,108.8 317.3,109.4 324.2,110.0 331.1,110.5 338.0,111.1 344.9,111.6 351.8,112.1 358.7,112.5 365.6,113.0 372.5,113.4 379.5,113.8 386.4,114.2 393.3,114.6 400.2,115.0 407.1,115.3 414.0,115.7 420.9,116.0 427.8,116.3 434.7,116.6 441.6,116.9 448.5,117.2 455.4,117.4 462.3,117.7 469.2,117.9 476.1,118.2 483.0,118.4 489.9,118.6 496.8,118.8 503.7,119.0 510.7,119.2 517.6,119.4 524.5,119.6 531.4,119.8 538.3,119.9 545.2,120.1 552.1,120.3 559.0,120.4 565.9,120.5 572.8,120.7 579.7,120.8 586.6,120.9 593.5,121.1 600.4,121.2 607.3,121.3 614.2,121.4 621.1,121.5 628.0,121.6 634.9,121.7 641.9,121.8 648.8,121.9 655.7,121.9 662.6,122.0 669.5,122.1 676.4,122.2 683.3,122.2 690.2,122.3 697.1,122.4 704.0,122.4"/>
+</svg>
+</div>
+<div class="prog-legend">
+ <span class="lg-actual">New concepts per video</span>
+ <span class="lg-model">Model rate (K/&tau;)&middot;e<sup>&minus;n/&tau;</sup></span>
+</div>
+<h2 id="equation">The equation</h2>
+<div class="prog-eq">
+ total(n) = K &middot; (1 &minus; e<sup>&minus;n/&tau;</sup>)
+ <span class="sub">n = videos processed &middot; K = 442 (ceiling) &middot; &tau; = 25 videos
+ &middot; fitted by least squares to the 26 points above</span>
+</div>
+<p>Finance has a big but finite vocabulary, and this channel draws from one
+bag of it. Picture a bag of K marbles: every video grabs a handful, but
+only the ones you don't already own count as new. Early on nearly every
+grab is new; later almost every grab is a repeat. That produces a curve
+that climbs fast and flattens toward K, and the formula above is the
+standard shape for it. &tau; ("tau") is how many videos it takes to burn
+through about 63% of the bag.</p>
+<p>The bot refits K and &tau; every time it rebuilds this page: it tries
+every plausible pair and keeps the one whose curve sits closest to the real
+dots. Everything else falls out of those two numbers. The rate of new
+concepts at video n is (K/&tau;)&middot;e<sup>&minus;n/&tau;</sup>, which is
+6.2 today; it drops below one per video at video
+72. At the channel's pace of 1.3 videos a day, that
+is roughly ~5 wk away.</p>
+<p class="prog-note">Caveats: this is one channel's vocabulary fitted with two
+parameters, so treat it as a trend line, not a promise. If the presenter
+starts a new topic series the ceiling moves up. The tail is mostly deep
+cuts, so the must-know material will feel finished a week or two before
+the bot literally goes quiet. When a few weeks pass with nothing new
+starred or standard, the goal is met &mdash; turn on "Hide deep cuts",
+finish what's left, and go read books.</p>
+<h2 id="table">The data</h2>
+<table class="prog-table" role="presentation">
+<tr><th>#</th><th>Date</th><th>New</th><th>Total</th><th>Model</th></tr>
+<tr><td>1</td><td>2026-08-31</td><td>25</td><td>25</td><td>17</td></tr><tr><td>2</td><td>2026-08-31</td><td>0</td><td>25</td><td>34</td></tr><tr><td>3</td><td>2026-08-31</td><td>18</td><td>43</td><td>50</td></tr><tr><td>4</td><td>2026-09-01</td><td>15</td><td>58</td><td>65</td></tr><tr><td>5</td><td>2026-09-02</td><td>10</td><td>68</td><td>80</td></tr><tr><td>6</td><td>2026-09-03</td><td>17</td><td>85</td><td>94</td></tr><tr><td>7</td><td>2026-09-04</td><td>12</td><td>97</td><td>108</td></tr><tr><td>8</td><td>2026-09-05</td><td>16</td><td>113</td><td>121</td></tr><tr><td>9</td><td>2026-09-06</td><td>17</td><td>130</td><td>134</td></tr><tr><td>10</td><td>2026-09-06</td><td>22</td><td>152</td><td>146</td></tr><tr><td>11</td><td>2026-09-07</td><td>14</td><td>166</td><td>157</td></tr><tr><td>12</td><td>2026-09-08</td><td>11</td><td>177</td><td>168</td></tr><tr><td>13</td><td>2026-09-09</td><td>5</td><td>182</td><td>179</td></tr><tr><td>14</td><td>2026-09-10</td><td>13</td><td>195</td><td>190</td></tr><tr><td>15</td><td>2026-09-10</td><td>10</td><td>205</td><td>199</td></tr><tr><td>16</td><td>2026-09-11</td><td>5</td><td>210</td><td>209</td></tr><tr><td>17</td><td>2026-09-12</td><td>10</td><td>220</td><td>218</td></tr><tr><td>18</td><td>2026-09-13</td><td>13</td><td>233</td><td>227</td></tr><tr><td>19</td><td>2026-09-13</td><td>9</td><td>242</td><td>235</td></tr><tr><td>20</td><td>2026-09-14</td><td>7</td><td>249</td><td>243</td></tr><tr><td>21</td><td>2026-09-15</td><td>2</td><td>251</td><td>251</td></tr><tr><td>22</td><td>2026-09-16</td><td>4</td><td>255</td><td>259</td></tr><tr><td>23</td><td>2026-09-17</td><td>5</td><td>260</td><td>266</td></tr><tr><td>24</td><td>2026-09-18</td><td>10</td><td>270</td><td>273</td></tr><tr><td>25</td><td>2026-09-19</td><td>5</td><td>275</td><td>279</td></tr><tr><td>26</td><td>2026-09-20</td><td>9</td><td>284</td><td>286</td></tr>
+</table>
+<script>
+(function(){
+  var c=document.getElementById('progChart'), tip=document.getElementById('progTip');
+  if(!c||!tip) return;
+  c.querySelectorAll('.hit').forEach(function(h){
+    h.addEventListener('mousemove',function(e){
+      var r=c.getBoundingClientRect();
+      tip.innerHTML=h.getAttribute('data-tip');
+      tip.style.display='block';
+      tip.style.left=Math.min(e.clientX-r.left+12, r.width-tip.offsetWidth-4)+'px';
+      tip.style.top=(e.clientY-r.top-tip.offsetHeight-8)+'px';
+    });
+    h.addEventListener('mouseleave',function(){ tip.style.display='none'; });
+  });
+})();
+</script>
+<script>var BM_KEY = 'fg_progress';</script>
+<script src="../book.js"></script>
+<script src="fg.js"></script>
+</body>
+</html>
