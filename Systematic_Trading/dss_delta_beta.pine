@@ -1,0 +1,134 @@
+//@version=6
+indicator("DSS Delta (MACD-Style)", overlay=false)
+
+// =========================================================
+// DSS DELTA — Short Wave minus Long Wave
+// Like MACD but for DSS cycles: delta + signal + histogram
+// =========================================================
+
+// === SHORT WAVE DSS ===
+grpShort      = "Short Wave DSS"
+shortLen      = input.int(5, "Stochastic Period",
+     group=grpShort, minval=2, maxval=30)
+shortSmooth   = input.int(3, "EMA Smoothing",
+     group=grpShort, minval=2, maxval=15)
+shortPostEma  = input.int(5, "Post-DSS EMA",
+     group=grpShort, minval=1, maxval=21,
+     tooltip="Smooths the short wave after DSS calc. " +
+     "1 = off, 3-7 = tame chop, 9+ = very smooth")
+
+// === LONG WAVE DSS ===
+grpLong    = "Long Wave DSS"
+longLen    = input.int(13, "Stochastic Period",
+     group=grpLong, minval=2, maxval=50)
+longSmooth = input.int(8, "EMA Smoothing",
+     group=grpLong, minval=2, maxval=21)
+
+// === DELTA SETTINGS ===
+grpDelta    = "Delta Settings"
+sigLen      = input.int(9, "Signal Line EMA",
+     group=grpDelta, minval=2, maxval=21)
+src         = input.source(close, "Source",
+     group=grpDelta)
+
+// === LEVELS ===
+grpLvl      = "Levels"
+upperLvl    = input.float(30, "Upper Threshold",
+     group=grpLvl, minval=10, maxval=60, step=5)
+lowerLvl    = input.float(-30, "Lower Threshold",
+     group=grpLvl, minval=-60, maxval=-10, step=5)
+
+// === SIGNAL FILTER ===
+grpFilt     = "Signal Filter"
+cooldown    = input.int(10, "Min Bars Between Signals",
+     group=grpFilt, minval=3, maxval=50,
+     tooltip="Prevents signal spam")
+
+// =========================================================
+// DSS BRESSERT
+// =========================================================
+dss_bressert(float _src, int stochLen,
+     int emaLen) =>
+    hh      = ta.highest(_src, stochLen)
+    ll      = ta.lowest(_src,  stochLen)
+    raw1    = hh != ll ?
+         (_src - ll) / (hh - ll) * 100 : 50.0
+    smooth1 = ta.ema(raw1, emaLen)
+    hh2     = ta.highest(smooth1, stochLen)
+    ll2     = ta.lowest(smooth1,  stochLen)
+    raw2    = hh2 != ll2 ?
+         (smooth1 - ll2) / (hh2 - ll2) * 100 : 50.0
+    ta.ema(raw2, emaLen)
+
+// =========================================================
+// CALCULATE (pinned to Daily)
+// =========================================================
+shortRaw = request.security(syminfo.tickerid, "D",
+     dss_bressert(src, shortLen, shortSmooth))
+longDSS  = request.security(syminfo.tickerid, "D",
+     dss_bressert(src, longLen, longSmooth))
+
+// Smooth the short wave to tame chop
+shortDSS = shortPostEma > 1 ?
+     ta.ema(shortRaw, shortPostEma) : shortRaw
+
+delta    = shortDSS - longDSS
+signal   = ta.ema(delta, sigLen)
+hist     = delta - signal
+
+// =========================================================
+// COLORS
+// =========================================================
+histColor = hist >= 0 ?
+     (hist > hist[1] ? color.new(#26a69a, 0) :
+      color.new(#26a69a, 60)) :
+     (hist < hist[1] ? color.new(#ef5350, 0) :
+      color.new(#ef5350, 60))
+
+// =========================================================
+// PLOT
+// =========================================================
+plot(delta, "DSS Delta", color.new(#2196F3, 0),
+     linewidth=2)
+plot(signal, "Signal", color.new(#FF9800, 0),
+     linewidth=1)
+plot(hist, "Histogram", histColor,
+     style=plot.style_histogram, linewidth=3)
+
+hline(0, "Zero", color.gray, linestyle=hline.style_solid)
+hline(upperLvl, "Upper", color.new(color.red, 60),
+     linestyle=hline.style_dashed)
+hline(lowerLvl, "Lower", color.new(color.green, 60),
+     linestyle=hline.style_dashed)
+
+// === CROSSOVER MARKERS (filtered) ===
+// Only signal from extreme zones + cooldown
+var int barsSinceBull = 999
+var int barsSinceBear = 999
+barsSinceBull += 1
+barsSinceBear += 1
+
+rawBull = ta.crossover(delta, signal) and
+     delta < lowerLvl
+rawBear = ta.crossunder(delta, signal) and
+     delta > upperLvl
+
+bullCross = rawBull and barsSinceBull >= cooldown
+bearCross = rawBear and barsSinceBear >= cooldown
+
+if bullCross
+    barsSinceBull := 0
+if bearCross
+    barsSinceBear := 0
+
+plotshape(bullCross, "Bull Cross", shape.triangleup,
+     location.bottom, color.new(#FFFFFF, 0),
+     size=size.tiny)
+plotshape(bearCross, "Bear Cross", shape.triangledown,
+     location.top, color.new(#FFFF00, 0),
+     size=size.tiny)
+
+// === BACKGROUND ===
+bgcolor(delta > upperLvl ? color.new(#ef5350, 90) :
+     delta < lowerLvl ? color.new(#26a69a, 90) :
+     na)

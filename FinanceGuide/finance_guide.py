@@ -575,10 +575,13 @@ EXISTING (closest matches by title):
 {cat_block}
 Verdicts:
 - "same": the candidate is the same concept as an existing entry, just worded differently.
-- "instance": the candidate is a specific example, application, or narrower framing of an
-  existing entry (e.g. "Diesel Cost Pass-Through" is an instance of "Cost Pass-Through";
+- "instance": the existing entry's chapter plus one added sentence would fully cover the
+  candidate. The candidate has no definition or mechanism a reader of the existing chapter
+  wouldn't already know (e.g. "Diesel Cost Pass-Through" is an instance of "Cost Pass-Through";
   "China Reducing Treasury Holdings" is an instance of "Foreign Treasury Holdings").
-- "new": a genuinely distinct concept that deserves its own glossary entry.
+- "new": the candidate has its own definition or mechanism that the existing entry doesn't
+  teach. Two concepts defined relative to each other are still two concepts
+  (e.g. "Neutral Interest Rate" and "Accommodative Monetary Policy" are both "new").
 
 Be strict: when in doubt between "instance" and "new", answer "instance".
 Output ONLY JSON: {{"verdict": "same|instance|new", "match_slug": "<slug or null>"}}
@@ -603,6 +606,43 @@ Output ONLY JSON: {{"verdict": "same|instance|new", "match_slug": "<slug or null
     return {"verdict": "new", "match_slug": None}
 
 
+def enrich_chapter(existing_slug, candidate, video_title, transcript,
+                   concepts):
+    """When an instance is merged, append an 'In practice' paragraph to
+    the existing chapter so the applied insight isn't lost."""
+    c = concepts[existing_slug]
+    chapter = c.get("chapter_html", "")
+    if not chapter:
+        return  # no chapter to enrich
+    excerpt = relevant_excerpt(transcript, candidate)
+    prompt = f"""You are enriching an existing finance-guide chapter with a
+specific real-world application from a new video.
+
+EXISTING CONCEPT: {c['title']}
+INSTANCE BEING MERGED: {candidate['title']}
+CONTEXT FROM VIDEO: {candidate.get('context') or candidate.get('summary', '')}
+VIDEO: "{video_title}"
+
+RELEVANT TRANSCRIPT EXCERPT:
+{excerpt}
+
+Write ONE short paragraph (80-120 words) explaining this specific application.
+Start with: <p><strong>In practice:</strong>
+Use specific numbers, dates, or examples from the video. Cite the video title
+in parentheses at the end. Output ONLY the <p>...</p> tag, nothing else.
+"""
+    out = run_claude(prompt, timeout=120)
+    if not out:
+        return
+    # Extract just the <p> tag
+    m = re.search(r"<p>.*?</p>", out, re.DOTALL)
+    if not m:
+        return
+    para = m.group()
+    c["chapter_html"] = chapter.rstrip() + "\n" + para
+    log(f"    Enriched: {c['title']} ← {candidate['title']}")
+
+
 def merge_into(existing_slug, candidate_title, vid_id, concepts):
     """Record a duplicate against its existing concept: video becomes a
     source, the alternate wording becomes an alias (so both the prompt
@@ -619,15 +659,17 @@ def merge_into(existing_slug, candidate_title, vid_id, concepts):
 
 def resolve_candidate(candidate, concepts):
     """Run both dedup layers. Returns ("new", None), ("dup", slug),
-    or (None, None) on judge failure."""
+    ("instance", slug), or (None, None) on judge failure."""
     dup = find_fuzzy_duplicate(candidate["title"], concepts)
     if dup:
         return "dup", dup
     verdict = judge_duplicate(candidate, concepts)
     if verdict is None:
         return None, None
-    if verdict["verdict"] in ("same", "instance"):
+    if verdict["verdict"] == "same":
         return "dup", verdict["match_slug"]
+    if verdict["verdict"] == "instance":
+        return "instance", verdict["match_slug"]
     return "new", None
 
 
@@ -1343,8 +1385,11 @@ def run_once():
             if verdict is None:
                 failed += 1
                 continue
-            if verdict == "dup":
+            if verdict in ("dup", "instance"):
                 merge_into(match, concept["title"], vid_id, concepts)
+                if verdict == "instance":
+                    enrich_chapter(match, concept, title, transcript,
+                                   concepts)
                 save_json(CONCEPTS_FILE, concepts)
                 merged += 1
                 continue

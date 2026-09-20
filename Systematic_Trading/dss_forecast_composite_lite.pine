@@ -1,0 +1,529 @@
+//@version=6
+indicator("DSS Forecast Composite Lite",
+     overlay=false, precision=2)
+
+// Lightweight composite: runs the 3 tier
+// combined forecasts (short, mid, long) and
+// blends them with adjustable weights.
+// Same result as full stack but cleaner/faster.
+// Each tier uses its own internal weights.
+
+// === TIER WEIGHTS ===
+grpTier = "Tier Weights (must sum to 100)"
+tierShort = input.float(25, "Short Wave %",
+     group=grpTier, minval=0, maxval=100)
+tierMid = input.float(40, "Mid Wave %",
+     group=grpTier, minval=0, maxval=100)
+tierLong = input.float(35, "Long Wave %",
+     group=grpTier, minval=0, maxval=100)
+
+grpComb = "Combined Forecast"
+showCombined = input.bool(true,
+     "Show Combined Forecast", group=grpComb)
+divMultiplier = input.float(1.31,
+     "Diversification Multiplier",
+     group=grpComb, minval=1.0, maxval=2.5,
+     step=0.01)
+showTiers = input.bool(true,
+     "Show Tier Lines", group=grpComb)
+
+grpMom = "Momentum Gate"
+useMomGate = input.bool(true,
+     "RSI Velocity Filter", group=grpMom)
+rsiLen = input.int(14, "RSI Length",
+     group=grpMom, minval=2, maxval=21)
+rsiVelLen = input.int(4, "Velocity Lookback",
+     group=grpMom, minval=1, maxval=12)
+rsiVelThresh = input.float(2.0,
+     "Min Velocity",
+     group=grpMom, minval=0.5, maxval=10.0,
+     step=0.5)
+
+// === DSS BRESSERT FUNCTION ===
+dss_bressert(float src, int stochLen,
+     int emaLen) =>
+    hh = ta.highest(src, stochLen)
+    ll = ta.lowest(src, stochLen)
+    raw1 = hh != ll ?
+         (src - ll) / (hh - ll) * 100 : 50.0
+    smooth1 = ta.ema(raw1, emaLen)
+    hh2 = ta.highest(smooth1, stochLen)
+    ll2 = ta.lowest(smooth1, stochLen)
+    raw2 = hh2 != ll2 ?
+         (smooth1 - ll2) / (hh2 - ll2) * 100
+         : 50.0
+    dssLine = ta.ema(raw2, emaLen)
+    dssLine
+
+// === DSS FORECAST (0-100 → ±20) ===
+dss_fc(int stochLen, int emaLen) =>
+    dss = dss_bressert(close, stochLen, emaLen)
+    math.max(-20.0, math.min(20.0,
+         dss * 0.4 - 20.0))
+
+// === SHORT TIER (5 speeds) ===
+// 2/2, 3/2, 5/3, 8/3, 13/5
+// Weights: 15/20/25/22/18
+shortFC = (dss_fc(2,2) * 15 +
+     dss_fc(3,2) * 20 +
+     dss_fc(5,3) * 25 +
+     dss_fc(8,3) * 22 +
+     dss_fc(13,5) * 18) / 100.0
+
+// === MID TIER (5 speeds) ===
+// 8/5, 13/8, 21/8, 34/13, 55/13
+// Weights: 12/15/20/25/28
+midFC = (dss_fc(8,5) * 12 +
+     dss_fc(13,8) * 15 +
+     dss_fc(21,8) * 20 +
+     dss_fc(34,13) * 25 +
+     dss_fc(55,13) * 28) / 100.0
+
+// === LONG TIER (5 speeds) ===
+// 21/13, 40/15, 63/21, 100/34, 165/40
+// Weights: 10/15/20/25/30
+longFC = (dss_fc(21,13) * 10 +
+     dss_fc(40,15) * 15 +
+     dss_fc(63,21) * 20 +
+     dss_fc(100,34) * 25 +
+     dss_fc(165,40) * 30) / 100.0
+
+// === MASTER COMBINED ===
+totalTier = tierShort + tierMid + tierLong
+rawMaster = totalTier > 0 ?
+     (shortFC * tierShort +
+     midFC * tierMid +
+     longFC * tierLong) / totalTier : 0.0
+scaledMaster = rawMaster * divMultiplier
+combined = math.max(-20.0,
+     math.min(20.0, scaledMaster))
+
+// === RSI MOMENTUM GATE ===
+rsiVal = ta.rsi(close, rsiLen)
+rsiVelocity = rsiVal - rsiVal[rsiVelLen]
+momBullOk = not useMomGate or
+     rsiVelocity > rsiVelThresh
+momBearOk = not useMomGate or
+     rsiVelocity < -rsiVelThresh
+
+// === TIER AGREEMENT ===
+tierBull = (shortFC > 0 ? 1 : 0) +
+     (midFC > 0 ? 1 : 0) +
+     (longFC > 0 ? 1 : 0)
+tierBear = (shortFC < 0 ? 1 : 0) +
+     (midFC < 0 ? 1 : 0) +
+     (longFC < 0 ? 1 : 0)
+
+// === VELOCITY ===
+fcVel = combined - combined[3]
+fcAccel = fcVel - fcVel[2]
+
+// === TIER SPREAD ===
+tierMax = math.max(shortFC,
+     math.max(midFC, longFC))
+tierMin = math.min(shortFC,
+     math.min(midFC, longFC))
+tierSpread = tierMax - tierMin
+
+// === FAST vs SLOW ===
+fastSlow = shortFC - longFC
+
+
+// =========================================================
+// SIGNAL 1: TIER CONVERGENCE
+// All 3 tiers flip same direction
+// =========================================================
+grpConv = "① Tier Convergence"
+showConv = input.bool(true,
+     "Show Tier Convergence", group=grpConv)
+convCooldown = input.int(20,
+     "Cooldown (bars)",
+     group=grpConv, minval=1, maxval=100)
+
+allTiersBull = shortFC > 0 and midFC > 0 and
+     longFC > 0
+allTiersBear = shortFC < 0 and midFC < 0 and
+     longFC < 0
+
+convBuyRaw = allTiersBull and
+     not allTiersBull[1] and momBullOk
+convSellRaw = allTiersBear and
+     not allTiersBear[1] and momBearOk
+
+barsSinceCB = ta.barssince(convBuyRaw[1])
+barsSinceCS = ta.barssince(convSellRaw[1])
+convBuyFinal = convBuyRaw and
+     (na(barsSinceCB) or
+     barsSinceCB >= convCooldown) and
+     barstate.isconfirmed
+convSellFinal = convSellRaw and
+     (na(barsSinceCS) or
+     barsSinceCS >= convCooldown) and
+     barstate.isconfirmed
+
+
+// =========================================================
+// SIGNAL 2: EXTREME REVERSAL
+// =========================================================
+grpExt = "② Extreme Reversal"
+showExtreme = input.bool(true,
+     "Show Extreme Reversals", group=grpExt)
+extThresh = input.float(14.0,
+     "Extreme Threshold",
+     group=grpExt, minval=10.0, maxval=20.0,
+     step=1.0)
+extCooldown = input.int(15,
+     "Cooldown (bars)",
+     group=grpExt, minval=1, maxval=100)
+
+extBuyRaw = combined <= -extThresh and
+     shortFC > shortFC[1] and
+     shortFC[1] <= shortFC[2]
+extSellRaw = combined >= extThresh and
+     shortFC < shortFC[1] and
+     shortFC[1] >= shortFC[2]
+
+barsSinceEB = ta.barssince(extBuyRaw[1])
+barsSinceES = ta.barssince(extSellRaw[1])
+extBuyFinal = extBuyRaw and (na(barsSinceEB) or
+     barsSinceEB >= extCooldown) and
+     barstate.isconfirmed
+extSellFinal = extSellRaw and (na(barsSinceES) or
+     barsSinceES >= extCooldown) and
+     barstate.isconfirmed
+
+
+// =========================================================
+// SIGNAL 3: DIVERGENCE
+// Short tier flips against mid+long
+// =========================================================
+grpDiv = "③ Tier Divergence"
+showDiv = input.bool(true,
+     "Show Tier Divergence", group=grpDiv)
+divCooldown = input.int(15,
+     "Cooldown (bars)",
+     group=grpDiv, minval=1, maxval=100)
+
+// Short flips bull while mid+long still bear
+divBuyRaw = shortFC > 0 and shortFC[1] <= 0 and
+     midFC < 0 and longFC < 0 and momBullOk
+// Short flips bear while mid+long still bull
+divSellRaw = shortFC < 0 and shortFC[1] >= 0 and
+     midFC > 0 and longFC > 0 and momBearOk
+
+barsSinceDB = ta.barssince(divBuyRaw[1])
+barsSinceDS = ta.barssince(divSellRaw[1])
+divBuyFinal = divBuyRaw and
+     (na(barsSinceDB) or
+     barsSinceDB >= divCooldown) and
+     barstate.isconfirmed
+divSellFinal = divSellRaw and
+     (na(barsSinceDS) or
+     barsSinceDS >= divCooldown) and
+     barstate.isconfirmed
+
+
+// =========================================================
+// PLOTTING
+// =========================================================
+
+// === TIER LINES ===
+plot(showTiers ? shortFC : na,
+     "Short Tier", #FF5252, 2,
+     plot.style_line)
+plot(showTiers ? midFC : na,
+     "Mid Tier", #FFD740, 2,
+     plot.style_line)
+plot(showTiers ? longFC : na,
+     "Long Tier", #40C4FF, 2,
+     plot.style_line)
+
+// === MASTER COMBINED ===
+combColor = combined > 10 ? #D50000 :
+     combined > 5  ? #EF5350 :
+     combined > 0  ? #FFCDD2 :
+     combined > -5 ? #B9F6CA :
+     combined > -10 ? #69F0AE :
+     #00C853
+
+plot(showCombined ? combined : na,
+     "Master Forecast", combColor,
+     linewidth=3)
+
+// === REFERENCE LINES ===
+hline(20,  "Cap (+20)",
+     color.new(#D50000, 70), hline.style_dashed)
+hline(10,  "Strong (+10)",
+     color.new(#EF5350, 70), hline.style_dotted)
+hline(0,   "Neutral",
+     color.new(#888888, 50), hline.style_solid)
+hline(-10, "Strong (-10)",
+     color.new(#69F0AE, 70), hline.style_dotted)
+hline(-20, "Cap (-20)",
+     color.new(#00C853, 70), hline.style_dashed)
+
+// === BACKGROUND ZONES ===
+bgcolor(combined > 10 ?
+     color.new(#D50000, 92) :
+     combined < -10 ?
+     color.new(#00C853, 92) : na)
+
+// === SIGNALS ===
+// ① Tier convergence — diamonds
+plotshape(showConv and convBuyFinal ?
+     combined : na,
+     "Conv Buy", shape.diamond,
+     location.bottom,
+     color=color.new(#00C853, 0),
+     size=size.tiny)
+plotshape(showConv and convSellFinal ?
+     combined : na,
+     "Conv Sell", shape.diamond,
+     location.top,
+     color=color.new(#D50000, 0),
+     size=size.tiny)
+
+// ② Extreme reversal — X marks
+plotshape(showExtreme and extBuyFinal ?
+     combined : na,
+     "Extreme Buy", shape.xcross,
+     location.bottom,
+     color=color.new(#00C853, 0),
+     size=size.tiny)
+plotshape(showExtreme and extSellFinal ?
+     combined : na,
+     "Extreme Sell", shape.xcross,
+     location.top,
+     color=color.new(#FF1744, 0),
+     size=size.tiny)
+
+// ③ Tier divergence — triangles
+plotshape(showDiv and divBuyFinal ?
+     combined : na,
+     "Div Buy", shape.triangleup,
+     location.bottom,
+     color=color.new(#76FF03, 0),
+     size=size.tiny)
+plotshape(showDiv and divSellFinal ?
+     combined : na,
+     "Div Sell", shape.triangledown,
+     location.top,
+     color=color.new(#FF6D00, 0),
+     size=size.tiny)
+
+
+// =========================================================
+// INFO TABLE
+// =========================================================
+var table info = table.new(position.top_right,
+     3, 12,
+     bgcolor=color.new(#1a1a2e, 10),
+     border_width=1,
+     border_color=color.new(#333355, 50))
+
+if barstate.islast
+    table.cell(info, 0, 0, "LITE",
+         text_color=#58a6ff, text_size=size.small)
+    table.cell(info, 1, 0, "FC",
+         text_color=#aaaacc, text_size=size.small)
+    table.cell(info, 2, 0, "Vel",
+         text_color=#aaaacc, text_size=size.small)
+
+    // Short tier
+    table.cell(info, 0, 1, "SHORT",
+         text_color=#FF5252,
+         text_size=size.small)
+    table.cell(info, 1, 1,
+         str.tostring(shortFC, "#.#"),
+         text_color=shortFC > 0 ?
+         #69F0AE : #EF5350,
+         text_size=size.small)
+    sVel = shortFC - shortFC[2]
+    table.cell(info, 2, 1,
+         (sVel > 0 ? "+" : "") +
+         str.tostring(sVel, "#.#"),
+         text_color=sVel > 0 ?
+         #69F0AE : #EF5350,
+         text_size=size.small)
+
+    // Mid tier
+    table.cell(info, 0, 2, "MID",
+         text_color=#FFD740,
+         text_size=size.small)
+    table.cell(info, 1, 2,
+         str.tostring(midFC, "#.#"),
+         text_color=midFC > 0 ?
+         #69F0AE : #EF5350,
+         text_size=size.small)
+    mVel = midFC - midFC[2]
+    table.cell(info, 2, 2,
+         (mVel > 0 ? "+" : "") +
+         str.tostring(mVel, "#.#"),
+         text_color=mVel > 0 ?
+         #69F0AE : #EF5350,
+         text_size=size.small)
+
+    // Long tier
+    table.cell(info, 0, 3, "LONG",
+         text_color=#40C4FF,
+         text_size=size.small)
+    table.cell(info, 1, 3,
+         str.tostring(longFC, "#.#"),
+         text_color=longFC > 0 ?
+         #69F0AE : #EF5350,
+         text_size=size.small)
+    lVel = longFC - longFC[2]
+    table.cell(info, 2, 3,
+         (lVel > 0 ? "+" : "") +
+         str.tostring(lVel, "#.#"),
+         text_color=lVel > 0 ?
+         #69F0AE : #EF5350,
+         text_size=size.small)
+
+    // Separator
+    table.cell(info, 0, 4, "───",
+         text_color=#333355,
+         text_size=size.small)
+    table.cell(info, 1, 4, "───",
+         text_color=#333355,
+         text_size=size.small)
+    table.cell(info, 2, 4, "───",
+         text_color=#333355,
+         text_size=size.small)
+
+    // Master
+    table.cell(info, 0, 5, "MASTER",
+         text_color=#ffffff,
+         text_size=size.small)
+    table.cell(info, 1, 5,
+         str.tostring(combined, "#.#"),
+         text_color=combined > 0 ?
+         #00C853 : #D50000,
+         text_size=size.small)
+    table.cell(info, 2, 5,
+         (fcVel > 0 ? "+" : "") +
+         str.tostring(fcVel, "#.#"),
+         text_color=fcVel > 0 ?
+         #69F0AE : #EF5350,
+         text_size=size.small)
+
+    // Tier agreement
+    table.cell(info, 0, 6, "Tiers",
+         text_color=#aaaacc,
+         text_size=size.small)
+    tierStr = tierBull == 3 ? "3/3 BULL" :
+         tierBear == 3 ? "3/3 BEAR" :
+         tierBull == 2 ? "2/3 BULL" :
+         tierBear == 2 ? "2/3 BEAR" :
+         "MIXED"
+    tierCol = tierBull == 3 ? #00C853 :
+         tierBear == 3 ? #D50000 :
+         tierBull == 2 ? #69F0AE :
+         tierBear == 2 ? #EF5350 :
+         #FFD700
+    table.cell(info, 1, 6, tierStr,
+         text_color=tierCol,
+         text_size=size.small)
+    table.cell(info, 2, 6,
+         momBullOk ? "MOM ▲" :
+         momBearOk ? "MOM ▼" : "MOM —",
+         text_color=momBullOk ? #69F0AE :
+         momBearOk ? #EF5350 : #888888,
+         text_size=size.small)
+
+    // Spread
+    table.cell(info, 0, 7, "Spread",
+         text_color=#aaaacc,
+         text_size=size.small)
+    table.cell(info, 1, 7,
+         str.tostring(tierSpread, "#.#"),
+         text_color=#888888,
+         text_size=size.small)
+    table.cell(info, 2, 7, "",
+         text_size=size.small)
+
+    // Fast vs Slow
+    table.cell(info, 0, 8, "S-L",
+         text_color=#aaaacc,
+         text_size=size.small)
+    table.cell(info, 1, 8,
+         (fastSlow > 0 ? "+" : "") +
+         str.tostring(fastSlow, "#.#"),
+         text_color=fastSlow > 15 ? #76FF03 :
+         fastSlow < -15 ? #FF1744 :
+         fastSlow > 0 ? #69F0AE :
+         fastSlow < 0 ? #EF5350 : #888888,
+         text_size=size.small)
+    fsLabel = math.abs(fastSlow) > 20 ?
+         "TENSION" :
+         math.abs(fastSlow) > 12 ?
+         "BUILDING" : "—"
+    table.cell(info, 2, 8, fsLabel,
+         text_color=math.abs(fastSlow) > 20 ?
+         #FFD740 :
+         math.abs(fastSlow) > 12 ?
+         #FFAB40 : #888888,
+         text_size=size.small)
+
+    // Active signal
+    sigTxt = convBuyFinal ? "▲ CONV" :
+         convSellFinal ? "▼ CONV" :
+         extBuyFinal ? "▲ EXTRM" :
+         extSellFinal ? "▼ EXTRM" :
+         divBuyFinal ? "▲ DIV" :
+         divSellFinal ? "▼ DIV" : "—"
+    sigCol = convBuyFinal or extBuyFinal or
+         divBuyFinal ? #00C853 :
+         convSellFinal or extSellFinal or
+         divSellFinal ? #D50000 : #888888
+    table.cell(info, 0, 9, "SIG",
+         text_color=#aaaacc,
+         text_size=size.small)
+    table.cell(info, 1, 9, sigTxt,
+         text_color=sigCol,
+         text_size=size.small)
+    table.cell(info, 2, 9, "",
+         text_size=size.small)
+
+
+// =========================================================
+// ALERTS
+// =========================================================
+anyBuy = convBuyFinal or extBuyFinal or
+     divBuyFinal
+anySell = convSellFinal or extSellFinal or
+     divSellFinal
+
+atrAlert = ta.atr(14)
+
+if anyBuy
+    sl = close - atrAlert * 1.5
+    tp1 = close + atrAlert * 2.0
+    tp2 = close + atrAlert * 3.0
+    alert('{"signal":"buy","symbol":"' +
+         syminfo.ticker + '",' +
+         '"entry":' + str.tostring(close) + ',' +
+         '"sl":' + str.tostring(sl) + ',' +
+         '"tp1":' + str.tostring(tp1) + ',' +
+         '"tp2":' + str.tostring(tp2) + ',' +
+         '"rsi":' + str.tostring(rsiVal) + ',' +
+         '"timeframe":"' +
+         timeframe.period + '",' +
+         '"signals_used":"dss_composite_lite"}',
+         alert.freq_once_per_bar_close)
+
+if anySell
+    sl = close + atrAlert * 1.5
+    tp1 = close - atrAlert * 2.0
+    tp2 = close - atrAlert * 3.0
+    alert('{"signal":"short","symbol":"' +
+         syminfo.ticker + '",' +
+         '"entry":' + str.tostring(close) + ',' +
+         '"sl":' + str.tostring(sl) + ',' +
+         '"tp1":' + str.tostring(tp1) + ',' +
+         '"tp2":' + str.tostring(tp2) + ',' +
+         '"rsi":' + str.tostring(rsiVal) + ',' +
+         '"timeframe":"' +
+         timeframe.period + '",' +
+         '"signals_used":"dss_composite_lite"}',
+         alert.freq_once_per_bar_close)
