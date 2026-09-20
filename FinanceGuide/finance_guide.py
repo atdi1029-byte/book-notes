@@ -641,46 +641,6 @@ def get_done_slugs():
     return _done_cache
 
 
-def enrich_chapter(existing_slug, candidate, video_title, transcript,
-                   concepts):
-    """When an instance is merged, append an 'In practice' paragraph to
-    the existing chapter so the applied insight isn't lost."""
-    if existing_slug in get_done_slugs():
-        log(f"    Skip enrich (completed): {concepts[existing_slug]['title']}")
-        return
-    c = concepts[existing_slug]
-    chapter = c.get("chapter_html", "")
-    if not chapter:
-        return  # no chapter to enrich
-    excerpt = relevant_excerpt(transcript, candidate)
-    prompt = f"""You are enriching an existing finance-guide chapter with a
-specific real-world application from a new video.
-
-EXISTING CONCEPT: {c['title']}
-INSTANCE BEING MERGED: {candidate['title']}
-CONTEXT FROM VIDEO: {candidate.get('context') or candidate.get('summary', '')}
-VIDEO: "{video_title}"
-
-RELEVANT TRANSCRIPT EXCERPT:
-{excerpt}
-
-Write ONE short paragraph (80-120 words) explaining this specific application.
-Start with: <p><strong>In practice:</strong>
-Use specific numbers, dates, or examples from the video. Cite the video title
-in parentheses at the end. Output ONLY the <p>...</p> tag, nothing else.
-"""
-    out = run_claude(prompt, timeout=120)
-    if not out:
-        return
-    # Extract just the <p> tag
-    m = re.search(r"<p>.*?</p>", out, re.DOTALL)
-    if not m:
-        return
-    para = m.group()
-    c["chapter_html"] = chapter.rstrip() + "\n" + para
-    log(f"    Enriched: {c['title']} ← {candidate['title']}")
-
-
 def merge_into(existing_slug, candidate_title, vid_id, concepts):
     """Record a duplicate against its existing concept: video becomes a
     source, the alternate wording becomes an alias (so both the prompt
@@ -761,14 +721,30 @@ Rules:
   would still make sense in a video from a different year. "Federal Funds Rate" is
   a concept. "Fed raised rates" is news. "China cutting Treasury holdings" is a claim
   about a concept (Foreign Treasury Holdings), not a new concept.
+- THE TEXTBOOK TEST: a concept qualifies only if it would plausibly have its own
+  entry in a finance textbook, CFA curriculum, or Investopedia — a named term,
+  instrument, metric, institution, or market mechanism that a learner needs in
+  order to understand markets. If the title only makes sense with this video's
+  story attached, it is not a concept.
 - Basic, well-known concepts count and matter MOST (VIX, share buybacks, risk
   parity, yield curve). Never skip a concept because it seems too obvious — this
   guide is for a learner building from the ground up.
-- A concept counts if the video names it OR relies on it, even in a single sentence.
+- NOT concepts (never extract these as "new"):
+  * the presenter's analogies or historical comparisons ("1999 dot-com analogy",
+    "this looks like 2008") — file the underlying event as a concept if it is
+    one (Dot-Com Bubble), never the comparison itself;
+  * commentary heuristics or ways of reading a story ("multi-causal attribution",
+    "narrow vs broad decline as a signal", "unconfirmed vs confirmed reporting");
+  * generic business vocabulary that isn't finance-specific ("year-over-year
+    growth rate", "supply chain", "long-term contract") unless the video teaches
+    it as a finance mechanism;
+  * company-, deal-, or sector-specific plumbing that a general investor would
+    never need (mark genuinely useful sector mechanics "deep" instead).
+- A concept counts if the video names it OR clearly relies on it.
 - Work in two passes: first list every finance term or mechanism in the transcript;
-  then for each one, if it's already covered put its slug in "existing", otherwise
-  put it in "new". Only drop news, one-off claims, and instances of a general
-  mechanism you've already listed.
+  then apply the textbook test to each. Survivors already covered go in "existing"
+  (exact slug); the rest go in "new". Drop news, one-off claims, presenter
+  opinions, and instances of a general mechanism you've already listed.
 - Do NOT create a new concept for a specific instance, example, or framing of an
   existing one. Prefer the general mechanism ("Cost Pass-Through") over the
   instance ("Diesel Cost Pass-Through to Freight").
@@ -776,8 +752,9 @@ Rules:
 - Slugs: lowercase, underscores, no filler words.
 - If the video substantively discusses a concept already covered, put its EXACT slug
   (as written in the list) in "existing" — do not re-extract it.
-- A typical video yields 10-25 concepts (new + existing combined). If you have
-  fewer than 8, re-read the transcript for what you skipped.
+- There is no target count. A dense explainer may yield 15+ concepts; a news
+  recap may legitimately yield 2-3 (mostly "existing"). Quality over quantity —
+  a padded list is worse than a short one.
 - If nothing new, "new" is an empty array.
 - Output ONLY the JSON object, nothing else.
 """
@@ -849,7 +826,7 @@ def extract_concepts(video_id, title, transcript, existing_concepts):
             if s in existing_concepts:
                 merged_existing.add(s)
     total = len(merged_new) + len(merged_existing)
-    if total < 8 and len(transcript) > 500:
+    if total < 4 and len(transcript) > 2000:
         # Safety net: re-scan for missed concepts
         found_so_far = ", ".join(
             [c["title"] for c in merged_new.values()] +
@@ -862,7 +839,11 @@ were found, which seems low. Here is what was found so far:
 
 Re-read this transcript and list any finance terms or mechanisms that were
 missed. Include basic/well-known concepts (VIX, buybacks, risk parity, etc.)
-— never skip something for being too obvious.
+— never skip something for being too obvious. Apply the textbook test: only
+named terms, instruments, metrics, institutions, or market mechanisms that
+would have their own textbook or Investopedia entry. No analogies, presenter
+heuristics, news, or generic business vocabulary. If nothing was genuinely
+missed, return empty arrays.
 
 VIDEO: "{title}"
 TRANSCRIPT:
@@ -1486,10 +1467,10 @@ def run_once():
                 failed += 1
                 continue
             if verdict in ("dup", "instance"):
+                # Instances and dups are recorded as a source/alias only.
+                # Existing chapters are never rewritten or appended to:
+                # the guide is read once, concept by concept, then put away.
                 merge_into(match, concept["title"], vid_id, concepts)
-                if verdict == "instance":
-                    enrich_chapter(match, concept, title, transcript,
-                                   concepts)
                 save_json(CONCEPTS_FILE, concepts)
                 merged += 1
                 continue
