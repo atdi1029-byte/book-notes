@@ -723,6 +723,14 @@ Rules:
   would still make sense in a video from a different year. "Federal Funds Rate" is
   a concept. "Fed raised rates" is news. "China cutting Treasury holdings" is a claim
   about a concept (Foreign Treasury Holdings), not a new concept.
+- Basic, well-known concepts count and matter MOST (VIX, share buybacks, risk
+  parity, yield curve). Never skip a concept because it seems too obvious — this
+  guide is for a learner building from the ground up.
+- A concept counts if the video names it OR relies on it, even in a single sentence.
+- Work in two passes: first list every finance term or mechanism in the transcript;
+  then for each one, if it's already covered put its slug in "existing", otherwise
+  put it in "new". Only drop news, one-off claims, and instances of a general
+  mechanism you've already listed.
 - Do NOT create a new concept for a specific instance, example, or framing of an
   existing one. Prefer the general mechanism ("Cost Pass-Through") over the
   instance ("Diesel Cost Pass-Through to Freight").
@@ -730,6 +738,8 @@ Rules:
 - Slugs: lowercase, underscores, no filler words.
 - If the video substantively discusses a concept already covered, put its EXACT slug
   (as written in the list) in "existing" — do not re-extract it.
+- A typical video yields 10-25 concepts (new + existing combined). If you have
+  fewer than 8, re-read the transcript for what you skipped.
 - If nothing new, "new" is an empty array.
 - Output ONLY the JSON object, nothing else.
 """
@@ -800,6 +810,58 @@ def extract_concepts(video_id, title, transcript, existing_concepts):
         for s in data["existing"]:
             if s in existing_concepts:
                 merged_existing.add(s)
+    total = len(merged_new) + len(merged_existing)
+    if total < 8 and len(transcript) > 500:
+        # Safety net: re-scan for missed concepts
+        found_so_far = ", ".join(
+            [c["title"] for c in merged_new.values()] +
+            [existing_concepts[s]["title"] for s in merged_existing
+             if s in existing_concepts]
+        )
+        retry_prompt = f"""A finance video was scanned and only {total} concepts
+were found, which seems low. Here is what was found so far:
+{found_so_far}
+
+Re-read this transcript and list any finance terms or mechanisms that were
+missed. Include basic/well-known concepts (VIX, buybacks, risk parity, etc.)
+— never skip something for being too obvious.
+
+VIDEO: "{title}"
+TRANSCRIPT:
+{transcript[:CHUNK_CHARS]}
+
+ALREADY COVERED CONCEPTS:
+{concept_list if concept_list else "(none yet)"}
+
+Output ONE JSON object with "new" and "existing" arrays, same format as before.
+Only include concepts NOT in the found-so-far list above.
+"""
+        log(f"    Safety net: only {total} concepts, re-scanning...")
+        retry = run_claude(retry_prompt)
+        if retry:
+            m = re.search(r"\{.*\}", retry, re.DOTALL)
+            if m:
+                try:
+                    extra = json.loads(m.group())
+                    for c in extra.get("new", []):
+                        slug = c.get("slug")
+                        if slug and c.get("title") and slug not in existing_concepts \
+                                and slug not in merged_new:
+                            if c.get("category") not in CATEGORIES:
+                                c["category"] = concept_category(c)
+                            if c.get("flag") not in FLAGS:
+                                c["flag"] = "plain"
+                            c.setdefault("summary", "")
+                            c.setdefault("context", "")
+                            merged_new[slug] = c
+                    for s in extra.get("existing", []):
+                        if s in existing_concepts:
+                            merged_existing.add(s)
+                    log(f"    Safety net found {len(extra.get('new', []))} new, "
+                        f"{len(extra.get('existing', []))} existing")
+                except json.JSONDecodeError:
+                    pass
+
     return {"new": list(merged_new.values()),
             "existing": sorted(merged_existing)}
 
