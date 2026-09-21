@@ -1,0 +1,1260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Program Design Guide</title>
+<meta name="description" content="Reverse-engineering sixteen personal-trainer programs into the rules that built them, so you can write the next one yourself.">
+<style>
+  :root {
+    --bg: #0f1117; --surface: #1a1d27; --border: #2a2d3a; --text: #d4d8e8;
+    --muted: #7a7f9a; --accent: #6b8cff; --accent2: #a78bfa; --green: #4ade80;
+    --yellow: #facc15; --red: #f87171; --orange: #fb923c; --cyan: #22d3ee;
+    --code-bg: #111420; --code-border: #2a2d3a;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body { background: var(--bg); color: var(--text); font-family: 'Georgia', serif;
+    font-size: 17px; line-height: 1.75; max-width: 880px; margin: 0 auto; padding: 2rem 1.5rem 6rem; }
+  h1 { font-size: 2.4rem; color: #fff; line-height: 1.2; margin-bottom: 0.4rem; }
+  .subtitle { color: var(--muted); font-size: 1.05rem; margin-bottom: 2.5rem; }
+  h2 { font-size: 1.6rem; color: var(--accent); margin: 3rem 0 1rem; padding-bottom: 0.4rem; border-bottom: 1px solid var(--border); }
+  h3 { font-size: 1.15rem; color: var(--accent2); margin: 2rem 0 0.6rem; }
+  h4 { color: var(--cyan); margin: 1.4rem 0 0.4rem; text-transform: uppercase; letter-spacing: 0.05em; font-size: 0.85rem; }
+  p { margin-bottom: 1rem; }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  strong { color: #e8ecff; font-weight: 600; }
+  em { color: var(--yellow); font-style: normal; }
+  code { font-family: 'JetBrains Mono', 'Fira Code', monospace; font-size: 0.82em; background: var(--code-bg);
+    border: 1px solid var(--code-border); padding: 0.1em 0.35em; border-radius: 3px; color: #a5b4fc; }
+  pre { background: var(--code-bg); border: 1px solid var(--code-border); border-radius: 6px; padding: 1.2rem 1.4rem;
+    overflow-x: auto; margin: 1rem 0 1.6rem; font-size: 0.83em; line-height: 1.6; }
+  pre code { background: none; border: none; padding: 0; color: #c8d3ff; font-size: 1em; }
+  blockquote { border-left: 3px solid var(--accent); margin: 1.4rem 0; padding: 0.8rem 1.2rem;
+    background: rgba(107,140,255,0.06); border-radius: 0 6px 6px 0; color: #b8c4e8; font-style: italic; }
+  table { width: 100%; border-collapse: collapse; margin: 1rem 0 1.6rem; font-size: 0.88em; }
+  th { background: #1f2235; color: var(--accent); padding: 0.55rem 0.8rem; text-align: left; border-bottom: 1px solid var(--border); }
+  td { padding: 0.5rem 0.8rem; border-bottom: 1px solid #1f2235; vertical-align: top; }
+  tr:hover td { background: rgba(255,255,255,0.02); }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  .toc { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1.2rem 1.6rem; margin: 1.5rem 0 2.5rem; }
+  .toc ol { padding-left: 1.3rem; } .toc li { margin: 0.25rem 0; } .toc ol ol { margin-top: 0.2rem; font-size: 0.92em; }
+  .callout { background: var(--surface); border: 1px solid var(--border); border-left: 4px solid var(--accent2);
+    border-radius: 6px; padding: 1rem 1.3rem; margin: 1.4rem 0; }
+  .callout.law { border-left-color: var(--yellow); }
+  .callout.warn { border-left-color: var(--red); }
+  .callout.good { border-left-color: var(--green); }
+  .callout h4 { margin-top: 0; }
+  .diagram { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1rem; margin: 1.4rem 0; overflow-x: auto; }
+  .diagram svg { display: block; margin: 0 auto; max-width: 100%; height: auto; }
+  .diagram-caption { color: var(--muted); font-size: 0.85em; text-align: center; margin-top: 0.6rem; }
+  .pill { display: inline-block; padding: 0.05em 0.55em; border-radius: 999px; font-size: 0.75em; font-family: monospace; letter-spacing: 0.03em; }
+  .acc { background: rgba(74,222,128,0.15); color: var(--green); }
+  .int { background: rgba(250,204,21,0.15); color: var(--yellow); }
+  .spe { background: rgba(167,139,250,0.18); color: var(--accent2); }
+  .rea { background: rgba(251,146,60,0.18); color: var(--orange); }
+  .peak { background: rgba(248,113,113,0.18); color: var(--red); }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1.1rem 1.4rem; margin: 1.2rem 0; }
+  .card .meta { color: var(--muted); font-size: 0.85em; margin-bottom: 0.6rem; font-family: monospace; }
+  ul, ol { margin: 0 0 1rem 1.4rem; } li { margin-bottom: 0.35rem; }
+  .small { font-size: 0.85em; color: var(--muted); }
+  hr { border: none; border-top: 1px solid var(--border); margin: 2.5rem 0; }
+  @media (max-width: 600px) { body { font-size: 15.5px; padding: 1.2rem 1rem 4rem; } h1 { font-size: 1.8rem; } table { font-size: 0.8em; } td, th { padding: 0.4rem 0.5rem; } }
+  @media print { body { background: #fff; color: #222; max-width: none; } h1, strong { color: #000; } h2 { color: #2244aa; } h3 { color: #5533aa; }
+    .toc, .callout, .card, .diagram { background: #f6f7fb; border-color: #ccd; } th { background: #e8eaf5; color: #2244aa; } td { color: #222; }
+    code { color: #223; background: #eef; border-color: #ccd; } blockquote { color: #333; background: #f3f4fa; } a { color: #2244aa; } }
+
+  /* ====== BOOKMARK SYSTEM (book.js) ====== */
+  .bookmark-bar { position: sticky; top: 0; z-index: 998; background: var(--surface); color: var(--text);
+    padding: 0.5rem 1rem; display: none; align-items: center; justify-content: space-between; font-size: 0.85rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3); cursor: pointer; border-bottom: 1px solid var(--border); border-radius: 0 0 6px 6px; }
+  .bookmark-bar:hover { background: #1f2235; }
+  .bookmark-bar .bm-label { flex: 1; color: var(--text); }
+  .bookmark-bar .bm-clear { background: none; border: 1px solid rgba(255,255,255,0.25); color: var(--text);
+    padding: 0.15rem 0.5rem; border-radius: 4px; cursor: pointer; font-size: 0.8rem; margin-left: 0.75rem; font-family: inherit; }
+  .bookmark-bar .bm-clear:hover { background: rgba(255,255,255,0.1); }
+  .bm-btn { display: inline-block; cursor: pointer; font-size: 0.75rem; opacity: 0; margin-left: 0.5rem;
+    vertical-align: middle; transition: opacity 0.2s, transform 0.2s; user-select: none; }
+  h2:hover .bm-btn, h3:hover .bm-btn, h4:hover .bm-btn { opacity: 0.5; }
+  p:hover > .bm-p { opacity: 0.5; }
+  .bm-btn:hover { opacity: 0.8 !important; transform: scale(1.2); }
+  .bm-btn.active { opacity: 1 !important; color: var(--accent); }
+  .bm-p { position: absolute; left: -1.8rem; top: 0.15em; margin-left: 0; font-size: 0.65rem; }
+  p { position: relative; }
+  li > strong > .bm-btn { position: absolute; left: -2rem; top: 0.15em; margin-left: 0; }
+  li:has(> strong > .bm-btn) { position: relative; }
+  li:hover > strong > .bm-btn { opacity: 0.5; }
+  .bm-toast { position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%); background: #1f2235;
+    color: var(--text); padding: 0.5rem 1.25rem; border-radius: 6px; font-size: 0.85rem; z-index: 200; opacity: 0;
+    transition: opacity 0.3s; pointer-events: none; border: 1px solid var(--border); }
+  .bm-toast.show { opacity: 1; }
+  .bm-reset { background: none; border: 1px solid rgba(107,140,255,0.4); color: var(--muted); padding: 0.25rem 0.75rem;
+    border-radius: 4px; cursor: pointer; font-size: 0.75rem; font-family: inherit; display: block; margin: 0.5rem 0 1rem 0; }
+  .bm-reset:hover { background: rgba(107,140,255,0.1); color: var(--accent); }
+  .progress-bar { position: fixed; top: 0; left: 0; height: 3px; background: linear-gradient(90deg, var(--accent), var(--accent2)); z-index: 1000; transition: width 0.1s; }
+  .back-link { display: inline-block; color: var(--muted); font-size: 0.85rem; margin-bottom: 1.5rem; }
+  @media (max-width: 600px) { .bm-p { left: -1.1rem; } }
+</style>
+</head>
+<body>
+
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel">Resume reading</span>
+  <button class="bm-clear" onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+
+<a class="back-link" href="../index.html">&larr; Back to shelf</a>
+
+<h1>The Program Design Guide</h1>
+<p class="subtitle">Sixteen programs from your trainer, taken apart and put back together as rules.
+Read it once to understand <em>why</em> each block looks the way it does. Keep the last two
+chapters open the next time you sit down to write one yourself.</p>
+
+<div class="toc">
+<ol>
+  <li><a href="#read">How to Read a Program Line</a></li>
+  <li><a href="#bigpicture">The Big Picture: All Sixteen at a Glance</a></li>
+  <li><a href="#laws">The Seven Laws Behind Every Program</a></li>
+  <li><a href="#anatomy">Anatomy of a Training Day</a>
+    <ol>
+      <li><a href="#push">The Push Day</a></li>
+      <li><a href="#pull">The Pull Day</a></li>
+      <li><a href="#legs">The Leg Day</a></li>
+      <li><a href="#arms">The Arms Day</a></li>
+      <li><a href="#upper">The Upper (MMSS) Day</a></li>
+    </ol>
+  </li>
+  <li><a href="#programs">Program by Program</a>
+    <ol>
+      <li><a href="#abc01">ABC01 – ABC05: the three-day era</a></li>
+      <li><a href="#abcd01">ABCD01 – ABCD04: the arms-day era</a></li>
+      <li><a href="#abcd05">ABCD05 – ABCD08: the strength climb</a></li>
+      <li><a href="#abcd09">ABCD09 – ABCD11: reset and rebuild</a></li>
+    </ol>
+  </li>
+  <li><a href="#connect">How the Programs Connect: The Wave</a></li>
+  <li><a href="#yours">Your Own Programs (ABC+D1–D3), Graded</a></li>
+  <li><a href="#playbook">The Build-Your-Own Playbook</a></li>
+  <li><a href="#worked">Worked Example: Writing ABC+D4</a></li>
+  <li><a href="#year">A Year of Programs: The Calendar Template</a></li>
+  <li><a href="#card">One-Page Reference Card</a></li>
+  <li><a href="#appendix">Appendix: Data Tables</a></li>
+</ol>
+</div>
+
+<h2 id="read">1. How to Read a Program Line</h2>
+
+<p>Every exercise in the tracker is stored as one line with six parts:
+name, English name, muscle, <em>technique</em>, <em>set scheme</em>, and <em>rest in seconds</em>.
+The technique and the set scheme are where all the design decisions live. Once you can
+read those two fields fluently, the rest of this guide is just pattern recognition.</p>
+
+<pre><code>['Supino Reto','Barbell Bench Press','chest','S','2x8wu+3x6',180]
+                                              │    │            │
+                                     technique    set scheme    rest (s)</code></pre>
+
+<h3>The set scheme</h3>
+<table role="presentation">
+<tr><th>Notation</th><th>Meaning</th><th>Where you see it</th></tr>
+<tr><td><code>4x8-12</code></td><td>4 working sets, 8–12 reps each, same weight. When you hit 12 on every set, go up.</td><td>Almost every accumulation program</td></tr>
+<tr><td><code>2x8wu+3x6</code></td><td>2 warm-up sets of 8 (light, not counted), then 3 working sets of 6.</td><td>ABCD07, ABCD08 — every lift</td></tr>
+<tr><td><code>12/10/8/5</code></td><td>Four sets, one rep number each, weight going up every set. An ascending pyramid.</td><td>ABCD10, ABCD11</td></tr>
+<tr><td><code>12-15/10-12/8-10/5-8</code></td><td>Same pyramid, but each rung is a range. Add weight when you hit the top of the rung.</td><td>ABC02, ABC03, ABCD03</td></tr>
+<tr><td><code>2x12-15/2x8-12/2x5-8</code></td><td>Truncated pyramid: two sets on each rung before stepping up. Six sets total.</td><td>Leg curl in ABC03</td></tr>
+<tr><td><code>3x8-12+1xDrop</code></td><td>3 straight sets, then on the last one drop the weight 20–30% and keep going.</td><td>Leg extension, leg curl, machine flys</td></tr>
+<tr><td><code>3x8-12+Rest-Pause</code></td><td>3 straight sets; on the last, rest 10–15 s and squeeze out more reps, 2–3 times.</td><td>Cable rows, cable flys</td></tr>
+<tr><td><code>4x10 Bi-Set</code> (rest 0) then next line (rest 60)</td><td>Two exercises done back to back. The first line has rest 0; you rest only after the second.</td><td>Abs pairs, front raise + press, extension + lunge</td></tr>
+<tr><td><code>10/8/6/6</code></td><td>A wave: reps fall as weight rises, and the last rung is repeated at the same weight.</td><td>Bench and one-arm row in ABCD06</td></tr>
+<tr><td><code>12/10/8+15</code></td><td>Pyramid up, then a back-off set: drop 40–50% and do a high-rep pump set.</td><td>Calf press in ABCD06, ABCD07</td></tr>
+<tr><td><code>4xFailure</code></td><td>Bodyweight or fixed load, as many reps as possible every set.</td><td>Pull-ups, dips, push-ups</td></tr>
+<tr><td><code>200 reps</code></td><td>One target number, as many sets as it takes.</td><td>Crunches in ABCD07 (200) and ABCD08 (300)</td></tr>
+</table>
+
+<h3>The technique codes</h3>
+<p>The app carries a legend for these, but the important thing is not the definition; it is
+<em>which phase each one belongs to</em>. Read this table as two groups, not as fifteen items.</p>
+
+<table role="presentation">
+<tr><th>Code</th><th>Name</th><th>Family</th><th>What it buys you</th></tr>
+<tr><td><code>S</code></td><td>Straight sets</td><td>Neutral</td><td>Clean, repeatable, easy to progress. The default. 60–70% of every program.</td></tr>
+<tr><td><code>P</code> / <code>AP</code></td><td>Pyramid / ascending pyramid</td><td>Neutral–heavy</td><td>Warms up the movement while working it; lets you touch a heavy set every session without living there.</td></tr>
+<tr><td><code>TP</code></td><td>Truncated pyramid</td><td>Neutral–heavy</td><td>Same as a pyramid but with two sets on each rung, so more total work at each load.</td></tr>
+<tr><td><code>DS</code></td><td>Drop set</td><td>Fatigue</td><td>Extra effective reps after failure without adding a whole set. Cheap volume for machines.</td></tr>
+<tr><td><code>RestP</code></td><td>Rest-pause</td><td>Fatigue</td><td>Same idea as a drop set but you keep the weight. Best on cables and machines where re-racking is instant.</td></tr>
+<tr><td><code>BS</code> / <code>SS</code> / <code>TS</code></td><td>Bi-set / superset / tri-set</td><td>Density</td><td>Two or three exercises without rest. Saves time and forces blood into the area; used for abs, arms, and small muscles.</td></tr>
+<tr><td><code>PE</code></td><td>Pre-exhaust</td><td>Fatigue</td><td>Isolate first (cable fly), then press. The press feels lighter but the target muscle fails first.</td></tr>
+<tr><td><code>BO</code></td><td>Back-off set</td><td>Fatigue</td><td>One light pump set after heavy work. Appears on calves, where heavy work alone rarely grows anything.</td></tr>
+<tr><td><code>Fail</code></td><td>To failure</td><td>Fatigue</td><td>Bodyweight moves where you cannot add plates: pull-ups, dips, push-ups, ab wheel.</td></tr>
+<tr><td><code>Mob</code></td><td>Mobility</td><td>Prep</td><td>Stretching before legs. Appears exactly twice in sixteen programs.</td></tr>
+</table>
+
+<div class="callout law">
+<h4>The rule hiding in this table</h4>
+<p>Every technique in the "Fatigue" and "Density" families appears in programs with short rest
+(60 s) and high reps (8–12+). None of them appear in the heavy blocks with 120–180 s rest and
+6–8 reps, where 90–100% of exercises are plain straight sets. Your trainer never stacked
+heavy weight <em>and</em> fatigue techniques in the same block. That single decision explains more
+about these programs than any other.</p>
+</div>
+
+<h3>The phases</h3>
+<p>Each program carries a phase tag. Four of them cycle; two are special cases.</p>
+<ul>
+  <li><span class="pill acc">acc</span> <strong>Accumulation</strong> — build volume. Moderate weight, 8–12 reps, 60–80 s rest, many exercises, lots of sets. The purpose is to make you tolerate more work than last time.</li>
+  <li><span class="pill int">int</span> <strong>Intensification</strong> — make the work harder without adding sets. Pyramids that reach 5–8 reps, rest-pause, drop sets, supersets. Same or slightly fewer exercises than accumulation.</li>
+  <li><span class="pill spe">spe</span> <strong>Specialization</strong> — point extra volume at one weak muscle while keeping everything else on maintenance. Look for the muscle whose set count jumps.</li>
+  <li><span class="pill rea">rea</span> <strong>Realization</strong> — cash in. Fewer exercises, heavier loads, longer rest, no fancy techniques. This is where the strength you built shows up on the bar.</li>
+  <li><span class="pill peak">peak</span> <strong>Peak strength</strong> — the heaviest version of realization, or a metabolic peak that ends a cycle before a reset.</li>
+</ul>
+<p>Do not treat the tags as gospel. Two of the sixteen are tagged with a phase that the numbers
+do not support (ABCD07 says specialization but trains like realization; ABCD11 says peak but trains
+like intensification). The tag is what the block was <em>called</em>. The rep scheme, rest, and set
+count are what it <em>is</em>. When they disagree, believe the numbers, and in section 5 I will show
+you where they disagree.</p>
+
+<h2 id="bigpicture">2. The Big Picture: All Sixteen at a Glance</h2>
+
+<p>Before we go program by program, here is every trainer-written program on one table.
+Working sets exclude warm-ups and shoulder-rotation prehab. Average rest is across all
+exercises with a rest value. Average reps is the midpoint of the prescribed ranges. The
+numbering is the order the programs were delivered, so read the table top to bottom as a
+timeline: ABC01 through ABC05 were three-day programs; ABCD01 through ABCD11 were four-day.</p>
+
+<table role="presentation"><tr><th>Program</th><th>Phase</th><th class="num">Days·wks</th><th class="num">Exercises</th><th class="num">Working sets</th><th class="num">Avg rest (s)</th><th class="num">Avg reps</th><th>Signature</th></tr><tr><td><strong>ABC01</strong></td><td><span class="pill acc">acc</span></td><td class="num">3·10</td><td class="num">25</td><td class="num">91</td><td class="num">61</td><td class="num">10–14</td><td>4x8-12 straight sets; rope pyramids 20-30→5-10</td></tr><tr><td><strong>ABC02</strong></td><td><span class="pill int">int</span></td><td class="num">3·10</td><td class="num">27</td><td class="num">98</td><td class="num">69</td><td class="num">10–13</td><td>Bench pyramid to 5-8; bi-sets, rest-pause, failure</td></tr><tr><td><strong>ABC03</strong></td><td><span class="pill spe">spe</span></td><td class="num">3·10</td><td class="num">27</td><td class="num">99</td><td class="num">67</td><td class="num">10–12</td><td>Incline-first push; 5 back moves; deadlift + TP leg curl</td></tr><tr><td><strong>ABC04</strong></td><td><span class="pill rea">rea</span></td><td class="num">3·10</td><td class="num">19</td><td class="num">80</td><td class="num">70</td><td class="num">10–12</td><td>4x6-8; 19 exercises; cuff work + abs-first begin</td></tr><tr><td><strong>ABC05</strong></td><td><span class="pill acc">acc</span></td><td class="num">3·10</td><td class="num">24</td><td class="num">98</td><td class="num">64</td><td class="num">10–12</td><td>Primer sets; 4 biceps moves; hamstring bi-set</td></tr><tr><td><strong>ABCD01</strong></td><td><span class="pill int">int</span></td><td class="num">4·7</td><td class="num">30</td><td class="num">107</td><td class="num">65</td><td class="num">10–13</td><td>Arms day; 5 drop sets; 5x5-8 lead lifts</td></tr><tr><td><strong>ABCD02</strong></td><td><span class="pill spe">spe</span></td><td class="num">4·7</td><td class="num">26</td><td class="num">106</td><td class="num">66</td><td class="num">10–10</td><td>6-set pre-exhaust; "1 set + 3 to failure" arms</td></tr><tr><td><strong>ABCD03</strong></td><td><span class="pill int">int</span></td><td class="num">4·7</td><td class="num">30</td><td class="num">112</td><td class="num">75</td><td class="num">11–12</td><td>Everything at once; 12/10/8/6 @120 s; antagonist supersets</td></tr><tr><td><strong>ABCD04</strong></td><td><span class="pill rea">rea</span></td><td class="num">4·7</td><td class="num">26</td><td class="num">94</td><td class="num">99</td><td class="num">11–11</td><td>4x8 @120 s on every line; 20 abs sets</td></tr><tr><td><strong>ABCD05</strong></td><td><span class="pill peak">peak</span></td><td class="num">4·7</td><td class="num">23</td><td class="num">102</td><td class="num">89</td><td class="num">10–10</td><td>First upper day; 12 pyramids ending in 3–4x8</td></tr><tr><td><strong>ABCD06</strong></td><td><span class="pill int">int</span></td><td class="num">4·7</td><td class="num">25</td><td class="num">106</td><td class="num">108</td><td class="num">8–10</td><td>10/8/6/6 waves @180 s; pyramids to 6</td></tr><tr><td><strong>ABCD07</strong></td><td><span class="pill spe">spe</span></td><td class="num">4·7</td><td class="num">25</td><td class="num">74</td><td class="num">132</td><td class="num">8–9</td><td>2x8wu + 3x8 everything; 200-rep crunch</td></tr><tr><td><strong>ABCD08</strong></td><td><span class="pill rea">rea</span></td><td class="num">4·7</td><td class="num">25</td><td class="num">73</td><td class="num">119</td><td class="num">6–7</td><td>Same moves, 3x6; heaviest block</td></tr><tr><td><strong>ABCD09</strong></td><td><span class="pill acc">acc</span></td><td class="num">4·7</td><td class="num">31</td><td class="num">96</td><td class="num">91</td><td class="num">10–11</td><td>28 new exercises; 3x10; zero techniques</td></tr><tr><td><strong>ABCD10</strong></td><td><span class="pill int">int</span></td><td class="num">4·7</td><td class="num">23</td><td class="num">73</td><td class="num">83</td><td class="num">9–10</td><td>12/10/8/5 pyramids; 23 exercises</td></tr><tr><td><strong>ABCD11</strong></td><td><span class="pill peak">peak</span></td><td class="num">4·7</td><td class="num">29</td><td class="num">88</td><td class="num">77</td><td class="num">11–11</td><td>Pyramids + 3x12 accessories + drops return</td></tr></table>
+
+<p>Three things should jump out of that table.</p>
+
+<p><strong>First, the rest column climbs.</strong> Sixty seconds in ABC01, seventy in ABC04,
+a hundred in ABCD04, a hundred and thirty-two in ABCD07. Your trainer moved you toward heavier,
+slower training as the months went on. Longer rest is not laziness; it is the price of lifting
+heavier weights for the same number of quality reps. A beginner does not need 180 s between
+bench sets because a beginner's sets are not heavy enough to need it.</p>
+
+<p><strong>Second, the set count breathes.</strong> It rises for two or three programs, then falls
+hard, then rises again: 91 → 98 → 99 → <em>80</em> → 98, then 107 → 106 → 112 → <em>94</em> → 102 → 106 →
+<em>74 → 73</em> → 96 → <em>73</em> → 88. Every drop is a realization or strength block. Every rise is a new
+accumulation. This is a wave, and it is deliberate. Section 6 draws it.</p>
+
+<p><strong>Third, the reps fall as the rest rises.</strong> The two columns are mirror images.
+Where average reps sits near 12, rest sits near 60. Where reps drop to 7, rest is near 120.
+There is no program with high reps and long rest, and only one (ABCD09) with moderate reps and
+long-ish rest, and that one is the reset block after the heaviest stretch of the year.</p>
+
+<div class="diagram"><svg viewBox="0 0 820 300" xmlns="http://www.w3.org/2000/svg" font-family="Georgia, serif" font-size="11"><line x1="50" y1="230" x2="800" y2="230" stroke="#2a2d3a"/><text x="46" y="234" text-anchor="end" fill="#6b8cff">60</text><line x1="50" y1="170" x2="800" y2="170" stroke="#2a2d3a"/><text x="46" y="174" text-anchor="end" fill="#6b8cff">80</text><line x1="50" y1="110" x2="800" y2="110" stroke="#2a2d3a"/><text x="46" y="114" text-anchor="end" fill="#6b8cff">100</text><line x1="50" y1="50" x2="800" y2="50" stroke="#2a2d3a"/><text x="46" y="54" text-anchor="end" fill="#6b8cff">120</text><text x="804" y="216" fill="#fb923c">60s</text><text x="804" y="162" fill="#fb923c">90s</text><text x="804" y="108" fill="#fb923c">120s</text><text x="804" y="54" fill="#fb923c">150s</text><rect x="46" y="137" width="28" height="93" fill="#4ade80" opacity="0.55" rx="3"/><text x="60" y="132" text-anchor="middle" fill="#d4d8e8" font-size="10">91</text><text x="60" y="246" text-anchor="middle" fill="#7a7f9a" font-size="9.5" transform="rotate(0)">A01</text><rect x="92" y="116" width="28" height="114" fill="#facc15" opacity="0.55" rx="3"/><text x="106" y="111" text-anchor="middle" fill="#d4d8e8" font-size="10">98</text><text x="106" y="246" text-anchor="middle" fill="#7a7f9a" font-size="9.5" transform="rotate(0)">A02</text><rect x="138" y="113" width="28" height="117" fill="#a78bfa" opacity="0.55" rx="3"/><text x="152" y="108" text-anchor="middle" fill="#d4d8e8" font-size="10">99</text><text x="152" y="246" text-anchor="middle" fill="#7a7f9a" font-size="9.5" transform="rotate(0)">A03</text><rect x="184" y="170" width="28" height="60" fill="#fb923c" opacity="0.55" rx="3"/><text x="198" y="165" text-anchor="middle" fill="#d4d8e8" font-size="10">80</text><text x="198" y="246" text-anchor="middle" fill="#7a7f9a" font-size="9.5" transform="rotate(0)">A04</text><rect x="230" y="116" width="28" height="114" fill="#4ade80" opacity="0.55" rx="3"/><text x="244" y="111" text-anchor="middle" fill="#d4d8e8" font-size="10">98</text><text x="244" y="246" text-anchor="middle" fill="#7a7f9a" font-size="9.5" transform="rotate(0)">A05</text><rect x="276" y="89" width="28" height="141" fill="#facc15" opacity="0.55" rx="3"/><text x="290" y="84" text-anchor="middle" fill="#d4d8e8" font-size="10">107</text><text x="290" y="246" text-anchor="middle" fill="#7a7f9a" font-size="9.5" transform="rotate(0)">D01</text><rect x="322" y="92" width="28" height="138" fill="#a78bfa" opacity="0.55" rx="3"/><text x="336" y="87" text-anchor="middle" fill="#d4d8e8" font-size="10">106</text><text x="336" y="246" text-anchor="middle" fill="#7a7f9a" font-size="9.5" transform="rotate(0)">D02</text><rect x="368" y="74" width="28" height="156" fill="#facc15" opacity="0.55" rx="3"/><text x="382" y="69" text-anchor="middle" fill="#d4d8e8" font-size="10">112</text><text x="382" y="246" text-anchor="middle" fill="#7a7f9a" font-size="9.5" transform="rotate(0)">D03</text><rect x="414" y="128" width="28" height="102" fill="#fb923c" opacity="0.55" rx="3"/><text x="428" y="123" text-anchor="middle" fill="#d4d8e8" font-size="10">94</text><text x="428" y="246" text-anchor="middle" fill="#7a7f9a" font-size="9.5" transform="rotate(0)">D04</text><rect x="460" y="104" width="28" height="126" fill="#f87171" opacity="0.55" rx="3"/><text x="474" y="99" text-anchor="middle" fill="#d4d8e8" font-size="10">102</text><text x="474" y="246" text-anchor="middle" fill="#7a7f9a" font-size="9.5" transform="rotate(0)">D05</text><rect x="506" y="92" width="28" height="138" fill="#facc15" opacity="0.55" rx="3"/><text x="520" y="87" text-anchor="middle" fill="#d4d8e8" font-size="10">106</text><text x="520" y="246" text-anchor="middle" fill="#7a7f9a" font-size="9.5" transform="rotate(0)">D06</text><rect x="552" y="188" width="28" height="42" fill="#a78bfa" opacity="0.55" rx="3"/><text x="566" y="183" text-anchor="middle" fill="#d4d8e8" font-size="10">74</text><text x="566" y="246" text-anchor="middle" fill="#7a7f9a" font-size="9.5" transform="rotate(0)">D07</text><rect x="598" y="191" width="28" height="39" fill="#fb923c" opacity="0.55" rx="3"/><text x="612" y="186" text-anchor="middle" fill="#d4d8e8" font-size="10">73</text><text x="612" y="246" text-anchor="middle" fill="#7a7f9a" font-size="9.5" transform="rotate(0)">D08</text><rect x="644" y="122" width="28" height="108" fill="#4ade80" opacity="0.55" rx="3"/><text x="658" y="117" text-anchor="middle" fill="#d4d8e8" font-size="10">96</text><text x="658" y="246" text-anchor="middle" fill="#7a7f9a" font-size="9.5" transform="rotate(0)">D09</text><rect x="690" y="191" width="28" height="39" fill="#facc15" opacity="0.55" rx="3"/><text x="704" y="186" text-anchor="middle" fill="#d4d8e8" font-size="10">73</text><text x="704" y="246" text-anchor="middle" fill="#7a7f9a" font-size="9.5" transform="rotate(0)">D10</text><rect x="736" y="146" width="28" height="84" fill="#f87171" opacity="0.55" rx="3"/><text x="750" y="141" text-anchor="middle" fill="#d4d8e8" font-size="10">88</text><text x="750" y="246" text-anchor="middle" fill="#7a7f9a" font-size="9.5" transform="rotate(0)">D11</text><polyline points="60,210 106,196 152,199 198,194 244,205 290,203 336,201 382,185 428,142 474,160 520,126 566,82 612,106 658,156 704,171 750,181" fill="none" stroke="#fb923c" stroke-width="2.5"/><circle cx="60" cy="210" r="3.5" fill="#fb923c"/><circle cx="106" cy="196" r="3.5" fill="#fb923c"/><circle cx="152" cy="199" r="3.5" fill="#fb923c"/><circle cx="198" cy="194" r="3.5" fill="#fb923c"/><circle cx="244" cy="205" r="3.5" fill="#fb923c"/><circle cx="290" cy="203" r="3.5" fill="#fb923c"/><circle cx="336" cy="201" r="3.5" fill="#fb923c"/><circle cx="382" cy="185" r="3.5" fill="#fb923c"/><circle cx="428" cy="142" r="3.5" fill="#fb923c"/><circle cx="474" cy="160" r="3.5" fill="#fb923c"/><circle cx="520" cy="126" r="3.5" fill="#fb923c"/><circle cx="566" cy="82" r="3.5" fill="#fb923c"/><circle cx="612" cy="106" r="3.5" fill="#fb923c"/><circle cx="658" cy="156" r="3.5" fill="#fb923c"/><circle cx="704" cy="171" r="3.5" fill="#fb923c"/><circle cx="750" cy="181" r="3.5" fill="#fb923c"/><text x="46" y="32" fill="#6b8cff" font-weight="bold">Working sets (bars, by phase)</text><text x="804" y="32" text-anchor="end" fill="#fb923c" font-weight="bold">Avg rest (line)</text><text x="410" y="292" text-anchor="middle" fill="#7a7f9a" font-size="10">A = ABC · D = ABCD · bar color: green acc · yellow int · purple spe · orange rea · red peak</text></svg><div class="diagram-caption">Sets breathe, rest climbs, and every trough is a realization block. The two lowest bars (D07, D08) sit under the two highest rest values.</div></div>
+
+<p>Now the per-muscle breakdown. This table answers the question "how many working sets does
+each muscle get per week in this program?", which is the single most useful number for
+judging a program you wrote yourself. Shoulder rotations are excluded from shoulders.</p>
+
+<table role="presentation"><tr><th>Program</th><th>Phase</th><th class="num">Chest</th><th class="num">Back</th><th class="num">Shoul</th><th class="num">Quads</th><th class="num">Hamst</th><th class="num">Glute</th><th class="num">Calve</th><th class="num">Bicep</th><th class="num">Trice</th><th class="num">Forea</th><th class="num">Abs</th><th class="num">Total</th></tr><tr><td><strong>ABC01</strong></td><td><span class="pill acc">acc</span></td><td class="num">16</td><td class="num">16</td><td class="num">16</td><td class="num">14</td><td class="num">3</td><td class="num">–</td><td class="num">6</td><td class="num">8</td><td class="num">8</td><td class="num">–</td><td class="num">4</td><td class="num"><strong>91</strong></td></tr><tr><td><strong>ABC02</strong></td><td><span class="pill int">int</span></td><td class="num">20</td><td class="num">18</td><td class="num">12</td><td class="num">17</td><td class="num">3</td><td class="num">–</td><td class="num">4</td><td class="num">8</td><td class="num">8</td><td class="num">–</td><td class="num">8</td><td class="num"><strong>98</strong></td></tr><tr><td><strong>ABC03</strong></td><td><span class="pill spe">spe</span></td><td class="num">15</td><td class="num">23</td><td class="num">16</td><td class="num">9</td><td class="num">6</td><td class="num">–</td><td class="num">4</td><td class="num">11</td><td class="num">7</td><td class="num">–</td><td class="num">8</td><td class="num"><strong>99</strong></td></tr><tr><td><strong>ABC04</strong></td><td><span class="pill rea">rea</span></td><td class="num">11</td><td class="num">11</td><td class="num">8</td><td class="num">16</td><td class="num">6</td><td class="num">–</td><td class="num">3</td><td class="num">10</td><td class="num">10</td><td class="num">–</td><td class="num">5</td><td class="num"><strong>80</strong></td></tr><tr><td><strong>ABC05</strong></td><td><span class="pill acc">acc</span></td><td class="num">11</td><td class="num">11</td><td class="num">12</td><td class="num">16</td><td class="num">8</td><td class="num">–</td><td class="num">3</td><td class="num">16</td><td class="num">12</td><td class="num">–</td><td class="num">9</td><td class="num"><strong>98</strong></td></tr><tr><td><strong>ABCD01</strong></td><td><span class="pill int">int</span></td><td class="num">12</td><td class="num">17</td><td class="num">18</td><td class="num">18</td><td class="num">4</td><td class="num">–</td><td class="num">3</td><td class="num">12</td><td class="num">11</td><td class="num">–</td><td class="num">12</td><td class="num"><strong>107</strong></td></tr><tr><td><strong>ABCD02</strong></td><td><span class="pill spe">spe</span></td><td class="num">19</td><td class="num">19</td><td class="num">8</td><td class="num">9</td><td class="num">4</td><td class="num">4</td><td class="num">3</td><td class="num">16</td><td class="num">16</td><td class="num">–</td><td class="num">8</td><td class="num"><strong>106</strong></td></tr><tr><td><strong>ABCD03</strong></td><td><span class="pill int">int</span></td><td class="num">19</td><td class="num">20</td><td class="num">11</td><td class="num">14</td><td class="num">9</td><td class="num">–</td><td class="num">3</td><td class="num">12</td><td class="num">12</td><td class="num">–</td><td class="num">12</td><td class="num"><strong>112</strong></td></tr><tr><td><strong>ABCD04</strong></td><td><span class="pill rea">rea</span></td><td class="num">16</td><td class="num">16</td><td class="num">7</td><td class="num">9</td><td class="num">6</td><td class="num">–</td><td class="num">4</td><td class="num">8</td><td class="num">8</td><td class="num">–</td><td class="num">20</td><td class="num"><strong>94</strong></td></tr><tr><td><strong>ABCD05</strong></td><td><span class="pill peak">peak</span></td><td class="num">22</td><td class="num">22</td><td class="num">8</td><td class="num">16</td><td class="num">6</td><td class="num">–</td><td class="num">4</td><td class="num">9</td><td class="num">9</td><td class="num">–</td><td class="num">6</td><td class="num"><strong>102</strong></td></tr><tr><td><strong>ABCD06</strong></td><td><span class="pill int">int</span></td><td class="num">21</td><td class="num">18</td><td class="num">12</td><td class="num">13</td><td class="num">8</td><td class="num">–</td><td class="num">4</td><td class="num">9</td><td class="num">13</td><td class="num">–</td><td class="num">8</td><td class="num"><strong>106</strong></td></tr><tr><td><strong>ABCD07</strong></td><td><span class="pill spe">spe</span></td><td class="num">15</td><td class="num">15</td><td class="num">6</td><td class="num">9</td><td class="num">3</td><td class="num">–</td><td class="num">4</td><td class="num">9</td><td class="num">9</td><td class="num">–</td><td class="num">4</td><td class="num"><strong>74</strong></td></tr><tr><td><strong>ABCD08</strong></td><td><span class="pill rea">rea</span></td><td class="num">15</td><td class="num">15</td><td class="num">6</td><td class="num">9</td><td class="num">3</td><td class="num">–</td><td class="num">3</td><td class="num">9</td><td class="num">9</td><td class="num">–</td><td class="num">4</td><td class="num"><strong>73</strong></td></tr><tr><td><strong>ABCD09</strong></td><td><span class="pill acc">acc</span></td><td class="num">19</td><td class="num">18</td><td class="num">6</td><td class="num">9</td><td class="num">3</td><td class="num">–</td><td class="num">3</td><td class="num">12</td><td class="num">9</td><td class="num">3</td><td class="num">14</td><td class="num"><strong>96</strong></td></tr><tr><td><strong>ABCD10</strong></td><td><span class="pill int">int</span></td><td class="num">10</td><td class="num">10</td><td class="num">12</td><td class="num">7</td><td class="num">7</td><td class="num">–</td><td class="num">3</td><td class="num">10</td><td class="num">10</td><td class="num">–</td><td class="num">4</td><td class="num"><strong>73</strong></td></tr><tr><td><strong>ABCD11</strong></td><td><span class="pill peak">peak</span></td><td class="num">12</td><td class="num">10</td><td class="num">12</td><td class="num">13</td><td class="num">4</td><td class="num">–</td><td class="num">3</td><td class="num">12</td><td class="num">15</td><td class="num">–</td><td class="num">7</td><td class="num"><strong>88</strong></td></tr><tr style="color:#a78bfa"><td><strong>ABC+D1</strong></td><td><span class="pill acc">acc</span></td><td class="num">20</td><td class="num">20</td><td class="num">16</td><td class="num">15</td><td class="num">3</td><td class="num">3</td><td class="num">6</td><td class="num">12</td><td class="num">12</td><td class="num">6</td><td class="num">14</td><td class="num"><strong>127</strong></td></tr><tr style="color:#a78bfa"><td><strong>ABC+D2</strong></td><td><span class="pill int">int</span></td><td class="num">23</td><td class="num">17</td><td class="num">12</td><td class="num">14</td><td class="num">7</td><td class="num">3</td><td class="num">4</td><td class="num">8</td><td class="num">12</td><td class="num">4</td><td class="num">12</td><td class="num"><strong>116</strong></td></tr><tr style="color:#a78bfa"><td><strong>ABC+D3</strong></td><td><span class="pill spe">spe</span></td><td class="num">17</td><td class="num">15</td><td class="num">16</td><td class="num">8</td><td class="num">10</td><td class="num">4</td><td class="num">4</td><td class="num">12</td><td class="num">12</td><td class="num">4</td><td class="num">12</td><td class="num"><strong>114</strong></td></tr></table><p class="small">Purple rows are your self-written programs. Shoulders excludes the rotation prehab.</p>
+
+<p>Some things to see in the muscle table:</p>
+<ul>
+  <li><strong>Chest and back are always within a few sets of each other.</strong> 16/16, 20/18, 15/23, 11/11, 11/11, 12/17, 19/19, 19/20, 16/16, 22/22, 21/18, 15/15, 15/15, 19/18, 10/10, 12/10. Push and pull volume are balanced on purpose. When one gets ahead, it is a specialization block (ABC03 for back) and the next program corrects it.</li>
+  <li><strong>Hamstrings never get more than 9 sets and calves rarely more than 4.</strong> These are ride-along muscles: always present, never emphasized. If you had asked for a hamstring specialization, the pattern would look different.</li>
+  <li><strong>Biceps and triceps hover at 8–12 sets</strong> and only spike in the arms-day programs (ABCD01–04, up to 16 each). Arms got their own day for exactly four programs and then went back to being finishers. That is a specialization experiment, run once, then closed.</li>
+  <li><strong>Abs jumps from 4 to 20.</strong> When the rest of the program is low-volume and heavy (ABCD04), abs volume explodes. Abs are cheap: they do not compete for recovery with your bench press. Your trainer used them as filler where recovery budget was available.</li>
+  <li><strong>Quads swing from 7 to 18.</strong> Leg day was the first thing cut when the program went heavy. Nine sets of quads at 3x6-8 with 120 s rest (ABCD08) is not less stimulus than 18 sets at 4x10-15 with 60 s rest (ABCD01); it is a different kind.</li>
+</ul>
+
+<h2 id="laws">3. The Seven Laws Behind Every Program</h2>
+
+<p>You asked for the <em>why</em>. Here it is, compressed. Everything in the sixteen
+programs is downstream of these seven decisions. If you internalize them, you can write a
+program your trainer would recognize as one of his. If you break one of them, you will
+usually be able to feel it within three weeks.</p>
+
+<h3>Law 1 — Volume and intensity are a see-saw, never a ladder</h3>
+<p>The heaviest programs are the smallest programs. ABCD08 has 73 working sets at an average
+of 6–7 reps with 119 s rest. ABCD03 has 112 sets at 11–12 reps with 75 s rest. Nobody gets
+both. When the weight goes up, the set count comes down, the rest goes up, and the exercise
+list gets shorter. When the weight comes back down, all three reverse.</p>
+<p>The reason is recovery, not time. Heavy sets cost far more to recover from than moderate
+ones, in the joints and in the nervous system as much as in the muscle. A block that tries to
+keep accumulation-level volume at realization-level loads is the classic self-written program,
+and it is the one that produces a nagging elbow in week four and a stalled bench in week six.
+Your trainer's response to "I want to lift heavier" was always "then we do less." Every single
+time.</p>
+<p>The see-saw also runs inside a single day. Look at any heavy block: the first compound has
+180 s rest, the second 120, the isolation 90 or 60. The rest is proportional to how heavy the
+set is, because that is what the rest is for.</p>
+
+<h3>Law 2 — Intensity techniques live in the high-rep phases; heavy blocks are boring on purpose</h3>
+<p>Count the techniques. ABC02 (intensification, 8–12 reps): 3 pyramids, 6 bi-set lines,
+2 rest-pause, 1 failure, 1 drop. ABCD03 (intensification): 6 pyramids, 6 superset lines,
+2 drops, 2 rest-pause, 2 failure. Now ABCD04 (realization): 25 straight sets, 1 drop set.
+ABCD07: 21 straight, 1 rest-pause, 1 back-off. ABCD08: 23 straight, 1 rest-pause.</p>
+<p>The fatigue techniques (drop, rest-pause, failure, pre-exhaust) exist to squeeze more
+stimulus out of moderate weights. That is exactly what you want when the weight is moderate and
+the goal is volume. It is exactly what you do not want when the weight is heavy, because heavy
+work to failure plus a drop set is how you turn a productive 3x6 into a week of tendon pain.
+Your trainer let the weight be the intensity in the heavy blocks, and let the technique be the
+intensity in the lighter blocks. Never both.</p>
+<p>A corollary: <strong>density techniques (bi-sets, supersets, tri-sets) are for small or cheap
+muscles.</strong> In sixteen programs they were used on abs (constantly), arms (ABCD03), delts
+(front raise + press, ABC03 and ABCD01), calves, and one leg pair (extension + lunge). They were
+never used on the first compound of the day. Supersetting your bench press is a way to make your
+bench press worse, not a way to save time.</p>
+
+<h3>Law 3 — Movement patterns are permanent; the implements rotate</h3>
+<p>Every push day in sixteen programs contains a horizontal press. Every pull day contains a
+row and a vertical pull. Every leg day contains a knee-dominant compound, a leg extension or
+lunge, a leg curl, and calves. The <em>pattern</em> is fixed. What changes is the tool:</p>
+<ul>
+  <li>Horizontal press: barbell bench (10 programs) → incline DB (12) → DB flat (5) → machine press → Smith → dips (6) → weighted push-ups.</li>
+  <li>Vertical pull: lat pulldown (12) → V-bar pulldown (10) → pull-ups → chin-ups → reverse-grip pulldown.</li>
+  <li>Row: bent-over barbell (11) → seated cable (10) → one-arm DB (7) → wide-grip cable → T-bar → Kroc row → kettlebell.</li>
+  <li>Knee-dominant: leg press (13, the most-used exercise of all) → hack squat (7) → back squat (4) → Smith squat (4) → Bulgarian split squat (2).</li>
+</ul>
+<p>The point of rotating the implement is that a barbell bench and an incline DB press train the
+same muscles through slightly different lines of pull, so you can change the stimulus without
+losing the skill or the strength you built. The point of <em>not</em> rotating the pattern is that
+the pattern is the thing you are actually trying to get strong at. A program that swaps the
+horizontal press for a cable crossover for two months is not a variation; it is a two-month
+hole in your bench.</p>
+
+<h3>Law 4 — Inside a wave, change one big variable; between waves, change everything</h3>
+<p>Compare consecutive programs by how many exercises carry over:</p>
+<ul>
+  <li>ABCD07 → ABCD08: <strong>60% of exercises kept.</strong> Reps went from 3x8 to 3x6. That is the whole change. Same movements, one notch heavier.</li>
+  <li>ABCD01 → ABCD02: <strong>62% kept.</strong> Same arms-day split; drop sets swapped for pre-exhaust and failure sets.</li>
+  <li>ABCD10 → ABCD11: <strong>57% kept.</strong> Pyramids stayed on the compounds; accessories went from 3x10 to 3x12 and drop sets came back on day D.</li>
+  <li>ABCD08 → ABCD09: <strong>10% kept.</strong> After the two heaviest blocks, 28 of 31 exercises were new, the reps went from 6 back to 10, and a forearm slot appeared. Total reset.</li>
+  <li>ABCD11 → ABC+D1 (your first self-written program): 6% kept. Also a reset, whether you intended it or not.</li>
+</ul>
+<p>When two blocks are part of the same climb, they share most of their exercises so you can
+carry the weights forward and actually see the progression; changing the exercise <em>and</em> the
+rep scheme at once means every number resets and you learn nothing about whether you got
+stronger. When a climb is over, and it is over after the realization block, everything resets on
+purpose: new movements, new rep range, new rest. The novelty is the recovery.</p>
+
+<h3>Law 5 — A block is about thirty sessions, not a number of weeks</h3>
+<p>Every three-day program is 10 weeks. Every four-day program is 7 weeks. That looks like two
+arbitrary numbers until you multiply: 10 × 3 = 30 sessions, 7 × 4 = 28 sessions. Your trainer
+sized blocks by exposures, not by the calendar. The more often you hit a muscle each week, the
+faster you adapt to the stimulus and the sooner it stops working, so the block ends sooner.</p>
+<p>This is the rule to use when you change frequency. A five-day split would be a five- or
+six-week block. A two-day full-body program could run fifteen weeks. And a block that has
+stopped producing new weights before its thirtieth session is a block that ended early; do not
+grind out the calendar.</p>
+
+<h3>Law 6 — Push and pull stay balanced; the leftover budget goes to a target</h3>
+<p>Chest and back working sets track each other within two or three sets in fourteen of
+sixteen programs. The two exceptions are specialization blocks: ABC03 (15 chest / 23 back) and
+ABCD01 (12 chest / 17 back, plus 18 sets of delts). Both were followed by programs that
+rebalanced.</p>
+<p>The reason is the shoulder. Pressing volume without matching pulling volume rounds the
+shoulders forward and shortens the pecs, which is how the rotator-cuff prehab ended up in every
+program from ABC04 on. Balanced push/pull is not aesthetics; it is the cheapest injury insurance
+there is. Once the balance is set, whatever recovery budget is left over goes to <em>one</em> target
+muscle for a block: biceps in ABC05 (16 sets), triceps in ABCD02 (16), abs in ABCD04 (20),
+chest and back together in ABCD05 (22 each). One target. Never three.</p>
+
+<h3>Law 7 — The ride-alongs never leave, and they moved to the front</h3>
+<p>Some things appear in every program regardless of phase:</p>
+<ul>
+  <li><strong>Calves</strong> on every leg day, 3–6 sets, usually 12–20 reps, 30–60 s rest.</li>
+  <li><strong>Abs</strong> on two or three days per week, in every single program.</li>
+  <li><strong>Shoulder internal and external rotation</strong>, 1–2 sets of 10, on every upper day from ABC04 onward. Twelve programs in a row.</li>
+  <li><strong>Warm-up sets</strong> on the first compound of each muscle group (2x8 or 2x10), and, in the heavy blocks, on every exercise.</li>
+</ul>
+<p>And notice <em>where</em> the abs and the cuff work sit. In ABC01 through ABC03, abs were the last
+line of the day. From ABC04 onward, abs and rotations are the <strong>first</strong> lines of the day,
+before the heavy press. This is a practical fix for a practical problem: work that is at the end
+of the session is work that gets skipped when you are tired or late. Putting the boring,
+important stuff first guarantees it happens, warms up the trunk and cuff before they have to
+stabilize a heavy bar, and costs nothing because four sets of cable crunches do not tire out
+your chest. Copy this. Whatever you keep skipping, move it to slot one.</p>
+
+<div class="callout law">
+<h4>The seven laws in one breath</h4>
+<p>Volume and intensity see-saw. Techniques only in the light phases. Patterns fixed, implements
+rotate. One variable per block inside a wave, everything between waves. Thirty sessions per block.
+Push equals pull, surplus to one target. Ride-alongs always, and up front.</p>
+</div>
+
+<h2 id="anatomy">4. Anatomy of a Training Day</h2>
+
+<p>The laws tell you how programs relate to each other. This section tells you how a single
+day is built. Every day in the sixteen programs follows the same slot order, and once you see
+the slots you will never need to wonder what goes where.</p>
+
+<div class="diagram">
+<svg viewBox="0 0 820 300" xmlns="http://www.w3.org/2000/svg" font-family="Georgia, serif">
+  <defs>
+    <marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#7a7f9a"/></marker>
+  </defs>
+  <g font-size="13" fill="#d4d8e8">
+    <rect x="10" y="20" width="120" height="70" rx="8" fill="#1a1d27" stroke="#22d3ee" stroke-width="1.5"/>
+    <text x="70" y="45" text-anchor="middle" fill="#22d3ee" font-weight="bold">0 · PREP</text>
+    <text x="70" y="65" text-anchor="middle" font-size="11">abs · cuff rotations</text>
+    <text x="70" y="80" text-anchor="middle" font-size="11">4–6 sets, no fatigue</text>
+
+    <rect x="150" y="20" width="130" height="70" rx="8" fill="#1a1d27" stroke="#f87171" stroke-width="1.5"/>
+    <text x="215" y="45" text-anchor="middle" fill="#f87171" font-weight="bold">1 · HEAVY</text>
+    <text x="215" y="65" text-anchor="middle" font-size="11">main compound + wu</text>
+    <text x="215" y="80" text-anchor="middle" font-size="11">longest rest of the day</text>
+
+    <rect x="300" y="20" width="130" height="70" rx="8" fill="#1a1d27" stroke="#fb923c" stroke-width="1.5"/>
+    <text x="365" y="45" text-anchor="middle" fill="#fb923c" font-weight="bold">2 · SECOND</text>
+    <text x="365" y="65" text-anchor="middle" font-size="11">same pattern, new angle</text>
+    <text x="365" y="80" text-anchor="middle" font-size="11">or new implement</text>
+
+    <rect x="450" y="20" width="130" height="70" rx="8" fill="#1a1d27" stroke="#facc15" stroke-width="1.5"/>
+    <text x="515" y="45" text-anchor="middle" fill="#facc15" font-weight="bold">3 · ISOLATE</text>
+    <text x="515" y="65" text-anchor="middle" font-size="11">fly / extension / curl</text>
+    <text x="515" y="80" text-anchor="middle" font-size="11">drop or rest-pause here</text>
+
+    <rect x="600" y="20" width="100" height="70" rx="8" fill="#1a1d27" stroke="#a78bfa" stroke-width="1.5"/>
+    <text x="650" y="45" text-anchor="middle" fill="#a78bfa" font-weight="bold">4 · DELTS</text>
+    <text x="650" y="65" text-anchor="middle" font-size="11">press or raise</text>
+    <text x="650" y="80" text-anchor="middle" font-size="11">4 sets</text>
+
+    <rect x="720" y="20" width="90" height="70" rx="8" fill="#1a1d27" stroke="#4ade80" stroke-width="1.5"/>
+    <text x="765" y="45" text-anchor="middle" fill="#4ade80" font-weight="bold">5–6 · ARMS</text>
+    <text x="765" y="65" text-anchor="middle" font-size="11">two moves</text>
+    <text x="765" y="80" text-anchor="middle" font-size="11">bi-set OK</text>
+
+    <line x1="130" y1="55" x2="148" y2="55" stroke="#7a7f9a" marker-end="url(#arr)"/>
+    <line x1="280" y1="55" x2="298" y2="55" stroke="#7a7f9a" marker-end="url(#arr)"/>
+    <line x1="430" y1="55" x2="448" y2="55" stroke="#7a7f9a" marker-end="url(#arr)"/>
+    <line x1="580" y1="55" x2="598" y2="55" stroke="#7a7f9a" marker-end="url(#arr)"/>
+    <line x1="700" y1="55" x2="718" y2="55" stroke="#7a7f9a" marker-end="url(#arr)"/>
+  </g>
+  <g font-size="12" fill="#7a7f9a">
+    <text x="20" y="130">REST</text>
+    <line x1="60" y1="126" x2="800" y2="126" stroke="#2a2d3a"/>
+    <text x="70" y="150" fill="#22d3ee">60 s</text>
+    <text x="215" y="150" fill="#f87171" text-anchor="middle">120–180 s</text>
+    <text x="365" y="150" fill="#fb923c" text-anchor="middle">90–120 s</text>
+    <text x="515" y="150" fill="#facc15" text-anchor="middle">60–90 s</text>
+    <text x="650" y="150" fill="#a78bfa" text-anchor="middle">60 s</text>
+    <text x="765" y="150" fill="#4ade80" text-anchor="middle">60 s</text>
+    <text x="20" y="185">LOAD</text>
+    <line x1="60" y1="181" x2="800" y2="181" stroke="#2a2d3a"/>
+    <text x="70" y="205" fill="#22d3ee">light</text>
+    <text x="215" y="205" fill="#f87171" text-anchor="middle">heaviest</text>
+    <text x="365" y="205" fill="#fb923c" text-anchor="middle">heavy</text>
+    <text x="515" y="205" fill="#facc15" text-anchor="middle">moderate</text>
+    <text x="650" y="205" fill="#a78bfa" text-anchor="middle">moderate</text>
+    <text x="765" y="205" fill="#4ade80" text-anchor="middle">light–mod</text>
+    <text x="20" y="240">TECHNIQUE</text>
+    <line x1="100" y1="236" x2="800" y2="236" stroke="#2a2d3a"/>
+    <text x="70" y="260" fill="#22d3ee">straight</text>
+    <text x="215" y="260" fill="#f87171" text-anchor="middle">straight / pyramid</text>
+    <text x="365" y="260" fill="#fb923c" text-anchor="middle">straight / pyramid</text>
+    <text x="515" y="260" fill="#facc15" text-anchor="middle">drop · RP · PE</text>
+    <text x="650" y="260" fill="#a78bfa" text-anchor="middle">straight / bi-set</text>
+    <text x="765" y="260" fill="#4ade80" text-anchor="middle">any</text>
+    <text x="410" y="290" text-anchor="middle" font-size="11">Rest, load, and technique all follow the slot. The slot never follows the technique.</text>
+  </g>
+</svg>
+<div class="diagram-caption">The universal day. Slot 0 was added from ABC04 onward; before that the abs sat at the end and were the first thing skipped.</div>
+</div>
+
+<p>Why this order? Because fatigue is a resource you spend, and the heavy compound is the
+thing that most deserves to be done fresh. Everything after slot 1 is progressively more
+tolerant of being done tired. A drop set on the leg extension while your quads are already
+cooked is fine; it is arguably the point. A drop set on the hack squat while your quads are
+fresh is a waste of the freshness. Isolation work also cannot hurt you much when it is done
+fatigued, whereas a heavy squat done fatigued absolutely can.</p>
+
+<p>The slot count is also the volume control. A push day in an accumulation block fills every
+slot and sometimes doubles slot 2 or 3 (ABC02 had four chest exercises). A push day in a
+realization block fills slots 0, 1, 2, 3, and one arm move and stops (ABC04: six lines).
+You never remove slot 1 to make room for something else.</p>
+
+<h3 id="push">4.1 The Push Day</h3>
+<table role="presentation">
+<tr><th>Slot</th><th>Most common choice (programs)</th><th>Alternatives your trainer used</th><th>Notes</th></tr>
+<tr><td>0 Prep</td><td>Cable crunch 4x10-15 (8) · IR/ER 1x10</td><td>Straight-arm crunch, ab wheel, plank on ball, jackknife</td><td>Rotations came in at ABC04; abs moved here at the same time</td></tr>
+<tr><td>1 Heavy press</td><td>Barbell bench press (10)</td><td>Smith bench, machine press, reverse-grip Smith, DB bench, weighted push-ups</td><td>Always with 2 warm-up sets. Rest 80 s (acc) → 180 s (rea)</td></tr>
+<tr><td>2 Second press</td><td>Incline DB press (12)</td><td>Dips (6), incline barbell, incline machine, decline Smith</td><td>Different angle from slot 1. If slot 1 was flat, this is incline or dips</td></tr>
+<tr><td>3 Isolation</td><td>Cable fly (10)</td><td>Machine fly (6), flat DB fly, incline DB fly</td><td>Where the drop set or rest-pause lives in light phases</td></tr>
+<tr><td>4 Delts</td><td>DB / machine shoulder press (10)</td><td>Front raise (6), Arnold press, Viking press, upright row</td><td>Lateral raises usually live on pull day, not here</td></tr>
+<tr><td>5 Triceps A</td><td>Skull crushers (10) / French press</td><td>DB skull crushers, incline skull crushers, JM press, overhead DB extension</td><td>The long-head move: elbow overhead or bar to forehead</td></tr>
+<tr><td>6 Triceps B</td><td>Rope pushdown (9) / pushdown (5)</td><td>Kickback, bench dips, single-arm French press</td><td>The lateral-head move. Often the pyramid or failure set</td></tr>
+</table>
+<p>Two chest presses and one fly is the constant. Three presses appear only in accumulation
+blocks. The trainer's clear favorite pairing is flat barbell in slot 1 and incline DB in slot 2,
+which appears in ABC04, ABCD03, ABCD04, ABCD05, and ABCD07. When slot 1 is a machine or
+Smith variation, slot 2 becomes dips. Read that as a rule: <em>one fixed-path press, one free-weight
+press, every push day</em>.</p>
+
+<h3 id="pull">4.2 The Pull Day</h3>
+<table role="presentation">
+<tr><th>Slot</th><th>Most common choice (programs)</th><th>Alternatives</th><th>Notes</th></tr>
+<tr><td>0 Prep</td><td>Leg raises 4-5x12-15 (5) · IR/ER 1x10</td><td>Dragon flag, crunch AMRAP, plank, ab wheel</td><td>The pull-day ab move is usually a lower-ab / anti-extension move</td></tr>
+<tr><td>1 Heavy pull</td><td>Bent-over barbell row (11)</td><td>Lat pulldown first (ABC01), pull-ups to failure first (ABC02, ABC03), Yates row, T-bar</td><td>2 warm-ups. In the heavy blocks this gets 180 s</td></tr>
+<tr><td>2 Vertical pull</td><td>Lat pulldown (12) / V-bar pulldown (10)</td><td>Pull-ups, chin-ups, reverse-grip pulldown</td><td>Both grips of pulldown often appear on the same day</td></tr>
+<tr><td>3 Second row</td><td>Seated cable row (10)</td><td>Wide-grip seated row, underhand seated row, Kroc row, kettlebell row</td><td>Where rest-pause lives on pull day</td></tr>
+<tr><td>4 Unilateral</td><td>One-arm DB row (7)</td><td>Single-arm seated row, single-arm pulldown</td><td>Appears in about half the programs; dropped in the leanest blocks</td></tr>
+<tr><td>5 Rear delt</td><td>Reverse fly (8)</td><td>Cable reverse fly, DB face pull</td><td>Rear delts are always on pull day, never push</td></tr>
+<tr><td>6 Side delt</td><td>Lateral raise (11) / single-arm lateral (5)</td><td>Upright row</td><td>Lateral raises are a pull-day exercise in this system</td></tr>
+<tr><td>7 Biceps A</td><td>Concentration curl (8) / barbell curl (6)</td><td>Preacher curl (machine or cable), incline DB curl, DB curls</td><td>One curl with a stable elbow (preacher / concentration)</td></tr>
+<tr><td>8 Biceps B</td><td>Hammer curl (4) / rope cable curl (3)</td><td>Cable curl, alternating DB curl</td><td>One curl with a neutral or cable line. Pyramid or failure set here</td></tr>
+</table>
+<p>Pull day is consistently the longest day: three or four back movements, two delt movements,
+two biceps movements. That is because "back" is really three regions, upper (traps/rhomboids via
+rows), lats (via vertical pulls and unilateral rows), and lower (via bent-over rows and, in some
+blocks, deadlifts or rack pulls), and each needs its own line. The delts are split across the
+week on purpose: pressing and front raises on push day, laterals and rear delts on pull day, so
+the shoulder gets hit twice with no single day being a "shoulder day."</p>
+
+<h3 id="legs">4.3 The Leg Day</h3>
+<table role="presentation">
+<tr><th>Slot</th><th>Most common choice (programs)</th><th>Alternatives</th><th>Notes</th></tr>
+<tr><td>0 Prep</td><td>Stretching 1x30s (ABC03, ABCD01) or nothing</td><td>Abs sometimes ride here (weighted Bosu crunch)</td><td>Legs is the one day where prep is optional</td></tr>
+<tr><td>1 Heavy knee-dominant</td><td>Hack squat (7) / leg press (13 overall)</td><td>Back squat (4), Smith squat (4), barbell hack, deadlift (ABC03)</td><td>2 warm-ups, 90–120 s rest. Leg press sometimes leads instead</td></tr>
+<tr><td>2 Second compound</td><td>Leg press (when not slot 1)</td><td>Back squat, Smith squat, quad-focused leg press</td><td>Machine after free-weight, or free-weight after machine</td></tr>
+<tr><td>3 Quad isolation</td><td>Leg extension (12)</td><td>Single-leg extension</td><td>Drop sets and 6x10-12 pre-exhausts live here</td></tr>
+<tr><td>4 Lunge / unilateral</td><td>Walking DB lunges 3x20 (6)</td><td>DB lunges, Smith lunge, Bulgarian split squat (2)</td><td>Often bi-set with leg extension</td></tr>
+<tr><td>5 Hamstring</td><td>Seated leg curl (10) / lying leg curl (6)</td><td>Stiff-leg deadlift (4), good morning, deadlift</td><td>Drop set or truncated pyramid here. The hip-hinge appears in roughly a third of programs</td></tr>
+<tr><td>6 Calves</td><td>Calf press (8) / Smith calf raise (5)</td><td>Seated calf raise</td><td>3–6 sets, 12–30 reps, 30–60 s. Every program</td></tr>
+</table>
+<p>Leg day is the most conservative day in the whole system. The same seven-slot skeleton
+appears in ABC01 and ABCD11 with only implement swaps. Quads get two compounds plus an isolation
+plus a lunge; hamstrings get one curl and occasionally a hinge; glutes get nothing dedicated
+except in the two blocks with hip abductors or hip thrusts. This is a quad-forward, machine-heavy
+leg day, which is a reasonable choice for a physique program where the free-weight squat is
+present but not the centerpiece. If you ever want a hamstring or glute specialization, this is
+the day that has the most room to change.</p>
+
+<h3 id="arms">4.4 The Arms Day (ABCD01–ABCD04 only)</h3>
+<p>For four programs the fourth day was arms plus abs. The template:</p>
+<ul>
+  <li>Abs tri-set or straight sets first (crunch / leg raise / plank).</li>
+  <li>Biceps: one barbell or machine curl with a pyramid or failure scheme, one DB curl 4x8, one cable curl to failure.</li>
+  <li>Triceps: mirror image, rope pushdown pyramid, skull crushers 4x8-12, kickback or single-arm French press with rest-pause or failure.</li>
+  <li>ABCD03 turned the whole day into antagonist supersets: barbell curl + skull crusher, French press + barbell curl, cable curl + pushdown, with 90 s rest after each pair.</li>
+</ul>
+<p>The arms day pushes biceps and triceps volume from 8–10 sets to 12–16 sets per week. That is
+what it is for. It was run for four consecutive blocks (28 weeks) and then retired in favor of a
+fourth upper-body day, which suggests either the arms caught up or the trainer decided the fourth
+day was better spent on a second chest/back exposure. Either way, it is a specialization tool,
+not a permanent fixture.</p>
+
+<h3 id="upper">4.5 The Upper (MMSS) Day (ABCD05–ABCD11)</h3>
+<p><em>MMSS</em> is <em>membros superiores</em>, upper limbs. From ABCD05 on, the fourth day was a
+compressed second upper session. It is always six to eight lines and always follows the same
+recipe:</p>
+<ul>
+  <li>Two chest moves: a press and a fly or second press. <strong>Always the implement that days A did not use.</strong> If Monday's bench was barbell, Thursday's is DB or machine. ABCD05: A = barbell bench + incline DB, D = DB bench + incline barbell. Swapped exactly.</li>
+  <li>One triceps move.</li>
+  <li>Two back moves: a vertical pull and a row, again the implements A/B did not use. ABCD08: B = wide cable row + seated row + V-bar; D = lat pulldown + one-arm DB row.</li>
+  <li>One biceps move.</li>
+  <li>Sometimes a lateral raise or upright row, and in ABCD11 the abs bi-set rides here.</li>
+</ul>
+<p>The upper day is why chest and back volume in the ABCD05+ programs sits near 20 sets each
+while the push and pull days themselves are no bigger than in the ABC era. Frequency went from
+one exposure per week to two for everything above the waist, while legs stayed at one. That
+matches the priorities of the person being trained: this is an upper-body-first program, and
+the fourth day says so explicitly.</p>
+
+<h2 id="programs">5. Program by Program</h2>
+
+<p>Now the sixteen in order. For each one: what it is, what changed from the block before,
+why that change makes sense, and what is worth stealing. The numbers in each header are
+days · weeks · exercises · working sets · average rest · average rep range. I count shoulder
+rotations as prep, not as shoulder work, and warm-up sets are excluded from the set counts.</p>
+
+<h3 id="abc01">5.1 ABC01 – ABC05: the three-day era</h3>
+
+<div class="card">
+<div class="meta">ABC01 · <span class="pill acc">accumulation</span> · 3 days · 10 weeks · 25 exercises · 91 sets · rest 61 s · reps 10–14</div>
+<p><strong>What it is.</strong> The baseline. Every exercise is 4x8-12 straight sets with 60 s rest,
+except the first compound of each day, which gets two warm-up sets of ten and 80 s. Push day is
+four chest movements (barbell bench, incline machine, cable fly, DB bench), a DB press, a
+side-and-front raise sequence, two triceps moves, and an abs bi-set at the end. Pull day is four
+back movements (pulldown, V-bar, one-arm row, barbell row), reverse fly, single-arm lateral, two
+biceps moves. Leg day is hack squat, back squat, leg press, leg extension with a drop, walking
+lunges, seated leg curl, and six sets of seated calves.</p>
+<p><strong>The design idea.</strong> Establish the skeleton and let the weights find their level.
+There is almost nothing clever here on purpose: an accumulation block for someone new to a
+coach is a block where the coach learns what you can lift and you learn the movements. The one
+sophisticated touch is the four-rung descending-rep pyramid on the rope pushdown and rope curl
+(<code>20-30/15-20/10-15/5-10</code>), which is a way to warm up small joints thoroughly while
+still finishing heavy.</p>
+<p><strong>Steal this.</strong> The push/pull/legs skeleton, the balance (16 chest / 16 back), and
+the rule that the first compound gets warm-ups and longer rest than everything after it.</p>
+</div>
+
+<div class="card">
+<div class="meta">ABC02 · <span class="pill int">intensification</span> · 3 days · 10 weeks · 27 exercises · 98 sets · rest 69 s · reps 10–13</div>
+<p><strong>What changed.</strong> The skeleton is the same, 48% of exercises carried over, and the
+techniques were layered on. Barbell bench became a pyramid (<code>12-15/10-12/8-10/5-8</code>), the
+first time you touched a 5–8 rep set. Machine fly got bi-set with push-ups to failure. Cable fly
+picked up rest-pause. A decline machine press was added so there were five chest lines. Pull-ups
+to failure now open pull day; the pulldown is a pyramid; the seated row is rest-pause; the one-arm
+row is an ascending pyramid. On legs, extension and lunges became a bi-set and the lying leg
+curl got a drop set. Rest on the squats went to 90 s.</p>
+<p><strong>Why.</strong> This is the textbook move from accumulation to intensification: keep the
+volume roughly where it was (91 → 98 sets) and make each set cost more. The pyramids introduce
+heavy singles-digit sets without making the whole session heavy; the failure and rest-pause work
+extends the moderate sets past where they would normally stop. You are being taught to work
+harder inside the same movements you already know, which is exactly why the exercises did not
+change much.</p>
+<p><strong>Steal this.</strong> The transition itself. When a block has stopped producing new
+weights, the cheapest next block is the same exercises with a pyramid on the main lift and one
+fatigue technique per day on an isolation move.</p>
+</div>
+
+<div class="card">
+<div class="meta">ABC03 · <span class="pill spe">specialization</span> · 3 days · 10 weeks · 27 exercises · 99 sets · rest 67 s · reps 10–12</div>
+<p><strong>What changed.</strong> Only 30% of exercises carried over, and the volume moved. Push day
+leads with <em>incline</em> barbell (4x8-10), then incline DB flyes, then incline DB press pyramid:
+three incline moves in a row, with the machine fly rest-pause after. Front raise and DB press became
+a bi-set. Pull day is five back movements (pull-ups, V-bar, seated row, one-arm row pyramid,
+underhand row rest-pause) for 23 sets, plus three biceps moves for 11. Leg day changed character
+completely: stretching, then a <em>deadlift</em> (3x10 warm-up + 4x10), leg press, a truncated
+pyramid on the seated leg curl (<code>2x12-15/2x8-12/2x5-8</code>), Bulgarian split squats, and
+Smith calves. Quads dropped from 17 to 9 sets.</p>
+<p><strong>Why.</strong> This is what specialization looks like in practice: the extra sets go to
+upper chest and back, the deadlift and the six-set leg-curl pyramid shift the leg day toward the
+posterior chain, and the quads are cut to pay for it. Notice that total volume barely moved
+(98 → 99). Specialization is a <em>redistribution</em>, not an addition. Notice too that the reps
+crept down (4x8-10 on the lead lifts instead of 8-12), which is the intensification trend
+continuing underneath.</p>
+<p><strong>Steal this.</strong> The truncated pyramid for a muscle you want to bring up: two sets on
+each of three rungs gives six quality sets with a built-in warm-up and a built-in heavy finish.</p>
+</div>
+
+<div class="card">
+<div class="meta">ABC04 · <span class="pill rea">realization</span> · 3 days · 10 weeks · 19 exercises · 80 sets · rest 70 s · reps 9–12</div>
+<p><strong>What changed.</strong> Eight exercises disappeared. Bench is 4x6-8, incline DB is 4x6-8,
+the pyramids on the rope pushdown and cable curl now end at 6-8, the leg curl pyramid ends at 5-8.
+Rest on the compounds went to 90 s. And two things appeared that never left again: shoulder
+internal and external rotations at the top of pull day, and abs (leg raises 5x12-15) as the
+<em>first</em> line of the day instead of the last.</p>
+<p><strong>Why.</strong> Three blocks of accumulating and intensifying have to be cashed in. The
+realization block strips the exercise list to the essentials so the sets you keep can be genuinely
+heavy, and the drop in total sets (99 → 80) is what pays for the drop in reps. The cuff work
+arriving at the same moment the loads went up is not a coincidence; heavy pressing at 6-8 reps is
+where shoulders start to complain, and the rotations are the cheapest insurance available. Moving
+abs to the front is the fix for abs being skipped, which they had been for three programs.</p>
+<p><strong>Steal this.</strong> Cutting exercises when the weight goes up. If you cannot name which
+eight lines you would remove from your current program to make it a realization block, you do not
+yet have a realization block.</p>
+</div>
+
+<div class="card">
+<div class="meta">ABC05 · <span class="pill acc">accumulation</span> · 3 days · 10 weeks · 24 exercises · 98 sets · rest 64 s · reps 10–12</div>
+<p><strong>What changed.</strong> The reset. Only 29% carried over. The reps go back to 8-12 and
+pyramids (<code>1x12/2x8-10/2x5-8</code>) carry their own warm-up, so explicit warm-up lines almost
+vanish. Push day opens with two light sets of cable fly as a primer before DB bench; pull day opens
+with two light sets of seated row before the barbell row. Overhead extension and bench dips are a
+bi-set; preacher and hammer curls are a bi-set; stiff-leg deadlift and lying leg curl are a
+bi-set. Biceps get four exercises and 16 sets; triceps 12; abs 9 with the ab wheel to failure up
+front. Prep slot (ab wheel or leg raises, then rotations) is now on both upper days.</p>
+<p><strong>Why.</strong> After a realization block you cannot simply go heavier again; the joints and
+the motivation both need the loads to come down and the exercise list to change. The primer sets
+(two easy sets of an isolation move before the heavy compound) are a gentler version of pre-exhaust:
+they wake the muscle up without tiring it. The arms getting 28 combined sets is a quiet
+specialization tucked inside the accumulation block, and it was the setup for the next four
+programs, which gave arms their own day.</p>
+<p><strong>Steal this.</strong> The primer-set idea, and the hamstring bi-set (a hinge paired with a
+curl) as a way to double hamstring work without adding a slot.</p>
+</div>
+
+<h3 id="abcd01">5.2 ABCD01 – ABCD04: the arms-day era</h3>
+
+<p>Here the program went to four days and the block length dropped from ten weeks to seven.
+The fourth day is arms plus abs. Chest and shoulders share a day; back and rear delts share a
+day; legs get a full day.</p>
+
+<div class="card">
+<div class="meta">ABCD01 · <span class="pill int">intensification</span> · 4 days · 7 weeks · 30 exercises · 107 sets · rest 65 s · reps 10–14</div>
+<p><strong>What it is.</strong> The most drop-set-heavy program of the sixteen (five of them) and
+the first appearance of 5x5-8 on the lead lifts (incline DB press, lat pulldown). Chest day opens
+with a machine fly drop set before the pressing, a pre-exhaust in spirit; machine press gets a
+drop; front raise and upright row are a bi-set. Back day: six sets of cable crunches, rotations,
+then the only true up-and-down pyramid in all sixteen programs on the barbell row
+(<code>12-15/10/5/10/12-15</code>), a cable row drop, pulldown 5x5-8, wide row, lateral raise drop,
+reverse fly. Arms day: abs tri-set, then three biceps and three triceps moves with a pyramid, a
+straight 4x8, and a failure or rest-pause finisher on each side. Legs: stretching, hack squat
+3x8 after warm-ups, DB lunges, extension + walking-lunge bi-set, leg press, leg curl drop, calf
+press 3x20-30.</p>
+<p><strong>Why.</strong> Going from three days to four is itself the accumulation; the trainer
+skipped straight to intensification because the fourth day already added the volume (98 → 107
+sets). Delts get 18 sets, the most of any program, because chest-and-shoulders and
+back-and-rear-delts each put a full delt slot in. The 5x5-8 on the lead lifts is the heaviest
+straight-set scheme you had seen: five sets is a lot of exposures to a near-limit weight, and it
+only works because the rest of the day is machines and cables.</p>
+<p><strong>Steal this.</strong> The <code>15/12/2x5-10</code> arm pyramid, and the idea that one lift
+per day can be 5x5-8 as long as everything around it is moderate.</p>
+</div>
+
+<div class="card">
+<div class="meta">ABCD02 · <span class="pill spe">specialization</span> · 4 days · 7 weeks · 26 exercises · 106 sets · rest 66 s · reps 9–11</div>
+<p><strong>What changed.</strong> 62% of exercises kept (Law 4). The novelty is pre-exhaust done
+seriously: cable fly for <em>six</em> sets of 10-12 before any pressing on push day, and seated cable
+row for six sets before the barbell row on pull day. Then four chest presses (DB bench pyramid,
+incline barbell 4x8, incline DB 4x8, machine press with a drop). Pull day has a pulldown and a
+reverse-grip pulldown back to back. Arms day now uses "one working set then three to failure" on
+the preacher machine and the rope pushdown, and single-arm French press at 4x6-8. Leg day is
+compact: hack pyramid, leg press, extension with a strip set, hip abductor (first glute-specific
+line), lying leg curl, calf pyramid.</p>
+<p><strong>Why.</strong> The specialization here is chest and arms (19 chest sets, 16 triceps, 16
+biceps). Pre-exhaust is the tool: by the time you press, the pecs are already worked, so the
+press finishes them rather than the triceps or front delts finishing first. Most of the reps sit at
+8, so this is also a step heavier than ABCD01; the trainer never ran two blocks at the same rep
+target in a row.</p>
+<p><strong>Steal this.</strong> The six-set isolation opener when one muscle refuses to grow from
+compounds alone. And the rule of "one hard set, then failure sets" for arm finishers, which produces
+enormous fatigue with only four lines.</p>
+</div>
+
+<div class="card">
+<div class="meta">ABCD03 · <span class="pill int">intensification</span> · 4 days · 7 weeks · 30 exercises · 112 sets · rest 75 s · reps 11–12</div>
+<p><strong>What it is.</strong> The biggest program of the sixteen, and the one where every tool was
+used at once. Push: bench leg raises + plank bi-set, rotations, bench pyramid <code>12/10/8/6</code>
+with 120 s rest (the first time 120 s appeared), machine press drop, incline DB pyramid 12/10/8/6
+at 120 s, cable fly rest-pause, push-ups to failure, a machine shoulder press drop, front raises.
+Five chest lines. Pull: dragon flag, barbell row pyramid at 120 s, Kroc row with a failure set,
+pulldown pyramid, V-bar rest-pause, kettlebell row, single-arm laterals. Arms: three antagonist
+supersets (curl + skull crusher, French press + curl, cable curl + pushdown) with 90 s after each
+pair. Legs: leg extension 6x10-12 <em>first</em>, then leg press 4x10 at 120 s, hack squat 4x12 with
+only 45 s, seated curl pyramid, lying curl 4x6-8, calf pyramid.</p>
+<p><strong>Why.</strong> This is the top of the wave. Volume, pyramids to 6, rest-pause, failure,
+supersets, and pre-exhaust all in the same seven weeks. It is sustainable for seven weeks precisely
+because it is only seven weeks, and because the block after it (ABCD04) is the exact opposite. If
+you ever want to know what "as much as you can recover from" looks like for you, it looks like this.
+Note the rest on the lead lifts going to 120 s while the isolation rest stays at 60: the see-saw
+inside the day.</p>
+<p><strong>Steal this.</strong> The antagonist-superset arms day, which is the most time-efficient way
+to get 24 arm sets done, and the leg-extension-first leg day for a quad-focused block.</p>
+</div>
+
+<div class="card">
+<div class="meta">ABCD04 · <span class="pill rea">realization</span> · 4 days · 7 weeks · 26 exercises · 94 sets · rest 99 s · reps 10–11</div>
+<p><strong>What changed.</strong> Every technique gone except one drop set on reverse flys. Every
+working line is 4x8 (or 3x8 on legs) with 120 s rest. Push: plank on ball 4x90 s, jackknife,
+rotations, bench, incline DB, dips, machine fly, lateral raise. Pull: ab wheel, dragon flag,
+rotations, pull-ups, seated row, V-bar, barbell row, reverse fly. Arms: four lines of 4x8 at 120 s,
+plus rower crunches 4x30 and cable crunches. Legs: hack, stiff-leg deadlift, extension, seated
+curl, lunges 3x16 steps, calves, each with one warm-up set and 120 s. Abs get 20 sets, the most of
+any program.</p>
+<p><strong>Why.</strong> After ABCD03 the only sensible next block is one that takes everything
+away except the weight. The straight 4x8 at 120 s is a strength-endurance scheme that lets the
+loads from the pyramids become working weights for four full sets. The average rest jumping from
+75 to 99 s is the clearest signal in the whole table that a block is a realization block. The abs
+volume ballooning is the trainer using the recovery budget that low-volume heavy work leaves free:
+abs do not compete with your bench, so when the bench is heavy, abs are cheap.</p>
+<p><strong>Steal this.</strong> The template itself. "Every line 4x8 at 120 s, one warm-up set, no
+techniques" is a complete realization block you can write in ten minutes for any split.</p>
+</div>
+
+<h3 id="abcd05">5.3 ABCD05 – ABCD08: the strength climb</h3>
+
+<p>The split changed again. Arms day was retired and replaced with an upper-body day (MMSS),
+which put chest and back at two exposures a week. These four blocks are one continuous climb in
+load: 4x8 pyramids → waves to 6 → 3x8 → 3x6. Rest climbs with it: 89 → 108 → 132 → 119 s.</p>
+
+<div class="card">
+<div class="meta">ABCD05 · <span class="pill peak">peak strength</span> · 4 days · 7 weeks · 23 exercises · 102 sets · rest 89 s · reps 9–10</div>
+<p><strong>What it is.</strong> Twelve pyramids, all ending in three or four sets of 8, plus warm-ups
+on nearly everything. Push: cross crunch, rotations, incline DB 2x8wu+4x8 at 120, bench 2x8wu+4x8
+at 120, cable fly 4x8-12, front raise pyramid 15/12/2x10, French press 4x8. Pull: crunch 3x30,
+rotations, barbell row 4x8 at 120, seated row 4x8, pulldown 4x8-12, lateral raise pyramid,
+preacher curl 4x8. Legs: five lines, each a pyramid finishing at 3-4x8 (extension, leg press,
+Bulgarian, seated curl, calves with a 15-rep back-off). Upper: DB bench, incline barbell, skull
+crushers, V-bar, one-arm row, barbell curl, every one <code>12/10/3x8</code> at 120 s.</p>
+<p><strong>Why.</strong> This is the first program with upper body twice a week, and the trainer
+made the fourth day mirror days A and B with the opposite implements (barbell bench on A, DB bench
+on D; incline DB on A, incline barbell on D; seated row and barbell row on B, one-arm row and V-bar
+on D). The pyramid-to-8 scheme lets a second weekly exposure happen without either day being a
+grind: the 12 and 10 rungs are warm-ups you count, and only the 8s are hard. "Peak" is the label;
+"heavy 4x8 with a built-in ramp" is what it is.</p>
+<p><strong>Steal this.</strong> The upper-day mirror rule: same patterns as A and B, opposite tools.</p>
+</div>
+
+<div class="card">
+<div class="meta">ABCD06 · <span class="pill int">intensification</span> · 4 days · 7 weeks · 25 exercises · 106 sets · rest 108 s · reps 8–10</div>
+<p><strong>What changed.</strong> The loads step up. Bench is a wave, <code>2x8wu+10/8/6/6</code>, with
+180 s rest, the first 180 in any program. The one-arm row gets the same wave and the same 180 s.
+Dips 4x8 at 120. DB press 4x8. Single-arm French press 4x6-8. Concentration curls 4x6-8. Legs:
+leg press pyramid to 4x8-12, back squat 4x8-12 at 120, stiff-leg deadlift 4x8-12 at 120, single-leg
+extension 3x8, seated curl with a drop, calf pyramid with a 15-rep back-off. Upper: incline DB
+<code>12/10/8/3x6</code>, machine fly 3x6-8 with a drop, DB skull crushers to 3x6-8, pulldown
+<code>12/10/8/3x6</code>, single-arm seated row 4x8, DB curl to 3x6-8.</p>
+<p><strong>Why.</strong> Intensification in this era means "heavier," not "more techniques."
+The waves and pyramids reach 6 reps on almost every lift, the drop sets survive only on machines
+(fly, curl, reverse fly), and rest is now above 100 s on average. Chest sits at 21 sets, the second
+highest ever, but the sets are shorter and heavier. This is the block that decides whether the next
+two blocks of 3x8 and 3x6 will be productive: the 6-rep rungs here are the rehearsal.</p>
+<p><strong>Steal this.</strong> The 10/8/6/6 wave. It is a pyramid that spends two sets at the heavy
+end instead of one, which is where the strength adaptation actually happens.</p>
+</div>
+
+<div class="card">
+<div class="meta">ABCD07 · <span class="pill spe">specialization (label)</span> — trains as realization · 4 days · 7 weeks · 25 exercises · 74 sets · rest 132 s · reps 8–9</div>
+<p><strong>What it is.</strong> Every single working line is <code>2x8wu+3x8</code> (or 1x8wu+3x8 on
+arms) with 120–180 s rest. Forty warm-up sets, seventy-four working sets. Push: cable crunch,
+rotations, incline DB at 180, bench at 180, cable fly 120, DB press 120, skull crushers 120, rope
+120. Pull: 200 crunches however many sets it takes, rotations, barbell row, seated row, pulldown all
+at 180, laterals, concentration curl, hammer curl at 120. Legs: Smith lunge, Smith squat at 180,
+leg press, seated curl with a rest-pause finisher, calf press with a back-off. Upper: DB bench,
+machine press, single-arm French, V-bar, one-arm row, preacher, all 3x8.</p>
+<p><strong>Why.</strong> Whatever the tag says, this is a strength block: the exercise count is the
+same as ABCD06 but the sets dropped from 106 to 74, the rest went to 132 s, and there is nothing in
+it but straight sets. Two warm-ups on <em>every</em> exercise, not just the first, is the tell:
+when the working weight is heavy on the isolation moves too, they need ramping. The 200-rep crunch
+target is the abs equivalent of ABCD04's 20 sets: cheap work in a block with spare recovery.</p>
+<p><strong>Steal this.</strong> "3x8 everything, two warm-ups everything, 120–180 s everything" as
+the first half of a two-block strength peak.</p>
+</div>
+
+<div class="card">
+<div class="meta">ABCD08 · <span class="pill rea">realization</span> · 4 days · 7 weeks · 25 exercises · 73 sets · rest 119 s · reps 6–7</div>
+<p><strong>What changed.</strong> 60% of exercises kept, and the 8s became 6s. That is the entire
+difference. Bench 2x8wu+3x6 at 180, dips 3x6, cable fly 3x6-8, machine press 3x6, pushdown 3x6,
+skull crushers 3x6. Pull: 300 crunches, then wide row, seated row, V-bar, laterals 3x8,
+concentration and preacher curls 3x6. Legs: extension 3x6-8, leg press 3x6-8, DB lunges 3x6,
+seated curl 3x8 with rest-pause, Smith calves 3x8-12. Upper: incline DB, machine press, DB skull
+crushers, pulldown, one-arm row, barbell curl, all 3x6.</p>
+<p><strong>Why.</strong> This is the heaviest program of the sixteen and the smallest. It is the
+payoff for ABCD05, 06, and 07. Because the movements are the ones from ABCD07, every weight on the
+bar is a known quantity plus a small jump; the trainer did not make you learn a new exercise while
+lifting the most you had ever lifted. That is Law 4 at its most literal. After this block the loads
+were as high as they were going to get in this cycle, and the next program had to be a reset.</p>
+<p><strong>Steal this.</strong> The pairing. A 3x8 block followed by the same exercises at 3x6 is
+the simplest two-step strength peak there is, and it is exactly what your own programs have not
+done yet.</p>
+</div>
+
+<h3 id="abcd09">5.4 ABCD09 – ABCD11: reset and rebuild</h3>
+
+<div class="card">
+<div class="meta">ABCD09 · <span class="pill acc">accumulation</span> · 4 days · 7 weeks · 31 exercises · 96 sets · rest 91 s · reps 10</div>
+<p><strong>What it is.</strong> Twenty-eight of thirty-one exercises are new. Everything is 3x10
+after one or two warm-up sets, with 80–180 s rest. No techniques at all: thirty straight-set lines.
+Push: dumbbell circles 4x12 as a shoulder warm-up, reverse-grip Smith bench, weighted dips, incline
+seated cable fly at 37°, seated Viking press, barbell triceps extension, pushdown, lying
+chest-supported wrist curls, cable crunch. Pull: rotations, seated lat pull-in, T-bar row, Reeves
+row, behind-the-back upright row, cable preacher, hammer curl, Zercher back curl (1x5wu+3x5, the only
+straight-sets-of-5 line in sixteen programs), weighted boat crunch. Legs: barbell hack squat, Smith squat,
+single-leg Smith good morning, quad-focused leg press, calves, Bosu crunches. Upper: 30° incline
+Smith, flat DB fly, JM press, rack pulls, pullover, incline DB curl, dead-stop cheat curl, weighted
+sit-ups.</p>
+<p><strong>Why.</strong> After fourteen weeks at 3x8 and 3x6, the reset has to do three things: bring
+the reps up so the joints get a break from limit loads, change the movements so there is a fresh
+stimulus and no pressure to match old numbers, and keep the rest fairly long because the strength
+you built means even 3x10 is now heavy. All three are here. The exotic exercise selection (Reeves
+row, Zercher back curl, rack pulls, JM press, Viking press) is not showing off; it is the point.
+A new exercise is "free" progress for four to six weeks because the early gains are neural. Forearms
+appear for the first time because there is room.</p>
+<p><strong>Steal this.</strong> The reset recipe: 3x10, straight sets, mostly new movements,
+moderate rest. And the principle that novelty is a recovery tool, not just a boredom tool.</p>
+</div>
+
+<div class="card">
+<div class="meta">ABCD10 · <span class="pill int">intensification</span> · 4 days · 7 weeks · 23 exercises · 73 sets · rest 83 s · reps 9–10</div>
+<p><strong>What changed.</strong> Back to familiar movements (22% carried over from ABCD09, but most
+are old friends from earlier blocks), and the scheme is <code>12/10/8/5</code> on every lead lift:
+bench, dips, pushdown, V-bar, barbell row, preacher machine, leg extension, seated curl. Accessories
+are 3x10. Only 23 exercises and 73 sets, the same size as ABCD08. Upper day: incline DB and
+pulldown with 2x10-12 plus a drop, lateral raise, rope, upright row, incline curl. Plank 3x2 min.</p>
+<p><strong>Why.</strong> The 5-rep top set on every pyramid is a heavy single-set touch of the
+weights from ABCD08, once per exercise per week, inside a program that is otherwise moderate.
+That is how you keep strength while the volume stays low enough to recover from the reset block.
+The small exercise count means each pyramid gets full attention. Quads at 7 sets is the lowest in
+any program; leg day is five lines. This is a lean, focused block, which is what an intensification
+block after a novelty block should be.</p>
+<p><strong>Steal this.</strong> The 12/10/8/5 pyramid as a strength-maintenance device: it hides
+one near-max set inside four sets of ramping.</p>
+</div>
+
+<div class="card">
+<div class="meta">ABCD11 · <span class="pill peak">peak (label)</span> — trains as volume rebuild · 4 days · 7 weeks · 29 exercises · 88 sets · rest 77 s · reps 10–11</div>
+<p><strong>What changed.</strong> 57% carried over. The pyramids stay on the compounds (machine
+press, dips, pulldown, V-bar, leg extension, all <code>2x8wu+12/10/8/5</code>), but the accessories go
+from 3x10 to 3x12 and multiply: three triceps moves on push day, three biceps moves on pull day.
+Smith squat, Smith lunge, and leg press at 3x12. Seated curl <code>12/10/8/8+Drop</code>. Upper day
+brings drop sets back on the incline machine, incline DB, and wide row (<code>2x10-12+1xDrop</code>),
+with laterals, single-arm laterals, single-arm French press, rope, and incline curls. Mountain
+climbers and rower crunches as an abs bi-set. Rest falls back to 77 s.</p>
+<p><strong>Why.</strong> This closes the cycle by rebuilding volume on top of the strength from
+ABCD10: same heavy pyramids, more and longer accessory work, drop sets back on the upper day.
+The trainer called it a peak; structurally it is the first half of a new accumulation, and had the
+sequence continued the next block would likely have been a full accumulation with new movements.
+Arms at 15 triceps / 12 biceps and quads at 13 show the volume coming back everywhere at once.</p>
+<p><strong>Steal this.</strong> The split-personality block: heavy pyramids on compounds and
+high-rep accessories in the same session lets you hold strength and add volume for a few weeks
+before a full reset. This is also the last program your trainer wrote before you started writing
+your own, so it is the block your ABC+D1 should have been compared against.</p>
+</div>
+
+<h2 id="connect">6. How the Programs Connect: The Wave</h2>
+
+<p>Individually, each program is a sensible seven or ten weeks. Together they are something
+better: three overlapping waves of load, each one built on the last. Here is the whole sequence
+drawn as one timeline.</p>
+
+<div class="diagram"><svg viewBox="0 0 820 250" xmlns="http://www.w3.org/2000/svg" font-family="Georgia, serif" font-size="10"><text x="20" y="18" fill="#d4d8e8" font-size="12" font-weight="bold">Cycle 1 · 3 days</text><text x="327" y="18" fill="#d4d8e8" font-size="12" font-weight="bold">Cycle 2 · arms day</text><text x="499" y="18" fill="#d4d8e8" font-size="12" font-weight="bold">Cycle 3 · strength climb</text><text x="671" y="18" fill="#d4d8e8" font-size="12" font-weight="bold">Cycle 4 · reset</text><rect x="20.0" y="30" width="59.4" height="44" fill="#4ade80" opacity="0.35" stroke="#4ade80" rx="4"/><text x="50.7" y="47" text-anchor="middle" fill="#fff" font-size="10.5" font-weight="bold">A01</text><text x="50.7" y="62" text-anchor="middle" fill="#d4d8e8" font-size="9">acc</text><rect x="23.0" y="123.8" width="53.4" height="36.2" fill="#6b8cff" opacity="0.6" rx="2"/><text x="50.7" y="119.8" text-anchor="middle" fill="#a5b4fc" font-size="9">91</text><circle cx="50.7" cy="228.4" r="3" fill="#fb923c"/><text x="50.7" y="222.4" text-anchor="middle" fill="#fb923c" font-size="8.5">61s</text><text x="50.7" y="176" text-anchor="middle" fill="#7a7f9a" font-size="8.5">10–14</text><rect x="81.4" y="30" width="59.4" height="44" fill="#facc15" opacity="0.35" stroke="#facc15" rx="4"/><text x="112.1" y="47" text-anchor="middle" fill="#fff" font-size="10.5" font-weight="bold">A02</text><text x="112.1" y="62" text-anchor="middle" fill="#d4d8e8" font-size="9">int</text><rect x="84.4" y="115.7" width="53.4" height="44.3" fill="#6b8cff" opacity="0.6" rx="2"/><text x="112.1" y="111.7" text-anchor="middle" fill="#a5b4fc" font-size="9">98</text><circle cx="112.1" cy="223.6" r="3" fill="#fb923c"/><text x="112.1" y="217.6" text-anchor="middle" fill="#fb923c" font-size="8.5">69s</text><text x="112.1" y="176" text-anchor="middle" fill="#7a7f9a" font-size="8.5">10–13</text><rect x="142.8" y="30" width="59.4" height="44" fill="#a78bfa" opacity="0.35" stroke="#a78bfa" rx="4"/><text x="173.5" y="47" text-anchor="middle" fill="#fff" font-size="10.5" font-weight="bold">A03</text><text x="173.5" y="62" text-anchor="middle" fill="#d4d8e8" font-size="9">spe</text><rect x="145.8" y="114.5" width="53.4" height="45.5" fill="#6b8cff" opacity="0.6" rx="2"/><text x="173.5" y="110.5" text-anchor="middle" fill="#a5b4fc" font-size="9">99</text><circle cx="173.5" cy="224.8" r="3" fill="#fb923c"/><text x="173.5" y="218.8" text-anchor="middle" fill="#fb923c" font-size="8.5">67s</text><text x="173.5" y="176" text-anchor="middle" fill="#7a7f9a" font-size="8.5">10–12</text><rect x="204.3" y="30" width="59.4" height="44" fill="#fb923c" opacity="0.35" stroke="#fb923c" rx="4"/><text x="235.0" y="47" text-anchor="middle" fill="#fff" font-size="10.5" font-weight="bold">A04</text><text x="235.0" y="62" text-anchor="middle" fill="#d4d8e8" font-size="9">rea</text><rect x="207.3" y="136.7" width="53.4" height="23.3" fill="#6b8cff" opacity="0.6" rx="2"/><text x="235.0" y="132.7" text-anchor="middle" fill="#a5b4fc" font-size="9">80</text><circle cx="235.0" cy="223.0" r="3" fill="#fb923c"/><text x="235.0" y="217.0" text-anchor="middle" fill="#fb923c" font-size="8.5">70s</text><text x="235.0" y="176" text-anchor="middle" fill="#7a7f9a" font-size="8.5">10–12</text><rect x="265.7" y="30" width="59.4" height="44" fill="#4ade80" opacity="0.35" stroke="#4ade80" rx="4"/><text x="296.4" y="47" text-anchor="middle" fill="#fff" font-size="10.5" font-weight="bold">A05</text><text x="296.4" y="62" text-anchor="middle" fill="#d4d8e8" font-size="9">acc</text><rect x="268.7" y="115.7" width="53.4" height="44.3" fill="#6b8cff" opacity="0.6" rx="2"/><text x="296.4" y="111.7" text-anchor="middle" fill="#a5b4fc" font-size="9">98</text><circle cx="296.4" cy="226.6" r="3" fill="#fb923c"/><text x="296.4" y="220.6" text-anchor="middle" fill="#fb923c" font-size="8.5">64s</text><text x="296.4" y="176" text-anchor="middle" fill="#7a7f9a" font-size="8.5">10–12</text><rect x="327.1" y="30" width="41.0" height="44" fill="#facc15" opacity="0.35" stroke="#facc15" rx="4"/><text x="348.6" y="47" text-anchor="middle" fill="#fff" font-size="10.5" font-weight="bold">D01</text><text x="348.6" y="62" text-anchor="middle" fill="#d4d8e8" font-size="9">int</text><rect x="330.1" y="105.2" width="35.0" height="54.8" fill="#6b8cff" opacity="0.6" rx="2"/><text x="348.6" y="101.2" text-anchor="middle" fill="#a5b4fc" font-size="9">107</text><circle cx="348.6" cy="226.0" r="3" fill="#fb923c"/><text x="348.6" y="220.0" text-anchor="middle" fill="#fb923c" font-size="8.5">65s</text><text x="348.6" y="176" text-anchor="middle" fill="#7a7f9a" font-size="8.5">10–13</text><rect x="370.1" y="30" width="41.0" height="44" fill="#a78bfa" opacity="0.35" stroke="#a78bfa" rx="4"/><text x="391.6" y="47" text-anchor="middle" fill="#fff" font-size="10.5" font-weight="bold">D02</text><text x="391.6" y="62" text-anchor="middle" fill="#d4d8e8" font-size="9">spe</text><rect x="373.1" y="106.3" width="35.0" height="53.7" fill="#6b8cff" opacity="0.6" rx="2"/><text x="391.6" y="102.3" text-anchor="middle" fill="#a5b4fc" font-size="9">106</text><circle cx="391.6" cy="225.4" r="3" fill="#fb923c"/><text x="391.6" y="219.4" text-anchor="middle" fill="#fb923c" font-size="8.5">66s</text><text x="391.6" y="176" text-anchor="middle" fill="#7a7f9a" font-size="8.5">10–10</text><rect x="413.1" y="30" width="41.0" height="44" fill="#facc15" opacity="0.35" stroke="#facc15" rx="4"/><text x="434.6" y="47" text-anchor="middle" fill="#fff" font-size="10.5" font-weight="bold">D03</text><text x="434.6" y="62" text-anchor="middle" fill="#d4d8e8" font-size="9">int</text><rect x="416.1" y="99.3" width="35.0" height="60.7" fill="#6b8cff" opacity="0.6" rx="2"/><text x="434.6" y="95.3" text-anchor="middle" fill="#a5b4fc" font-size="9">112</text><circle cx="434.6" cy="220.0" r="3" fill="#fb923c"/><text x="434.6" y="214.0" text-anchor="middle" fill="#fb923c" font-size="8.5">75s</text><text x="434.6" y="176" text-anchor="middle" fill="#7a7f9a" font-size="8.5">11–12</text><rect x="456.1" y="30" width="41.0" height="44" fill="#fb923c" opacity="0.35" stroke="#fb923c" rx="4"/><text x="477.6" y="47" text-anchor="middle" fill="#fff" font-size="10.5" font-weight="bold">D04</text><text x="477.6" y="62" text-anchor="middle" fill="#d4d8e8" font-size="9">rea</text><rect x="459.1" y="120.3" width="35.0" height="39.7" fill="#6b8cff" opacity="0.6" rx="2"/><text x="477.6" y="116.3" text-anchor="middle" fill="#a5b4fc" font-size="9">94</text><circle cx="477.6" cy="205.6" r="3" fill="#fb923c"/><text x="477.6" y="199.6" text-anchor="middle" fill="#fb923c" font-size="8.5">99s</text><text x="477.6" y="176" text-anchor="middle" fill="#7a7f9a" font-size="8.5">11–11</text><rect x="499.1" y="30" width="41.0" height="44" fill="#f87171" opacity="0.35" stroke="#f87171" rx="4"/><text x="520.6" y="47" text-anchor="middle" fill="#fff" font-size="10.5" font-weight="bold">D05</text><text x="520.6" y="62" text-anchor="middle" fill="#d4d8e8" font-size="9">peak</text><rect x="502.1" y="111.0" width="35.0" height="49.0" fill="#6b8cff" opacity="0.6" rx="2"/><text x="520.6" y="107.0" text-anchor="middle" fill="#a5b4fc" font-size="9">102</text><circle cx="520.6" cy="211.6" r="3" fill="#fb923c"/><text x="520.6" y="205.6" text-anchor="middle" fill="#fb923c" font-size="8.5">89s</text><text x="520.6" y="176" text-anchor="middle" fill="#7a7f9a" font-size="8.5">10–10</text><rect x="542.0" y="30" width="41.0" height="44" fill="#facc15" opacity="0.35" stroke="#facc15" rx="4"/><text x="563.5" y="47" text-anchor="middle" fill="#fff" font-size="10.5" font-weight="bold">D06</text><text x="563.5" y="62" text-anchor="middle" fill="#d4d8e8" font-size="9">int</text><rect x="545.0" y="106.3" width="35.0" height="53.7" fill="#6b8cff" opacity="0.6" rx="2"/><text x="563.5" y="102.3" text-anchor="middle" fill="#a5b4fc" font-size="9">106</text><circle cx="563.5" cy="200.2" r="3" fill="#fb923c"/><text x="563.5" y="194.2" text-anchor="middle" fill="#fb923c" font-size="8.5">108s</text><text x="563.5" y="176" text-anchor="middle" fill="#7a7f9a" font-size="8.5">8–10</text><rect x="585.0" y="30" width="41.0" height="44" fill="#a78bfa" opacity="0.35" stroke="#a78bfa" rx="4"/><text x="606.5" y="47" text-anchor="middle" fill="#fff" font-size="10.5" font-weight="bold">D07</text><text x="606.5" y="62" text-anchor="middle" fill="#d4d8e8" font-size="9">spe</text><rect x="588.0" y="143.7" width="35.0" height="16.3" fill="#6b8cff" opacity="0.6" rx="2"/><text x="606.5" y="139.7" text-anchor="middle" fill="#a5b4fc" font-size="9">74</text><circle cx="606.5" cy="185.8" r="3" fill="#fb923c"/><text x="606.5" y="179.8" text-anchor="middle" fill="#fb923c" font-size="8.5">132s</text><text x="606.5" y="176" text-anchor="middle" fill="#7a7f9a" font-size="8.5">8–9</text><rect x="628.0" y="30" width="41.0" height="44" fill="#fb923c" opacity="0.35" stroke="#fb923c" rx="4"/><text x="649.5" y="47" text-anchor="middle" fill="#fff" font-size="10.5" font-weight="bold">D08</text><text x="649.5" y="62" text-anchor="middle" fill="#d4d8e8" font-size="9">rea</text><rect x="631.0" y="144.8" width="35.0" height="15.2" fill="#6b8cff" opacity="0.6" rx="2"/><text x="649.5" y="140.8" text-anchor="middle" fill="#a5b4fc" font-size="9">73</text><circle cx="649.5" cy="193.6" r="3" fill="#fb923c"/><text x="649.5" y="187.6" text-anchor="middle" fill="#fb923c" font-size="8.5">119s</text><text x="649.5" y="176" text-anchor="middle" fill="#7a7f9a" font-size="8.5">6–7</text><rect x="671.0" y="30" width="41.0" height="44" fill="#4ade80" opacity="0.35" stroke="#4ade80" rx="4"/><text x="692.5" y="47" text-anchor="middle" fill="#fff" font-size="10.5" font-weight="bold">D09</text><text x="692.5" y="62" text-anchor="middle" fill="#d4d8e8" font-size="9">acc</text><rect x="674.0" y="118.0" width="35.0" height="42.0" fill="#6b8cff" opacity="0.6" rx="2"/><text x="692.5" y="114.0" text-anchor="middle" fill="#a5b4fc" font-size="9">96</text><circle cx="692.5" cy="210.4" r="3" fill="#fb923c"/><text x="692.5" y="204.4" text-anchor="middle" fill="#fb923c" font-size="8.5">91s</text><text x="692.5" y="176" text-anchor="middle" fill="#7a7f9a" font-size="8.5">10–11</text><rect x="714.0" y="30" width="41.0" height="44" fill="#facc15" opacity="0.35" stroke="#facc15" rx="4"/><text x="735.5" y="47" text-anchor="middle" fill="#fff" font-size="10.5" font-weight="bold">D10</text><text x="735.5" y="62" text-anchor="middle" fill="#d4d8e8" font-size="9">int</text><rect x="717.0" y="144.8" width="35.0" height="15.2" fill="#6b8cff" opacity="0.6" rx="2"/><text x="735.5" y="140.8" text-anchor="middle" fill="#a5b4fc" font-size="9">73</text><circle cx="735.5" cy="215.2" r="3" fill="#fb923c"/><text x="735.5" y="209.2" text-anchor="middle" fill="#fb923c" font-size="8.5">83s</text><text x="735.5" y="176" text-anchor="middle" fill="#7a7f9a" font-size="8.5">9–10</text><rect x="757.0" y="30" width="41.0" height="44" fill="#f87171" opacity="0.35" stroke="#f87171" rx="4"/><text x="778.5" y="47" text-anchor="middle" fill="#fff" font-size="10.5" font-weight="bold">D11</text><text x="778.5" y="62" text-anchor="middle" fill="#d4d8e8" font-size="9">peak</text><rect x="760.0" y="127.3" width="35.0" height="32.7" fill="#6b8cff" opacity="0.6" rx="2"/><text x="778.5" y="123.3" text-anchor="middle" fill="#a5b4fc" font-size="9">88</text><circle cx="778.5" cy="218.8" r="3" fill="#fb923c"/><text x="778.5" y="212.8" text-anchor="middle" fill="#fb923c" font-size="8.5">77s</text><text x="778.5" y="176" text-anchor="middle" fill="#7a7f9a" font-size="8.5">11–11</text><line x1="327" y1="24" x2="327" y2="245" stroke="#7a7f9a" stroke-dasharray="3,3"/><line x1="499" y1="24" x2="499" y2="245" stroke="#7a7f9a" stroke-dasharray="3,3"/><line x1="671" y1="24" x2="671" y2="245" stroke="#7a7f9a" stroke-dasharray="3,3"/><text x="20" y="100" fill="#6b8cff" font-size="9">working sets</text><text x="20" y="188" fill="#7a7f9a" font-size="9">avg reps</text><text x="20" y="205" fill="#fb923c" font-size="9">avg rest</text><text x="410" y="248" text-anchor="middle" fill="#7a7f9a" font-size="9">127 weeks of trainer programming, to scale</text></svg><div class="diagram-caption">Four cycles. Blue bars are working sets, orange dots are average rest. Each cycle ends with the shortest bar and the highest dot, then resets.</div></div>
+
+<p>Read it as three cycles.</p>
+
+<h3>Cycle 1 — ABC01 → ABC05 (50 weeks, three days)</h3>
+<p><strong>acc → int → spe → rea → acc.</strong> Build the base (01), make it harder (02),
+redistribute toward back and posterior chain (03), cut and cash in (04), reset with new movements
+and an arms emphasis (05). The rep target drifts from 8-12 down to 6-8 and back. Rest barely
+moves (61 → 70 → 64) because the whole cycle lives in the moderate-load world. This is the
+"learn the system" cycle.</p>
+
+<h3>Cycle 2 — ABCD01 → ABCD04 (28 weeks, arms-day split)</h3>
+<p><strong>int → spe → int → rea.</strong> The fourth day added the volume, so accumulation was
+skipped. Drops and 5x5-8 (01), pre-exhaust and failure sets on chest and arms (02), everything at
+once at 112 sets (03), then strip it all to 4x8 at 120 s (04). Rest climbs from 65 to 99 s across
+the cycle. This is the "find the ceiling" cycle.</p>
+
+<h3>Cycle 3 — ABCD05 → ABCD08 (28 weeks, upper-day split)</h3>
+<p><strong>4x8 pyramids → waves to 6 → 3x8 → 3x6.</strong> A straight strength ladder with two
+upper exposures a week. Sets fall 102 → 106 → 74 → 73; rest rises 89 → 108 → 132 → 119. Each
+block keeps most of the previous block's exercises so the weights carry forward. This is the
+"get strong" cycle and it is the one your own programs have not yet reproduced.</p>
+
+<h3>Cycle 4 (partial) — ABCD09 → ABCD11 (21 weeks)</h3>
+<p><strong>acc (novelty) → int (12/10/8/5) → volume rebuild.</strong> Reset with new movements at
+3x10, re-touch the heavy weights inside pyramids, then add accessory volume back. Sets 96 → 73 → 88.
+Where it was heading: a full accumulation block, then another climb.</p>
+
+<h3>The transition rules, extracted</h3>
+<table role="presentation">
+<tr><th>Coming out of…</th><th>Go to…</th><th>How (what actually changes)</th><th>Seen in</th></tr>
+<tr><td>Accumulation</td><td>Intensification</td><td>Keep 40–60% of exercises. Add a pyramid to the lead lift of each day. Add one fatigue technique per day on an isolation move. Volume flat or +5%.</td><td>ABC01→02, ABCD09→10</td></tr>
+<tr><td>Intensification</td><td>Specialization</td><td>Pick one muscle. Give it +4–8 sets by taking them from a low-priority muscle. Keep total volume flat. Reps creep down.</td><td>ABC02→03, ABCD01→02</td></tr>
+<tr><td>Intensification</td><td>Second intensification</td><td>Only if the first one was mild. Push every technique at once, raise rest on lead lifts to 120 s. This is the ceiling.</td><td>ABCD02→03</td></tr>
+<tr><td>Specialization or peak-volume</td><td>Realization</td><td>Cut 20–30% of exercises. Straight sets only. 4x8 → 4x6-8 → 3x6. Rest 120–180 s. Warm-ups on everything. Abs volume can go up.</td><td>ABC03→04, ABCD03→04, ABCD06→07→08</td></tr>
+<tr><td>Realization / strength peak</td><td>Accumulation (reset)</td><td>Change 70–90% of exercises. Reps back to 8-12 or 3x10. Rest moderate. No techniques for the first block. Novelty is the stimulus.</td><td>ABC04→05, ABCD08→09</td></tr>
+<tr><td>Any block</td><td>Frequency change</td><td>Change the split and the block length together (3 days/10 weeks ↔ 4 days/7 weeks). Treat the first block on a new split as accumulation even if it is labeled otherwise.</td><td>ABC05→ABCD01, ABCD04→ABCD05</td></tr>
+</table>
+
+<div class="callout law">
+<h4>The one-sentence version</h4>
+<p>Two or three blocks up (volume, then techniques, then a target), one block to cash in, one block
+to reset with new movements, and every block hands its weights or its exercises, never neither, to
+the next.</p>
+</div>
+
+<h2 id="yours">7. Your Own Programs (ABC+D1–D3), Graded</h2>
+
+<p>Since April you have written three programs yourself: ABC+D1 (June), ABC+D2 (July), ABC+D3
+(August). The commit history says D1 was "modeled after ABCD05" and D2 was "ABC02 expanded to a
+push/pull/legs/upper split." Here is how they measure against the laws. I am being direct
+because the point of this document is that you write the next one better.</p>
+
+<table role="presentation">
+<tr><th>Program</th><th>Tag</th><th>Days · weeks</th><th class="num">Exercises</th><th class="num">Working sets</th><th class="num">Warm-ups</th><th class="num">Avg rest</th><th>Avg reps</th><th class="num">Kept from prev.</th></tr>
+<tr><td>ABC+D1</td><td><span class="pill acc">acc</span></td><td>4 · 10</td><td class="num">32</td><td class="num"><strong>127</strong></td><td class="num">33</td><td class="num">61 s</td><td>10–13</td><td class="num">6%</td></tr>
+<tr><td>ABC+D2</td><td><span class="pill int">int</span></td><td>4 · 10</td><td class="num">32</td><td class="num"><strong>116</strong></td><td class="num">12</td><td class="num">65 s</td><td>10–13</td><td class="num">22%</td></tr>
+<tr><td>ABC+D3</td><td><span class="pill spe">spe</span></td><td>4 · 10</td><td class="num">29</td><td class="num"><strong>114</strong></td><td class="num">12</td><td class="num">62 s</td><td>9–12</td><td class="num">45%</td></tr>
+<tr><td class="small" colspan="9">Trainer's four-day range for comparison: 23–31 exercises, 73–112 working sets, 65–132 s rest, 7 weeks.</td></tr>
+</table>
+
+<h3>What you got right</h3>
+<ul>
+  <li><strong>The skeleton is intact.</strong> Push / pull / legs / upper, prep slot with rotations and abs first, one heavy press then a second angle then a fly, three or four back movements, laterals on pull day, calves every leg day. You absorbed the day templates completely.</li>
+  <li><strong>Implements rotate, patterns stay.</strong> Yates row, Smith bench, seated Viking press, Helms row, witches squat, behind-the-back deadlift, Meadows curl: new tools, same slots. That is Law 3 done well.</li>
+  <li><strong>D2 is a real intensification.</strong> Pyramids on the decline Smith, lat pullover, and one-arm row; rest-pause on the underhand row and cable fly; a drop on the lying curl; pull-ups and push-ups to failure as a bi-set. This is the ABC02 move, correctly executed.</li>
+  <li><strong>D3 is the first genuine hamstring specialization in the whole system.</strong> Deficit behind-the-back deadlift 4x10, good morning truncated pyramid, hip thrust: hamstrings at 10 sets, the most ever, paid for by quads dropping to 8. That is exactly how ABC03 did it for back. Good.</li>
+  <li><strong>D3 kept 45% of D2's exercises</strong>, so the rest-pause and drop-set weights had something to build on.</li>
+</ul>
+
+<h3>What to fix</h3>
+<div class="callout warn">
+<h4>1. Volume is above anything your trainer ever prescribed, with the shortest rest</h4>
+<p>ABC+D1 has 127 working sets. The trainer's maximum, ABCD03, was 112, and that was a deliberate
+ceiling block followed immediately by a cut. D2 (116) and D3 (114) are also above every trainer
+program except ABCD03, and all three sit at 61–65 s rest, which is the rest of a light
+accumulation block. D1 was "modeled after ABCD05," but ABCD05 had 102 sets at 89 s rest and 4x8
+pyramids; you took its split and not its loading. Law 1 says volume and intensity see-saw; at
+127 sets the see-saw is pinned to the floor.</p>
+</div>
+<div class="callout warn">
+<h4>2. Three ten-week blocks with four days each is 120 sessions</h4>
+<p>The trainer's four-day blocks were seven weeks (28 sessions). Yours are ten (40 sessions). Law 5
+says a block is about thirty sessions. By week eight of a four-day block, the exercises are stale
+and the numbers have stopped moving; you are paying three extra weeks for nothing. Set the next
+four-day block to seven weeks, and if the weights are still climbing at week seven, extend by
+one week at a time, not by three.</p>
+</div>
+<div class="callout warn">
+<h4>3. There has been no realization block for thirty weeks</h4>
+<p>acc → int → spe is the right sequence. The next block in that sequence is always <em>rea</em>:
+fewer exercises, straight sets, 3x6 to 4x8, 120–180 s rest, warm-ups on everything, 70–85 working
+sets. Your trainer never ran more than three build-up blocks without cashing in, and the cash-in
+block is where the strength you have been accumulating since June actually shows up. Section 9
+writes that block for you.</p>
+</div>
+<div class="callout warn">
+<h4>4. D1 → D2 kept only 22% of exercises</h4>
+<p>Inside a wave, blocks share exercises so the pyramids in the intensification block start from
+known weights. Going from D1 to D2 you changed the movements <em>and</em> added pyramids and rest-pause,
+so every pyramid began with a guessed load. D2 → D3 at 45% was much better. For D3 → D4, keep 55–65%.</p>
+</div>
+<div class="callout good">
+<h4>Minor, but worth knowing</h4>
+<p>Hamstrings at 3 sets in D1 on a nine-line leg day is quad-heavier than anything the trainer wrote
+(his floor was 3 too, but on six-line leg days). Forearms at 4–6 sets is fine and was your own
+addition; keep it as a ride-along. And D1 had 33 explicit warm-up sets at 60 s rest, which is a lot
+of clock: warm-ups on every line belong to the heavy blocks, where the rest is long anyway.</p>
+</div>
+
+<h2 id="playbook">8. The Build-Your-Own Playbook</h2>
+
+<p>Ten steps. Do them in order and write the answers down before you write a single exercise.
+Most bad programs come from starting at step 5.</p>
+
+<h3>Step 1 — Locate yourself in the wave</h3>
+<p>Look at the last two blocks. Which phase were they? How many sets, what rest, what reps? The
+transition table in section 6 tells you what comes next. If the last block was a build-up (acc, int,
+spe) and you have not cashed in for two or more blocks, the next block is realization, no matter how
+much you want to try a new exercise. If the last block was a realization or strength block, the
+next is a reset, no matter how strong you feel.</p>
+
+<h3>Step 2 — Choose the phase, and let it fix the numbers</h3>
+<table role="presentation">
+<tr><th>Phase</th><th>Working sets (4-day)</th><th>Lead-lift scheme</th><th>Accessory scheme</th><th>Rest lead / accessory</th><th>Techniques per day</th><th>Exercises</th></tr>
+<tr><td><span class="pill acc">Accumulation</span></td><td>90–105</td><td>2x8wu + 4x8-12 or 3x10</td><td>4x10-12, 3x12</td><td>80–120 / 60</td><td>0–1, bi-sets on abs/arms only</td><td>26–31</td></tr>
+<tr><td><span class="pill int">Intensification</span></td><td>95–112</td><td>Pyramid 12/10/8/6 or 12-15/10-12/8-10/5-8</td><td>4x8-12 with one drop / RP per day</td><td>90–120 / 60</td><td>2–3</td><td>26–30</td></tr>
+<tr><td><span class="pill spe">Specialization</span></td><td>Same as previous block</td><td>4x8-10</td><td>Target muscle +4–8 sets: 6-set pre-exhaust, TP, extra move</td><td>90 / 60</td><td>2–3, all on the target</td><td>Same as previous</td></tr>
+<tr><td><span class="pill rea">Realization</span></td><td>70–95</td><td>2x8wu + 4x8 → 4x6-8 → 3x6</td><td>1x8wu + 3x6-8</td><td>150–180 / 120</td><td>0–1</td><td>19–26</td></tr>
+<tr><td><span class="pill acc">Reset</span></td><td>90–100</td><td>1–2x8wu + 3x10</td><td>3x10</td><td>120 / 80–90</td><td>0</td><td>28–31, 70–90% new</td></tr>
+</table>
+<p>Write the target set count and the rest values at the top of the page. Everything you add
+later has to fit inside them.</p>
+
+<h3>Step 3 — Choose the split and the block length together</h3>
+<p>Three days = 10 weeks. Four days = 7 weeks. If you change the split, treat the first block as
+accumulation regardless of what you call it. Do not change the split in a realization block; the
+whole point of realization is that everything is familiar except the weight.</p>
+
+<h3>Step 4 — Decide push/pull balance and the one target</h3>
+<p>Chest sets ≈ back sets, within three. Then pick <em>one</em> muscle that gets the surplus this
+block, and one that pays for it. Write both names down. If you cannot name the payer, you are about
+to add volume instead of moving it, and the set count from step 2 will tell on you.</p>
+
+<h3>Step 5 — Fill the slots with patterns, then pick implements</h3>
+<p>For each day, write the slots first (section 4) as patterns: "horizontal press, incline press,
+fly, delt press, long-head triceps, pushdown." Only then choose the tool for each. Two rules for
+the tools:</p>
+<ul>
+  <li><strong>Carry-over.</strong> Inside a wave, keep 55–65% of last block's exercises; the ones you keep should be the lead lifts. Between waves, keep 10–30%.</li>
+  <li><strong>Mirror on the upper day.</strong> Whatever implement days A and B used, day D uses the other one for the same pattern.</li>
+</ul>
+
+<h3>Step 6 — Assign the rep schemes slot by slot</h3>
+<p>The lead lift gets the phase's lead scheme and the longest rest. The second compound gets a
+straight scheme one notch lighter. Isolation gets the phase's accessory scheme and, in the light
+phases, the day's one technique. Arms and delts get straight sets or a bi-set. Never put a fatigue
+technique on slot 1.</p>
+
+<h3>Step 7 — Warm-ups</h3>
+<p>Light phases: two warm-up sets on the first compound of each muscle group, none elsewhere (or
+let the pyramid be the warm-up). Heavy phases: two on every compound, one on every isolation.
+Warm-ups are 8 reps at roughly 50–60% of the working weight, and they are not counted in the set
+total.</p>
+
+<h3>Step 8 — Add the ride-alongs</h3>
+<p>Rotations 1–2x10 at the top of every upper day. Abs first on two or three days (cable crunch,
+leg raises, ab wheel, dragon flag, plank; AMRAP totals in the heavy blocks). Calves 3–6 sets on
+leg day. Forearms if you want them, 3–6 sets on pull day. These do not count against the target
+muscle budget, but they do count in the set total, so budget 12–20 sets for them.</p>
+
+<h3>Step 9 — Audit the numbers</h3>
+<ul>
+  <li>Total working sets inside the phase range from step 2?</li>
+  <li>Chest within three sets of back?</li>
+  <li>Exactly one muscle above its usual range, and one below?</li>
+  <li>Techniques: zero or one per day in heavy phases, two or three in light phases, none on slot 1?</li>
+  <li>Rest on slot 1 the longest of the day, isolation the shortest?</li>
+  <li>Block length matches the split?</li>
+  <li>Lead lifts carried over from last block if this is the same wave?</li>
+</ul>
+<p>If any line fails, fix it now. It is much cheaper to delete an exercise on paper than to
+discover in week four that the program does not recover.</p>
+
+<h3>Step 10 — Write the exit criteria</h3>
+<p>Decide before you start what ends the block: the calendar (7 or 10 weeks), or two consecutive
+sessions where the lead lifts did not move, whichever comes first. Then decide, also before you
+start, what the next phase will be. A block with a known successor is a block you will finish.</p>
+
+<h2 id="worked">9. Worked Example: Writing ABC+D4</h2>
+
+<p>Applying the playbook to your actual situation.</p>
+
+<p><strong>Step 1.</strong> Last three blocks: acc (127 sets), int (116), spe (114), all at ~62 s rest.
+Thirty weeks of build-up, no cash-in. Next block is <span class="pill rea">realization</span>.</p>
+
+<p><strong>Step 2.</strong> Realization on four days: 70–85 working sets, lead lifts 2x8wu+3x6 at
+180 s, second compounds 3x6-8 at 120–150 s, isolation 1x8wu+3x6-8 at 90–120 s, no techniques
+except one optional rest-pause on a leg curl, 22–26 exercises. Because you are coming from a
+long stretch of 8-12 reps and have never run 3x6, I would run this as the ABCD07/08 pair: seven
+weeks at <strong>3x8</strong>, then, if the weights are still moving, a second seven-week block at
+<strong>3x6</strong> with the same exercises. Below is the 3x8 version.</p>
+
+<p><strong>Step 3.</strong> Four days, seven weeks. Split unchanged: push / pull / legs / upper.</p>
+
+<p><strong>Step 4.</strong> Chest 15, back 15. Target: none. A realization block has no target; the
+target is the bar. Hamstrings drop from 10 back to 4–6 (the specialization is over), quads go back
+to 9. Abs get the surplus recovery, as in ABCD04 and ABCD07.</p>
+
+<p><strong>Step 5–8.</strong> Keep ~60% of D3's exercises, lead lifts first. Rotate the tool only
+where D3's choice does not suit low reps (a squeeze-crossover fly is a bad 3x6 exercise; a flat DB fly
+is fine). Upper day mirrors A and B with the opposite implements.</p>
+
+<h4>Day A — Push (8 lines · 22 working sets)</h4>
+<table role="presentation">
+<tr><th>Exercise</th><th>Scheme</th><th class="num">Rest</th><th>Note</th></tr>
+<tr><td>Cable crunch</td><td>4x10-15</td><td class="num">60</td><td>Prep, from D3</td></tr>
+<tr><td>Internal / external rotation</td><td>1x10 each</td><td class="num">60</td><td>Prep</td></tr>
+<tr><td>Incline Smith press</td><td>2x8wu + 3x8</td><td class="num">180</td><td>Lead lift, kept from D3</td></tr>
+<tr><td>Weighted dips</td><td>1x8wu + 3x8</td><td class="num">120</td><td>Second press, free-weight after fixed-path (ABCD06/08 pairing)</td></tr>
+<tr><td>Flat DB fly</td><td>2x8wu + 3x8</td><td class="num">120</td><td>Kept from D3, rest-pause removed</td></tr>
+<tr><td>Arnold press</td><td>2x8wu + 3x8</td><td class="num">120</td><td>Kept from D3</td></tr>
+<tr><td>Rolling DB triceps extension</td><td>1x8wu + 3x8</td><td class="num">120</td><td>Kept, long-head</td></tr>
+<tr><td>Pushdown (facing away)</td><td>1x8wu + 3x8</td><td class="num">90</td><td>Kept, drop set removed</td></tr>
+</table>
+
+<h4>Day B — Pull (9 lines · 21 working sets)</h4>
+<table role="presentation">
+<tr><th>Exercise</th><th>Scheme</th><th class="num">Rest</th><th>Note</th></tr>
+<tr><td>Crunches</td><td>200 reps AMRAP</td><td class="num">0</td><td>ABCD07's abs device; cheap volume</td></tr>
+<tr><td>External / internal rotation</td><td>1x10 each</td><td class="num">60</td><td>Prep</td></tr>
+<tr><td>Smith machine row</td><td>2x8wu + 3x8</td><td class="num">180</td><td>Lead lift, kept from D3, rest-pause removed</td></tr>
+<tr><td>V-bar pulldown</td><td>2x8wu + 3x8</td><td class="num">150</td><td>Kept</td></tr>
+<tr><td>Wide underhand cable row</td><td>2x8wu + 3x8</td><td class="num">120</td><td>Kept</td></tr>
+<tr><td>Cable reverse fly</td><td>1x8wu + 3x8</td><td class="num">90</td><td>Kept</td></tr>
+<tr><td>Meadows curl</td><td>1x8wu + 3x8</td><td class="num">120</td><td>Kept</td></tr>
+<tr><td>Arnold concentration curl</td><td>1x8wu + 3x8</td><td class="num">90</td><td>Kept</td></tr>
+<tr><td>T-bar forearm curl</td><td>3x10-12</td><td class="num">60</td><td>Ride-along</td></tr>
+</table>
+
+<h4>Day C — Legs (6 lines · 18 working sets)</h4>
+<table role="presentation">
+<tr><th>Exercise</th><th>Scheme</th><th class="num">Rest</th><th>Note</th></tr>
+<tr><td>Witches squat</td><td>2x8wu + 3x8</td><td class="num">180</td><td>Lead lift, kept; quads back to first</td></tr>
+<tr><td>Deficit behind-the-back deadlift</td><td>2x8wu + 3x8</td><td class="num">180</td><td>Kept; the one hinge (ABCD04 pattern: squat then stiff)</td></tr>
+<tr><td>Bulgarian split squat</td><td>1x8wu + 3x8 each</td><td class="num">120</td><td>Kept</td></tr>
+<tr><td>Seated leg curl</td><td>1x8wu + 3x8 + rest-pause on last</td><td class="num">120</td><td>The block's one technique, where ABCD07/08 put it</td></tr>
+<tr><td>Smith calf raise</td><td>3x8-12</td><td class="num">90</td><td>Ride-along</td></tr>
+<tr><td>Weighted Bosu crunch</td><td>3x12</td><td class="num">60</td><td>Ride-along, kept</td></tr>
+</table>
+
+<h4>Day D — Upper (7 lines · 21 working sets)</h4>
+<table role="presentation">
+<tr><th>Exercise</th><th>Scheme</th><th class="num">Rest</th><th>Note</th></tr>
+<tr><td>Incline DB press</td><td>2x8wu + 3x8</td><td class="num">150</td><td>Kept; DB mirrors A's Smith</td></tr>
+<tr><td>Machine chest press</td><td>2x8wu + 3x8</td><td class="num">120</td><td>ABCD07/08 upper-day choice; machine mirrors A's dips</td></tr>
+<tr><td>Rope French press</td><td>1x8wu + 3x8</td><td class="num">120</td><td>Kept, drop removed</td></tr>
+<tr><td>One-arm DB row</td><td>2x8wu + 3x8</td><td class="num">150</td><td>Kept; unilateral mirrors B's Smith row</td></tr>
+<tr><td>Lat pulldown</td><td>2x8wu + 3x8</td><td class="num">120</td><td>Wide grip mirrors B's V-bar</td></tr>
+<tr><td>Cable preacher curl</td><td>1x8wu + 3x8</td><td class="num">120</td><td>Kept, drop removed</td></tr>
+<tr><td>Jayme lateral raise</td><td>1x8wu + 3x8</td><td class="num">90</td><td>Kept; laterals moved here from B to shorten pull day</td></tr>
+</table>
+
+<p><strong>Step 9 audit.</strong> Working sets: 22 + 21 + 18 + 21 = <strong>82</strong> (target 70–85 ✓).
+Chest 15, back 15 (balanced ✓). Quads 6, hamstrings 6, calves 3, abs 7 plus the AMRAP, biceps 6,
+triceps 9, delts 9, forearms 3. Techniques: one (leg-curl rest-pause) ✓. Slot 1 rest longest on
+every day ✓. Seven weeks on four days ✓. Carried over from D3: 23 of 28 exercises = 82%, above the
+55–65% guideline, which is the right side to err on for a realization block, where familiarity is
+the point (ABCD07→08 was 60%) ✓. Exercises: 26 working exercises plus prep, inside the 19–26
+realization range ✓.</p>
+
+<p><strong>Step 10.</strong> Exit: seven weeks, or two sessions in a row where the incline Smith,
+Smith row, and witches squat all fail to add weight. Successor: ABC+D5, same exercises at 3x6
+with rest 180/150/120, seven weeks, or, if the 3x8 block stalled early, skip straight to a reset
+(ABCD09 recipe: 3x10, 70–90% new movements, no techniques).</p>
+
+<div class="callout good">
+<h4>What this block will feel like</h4>
+<p>Short sessions, long rests, heavier bars than you have used since ABCD08, and a feeling in week
+three that you are not doing enough. That feeling is the block working. The volume you have been
+carrying since June was the deposit; this is the withdrawal.</p>
+</div>
+
+<h2 id="year">10. A Year of Programs: The Calendar Template</h2>
+
+<p>Here is a fifty-two-week plan built from the transition rules, using only the tools in the
+sixteen programs. Each row is one block. Four-day split throughout, seven-week blocks, with one
+deliberate deload week between cycles.</p>
+
+<table role="presentation">
+<tr><th>Weeks</th><th>Block</th><th>Phase</th><th class="num">Sets</th><th>Lead scheme</th><th class="num">Rest (lead)</th><th>Techniques</th><th>Exercise carry-over</th><th>Model</th></tr>
+<tr><td>1–7</td><td>Block 1</td><td><span class="pill rea">Realization A</span></td><td class="num">75</td><td>3x8</td><td class="num">180</td><td>1</td><td>60% from last block</td><td>ABCD07</td></tr>
+<tr><td>8–14</td><td>Block 2</td><td><span class="pill rea">Realization B</span></td><td class="num">73</td><td>3x6</td><td class="num">180</td><td>1</td><td>60% from Block 1</td><td>ABCD08</td></tr>
+<tr><td>15</td><td>—</td><td>Deload</td><td class="num">40</td><td>2x10 at 60%</td><td class="num">90</td><td>0</td><td>Block 2's</td><td>—</td></tr>
+<tr><td>16–22</td><td>Block 3</td><td><span class="pill acc">Reset</span></td><td class="num">96</td><td>3x10</td><td class="num">120</td><td>0</td><td>10–20% (novelty)</td><td>ABCD09</td></tr>
+<tr><td>23–29</td><td>Block 4</td><td><span class="pill int">Intensification</span></td><td class="num">85</td><td>12/10/8/5</td><td class="num">120</td><td>2</td><td>50% from Block 3</td><td>ABCD10</td></tr>
+<tr><td>30–36</td><td>Block 5</td><td><span class="pill spe">Specialization</span></td><td class="num">100</td><td>4x8-10</td><td class="num">90</td><td>3 (all on target)</td><td>60% from Block 4</td><td>ABC03 / ABCD02</td></tr>
+<tr><td>37–43</td><td>Block 6</td><td><span class="pill rea">Realization</span></td><td class="num">90</td><td>4x8</td><td class="num">120</td><td>0–1</td><td>60% from Block 5</td><td>ABCD04</td></tr>
+<tr><td>44</td><td>—</td><td>Deload</td><td class="num">40</td><td>2x10 at 60%</td><td class="num">90</td><td>0</td><td>Block 6's</td><td>—</td></tr>
+<tr><td>45–51</td><td>Block 7</td><td><span class="pill acc">Accumulation</span></td><td class="num">105</td><td>2x8wu + 4x8-12</td><td class="num">90</td><td>1 (bi-sets)</td><td>30% (new cycle)</td><td>ABC01 / ABC+D1 at 105 sets</td></tr>
+<tr><td>52</td><td>—</td><td>Test week</td><td class="num">—</td><td>Work up to a heavy 5 on the four lead lifts</td><td class="num">240</td><td>0</td><td>—</td><td>—</td></tr>
+</table>
+
+<p>Two things your trainer's programs do not contain that I have added: an explicit deload week
+between cycles, and a test week. He handled deloads by making the reset block itself lighter
+(ABCD09's 3x10 with new movements is a deload in disguise), which works when someone is watching
+you. When you are writing your own programs, a scheduled easy week is safer than trusting yourself
+to notice you need one. The test week exists because the whole reason to run realization blocks is
+to find out what the number is.</p>
+
+<h2 id="card">11. One-Page Reference Card</h2>
+
+<div class="card">
+<h4>The laws</h4>
+<ol>
+  <li>Volume ↔ intensity see-saw. Heavier means fewer sets, fewer exercises, longer rest.</li>
+  <li>Fatigue techniques only when reps ≥ 8 and rest ≤ 90 s. Heavy blocks are straight sets.</li>
+  <li>Patterns are permanent; implements rotate.</li>
+  <li>Same wave: keep 55–65% of exercises, change the scheme. New wave: change 70–90% of exercises.</li>
+  <li>A block ≈ 30 sessions. 3 days → 10 weeks. 4 days → 7 weeks.</li>
+  <li>Chest ≈ back. One target muscle per block, one payer.</li>
+  <li>Rotations, abs, calves, warm-ups: always. Abs and rotations first.</li>
+</ol>
+<h4>The day</h4>
+<p>Prep (abs + cuff) → heavy compound (2 wu, longest rest) → second compound, different angle or tool →
+isolation (technique lives here) → delts → two arm moves. Rest and load fall left to right.</p>
+<h4>The sequence</h4>
+<p>acc → int → (spe) → rea → reset. Two or three up, one to cash in, one to reset. Never more than three build-ups in a row.</p>
+<h4>The numbers (4-day)</h4>
+<table role="presentation">
+<tr><th>Phase</th><th class="num">Sets</th><th>Lead</th><th class="num">Rest</th><th>Tech/day</th></tr>
+<tr><td>acc</td><td class="num">90–105</td><td>4x8-12</td><td class="num">80–120</td><td>0–1</td></tr>
+<tr><td>int</td><td class="num">95–112</td><td>pyramid to 5–6</td><td class="num">90–120</td><td>2–3</td></tr>
+<tr><td>spe</td><td class="num">= prev</td><td>4x8-10</td><td class="num">90</td><td>2–3 on target</td></tr>
+<tr><td>rea</td><td class="num">70–95</td><td>4x8 → 3x6</td><td class="num">150–180</td><td>0–1</td></tr>
+<tr><td>reset</td><td class="num">90–100</td><td>3x10, new moves</td><td class="num">120</td><td>0</td></tr>
+</table>
+<h4>Per-muscle weekly sets (trainer's ranges)</h4>
+<p>Chest 10–22 · Back 10–23 · Delts 6–18 · Quads 7–18 · Hams 3–10 · Biceps 8–16 · Triceps 7–16 · Calves 3–6 · Abs 4–20</p>
+</div>
+
+<h2 id="appendix">12. Appendix: Data Tables</h2>
+
+<h3>A. Technique counts per program</h3>
+<table role="presentation"><tr><th>Program</th><th>Phase</th><th class="num">S</th><th class="num">P</th><th class="num">AP</th><th class="num">TP</th><th class="num">DS</th><th class="num">RestP</th><th class="num">BS</th><th class="num">SS</th><th class="num">TS</th><th class="num">PE</th><th class="num">BO</th><th class="num">Fail</th><th class="num">Mob</th><th class="num">PC</th><th class="num">Fatigue + density</th><th class="num">Rest</th></tr><tr><td><strong>ABC01</strong></td><td><span class="pill acc">acc</span></td><td class="num">18</td><td class="num">–</td><td class="num">3</td><td class="num">–</td><td class="num">1</td><td class="num">–</td><td class="num">2</td><td class="num">–</td><td class="num">–</td><td class="num">–</td><td class="num">–</td><td class="num">1</td><td class="num">–</td><td class="num">–</td><td class="num"><strong>4</strong></td><td class="num">61</td></tr><tr><td><strong>ABC02</strong></td><td><span class="pill int">int</span></td><td class="num">14</td><td class="num">–</td><td class="num">3</td><td class="num">–</td><td class="num">1</td><td class="num">2</td><td class="num">6</td><td class="num">–</td><td class="num">–</td><td class="num">–</td><td class="num">–</td><td class="num">1</td><td class="num">–</td><td class="num">–</td><td class="num"><strong>10</strong></td><td class="num">69</td></tr><tr><td><strong>ABC03</strong></td><td><span class="pill spe">spe</span></td><td class="num">14</td><td class="num">–</td><td class="num">2</td><td class="num">1</td><td class="num">2</td><td class="num">2</td><td class="num">4</td><td class="num">–</td><td class="num">–</td><td class="num">–</td><td class="num">–</td><td class="num">1</td><td class="num">1</td><td class="num">–</td><td class="num"><strong>9</strong></td><td class="num">67</td></tr><tr><td><strong>ABC04</strong></td><td><span class="pill rea">rea</span></td><td class="num">11</td><td class="num">3</td><td class="num">–</td><td class="num">–</td><td class="num">2</td><td class="num">–</td><td class="num">2</td><td class="num">–</td><td class="num">–</td><td class="num">–</td><td class="num">–</td><td class="num">1</td><td class="num">–</td><td class="num">–</td><td class="num"><strong>5</strong></td><td class="num">70</td></tr><tr><td><strong>ABC05</strong></td><td><span class="pill acc">acc</span></td><td class="num">12</td><td class="num">4</td><td class="num">–</td><td class="num">–</td><td class="num">1</td><td class="num">–</td><td class="num">6</td><td class="num">–</td><td class="num">–</td><td class="num">–</td><td class="num">–</td><td class="num">1</td><td class="num">–</td><td class="num">–</td><td class="num"><strong>8</strong></td><td class="num">64</td></tr><tr><td><strong>ABCD01</strong></td><td><span class="pill int">int</span></td><td class="num">12</td><td class="num">3</td><td class="num">–</td><td class="num">–</td><td class="num">5</td><td class="num">1</td><td class="num">4</td><td class="num">–</td><td class="num">3</td><td class="num">–</td><td class="num">–</td><td class="num">1</td><td class="num">1</td><td class="num">–</td><td class="num"><strong>14</strong></td><td class="num">65</td></tr><tr><td><strong>ABCD02</strong></td><td><span class="pill spe">spe</span></td><td class="num">17</td><td class="num">3</td><td class="num">–</td><td class="num">–</td><td class="num">2</td><td class="num">–</td><td class="num">–</td><td class="num">–</td><td class="num">–</td><td class="num">2</td><td class="num">–</td><td class="num">2</td><td class="num">–</td><td class="num">–</td><td class="num"><strong>6</strong></td><td class="num">66</td></tr><tr><td><strong>ABCD03</strong></td><td><span class="pill int">int</span></td><td class="num">10</td><td class="num">–</td><td class="num">6</td><td class="num">–</td><td class="num">2</td><td class="num">2</td><td class="num">2</td><td class="num">6</td><td class="num">–</td><td class="num">–</td><td class="num">–</td><td class="num">2</td><td class="num">–</td><td class="num">–</td><td class="num"><strong>14</strong></td><td class="num">75</td></tr><tr><td><strong>ABCD04</strong></td><td><span class="pill rea">rea</span></td><td class="num">25</td><td class="num">–</td><td class="num">–</td><td class="num">–</td><td class="num">1</td><td class="num">–</td><td class="num">–</td><td class="num">–</td><td class="num">–</td><td class="num">–</td><td class="num">–</td><td class="num">–</td><td class="num">–</td><td class="num">–</td><td class="num"><strong>1</strong></td><td class="num">99</td></tr><tr><td><strong>ABCD05</strong></td><td><span class="pill peak">peak</span></td><td class="num">11</td><td class="num">12</td><td class="num">–</td><td class="num">–</td><td class="num">–</td><td class="num">–</td><td class="num">–</td><td class="num">–</td><td class="num">–</td><td class="num">–</td><td class="num">–</td><td class="num">–</td><td class="num">–</td><td class="num">–</td><td class="num"><strong>0</strong></td><td class="num">89</td></tr><tr><td><strong>ABCD06</strong></td><td><span class="pill int">int</span></td><td class="num">16</td><td class="num">5</td><td class="num">–</td><td class="num">–</td><td class="num">3</td><td class="num">–</td><td class="num">–</td><td class="num">–</td><td class="num">–</td><td class="num">–</td><td class="num">1</td><td class="num">–</td><td class="num">–</td><td class="num">–</td><td class="num"><strong>4</strong></td><td class="num">108</td></tr><tr><td><strong>ABCD07</strong></td><td><span class="pill spe">spe</span></td><td class="num">21</td><td class="num">–</td><td class="num">1</td><td class="num">–</td><td class="num">–</td><td class="num">1</td><td class="num">–</td><td class="num">–</td><td class="num">–</td><td class="num">–</td><td class="num">1</td><td class="num">1</td><td class="num">–</td><td class="num">–</td><td class="num"><strong>3</strong></td><td class="num">132</td></tr><tr><td><strong>ABCD08</strong></td><td><span class="pill rea">rea</span></td><td class="num">23</td><td class="num">–</td><td class="num">–</td><td class="num">–</td><td class="num">–</td><td class="num">1</td><td class="num">–</td><td class="num">–</td><td class="num">–</td><td class="num">–</td><td class="num">–</td><td class="num">1</td><td class="num">–</td><td class="num">–</td><td class="num"><strong>2</strong></td><td class="num">119</td></tr><tr><td><strong>ABCD09</strong></td><td><span class="pill acc">acc</span></td><td class="num">30</td><td class="num">–</td><td class="num">–</td><td class="num">–</td><td class="num">–</td><td class="num">–</td><td class="num">–</td><td class="num">–</td><td class="num">–</td><td class="num">–</td><td class="num">–</td><td class="num">–</td><td class="num">–</td><td class="num">1</td><td class="num"><strong>0</strong></td><td class="num">91</td></tr><tr><td><strong>ABCD10</strong></td><td><span class="pill int">int</span></td><td class="num">13</td><td class="num">8</td><td class="num">–</td><td class="num">–</td><td class="num">2</td><td class="num">–</td><td class="num">–</td><td class="num">–</td><td class="num">–</td><td class="num">–</td><td class="num">–</td><td class="num">–</td><td class="num">–</td><td class="num">–</td><td class="num"><strong>2</strong></td><td class="num">83</td></tr><tr><td><strong>ABCD11</strong></td><td><span class="pill peak">peak</span></td><td class="num">18</td><td class="num">5</td><td class="num">–</td><td class="num">–</td><td class="num">4</td><td class="num">–</td><td class="num">2</td><td class="num">–</td><td class="num">–</td><td class="num">–</td><td class="num">–</td><td class="num">–</td><td class="num">–</td><td class="num">–</td><td class="num"><strong>6</strong></td><td class="num">77</td></tr><tr style="color:#a78bfa"><td><strong>ABC+D1</strong></td><td><span class="pill acc">acc</span></td><td class="num">26</td><td class="num">–</td><td class="num">3</td><td class="num">–</td><td class="num">1</td><td class="num">–</td><td class="num">1</td><td class="num">–</td><td class="num">–</td><td class="num">–</td><td class="num">–</td><td class="num">1</td><td class="num">–</td><td class="num">–</td><td class="num"><strong>3</strong></td><td class="num">61</td></tr><tr style="color:#a78bfa"><td><strong>ABC+D2</strong></td><td><span class="pill int">int</span></td><td class="num">24</td><td class="num">–</td><td class="num">3</td><td class="num">–</td><td class="num">1</td><td class="num">2</td><td class="num">2</td><td class="num">–</td><td class="num">–</td><td class="num">–</td><td class="num">–</td><td class="num">–</td><td class="num">–</td><td class="num">–</td><td class="num"><strong>5</strong></td><td class="num">65</td></tr><tr style="color:#a78bfa"><td><strong>ABC+D3</strong></td><td><span class="pill spe">spe</span></td><td class="num">21</td><td class="num">–</td><td class="num">2</td><td class="num">1</td><td class="num">3</td><td class="num">2</td><td class="num">–</td><td class="num">–</td><td class="num">–</td><td class="num">–</td><td class="num">–</td><td class="num">–</td><td class="num">–</td><td class="num">–</td><td class="num"><strong>5</strong></td><td class="num">62</td></tr></table><p class="small">Counts are exercise lines carrying each technique code. The last two columns are the point: the fatigue/density count and the average rest move in opposite directions.</p>
+
+<h3>B. Exercise carry-over between consecutive programs</h3>
+<table role="presentation"><tr><th>Transition</th><th>Phases</th><th class="num">Exercises kept</th><th class="num">%</th><th class="num">Avg reps</th></tr><tr><td>ABC01 → ABC02</td><td><span class="pill acc">acc</span> → <span class="pill int">int</span></td><td class="num">13/27</td><td class="num">48%</td><td class="num">10–14 → 10–13</td></tr><tr><td>ABC02 → ABC03</td><td><span class="pill int">int</span> → <span class="pill spe">spe</span></td><td class="num">8/27</td><td class="num">30%</td><td class="num">10–13 → 10–12</td></tr><tr><td>ABC03 → ABC04</td><td><span class="pill spe">spe</span> → <span class="pill rea">rea</span></td><td class="num">7/19</td><td class="num">37%</td><td class="num">10–12 → 10–12</td></tr><tr><td>ABC04 → ABC05</td><td><span class="pill rea">rea</span> → <span class="pill acc">acc</span></td><td class="num">7/24</td><td class="num">29%</td><td class="num">10–12 → 10–12</td></tr><tr><td>ABC05 → ABCD01</td><td><span class="pill acc">acc</span> → <span class="pill int">int</span></td><td class="num">12/30</td><td class="num">40%</td><td class="num">10–12 → 10–13</td></tr><tr><td>ABCD01 → ABCD02</td><td><span class="pill int">int</span> → <span class="pill spe">spe</span></td><td class="num">16/26</td><td class="num">62%</td><td class="num">10–13 → 10–10</td></tr><tr><td>ABCD02 → ABCD03</td><td><span class="pill spe">spe</span> → <span class="pill int">int</span></td><td class="num">12/30</td><td class="num">40%</td><td class="num">10–10 → 11–12</td></tr><tr><td>ABCD03 → ABCD04</td><td><span class="pill int">int</span> → <span class="pill rea">rea</span></td><td class="num">12/26</td><td class="num">46%</td><td class="num">11–12 → 11–11</td></tr><tr><td>ABCD04 → ABCD05</td><td><span class="pill rea">rea</span> → <span class="pill peak">peak</span></td><td class="num">11/23</td><td class="num">48%</td><td class="num">11–11 → 10–10</td></tr><tr><td>ABCD05 → ABCD06</td><td><span class="pill peak">peak</span> → <span class="pill int">int</span></td><td class="num">10/25</td><td class="num">40%</td><td class="num">10–10 → 8–10</td></tr><tr><td>ABCD06 → ABCD07</td><td><span class="pill int">int</span> → <span class="pill spe">spe</span></td><td class="num">13/25</td><td class="num">52%</td><td class="num">8–10 → 8–9</td></tr><tr><td>ABCD07 → ABCD08</td><td><span class="pill spe">spe</span> → <span class="pill rea">rea</span></td><td class="num">15/25</td><td class="num">60%</td><td class="num">8–9 → 6–7</td></tr><tr><td>ABCD08 → ABCD09</td><td><span class="pill rea">rea</span> → <span class="pill acc">acc</span></td><td class="num">3/31</td><td class="num">10%</td><td class="num">6–7 → 10–11</td></tr><tr><td>ABCD09 → ABCD10</td><td><span class="pill acc">acc</span> → <span class="pill int">int</span></td><td class="num">5/23</td><td class="num">22%</td><td class="num">10–11 → 9–10</td></tr><tr><td>ABCD10 → ABCD11</td><td><span class="pill int">int</span> → <span class="pill peak">peak</span></td><td class="num">16/28</td><td class="num">57%</td><td class="num">9–10 → 11–11</td></tr><tr style="color:#a78bfa"><td>ABCD11 → ABC+D1</td><td><span class="pill peak">peak</span> → <span class="pill acc">acc</span></td><td class="num">2/32</td><td class="num">6%</td><td class="num">11–11 → 10–13</td></tr><tr style="color:#a78bfa"><td>ABC+D1 → ABC+D2</td><td><span class="pill acc">acc</span> → <span class="pill int">int</span></td><td class="num">7/32</td><td class="num">22%</td><td class="num">10–13 → 10–13</td></tr><tr style="color:#a78bfa"><td>ABC+D2 → ABC+D3</td><td><span class="pill int">int</span> → <span class="pill spe">spe</span></td><td class="num">13/29</td><td class="num">45%</td><td class="num">10–13 → 9–12</td></tr></table>
+
+<h3>C. The twenty most-used exercises across the sixteen trainer programs</h3>
+<table role="presentation"><tr><th>Exercise</th><th>English</th><th class="num">Programs (of 16)</th></tr><tr><td>Leg 45</td><td>Leg Press</td><td class="num">13</td></tr><tr><td>Cadeira Extensora</td><td>Leg Extension</td><td class="num">12</td></tr><tr><td>Puxada</td><td>Lat Pulldown</td><td class="num">12</td></tr><tr><td>Supino Inclinado com Halteres</td><td>Incline DB Press</td><td class="num">12</td></tr><tr><td>Elevação Lateral com Halteres</td><td>Lateral Raise</td><td class="num">11</td></tr><tr><td>Remada Curvada com Barra</td><td>Bent Over Barbell Row</td><td class="num">11</td></tr><tr><td>Cadeira Flexora</td><td>Seated Leg Curl</td><td class="num">10</td></tr><tr><td>Crucifixo na Polia</td><td>Cable Fly</td><td class="num">10</td></tr><tr><td>Puxada Frente Triângulo</td><td>V-Bar Pulldown</td><td class="num">10</td></tr><tr><td>Remada Baixa</td><td>Seated Cable Row</td><td class="num">10</td></tr><tr><td>Supino Reto</td><td>Barbell Bench Press</td><td class="num">10</td></tr><tr><td>Tríceps Testa</td><td>Skull Crushers</td><td class="num">10</td></tr><tr><td>Tríceps Corda</td><td>Triceps Rope Pushdown</td><td class="num">9</td></tr><tr><td>Abdominal na Polia Alta</td><td>Cable Crunch</td><td class="num">8</td></tr><tr><td>Bíceps Concentrado</td><td>Concentration Curl</td><td class="num">8</td></tr><tr><td>Crucifixo Inverso</td><td>Reverse Fly</td><td class="num">8</td></tr><tr><td>Panturrilha Press</td><td>Calf Press</td><td class="num">8</td></tr><tr><td>Agachamento Hack</td><td>Hack Squat</td><td class="num">7</td></tr><tr><td>Remada Unilateral com Halter</td><td>One-Arm DB Row</td><td class="num">7</td></tr><tr><td>Crucifixo (Voador)</td><td>Chest Fly Machine</td><td class="num">6</td></tr></table>
+
+<p class="small">Source: the <code>PROGRAMS</code> constant in the Zercher workout tracker
+(<code>Zercher/index.html</code>), sixteen trainer-written programs plus three self-written ones,
+parsed on 2026-09-20. Set counts exclude warm-up sets and shoulder-rotation prehab; average reps
+are midpoints of prescribed ranges; average rest is over all lines with a non-zero rest value.
+Phase tags are as stored in the app.</p>
+
+
+<!-- Bookmark system -->
+<script>var BM_KEY = 'bm_program_design';</script>
+<script src="../book.js?v=43"></script>
+
+</body>
+</html>
