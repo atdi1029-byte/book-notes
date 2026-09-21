@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Truth in Lending Act (TILA) APR Disclosure - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.prog-stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(112px,1fr));
+  gap:10px; margin:1rem 0 1.5rem; }
+.prog-stat { background:#e8e0d0; border:1px solid #d4c8b0; border-radius:8px;
+  padding:0.7rem 0.9rem; }
+.prog-stat .n { display:block; font-size:1.5rem; color:#5a3e1a; line-height:1.1; }
+.prog-stat .l { display:block; font-size:0.75rem; color:#8a7a60; margin-top:0.2rem; }
+.prog-chart { position:relative; margin:0.5rem 0 0.4rem; }
+.prog-chart svg { width:100%; height:auto; display:block; overflow:visible; }
+.prog-chart .grid { stroke:#ddd3c0; stroke-width:1; }
+.prog-chart .axis { stroke:#c8bca4; stroke-width:1; }
+.prog-chart .tick { fill:#8a7a60; font-size:11px; }
+.prog-chart .ylab { fill:#8a7a60; font-size:11px; }
+.prog-chart .actual { fill:none; stroke:#9a5a22; stroke-width:2; stroke-linejoin:round; }
+.prog-chart .actual-dot { fill:#9a5a22; stroke:#f4efe8; stroke-width:2; }
+.prog-chart .model { fill:none; stroke:#0e9488; stroke-width:2; stroke-dasharray:6 4; }
+.prog-chart .ceiling { stroke:#8a7a60; stroke-width:1; stroke-dasharray:2 4; }
+.prog-chart .here { stroke:#9a5a22; stroke-width:1; stroke-dasharray:2 3; opacity:0.6; }
+.prog-chart .dlabel { font-size:11px; fill:#3a2e1e; }
+.prog-chart .bar { fill:#9a5a22; opacity:0.75; }
+.prog-chart .bar-model { fill:none; stroke:#0e9488; stroke-width:2; stroke-dasharray:6 4; }
+.prog-chart .hit { fill:transparent; cursor:crosshair; }
+.prog-tip { position:absolute; pointer-events:none; display:none;
+  background:#3a2e1e; color:#f4efe8; font-size:12px; line-height:1.4;
+  padding:6px 9px; border-radius:6px; white-space:nowrap; z-index:5; }
+.prog-legend { display:flex; gap:1.2rem; font-size:0.8rem; color:#5a3e1a;
+  margin:0 0 1.5rem; flex-wrap:wrap; }
+.prog-legend span::before { content:""; display:inline-block; width:18px; height:0;
+  border-top:2px solid; margin-right:6px; vertical-align:middle; }
+.prog-legend .lg-actual::before { border-color:#9a5a22; }
+.prog-legend .lg-model::before { border-color:#0e9488; border-top-style:dashed; }
+.prog-legend .lg-ceiling::before { border-color:#8a7a60; border-top-style:dotted; }
+.prog-eq { background:#e8e0d0; border:1px solid #d4c8b0; border-radius:8px;
+  padding:0.9rem 1.1rem; font-family:Georgia,serif; font-size:1.05rem; color:#3a2e1e;
+  margin:1rem 0; }
+.prog-eq .sub { display:block; font-size:0.85rem; color:#8a7a60; margin-top:0.4rem;
+  font-family:inherit; }
+.prog-note { font-size:0.85rem; color:#8a7a60; }
+.prog-link { font-size:0.85rem; margin:-0.8rem 0 1.2rem; }
+.prog-link a { color:#0e9488; }
+table.prog-table { font-size:0.85rem; margin:1rem 0; }
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.tier .tier-desc { color: #a08060; font-size: 0.85rem; margin: 0.4rem 0 0.8rem; }
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done,
+body.hide-done .cat-card.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+.vid-tab {
+  margin: 0 0 1.2rem; background: #e8e0d0; border: 1px solid #d4c8b0;
+  border-radius: 8px; overflow: hidden;
+}
+.vid-tab summary {
+  padding: 0.6rem 0.9rem; cursor: pointer; font-size: 0.85rem;
+  color: #3a2a1a; list-style: none; user-select: none;
+}
+.vid-tab summary::-webkit-details-marker { display: none; }
+.vid-tab summary::before {
+  content: '▶'; display: inline-block; margin-right: 0.5rem;
+  font-size: 0.7rem; transition: transform 0.2s;
+}
+.vid-tab[open] summary::before { transform: rotate(90deg); }
+.vid-tab .vid-status {
+  float: right; font-size: 0.75rem; padding: 0.15rem 0.5rem;
+  border-radius: 3px; margin-left: 0.5rem;
+}
+.vid-tab .vid-ok { background: #4ade8040; color: #2d6a4f; }
+.vid-tab .vid-err { background: #f8717140; color: #9b2c2c; }
+.vid-tab .vid-list {
+  padding: 0 0.9rem 0.7rem; margin: 0;
+  list-style: none; font-size: 0.8rem;
+}
+.vid-tab .vid-list li {
+  padding: 0.35rem 0; border-top: 1px solid #d4c8b0;
+  display: flex; justify-content: space-between; gap: 8px;
+}
+.vid-tab .vid-list .vid-date {
+  color: #a08060; white-space: nowrap; flex: none;
+}
+.vid-tab .vid-list .vid-concepts {
+  color: #a08060; white-space: nowrap; flex: none; font-size: 0.75rem;
+}
+.vid-tab .vid-none {
+  padding: 0.4rem 0.9rem 0.7rem; color: #a08060; font-size: 0.8rem;
+}
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../personal-finance-basics.html">&larr; Personal Finance Basics</a>
+
+<div class="concept-meta"><span>standard</span><span>Personal Finance Basics</span><span>added 2026-09-21</span></div>
+<h4 id="truth_in_lending_act_apr_disclosure">Truth in Lending Act (TILA) APR Disclosure</h4>
+
+<p>The <strong>Truth in Lending Act</strong> (TILA) is a federal law passed in 1968 that
+forces lenders to disclose the true cost of borrowing in a standardized way,
+so consumers can compare loans on an apples-to-apples basis. The centerpiece
+of that disclosure is the <strong>Annual Percentage Rate</strong>, or
+<strong>APR</strong> — a single number that rolls the interest rate together
+with points, lender fees, and other financing costs into one comparable
+figure. This is distinct from the plain <strong>note rate</strong> (also
+called the interest rate), which only reflects interest charged on the
+principal. TILA doesn't cap what a lender can charge or ban aggressive
+marketing. It simply requires the real cost to be printed somewhere on the
+document, in a specific, defined way, even when the marketing headline says
+something far more attractive.</p>
+
+<p>This disclosure matters because marketing numbers and financing costs are
+structurally incentivized to diverge, especially in an environment where
+sellers are subsidizing rates to move inventory. A big banner rate draws
+attention and drives foot traffic; the APR is the boring number regulators
+require so that attention-grabbing rate can't quietly hide fees, points, or a
+temporary teaser structure. Without a mandated, standardized APR, a buyer
+comparing a builder's promotional loan against a bank's plain-vanilla
+mortgage would have no reliable way to know which one actually costs less
+over time. The APR exists to protect the comparison itself — it's a
+market-transparency mechanism, not a marketing tool, and that's exactly why
+it typically gets printed in the smallest type on the page.</p>
+
+<p>Mechanically, the APR calculation works by taking every financing cost
+associated with the loan — the interest rate (including any teaser or
+step-up structure over the life of the loan), discount points, origination
+fees, and certain closing costs — and converting them into a single
+annualized percentage that reflects the effective cost of borrowing if the
+loan is held to term. If a rate steps up over time (say, low in year one,
+higher in year two, and higher still for the remaining term), the APR isn't
+just the first-year number — it blends the entire structure into one rate.
+Lenders are legally required to calculate and disclose this figure using a
+standardized formula, which is why it can be compared across totally
+different loan products, lenders, and fee structures without the consumer
+having to reverse-engineer anything themselves.</p>
+
+<p>The video's real-world example makes this concrete. A homebuilder in
+Greenville, South Carolina advertised a mortgage with a headline rate of
+<strong>3.99%</strong> in year one, stepping up to 4.99% in year two, then
+settling at 5.99% for the remaining 28 years. The sign made it look like a
+sub-4% mortgage. But the same flyer's legally mandated disclosure listed an
+APR of <strong>6.854%</strong> — the number that accounts for the full
+step-structure plus whatever points and fees the builder's mortgage arm
+baked in to make the teaser possible. As the video puts it: <blockquote>"Both
+numbers are true. Only one of them is real."</blockquote> The 3.99% is real
+in the sense that it's the rate charged in year one. But the APR is the
+number that tells you what the whole package actually costs.</p>
+
+<p>Savvy buyers and investors use the APR as the default comparison tool
+specifically because it neutralizes marketing tricks. The practical move
+illustrated in the video is to take the disclosed APR and stack it directly
+against prevailing market benchmarks — the average 30-year fixed rate on
+lender rate sheets, or the average FHA rate, published weekly and widely
+available. In the example, market 30-year fixed rates were running at
+7.19%, and FHA rates at 6.81%, against the builder's 6.854% APR. That
+comparison instantly reveals the real size of the discount: not the 320
+basis points implied by the sign (3.99% vs. 7.19%), but roughly 34 basis
+points against the conventional benchmark — and the builder's package was
+actually slightly worse than a plain FHA loan. Anyone shopping a promotional
+mortgage should do exactly this: find the APR, then call an outside lender
+and compare it to what's actually available in the market that week.</p>
+
+<p>The biggest misconception is treating the headline teaser rate as the
+loan's real cost, when it's often just the first leg of a multi-year
+step structure designed to look dramatic on a sign. A related gotcha is
+assuming a bigger gap between the teaser rate and market rates means a
+bigger discount — it doesn't, because the teaser is temporary and the APR
+captures the entire life of the loan, including years where the rate resets
+higher. Another subtlety: APR can actually run <em>higher</em> than a
+loan's simple note rate once fees and points are included, which is why an
+APR that looks only modestly below market can still represent a genuinely
+weak deal once you account for what the borrower gave up in fees to get
+there. The instinct to compare "sign rate versus market rate" instead of
+"APR versus market rate" is the single most common way buyers overstate how
+good a promotional financing deal actually is.</p>
+
+<p>TILA disclosure breaks down as a consumer protection when buyers don't
+read past the sign, or when the asterisked fine print is functionally
+illegible — printed in type small enough that, as the video notes, you'd
+have to stop the car and walk up to read it. The law doesn't require the
+disclosure to be prominent, only present and accurate, which means full
+compliance can coexist with a badly misleading first impression. There's
+also a real economic edge case behind why builders lean on short teaser
+periods rather than permanent rate buydowns: research cited in the video
+(from the American Enterprise Institute) estimates that permanently buying
+a mortgage rate down by a full percentage point costs a builder roughly
+3.2% of the sale price. Buying a rate down by more than two points, as in
+the example, would consume close to half the builder's entire gross margin
+on that house — which is exactly why the deal is structured as a 2-year
+step-down instead of a 30-year rate cut. The APR is what exposes that
+structural constraint to the buyer, whether or not the builder wants it
+exposed.</p>
+
+<p>The APR disclosure connects directly to how sellers move subsidy value
+around without changing the total amount subsidized. In the video's data,
+Lennar's incentive rate as a percentage of sale price actually <em>fell</em>
+over the year — from 14.3% to 12.0% — while the average home price also
+dropped, from $383,000 to $372,000. Run the dollars and the total giveback
+per house barely moved, changing by about $871 on a roughly $400,000 home.
+What changed was the <em>form</em> of the subsidy: less money went into
+rate buydowns (invisible, temporary, and specific to one buyer's loan) and
+more went into the sticker price cut (permanent, visible in every future
+appraisal and comp on the street). Because APR disclosure makes rate
+buydowns transparent and comparable, it's part of what allows this kind of
+shift to be reconstructed from public numbers — connecting directly to
+concepts like builder incentive rates, gross margin compression, and the
+comp-based nature of home appraisals.</p>
+<div class="concept-side">Sources: LENNAR EARNINGS CRACK: Why Homebuilders Are Quietly Slashing Sticker Prices<br>Related in this category: <a href="credit_score.html">Credit Score (FICO / VantageScore)</a>, <a href="used_vehicle_resale_value.html">Used Vehicle Resale Value (Residual Value)</a>, <a href="erisa_fiduciary_safe_harbor.html">ERISA Fiduciary Safe Harbor</a>, <a href="loan_amortization.html">Loan Amortization</a>, <a href="home_equity_line_of_credit.html">Home Equity Line of Credit (HELOC)</a>, <a href="margin_loan.html">Margin Loan</a></div>
+<button class="concept-done" data-slug="truth_in_lending_act_apr_disclosure" onclick="toggleDone('truth_in_lending_act_apr_disclosure')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_truth_in_lending_act_apr_disclosure';</script>
+<script src="../../book.js"></script>
+<script src="../fg.js"></script>
+</body>
+</html>
