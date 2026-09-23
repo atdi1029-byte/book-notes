@@ -1635,18 +1635,18 @@ def rebuild_html(concepts):
                      else "<span>deep cut</span>" if flag == "deep" else "<span>standard</span>")
         chapter = c.get("chapter_html") or (
             f'<h4 id="{slug}">{_esc(c["title"])}</h4><p>{_esc(c.get("summary", ""))}</p>')
-        srcs = "; ".join(_esc(video_titles.get(v, v)) for v in c.get("sources", []))
         related = [(sl, x) for sl, x in by_cat[cat_name] if sl != slug][:6]
-        side = f"Sources: {srcs}"
+        side_parts = []
         if c.get("aliases"):
-            side += "<br>Also called: " + _esc(", ".join(c["aliases"]))
+            side_parts.append("Also called: " + _esc(", ".join(c["aliases"])))
         if related:
-            side += ("<br>Related in this category: "
-                     + ", ".join(f'<a href="{sl}.html">{_esc(x["title"])}</a>' for sl, x in related))
+            side_parts.append("Related in this category: "
+                              + ", ".join(f'<a href="{sl}.html">{_esc(x["title"])}</a>' for sl, x in related))
+        side = "<br>".join(side_parts)
         body = f"""
 <div class="concept-meta">{flag_html}<span>{_esc(cat_name)}</span><span>added {c.get("added", "")}</span></div>
 {chapter}
-<div class="concept-side">{side}</div>
+{f'<div class="concept-side">{side}</div>' if side else ""}
 <button class="concept-done" data-slug="{slug}" onclick="toggleDone('{slug}')">&#x2713; Mark complete</button>"""
         path = cdir / f"{slug}.html"
         path.write_text(_page_wrap(c["title"], body, css_path="../../book.css",
