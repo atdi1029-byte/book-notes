@@ -382,15 +382,27 @@ def run_claude(prompt, timeout=300, model="sonnet"):
 
     The CLI exits 0 and prints "API Error: ..." on network failures,
     so a return-code check alone is not enough.
+
+    Claude Code auto-updates by reinstalling itself, and for a few seconds
+    the `claude` symlink does not exist.  A call that lands in that gap
+    gets FileNotFoundError — wait and retry instead of failing the video.
     """
-    try:
-        result = subprocess.run(
-            ["claude", "-p", prompt, "--model", model],
-            capture_output=True, text=True, timeout=timeout
-        )
-    except Exception as e:
-        log(f"  ERROR running claude: {e}")
-        return None
+    for attempt in range(4):
+        try:
+            result = subprocess.run(
+                ["claude", "-p", prompt, "--model", model],
+                capture_output=True, text=True, timeout=timeout
+            )
+            break
+        except FileNotFoundError as e:
+            if attempt == 3:
+                log(f"  ERROR running claude: {e}")
+                return None
+            log(f"  claude not found (mid-update?) — retrying in 30s")
+            time.sleep(30)
+        except Exception as e:
+            log(f"  ERROR running claude: {e}")
+            return None
     out = (result.stdout or "").strip()
     if result.returncode != 0:
         log(f"  ERROR claude exit {result.returncode}: "
@@ -1184,8 +1196,16 @@ def _concept_rows(items, href_prefix):
     )
 
 
-def _videos_this_week_html(processed):
-    """Build a collapsible tab showing videos processed in the last 7 days."""
+def _videos_this_week_html(processed, concepts):
+    """Build a collapsible tab showing videos processed in the last 7 days,
+    including partial ones (some chapters written, rest queued for retry).
+    Concept counts come from the guide itself — concepts whose first source
+    is the video — so a video finished across several runs shows its full
+    total, not just the last run's."""
+    added_by = {}
+    for c in concepts.values():
+        if c.get("sources"):
+            added_by[c["sources"][0]] = added_by.get(c["sources"][0], 0) + 1
     now = datetime.now()
     cutoff = (now - timedelta(days=7)).strftime("%Y-%m-%d")
     week_vids = []
@@ -1194,8 +1214,8 @@ def _videos_this_week_html(processed):
             continue
         ts = v.get("processed", "")
         if ts >= cutoff:
-            week_vids.append(v)
-    week_vids.sort(key=lambda v: v.get("processed", ""), reverse=True)
+            week_vids.append((vid_id, v))
+    week_vids.sort(key=lambda x: x[1].get("processed", ""), reverse=True)
 
     # Check bot health: last successful run
     last_run = ""
@@ -1224,11 +1244,13 @@ def _videos_this_week_html(processed):
         inner = '<p class="vid-none">No videos processed this week.</p>'
     else:
         rows = []
-        for v in week_vids:
+        for vid_id, v in week_vids:
             ts = v.get("processed", "")[:10]
             title = _esc(v.get("title", "?"))
-            n = v.get("concepts_extracted", 0)
+            n = added_by.get(vid_id, 0)
             ctext = f"{n} concept{'s' if n != 1 else ''}" if n else "0 new"
+            if v.get("partial"):
+                ctext += " &middot; finishing"
             rows.append(
                 f'<li><span>{title}</span>'
                 f'<span class="vid-concepts">{ctext}</span>'
@@ -1532,7 +1554,8 @@ def rebuild_html(concepts):
     one page per concept, plus recent.html.  Layout follows the Master
     Reading List outline; filing decided at extraction time."""
     processed = load_json(PROCESSED_FILE)
-    videos_done = sum(1 for v in processed.values() if not v.get("skipped"))
+    videos_done = sum(1 for v in processed.values()
+                      if not v.get("skipped") and not v.get("retry"))
     video_titles = {k: v.get("title", k) for k, v in processed.items()}
 
     by_cat = {n: [] for n in CATEGORY_NAMES}
@@ -1570,7 +1593,7 @@ def rebuild_html(concepts):
         )
 
     recent = _recent_concepts(concepts)
-    vid_tab = _videos_this_week_html(processed)
+    vid_tab = _videos_this_week_html(processed, concepts)
     prog = _progress_model(processed, concepts)
     body = f"""
 <h1>Finance Guide</h1>
@@ -1840,8 +1863,20 @@ def run_once():
 
         if failed:
             # Concepts that did get written are saved and will be skipped
-            # next time; the video stays unprocessed so the rest get retried.
+            # next time; the video stays queued (retry) so the rest get
+            # retried.  Record it as partial so "Videos this week" lists it
+            # alongside the concepts it already added to the guide.
             log(f"    {failed} chapter(s) failed — video left for retry")
+            entry = processed.get(vid_id, {})
+            entry.update({
+                "title": title,
+                "channel": channel,
+                "processed": datetime.now().strftime("%Y-%m-%d %H:%M"),
+                "retry": True,
+                "partial": True,
+            })
+            processed[vid_id] = entry
+            save_json(PROCESSED_FILE, processed)
             ok = False
             continue
 

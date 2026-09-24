@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Wrong-Way Risk (Collateral-Exposure Correlation) - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.prog-stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(112px,1fr));
+  gap:10px; margin:1rem 0 1.5rem; }
+.prog-stat { background:#e8e0d0; border:1px solid #d4c8b0; border-radius:8px;
+  padding:0.7rem 0.9rem; }
+.prog-stat .n { display:block; font-size:1.5rem; color:#5a3e1a; line-height:1.1; }
+.prog-stat .l { display:block; font-size:0.75rem; color:#8a7a60; margin-top:0.2rem; }
+.prog-chart { position:relative; margin:0.5rem 0 0.4rem; }
+.prog-chart svg { width:100%; height:auto; display:block; overflow:visible; }
+.prog-chart .grid { stroke:#ddd3c0; stroke-width:1; }
+.prog-chart .axis { stroke:#c8bca4; stroke-width:1; }
+.prog-chart .tick { fill:#8a7a60; font-size:11px; }
+.prog-chart .ylab { fill:#8a7a60; font-size:11px; }
+.prog-chart .actual { fill:none; stroke:#9a5a22; stroke-width:2; stroke-linejoin:round; }
+.prog-chart .actual-dot { fill:#9a5a22; stroke:#f4efe8; stroke-width:2; }
+.prog-chart .model { fill:none; stroke:#0e9488; stroke-width:2; stroke-dasharray:6 4; }
+.prog-chart .ceiling { stroke:#8a7a60; stroke-width:1; stroke-dasharray:2 4; }
+.prog-chart .here { stroke:#9a5a22; stroke-width:1; stroke-dasharray:2 3; opacity:0.6; }
+.prog-chart .dlabel { font-size:11px; fill:#3a2e1e; }
+.prog-chart .bar { fill:#9a5a22; opacity:0.75; }
+.prog-chart .bar-model { fill:none; stroke:#0e9488; stroke-width:2; stroke-dasharray:6 4; }
+.prog-chart .hit { fill:transparent; cursor:crosshair; }
+.prog-tip { position:absolute; pointer-events:none; display:none;
+  background:#3a2e1e; color:#f4efe8; font-size:12px; line-height:1.4;
+  padding:6px 9px; border-radius:6px; white-space:nowrap; z-index:5; }
+.prog-legend { display:flex; gap:1.2rem; font-size:0.8rem; color:#5a3e1a;
+  margin:0 0 1.5rem; flex-wrap:wrap; }
+.prog-legend span::before { content:""; display:inline-block; width:18px; height:0;
+  border-top:2px solid; margin-right:6px; vertical-align:middle; }
+.prog-legend .lg-actual::before { border-color:#9a5a22; }
+.prog-legend .lg-model::before { border-color:#0e9488; border-top-style:dashed; }
+.prog-legend .lg-ceiling::before { border-color:#8a7a60; border-top-style:dotted; }
+.prog-eq { background:#e8e0d0; border:1px solid #d4c8b0; border-radius:8px;
+  padding:0.9rem 1.1rem; font-family:Georgia,serif; font-size:1.05rem; color:#3a2e1e;
+  margin:1rem 0; }
+.prog-eq .sub { display:block; font-size:0.85rem; color:#8a7a60; margin-top:0.4rem;
+  font-family:inherit; }
+.prog-note { font-size:0.85rem; color:#8a7a60; }
+.prog-link { font-size:0.85rem; margin:-0.8rem 0 1.2rem; }
+.prog-link a { color:#0e9488; }
+table.prog-table { font-size:0.85rem; margin:1rem 0; }
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.tier .tier-desc { color: #a08060; font-size: 0.85rem; margin: 0.4rem 0 0.8rem; }
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done,
+body.hide-done .cat-card.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+.vid-tab {
+  margin: 0 0 1.2rem; background: #e8e0d0; border: 1px solid #d4c8b0;
+  border-radius: 8px; overflow: hidden;
+}
+.vid-tab summary {
+  padding: 0.6rem 0.9rem; cursor: pointer; font-size: 0.85rem;
+  color: #3a2a1a; list-style: none; user-select: none;
+}
+.vid-tab summary::-webkit-details-marker { display: none; }
+.vid-tab summary::before {
+  content: '▶'; display: inline-block; margin-right: 0.5rem;
+  font-size: 0.7rem; transition: transform 0.2s;
+}
+.vid-tab[open] summary::before { transform: rotate(90deg); }
+.vid-tab .vid-status {
+  float: right; font-size: 0.75rem; padding: 0.15rem 0.5rem;
+  border-radius: 3px; margin-left: 0.5rem;
+}
+.vid-tab .vid-ok { background: #4ade8040; color: #2d6a4f; }
+.vid-tab .vid-err { background: #f8717140; color: #9b2c2c; }
+.vid-tab .vid-list {
+  padding: 0 0.9rem 0.7rem; margin: 0;
+  list-style: none; font-size: 0.8rem;
+}
+.vid-tab .vid-list li {
+  padding: 0.35rem 0; border-top: 1px solid #d4c8b0;
+  display: flex; justify-content: space-between; gap: 8px;
+}
+.vid-tab .vid-list .vid-date {
+  color: #a08060; white-space: nowrap; flex: none;
+}
+.vid-tab .vid-list .vid-concepts {
+  color: #a08060; white-space: nowrap; flex: none; font-size: 0.75rem;
+}
+.vid-tab .vid-none {
+  padding: 0.4rem 0.9rem 0.7rem; color: #a08060; font-size: 0.8rem;
+}
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../risk-management-position-sizing.html">&larr; Risk Management &amp; Position Sizing</a>
+
+<div class="concept-meta"><span>deep cut</span><span>Risk Management &amp; Position Sizing</span><span>added 2026-09-24</span></div>
+<h4 id="wrong_way_risk">Wrong-Way Risk (Collateral-Exposure Correlation)</h4>
+
+<p><strong>Wrong-way risk</strong> is what happens when the value of the collateral backing a loan is correlated with the very economic force that threatens to make the borrower default. In plain terms: the thing you pledged to secure the loan tends to lose value for the exact same reason your ability to repay the loan gets harder. A healthy loan structure wants the opposite — collateral that holds its value (or rises) precisely when the borrower is under stress. Wrong-way risk is a structural flaw hiding inside a balance sheet, invisible in calm markets, and catastrophic in stressed ones, because the two legs of the trade that are supposed to protect the lender both move against the borrower at once, doubling the damage instead of offsetting it.</p>
+
+<p>This matters because it turns an ordinary market wobble into a forced, mechanical unwind. Most investors think of stock declines and bond selloffs as separate stories happening in separate markets. Wrong-way risk is the hidden wire connecting them. When a company has borrowed against an asset whose price is itself sensitive to the same macro variable — interest rates, credit spreads, sector sentiment — a decline doesn't just hurt the equity holders. It triggers contractual mechanisms in the debt: margin calls, covenant breaches, forced collateral top-ups. Those mechanisms don't wait for a vote or a board meeting. They execute automatically, which is why wrong-way risk is dangerous specifically because it removes human discretion from the deleveraging process at the worst possible moment.</p>
+
+<p>Mechanically, it works in a chain. Step one: a borrower pledges a volatile, market-priced asset — usually publicly traded stock — as collateral for a loan, rather than pledging something stable like cash or real estate. Step two: the loan agreement contains covenants tied to the collateral's market value, often expressed as a <strong>loan-to-value ratio</strong> — if the pledged shares are worth $25 billion against a $25 billion facility today, the lender requires that ratio stay within a safe band. Step three: some external shock hits the specific asset class the collateral belongs to. Step four: as the collateral's price falls, the loan-to-value ratio breaches its covenant, and the borrower is contractually required to post more collateral, pay down the loan, or face liquidation of the pledged shares — right as the borrower's cash position is often also stressed by the same shock.</p>
+
+<p>The video lays out a textbook real-world case. <strong>SoftBank Group</strong> expanded a margin loan facility to $25 billion, collateralized by 769 million shares of <strong>ARM Holdings</strong> — 72% of the entire company pledged as backstop. ARM is a chip stock, which means its valuation is directly exposed to the same discount-rate math driving broader tech multiples. At the same moment, SoftBank priced an $11.15 billion junk bond offering (rated <strong>BB+</strong>, sub-investment grade) with longer tranches testing yields near 10%, obligating SoftBank to fixed coupon payments for years. If rising bond yields compress multiples across chip and AI stocks, ARM shares fall, the margin loan's collateral cushion shrinks, covenants tighten — precisely while SoftBank must also service that new 10% junk debt and just wired $10 billion to OpenAI, a company burning cash with no near-term IPO.</p>
+
+<blockquote>"That's not speculation. That is the mathematical geometry of a leveraged balance sheet."<cite>— Mark, on SoftBank's ARM-collateralized margin loan</cite></blockquote>
+
+<p>Traders and credit analysts use wrong-way risk as a screening tool, not a prediction tool — it tells you where a shock will amplify rather than dissipate. The practical exercise is to ask: what collateral backs this entity's debt, and what single macro factor could hit both the collateral's price and the borrower's cash flow simultaneously? Desks watch pledged-share disclosures (often buried in 13Ds, prospectuses, or loan covenant filings), track the correlation between the collateral asset and the borrower's core business, and monitor the loan-to-value cushion — how far collateral can fall before triggering a call. A wide cushion buys time; a thin one means the borrower is one bad week away from forced action. This is also why the video recommends watching ARM's share price as a leading indicator for SoftBank's entire credit structure — the collateral is the tripwire.</p>
+
+<p>The biggest misconception is assuming that pledging "blue chip" or "crown jewel" assets as collateral makes a loan safer. Investors hear that a loan is backed by a company's most valuable holding and read that as reassurance. It's backwards: the more that collateral is a single concentrated, publicly traded, sentiment-driven equity position — rather than a diversified or stable asset — the more wrong-way risk is baked into the structure. A second misconception is treating the loan and the equity position as separate risks that can be evaluated independently. In a wrong-way risk setup, they are the same risk wearing two costumes; sizing them separately understates the true exposure because it ignores the correlation between them.
+
+<p>When wrong-way risk breaks bad, it doesn't fail gracefully — it fails in a self-reinforcing spiral, often called a <strong>collateral death spiral</strong>. Falling collateral value triggers a margin call; meeting the call (or the lender liquidating pledged shares) forces selling of the very asset that's already falling, which pushes the price down further, which can trigger the next covenant breach. This is distinct from ordinary balance-sheet stress because it's automatic and price-reflexive — the act of defending the loan makes the underlying problem worse. It also creates contagion beyond the borrower: forced share sales dump supply onto the market, pressuring the stock for other holders who have nothing to do with the loan, and credit funds tracking high-yield benchmarks (like HYG or JNK) are structurally forced to absorb the new debt regardless of its risk profile, spreading the exposure into retirement accounts that never chose to hold it.</p>
+
+<p>Wrong-way risk connects directly to the discount-rate mechanics driving <strong>multiple compression</strong> — the same rising-yield environment that shrinks the present value of future tech earnings is what pressures ARM's share price and tightens SoftBank's covenants, showing how a single macro variable (the cost of capital) can attack a balance sheet from two directions at once. It also relates to counterparty and liquidity risk more broadly: any structure where an asset's price and an obligation's servicing cost move together under stress — a bank holding its own stock as regulatory capital, a hedge fund posting correlated securities as margin, a country borrowing in foreign currency while its own currency depreciates — is a variant of the same underlying flaw. Recognizing the pattern in one context, like SoftBank and ARM, trains you to spot it in others before the covenant breach makes it front-page news.</p>
+<div class="concept-side">Related in this category: <a href="platform_obsolescence.html">Platform Obsolescence Risk</a>, <a href="redemption_gate.html">Redemption Gate</a>, <a href="hedge_basis_risk.html">Hedge Basis Risk (Correlated Hedge Failure)</a>, <a href="asset_resale_liquidity_vs_illiquid_obligation.html">Resalable Assets vs. Illiquid Long-Term Obligations</a>, <a href="margin_call.html">Margin Call / Collateral Covenant Trigger</a>, <a href="fuel_surcharge_clause.html">Fuel Surcharge Clause</a></div>
+<button class="concept-done" data-slug="wrong_way_risk" onclick="toggleDone('wrong_way_risk')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_wrong_way_risk';</script>
+<script src="../../book.js"></script>
+<script src="../fg.js"></script>
+</body>
+</html>

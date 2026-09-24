@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Refinery Utilization Rate - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.prog-stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(112px,1fr));
+  gap:10px; margin:1rem 0 1.5rem; }
+.prog-stat { background:#e8e0d0; border:1px solid #d4c8b0; border-radius:8px;
+  padding:0.7rem 0.9rem; }
+.prog-stat .n { display:block; font-size:1.5rem; color:#5a3e1a; line-height:1.1; }
+.prog-stat .l { display:block; font-size:0.75rem; color:#8a7a60; margin-top:0.2rem; }
+.prog-chart { position:relative; margin:0.5rem 0 0.4rem; }
+.prog-chart svg { width:100%; height:auto; display:block; overflow:visible; }
+.prog-chart .grid { stroke:#ddd3c0; stroke-width:1; }
+.prog-chart .axis { stroke:#c8bca4; stroke-width:1; }
+.prog-chart .tick { fill:#8a7a60; font-size:11px; }
+.prog-chart .ylab { fill:#8a7a60; font-size:11px; }
+.prog-chart .actual { fill:none; stroke:#9a5a22; stroke-width:2; stroke-linejoin:round; }
+.prog-chart .actual-dot { fill:#9a5a22; stroke:#f4efe8; stroke-width:2; }
+.prog-chart .model { fill:none; stroke:#0e9488; stroke-width:2; stroke-dasharray:6 4; }
+.prog-chart .ceiling { stroke:#8a7a60; stroke-width:1; stroke-dasharray:2 4; }
+.prog-chart .here { stroke:#9a5a22; stroke-width:1; stroke-dasharray:2 3; opacity:0.6; }
+.prog-chart .dlabel { font-size:11px; fill:#3a2e1e; }
+.prog-chart .bar { fill:#9a5a22; opacity:0.75; }
+.prog-chart .bar-model { fill:none; stroke:#0e9488; stroke-width:2; stroke-dasharray:6 4; }
+.prog-chart .hit { fill:transparent; cursor:crosshair; }
+.prog-tip { position:absolute; pointer-events:none; display:none;
+  background:#3a2e1e; color:#f4efe8; font-size:12px; line-height:1.4;
+  padding:6px 9px; border-radius:6px; white-space:nowrap; z-index:5; }
+.prog-legend { display:flex; gap:1.2rem; font-size:0.8rem; color:#5a3e1a;
+  margin:0 0 1.5rem; flex-wrap:wrap; }
+.prog-legend span::before { content:""; display:inline-block; width:18px; height:0;
+  border-top:2px solid; margin-right:6px; vertical-align:middle; }
+.prog-legend .lg-actual::before { border-color:#9a5a22; }
+.prog-legend .lg-model::before { border-color:#0e9488; border-top-style:dashed; }
+.prog-legend .lg-ceiling::before { border-color:#8a7a60; border-top-style:dotted; }
+.prog-eq { background:#e8e0d0; border:1px solid #d4c8b0; border-radius:8px;
+  padding:0.9rem 1.1rem; font-family:Georgia,serif; font-size:1.05rem; color:#3a2e1e;
+  margin:1rem 0; }
+.prog-eq .sub { display:block; font-size:0.85rem; color:#8a7a60; margin-top:0.4rem;
+  font-family:inherit; }
+.prog-note { font-size:0.85rem; color:#8a7a60; }
+.prog-link { font-size:0.85rem; margin:-0.8rem 0 1.2rem; }
+.prog-link a { color:#0e9488; }
+table.prog-table { font-size:0.85rem; margin:1rem 0; }
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.tier .tier-desc { color: #a08060; font-size: 0.85rem; margin: 0.4rem 0 0.8rem; }
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done,
+body.hide-done .cat-card.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+.vid-tab {
+  margin: 0 0 1.2rem; background: #e8e0d0; border: 1px solid #d4c8b0;
+  border-radius: 8px; overflow: hidden;
+}
+.vid-tab summary {
+  padding: 0.6rem 0.9rem; cursor: pointer; font-size: 0.85rem;
+  color: #3a2a1a; list-style: none; user-select: none;
+}
+.vid-tab summary::-webkit-details-marker { display: none; }
+.vid-tab summary::before {
+  content: '▶'; display: inline-block; margin-right: 0.5rem;
+  font-size: 0.7rem; transition: transform 0.2s;
+}
+.vid-tab[open] summary::before { transform: rotate(90deg); }
+.vid-tab .vid-status {
+  float: right; font-size: 0.75rem; padding: 0.15rem 0.5rem;
+  border-radius: 3px; margin-left: 0.5rem;
+}
+.vid-tab .vid-ok { background: #4ade8040; color: #2d6a4f; }
+.vid-tab .vid-err { background: #f8717140; color: #9b2c2c; }
+.vid-tab .vid-list {
+  padding: 0 0.9rem 0.7rem; margin: 0;
+  list-style: none; font-size: 0.8rem;
+}
+.vid-tab .vid-list li {
+  padding: 0.35rem 0; border-top: 1px solid #d4c8b0;
+  display: flex; justify-content: space-between; gap: 8px;
+}
+.vid-tab .vid-list .vid-date {
+  color: #a08060; white-space: nowrap; flex: none;
+}
+.vid-tab .vid-list .vid-concepts {
+  color: #a08060; white-space: nowrap; flex: none; font-size: 0.75rem;
+}
+.vid-tab .vid-none {
+  padding: 0.4rem 0.9rem 0.7rem; color: #a08060; font-size: 0.8rem;
+}
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../commodities-energy.html">&larr; Commodities &amp; Energy</a>
+
+<div class="concept-meta"><span>standard</span><span>Commodities &amp; Energy</span><span>added 2026-09-24</span></div>
+<h4 id="refinery_utilization_rate">Refinery Utilization Rate</h4>
+
+<p><strong>Refinery utilization rate</strong> measures what percentage of a
+refinery's total processing capacity is actually being run at any given
+time, expressed as a percentage of the maximum barrels per day the
+refining system could theoretically process. A rate of 96.8% means
+American refiners are converting crude oil into finished fuels — gasoline,
+diesel, jet fuel — at 96.8% of their maximum possible throughput. This
+number is published weekly by the U.S. Energy Information Administration
+(EIA) and is one of the most closely watched, least understood numbers in
+energy markets. It is not a measure of oil supply. It is a measure of how
+hard the industrial machinery that turns oil into usable fuel is being
+pushed, week after week.</p>
+
+<p>This number matters because refining capacity, not crude oil, is
+usually the actual bottleneck in fuel markets. As the video bluntly puts
+it, "you don't burn crude oil. Nobody does. Crude is a raw ingredient."
+Crude can be sitting in tankers by the millions of barrels, and prices for
+gasoline and diesel can still spike to record highs — because the
+physical plants that convert crude into something a truck or a car can
+actually burn are running flat out and can't process any more. When
+utilization is near its ceiling, there's no slack left in the system. Any
+unplanned outage — a fire, a hurricane, a mechanical failure — removes
+capacity that cannot be replaced quickly, and prices for finished fuel
+spike even while crude oil is falling.</p>
+
+<p>Mechanically, refineries run a seasonal cycle. Every autumn, once
+summer driving season winds down, refiners are supposed to throttle back
+and take units offline for scheduled maintenance — called
+<strong>turnaround season</strong>. This is deliberate: pumps, towers,
+and catalytic crackers wear down and need inspection and repair, and
+doing that work in September and October, before winter heating-oil
+demand and before next summer's driving season, is the industry's normal
+rhythm. Utilization rates drop by a few points during these weeks as a
+matter of routine housekeeping. Skipping or shortening turnaround season
+doesn't make the wear and tear disappear — it just defers the day the
+equipment forces a shutdown, and that day tends to arrive as an
+unplanned, more disruptive outage rather than a scheduled one.</p>
+
+<p>The video's real-world example is precise and damning. Last September,
+utilization fell in an orderly, visible sequence: 94.9%, then 93.3%, then
+93%, then 91.4% — a normal seasonal decline as refiners took units down
+for repairs. This September, utilization sat at 96.8%, a full three and a
+half points higher than the same point a year earlier, during the exact
+weeks refiners are supposed to be doing maintenance instead of maximizing
+output.</p>
+
+<blockquote>"American refiners are running three and a half points hotter
+than this time last year. During the exact weeks they're supposed to be
+actually shut down for repairs, my friends, that's not strength. That is
+deferred maintenance."</blockquote>
+
+<p>The reason refiners are skipping their normal seasonal slowdown
+connects directly to the diesel shortage driving the rest of the video.
+Diesel hit an all-time record of $6.53 a gallon even as crude oil broke
+below $100, because Russian refineries — knocked offline by war damage —
+stopped supplying the diesel export markets they once served, and that
+demand redirected to U.S. Gulf Coast refiners. With the world leaning
+harder than usual on American refining capacity, refiners have an
+incentive to keep running near their ceiling rather than take capacity
+offline for maintenance, even though every week of deferred repairs adds
+risk to the system. Utilization had actually peaked even higher, near
+98%, in August, before easing slightly.</p>
+
+<p>Traders and analysts use utilization rate less as a standalone number
+and more as a diagnostic for the health of the whole refining system,
+read alongside two companion numbers: the <strong>crack spread</strong>
+(the profit margin refiners earn turning crude into finished fuel, which
+sat over $111 a barrel on the Gulf Coast that week versus a normal $20-30)
+and distillate inventories (which were about 16 million barrels, or 13%,
+below their five-year average). A high utilization rate combined with a
+wide crack spread and thin inventories is the signature of a refining
+system with no cushion — every barrel matters, and there's no slack to
+absorb a disruption. The video's own trading advice is to watch whether
+utilization stays "pinned near 97% instead of dropping for maintenance,"
+because that would mean refiners are continuing to borrow against next
+year's reliability to meet this year's demand.</p>
+
+<p>The gotcha is that a high utilization rate can look like good news —
+refiners running hard, meeting demand, keeping fuel flowing — when it is
+actually a warning sign. People instinctively read "97% capacity" as
+strength, the same way a factory running near full output looks healthy.
+But in refining, capacity utilization near the ceiling during a period
+when it's supposed to be low is closer to a car engine redlined on a road
+trip when it was scheduled for an oil change. It runs fine for a while.
+The risk isn't today's output; it's what breaks three months from now
+because the inspection that would have caught it never happened. This is
+also why utilization has to be read in the context of the calendar — 96.8%
+in July is unremarkable, while 96.8% in late September, deep into
+turnaround season, is a genuine anomaly.</p>
+
+<p>When deferred maintenance finally catches up with a refinery, the
+failure mode is an unplanned outage: a unit goes down unexpectedly rather
+than on a scheduled, staggered basis, and because so many refiners were
+all running hot at once instead of staggering their maintenance normally,
+multiple outages can cluster together and remove a large chunk of national
+capacity at once. Because refined products can't simply be shipped
+anywhere — the video notes the pipeline network runs in fixed directions,
+so Gulf Coast diesel can't easily reach New England, which is why the
+East Coast imports over a million barrels a day of finished product —
+localized refinery failures can cause regional fuel spikes even when
+national crude supply is abundant. This is the same "plumbing, not
+molecules" constraint that made a diesel export ban politically appealing
+but economically dangerous: refining industry estimates suggested a ban
+could idle 1.3 million barrels a day of capacity, about 7% of the
+country's refining, precisely because the system has so little spare
+running room left to absorb a shock.</p>
+
+<p>Refinery utilization rate connects directly to the
+<strong>crack spread</strong> concept covered elsewhere in this guide —
+utilization is the mechanical cause, and the crack spread is the price
+effect. It also connects to the idea of <strong>distillate inventories</strong>
+as a buffer: when inventories are thin and utilization is maxed out, the
+system has no shock absorber left, which is exactly the setup the video
+describes as a "diesel trap" — a shortage of refining capacity that no
+amount of cheap crude oil can fix.</p>
+<div class="concept-side">Related in this category: <a href="gold_futures.html">Gold Futures</a>, <a href="agricultural_input_cost_inflation.html">Agricultural Input Cost Inflation</a>, <a href="nitrogen_fertilizer_as_commodity.html">Nitrogen Fertilizer Pricing</a>, <a href="potash_supply_concentration_risk.html">Potash Supply Concentration Risk</a>, <a href="commodity_supply_shock.html">Commodity Supply Shock</a>, <a href="strategic_petroleum_reserve.html">Strategic Petroleum Reserve (SPR)</a></div>
+<button class="concept-done" data-slug="refinery_utilization_rate" onclick="toggleDone('refinery_utilization_rate')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_refinery_utilization_rate';</script>
+<script src="../../book.js"></script>
+<script src="../fg.js"></script>
+</body>
+</html>

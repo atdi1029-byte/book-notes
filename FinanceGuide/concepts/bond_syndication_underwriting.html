@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Bond Syndication / Underwriting Process - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.prog-stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(112px,1fr));
+  gap:10px; margin:1rem 0 1.5rem; }
+.prog-stat { background:#e8e0d0; border:1px solid #d4c8b0; border-radius:8px;
+  padding:0.7rem 0.9rem; }
+.prog-stat .n { display:block; font-size:1.5rem; color:#5a3e1a; line-height:1.1; }
+.prog-stat .l { display:block; font-size:0.75rem; color:#8a7a60; margin-top:0.2rem; }
+.prog-chart { position:relative; margin:0.5rem 0 0.4rem; }
+.prog-chart svg { width:100%; height:auto; display:block; overflow:visible; }
+.prog-chart .grid { stroke:#ddd3c0; stroke-width:1; }
+.prog-chart .axis { stroke:#c8bca4; stroke-width:1; }
+.prog-chart .tick { fill:#8a7a60; font-size:11px; }
+.prog-chart .ylab { fill:#8a7a60; font-size:11px; }
+.prog-chart .actual { fill:none; stroke:#9a5a22; stroke-width:2; stroke-linejoin:round; }
+.prog-chart .actual-dot { fill:#9a5a22; stroke:#f4efe8; stroke-width:2; }
+.prog-chart .model { fill:none; stroke:#0e9488; stroke-width:2; stroke-dasharray:6 4; }
+.prog-chart .ceiling { stroke:#8a7a60; stroke-width:1; stroke-dasharray:2 4; }
+.prog-chart .here { stroke:#9a5a22; stroke-width:1; stroke-dasharray:2 3; opacity:0.6; }
+.prog-chart .dlabel { font-size:11px; fill:#3a2e1e; }
+.prog-chart .bar { fill:#9a5a22; opacity:0.75; }
+.prog-chart .bar-model { fill:none; stroke:#0e9488; stroke-width:2; stroke-dasharray:6 4; }
+.prog-chart .hit { fill:transparent; cursor:crosshair; }
+.prog-tip { position:absolute; pointer-events:none; display:none;
+  background:#3a2e1e; color:#f4efe8; font-size:12px; line-height:1.4;
+  padding:6px 9px; border-radius:6px; white-space:nowrap; z-index:5; }
+.prog-legend { display:flex; gap:1.2rem; font-size:0.8rem; color:#5a3e1a;
+  margin:0 0 1.5rem; flex-wrap:wrap; }
+.prog-legend span::before { content:""; display:inline-block; width:18px; height:0;
+  border-top:2px solid; margin-right:6px; vertical-align:middle; }
+.prog-legend .lg-actual::before { border-color:#9a5a22; }
+.prog-legend .lg-model::before { border-color:#0e9488; border-top-style:dashed; }
+.prog-legend .lg-ceiling::before { border-color:#8a7a60; border-top-style:dotted; }
+.prog-eq { background:#e8e0d0; border:1px solid #d4c8b0; border-radius:8px;
+  padding:0.9rem 1.1rem; font-family:Georgia,serif; font-size:1.05rem; color:#3a2e1e;
+  margin:1rem 0; }
+.prog-eq .sub { display:block; font-size:0.85rem; color:#8a7a60; margin-top:0.4rem;
+  font-family:inherit; }
+.prog-note { font-size:0.85rem; color:#8a7a60; }
+.prog-link { font-size:0.85rem; margin:-0.8rem 0 1.2rem; }
+.prog-link a { color:#0e9488; }
+table.prog-table { font-size:0.85rem; margin:1rem 0; }
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.tier .tier-desc { color: #a08060; font-size: 0.85rem; margin: 0.4rem 0 0.8rem; }
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done,
+body.hide-done .cat-card.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+.vid-tab {
+  margin: 0 0 1.2rem; background: #e8e0d0; border: 1px solid #d4c8b0;
+  border-radius: 8px; overflow: hidden;
+}
+.vid-tab summary {
+  padding: 0.6rem 0.9rem; cursor: pointer; font-size: 0.85rem;
+  color: #3a2a1a; list-style: none; user-select: none;
+}
+.vid-tab summary::-webkit-details-marker { display: none; }
+.vid-tab summary::before {
+  content: '▶'; display: inline-block; margin-right: 0.5rem;
+  font-size: 0.7rem; transition: transform 0.2s;
+}
+.vid-tab[open] summary::before { transform: rotate(90deg); }
+.vid-tab .vid-status {
+  float: right; font-size: 0.75rem; padding: 0.15rem 0.5rem;
+  border-radius: 3px; margin-left: 0.5rem;
+}
+.vid-tab .vid-ok { background: #4ade8040; color: #2d6a4f; }
+.vid-tab .vid-err { background: #f8717140; color: #9b2c2c; }
+.vid-tab .vid-list {
+  padding: 0 0.9rem 0.7rem; margin: 0;
+  list-style: none; font-size: 0.8rem;
+}
+.vid-tab .vid-list li {
+  padding: 0.35rem 0; border-top: 1px solid #d4c8b0;
+  display: flex; justify-content: space-between; gap: 8px;
+}
+.vid-tab .vid-list .vid-date {
+  color: #a08060; white-space: nowrap; flex: none;
+}
+.vid-tab .vid-list .vid-concepts {
+  color: #a08060; white-space: nowrap; flex: none; font-size: 0.75rem;
+}
+.vid-tab .vid-none {
+  padding: 0.4rem 0.9rem 0.7rem; color: #a08060; font-size: 0.8rem;
+}
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../fixed-income-bonds.html">&larr; Fixed Income &amp; Bonds</a>
+
+<div class="concept-meta"><span>standard</span><span>Fixed Income &amp; Bonds</span><span>added 2026-09-24</span></div>
+<h4 id="bond_syndication_underwriting">Bond Syndication / Underwriting Process</h4>
+
+<p><strong>Bond syndication</strong> is the process by which a group of investment banks — the <strong>underwriters</strong> — jointly manage the sale of a large debt offering on behalf of a company or government. Instead of one bank taking on all the risk of selling, say, $11 billion of bonds, a syndicate of banks (in the SoftBank example, <strong>Citi, Goldman Sachs, JPMorgan, and Morgan Stanley</strong>) splits the underwriting duties. They agree to buy the bonds from the issuer and then resell them to institutional investors — pension funds, insurance companies, mutual funds, hedge funds. The underwriters earn a fee for this service, but more importantly, they take on <strong>placement risk</strong>: if they can't find enough buyers at the price they promised the issuer, they can be stuck holding unsold bonds, or forced to cut the price after the deal is already committed.</p>
+
+<p>This process matters because it is the literal mechanism by which corporate borrowing gets priced in real time. The bond market doesn't have a single visible "price" the way a stock does on an exchange — it gets discovered through this underwriting dance of testing demand, adjusting yield, and watching who shows up to buy. When a syndication goes badly — meaning underwriters have to raise the yield sharply just to get the deal done — that's a direct, real-time signal that the market's appetite for risk has changed. It's one of the purest readings of investor sentiment toward credit risk available, and because borrowing costs ripple through to equity valuations, what happens in a syndicate's order book in lower Manhattan can move stock prices worldwide.</p>
+
+<p>Mechanically, the process starts when the issuer decides to raise money and hires banks to lead the deal. The underwriters "<strong>open the books</strong>" — meaning they announce the offering to institutional investors with initial price guidance, a range of yields the bonds might carry. Investors then submit orders indicating how much they'd buy and at what yield. This is called <strong>book-building</strong>. If demand is strong, the underwriters can tighten the yield (lower it) because they don't need to pay up to attract buyers. If demand is weak, they widen it — offering a higher yield, which means a bigger discount, to entice more buyers in. Only once the order book is sufficiently oversubscribed relative to the deal size does the syndicate finalize, or "price," the deal and allocate bonds to investors.</p>
+
+<p>The SoftBank deal illustrates what happens when book-building is hard rather than easy. When Apple or Microsoft — both <strong>investment grade</strong> issuers — sell bonds, underwriters can often price them "with their eyes closed" at a tight spread of 50–70 basis points over Treasuries, because deep pools of conservative, benchmark-tracking capital buy that paper automatically. SoftBank's $11.15 billion offering was different: rated <strong>BB+</strong> by S&P and Fitch — one notch below investment grade, meaning <strong>junk bond</strong> or speculative-grade status. Because passive index funds generally can't or won't buy junk paper, the underwriters had to actively market it to a narrower pool of high-yield specialists, and had to test the longer, seven-and-a-half-year tranche at yields near 10% just to fill the book. SoftBank's existing 2031 bonds had already drifted from a 6.7% yield in January to 8.2% by the week of the sale — evidence that demand for its debt was already softening before the new deal even launched.</p>
+
+<blockquote>"Underwriters like Citi, Goldman Sachs, JP Morgan, and Morgan Stanley — they can't just place calls to passive index funds. They have to offer a fat concession." <cite>— video narrator, describing the SoftBank syndication</cite></blockquote>
+
+<p>Traders and analysts watch syndication activity as a live gauge of credit market health. A deal that prices at the tight end of initial guidance, gets oversubscribed several times over, and trades up in the secondary market the next day signals strong risk appetite. A deal that has to be repriced wider mid-syndication, or that requires a large <strong>concession</strong> (extra yield paid versus where similar existing bonds trade) to clear, signals the opposite — investors are demanding more compensation for risk, a warning sign for the broader market. Desk professionals also watch how a big new issue affects pricing on comparable existing bonds; a large new deal can make older bonds from similar issuers look relatively less attractive, pushing their yields up too. This is sometimes called <strong>supply indigestion</strong>.</p>
+
+<p>A key nuance is the <strong>crowding-out effect</strong> described in the video: when a single issuer floods the market with a large concessionary offering, it doesn't just affect that one company's bonds. Institutional credit managers who could suddenly buy the new mega-cap junk paper at a high single-digit or near-10% yield have little reason to hold lower-yielding bonds from other, less prominent issuers at 6.5%. So they demand more yield on those too, and credit spreads widen across the entire high-yield and crossover space — not just for the company that issued the new debt. A misconception worth correcting: people often think a single company's bond sale is isolated to that company. In reality, because the market is an interconnected pricing web, one large syndication can reset the going rate for an entire category of borrowers.</p>
+
+<p>When syndication breaks down — meaning underwriters badly misjudge demand — the consequences can be severe. If a deal is launched at a yield that turns out too low, the underwriters may be forced to slash the price (raise the yield) mid-process, embarrassing the issuer and signaling distress to the market, or they may be left holding unsold inventory that they must offload at a loss. This is sometimes called being "hung" with a deal. In extreme cases, issuers pull offerings entirely rather than accept punishing terms, which itself sends a negative signal about that company's or that market's health. For SoftBank, failure to complete the syndication successfully would have been especially consequential given the tight timeline: the bonds needed to settle by September 29th so the cash could be wired to OpenAI by the October 1st deadline for the third $10 billion tranche of its committed investment — leaving essentially no room for a failed or delayed deal.</p>
+
+<p>Bond syndication connects directly to two other core ideas in this guide: <strong>credit spreads</strong> and the <strong>discount rate</strong> used in equity valuation. The yield tested during syndication becomes the new benchmark data point for credit spreads across the sector, and because corporate borrowing costs feed into the weighted average cost of capital (WACC) that Wall Street uses to value future earnings, a wave of high-yield syndications testing 9–10% yields — as opposed to the 5–6% cost of capital assumed in years past — directly raises the discount rate applied to growth stocks, compressing the price-to-earnings multiples investors are willing to pay. In this way, a niche mechanical process on a fixed income trading desk becomes a transmission line straight into the valuation of AI and tech stocks sitting in ordinary retirement accounts.</p>
+<div class="concept-side">Related in this category: <a href="two_year_treasury_yield.html">Two-Year Treasury Yield</a>, <a href="thirty_year_treasury_bond.html">30-Year Treasury Bond</a>, <a href="interest_coverage_ratio.html">Interest Coverage Ratio</a>, <a href="debt_rollover_risk.html">Debt Rollover Risk</a>, <a href="farm_debt_to_asset_ratio.html">Farm Debt-to-Asset Ratio</a>, <a href="farm_debt_service_ratio.html">Farm Debt Service Ratio</a></div>
+<button class="concept-done" data-slug="bond_syndication_underwriting" onclick="toggleDone('bond_syndication_underwriting')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_bond_syndication_underwriting';</script>
+<script src="../../book.js"></script>
+<script src="../fg.js"></script>
+</body>
+</html>
