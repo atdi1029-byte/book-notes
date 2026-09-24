@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Primary vs. Secondary Bond Market - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.prog-stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(112px,1fr));
+  gap:10px; margin:1rem 0 1.5rem; }
+.prog-stat { background:#e8e0d0; border:1px solid #d4c8b0; border-radius:8px;
+  padding:0.7rem 0.9rem; }
+.prog-stat .n { display:block; font-size:1.5rem; color:#5a3e1a; line-height:1.1; }
+.prog-stat .l { display:block; font-size:0.75rem; color:#8a7a60; margin-top:0.2rem; }
+.prog-chart { position:relative; margin:0.5rem 0 0.4rem; }
+.prog-chart svg { width:100%; height:auto; display:block; overflow:visible; }
+.prog-chart .grid { stroke:#ddd3c0; stroke-width:1; }
+.prog-chart .axis { stroke:#c8bca4; stroke-width:1; }
+.prog-chart .tick { fill:#8a7a60; font-size:11px; }
+.prog-chart .ylab { fill:#8a7a60; font-size:11px; }
+.prog-chart .actual { fill:none; stroke:#9a5a22; stroke-width:2; stroke-linejoin:round; }
+.prog-chart .actual-dot { fill:#9a5a22; stroke:#f4efe8; stroke-width:2; }
+.prog-chart .model { fill:none; stroke:#0e9488; stroke-width:2; stroke-dasharray:6 4; }
+.prog-chart .ceiling { stroke:#8a7a60; stroke-width:1; stroke-dasharray:2 4; }
+.prog-chart .here { stroke:#9a5a22; stroke-width:1; stroke-dasharray:2 3; opacity:0.6; }
+.prog-chart .dlabel { font-size:11px; fill:#3a2e1e; }
+.prog-chart .bar { fill:#9a5a22; opacity:0.75; }
+.prog-chart .bar-model { fill:none; stroke:#0e9488; stroke-width:2; stroke-dasharray:6 4; }
+.prog-chart .hit { fill:transparent; cursor:crosshair; }
+.prog-tip { position:absolute; pointer-events:none; display:none;
+  background:#3a2e1e; color:#f4efe8; font-size:12px; line-height:1.4;
+  padding:6px 9px; border-radius:6px; white-space:nowrap; z-index:5; }
+.prog-legend { display:flex; gap:1.2rem; font-size:0.8rem; color:#5a3e1a;
+  margin:0 0 1.5rem; flex-wrap:wrap; }
+.prog-legend span::before { content:""; display:inline-block; width:18px; height:0;
+  border-top:2px solid; margin-right:6px; vertical-align:middle; }
+.prog-legend .lg-actual::before { border-color:#9a5a22; }
+.prog-legend .lg-model::before { border-color:#0e9488; border-top-style:dashed; }
+.prog-legend .lg-ceiling::before { border-color:#8a7a60; border-top-style:dotted; }
+.prog-eq { background:#e8e0d0; border:1px solid #d4c8b0; border-radius:8px;
+  padding:0.9rem 1.1rem; font-family:Georgia,serif; font-size:1.05rem; color:#3a2e1e;
+  margin:1rem 0; }
+.prog-eq .sub { display:block; font-size:0.85rem; color:#8a7a60; margin-top:0.4rem;
+  font-family:inherit; }
+.prog-note { font-size:0.85rem; color:#8a7a60; }
+.prog-link { font-size:0.85rem; margin:-0.8rem 0 1.2rem; }
+.prog-link a { color:#0e9488; }
+table.prog-table { font-size:0.85rem; margin:1rem 0; }
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.tier .tier-desc { color: #a08060; font-size: 0.85rem; margin: 0.4rem 0 0.8rem; }
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done,
+body.hide-done .cat-card.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+.vid-tab {
+  margin: 0 0 1.2rem; background: #e8e0d0; border: 1px solid #d4c8b0;
+  border-radius: 8px; overflow: hidden;
+}
+.vid-tab summary {
+  padding: 0.6rem 0.9rem; cursor: pointer; font-size: 0.85rem;
+  color: #3a2a1a; list-style: none; user-select: none;
+}
+.vid-tab summary::-webkit-details-marker { display: none; }
+.vid-tab summary::before {
+  content: '▶'; display: inline-block; margin-right: 0.5rem;
+  font-size: 0.7rem; transition: transform 0.2s;
+}
+.vid-tab[open] summary::before { transform: rotate(90deg); }
+.vid-tab .vid-status {
+  float: right; font-size: 0.75rem; padding: 0.15rem 0.5rem;
+  border-radius: 3px; margin-left: 0.5rem;
+}
+.vid-tab .vid-ok { background: #4ade8040; color: #2d6a4f; }
+.vid-tab .vid-err { background: #f8717140; color: #9b2c2c; }
+.vid-tab .vid-list {
+  padding: 0 0.9rem 0.7rem; margin: 0;
+  list-style: none; font-size: 0.8rem;
+}
+.vid-tab .vid-list li {
+  padding: 0.35rem 0; border-top: 1px solid #d4c8b0;
+  display: flex; justify-content: space-between; gap: 8px;
+}
+.vid-tab .vid-list .vid-date {
+  color: #a08060; white-space: nowrap; flex: none;
+}
+.vid-tab .vid-list .vid-concepts {
+  color: #a08060; white-space: nowrap; flex: none; font-size: 0.75rem;
+}
+.vid-tab .vid-none {
+  padding: 0.4rem 0.9rem 0.7rem; color: #a08060; font-size: 0.8rem;
+}
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../fixed-income-bonds.html">&larr; Fixed Income &amp; Bonds</a>
+
+<div class="concept-meta"><span>standard</span><span>Fixed Income &amp; Bonds</span><span>added 2026-09-24</span></div>
+<h4 id="primary_secondary_bond_market">Primary vs. Secondary Bond Market</h4>
+
+<p>Every bond trades in one of two distinct venues, and understanding the difference is essential to understanding how credit markets actually move. The <strong>primary market</strong> is where a bond is born — the issuer (a company, government, or agency) sells brand-new debt directly to investors for the first time, raising fresh cash in exchange for a promise to pay interest and eventually return principal. The <strong>secondary market</strong> is everything that happens afterward: those same bonds changing hands between investors, day after day, year after year, with no money flowing back to the original issuer. When SoftBank "opened the books on an 11.15 billion debt sale," that was a primary market event. When "SoftBank's existing 2031 bonds were already changing hands at an 8.2% yield earlier this week," that was the secondary market pricing debt that had already been issued years before.</p>
+
+<p>This distinction matters because the two markets serve completely different economic functions and respond to different forces. The primary market is about <strong>capital formation</strong> — it's literally how companies fund operations, expansions, and in SoftBank's case, a $10 billion wire transfer to OpenAI. The secondary market is about <strong>price discovery and liquidity</strong> — it tells you, in real time, what the market currently thinks an issuer's credit risk is worth. A company can only raise money in the primary market, but investors rely on the secondary market to decide whether to buy, hold, or sell what they already own. When the two markets diverge — when secondary yields are spiking while a company still needs to sell new debt — you get exactly the kind of stress the video describes.</p>
+
+<p>Mechanically, a primary bond sale works through a structured process run by underwriters. Investment banks — in SoftBank's case City (Citi), Goldman Sachs, JP Morgan, and Morgan Stanley — act as the syndicate that markets the deal, gauges investor demand, and sets the final price and yield. This process is called "opening the books": the underwriters go to institutional investors (pension funds, insurance companies, bond mutual funds, hedge funds) and essentially take orders at a range of proposed yields to see how much demand exists at each level. If demand is weak, they raise the offered yield — a "concession" — until enough buyers commit to fill the order book. Once the deal prices, it settles a few business days later, meaning the issuer actually receives the cash and investors receive the bonds, which can then be freely resold in the secondary market.</p>
+
+<p>The SoftBank deal is a textbook real-world example of primary-market price discovery under stress. The company needed to raise $11.15 billion — $10 billion in three US dollar tranches plus roughly $1 billion in euros — rated <strong>double-B-plus</strong> by both S&P and Fitch, one notch below investment grade, making it a <strong>junk bond</strong> (also called high-yield or speculative-grade debt). To fill the book on the longest, seven-and-a-half-year tranche, underwriters had to "test" yields in the high-9%-to-10% range. That number wasn't arbitrary — it was informed directly by the secondary market, where SoftBank's existing 2031 bonds were already trading at an 8.2% yield, up sharply from 6.7% back in January. The secondary market set the floor; the primary deal had to clear above it to attract buyers.</p>
+
+<p>Traders and portfolio managers watch the relationship between these two markets constantly, because it's one of the clearest real-time signals of credit stress or credit ease. If a new issue prices at a tight yield relative to where the issuer's outstanding bonds trade in the secondary market, that signals strong demand and easy financial conditions. If a new issue has to offer a fat concession above secondary levels just to get done — as SoftBank did — that signals the opposite: investors are demanding more compensation for risk, and financing conditions are tightening. Credit desks also watch how a large new primary deal reprices the entire secondary market around it, since a big issuance effectively resets the reference point other similar bonds get valued against.</p>
+
+<p>A common misconception is that a bond's yield is fixed once it's issued. It isn't — the <strong>coupon</strong> (the fixed interest payment) is fixed, but the <strong>yield</strong> moves constantly in the secondary market as the bond's price fluctuates with supply, demand, and perceived credit risk. This is the mechanism behind the video's core point: when a massive new deal like SoftBank's "absorbs a massive slice of available secondary liquidity," it doesn't just raise money for one company — it pulls investor demand away from other bonds trading in the secondary market. Institutional buyers who can get high-single-digit or 10% yields on a mega-cap syndication like SoftBank's have no reason to hold a triple-B-minus industrial or utility bond yielding 6.5%. They demand more yield there too, which means secondary prices on unrelated bonds fall — this is the <strong>crowding-out effect</strong> described in the transcript, and it's a direct, mechanical link between one company's primary issuance and the pricing of thousands of unrelated bonds already outstanding.</p>
+
+<p>Things break down when primary and secondary markets stop functioning smoothly together. In a healthy market, new issuance prices efficiently off secondary levels and gets absorbed without much disruption. In a stressed market, primary deals require bigger and bigger concessions to clear, secondary bonds sell off in sympathy as investors reprice risk across the board, and eventually the primary market can shut entirely — issuers simply can't sell new debt at a price they're willing to pay, forcing them to delay financing or turn to more expensive alternatives like margin loans. This is exactly the dynamic underpinning SoftBank's situation: it needed $10 billion to wire to OpenAI by October 1st on a hard deadline, meaning it had far less room to walk away from an expensive primary deal than an issuer under no time pressure would.</p>
+
+<blockquote>"A single 11 billion offering absorbs a massive slice of available secondary liquidity. It forces credit spreads wider across the entire high yield and crossover space."</blockquote>
+
+<p>The primary-secondary relationship connects directly to two other core ideas in the video: <strong>credit spreads</strong> and the <strong>discount rate</strong> used in equity valuation. Widening spreads — the gap between what a risky borrower like SoftBank pays versus a safe benchmark like Treasuries — show up first as a secondary-market phenomenon (existing bonds repricing lower) and then get confirmed and amplified by primary-market events (new deals pricing at even wider spreads to clear). That combination is what pushes the corporate cost of capital higher across the board, which flows directly into the weighted average cost of capital used to discount future corporate earnings — the mechanism the video points to as the real transmission line from a junk bond sale in lower Manhattan to multiple compression on tech stocks sitting inside an ordinary 401(k).</p>
+<div class="concept-side">Related in this category: <a href="two_year_treasury_yield.html">Two-Year Treasury Yield</a>, <a href="thirty_year_treasury_bond.html">30-Year Treasury Bond</a>, <a href="interest_coverage_ratio.html">Interest Coverage Ratio</a>, <a href="debt_rollover_risk.html">Debt Rollover Risk</a>, <a href="farm_debt_to_asset_ratio.html">Farm Debt-to-Asset Ratio</a>, <a href="farm_debt_service_ratio.html">Farm Debt Service Ratio</a></div>
+<button class="concept-done" data-slug="primary_secondary_bond_market" onclick="toggleDone('primary_secondary_bond_market')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_primary_secondary_bond_market';</script>
+<script src="../../book.js"></script>
+<script src="../fg.js"></script>
+</body>
+</html>

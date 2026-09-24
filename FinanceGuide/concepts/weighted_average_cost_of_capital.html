@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Weighted Average Cost of Capital (WACC) - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.prog-stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(112px,1fr));
+  gap:10px; margin:1rem 0 1.5rem; }
+.prog-stat { background:#e8e0d0; border:1px solid #d4c8b0; border-radius:8px;
+  padding:0.7rem 0.9rem; }
+.prog-stat .n { display:block; font-size:1.5rem; color:#5a3e1a; line-height:1.1; }
+.prog-stat .l { display:block; font-size:0.75rem; color:#8a7a60; margin-top:0.2rem; }
+.prog-chart { position:relative; margin:0.5rem 0 0.4rem; }
+.prog-chart svg { width:100%; height:auto; display:block; overflow:visible; }
+.prog-chart .grid { stroke:#ddd3c0; stroke-width:1; }
+.prog-chart .axis { stroke:#c8bca4; stroke-width:1; }
+.prog-chart .tick { fill:#8a7a60; font-size:11px; }
+.prog-chart .ylab { fill:#8a7a60; font-size:11px; }
+.prog-chart .actual { fill:none; stroke:#9a5a22; stroke-width:2; stroke-linejoin:round; }
+.prog-chart .actual-dot { fill:#9a5a22; stroke:#f4efe8; stroke-width:2; }
+.prog-chart .model { fill:none; stroke:#0e9488; stroke-width:2; stroke-dasharray:6 4; }
+.prog-chart .ceiling { stroke:#8a7a60; stroke-width:1; stroke-dasharray:2 4; }
+.prog-chart .here { stroke:#9a5a22; stroke-width:1; stroke-dasharray:2 3; opacity:0.6; }
+.prog-chart .dlabel { font-size:11px; fill:#3a2e1e; }
+.prog-chart .bar { fill:#9a5a22; opacity:0.75; }
+.prog-chart .bar-model { fill:none; stroke:#0e9488; stroke-width:2; stroke-dasharray:6 4; }
+.prog-chart .hit { fill:transparent; cursor:crosshair; }
+.prog-tip { position:absolute; pointer-events:none; display:none;
+  background:#3a2e1e; color:#f4efe8; font-size:12px; line-height:1.4;
+  padding:6px 9px; border-radius:6px; white-space:nowrap; z-index:5; }
+.prog-legend { display:flex; gap:1.2rem; font-size:0.8rem; color:#5a3e1a;
+  margin:0 0 1.5rem; flex-wrap:wrap; }
+.prog-legend span::before { content:""; display:inline-block; width:18px; height:0;
+  border-top:2px solid; margin-right:6px; vertical-align:middle; }
+.prog-legend .lg-actual::before { border-color:#9a5a22; }
+.prog-legend .lg-model::before { border-color:#0e9488; border-top-style:dashed; }
+.prog-legend .lg-ceiling::before { border-color:#8a7a60; border-top-style:dotted; }
+.prog-eq { background:#e8e0d0; border:1px solid #d4c8b0; border-radius:8px;
+  padding:0.9rem 1.1rem; font-family:Georgia,serif; font-size:1.05rem; color:#3a2e1e;
+  margin:1rem 0; }
+.prog-eq .sub { display:block; font-size:0.85rem; color:#8a7a60; margin-top:0.4rem;
+  font-family:inherit; }
+.prog-note { font-size:0.85rem; color:#8a7a60; }
+.prog-link { font-size:0.85rem; margin:-0.8rem 0 1.2rem; }
+.prog-link a { color:#0e9488; }
+table.prog-table { font-size:0.85rem; margin:1rem 0; }
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.tier .tier-desc { color: #a08060; font-size: 0.85rem; margin: 0.4rem 0 0.8rem; }
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done,
+body.hide-done .cat-card.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+.vid-tab {
+  margin: 0 0 1.2rem; background: #e8e0d0; border: 1px solid #d4c8b0;
+  border-radius: 8px; overflow: hidden;
+}
+.vid-tab summary {
+  padding: 0.6rem 0.9rem; cursor: pointer; font-size: 0.85rem;
+  color: #3a2a1a; list-style: none; user-select: none;
+}
+.vid-tab summary::-webkit-details-marker { display: none; }
+.vid-tab summary::before {
+  content: '▶'; display: inline-block; margin-right: 0.5rem;
+  font-size: 0.7rem; transition: transform 0.2s;
+}
+.vid-tab[open] summary::before { transform: rotate(90deg); }
+.vid-tab .vid-status {
+  float: right; font-size: 0.75rem; padding: 0.15rem 0.5rem;
+  border-radius: 3px; margin-left: 0.5rem;
+}
+.vid-tab .vid-ok { background: #4ade8040; color: #2d6a4f; }
+.vid-tab .vid-err { background: #f8717140; color: #9b2c2c; }
+.vid-tab .vid-list {
+  padding: 0 0.9rem 0.7rem; margin: 0;
+  list-style: none; font-size: 0.8rem;
+}
+.vid-tab .vid-list li {
+  padding: 0.35rem 0; border-top: 1px solid #d4c8b0;
+  display: flex; justify-content: space-between; gap: 8px;
+}
+.vid-tab .vid-list .vid-date {
+  color: #a08060; white-space: nowrap; flex: none;
+}
+.vid-tab .vid-list .vid-concepts {
+  color: #a08060; white-space: nowrap; flex: none; font-size: 0.75rem;
+}
+.vid-tab .vid-none {
+  padding: 0.4rem 0.9rem 0.7rem; color: #a08060; font-size: 0.8rem;
+}
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../corporate-finance-investment-banking.html">&larr; Corporate Finance &amp; Investment Banking</a>
+
+<div class="concept-meta"><span><span class="star">&#9733;</span> must-know</span><span>Corporate Finance &amp; Investment Banking</span><span>added 2026-09-24</span></div>
+<h4 id="weighted_average_cost_of_capital">Weighted Average Cost of Capital (WACC)</h4>
+
+<p><strong>Weighted Average Cost of Capital</strong>, or <strong>WACC</strong> — traders on the desk just call it "the whack" — is the blended rate a company pays for the money it uses to run and grow its business. Every company funds itself with a mix of two things: debt (bonds and loans, which charge interest) and equity (stock, which investors expect to be compensated for with returns). WACC weights the cost of each by how much of the company's capital structure it represents, then combines them into a single percentage. A firm funded 70% by cheap debt and 30% by equity has a very different WACC than one funded mostly by equity. Critically, WACC is also the number Wall Street uses as the <strong>discount rate</strong> in nearly every valuation model — it is the bridge between a company's future cash flows and what those cash flows are worth today.</p>
+
+<p>WACC matters because it sits underneath the price of practically every stock you own, whether inside a 401k or a personal brokerage account. Analysts build models that project a company's earnings or free cash flow for the next five, ten, even fifteen years, then use WACC to convert those future dollars into a present-day value — because a dollar earned in 2035 is worth less than a dollar in your hand today. That present value, summed across all future years, is what analysts call the company's <strong>intrinsic value</strong>, and it's the backbone of the price targets, "fair value" estimates, and buy/sell ratings that move markets. When WACC changes, nothing about the company's actual business has to change at all — yet the calculated value of that business shifts dramatically. That's why a rate most retail investors never think about ends up dictating whether a stock trades at 15 times earnings or 40 times earnings.</p>
+
+<p>Mechanically, WACC is a straightforward formula, but the intuition matters more than the algebra. You take the cost of equity (roughly, the return shareholders demand for the risk of owning the stock) multiplied by the proportion of the company funded by equity, and add it to the after-tax cost of debt multiplied by the proportion funded by debt. The <strong>cost of debt</strong> piece is the part that moves fastest in a credit crunch, because it's set directly by what bond investors demand in the market — not by internal committee decisions. If a company's borrowing costs rise, its overall WACC rises too, even if its equity investors haven't changed their expectations at all. In a <strong>discounted cash flow (DCF)</strong> model, that WACC number becomes the denominator applied, compounded, to every single year of projected earnings — so a small change in the rate ripples through every year of the forecast, not just one.</p>
+
+<p>The video's real-world example makes this concrete. <strong>SoftBank Group</strong> priced an <strong>$11.15 billion bond offering</strong> — the largest non-financial corporate bond sale in Asian history — with longer tranches testing yields in the "high nine to 10% range." That's a double-B-plus, speculative-grade ("junk") rating, one notch below investment grade. SoftBank's existing 2031 bonds had already moved from a 6.7% yield in January to 8.2% just before the new deal priced. When one issuer of that size clears the market at nearly 10%, it doesn't stay contained — it resets what investors demand across the entire high-yield and crossover credit space, since institutional buyers won't hold a lower-yielding triple-B bond when double-digit paper is available elsewhere. That "crowding out effect," as the video calls it, pushes corporate borrowing costs higher broadly, independent of anything the Federal Reserve does with the overnight funds rate.</p>
+
+<blockquote>"When the cost of capital sits at five or 6%, those distant earnings look huge. That's how you justify paying 35 or 40 times forward earnings for a semiconductor company or a cloud software platform. But when corporate credit clears at 9 and 10%... your discount rate goes straight up. And when the discount rate jumps, the mathematical present value of those future earnings, it collapses."<cite>— from "THE 10% DEBT SQUEEZE"</cite></blockquote>
+
+<p>Traders and analysts use WACC as a constant sanity check on valuation, not just a one-time input. When credit spreads widen — meaning bond yields rise relative to safe Treasury benchmarks — desks immediately re-run their DCF models with a higher discount rate assumption, and the resulting present values drop even if the company's revenue and profit forecasts haven't budged an inch. This is why experienced investors watch the corporate bond market and high-yield credit spreads (tracked by benchmarks and ETFs like <strong>HYG</strong> and <strong>JNK</strong>) as a leading signal for equities, not a separate, unrelated market. A company that depends on <strong>persistent debt financing</strong> to fund losses — the video's description of high-growth, cash-burning tech and AI companies — is especially exposed, because rising WACC hits it twice: existing valuations compress, and new borrowing to fund operations gets more expensive at the same time.</p>
+
+<p>The biggest misconception is treating WACC as a fixed, static number a company "has." In reality it moves constantly with market conditions, credit ratings, and capital structure decisions, and it's frequently invisible to retail investors because it lives inside a spreadsheet, not on a stock ticker. A second nuance: the effect described in the video — <strong>multiple compression</strong> — is pure mathematics, not sentiment. If the discount rate is in the denominator of the valuation equation and it rises, the present value falls mechanically; no amount of bullish narrative reverses that arithmetic unless earnings growth accelerates enough to offset it. People often blame multiple compression on "fear" or "rotation," when frequently the real driver is simply that the discount rate embedded in every model just went up because credit got more expensive.</p>
+
+<p>WACC breaks down as a useful signal when a company's true funding cost diverges sharply from its stated or perceived cost — which is exactly the stress case the video describes. SoftBank's ability to raise money at all wasn't backed by predictable operating cash flow; it was collateralized by <strong>769 million shares of ARM Holdings</strong>, representing roughly 72% of that company, pledged against a $25 billion margin facility. That creates a feedback loop: if rising WACC compresses tech and chip-stock valuations, ARM's share price falls, which tightens the margin covenants on SoftBank's loan, creating a collateral squeeze at precisely the moment SoftBank must pay fixed coupons on 10% junk debt. This is the edge case where WACC stops being an abstract valuation input and becomes an actual solvency risk — the discount rate and the borrower's survival become the same problem.</p>
+
+<p>WACC connects directly to <strong>discounted cash flow analysis</strong>, <strong>credit spreads</strong>, and <strong>present value</strong> mechanics — it's the hinge between the bond market and the stock market that the video spends its entire runtime explaining. It also connects to <strong>margin loans and collateral</strong>: SoftBank's financing structure shows how a company's cost of capital and its collateral quality are intertwined, since a high WACC borrower often has to pledge hard assets (like ARM shares) precisely because cash-flow-based lending isn't available to it. Investors who understand WACC don't just watch the Fed's overnight rate — they watch where corporate bonds are actually clearing, because that's the number quietly resetting the multiple on every growth stock in their portfolio.</p>
+<div class="concept-side">Related in this category: <a href="hyperscaler.html">Hyperscaler (Cloud Infrastructure Giant)</a>, <a href="corporate_restructuring.html">Corporate Restructuring</a>, <a href="cross_subsidization.html">Cross-Subsidization Between Business Divisions</a>, <a href="cash_cow.html">Cash Cow Business Unit</a>, <a href="oem_tier_supplier_hierarchy.html">OEM Tiered Supply Chain Hierarchy (Tier 1 / Tier 2 Suppliers)</a>, <a href="business_development_company_bdc.html">Business Development Company (BDC)</a></div>
+<button class="concept-done" data-slug="weighted_average_cost_of_capital" onclick="toggleDone('weighted_average_cost_of_capital')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_weighted_average_cost_of_capital';</script>
+<script src="../../book.js"></script>
+<script src="../fg.js"></script>
+</body>
+</html>
