@@ -24,6 +24,11 @@ SHELF_PATH = os.path.join(BOOKS_DIR, 'index.html')
 OUT_INDEX = os.path.join(BOOKS_DIR, 'metadata.json')
 OUT_DIR = os.path.join(BOOKS_DIR, 'metadata')
 
+# Real books shelved in a guide section, mapped to their topical category
+SHELF_CATEGORY_OVERRIDES = {
+    'intelligent_asset_allocator': 'Investing Fundamentals',
+}
+
 # ── Keyword extraction ──
 
 # Domain-specific keywords to tag books with
@@ -166,7 +171,10 @@ def parse_shelf_with_regex(html):
         seen_ids.add(book_id)
 
         category = get_category(m.start())
-        if category in ('Guides', 'To Read', ''):
+        # Real books parked on a guide shelf keep their topical category
+        category = SHELF_CATEGORY_OVERRIDES.get(book_id, category)
+        if category in ('Guides', 'Flywheel & Asset Guides',
+                        'To Read', ''):
             continue
         if 'Recently Added' in category:
             continue

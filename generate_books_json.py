@@ -557,6 +557,7 @@ CATEGORY_ORDER = [
     'Self-Development & Mindset',
     'Training & Nutrition',
     'Language Guides',
+    'Flywheel & Asset Guides',
     'Guides',
 ]
 
