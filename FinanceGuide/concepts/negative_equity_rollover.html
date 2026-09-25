@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Negative Equity Rollover (Auto Loans) - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.prog-stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(112px,1fr));
+  gap:10px; margin:1rem 0 1.5rem; }
+.prog-stat { background:#e8e0d0; border:1px solid #d4c8b0; border-radius:8px;
+  padding:0.7rem 0.9rem; }
+.prog-stat .n { display:block; font-size:1.5rem; color:#5a3e1a; line-height:1.1; }
+.prog-stat .l { display:block; font-size:0.75rem; color:#8a7a60; margin-top:0.2rem; }
+.prog-chart { position:relative; margin:0.5rem 0 0.4rem; }
+.prog-chart svg { width:100%; height:auto; display:block; overflow:visible; }
+.prog-chart .grid { stroke:#ddd3c0; stroke-width:1; }
+.prog-chart .axis { stroke:#c8bca4; stroke-width:1; }
+.prog-chart .tick { fill:#8a7a60; font-size:11px; }
+.prog-chart .ylab { fill:#8a7a60; font-size:11px; }
+.prog-chart .actual { fill:none; stroke:#9a5a22; stroke-width:2; stroke-linejoin:round; }
+.prog-chart .actual-dot { fill:#9a5a22; stroke:#f4efe8; stroke-width:2; }
+.prog-chart .model { fill:none; stroke:#0e9488; stroke-width:2; stroke-dasharray:6 4; }
+.prog-chart .ceiling { stroke:#8a7a60; stroke-width:1; stroke-dasharray:2 4; }
+.prog-chart .here { stroke:#9a5a22; stroke-width:1; stroke-dasharray:2 3; opacity:0.6; }
+.prog-chart .dlabel { font-size:11px; fill:#3a2e1e; }
+.prog-chart .bar { fill:#9a5a22; opacity:0.75; }
+.prog-chart .bar-model { fill:none; stroke:#0e9488; stroke-width:2; stroke-dasharray:6 4; }
+.prog-chart .hit { fill:transparent; cursor:crosshair; }
+.prog-tip { position:absolute; pointer-events:none; display:none;
+  background:#3a2e1e; color:#f4efe8; font-size:12px; line-height:1.4;
+  padding:6px 9px; border-radius:6px; white-space:nowrap; z-index:5; }
+.prog-legend { display:flex; gap:1.2rem; font-size:0.8rem; color:#5a3e1a;
+  margin:0 0 1.5rem; flex-wrap:wrap; }
+.prog-legend span::before { content:""; display:inline-block; width:18px; height:0;
+  border-top:2px solid; margin-right:6px; vertical-align:middle; }
+.prog-legend .lg-actual::before { border-color:#9a5a22; }
+.prog-legend .lg-model::before { border-color:#0e9488; border-top-style:dashed; }
+.prog-legend .lg-ceiling::before { border-color:#8a7a60; border-top-style:dotted; }
+.prog-eq { background:#e8e0d0; border:1px solid #d4c8b0; border-radius:8px;
+  padding:0.9rem 1.1rem; font-family:Georgia,serif; font-size:1.05rem; color:#3a2e1e;
+  margin:1rem 0; }
+.prog-eq .sub { display:block; font-size:0.85rem; color:#8a7a60; margin-top:0.4rem;
+  font-family:inherit; }
+.prog-note { font-size:0.85rem; color:#8a7a60; }
+.prog-link { font-size:0.85rem; margin:-0.8rem 0 1.2rem; }
+.prog-link a { color:#0e9488; }
+table.prog-table { font-size:0.85rem; margin:1rem 0; }
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.tier .tier-desc { color: #a08060; font-size: 0.85rem; margin: 0.4rem 0 0.8rem; }
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done,
+body.hide-done .cat-card.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+.vid-tab {
+  margin: 0 0 1.2rem; background: #e8e0d0; border: 1px solid #d4c8b0;
+  border-radius: 8px; overflow: hidden;
+}
+.vid-tab summary {
+  padding: 0.6rem 0.9rem; cursor: pointer; font-size: 0.85rem;
+  color: #3a2a1a; list-style: none; user-select: none;
+}
+.vid-tab summary::-webkit-details-marker { display: none; }
+.vid-tab summary::before {
+  content: '▶'; display: inline-block; margin-right: 0.5rem;
+  font-size: 0.7rem; transition: transform 0.2s;
+}
+.vid-tab[open] summary::before { transform: rotate(90deg); }
+.vid-tab .vid-status {
+  float: right; font-size: 0.75rem; padding: 0.15rem 0.5rem;
+  border-radius: 3px; margin-left: 0.5rem;
+}
+.vid-tab .vid-ok { background: #4ade8040; color: #2d6a4f; }
+.vid-tab .vid-err { background: #f8717140; color: #9b2c2c; }
+.vid-tab .vid-list {
+  padding: 0 0.9rem 0.7rem; margin: 0;
+  list-style: none; font-size: 0.8rem;
+}
+.vid-tab .vid-list li {
+  padding: 0.35rem 0; border-top: 1px solid #d4c8b0;
+  display: flex; justify-content: space-between; gap: 8px;
+}
+.vid-tab .vid-list .vid-date {
+  color: #a08060; white-space: nowrap; flex: none;
+}
+.vid-tab .vid-list .vid-concepts {
+  color: #a08060; white-space: nowrap; flex: none; font-size: 0.75rem;
+}
+.vid-tab .vid-none {
+  padding: 0.4rem 0.9rem 0.7rem; color: #a08060; font-size: 0.8rem;
+}
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../personal-finance-basics.html">&larr; Personal Finance Basics</a>
+
+<div class="concept-meta"><span>deep cut</span><span>Personal Finance Basics</span><span>added 2026-09-25</span></div>
+<h4 id="negative_equity_rollover">Negative Equity Rollover (Auto Loans)</h4>
+
+<p><strong>Negative equity rollover</strong> is what happens when a car buyer trades in a vehicle they still owe more money on than it's actually worth, and the dealer folds that leftover debt into the loan for their next car. Say you owe $18,000 on your current car but it's only worth $12,000 at trade-in — that $6,000 gap is your negative equity, sometimes called being "upside down" or "underwater" on the loan. Instead of paying that $6,000 out of pocket, the dealer rolls it into the financing for your next vehicle, so you drive off owing more than the new car is worth from day one. It's a financing sleight of hand that lets people keep trading cars every few years without ever actually closing the gap between what they owe and what their car is worth.</p>
+
+<p>This matters because it's a quiet but massive channel of consumer credit expansion, and when it shuts off, people who've been treating car trade-ins like a revolving door suddenly can't do that anymore. Auto lending is one of the largest consumer credit markets in the country, and rollover loans are a big part of what keeps dealership showrooms moving. When this mechanism tightens, it doesn't just affect car buyers — it's a signal of the same underlying liquidity stress hitting credit card limits and home equity lines. The video frames it as one more valve closing in a system where <strong>warehouse lenders</strong> are pulling back everywhere at once, and auto lending is often one of the first places consumer credit stress shows up because cars depreciate fast and loan terms have stretched dangerously long.</p>
+
+<p>Mechanically, it works like this: a dealer doesn't fund your loan directly out of its own pocket. It uses a <strong>warehouse line of credit</strong> — essentially a short-term credit facility from a bank or specialty lender that lets the dealer originate loans and then bundle and sell them (often as <strong>auto asset-backed securities</strong, or auto ABS) to investors. The warehouse lender sets an <strong>advance rate</strong>, which is the maximum percentage of a car's invoice price it will finance. If the advance rate is 110% of invoice, a dealer can lend up to 10% more than the car is technically worth on paper — enough headroom to absorb a trade-in's negative equity and still get the loan funded. When warehouse lenders cut that advance rate back toward 100% or lower, there's no more room to hide the rollover debt, and the dealer either has to demand cash from the buyer or refuse the deal.</p>
+
+<p>The video puts a specific number on this: dealers "can no longer roll $6,000 of negative equity from an old car into a fresh 84-month loan because warehouse lenders refuse to accept advance rates over 110% of invoice." An <strong>84-month loan</strong> — seven years of payments — is itself a symptom of the same disease, since stretching the term is the classic way to make an underwater trade-in look affordable on a monthly payment basis, even though the buyer is financing a depreciating asset for longer than most people keep their cars. The video also cites <strong>auto ABS 60-day delinquencies</strong> surpassing 6.2% this autumn, which it says broke records set back in the 2008 financial crisis — meaning the loans already on the books are souring at a pace that makes lenders even less willing to extend fresh advance-rate room to new borrowers.</p>
+
+<p>Traders and analysts watching consumer credit health use rollover trends and advance rates as an early warning signal, precisely because auto loans move faster and default sooner than mortgages. A <strong>60-day delinquency rate</strong> climbing past prior peaks tells you stress is already baked into existing pools of securitized auto debt, which affects how those bonds are priced and how eager investors are to buy the next batch. When advance rates get cut across the industry, it's a leading indicator that lenders expect used car values to keep falling relative to loan balances, and it typically shows up in the data a few months before delinquencies and repossessions spike further. Anyone tracking consumer balance-sheet stress watches auto lending terms the way doctors watch a fever — it's rarely the disease itself, but it's one of the first symptoms to show.</p>
+
+<p>The biggest misconception is thinking negative equity rollover is some fringe practice used only by irresponsible buyers — in reality it has been baked into a huge share of ordinary car deals for years, especially as vehicle prices rose sharply during the pandemic and buyers kept trading in cars that hadn't built any equity. Another misconception is treating the 84-month loan term as harmless just because the monthly payment looks manageable. Stretching a loan to seven years means the car depreciates faster than the loan balance falls for a much longer stretch of ownership, so buyers spend years underwater, which sets up the very next rollover problem when they eventually want to trade in again. This is a structural trap, not a one-time mistake — once you roll negative equity in, you're more likely to be upside down again at the next trade-in.</p>
+
+<p>When this financing channel breaks down, the immediate effect is that marginal buyers — the ones who needed the rollover to make a trade-in work — simply can't complete the transaction. They're stuck driving an older car with an underwater loan, unable to trade it without coming up with cash they don't have, which suppresses new car sales and used car turnover alike. On the lender side, the risk is concentrated in the auto ABS market: if delinquencies keep climbing past 2008-era levels while advance rates tighten, investors buying these securitized loan pools demand higher yields to compensate for the risk, which raises borrowing costs even further and creates a feedback loop — tighter credit causes more defaults among stressed borrowers, which causes lenders to tighten further.</p>
+
+<p>This concept connects directly to the broader liquidity story the video is telling about the <strong>Treasury General Account</strong> and shrinking <strong>bank reserves</strong>. The same warehouse lenders cutting advance rates on auto loans are the commercial banks and specialty finance firms watching their own reserve positions get squeezed as the Treasury hoards cash and the <strong>reverse repo facility</strong> empties out. Just as those banks are cutting consumer credit card limits overnight because unused credit lines represent contingent risk they can't fund, they're applying the same defensive logic to auto lending — pulling back the advance rate room that let dealers paper over negative equity. It's the same liquidity drought showing up in a different corner of the consumer credit market, which is exactly the pattern worth watching across every type of lending simultaneously rather than in isolation.</p>
+<div class="concept-side">Related in this category: <a href="credit_score.html">Credit Score (FICO / VantageScore)</a>, <a href="used_vehicle_resale_value.html">Used Vehicle Resale Value (Residual Value)</a>, <a href="erisa_fiduciary_safe_harbor.html">ERISA Fiduciary Safe Harbor</a>, <a href="loan_amortization.html">Loan Amortization</a>, <a href="home_equity_line_of_credit.html">Home Equity Line of Credit (HELOC)</a>, <a href="margin_loan.html">Margin Loan</a></div>
+<button class="concept-done" data-slug="negative_equity_rollover" onclick="toggleDone('negative_equity_rollover')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_negative_equity_rollover';</script>
+<script src="../../book.js"></script>
+<script src="../fg.js"></script>
+</body>
+</html>
