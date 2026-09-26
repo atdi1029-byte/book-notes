@@ -1,0 +1,430 @@
+//@version=6
+indicator("DSS Forecast Silly (Beta)",
+     overlay=false, precision=2)
+
+// DSS Forecast Silly: the dumbest possible
+// version of the DSS Forecast. No Fibonacci
+// pairs, no weights, no tiers, no gates.
+// Just 10 DSS lookbacks — 10, 20, 30 ... 100 —
+// blended into one line.
+// Default weighting is slow-heavy: the 100
+// gets 30, then it steps down to 1 for the 10,
+// summing to 100. Flip to Equal / Fast-heavy /
+// Custom to compare.
+// Signals: 10/10 stack flip, extreme reversal.
+
+// === SETTINGS ===
+grpLad = "Ladder"
+step = input.int(10, "Lookback Step",
+     group=grpLad, minval=1, maxval=50,
+     tooltip="Lookbacks = step x 1..10. " +
+     "10 gives 10, 20, 30 ... 100")
+smoothDiv = input.float(3.0,
+     "Smoothing = Lookback ÷",
+     group=grpLad, minval=1.0, maxval=10.0,
+     step=0.5,
+     tooltip="EMA length for each DSS. " +
+     "3 gives 10/3, 20/7, 30/10 ... 100/33")
+
+grpWt = "Weighting"
+wtMode = input.string("Slow-heavy", "Mode",
+     options=["Slow-heavy", "Equal",
+     "Fast-heavy", "Custom"],
+     group=grpWt,
+     tooltip="Slow-heavy: 100→30, 90→21, " +
+     "80→15, 70→11, 60→8, 50→5, 40→4, " +
+     "30→3, 20→2, 10→1 (sums to 100). " +
+     "Equal: 10 each. Fast-heavy: mirror " +
+     "of slow-heavy. Custom: weights below " +
+     "(any total, auto-normalized).")
+
+grpCW = "Custom Weights (lookback at step 10)"
+cw1 = input.float(1, "Weight: 10",
+     group=grpCW, minval=0, maxval=100)
+cw2 = input.float(2, "Weight: 20",
+     group=grpCW, minval=0, maxval=100)
+cw3 = input.float(3, "Weight: 30",
+     group=grpCW, minval=0, maxval=100)
+cw4 = input.float(4, "Weight: 40",
+     group=grpCW, minval=0, maxval=100)
+cw5 = input.float(5, "Weight: 50",
+     group=grpCW, minval=0, maxval=100)
+cw6 = input.float(8, "Weight: 60",
+     group=grpCW, minval=0, maxval=100)
+cw7 = input.float(11, "Weight: 70",
+     group=grpCW, minval=0, maxval=100)
+cw8 = input.float(15, "Weight: 80",
+     group=grpCW, minval=0, maxval=100)
+cw9 = input.float(21, "Weight: 90",
+     group=grpCW, minval=0, maxval=100)
+cw10 = input.float(30, "Weight: 100",
+     group=grpCW, minval=0, maxval=100)
+
+grpVis = "Visual"
+showLadder = input.bool(true,
+     "Show All 10 Lines", group=grpVis)
+showCombined = input.bool(true,
+     "Show Combined Forecast", group=grpVis)
+
+// === DSS BRESSERT FUNCTION ===
+dss_bressert(float src, int stochLen,
+     int emaLen) =>
+    hh = ta.highest(src, stochLen)
+    ll = ta.lowest(src, stochLen)
+    raw1 = hh != ll ?
+         (src - ll) / (hh - ll) * 100 : 50.0
+    smooth1 = ta.ema(raw1, emaLen)
+    hh2 = ta.highest(smooth1, stochLen)
+    ll2 = ta.lowest(smooth1, stochLen)
+    raw2 = hh2 != ll2 ?
+         (smooth1 - ll2) / (hh2 - ll2) * 100
+         : 50.0
+    dssLine = ta.ema(raw2, emaLen)
+    dssLine
+
+// === DSS FORECAST (0-100 → ±20) ===
+dss_fc(int len) =>
+    emaLen = math.max(2,
+         math.round(len / smoothDiv))
+    dss = dss_bressert(close, len, emaLen)
+    math.max(-20.0, math.min(20.0,
+         dss * 0.4 - 20.0))
+
+// === THE LADDER (fast → slow) ===
+f1  = dss_fc(step * 1)
+f2  = dss_fc(step * 2)
+f3  = dss_fc(step * 3)
+f4  = dss_fc(step * 4)
+f5  = dss_fc(step * 5)
+f6  = dss_fc(step * 6)
+f7  = dss_fc(step * 7)
+f8  = dss_fc(step * 8)
+f9  = dss_fc(step * 9)
+f10 = dss_fc(step * 10)
+
+// === WEIGHTS ===
+w_pick(float slow, float fast, float cust) =>
+    wtMode == "Slow-heavy" ? slow :
+         wtMode == "Fast-heavy" ? fast :
+         wtMode == "Equal" ? 10.0 : cust
+
+w1  = w_pick(1,  30, cw1)
+w2  = w_pick(2,  21, cw2)
+w3  = w_pick(3,  15, cw3)
+w4  = w_pick(4,  11, cw4)
+w5  = w_pick(5,  8,  cw5)
+w6  = w_pick(8,  5,  cw6)
+w7  = w_pick(11, 4,  cw7)
+w8  = w_pick(15, 3,  cw8)
+w9  = w_pick(21, 2,  cw9)
+w10 = w_pick(30, 1,  cw10)
+
+// === COMBINED ===
+totalWeight = w1 + w2 + w3 + w4 + w5 +
+     w6 + w7 + w8 + w9 + w10
+weightedSum = f1 * w1 + f2 * w2 + f3 * w3 +
+     f4 * w4 + f5 * w5 + f6 * w6 +
+     f7 * w7 + f8 * w8 + f9 * w9 +
+     f10 * w10
+combined = totalWeight > 0 ?
+     weightedSum / totalWeight : 0.0
+
+// === AGREEMENT COUNTER ===
+bullCount = (f1 > 0 ? 1 : 0) +
+     (f2 > 0 ? 1 : 0) + (f3 > 0 ? 1 : 0) +
+     (f4 > 0 ? 1 : 0) + (f5 > 0 ? 1 : 0) +
+     (f6 > 0 ? 1 : 0) + (f7 > 0 ? 1 : 0) +
+     (f8 > 0 ? 1 : 0) + (f9 > 0 ? 1 : 0) +
+     (f10 > 0 ? 1 : 0)
+bearCount = (f1 < 0 ? 1 : 0) +
+     (f2 < 0 ? 1 : 0) + (f3 < 0 ? 1 : 0) +
+     (f4 < 0 ? 1 : 0) + (f5 < 0 ? 1 : 0) +
+     (f6 < 0 ? 1 : 0) + (f7 < 0 ? 1 : 0) +
+     (f8 < 0 ? 1 : 0) + (f9 < 0 ? 1 : 0) +
+     (f10 < 0 ? 1 : 0)
+
+
+// =========================================================
+// SIGNAL 1: STACK FLIP (10/10)
+// All 10 were on one side, then the stack
+// breaks and stays broken for N bars
+// =========================================================
+grpFlip = "① Stack Flip"
+showFlips = input.bool(true,
+     "Show Stack Flips", group=grpFlip)
+confirmBars = input.int(3, "Confirmation Bars",
+     group=grpFlip, minval=1, maxval=10)
+flipCooldown = input.int(20,
+     "Cooldown (bars)",
+     group=grpFlip, minval=1, maxval=100)
+
+bearStack = bearCount == 10
+bullStack = bullCount == 10
+
+var int bearBrokenCount = 0
+var int bullBrokenCount = 0
+bearBrokenCount := bearStack ? 0 :
+     bearStack[1] ? 1 :
+     bearBrokenCount > 0 ?
+     bearBrokenCount + 1 : 0
+bullBrokenCount := bullStack ? 0 :
+     bullStack[1] ? 1 :
+     bullBrokenCount > 0 ?
+     bullBrokenCount + 1 : 0
+
+rawBuy = bearBrokenCount == confirmBars
+rawSell = bullBrokenCount == confirmBars
+
+barsSinceBuy = ta.barssince(rawBuy[1])
+barsSinceSell = ta.barssince(rawSell[1])
+buySignal = rawBuy and (na(barsSinceBuy) or
+     barsSinceBuy >= flipCooldown) and
+     barstate.isconfirmed
+sellSignal = rawSell and (na(barsSinceSell) or
+     barsSinceSell >= flipCooldown) and
+     barstate.isconfirmed
+
+
+// =========================================================
+// SIGNAL 2: EXTREME REVERSAL
+// Combined at ±thresh and fastest DSS turns against
+// =========================================================
+grpExt = "② Extreme Reversal"
+showExtreme = input.bool(true,
+     "Show Extreme Reversals", group=grpExt)
+extThresh = input.float(14.0,
+     "Extreme Threshold",
+     group=grpExt, minval=8.0, maxval=20.0,
+     step=1.0)
+extCooldown = input.int(10,
+     "Cooldown (bars)",
+     group=grpExt, minval=1, maxval=50)
+
+extBuyRaw = combined <= -extThresh and
+     f1 > f1[1] and f1[1] <= f1[2]
+extSellRaw = combined >= extThresh and
+     f1 < f1[1] and f1[1] >= f1[2]
+
+barsSinceEB = ta.barssince(extBuyRaw[1])
+barsSinceES = ta.barssince(extSellRaw[1])
+extBuyFinal = extBuyRaw and (na(barsSinceEB) or
+     barsSinceEB >= extCooldown) and
+     barstate.isconfirmed
+extSellFinal = extSellRaw and (na(barsSinceES) or
+     barsSinceES >= extCooldown) and
+     barstate.isconfirmed
+
+
+// =========================================================
+// PLOTTING
+// =========================================================
+
+// === THE LADDER — hot (fast) to cool (slow) ===
+plot(showLadder ? f1 : na, "DSS 1x",
+     color.new(#FF1744, 65), linewidth=1)
+plot(showLadder ? f2 : na, "DSS 2x",
+     color.new(#FF6D00, 65), linewidth=1)
+plot(showLadder ? f3 : na, "DSS 3x",
+     color.new(#FFAB00, 65), linewidth=1)
+plot(showLadder ? f4 : na, "DSS 4x",
+     color.new(#FFEA00, 65), linewidth=1)
+plot(showLadder ? f5 : na, "DSS 5x",
+     color.new(#C6FF00, 65), linewidth=1)
+plot(showLadder ? f6 : na, "DSS 6x",
+     color.new(#00E676, 65), linewidth=1)
+plot(showLadder ? f7 : na, "DSS 7x",
+     color.new(#1DE9B6, 65), linewidth=1)
+plot(showLadder ? f8 : na, "DSS 8x",
+     color.new(#00B0FF, 65), linewidth=1)
+plot(showLadder ? f9 : na, "DSS 9x",
+     color.new(#651FFF, 65), linewidth=1)
+plot(showLadder ? f10 : na, "DSS 10x",
+     color.new(#D500F9, 65), linewidth=1)
+
+// === PLOT COMBINED ===
+combColor = combined > 10 ? #D50000 :
+     combined > 5  ? #EF5350 :
+     combined > 0  ? #FFCDD2 :
+     combined > -5 ? #B9F6CA :
+     combined > -10 ? #69F0AE :
+     #00C853
+
+plot(showCombined ? combined : na,
+     "Combined Forecast", combColor,
+     linewidth=3)
+
+// === REFERENCE LINES ===
+hline(20,  "Cap (+20)",
+     color.new(#D50000, 70), hline.style_dashed)
+hline(10,  "Strong (+10)",
+     color.new(#EF5350, 70), hline.style_dotted)
+hline(0,   "Neutral",
+     color.new(#888888, 50), hline.style_solid)
+hline(-10, "Strong (-10)",
+     color.new(#69F0AE, 70), hline.style_dotted)
+hline(-20, "Cap (-20)",
+     color.new(#00C853, 70), hline.style_dashed)
+
+// === BACKGROUND ZONES ===
+bgcolor(combined > 10 ?
+     color.new(#D50000, 92) :
+     combined < -10 ?
+     color.new(#00C853, 92) : na)
+
+// === PLOT SIGNALS ===
+// ① Stack flip — triangles
+plotshape(showFlips and buySignal ?
+     combined : na,
+     "Stack Buy", shape.triangleup,
+     location.bottom,
+     color=color.new(#00C853, 0),
+     size=size.tiny)
+plotshape(showFlips and sellSignal ?
+     combined : na,
+     "Stack Sell", shape.triangledown,
+     location.top,
+     color=color.new(#D50000, 0),
+     size=size.tiny)
+
+// ② Extreme reversal — X marks
+plotshape(showExtreme and extBuyFinal ?
+     combined : na,
+     "Extreme Buy", shape.xcross,
+     location.bottom,
+     color=color.new(#00C853, 0),
+     size=size.tiny)
+plotshape(showExtreme and extSellFinal ?
+     combined : na,
+     "Extreme Sell", shape.xcross,
+     location.top,
+     color=color.new(#FF1744, 0),
+     size=size.tiny)
+
+// =========================================================
+// INFO TABLE
+// =========================================================
+var table info = table.new(position.top_right,
+     2, 6,
+     bgcolor=color.new(#1a1a2e, 10),
+     border_width=1,
+     border_color=color.new(#333355, 50))
+
+if barstate.islast
+    // Ladder: one arrow per lookback, fast → slow
+    ladStr = (f1 > 0 ? "▲" : "▼") +
+         (f2 > 0 ? "▲" : "▼") +
+         (f3 > 0 ? "▲" : "▼") +
+         (f4 > 0 ? "▲" : "▼") +
+         (f5 > 0 ? "▲" : "▼") +
+         (f6 > 0 ? "▲" : "▼") +
+         (f7 > 0 ? "▲" : "▼") +
+         (f8 > 0 ? "▲" : "▼") +
+         (f9 > 0 ? "▲" : "▼") +
+         (f10 > 0 ? "▲" : "▼")
+    table.cell(info, 0, 0, "Ladder",
+         text_color=#aaaacc,
+         text_size=size.small)
+    table.cell(info, 1, 0, ladStr,
+         text_color=bullCount > bearCount ?
+         #69F0AE : #EF5350,
+         text_size=size.small,
+         text_font_family=font.family_monospace)
+
+    table.cell(info, 0, 1, "COMB",
+         text_color=#ffffff,
+         text_size=size.small)
+    table.cell(info, 1, 1,
+         str.tostring(combined, "#.#"),
+         text_color=combined > 0 ?
+         #00C853 : #D50000,
+         text_size=size.small)
+
+    agreeStr = bullCount > bearCount ?
+         str.tostring(bullCount) + "/10 BULL" :
+         bearCount > bullCount ?
+         str.tostring(bearCount) + "/10 BEAR" :
+         "SPLIT"
+    agreeCol = bullCount == 10 ? #00C853 :
+         bearCount == 10 ? #D50000 :
+         bullCount > bearCount ? #69F0AE :
+         bearCount > bullCount ? #EF5350 :
+         #FFD700
+    table.cell(info, 0, 2, "Agree",
+         text_color=#aaaacc,
+         text_size=size.small)
+    table.cell(info, 1, 2, agreeStr,
+         text_color=agreeCol,
+         text_size=size.small)
+
+    table.cell(info, 0, 3, "Range",
+         text_color=#aaaacc,
+         text_size=size.small)
+    table.cell(info, 1, 3,
+         str.tostring(step) + "–" +
+         str.tostring(step * 10),
+         text_color=#888888,
+         text_size=size.small)
+
+    sigTxt = buySignal ? "▲ STACK" :
+         sellSignal ? "▼ STACK" :
+         extBuyFinal ? "▲ EXTRM" :
+         extSellFinal ? "▼ EXTRM" : "—"
+    sigCol = buySignal or extBuyFinal ?
+         #00C853 :
+         sellSignal or extSellFinal ?
+         #D50000 : #888888
+    table.cell(info, 0, 4, "Wt",
+         text_color=#aaaacc,
+         text_size=size.small)
+    table.cell(info, 1, 4, wtMode,
+         text_color=#888888,
+         text_size=size.small)
+
+    table.cell(info, 0, 5, "SIG",
+         text_color=#aaaacc,
+         text_size=size.small)
+    table.cell(info, 1, 5, sigTxt,
+         text_color=sigCol,
+         text_size=size.small)
+
+
+// =========================================================
+// ALERTS — ATR-based SL/TP for trade app
+// =========================================================
+anyBuy = buySignal or extBuyFinal
+anySell = sellSignal or extSellFinal
+
+atrAlert = ta.atr(14)
+rsiVal = ta.rsi(close, 14)
+
+if anyBuy
+    sl = close - atrAlert * 1.5
+    tp1 = close + atrAlert * 2.0
+    tp2 = close + atrAlert * 3.0
+    alert('{"signal":"buy","symbol":"' +
+         syminfo.ticker + '",' +
+         '"entry":' + str.tostring(close) + ',' +
+         '"sl":' + str.tostring(sl) + ',' +
+         '"tp1":' + str.tostring(tp1) + ',' +
+         '"tp2":' + str.tostring(tp2) + ',' +
+         '"rsi":' + str.tostring(rsiVal) + ',' +
+         '"timeframe":"' +
+         timeframe.period + '",' +
+         '"signals_used":"dss_forecast_silly"}',
+         alert.freq_once_per_bar_close)
+
+if anySell
+    sl = close + atrAlert * 1.5
+    tp1 = close - atrAlert * 2.0
+    tp2 = close - atrAlert * 3.0
+    alert('{"signal":"short","symbol":"' +
+         syminfo.ticker + '",' +
+         '"entry":' + str.tostring(close) + ',' +
+         '"sl":' + str.tostring(sl) + ',' +
+         '"tp1":' + str.tostring(tp1) + ',' +
+         '"tp2":' + str.tostring(tp2) + ',' +
+         '"rsi":' + str.tostring(rsiVal) + ',' +
+         '"timeframe":"' +
+         timeframe.period + '",' +
+         '"signals_used":"dss_forecast_silly"}',
+         alert.freq_once_per_bar_close)
