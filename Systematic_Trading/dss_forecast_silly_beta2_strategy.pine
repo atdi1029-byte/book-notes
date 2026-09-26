@@ -1,0 +1,835 @@
+//@version=6
+strategy("DSS Silly Beta 2 Strategy",
+     overlay=false, precision=2,
+     initial_capital=10000,
+     default_qty_type=strategy.percent_of_equity,
+     default_qty_value=100,
+     commission_type=strategy.commission.percent,
+     commission_value=0.05,
+     slippage=1,
+     pyramiding=0)
+
+// DSS Forecast Silly Beta 2
+// 10 DSS lines between Fastest and Slowest,
+// spaced by ratio (each ~36% longer than the
+// last at 8–125) so no speed range gets
+// over-counted. Slow-heavy weights by default.
+// 8–125 keeps beta 1's feel (weighted average
+// lookback ~78 vs ~79) but adds a faster front
+// end and a longer backdrop.
+//
+// Signals, earliest → latest:
+//  ✕ Extreme reversal — blend in the zone,
+//    fastest line hooks
+//  ◆ Ladder turn — the turn has climbed from
+//    the fastest line up through N lines
+//  ▲ Stack flip — all 10 were on one side,
+//    then the stack broke for N bars
+// Zones are dynamic (the blend's own
+// percentiles) so they fit any weighting.
+
+// === SETTINGS ===
+grpLad = "Ladder"
+fastLen = input.int(8, "Fastest Lookback",
+     group=grpLad, minval=3, maxval=100)
+slowLen = input.int(125, "Slowest Lookback",
+     group=grpLad, minval=10, maxval=500)
+spacing = input.string("Ratio", "Spacing",
+     options=["Ratio", "Linear"],
+     group=grpLad,
+     tooltip="Ratio: each line a fixed % " +
+     "longer than the last. 8–125 gives 8, " +
+     "11, 15, 20, 27, 37, 50, 68, 92, 125. " +
+     "Linear: equal steps. 10–100 gives " +
+     "10, 20 ... 100 (beta 1).")
+smoothDiv = input.float(3.0,
+     "Smoothing = Lookback ÷",
+     group=grpLad, minval=1.0, maxval=10.0,
+     step=0.5,
+     tooltip="EMA length for each DSS. " +
+     "3 gives 8/3, 11/4, 15/5 ... 125/42")
+
+grpWt = "Weighting"
+wtMode = input.string("Slow-heavy", "Mode",
+     options=["Slow-heavy", "Equal",
+     "Fast-heavy", "Custom"],
+     group=grpWt,
+     tooltip="Slow-heavy: slowest→30, then " +
+     "21, 15, 11, 8, 5, 4, 3, 2, fastest→1 " +
+     "(sums to 100). Equal: 10 each. " +
+     "Fast-heavy: mirror. Custom: weights " +
+     "below (any total, auto-normalized). " +
+     "Past ~150 on Slowest, try Equal.")
+
+grpCW = "Custom Weights"
+cw1 = input.float(1, "Weight: #1 (fastest)",
+     group=grpCW, minval=0, maxval=100)
+cw2 = input.float(2, "Weight: #2",
+     group=grpCW, minval=0, maxval=100)
+cw3 = input.float(3, "Weight: #3",
+     group=grpCW, minval=0, maxval=100)
+cw4 = input.float(4, "Weight: #4",
+     group=grpCW, minval=0, maxval=100)
+cw5 = input.float(5, "Weight: #5",
+     group=grpCW, minval=0, maxval=100)
+cw6 = input.float(8, "Weight: #6",
+     group=grpCW, minval=0, maxval=100)
+cw7 = input.float(11, "Weight: #7",
+     group=grpCW, minval=0, maxval=100)
+cw8 = input.float(15, "Weight: #8",
+     group=grpCW, minval=0, maxval=100)
+cw9 = input.float(21, "Weight: #9",
+     group=grpCW, minval=0, maxval=100)
+cw10 = input.float(30, "Weight: #10 (slowest)",
+     group=grpCW, minval=0, maxval=100)
+
+grpZone = "Zones"
+zoneMode = input.string("Dynamic", "Zone Mode",
+     options=["Dynamic", "Fixed"],
+     group=grpZone,
+     tooltip="Dynamic: zones follow the " +
+     "blend's own recent range, so they fit " +
+     "any weighting, range or asset. " +
+     "Fixed: a flat ± level.")
+zonePct = input.float(15, "Dynamic: Outer %",
+     group=grpZone, minval=5, maxval=40,
+     step=1,
+     tooltip="Buy zone = lowest X% of the " +
+     "blend over the lookback. Sell zone = " +
+     "highest X%.")
+zoneLen = input.int(200, "Dynamic: Lookback",
+     group=grpZone, minval=50, maxval=1000)
+zoneFloor = input.float(6.0,
+     "Dynamic: Min Depth (±)",
+     group=grpZone, minval=0, maxval=15,
+     step=1,
+     tooltip="Zones never sit closer to 0 " +
+     "than this, so a quiet stretch can't " +
+     "shrink them to nothing.")
+zoneFixed = input.float(12.0,
+     "Fixed Level (±)",
+     group=grpZone, minval=4, maxval=20,
+     step=1)
+
+grpVis = "Visual"
+viewMode = input.string("Lines", "View",
+     options=["Lines", "Heatmap"],
+     group=grpVis,
+     tooltip="Heatmap: 10 rows, fastest at " +
+     "the bottom. Green = that line rising, " +
+     "red = falling. A turn shows up as a " +
+     "staircase climbing from the bottom " +
+     "row to the top.")
+showCombined = input.bool(true,
+     "Show Combined Forecast", group=grpVis)
+showZones = input.bool(true,
+     "Show Zones", group=grpVis)
+
+// === DSS BRESSERT FUNCTION ===
+dss_bressert(float src, int stochLen,
+     int emaLen) =>
+    hh = ta.highest(src, stochLen)
+    ll = ta.lowest(src, stochLen)
+    raw1 = hh != ll ?
+         (src - ll) / (hh - ll) * 100 : 50.0
+    smooth1 = ta.ema(raw1, emaLen)
+    hh2 = ta.highest(smooth1, stochLen)
+    ll2 = ta.lowest(smooth1, stochLen)
+    raw2 = hh2 != ll2 ?
+         (smooth1 - ll2) / (hh2 - ll2) * 100
+         : 50.0
+    dssLine = ta.ema(raw2, emaLen)
+    dssLine
+
+// === DSS FORECAST (0-100 → ±20) ===
+dss_fc(int len) =>
+    emaLen = math.max(2,
+         math.round(len / smoothDiv))
+    dss = dss_bressert(close, len, emaLen)
+    math.max(-20.0, math.min(20.0,
+         dss * 0.4 - 20.0))
+
+// === LOOKBACK FOR LINE i (1 = fastest) ===
+lenAt(int i) =>
+    spacing == "Ratio" ?
+         math.round(fastLen *
+         math.pow(float(slowLen) / fastLen,
+         (i - 1) / 9.0)) :
+         math.round(fastLen +
+         (slowLen - fastLen) * (i - 1) / 9.0)
+
+len1  = lenAt(1)
+len10 = lenAt(10)
+
+// === THE LADDER (fast → slow) ===
+f1  = dss_fc(len1)
+f2  = dss_fc(lenAt(2))
+f3  = dss_fc(lenAt(3))
+f4  = dss_fc(lenAt(4))
+f5  = dss_fc(lenAt(5))
+f6  = dss_fc(lenAt(6))
+f7  = dss_fc(lenAt(7))
+f8  = dss_fc(lenAt(8))
+f9  = dss_fc(lenAt(9))
+f10 = dss_fc(len10)
+
+// === WEIGHTS ===
+w_pick(float slow, float fast, float cust) =>
+    wtMode == "Slow-heavy" ? slow :
+         wtMode == "Fast-heavy" ? fast :
+         wtMode == "Equal" ? 10.0 : cust
+
+w1  = w_pick(1,  30, cw1)
+w2  = w_pick(2,  21, cw2)
+w3  = w_pick(3,  15, cw3)
+w4  = w_pick(4,  11, cw4)
+w5  = w_pick(5,  8,  cw5)
+w6  = w_pick(8,  5,  cw6)
+w7  = w_pick(11, 4,  cw7)
+w8  = w_pick(15, 3,  cw8)
+w9  = w_pick(21, 2,  cw9)
+w10 = w_pick(30, 1,  cw10)
+
+// === COMBINED ===
+totalWeight = w1 + w2 + w3 + w4 + w5 +
+     w6 + w7 + w8 + w9 + w10
+weightedSum = f1 * w1 + f2 * w2 + f3 * w3 +
+     f4 * w4 + f5 * w5 + f6 * w6 +
+     f7 * w7 + f8 * w8 + f9 * w9 +
+     f10 * w10
+combined = totalWeight > 0 ?
+     weightedSum / totalWeight : 0.0
+
+// === ZONES ===
+upZoneDyn = math.max(
+     ta.percentile_linear_interpolation(
+     combined, zoneLen, 100 - zonePct),
+     zoneFloor)
+loZoneDyn = math.min(
+     ta.percentile_linear_interpolation(
+     combined, zoneLen, zonePct),
+     -zoneFloor)
+upZone = zoneMode == "Dynamic" ?
+     upZoneDyn : zoneFixed
+loZone = zoneMode == "Dynamic" ?
+     loZoneDyn : -zoneFixed
+inBuyZone = combined <= loZone
+inSellZone = combined >= upZone
+
+// === SLOPES (is each line rising?) ===
+r1  = f1 > f1[1]
+r2  = f2 > f2[1]
+r3  = f3 > f3[1]
+r4  = f4 > f4[1]
+r5  = f5 > f5[1]
+r6  = f6 > f6[1]
+r7  = f7 > f7[1]
+r8  = f8 > f8[1]
+r9  = f9 > f9[1]
+r10 = f10 > f10[1]
+d1  = f1 < f1[1]
+d2  = f2 < f2[1]
+d3  = f3 < f3[1]
+d4  = f4 < f4[1]
+d5  = f5 < f5[1]
+d6  = f6 < f6[1]
+d7  = f7 < f7[1]
+d8  = f8 < f8[1]
+d9  = f9 < f9[1]
+d10 = f10 < f10[1]
+
+// === TURN DEPTH ===
+// How many lines in a row, starting from the
+// fastest, are turning the same way. A bottom
+// climbs 1 → 2 → 3 ... as the turn spreads to
+// slower lines. A dip inside an uptrend
+// (fast falling, slow rising) stays shallow.
+upDepth = r1 ? 1 : 0
+upDepth := upDepth == 1 and r2 ? 2 : upDepth
+upDepth := upDepth == 2 and r3 ? 3 : upDepth
+upDepth := upDepth == 3 and r4 ? 4 : upDepth
+upDepth := upDepth == 4 and r5 ? 5 : upDepth
+upDepth := upDepth == 5 and r6 ? 6 : upDepth
+upDepth := upDepth == 6 and r7 ? 7 : upDepth
+upDepth := upDepth == 7 and r8 ? 8 : upDepth
+upDepth := upDepth == 8 and r9 ? 9 : upDepth
+upDepth := upDepth == 9 and r10 ? 10 : upDepth
+
+dnDepth = d1 ? 1 : 0
+dnDepth := dnDepth == 1 and d2 ? 2 : dnDepth
+dnDepth := dnDepth == 2 and d3 ? 3 : dnDepth
+dnDepth := dnDepth == 3 and d4 ? 4 : dnDepth
+dnDepth := dnDepth == 4 and d5 ? 5 : dnDepth
+dnDepth := dnDepth == 5 and d6 ? 6 : dnDepth
+dnDepth := dnDepth == 6 and d7 ? 7 : dnDepth
+dnDepth := dnDepth == 7 and d8 ? 8 : dnDepth
+dnDepth := dnDepth == 8 and d9 ? 9 : dnDepth
+dnDepth := dnDepth == 9 and d10 ? 10 : dnDepth
+
+// === AGREEMENT COUNTER (which side of 0) ===
+bullCount = (f1 > 0 ? 1 : 0) +
+     (f2 > 0 ? 1 : 0) + (f3 > 0 ? 1 : 0) +
+     (f4 > 0 ? 1 : 0) + (f5 > 0 ? 1 : 0) +
+     (f6 > 0 ? 1 : 0) + (f7 > 0 ? 1 : 0) +
+     (f8 > 0 ? 1 : 0) + (f9 > 0 ? 1 : 0) +
+     (f10 > 0 ? 1 : 0)
+bearCount = (f1 < 0 ? 1 : 0) +
+     (f2 < 0 ? 1 : 0) + (f3 < 0 ? 1 : 0) +
+     (f4 < 0 ? 1 : 0) + (f5 < 0 ? 1 : 0) +
+     (f6 < 0 ? 1 : 0) + (f7 < 0 ? 1 : 0) +
+     (f8 < 0 ? 1 : 0) + (f9 < 0 ? 1 : 0) +
+     (f10 < 0 ? 1 : 0)
+
+
+// =========================================================
+// SIGNAL 1: EXTREME REVERSAL (earliest)
+// Blend in the zone and the fastest line hooks
+// =========================================================
+grpExt = "① Extreme Reversal (earliest)"
+showExtreme = input.bool(true,
+     "Show Extreme Reversals", group=grpExt)
+extCooldown = input.int(10,
+     "Cooldown (bars)",
+     group=grpExt, minval=1, maxval=50)
+
+extBuyRaw = inBuyZone and
+     f1 > f1[1] and f1[1] <= f1[2]
+extSellRaw = inSellZone and
+     f1 < f1[1] and f1[1] >= f1[2]
+
+barsSinceEB = ta.barssince(extBuyRaw[1])
+barsSinceES = ta.barssince(extSellRaw[1])
+extBuyFinal = extBuyRaw and (na(barsSinceEB) or
+     barsSinceEB >= extCooldown) and
+     barstate.isconfirmed
+extSellFinal = extSellRaw and (na(barsSinceES) or
+     barsSinceES >= extCooldown) and
+     barstate.isconfirmed
+
+
+// =========================================================
+// SIGNAL 2: LADDER TURN (confirmed)
+// The turn has climbed from the fastest line
+// up through N lines, and the blend was in the
+// zone recently
+// =========================================================
+grpTurn = "② Ladder Turn"
+showTurn = input.bool(true,
+     "Show Ladder Turns", group=grpTurn)
+turnDepth = input.int(5, "Turn Depth (lines)",
+     group=grpTurn, minval=2, maxval=10,
+     tooltip="Fires when the fastest N lines " +
+     "are all rising (or all falling) in a " +
+     "row: the turn has climbed N rungs.")
+turnSetup = input.int(20,
+     "Zone Memory (bars)",
+     group=grpTurn, minval=1, maxval=100,
+     tooltip="The blend must have been in " +
+     "the buy/sell zone within this many " +
+     "bars. Stops turns in the middle of " +
+     "nowhere.")
+turnCooldown = input.int(15,
+     "Cooldown (bars)",
+     group=grpTurn, minval=1, maxval=100)
+
+bsBuyZone = ta.barssince(inBuyZone)
+bsSellZone = ta.barssince(inSellZone)
+wasLow = not na(bsBuyZone) and
+     bsBuyZone <= turnSetup
+wasHigh = not na(bsSellZone) and
+     bsSellZone <= turnSetup
+
+turnBuyRaw = upDepth >= turnDepth and
+     upDepth[1] < turnDepth and wasLow
+turnSellRaw = dnDepth >= turnDepth and
+     dnDepth[1] < turnDepth and wasHigh
+
+barsSinceTB = ta.barssince(turnBuyRaw[1])
+barsSinceTS = ta.barssince(turnSellRaw[1])
+turnBuyFinal = turnBuyRaw and
+     (na(barsSinceTB) or
+     barsSinceTB >= turnCooldown) and
+     barstate.isconfirmed
+turnSellFinal = turnSellRaw and
+     (na(barsSinceTS) or
+     barsSinceTS >= turnCooldown) and
+     barstate.isconfirmed
+
+
+// =========================================================
+// SIGNAL 3: STACK FLIP (latest)
+// All 10 were on one side, then the stack
+// breaks and stays broken for N bars
+// =========================================================
+grpFlip = "③ Stack Flip (latest)"
+showFlips = input.bool(true,
+     "Show Stack Flips", group=grpFlip)
+confirmBars = input.int(3, "Confirmation Bars",
+     group=grpFlip, minval=1, maxval=10)
+flipCooldown = input.int(20,
+     "Cooldown (bars)",
+     group=grpFlip, minval=1, maxval=100)
+
+bearStack = bearCount == 10
+bullStack = bullCount == 10
+
+var int bearBrokenCount = 0
+var int bullBrokenCount = 0
+bearBrokenCount := bearStack ? 0 :
+     bearStack[1] ? 1 :
+     bearBrokenCount > 0 ?
+     bearBrokenCount + 1 : 0
+bullBrokenCount := bullStack ? 0 :
+     bullStack[1] ? 1 :
+     bullBrokenCount > 0 ?
+     bullBrokenCount + 1 : 0
+
+rawBuy = bearBrokenCount == confirmBars
+rawSell = bullBrokenCount == confirmBars
+
+barsSinceBuy = ta.barssince(rawBuy[1])
+barsSinceSell = ta.barssince(rawSell[1])
+buySignal = rawBuy and (na(barsSinceBuy) or
+     barsSinceBuy >= flipCooldown) and
+     barstate.isconfirmed
+sellSignal = rawSell and (na(barsSinceSell) or
+     barsSinceSell >= flipCooldown) and
+     barstate.isconfirmed
+
+
+// =========================================================
+// PLOTTING
+// =========================================================
+isHeat = viewMode == "Heatmap"
+isLines = not isHeat
+
+// === THE LADDER — hot (fast) to cool (slow) ===
+plot(isLines ? f1 : na, "DSS #1 (fastest)",
+     color.new(#FF1744, 65), linewidth=1)
+plot(isLines ? f2 : na, "DSS #2",
+     color.new(#FF6D00, 65), linewidth=1)
+plot(isLines ? f3 : na, "DSS #3",
+     color.new(#FFAB00, 65), linewidth=1)
+plot(isLines ? f4 : na, "DSS #4",
+     color.new(#FFEA00, 65), linewidth=1)
+plot(isLines ? f5 : na, "DSS #5",
+     color.new(#C6FF00, 65), linewidth=1)
+plot(isLines ? f6 : na, "DSS #6",
+     color.new(#00E676, 65), linewidth=1)
+plot(isLines ? f7 : na, "DSS #7",
+     color.new(#1DE9B6, 65), linewidth=1)
+plot(isLines ? f8 : na, "DSS #8",
+     color.new(#00B0FF, 65), linewidth=1)
+plot(isLines ? f9 : na, "DSS #9",
+     color.new(#651FFF, 65), linewidth=1)
+plot(isLines ? f10 : na, "DSS #10 (slowest)",
+     color.new(#D500F9, 65), linewidth=1)
+
+// === HEATMAP — 10 rows, fastest at bottom ===
+hb0 = plot(isHeat ? -20.0 : na, "HB0",
+     editable=false, display=display.none)
+hb1 = plot(isHeat ? -16.0 : na, "HB1",
+     editable=false, display=display.none)
+hb2 = plot(isHeat ? -12.0 : na, "HB2",
+     editable=false, display=display.none)
+hb3 = plot(isHeat ? -8.0 : na, "HB3",
+     editable=false, display=display.none)
+hb4 = plot(isHeat ? -4.0 : na, "HB4",
+     editable=false, display=display.none)
+hb5 = plot(isHeat ? 0.0 : na, "HB5",
+     editable=false, display=display.none)
+hb6 = plot(isHeat ? 4.0 : na, "HB6",
+     editable=false, display=display.none)
+hb7 = plot(isHeat ? 8.0 : na, "HB7",
+     editable=false, display=display.none)
+hb8 = plot(isHeat ? 12.0 : na, "HB8",
+     editable=false, display=display.none)
+hb9 = plot(isHeat ? 16.0 : na, "HB9",
+     editable=false, display=display.none)
+hb10 = plot(isHeat ? 20.0 : na, "HB10",
+     editable=false, display=display.none)
+
+heatUp = color.new(#00C853, 30)
+heatDn = color.new(#D50000, 30)
+fill(hb0, hb1, isHeat ?
+     (r1 ? heatUp : heatDn) : na, "Heat #1")
+fill(hb1, hb2, isHeat ?
+     (r2 ? heatUp : heatDn) : na, "Heat #2")
+fill(hb2, hb3, isHeat ?
+     (r3 ? heatUp : heatDn) : na, "Heat #3")
+fill(hb3, hb4, isHeat ?
+     (r4 ? heatUp : heatDn) : na, "Heat #4")
+fill(hb4, hb5, isHeat ?
+     (r5 ? heatUp : heatDn) : na, "Heat #5")
+fill(hb5, hb6, isHeat ?
+     (r6 ? heatUp : heatDn) : na, "Heat #6")
+fill(hb6, hb7, isHeat ?
+     (r7 ? heatUp : heatDn) : na, "Heat #7")
+fill(hb7, hb8, isHeat ?
+     (r8 ? heatUp : heatDn) : na, "Heat #8")
+fill(hb8, hb9, isHeat ?
+     (r9 ? heatUp : heatDn) : na, "Heat #9")
+fill(hb9, hb10, isHeat ?
+     (r10 ? heatUp : heatDn) : na, "Heat #10")
+
+// === ZONES ===
+plot(showZones ? upZone : na, "Sell Zone",
+     color.new(#EF5350, 40), linewidth=1)
+plot(showZones ? loZone : na, "Buy Zone",
+     color.new(#00C853, 40), linewidth=1)
+
+// === PLOT COMBINED ===
+combColor = isHeat ? #000000 :
+     combined > 10 ? #D50000 :
+     combined > 5  ? #EF5350 :
+     combined > 0  ? #FFCDD2 :
+     combined > -5 ? #B9F6CA :
+     combined > -10 ? #69F0AE :
+     #00C853
+
+plot(showCombined ? combined : na,
+     "Combined Forecast", combColor,
+     linewidth=3)
+
+// === REFERENCE LINES ===
+hline(20,  "Cap (+20)",
+     color.new(#D50000, 70), hline.style_dashed)
+hline(0,   "Neutral",
+     color.new(#888888, 50), hline.style_solid)
+hline(-20, "Cap (-20)",
+     color.new(#00C853, 70), hline.style_dashed)
+
+// === BACKGROUND ZONES ===
+bgcolor(isLines and inSellZone ?
+     color.new(#D50000, 92) :
+     isLines and inBuyZone ?
+     color.new(#00C853, 92) : na)
+
+// === PLOT SIGNALS ===
+// ① Extreme reversal — X marks
+plotshape(showExtreme and extBuyFinal ?
+     combined : na,
+     "Extreme Buy", shape.xcross,
+     location.bottom,
+     color=color.new(#00C853, 0),
+     size=size.tiny)
+plotshape(showExtreme and extSellFinal ?
+     combined : na,
+     "Extreme Sell", shape.xcross,
+     location.top,
+     color=color.new(#FF1744, 0),
+     size=size.tiny)
+
+// ② Ladder turn — diamonds
+plotshape(showTurn and turnBuyFinal ?
+     combined : na,
+     "Turn Buy", shape.diamond,
+     location.bottom,
+     color=color.new(#00C853, 0),
+     size=size.small)
+plotshape(showTurn and turnSellFinal ?
+     combined : na,
+     "Turn Sell", shape.diamond,
+     location.top,
+     color=color.new(#D50000, 0),
+     size=size.small)
+
+// ③ Stack flip — triangles
+plotshape(showFlips and buySignal ?
+     combined : na,
+     "Stack Buy", shape.triangleup,
+     location.bottom,
+     color=color.new(#00C853, 0),
+     size=size.tiny)
+plotshape(showFlips and sellSignal ?
+     combined : na,
+     "Stack Sell", shape.triangledown,
+     location.top,
+     color=color.new(#D50000, 0),
+     size=size.tiny)
+
+// =========================================================
+// ACTIVE SIGNALS (show toggles also gate alerts)
+// =========================================================
+sigExtBuy = showExtreme and extBuyFinal
+sigExtSell = showExtreme and extSellFinal
+sigTurnBuy = showTurn and turnBuyFinal
+sigTurnSell = showTurn and turnSellFinal
+sigStackBuy = showFlips and buySignal
+sigStackSell = showFlips and sellSignal
+
+anyBuy = sigExtBuy or sigTurnBuy or sigStackBuy
+anySell = sigExtSell or sigTurnSell or
+     sigStackSell
+
+buyType = sigTurnBuy ? "turn" :
+     sigStackBuy ? "stack" : "extreme"
+sellType = sigTurnSell ? "turn" :
+     sigStackSell ? "stack" : "extreme"
+
+// Last signal, for the table
+var string lastSig = "—"
+var int lastSigBar = na
+var color lastSigCol = #888888
+if anyBuy
+    lastSig := buyType == "turn" ? "▲ TURN" :
+         buyType == "stack" ? "▲ STACK" :
+         "▲ EXTRM"
+    lastSigBar := bar_index
+    lastSigCol := #00C853
+if anySell
+    lastSig := sellType == "turn" ? "▼ TURN" :
+         sellType == "stack" ? "▼ STACK" :
+         "▼ EXTRM"
+    lastSigBar := bar_index
+    lastSigCol := #D50000
+
+// =========================================================
+// INFO TABLE
+// =========================================================
+var table info = table.new(position.top_right,
+     2, 8,
+     bgcolor=color.new(#1a1a2e, 10),
+     border_width=1,
+     border_color=color.new(#333355, 50))
+
+if barstate.islast
+    // Slope of each line, fast → slow
+    slopeStr = (r1 ? "▲" : "▼") +
+         (r2 ? "▲" : "▼") + (r3 ? "▲" : "▼") +
+         (r4 ? "▲" : "▼") + (r5 ? "▲" : "▼") +
+         (r6 ? "▲" : "▼") + (r7 ? "▲" : "▼") +
+         (r8 ? "▲" : "▼") + (r9 ? "▲" : "▼") +
+         (r10 ? "▲" : "▼")
+    table.cell(info, 0, 0, "Slope",
+         text_color=#aaaacc,
+         text_size=size.small)
+    table.cell(info, 1, 0, slopeStr,
+         text_color=upDepth > 0 ?
+         #69F0AE : #EF5350,
+         text_size=size.small,
+         text_font_family=font.family_monospace)
+
+    depthStr = upDepth > 0 ?
+         "▲ " + str.tostring(upDepth) + "/10" :
+         dnDepth > 0 ?
+         "▼ " + str.tostring(dnDepth) + "/10" :
+         "—"
+    table.cell(info, 0, 1, "Depth",
+         text_color=#aaaacc,
+         text_size=size.small)
+    table.cell(info, 1, 1, depthStr,
+         text_color=upDepth >= turnDepth ?
+         #00C853 :
+         dnDepth >= turnDepth ? #D50000 :
+         #888888,
+         text_size=size.small)
+
+    table.cell(info, 0, 2, "COMB",
+         text_color=#ffffff,
+         text_size=size.small)
+    table.cell(info, 1, 2,
+         str.tostring(combined, "#.#"),
+         text_color=combined > 0 ?
+         #00C853 : #D50000,
+         text_size=size.small)
+
+    zoneStr = inBuyZone ? "BUY ZONE" :
+         inSellZone ? "SELL ZONE" :
+         str.tostring(loZone, "#.#") + " / " +
+         str.tostring(upZone, "#.#")
+    table.cell(info, 0, 3, "Zone",
+         text_color=#aaaacc,
+         text_size=size.small)
+    table.cell(info, 1, 3, zoneStr,
+         text_color=inBuyZone ? #00C853 :
+         inSellZone ? #D50000 : #888888,
+         text_size=size.small)
+
+    agreeStr = bullCount > bearCount ?
+         str.tostring(bullCount) + "/10 BULL" :
+         bearCount > bullCount ?
+         str.tostring(bearCount) + "/10 BEAR" :
+         "SPLIT"
+    agreeCol = bullCount == 10 ? #00C853 :
+         bearCount == 10 ? #D50000 :
+         bullCount > bearCount ? #69F0AE :
+         bearCount > bullCount ? #EF5350 :
+         #FFD700
+    table.cell(info, 0, 4, "Agree",
+         text_color=#aaaacc,
+         text_size=size.small)
+    table.cell(info, 1, 4, agreeStr,
+         text_color=agreeCol,
+         text_size=size.small)
+
+    table.cell(info, 0, 5, "Lines",
+         text_color=#aaaacc,
+         text_size=size.small)
+    table.cell(info, 1, 5,
+         str.tostring(len1) + "–" +
+         str.tostring(len10) +
+         (spacing == "Ratio" ? " ratio" :
+         " linear"),
+         text_color=#888888,
+         text_size=size.small)
+
+    table.cell(info, 0, 6, "Wt",
+         text_color=#aaaacc,
+         text_size=size.small)
+    table.cell(info, 1, 6, wtMode,
+         text_color=#888888,
+         text_size=size.small)
+
+    sigTxt = na(lastSigBar) ? lastSig :
+         lastSig + " " +
+         str.tostring(bar_index - lastSigBar) +
+         "b ago"
+    table.cell(info, 0, 7, "Last",
+         text_color=#aaaacc,
+         text_size=size.small)
+    table.cell(info, 1, 7, sigTxt,
+         text_color=lastSigCol,
+         text_size=size.small)
+
+
+// =========================================================
+// ALERTS — ATR-based SL/TP for trade app
+// =========================================================
+atrAlert = ta.atr(14)
+rsiVal = ta.rsi(close, 14)
+
+if anyBuy
+    sl = close - atrAlert * 1.5
+    tp1 = close + atrAlert * 2.0
+    tp2 = close + atrAlert * 3.0
+    alert('{"signal":"buy","symbol":"' +
+         syminfo.ticker + '",' +
+         '"entry":' + str.tostring(close) + ',' +
+         '"sl":' + str.tostring(sl) + ',' +
+         '"tp1":' + str.tostring(tp1) + ',' +
+         '"tp2":' + str.tostring(tp2) + ',' +
+         '"rsi":' + str.tostring(rsiVal) + ',' +
+         '"timeframe":"' +
+         timeframe.period + '",' +
+         '"signals_used":"dss_forecast_silly2:' +
+         buyType + '"}',
+         alert.freq_once_per_bar_close)
+
+if anySell
+    sl = close + atrAlert * 1.5
+    tp1 = close - atrAlert * 2.0
+    tp2 = close - atrAlert * 3.0
+    alert('{"signal":"short","symbol":"' +
+         syminfo.ticker + '",' +
+         '"entry":' + str.tostring(close) + ',' +
+         '"sl":' + str.tostring(sl) + ',' +
+         '"tp1":' + str.tostring(tp1) + ',' +
+         '"tp2":' + str.tostring(tp2) + ',' +
+         '"rsi":' + str.tostring(rsiVal) + ',' +
+         '"timeframe":"' +
+         timeframe.period + '",' +
+         '"signals_used":"dss_forecast_silly2:' +
+         sellType + '"}',
+         alert.freq_once_per_bar_close)
+
+// =========================================================
+// STRATEGY — identical exits in every DSS strategy
+// Enters on the signal bar's close (fills next
+// open). SL/TP come from that close, same math
+// as the alert payload. Show toggles above pick
+// which signals get traded.
+// =========================================================
+grpX = "Strategy Exits"
+xDir = input.string("Both", "Direction",
+     options=["Both", "Long only", "Short only"],
+     group=grpX)
+xSL = input.float(1.5, "Stop (ATR)",
+     group=grpX, minval=0.25, maxval=10.0,
+     step=0.25)
+xTP1 = input.float(2.0, "TP1 (ATR)",
+     group=grpX, minval=0.25, maxval=20.0,
+     step=0.25)
+xTP2 = input.float(3.0, "TP2 (ATR)",
+     group=grpX, minval=0.25, maxval=20.0,
+     step=0.25)
+xTP1Pct = input.float(50, "TP1 Size %",
+     group=grpX, minval=0, maxval=100, step=5)
+xBE = input.bool(true,
+     "Stop to Breakeven after TP1", group=grpX)
+xOpp = input.bool(true,
+     "Reverse / Exit on Opposite Signal",
+     group=grpX)
+
+xAtr = ta.atr(14)
+xLongOk = xDir != "Short only"
+xShortOk = xDir != "Long only"
+
+var float xLSL = na
+var float xLTP1 = na
+var float xLTP2 = na
+var float xSSL = na
+var float xSTP1 = na
+var float xSTP2 = na
+var bool xTP1Done = false
+
+pos = strategy.position_size
+
+// TP1 filled = position shrank but still open
+if (pos > 0 and pos < pos[1]) or
+     (pos < 0 and pos > pos[1])
+    xTP1Done := true
+
+// === ENTRIES ===
+xEnterL = false
+xEnterS = false
+if anyBuy and not anySell
+    if xLongOk
+        if pos == 0 or (pos < 0 and xOpp)
+            xEnterL := true
+    else if pos < 0 and xOpp
+        strategy.close("S", comment="Opp")
+if anySell and not anyBuy
+    if xShortOk
+        if pos == 0 or (pos > 0 and xOpp)
+            xEnterS := true
+    else if pos > 0 and xOpp
+        strategy.close("L", comment="Opp")
+
+if xEnterL
+    xLSL := close - xAtr * xSL
+    xLTP1 := close + xAtr * xTP1
+    xLTP2 := close + xAtr * xTP2
+    xTP1Done := false
+    strategy.entry("L", strategy.long)
+if xEnterS
+    xSSL := close + xAtr * xSL
+    xSTP1 := close - xAtr * xTP1
+    xSTP2 := close - xAtr * xTP2
+    xTP1Done := false
+    strategy.entry("S", strategy.short)
+
+// === EXITS (re-sent each bar so BE can move) ===
+if (pos > 0 and not xEnterS) or xEnterL
+    xStopL = xBE and xTP1Done ?
+         math.max(xLSL,
+         strategy.position_avg_price) : xLSL
+    if xTP1Pct > 0
+        strategy.exit("L-TP1", "L",
+             qty_percent=xTP1Pct,
+             limit=xLTP1, stop=xLSL)
+    strategy.exit("L-TP2", "L",
+         qty_percent=100,
+         limit=xLTP2, stop=xStopL)
+
+if (pos < 0 and not xEnterL) or xEnterS
+    xStopS = xBE and xTP1Done ?
+         math.min(xSSL,
+         strategy.position_avg_price) : xSSL
+    if xTP1Pct > 0
+        strategy.exit("S-TP1", "S",
+             qty_percent=xTP1Pct,
+             limit=xSTP1, stop=xSSL)
+    strategy.exit("S-TP2", "S",
+         qty_percent=100,
+         limit=xSTP2, stop=xStopS)
