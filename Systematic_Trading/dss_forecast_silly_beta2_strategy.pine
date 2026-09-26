@@ -149,28 +149,51 @@ dss_fc(int len) =>
     math.max(-20.0, math.min(20.0,
          dss * 0.4 - 20.0))
 
-// === LOOKBACK FOR LINE i (1 = fastest) ===
-lenAt(int i) =>
-    spacing == "Ratio" ?
-         math.round(fastLen *
-         math.pow(float(slowLen) / fastLen,
-         (i - 1) / 9.0)) :
-         math.round(fastLen +
-         (slowLen - fastLen) * (i - 1) / 9.0)
-
-len1  = lenAt(1)
-len10 = lenAt(10)
+// === LOOKBACKS (1 = fastest) ===
+// Worked out inline, not in a function:
+// ta.ema needs a "simple int" length, and a
+// function's return value comes back "series".
+isRatio = spacing == "Ratio"
+rStep = math.pow(slowLen * 1.0 / fastLen,
+     1 / 9.0)
+lStep = (slowLen - fastLen) / 9.0
+len1  = fastLen
+len2  = isRatio ?
+     math.round(fastLen * math.pow(rStep, 1)) :
+     math.round(fastLen + lStep * 1)
+len3  = isRatio ?
+     math.round(fastLen * math.pow(rStep, 2)) :
+     math.round(fastLen + lStep * 2)
+len4  = isRatio ?
+     math.round(fastLen * math.pow(rStep, 3)) :
+     math.round(fastLen + lStep * 3)
+len5  = isRatio ?
+     math.round(fastLen * math.pow(rStep, 4)) :
+     math.round(fastLen + lStep * 4)
+len6  = isRatio ?
+     math.round(fastLen * math.pow(rStep, 5)) :
+     math.round(fastLen + lStep * 5)
+len7  = isRatio ?
+     math.round(fastLen * math.pow(rStep, 6)) :
+     math.round(fastLen + lStep * 6)
+len8  = isRatio ?
+     math.round(fastLen * math.pow(rStep, 7)) :
+     math.round(fastLen + lStep * 7)
+len9  = isRatio ?
+     math.round(fastLen * math.pow(rStep, 8)) :
+     math.round(fastLen + lStep * 8)
+len10 = slowLen
 
 // === THE LADDER (fast → slow) ===
 f1  = dss_fc(len1)
-f2  = dss_fc(lenAt(2))
-f3  = dss_fc(lenAt(3))
-f4  = dss_fc(lenAt(4))
-f5  = dss_fc(lenAt(5))
-f6  = dss_fc(lenAt(6))
-f7  = dss_fc(lenAt(7))
-f8  = dss_fc(lenAt(8))
-f9  = dss_fc(lenAt(9))
+f2  = dss_fc(len2)
+f3  = dss_fc(len3)
+f4  = dss_fc(len4)
+f5  = dss_fc(len5)
+f6  = dss_fc(len6)
+f7  = dss_fc(len7)
+f8  = dss_fc(len8)
+f9  = dss_fc(len9)
 f10 = dss_fc(len10)
 
 // === WEIGHTS ===
