@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Freddie Mac Primary Mortgage Market Survey (PMMS) - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.prog-stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(112px,1fr));
+  gap:10px; margin:1rem 0 1.5rem; }
+.prog-stat { background:#e8e0d0; border:1px solid #d4c8b0; border-radius:8px;
+  padding:0.7rem 0.9rem; }
+.prog-stat .n { display:block; font-size:1.5rem; color:#5a3e1a; line-height:1.1; }
+.prog-stat .l { display:block; font-size:0.75rem; color:#8a7a60; margin-top:0.2rem; }
+.prog-chart { position:relative; margin:0.5rem 0 0.4rem; }
+.prog-chart svg { width:100%; height:auto; display:block; overflow:visible; }
+.prog-chart .grid { stroke:#ddd3c0; stroke-width:1; }
+.prog-chart .axis { stroke:#c8bca4; stroke-width:1; }
+.prog-chart .tick { fill:#8a7a60; font-size:11px; }
+.prog-chart .ylab { fill:#8a7a60; font-size:11px; }
+.prog-chart .actual { fill:none; stroke:#9a5a22; stroke-width:2; stroke-linejoin:round; }
+.prog-chart .actual-dot { fill:#9a5a22; stroke:#f4efe8; stroke-width:2; }
+.prog-chart .model { fill:none; stroke:#0e9488; stroke-width:2; stroke-dasharray:6 4; }
+.prog-chart .ceiling { stroke:#8a7a60; stroke-width:1; stroke-dasharray:2 4; }
+.prog-chart .here { stroke:#9a5a22; stroke-width:1; stroke-dasharray:2 3; opacity:0.6; }
+.prog-chart .dlabel { font-size:11px; fill:#3a2e1e; }
+.prog-chart .bar { fill:#9a5a22; opacity:0.75; }
+.prog-chart .bar-model { fill:none; stroke:#0e9488; stroke-width:2; stroke-dasharray:6 4; }
+.prog-chart .hit { fill:transparent; cursor:crosshair; }
+.prog-tip { position:absolute; pointer-events:none; display:none;
+  background:#3a2e1e; color:#f4efe8; font-size:12px; line-height:1.4;
+  padding:6px 9px; border-radius:6px; white-space:nowrap; z-index:5; }
+.prog-legend { display:flex; gap:1.2rem; font-size:0.8rem; color:#5a3e1a;
+  margin:0 0 1.5rem; flex-wrap:wrap; }
+.prog-legend span::before { content:""; display:inline-block; width:18px; height:0;
+  border-top:2px solid; margin-right:6px; vertical-align:middle; }
+.prog-legend .lg-actual::before { border-color:#9a5a22; }
+.prog-legend .lg-model::before { border-color:#0e9488; border-top-style:dashed; }
+.prog-legend .lg-ceiling::before { border-color:#8a7a60; border-top-style:dotted; }
+.prog-eq { background:#e8e0d0; border:1px solid #d4c8b0; border-radius:8px;
+  padding:0.9rem 1.1rem; font-family:Georgia,serif; font-size:1.05rem; color:#3a2e1e;
+  margin:1rem 0; }
+.prog-eq .sub { display:block; font-size:0.85rem; color:#8a7a60; margin-top:0.4rem;
+  font-family:inherit; }
+.prog-note { font-size:0.85rem; color:#8a7a60; }
+.prog-link { font-size:0.85rem; margin:-0.8rem 0 1.2rem; }
+.prog-link a { color:#0e9488; }
+table.prog-table { font-size:0.85rem; margin:1rem 0; }
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.tier .tier-desc { color: #a08060; font-size: 0.85rem; margin: 0.4rem 0 0.8rem; }
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done,
+body.hide-done .cat-card.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+.vid-tab {
+  margin: 0 0 1.2rem; background: #e8e0d0; border: 1px solid #d4c8b0;
+  border-radius: 8px; overflow: hidden;
+}
+.vid-tab summary {
+  padding: 0.6rem 0.9rem; cursor: pointer; font-size: 0.85rem;
+  color: #3a2a1a; list-style: none; user-select: none;
+}
+.vid-tab summary::-webkit-details-marker { display: none; }
+.vid-tab summary::before {
+  content: '▶'; display: inline-block; margin-right: 0.5rem;
+  font-size: 0.7rem; transition: transform 0.2s;
+}
+.vid-tab[open] summary::before { transform: rotate(90deg); }
+.vid-tab .vid-status {
+  float: right; font-size: 0.75rem; padding: 0.15rem 0.5rem;
+  border-radius: 3px; margin-left: 0.5rem;
+}
+.vid-tab .vid-ok { background: #4ade8040; color: #2d6a4f; }
+.vid-tab .vid-err { background: #f8717140; color: #9b2c2c; }
+.vid-tab .vid-list {
+  padding: 0 0.9rem 0.7rem; margin: 0;
+  list-style: none; font-size: 0.8rem;
+}
+.vid-tab .vid-list li {
+  padding: 0.35rem 0; border-top: 1px solid #d4c8b0;
+  display: flex; justify-content: space-between; gap: 8px;
+}
+.vid-tab .vid-list .vid-date {
+  color: #a08060; white-space: nowrap; flex: none;
+}
+.vid-tab .vid-list .vid-concepts {
+  color: #a08060; white-space: nowrap; flex: none; font-size: 0.75rem;
+}
+.vid-tab .vid-none {
+  padding: 0.4rem 0.9rem 0.7rem; color: #a08060; font-size: 0.8rem;
+}
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../economic-indicators.html">&larr; Economic Indicators</a>
+
+<div class="concept-meta"><span>deep cut</span><span>Economic Indicators</span><span>added 2026-09-26</span></div>
+<h4 id="freddie_mac_pmms">Freddie Mac Primary Mortgage Market Survey (PMMS)</h4>
+
+<p>The <strong>Freddie Mac Primary Mortgage Market Survey</strong>, universally called the <strong>PMMS</strong>, is the weekly report that almost every news headline about "mortgage rates" is actually quoting. Freddie Mac, one of the two government-sponsored enterprises that buys mortgages from lenders and packages them into securities, surveys a sample of lenders around the country and publishes an average rate for a 30-year fixed-rate conforming mortgage, along with a 15-year figure. It comes out every Thursday morning. For someone new to finance, the key thing to understand is that this is not a live market price like a stock quote. It is a survey — a poll of what lenders said they were offering earlier in the week — released on a lag, packaged as if it were the current state of the mortgage market.</p>
+
+<p>It matters because the PMMS has become the default reference point for the entire housing conversation in America. Realtors quote it to clients, financial news anchors put it on a chyron, the Fed watches it, and homebuyers anchor their expectations to it. When the PMMS says "7.03%," that number ripples through affordability calculators, listing agent pitches, and kitchen-table decisions about whether to buy now or wait. The problem is that housing decisions get made in real time, but the number guiding them was frozen days earlier. In a market where the underlying cost of money is moving fast, that lag turns a data point people trust into something closer to a stale price tag — accurate when it was printed, wrong by the time you're standing at the register.</p>
+
+<p>Mechanically, here's what happens: Freddie Mac collects rate quotes from lenders through roughly midweek — the video notes the survey <strong>"cut off its data collection on Wednesday morning"</strong> — then compiles, averages, and publishes the result the following Thursday. So the headline number reflects lender pricing from several days, sometimes closer to a week, before you read it. Lenders, meanwhile, reprice mortgage rates continuously — multiple times a day in volatile markets — because their pricing is tied directly to <strong>daily lock quotes</strong>, which track the secondary mortgage-backed securities (MBS) market and the 10-year Treasury yield in near real time. The PMMS captures a snapshot; the actual lending market is a video feed.</p>
+
+<p>The video's example makes the gap concrete. Freddie Mac's survey, cut off Wednesday morning, printed <strong>7.03%</strong> and was released the following Thursday — and every real estate blog and cable segment ran with "mortgage rates hovering around 7%." But in the two days between that Wednesday cutoff and the following Thursday afternoon, the 10-year Treasury yield surged to an intraday peak of 5.17%, and actual daily lock quotes for a conventional 30-year mortgage hit <strong>7.45%</strong> — the highest print of the year. Anyone using the published 7.03% figure to plan a purchase was working off a number that was already 42 basis points stale, translating into real monthly payment differences on a typical loan.</p>
+
+<p>Traders and mortgage professionals use the PMMS mainly as a historical marker and a media/sentiment indicator, not as a trading signal. Because it's backward-looking and averaged across a sample of lenders, it's useful for spotting broad trend direction over weeks and months — is the multi-week trajectory up or down — but it's nearly useless for timing a specific rate lock. Anyone actually pricing a mortgage decision watches the 10-year Treasury yield and the primary-to-secondary MBS spread in real time instead, then pulls an actual lender rate sheet for today's number. The PMMS is also watched as a proxy for how far behind public perception is running relative to reality, which is itself informative: a big gap between the PMMS print and live lock quotes signals that borrowers walking in the door are about to be surprised.</p>
+
+<p>The biggest misconception is treating the PMMS as "today's mortgage rate." It isn't, and the gap isn't always small. In calm weeks, when Treasury yields aren't moving much, the survey and live quotes track closely enough that the distinction barely matters. But in a week like the one described in the video, with the 10-year Treasury lurching from a stable range up through 5.1% and peaking near 5.17%, the PMMS becomes actively misleading — not wrong on the day it was measured, but obsolete by the time it's consumed. Another subtlety: the PMMS reflects an average across many lenders and loan profiles, so even a live version of it wouldn't match your specific quote, which depends on your credit score, down payment, loan size, and property type.</p>
+
+<p>The PMMS "breaks" — in the sense of becoming actively dangerous to rely on — precisely when rates are moving fast, which is exactly when people most need accurate information. This happens because of the mechanism the video describes: when the <strong>spread</strong> between the 10-year Treasury and the 30-year mortgage rate is historically wide, lenders have room to absorb a Treasury move without immediately repricing to consumers, so lagging surveys stay roughly representative. But when that spread has compressed to a structural floor — the video cites <strong>2.28 percentage points</strong> against a roughly 1.7-1.8 point historical norm, meaning there's still some cushion but far less than the pandemic-era distortions — lenders have less room to absorb shocks internally, and any Treasury move passes through to live quotes almost immediately. In that environment, a several-day-old survey and the live market can diverge by 40+ basis points within the same week, exactly as it did going from 7.03% to 7.45%.</p>
+
+<p>The PMMS connects directly to the <strong>mortgage-to-Treasury spread</strong> and the mechanics of the <strong>secondary mortgage market</strong>: your mortgage rate isn't set by a lender's whim but by what the 10-year Treasury yield is doing plus whatever spread MBS investors demand for risk, prepayment, and servicing. It also connects to Federal Reserve policy and Treasury issuance — when the Fed is not buying MBS or cutting rates, and the Treasury is flooding the market with new debt to fund deficits, both the Treasury yield and the spread over it can move against borrowers simultaneously. Understanding the PMMS as a lagging artifact, rather than a live price, is really a gateway to understanding that entire chain: Treasury supply and Fed policy set the baseline, the spread determines the markup, and daily lock quotes are the only number that reflects both in real time.</p>
+
+<blockquote>"That Freddie Mack survey cut off its data collection on Wednesday morning. It is actually a backwardlooking artifact."<cite>Wall Street Truth Bombs</cite></blockquote>
+<div class="concept-side">Related in this category: <a href="non_farm_payroll_report.html">Non-Farm Payroll (NFP) Report</a>, <a href="u6_unemployment_rate.html">U6 Unemployment Rate (Broad Labor Underutilization)</a>, <a href="adp_employment_report.html">ADP National Employment Report</a>, <a href="payroll_data_revision.html">Payroll Data Revision (BLS Benchmark Revision)</a>, <a href="challenger_gray_christmas_layoff_report.html">Challenger, Gray &amp; Christmas Job Cut Report</a>, <a href="average_hourly_earnings.html">Average Hourly Earnings (Wage Growth)</a></div>
+<button class="concept-done" data-slug="freddie_mac_pmms" onclick="toggleDone('freddie_mac_pmms')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_freddie_mac_pmms';</script>
+<script src="../../book.js"></script>
+<script src="../fg.js"></script>
+</body>
+</html>
