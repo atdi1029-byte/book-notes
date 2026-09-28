@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>PITI (Principal, Interest, Taxes, Insurance) - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.prog-stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(112px,1fr));
+  gap:10px; margin:1rem 0 1.5rem; }
+.prog-stat { background:#e8e0d0; border:1px solid #d4c8b0; border-radius:8px;
+  padding:0.7rem 0.9rem; }
+.prog-stat .n { display:block; font-size:1.5rem; color:#5a3e1a; line-height:1.1; }
+.prog-stat .l { display:block; font-size:0.75rem; color:#8a7a60; margin-top:0.2rem; }
+.prog-chart { position:relative; margin:0.5rem 0 0.4rem; }
+.prog-chart svg { width:100%; height:auto; display:block; overflow:visible; }
+.prog-chart .grid { stroke:#ddd3c0; stroke-width:1; }
+.prog-chart .axis { stroke:#c8bca4; stroke-width:1; }
+.prog-chart .tick { fill:#8a7a60; font-size:11px; }
+.prog-chart .ylab { fill:#8a7a60; font-size:11px; }
+.prog-chart .actual { fill:none; stroke:#9a5a22; stroke-width:2; stroke-linejoin:round; }
+.prog-chart .actual-dot { fill:#9a5a22; stroke:#f4efe8; stroke-width:2; }
+.prog-chart .model { fill:none; stroke:#0e9488; stroke-width:2; stroke-dasharray:6 4; }
+.prog-chart .ceiling { stroke:#8a7a60; stroke-width:1; stroke-dasharray:2 4; }
+.prog-chart .here { stroke:#9a5a22; stroke-width:1; stroke-dasharray:2 3; opacity:0.6; }
+.prog-chart .dlabel { font-size:11px; fill:#3a2e1e; }
+.prog-chart .bar { fill:#9a5a22; opacity:0.75; }
+.prog-chart .bar-model { fill:none; stroke:#0e9488; stroke-width:2; stroke-dasharray:6 4; }
+.prog-chart .hit { fill:transparent; cursor:crosshair; }
+.prog-tip { position:absolute; pointer-events:none; display:none;
+  background:#3a2e1e; color:#f4efe8; font-size:12px; line-height:1.4;
+  padding:6px 9px; border-radius:6px; white-space:nowrap; z-index:5; }
+.prog-legend { display:flex; gap:1.2rem; font-size:0.8rem; color:#5a3e1a;
+  margin:0 0 1.5rem; flex-wrap:wrap; }
+.prog-legend span::before { content:""; display:inline-block; width:18px; height:0;
+  border-top:2px solid; margin-right:6px; vertical-align:middle; }
+.prog-legend .lg-actual::before { border-color:#9a5a22; }
+.prog-legend .lg-model::before { border-color:#0e9488; border-top-style:dashed; }
+.prog-legend .lg-ceiling::before { border-color:#8a7a60; border-top-style:dotted; }
+.prog-eq { background:#e8e0d0; border:1px solid #d4c8b0; border-radius:8px;
+  padding:0.9rem 1.1rem; font-family:Georgia,serif; font-size:1.05rem; color:#3a2e1e;
+  margin:1rem 0; }
+.prog-eq .sub { display:block; font-size:0.85rem; color:#8a7a60; margin-top:0.4rem;
+  font-family:inherit; }
+.prog-note { font-size:0.85rem; color:#8a7a60; }
+.prog-link { font-size:0.85rem; margin:-0.8rem 0 1.2rem; }
+.prog-link a { color:#0e9488; }
+table.prog-table { font-size:0.85rem; margin:1rem 0; }
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.tier .tier-desc { color: #a08060; font-size: 0.85rem; margin: 0.4rem 0 0.8rem; }
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done,
+body.hide-done .cat-card.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+.vid-tab {
+  margin: 0 0 1.2rem; background: #e8e0d0; border: 1px solid #d4c8b0;
+  border-radius: 8px; overflow: hidden;
+}
+.vid-tab summary {
+  padding: 0.6rem 0.9rem; cursor: pointer; font-size: 0.85rem;
+  color: #3a2a1a; list-style: none; user-select: none;
+}
+.vid-tab summary::-webkit-details-marker { display: none; }
+.vid-tab summary::before {
+  content: '▶'; display: inline-block; margin-right: 0.5rem;
+  font-size: 0.7rem; transition: transform 0.2s;
+}
+.vid-tab[open] summary::before { transform: rotate(90deg); }
+.vid-tab .vid-status {
+  float: right; font-size: 0.75rem; padding: 0.15rem 0.5rem;
+  border-radius: 3px; margin-left: 0.5rem;
+}
+.vid-tab .vid-ok { background: #4ade8040; color: #2d6a4f; }
+.vid-tab .vid-err { background: #f8717140; color: #9b2c2c; }
+.vid-tab .vid-list {
+  padding: 0 0.9rem 0.7rem; margin: 0;
+  list-style: none; font-size: 0.8rem;
+}
+.vid-tab .vid-list li {
+  padding: 0.35rem 0; border-top: 1px solid #d4c8b0;
+  display: flex; justify-content: space-between; gap: 8px;
+}
+.vid-tab .vid-list .vid-date {
+  color: #a08060; white-space: nowrap; flex: none;
+}
+.vid-tab .vid-list .vid-concepts {
+  color: #a08060; white-space: nowrap; flex: none; font-size: 0.75rem;
+}
+.vid-tab .vid-none {
+  padding: 0.4rem 0.9rem 0.7rem; color: #a08060; font-size: 0.8rem;
+}
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../personal-finance-basics.html">&larr; Personal Finance Basics</a>
+
+<div class="concept-meta"><span><span class="star">&#9733;</span> must-know</span><span>Personal Finance Basics</span><span>added 2026-09-28</span></div>
+<h4 id="piti_mortgage_payment_components">PITI (Principal, Interest, Taxes, Insurance)</h4>
+
+<p><strong>PITI</strong> is the acronym for the four components that make up a
+typical monthly mortgage payment: <strong>Principal</strong> (the portion that
+pays down the actual loan balance you borrowed), <strong>Interest</strong>
+(the cost of borrowing that money, calculated against the outstanding
+balance), <strong>Taxes</strong> (your share of local property taxes, collected
+monthly instead of in one annual bill), and <strong>Insurance</strong> (your
+homeowner's policy premium, plus mortgage insurance if you put down less than
+20%). Lenders bundle all four into a single monthly draft so the loan stays
+current and the collateral stays protected. Most people think of their
+"mortgage payment" as one number, but PITI is really four separate financial
+obligations stitched together, each behaving very differently over time.</p>
+
+<p>PITI matters because it explains why a <strong>fixed-rate mortgage</strong>
+is not actually fixed. The video's transcript makes this distinction
+explicitly: your interest rate is locked, but "the cost of carrying the
+physical collateral, that is not." A 39% share of homeowners surveyed still
+believed their payment could never change — a dangerous misconception, because
+taxes and insurance are the two components with no ceiling. Understanding
+PITI is the difference between budgeting for a stable housing cost and being
+blindsided by an escrow shortage. As the transcript notes, roughly 65% of
+American homeowners with an escrow account are projected to hit a shortage in
+a given year, forcing an average jump of about $175 more per month — money
+that has nothing to do with the loan itself.</p>
+
+<p>Mechanically, PITI works through an account called <strong>escrow</strong>
+(sometimes called an impound account). Instead of you paying property taxes
+and insurance directly in large lump sums once or twice a year, the servicer
+collects one-twelfth of the estimated annual bill each month, folds it into
+your mortgage payment, and holds it in a separate escrow account. When the tax
+bill or insurance premium comes due, the servicer pays it out of that account
+on your behalf. Once a year, the servicer runs an <strong>escrow
+analysis</strong>: it compares what it actually collected against what it
+actually paid out. If taxes or insurance rose faster than projected, there's a
+gap — and that gap gets passed back to you, either as a lump-sum demand or
+spread across future payments, depending on its size.</p>
+
+<p>The real-world numbers from the video illustrate how lopsided PITI has
+become. Property insurance now averages $29 a month on a standard loan — an
+all-time high — and represents <strong>9.6%</strong> of the entire monthly
+payment, having surged nearly 80% since early 2020. Combine taxes and
+insurance together, and they now eat about 21% of the total monthly payment
+across the 450 largest U.S. metro markets. In nine states that figure exceeds
+40%, and in Pensacola, Florida, it sits around 43%. Meanwhile the average
+escrow shortage nationally runs about $21,100 <em>per borrower</em>, forcing
+that roughly $175 monthly out-of-pocket jump — even though the loan's
+principal and interest schedule hasn't changed at all.</p>
+
+<p>Traders and investors watch the T and I components of PITI as a leading
+signal for regional housing stress and insurance-sector profitability. When
+insurance costs rise faster than the underlying catastrophe risk they're
+supposed to price, as the video argues is happening now, that's a margin
+signal, not a risk signal. The video points out that the global
+<strong>reinsurance</strong> benchmark — essentially the wholesale price
+insurers pay to insure themselves — has fallen 23% from its post-pandemic
+peak, back to 2021 levels, even as retail insurance premiums hit record highs.
+That spread between falling wholesale risk and rising retail premium is
+exactly the kind of divergence an analyst would flag as unsustainable margin
+expansion rather than a genuine cost pass-through, and it tends to correct
+once state regulators intervene, as Florida and Louisiana have already done
+with rate cuts.</p>
+
+<p>A common misconception is that a "shortage" and a "deficiency" mean the
+same thing on an escrow statement — they don't, and the difference has real
+legal teeth. Under <strong>Regulation X</strong> (12 CFR §1024.17), a
+<strong>shortage</strong> means your escrow balance fell below the required
+target but never went negative; in that case, if the gap equals at least one
+month's escrow payment, your servicer must offer you the option to spread the
+deficit over 12 or more equal monthly installments — they cannot legally
+demand a lump-sum wire in 30 days. A <strong>deficiency</strong> means the
+account actually went negative, meaning the servicer had to front real cash;
+in that case, the mandatory 12-month spread protection disappears, and the
+servicer only has to offer two equal payments. Reading which word appears on
+your statement is the single most consequential piece of financial literacy
+buried in fine print most people never read.</p>
+
+<blockquote>"Your interest rate, well, that's locked. The cost of carrying
+the physical collateral, that is not."</blockquote>
+
+<p>PITI breaks down — or rather, exposes its cracks — when local conditions
+diverge sharply from national averages. The video is careful to separate
+national noise from real, isolated pain: nationally, the average property tax
+bill rose only about 3% (roughly $127 a year), and popular claims of
+$1,200–$2,500 annual tax spikes are, per the transcript, "off by a factor of
+10 to 20." But brutal local exceptions exist — Memphis saw an assessment jump
+around 34%, Baltimore around 27% — and those borrowers face a genuinely
+different reality than the national average suggests. Similarly, insurance
+markets diverge by state: Louisiana and Florida saw insurers cut rates as
+reinsurance costs fell, while California's FAIR Plan (the state's
+insurer-of-last-resort) grew 157% in four years with a 29% rate hike, because
+the driver there is regulatory and wildfire risk policy, not the national
+catastrophe-cost trend.</p>
+
+<blockquote>"That is not a natural disaster. That is pure corporate margin
+expansion."</blockquote>
+
+<p>PITI connects directly to <strong>debt-to-income (DTI) ratio</strong>
+calculations, since lenders qualify borrowers using the full PITI payment, not
+just principal and interest — meaning a spike in the T or I component can
+push an existing homeowner's effective debt burden higher without them ever
+missing a payment or refinancing. It also connects to the broader
+<strong>reinsurance cycle</strong>, since retail insurance premium trends lag
+wholesale catastrophe-bond and reinsurance pricing by roughly six months (the
+market resets every January and July). For anyone assessing regional housing
+affordability or an insurer's stock, watching PITI's tax-and-insurance slice —
+not just headline mortgage rates — reveals stress or margin opportunities
+that the "locked rate" narrative completely hides.</p>
+<div class="concept-side">Related in this category: <a href="credit_score.html">Credit Score (FICO / VantageScore)</a>, <a href="used_vehicle_resale_value.html">Used Vehicle Resale Value (Residual Value)</a>, <a href="erisa_fiduciary_safe_harbor.html">ERISA Fiduciary Safe Harbor</a>, <a href="loan_amortization.html">Loan Amortization</a>, <a href="home_equity_line_of_credit.html">Home Equity Line of Credit (HELOC)</a>, <a href="margin_loan.html">Margin Loan</a></div>
+<button class="concept-done" data-slug="piti_mortgage_payment_components" onclick="toggleDone('piti_mortgage_payment_components')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_piti_mortgage_payment_components';</script>
+<script src="../../book.js"></script>
+<script src="../fg.js"></script>
+</body>
+</html>
