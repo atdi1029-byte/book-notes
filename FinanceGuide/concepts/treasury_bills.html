@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Treasury Bills (T-Bills) - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.prog-stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(112px,1fr));
+  gap:10px; margin:1rem 0 1.5rem; }
+.prog-stat { background:#e8e0d0; border:1px solid #d4c8b0; border-radius:8px;
+  padding:0.7rem 0.9rem; }
+.prog-stat .n { display:block; font-size:1.5rem; color:#5a3e1a; line-height:1.1; }
+.prog-stat .l { display:block; font-size:0.75rem; color:#8a7a60; margin-top:0.2rem; }
+.prog-chart { position:relative; margin:0.5rem 0 0.4rem; }
+.prog-chart svg { width:100%; height:auto; display:block; overflow:visible; }
+.prog-chart .grid { stroke:#ddd3c0; stroke-width:1; }
+.prog-chart .axis { stroke:#c8bca4; stroke-width:1; }
+.prog-chart .tick { fill:#8a7a60; font-size:11px; }
+.prog-chart .ylab { fill:#8a7a60; font-size:11px; }
+.prog-chart .actual { fill:none; stroke:#9a5a22; stroke-width:2; stroke-linejoin:round; }
+.prog-chart .actual-dot { fill:#9a5a22; stroke:#f4efe8; stroke-width:2; }
+.prog-chart .model { fill:none; stroke:#0e9488; stroke-width:2; stroke-dasharray:6 4; }
+.prog-chart .ceiling { stroke:#8a7a60; stroke-width:1; stroke-dasharray:2 4; }
+.prog-chart .here { stroke:#9a5a22; stroke-width:1; stroke-dasharray:2 3; opacity:0.6; }
+.prog-chart .dlabel { font-size:11px; fill:#3a2e1e; }
+.prog-chart .bar { fill:#9a5a22; opacity:0.75; }
+.prog-chart .bar-model { fill:none; stroke:#0e9488; stroke-width:2; stroke-dasharray:6 4; }
+.prog-chart .hit { fill:transparent; cursor:crosshair; }
+.prog-tip { position:absolute; pointer-events:none; display:none;
+  background:#3a2e1e; color:#f4efe8; font-size:12px; line-height:1.4;
+  padding:6px 9px; border-radius:6px; white-space:nowrap; z-index:5; }
+.prog-legend { display:flex; gap:1.2rem; font-size:0.8rem; color:#5a3e1a;
+  margin:0 0 1.5rem; flex-wrap:wrap; }
+.prog-legend span::before { content:""; display:inline-block; width:18px; height:0;
+  border-top:2px solid; margin-right:6px; vertical-align:middle; }
+.prog-legend .lg-actual::before { border-color:#9a5a22; }
+.prog-legend .lg-model::before { border-color:#0e9488; border-top-style:dashed; }
+.prog-legend .lg-ceiling::before { border-color:#8a7a60; border-top-style:dotted; }
+.prog-eq { background:#e8e0d0; border:1px solid #d4c8b0; border-radius:8px;
+  padding:0.9rem 1.1rem; font-family:Georgia,serif; font-size:1.05rem; color:#3a2e1e;
+  margin:1rem 0; }
+.prog-eq .sub { display:block; font-size:0.85rem; color:#8a7a60; margin-top:0.4rem;
+  font-family:inherit; }
+.prog-note { font-size:0.85rem; color:#8a7a60; }
+.prog-link { font-size:0.85rem; margin:-0.8rem 0 1.2rem; }
+.prog-link a { color:#0e9488; }
+table.prog-table { font-size:0.85rem; margin:1rem 0; }
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.tier .tier-desc { color: #a08060; font-size: 0.85rem; margin: 0.4rem 0 0.8rem; }
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done,
+body.hide-done .cat-card.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+.vid-tab {
+  margin: 0 0 1.2rem; background: #e8e0d0; border: 1px solid #d4c8b0;
+  border-radius: 8px; overflow: hidden;
+}
+.vid-tab summary {
+  padding: 0.6rem 0.9rem; cursor: pointer; font-size: 0.85rem;
+  color: #3a2a1a; list-style: none; user-select: none;
+}
+.vid-tab summary::-webkit-details-marker { display: none; }
+.vid-tab summary::before {
+  content: '▶'; display: inline-block; margin-right: 0.5rem;
+  font-size: 0.7rem; transition: transform 0.2s;
+}
+.vid-tab[open] summary::before { transform: rotate(90deg); }
+.vid-tab .vid-status {
+  float: right; font-size: 0.75rem; padding: 0.15rem 0.5rem;
+  border-radius: 3px; margin-left: 0.5rem;
+}
+.vid-tab .vid-ok { background: #4ade8040; color: #2d6a4f; }
+.vid-tab .vid-err { background: #f8717140; color: #9b2c2c; }
+.vid-tab .vid-list {
+  padding: 0 0.9rem 0.7rem; margin: 0;
+  list-style: none; font-size: 0.8rem;
+}
+.vid-tab .vid-list li {
+  padding: 0.35rem 0; border-top: 1px solid #d4c8b0;
+  display: flex; justify-content: space-between; gap: 8px;
+}
+.vid-tab .vid-list .vid-date {
+  color: #a08060; white-space: nowrap; flex: none;
+}
+.vid-tab .vid-list .vid-concepts {
+  color: #a08060; white-space: nowrap; flex: none; font-size: 0.75rem;
+}
+.vid-tab .vid-none {
+  padding: 0.4rem 0.9rem 0.7rem; color: #a08060; font-size: 0.8rem;
+}
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../fixed-income-bonds.html">&larr; Fixed Income &amp; Bonds</a>
+
+<div class="concept-meta"><span><span class="star">&#9733;</span> must-know</span><span>Fixed Income &amp; Bonds</span><span>added 2026-09-29</span></div>
+<h4 id="treasury_bills">Treasury Bills (T-Bills)</h4>
+
+<p>A <strong>Treasury bill</strong>, or T-bill, is a short-term IOU from the U.S. government. It matures in one year or less. The standard maturities are 4, 6, 8, 13, 17, 26 and 52 weeks. T-bills pay no periodic interest, unlike longer Treasury notes and bonds, which send you a coupon every six months. You buy a bill at a discount to its face value and receive the full face value at maturity. If you pay $99.04 for a $100 bill that matures in 13 weeks, the $0.96 difference is your interest. Because Washington can tax and print dollars, investors treat T-bills as the closest thing to a risk-free asset in the dollar world.</p>
+
+<p>T-bills matter because they anchor the price of money for everything else. The yield on a 3-month bill is the baseline return you can earn for essentially no credit risk and almost no price risk. Every other asset has to beat it to justify itself. When bills pay 3.9%, a speculative stock, a junk bond or a leveraged property deal has to offer a much better expected return to be worth the danger. Banks, money market funds, corporations and foreign central banks also hold huge amounts of bills as their cash. That makes the bill market one of the deepest and most liquid places on earth, and it is where the Fed's policy rate reaches the rest of the economy.</p>
+
+<p>Mechanically, the Treasury sells bills at regular auctions, and investors bid competitively or non-competitively. Individuals can buy directly at TreasuryDirect or through a brokerage. The auction sets a <strong>discount rate</strong>, and price follows from it: price = 100 − (discount rate × days to maturity ÷ 360 × 100). At a 3.80% discount rate, a 91-day bill costs about $99.04 per $100 of face value. Your true return, the <strong>investment yield</strong>, is measured against what you actually paid: ($0.96 ÷ $99.04) × (365 ÷ 91), or about 3.89% annualized. That is why the quoted discount rate always understates your real yield slightly. You can hold the bill to maturity or sell it any day in a liquid secondary market.</p>
+
+<p>The video's final defense step tells viewers to keep cash "concentrated strictly in zero to three-month ultra-short treasury bills and repo funds." To see why, take the numbers he gives for a typical leveraged fund. The 10-year yield opened at 5.16% and touched 5.27%, an 11-basis-point rise. A 10-year note has a duration of roughly 8, so its price falls about 0.9% (8 × 0.11%). That sounds trivial until you apply the 20-to-1 leverage he describes. It becomes a loss of about 18% of the fund's equity in a single session. A 3-month bill has a duration of about 0.25, so the same yield move costs around 0.03%. That gap is why bills are the "principal protection" tool.</p>
+
+<p>Traders and investors use bills in several ways. The first is as a parking spot for cash, or "dry powder," which the video stresses. Cash in bills earns a real, positive yield while you wait for forced sellers to push good assets to fire-sale prices. The second is as collateral: institutions pledge bills in the overnight repo market, and the video cites financing at about 3.88%, tied to <strong>SOFR</strong>, the Secured Overnight Financing Rate. The third is as a signal. The bill yield tells you where the market expects the Fed to go. When bills yield more than the 10-year, the curve is inverted, and that has historically been a recession warning. Bills are also used in ladders, with a new bill maturing every few weeks.</p>
+
+<p>A <strong>repo fund</strong> is often grouped with T-bills, but it is a different product. In a repo (repurchase agreement), one party sells securities such as Treasuries and agrees to buy them back tomorrow at a slightly higher price. The difference is the overnight interest rate. Government money market funds and repo funds lend cash against that collateral, and they hold bills as well. Their yield tracks SOFR and resets almost daily, so it rises quickly when the Fed hikes. The video notes overnight repo volumes above $3 trillion a day, which shows how central this plumbing is. The tradeoff is that a fund holds no single bill to maturity. You get a floating yield and same-day liquidity in place of a locked-in rate.</p>
+
+<p>There are gotchas. "Risk-free" means no credit risk, not no risk. Inflation can still outrun your yield, so a 3.9% bill is a loss in real terms if inflation runs at 5%. <strong>Reinvestment risk</strong> is the mirror image of the video's warning about long bonds. If rates fall, your bill matures and you must roll it into a lower yield, whereas a 10-year would have locked in the higher rate. Bills also carry no FDIC insurance because they are Treasury securities, and interest is taxed federally as ordinary income. It is exempt from state and local income tax, which helps in high-tax states. Finally, a bill sold before maturity can trade slightly above or below your purchase price, though the swing is small.</p>
+
+<p>The scenarios where the "safe" choice fails are rare, but they exist. Bills can be disrupted by a debt-ceiling standoff. In those episodes, bills maturing near the projected default date have briefly traded at noticeably higher yields, and the 2011 downgrade of U.S. credit rating showed the political risk is real. Money market funds are a separate hazard: in 2008 the Reserve Primary Fund "broke the buck" and fell below $1.00 per share after Lehman losses. Prime funds holding commercial paper carry more risk than government-only funds. Both problems are far less likely than the video's own scenario, and they are one reason to prefer a government-only fund or actual bills over a fund that reaches for extra yield.</p>
+
+<p>T-bills connect to nearly every idea in the video. The whole cascade began at the long end: a rising 10-year yield cut bond prices, triggered variation margin calls, and forced traders to sell whatever they could sell, including gold and silver. Bills sit at the opposite end of that chain. They are what leveraged funds and prime brokers want as cash collateral, and they hold their value while everything else is being liquidated. The video also points out that when bills yield a clean 3.9% or more, institutions are "unwilling to pay premium multiples for risk assets." That links bills to discounted cash flow valuation, because the risk-free rate is the denominator, and to opportunity cost. In his words:</p>
+
+<blockquote>"Those deliver real positive yield, protect every dime of principal, and give you dry powder to deploy when forced liquidations drive quality assets down to fire sale valuations."</blockquote>
+
+<p>One caution on the source. The transcript is an auto-generated caption of a commentary video. It gives the 10-year's session high as both 5.27% and 5.77%, and the 5.27% figure appears throughout the argument, so treat the exact levels as unverified. The mechanism holds either way: rising long-term yields hurt leveraged bond holders, and short bills barely move. Also, the video is a market opinion. Holding cash in bills is a defensive choice with a cost, since it gives up the gains from stocks or long bonds if the selloff reverses. The sound takeaway is that T-bills are a place to be paid while you wait, sized to how much flexibility and safety you need, not a prediction that risk assets will keep falling.</p>
+<div class="concept-side">Related in this category: <a href="two_year_treasury_yield.html">Two-Year Treasury Yield</a>, <a href="thirty_year_treasury_bond.html">30-Year Treasury Bond</a>, <a href="interest_coverage_ratio.html">Interest Coverage Ratio</a>, <a href="debt_rollover_risk.html">Debt Rollover Risk</a>, <a href="farm_debt_to_asset_ratio.html">Farm Debt-to-Asset Ratio</a>, <a href="farm_debt_service_ratio.html">Farm Debt Service Ratio</a></div>
+<button class="concept-done" data-slug="treasury_bills" onclick="toggleDone('treasury_bills')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_treasury_bills';</script>
+<script src="../../book.js"></script>
+<script src="../fg.js"></script>
+</body>
+</html>
