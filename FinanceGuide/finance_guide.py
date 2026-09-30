@@ -969,6 +969,9 @@ PAGE_CSS = """
 .prog-chart .here { stroke:#9a5a22; stroke-width:1; stroke-dasharray:2 3; opacity:0.6; }
 .prog-chart .dlabel { font-size:11px; fill:#3a2e1e; }
 .prog-chart .bar { fill:#9a5a22; opacity:0.75; }
+.prog-chart .bar.spike { fill:#6b3410; opacity:1; }
+.prog-legend .lg-spike::before { border-color:#6b3410; border-top-width:6px; }
+.prog-spikes { font-size:0.88rem; color:#5a3e1a; margin:-0.8rem 0 1.5rem; }
 .prog-chart .bar-model { fill:none; stroke:#0e9488; stroke-width:2; stroke-dasharray:6 4; }
 .prog-chart .hit { fill:transparent; cursor:crosshair; }
 .prog-tip { position:absolute; pointer-events:none; display:none;
@@ -1267,7 +1270,7 @@ def _videos_this_week_html(processed, concepts):
 
 # === PROGRESS: "how close is the guide to running out?" ===
 def _video_series(processed, concepts):
-    """Chronological (date, new_concepts) per processed video, counting the
+    """Chronological (date, new_concepts, video_id) per processed video, counting the
     concepts that actually exist in the guide today (each credited to its
     earliest source video), so the curve matches the shelf count even after
     manual pruning or merges.  A concept with no known source is credited to
@@ -1281,7 +1284,7 @@ def _video_series(processed, concepts):
     for c in concepts.values():
         hits = [order[x] for x in c.get("sources", []) if x in order]
         counts[min(hits) if hits else 0] += 1
-    return [(ts, n) for (ts, _), n in zip(vids, counts)]
+    return [(ts, n, vid) for (ts, vid), n in zip(vids, counts)]
 
 
 def _fit_saturation(cum):
@@ -1311,6 +1314,11 @@ def _fit_saturation(cum):
     return best[1], best[2]
 
 
+SPIKE_MIN = 8       # a new-topic spike brings at least this many concepts...
+SPIKE_RATIO = 2.0   # ...and at least this multiple of the curve's rate there
+QUIET_WINDOW = 5    # recent non-spike videos averaged for "between topics"
+
+
 def _progress_model(processed, concepts):
     """Everything the progress page and index teaser need, or None."""
     import math
@@ -1318,7 +1326,7 @@ def _progress_model(processed, concepts):
     if len(series) < 5:
         return None
     cum, total = [], 0
-    for i, (ts, n) in enumerate(series, 1):
+    for i, (ts, n, _) in enumerate(series, 1):
         total += n
         cum.append((i, total))
     fit = _fit_saturation(cum)
@@ -1334,7 +1342,20 @@ def _progress_model(processed, concepts):
     last = datetime.strptime(series[-1][0][:10], "%Y-%m-%d")
     days = max(1, (last - first).days)
     per_day = n_now / days
+    # Spikes: a video that brings far more than the curve expects is the
+    # channel's first real visit to a new topic.  The curve is a staircase
+    # of these, so "videos since the last one" and how low the stretches
+    # between them run say more about running out than the smooth fit.
+    spikes = [(i, n, processed.get(vid, {}).get("title", vid))
+              for i, (ts, n, vid) in enumerate(series, 1)
+              if n >= SPIKE_MIN and n >= SPIKE_RATIO * (K / tau) * math.exp(-i / tau)]
+    last_spike = spikes[-1] if spikes else None
+    spike_ns = {i for i, _, _ in spikes}
+    quiet = [n for i, (_, n, _) in enumerate(series, 1) if i not in spike_ns][-QUIET_WINDOW:]
     return {
+        "spikes": spikes, "last_spike": last_spike,
+        "since_spike": n_now - last_spike[0] if last_spike else n_now,
+        "quiet": sum(quiet) / len(quiet) if quiet else None,
         "series": series, "cum": cum, "K": K, "tau": tau, "n_now": n_now,
         "total": total, "remaining": max(0, K - total), "rate_now": rate_now,
         "videos_to_lt1": max(0, n_lt1 - n_now), "videos_to_lt05": max(0, n_lt05 - n_now),
@@ -1352,6 +1373,27 @@ def _progress_teaser(m):
         if m["days_to_lt1"] is not None else ""
     return (f'<p class="prog-link"><a href="progress.html">Running out? &rarr;</a> '
             f'est. ceiling ~{m["K"]} concepts, ~{m["remaining"]} to go{wk}</p>')
+
+
+def _spike_line(m):
+    """One line under the bar chart: the last new-topic spike, how long ago,
+    and how quiet the videos between spikes are."""
+    ls = m["last_spike"]
+    if not ls:
+        return ('<p class="prog-spikes">No new-topic spikes yet: every video '
+                'has stayed close to the curve.</p>')
+    n, new, title = ls
+    since = m["since_spike"]
+    when = ("that was the latest video" if since == 0 else
+            f"{since} video{'s' if since != 1 else ''} since")
+    parts = [f'<b>Last new topic:</b> video {n}, &ldquo;{_esc(title)}&rdquo; '
+             f'(+{new}) &middot; {when}']
+    if m["quiet"] is not None:
+        parts.append(f"between topics: {m['quiet']:.1f} new/video "
+                     f"(last {QUIET_WINDOW} non-spike videos)")
+    parts.append(f"{len(m['spikes'])} spike{'s' if len(m['spikes']) != 1 else ''} "
+                 f"so far (&ge;{SPIKE_MIN} new and &ge;{SPIKE_RATIO:g}&times; the curve)")
+    return f'<p class="prog-spikes">{" &middot; ".join(parts)}</p>'
 
 
 def _progress_html(m, concepts):
@@ -1394,7 +1436,7 @@ def _progress_html(m, concepts):
                          for n in range(0, n_end + 1))
     actual_pts = " ".join(f"{X(n):.1f},{Y(t):.1f}" for n, t in m["cum"])
     dots, hits = [], []
-    for (n, t), (ts, new) in zip(m["cum"], m["series"]):
+    for (n, t), (ts, new) in zip(m["cum"], [x[:2] for x in m["series"]]):
         dots.append(f'<circle class="actual-dot" cx="{X(n):.1f}" cy="{Y(t):.1f}" r="3.5"/>')
         hits.append(f'<rect class="hit" x="{X(n) - pw / n_end / 2:.1f}" y="{T}" '
                     f'width="{pw / n_end:.1f}" height="{ph}" '
@@ -1428,16 +1470,22 @@ def _progress_html(m, concepts):
     # new-per-video bars + model rate
     H2, B2 = 150, 26
     ph2 = H2 - T - B2
-    r_max = max([n for _, n in m["series"]] + [K / tau]) * 1.1
+    r_max = max([x[1] for x in m["series"]] + [K / tau]) * 1.1
 
     def Y2(v):
         return T + ph2 * (1 - v / r_max)
 
     bars = []
     bw = max(2, pw / n_end - 2)
-    for (n, t), (ts, new) in zip(m["cum"], m["series"]):
-        bars.append(f'<rect class="bar" x="{X(n) - bw / 2:.1f}" y="{Y2(new):.1f}" '
-                    f'width="{bw:.1f}" height="{max(0, Y2(0) - Y2(new)):.1f}" rx="2"/>')
+    spike_ns = {sn for sn, _, _ in m["spikes"]}
+    for (n, t), (ts, new) in zip(m["cum"], [x[:2] for x in m["series"]]):
+        cls = "bar spike" if n in spike_ns else "bar"
+        bars.append(f'<rect class="{cls}" x="{X(n) - bw / 2:.1f}" y="{Y2(new):.1f}" '
+                    f'width="{bw:.1f}" height="{max(0, Y2(0) - Y2(new)):.1f}" rx="2">'
+                    f'<title>Video {n}: +{new} new</title></rect>')
+        if n in spike_ns:
+            bars.append(f'<text class="dlabel" x="{X(n):.1f}" y="{Y2(new) - 4:.1f}" '
+                        f'text-anchor="middle">{new}</text>')
     rate_pts = " ".join(f"{X(n):.1f},{Y2((K / tau) * math.exp(-n / tau)):.1f}"
                         for n in range(1, n_end + 1))
     one_y = Y2(1)
@@ -1456,8 +1504,10 @@ def _progress_html(m, concepts):
 </div>
 <div class="prog-legend">
  <span class="lg-actual">New concepts per video</span>
+ <span class="lg-spike">New-topic spike</span>
  <span class="lg-model">Model rate (K/&tau;)&middot;e<sup>&minus;n/&tau;</sup></span>
-</div>"""
+</div>
+{_spike_line(m)}"""
 
     flags = Counter(concept_flag(c) for c in concepts.values())
     total_words = sum(_words(c) for c in concepts.values())
@@ -1519,8 +1569,10 @@ concepts at video n is (K/&tau;)&middot;e<sup>&minus;n/&tau;</sup>, which is
 {n_lt1}. At the channel's pace of {m['per_day']:.1f} videos a day, that
 is roughly {wk1} away.</p>
 <p class="prog-note">Caveats: this is one channel's vocabulary fitted with two
-parameters, so treat it as a trend line, not a promise. If the presenter
-starts a new topic series the ceiling moves up. The tail is mostly deep
+parameters, so treat it as a trend line, not a promise. When the presenter
+opens a topic the channel hasn't covered, that video spikes (the dark bars
+above) and the ceiling moves up a little; each spike should be smaller and
+further from the last. The tail is mostly deep
 cuts, so the must-know material will feel finished a week or two before
 the bot literally goes quiet. When a few weeks pass with nothing new
 starred or standard, the goal is met &mdash; turn on "Hide deep cuts",
@@ -1528,7 +1580,7 @@ finish what's left, and go read books.</p>
 <h2 id="table">The data</h2>
 <table class="prog-table" role="presentation">
 <tr><th>#</th><th>Date</th><th>New</th><th>Total</th><th>Model</th></tr>
-{"".join(f"<tr><td>{n}</td><td>{ts[:10]}</td><td>{new}</td><td>{t}</td><td>{K * (1 - math.exp(-n / tau)):.0f}</td></tr>" for (n, t), (ts, new) in zip(m['cum'], m['series']))}
+{"".join(f"<tr><td>{n}</td><td>{ts[:10]}</td><td>{new}</td><td>{t}</td><td>{K * (1 - math.exp(-n / tau)):.0f}</td></tr>" for (n, t), (ts, new) in zip(m['cum'], [x[:2] for x in m['series']]))}
 </table>
 <script>
 (function(){{
