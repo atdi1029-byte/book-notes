@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>FDIC Quarterly Banking Profile - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.prog-stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(112px,1fr));
+  gap:10px; margin:1rem 0 1.5rem; }
+.prog-stat { background:#e8e0d0; border:1px solid #d4c8b0; border-radius:8px;
+  padding:0.7rem 0.9rem; }
+.prog-stat .n { display:block; font-size:1.5rem; color:#5a3e1a; line-height:1.1; }
+.prog-stat .l { display:block; font-size:0.75rem; color:#8a7a60; margin-top:0.2rem; }
+.prog-chart { position:relative; margin:0.5rem 0 0.4rem; }
+.prog-chart svg { width:100%; height:auto; display:block; overflow:visible; }
+.prog-chart .grid { stroke:#ddd3c0; stroke-width:1; }
+.prog-chart .axis { stroke:#c8bca4; stroke-width:1; }
+.prog-chart .tick { fill:#8a7a60; font-size:11px; }
+.prog-chart .ylab { fill:#8a7a60; font-size:11px; }
+.prog-chart .actual { fill:none; stroke:#9a5a22; stroke-width:2; stroke-linejoin:round; }
+.prog-chart .actual-dot { fill:#9a5a22; stroke:#f4efe8; stroke-width:2; }
+.prog-chart .model { fill:none; stroke:#0e9488; stroke-width:2; stroke-dasharray:6 4; }
+.prog-chart .ceiling { stroke:#8a7a60; stroke-width:1; stroke-dasharray:2 4; }
+.prog-chart .here { stroke:#9a5a22; stroke-width:1; stroke-dasharray:2 3; opacity:0.6; }
+.prog-chart .dlabel { font-size:11px; fill:#3a2e1e; }
+.prog-chart .bar { fill:#9a5a22; opacity:0.75; }
+.prog-chart .bar-model { fill:none; stroke:#0e9488; stroke-width:2; stroke-dasharray:6 4; }
+.prog-chart .hit { fill:transparent; cursor:crosshair; }
+.prog-tip { position:absolute; pointer-events:none; display:none;
+  background:#3a2e1e; color:#f4efe8; font-size:12px; line-height:1.4;
+  padding:6px 9px; border-radius:6px; white-space:nowrap; z-index:5; }
+.prog-legend { display:flex; gap:1.2rem; font-size:0.8rem; color:#5a3e1a;
+  margin:0 0 1.5rem; flex-wrap:wrap; }
+.prog-legend span::before { content:""; display:inline-block; width:18px; height:0;
+  border-top:2px solid; margin-right:6px; vertical-align:middle; }
+.prog-legend .lg-actual::before { border-color:#9a5a22; }
+.prog-legend .lg-model::before { border-color:#0e9488; border-top-style:dashed; }
+.prog-legend .lg-ceiling::before { border-color:#8a7a60; border-top-style:dotted; }
+.prog-eq { background:#e8e0d0; border:1px solid #d4c8b0; border-radius:8px;
+  padding:0.9rem 1.1rem; font-family:Georgia,serif; font-size:1.05rem; color:#3a2e1e;
+  margin:1rem 0; }
+.prog-eq .sub { display:block; font-size:0.85rem; color:#8a7a60; margin-top:0.4rem;
+  font-family:inherit; }
+.prog-note { font-size:0.85rem; color:#8a7a60; }
+.prog-link { font-size:0.85rem; margin:-0.8rem 0 1.2rem; }
+.prog-link a { color:#0e9488; }
+table.prog-table { font-size:0.85rem; margin:1rem 0; }
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.tier .tier-desc { color: #a08060; font-size: 0.85rem; margin: 0.4rem 0 0.8rem; }
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done,
+body.hide-done .cat-card.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+.vid-tab {
+  margin: 0 0 1.2rem; background: #e8e0d0; border: 1px solid #d4c8b0;
+  border-radius: 8px; overflow: hidden;
+}
+.vid-tab summary {
+  padding: 0.6rem 0.9rem; cursor: pointer; font-size: 0.85rem;
+  color: #3a2a1a; list-style: none; user-select: none;
+}
+.vid-tab summary::-webkit-details-marker { display: none; }
+.vid-tab summary::before {
+  content: '▶'; display: inline-block; margin-right: 0.5rem;
+  font-size: 0.7rem; transition: transform 0.2s;
+}
+.vid-tab[open] summary::before { transform: rotate(90deg); }
+.vid-tab .vid-status {
+  float: right; font-size: 0.75rem; padding: 0.15rem 0.5rem;
+  border-radius: 3px; margin-left: 0.5rem;
+}
+.vid-tab .vid-ok { background: #4ade8040; color: #2d6a4f; }
+.vid-tab .vid-err { background: #f8717140; color: #9b2c2c; }
+.vid-tab .vid-list {
+  padding: 0 0.9rem 0.7rem; margin: 0;
+  list-style: none; font-size: 0.8rem;
+}
+.vid-tab .vid-list li {
+  padding: 0.35rem 0; border-top: 1px solid #d4c8b0;
+  display: flex; justify-content: space-between; gap: 8px;
+}
+.vid-tab .vid-list .vid-date {
+  color: #a08060; white-space: nowrap; flex: none;
+}
+.vid-tab .vid-list .vid-concepts {
+  color: #a08060; white-space: nowrap; flex: none; font-size: 0.75rem;
+}
+.vid-tab .vid-none {
+  padding: 0.4rem 0.9rem 0.7rem; color: #a08060; font-size: 0.8rem;
+}
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../economic-indicators.html">&larr; Economic Indicators</a>
+
+<div class="concept-meta"><span>deep cut</span><span>Economic Indicators</span><span>added 2026-09-30</span></div>
+<h4 id="fdic_quarterly_banking_profile">FDIC Quarterly Banking Profile</h4>
+
+<p>The <strong>FDIC Quarterly Banking Profile</strong> (QBP) is a public report the Federal Deposit Insurance Corporation publishes every quarter. It summarizes the financial health of every FDIC-insured bank and savings institution in the United States, roughly 4,500 of them. The data comes from <strong>Call Reports</strong>, standardized financial statements each bank must file with regulators. The QBP adds them up into industry totals: net income, loan growth, deposits, capital levels, problem banks, and <strong>unrealized losses on securities</strong>. Think of it as a quarterly physical exam for the whole banking system. It is not a forecast or an opinion. It is a scoreboard built from filings the banks themselves sign.</p>
+
+<p>The QBP matters because banks sit between your savings and the real economy. They take deposits and turn them into mortgages, business lines, car loans, and credit cards. When the QBP shows loans shrinking, credit standards tightening, or capital thinning, that eventually shows up in your borrowing costs and in whether a local business can make payroll. Investors read it as the official record of bank stress. Depositors read it to judge safety. Policymakers use it to decide whether the system needs help. The video's $325.1 billion unrealized-loss figure, up $19 billion in one quarter, comes from this report. It is a real, publicly available number, not a secret.</p>
+
+<p>Mechanically, the process runs like this. Each bank files a Call Report after quarter-end. It lists assets, liabilities, income, and securities holdings, including the fair (market) value of each bond portfolio compared with what the bank paid. Securities sit in two buckets. <strong>Available-for-sale (AFS)</strong> securities are marked to market, so price changes flow through capital measures. <strong>Held-to-maturity (HTM)</strong> securities are carried at amortized cost, and the bank says it will hold them until they mature. Banks still must disclose the market value of HTM bonds. The FDIC totals the gap between market value and book value across all banks. That gap is the <strong>unrealized loss</strong>, and it swings mostly with interest rates, because bond prices fall when yields rise.</p>
+
+<p>The video's "frozen ice box" story maps onto this well. A restaurateur pays $100,000 for wagyu beef, locks it in a freezer, labels it "held to maturity," and never has to write it down unless he sells. Banks did something similar with low-coupon Treasuries and mortgage-backed securities bought when yields were near zero. If a bank holds a 1.5% bond while new bonds pay 4% or more, the old bond is worth less than face value. Nothing is lost on paper as long as the bank never sells. The QBP figure is the report that opens the freezer door and shows what the meat would fetch today. The number was $325.1 billion, up about $19 billion from the prior quarter.</p>
+
+<blockquote>"He padlocks the freezer door. He labels the inventory held to maturity... as long as he never opens that door, he doesn't have to admit that the meat is spoiled."</blockquote>
+
+<p>Traders and analysts use the QBP in a few practical ways. First, they track the direction of unrealized losses. A rise usually means yields climbed during the quarter, and a decline means yields fell. That makes it a rough gauge of how much rate risk is embedded in bank balance sheets. Second, they compare losses against <strong>capital</strong>. A $325 billion loss spread across the whole industry is small next to trillions in equity. The same loss concentrated in a few banks with thin capital and lots of uninsured deposits is dangerous. Third, they watch the "Problem Bank List," net interest margins, and deposit trends. A worsening combination of all of these is the real warning signal.</p>
+
+<p>The number's gotchas need care, and the video overstates several of them. The figure covers the entire industry, including the largest banks, not just regional lenders. Unrealized losses are not realized losses. A bank holding a bond to maturity gets its full principal back, so the loss shrinks toward zero as the bond ages and as rates fall. The peak was roughly $680 billion in late 2023, so $325 billion is less than half of the worst reading, and the FDIC published it openly rather than hiding it. Claims that regulators are "hiding insolvency" or that tangible equity is "functionally zero" across regional banks are opinions, not something the QBP shows. Averages also hide dispersion: most banks are fine, and a minority carry the real risk.</p>
+
+<p>The 2023 episode shows how the risk actually breaks. Silicon Valley Bank held large HTM portfolios, and most of its deposits were uninsured. When depositors got nervous, they withdrew. SVB had to sell bonds to meet the outflows, and selling turned paper losses into real ones, wiping out its capital. The failure needed three ingredients together: large unrealized losses, concentrated uninsured deposits, and a run. That is why the risk is a liquidity and confidence problem, not simply an accounting one. The padlock only holds while depositors stay calm. If a bank is forced to sell, the loophole disappears at exactly the moment it is needed most.</p>
+
+<p>The video argues that these losses squeeze lending: banks shrink loan books, tighten HELOC and small-business credit, and add deposit friction. Some of that is plausible. Banks under capital or liquidity pressure do tighten standards, and the QBP's loan growth data and the Fed's Senior Loan Officer Survey show whether that is happening. But claims like "60% of qualified HELOC applicants denied" are not in the QBP and should be checked against sources. The video's protective steps are common-sense risk management: keep balances within the <strong>$250,000 FDIC insurance limit</strong> per depositor, per bank, per ownership category, consider sweep networks such as IntraFi (formerly CDARS and ICS) that spread large balances across insured banks, and hold Treasury bills directly if you want no bank counterparty risk.</p>
+
+<p>The QBP connects to several other ideas. <strong>Interest-rate risk</strong> and <strong>duration</strong> explain why bond prices fall when rates rise. <strong>Net interest margin</strong> measures the gap between what a bank earns on assets and pays on deposits, and it gets squeezed when old low-yield bonds are funded with expensive deposits. <strong>Deposit insurance</strong> and <strong>uninsured deposit concentration</strong> determine who is likely to run. <strong>Capital ratios</strong> show the cushion available to absorb losses. To use the report well, read the headline unrealized-loss figure alongside those measures: how big the loss is compared with capital, who holds it, how sticky the deposits are, and which way rates are heading. That is what separates a scary number from an actual threat.</p>
+<div class="concept-side">Related in this category: <a href="non_farm_payroll_report.html">Non-Farm Payroll (NFP) Report</a>, <a href="u6_unemployment_rate.html">U6 Unemployment Rate (Broad Labor Underutilization)</a>, <a href="adp_employment_report.html">ADP National Employment Report</a>, <a href="payroll_data_revision.html">Payroll Data Revision (BLS Benchmark Revision)</a>, <a href="challenger_gray_christmas_layoff_report.html">Challenger, Gray &amp; Christmas Job Cut Report</a>, <a href="average_hourly_earnings.html">Average Hourly Earnings (Wage Growth)</a></div>
+<button class="concept-done" data-slug="fdic_quarterly_banking_profile" onclick="toggleDone('fdic_quarterly_banking_profile')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_fdic_quarterly_banking_profile';</script>
+<script src="../../book.js"></script>
+<script src="../fg.js"></script>
+</body>
+</html>

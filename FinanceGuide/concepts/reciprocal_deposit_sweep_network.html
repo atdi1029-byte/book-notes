@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Reciprocal Deposit Networks (IntraFi / CDARS) - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.prog-stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(112px,1fr));
+  gap:10px; margin:1rem 0 1.5rem; }
+.prog-stat { background:#e8e0d0; border:1px solid #d4c8b0; border-radius:8px;
+  padding:0.7rem 0.9rem; }
+.prog-stat .n { display:block; font-size:1.5rem; color:#5a3e1a; line-height:1.1; }
+.prog-stat .l { display:block; font-size:0.75rem; color:#8a7a60; margin-top:0.2rem; }
+.prog-chart { position:relative; margin:0.5rem 0 0.4rem; }
+.prog-chart svg { width:100%; height:auto; display:block; overflow:visible; }
+.prog-chart .grid { stroke:#ddd3c0; stroke-width:1; }
+.prog-chart .axis { stroke:#c8bca4; stroke-width:1; }
+.prog-chart .tick { fill:#8a7a60; font-size:11px; }
+.prog-chart .ylab { fill:#8a7a60; font-size:11px; }
+.prog-chart .actual { fill:none; stroke:#9a5a22; stroke-width:2; stroke-linejoin:round; }
+.prog-chart .actual-dot { fill:#9a5a22; stroke:#f4efe8; stroke-width:2; }
+.prog-chart .model { fill:none; stroke:#0e9488; stroke-width:2; stroke-dasharray:6 4; }
+.prog-chart .ceiling { stroke:#8a7a60; stroke-width:1; stroke-dasharray:2 4; }
+.prog-chart .here { stroke:#9a5a22; stroke-width:1; stroke-dasharray:2 3; opacity:0.6; }
+.prog-chart .dlabel { font-size:11px; fill:#3a2e1e; }
+.prog-chart .bar { fill:#9a5a22; opacity:0.75; }
+.prog-chart .bar-model { fill:none; stroke:#0e9488; stroke-width:2; stroke-dasharray:6 4; }
+.prog-chart .hit { fill:transparent; cursor:crosshair; }
+.prog-tip { position:absolute; pointer-events:none; display:none;
+  background:#3a2e1e; color:#f4efe8; font-size:12px; line-height:1.4;
+  padding:6px 9px; border-radius:6px; white-space:nowrap; z-index:5; }
+.prog-legend { display:flex; gap:1.2rem; font-size:0.8rem; color:#5a3e1a;
+  margin:0 0 1.5rem; flex-wrap:wrap; }
+.prog-legend span::before { content:""; display:inline-block; width:18px; height:0;
+  border-top:2px solid; margin-right:6px; vertical-align:middle; }
+.prog-legend .lg-actual::before { border-color:#9a5a22; }
+.prog-legend .lg-model::before { border-color:#0e9488; border-top-style:dashed; }
+.prog-legend .lg-ceiling::before { border-color:#8a7a60; border-top-style:dotted; }
+.prog-eq { background:#e8e0d0; border:1px solid #d4c8b0; border-radius:8px;
+  padding:0.9rem 1.1rem; font-family:Georgia,serif; font-size:1.05rem; color:#3a2e1e;
+  margin:1rem 0; }
+.prog-eq .sub { display:block; font-size:0.85rem; color:#8a7a60; margin-top:0.4rem;
+  font-family:inherit; }
+.prog-note { font-size:0.85rem; color:#8a7a60; }
+.prog-link { font-size:0.85rem; margin:-0.8rem 0 1.2rem; }
+.prog-link a { color:#0e9488; }
+table.prog-table { font-size:0.85rem; margin:1rem 0; }
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.tier .tier-desc { color: #a08060; font-size: 0.85rem; margin: 0.4rem 0 0.8rem; }
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done,
+body.hide-done .cat-card.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+.vid-tab {
+  margin: 0 0 1.2rem; background: #e8e0d0; border: 1px solid #d4c8b0;
+  border-radius: 8px; overflow: hidden;
+}
+.vid-tab summary {
+  padding: 0.6rem 0.9rem; cursor: pointer; font-size: 0.85rem;
+  color: #3a2a1a; list-style: none; user-select: none;
+}
+.vid-tab summary::-webkit-details-marker { display: none; }
+.vid-tab summary::before {
+  content: '▶'; display: inline-block; margin-right: 0.5rem;
+  font-size: 0.7rem; transition: transform 0.2s;
+}
+.vid-tab[open] summary::before { transform: rotate(90deg); }
+.vid-tab .vid-status {
+  float: right; font-size: 0.75rem; padding: 0.15rem 0.5rem;
+  border-radius: 3px; margin-left: 0.5rem;
+}
+.vid-tab .vid-ok { background: #4ade8040; color: #2d6a4f; }
+.vid-tab .vid-err { background: #f8717140; color: #9b2c2c; }
+.vid-tab .vid-list {
+  padding: 0 0.9rem 0.7rem; margin: 0;
+  list-style: none; font-size: 0.8rem;
+}
+.vid-tab .vid-list li {
+  padding: 0.35rem 0; border-top: 1px solid #d4c8b0;
+  display: flex; justify-content: space-between; gap: 8px;
+}
+.vid-tab .vid-list .vid-date {
+  color: #a08060; white-space: nowrap; flex: none;
+}
+.vid-tab .vid-list .vid-concepts {
+  color: #a08060; white-space: nowrap; flex: none; font-size: 0.75rem;
+}
+.vid-tab .vid-none {
+  padding: 0.4rem 0.9rem 0.7rem; color: #a08060; font-size: 0.8rem;
+}
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../personal-finance-basics.html">&larr; Personal Finance Basics</a>
+
+<div class="concept-meta"><span>deep cut</span><span>Personal Finance Basics</span><span>added 2026-09-30</span></div>
+<h4 id="reciprocal_deposit_sweep_network">Reciprocal Deposit Networks (IntraFi / CDARS)</h4>
+
+<p>A <strong>reciprocal deposit network</strong> is a service that lets you keep a very large sum at one bank while spreading the actual dollars across many banks, so that every dollar sits under the federal deposit insurance limit. The best-known operator is <strong>IntraFi</strong>, whose products are called <strong>ICS</strong> (Insured Cash Sweep) and <strong>CDARS</strong> (Certificate of Deposit Account Registry Service). You deal with one bank, sign one agreement and get one statement. Behind the scenes, your money is split into pieces of up to $250,000, and each piece is placed at a different member bank. The FDIC insures $250,000 per depositor, per bank, per ownership category. A network turns that per-bank cap into a per-network capacity of many millions.</p>
+
+<p>Why does this matter? The FDIC limit of $250,000 is tiny compared with what a business needs to run. A company with a $3 million payroll account, a homeowners' association with a reserve fund, or a family that just sold a house all hold balances far above the cap. Anything above $250,000 is an <strong>uninsured deposit</strong>, and its safety depends entirely on the bank staying solvent. The video describes sophisticated depositors and corporate treasurers who "sweep their liquidity out of regional banks" once they notice a bank is paying almost nothing while sitting on hidden losses. Reciprocal networks are the other answer to that fear: keep the relationship, remove the counterparty risk.</p>
+
+<p>Here is the mechanism, step by step. First, you open an account at a member bank, your <strong>relationship bank</strong>, and deposit, say, $2 million. Second, the bank places your funds through the network. It "sends out" $250,000 slices to other member banks, and in exchange it "receives" matching slices from those banks' customers. This exchange is the "reciprocal" part. Third, each recipient bank holds your slice as a deposit in your name, so each slice carries its own $250,000 of FDIC coverage. Fourth, your relationship bank keeps the full $2 million on its own books, because it receives $2 million back from others. You see one balance, one statement, one login. The network handles the bookkeeping across dozens of institutions.</p>
+
+<p>Take a concrete case. A contractor holds $2.4 million in operating cash at a regional bank. That amount exceeds the limit by $2.15 million. Through ICS, the bank divides the $2.4 million across roughly ten banks, each holding $240,000 or less, and each fully insured. If the relationship bank failed tomorrow, only the slice it held itself would be in play, and even that would be covered. Compare this with the video's scenario: regional banks sitting on $325.1 billion of unrealized securities losses, quietly buying time by borrowing at 4% or more to backfill fleeing deposits. An uninsured depositor at such a bank is betting that the "padlock" on the held-to-maturity portfolio never has to open. A network removes that bet.</p>
+
+<p>How do investors and treasurers use it? The main users are businesses, municipalities, nonprofits, trusts and wealthy households that want a bank relationship (loans, wires, payroll, a local banker) but not the exposure. It is sold as <strong>full insurance with one point of contact</strong>. You can choose a demand-style sweep for cash you need daily, or CDARS-style term placements at fixed rates for cash you can lock up. Watch two things when you use it: the rate the bank offers, which is often below a Treasury bill or government money market fund, and the bank's own health signals, such as unrealized losses relative to equity, wholesale borrowing and deposit flight. Those tell you whether the relationship bank is a place you want to be even when your deposit is insured.</p>
+
+<p>Now the gotchas. First, insurance is not free. The relationship bank sets the rate, and it often pays less than the 4% you could earn in T-bills or a government money market fund, so the price of safety is lost yield. The video notes regional banks paying just 0.2% to 0.4% on consumer checking while T-bills paid over 4%. A sweep balance can land closer to the bank's low rate than to the market. Second, the arrangement does not make the bank stronger. It protects you, not the bank. Third, a network deposit is still a bank deposit. It doesn't earn interest like a Treasury bond and does not give you the same access to the market. Fourth, coverage depends on you tracking every other account you hold at member banks, because the $250,000 limit counts across all your accounts in the same ownership category at any one bank.</p>
+
+<p>Another common misconception is that a network is a magic shield. Suppose your $2 million is spread across eight banks and one of them fails. The FDIC steps in and pays up to $250,000, usually within a few business days. But you may briefly lose access to that slice, and interest accrued may need to be checked against the insured limit. Also note that the network usually treats every slice as a deposit at the receiving bank, so if you add other accounts at that bank, you can exceed the limit without realizing it. Placement limits and program caps also exist. IntraFi has capacity constraints, and a relationship bank may cap how much it will place for a single customer. Read the program agreement, and confirm that you can see the list of banks holding your money.</p>
+
+<p>What happens when it breaks? Networks are far sturdier than uninsured deposits, but they carry risks of their own. The relationship bank is the operational hub. If it fails, the FDIC pays out the insured slices at other banks, but the process of unwinding and reissuing the arrangement can freeze your operating cash at exactly the moment you need payroll. That is a real liquidity risk, even though it is not a principal loss. Also, the reciprocal design needs other banks to be willing to swap. In a system-wide panic, where many institutions are trying to send out deposits and few want to receive, capacity can dry up. Many banks have also moved toward one-way "sell" placements in recent years, which pay a fee and rely on the network's funding rather than reciprocal exchange. Insurance, meanwhile, ultimately rests on the FDIC's fund and the Treasury's backing.</p>
+
+<p>How does this connect to the rest of the video's story? The video's chain is: low-coupon bonds bought in 2020 and 2021, yields rising to more than 5%, a <strong>held-to-maturity</strong> accounting label that hides the loss, deposits leaving for higher yields, and banks paying up in wholesale markets to replace them. A reciprocal network is a defense at the depositor level. It ties directly to <strong>counterparty risk</strong>, <strong>deposit flight</strong> and <strong>uninsured deposit concentration</strong>, which was the trigger in the 2023 failures of Silicon Valley Bank and Signature Bank. The alternatives are Treasury bills, government money market funds and multiple direct accounts at separate banks. Each trades convenience against yield and safety. The lesson: if you hold more than $250,000 in a bank, know how much of it is insured, know what the bank is doing with its assets, and choose deliberately between a network, T-bills and a plain account.</p>
+<div class="concept-side">Related in this category: <a href="credit_score.html">Credit Score (FICO / VantageScore)</a>, <a href="used_vehicle_resale_value.html">Used Vehicle Resale Value (Residual Value)</a>, <a href="erisa_fiduciary_safe_harbor.html">ERISA Fiduciary Safe Harbor</a>, <a href="loan_amortization.html">Loan Amortization</a>, <a href="home_equity_line_of_credit.html">Home Equity Line of Credit (HELOC)</a>, <a href="margin_loan.html">Margin Loan</a></div>
+<button class="concept-done" data-slug="reciprocal_deposit_sweep_network" onclick="toggleDone('reciprocal_deposit_sweep_network')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_reciprocal_deposit_sweep_network';</script>
+<script src="../../book.js"></script>
+<script src="../fg.js"></script>
+</body>
+</html>

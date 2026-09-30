@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Available-for-Sale (AFS) Securities - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.prog-stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(112px,1fr));
+  gap:10px; margin:1rem 0 1.5rem; }
+.prog-stat { background:#e8e0d0; border:1px solid #d4c8b0; border-radius:8px;
+  padding:0.7rem 0.9rem; }
+.prog-stat .n { display:block; font-size:1.5rem; color:#5a3e1a; line-height:1.1; }
+.prog-stat .l { display:block; font-size:0.75rem; color:#8a7a60; margin-top:0.2rem; }
+.prog-chart { position:relative; margin:0.5rem 0 0.4rem; }
+.prog-chart svg { width:100%; height:auto; display:block; overflow:visible; }
+.prog-chart .grid { stroke:#ddd3c0; stroke-width:1; }
+.prog-chart .axis { stroke:#c8bca4; stroke-width:1; }
+.prog-chart .tick { fill:#8a7a60; font-size:11px; }
+.prog-chart .ylab { fill:#8a7a60; font-size:11px; }
+.prog-chart .actual { fill:none; stroke:#9a5a22; stroke-width:2; stroke-linejoin:round; }
+.prog-chart .actual-dot { fill:#9a5a22; stroke:#f4efe8; stroke-width:2; }
+.prog-chart .model { fill:none; stroke:#0e9488; stroke-width:2; stroke-dasharray:6 4; }
+.prog-chart .ceiling { stroke:#8a7a60; stroke-width:1; stroke-dasharray:2 4; }
+.prog-chart .here { stroke:#9a5a22; stroke-width:1; stroke-dasharray:2 3; opacity:0.6; }
+.prog-chart .dlabel { font-size:11px; fill:#3a2e1e; }
+.prog-chart .bar { fill:#9a5a22; opacity:0.75; }
+.prog-chart .bar-model { fill:none; stroke:#0e9488; stroke-width:2; stroke-dasharray:6 4; }
+.prog-chart .hit { fill:transparent; cursor:crosshair; }
+.prog-tip { position:absolute; pointer-events:none; display:none;
+  background:#3a2e1e; color:#f4efe8; font-size:12px; line-height:1.4;
+  padding:6px 9px; border-radius:6px; white-space:nowrap; z-index:5; }
+.prog-legend { display:flex; gap:1.2rem; font-size:0.8rem; color:#5a3e1a;
+  margin:0 0 1.5rem; flex-wrap:wrap; }
+.prog-legend span::before { content:""; display:inline-block; width:18px; height:0;
+  border-top:2px solid; margin-right:6px; vertical-align:middle; }
+.prog-legend .lg-actual::before { border-color:#9a5a22; }
+.prog-legend .lg-model::before { border-color:#0e9488; border-top-style:dashed; }
+.prog-legend .lg-ceiling::before { border-color:#8a7a60; border-top-style:dotted; }
+.prog-eq { background:#e8e0d0; border:1px solid #d4c8b0; border-radius:8px;
+  padding:0.9rem 1.1rem; font-family:Georgia,serif; font-size:1.05rem; color:#3a2e1e;
+  margin:1rem 0; }
+.prog-eq .sub { display:block; font-size:0.85rem; color:#8a7a60; margin-top:0.4rem;
+  font-family:inherit; }
+.prog-note { font-size:0.85rem; color:#8a7a60; }
+.prog-link { font-size:0.85rem; margin:-0.8rem 0 1.2rem; }
+.prog-link a { color:#0e9488; }
+table.prog-table { font-size:0.85rem; margin:1rem 0; }
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.tier .tier-desc { color: #a08060; font-size: 0.85rem; margin: 0.4rem 0 0.8rem; }
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done,
+body.hide-done .cat-card.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+.vid-tab {
+  margin: 0 0 1.2rem; background: #e8e0d0; border: 1px solid #d4c8b0;
+  border-radius: 8px; overflow: hidden;
+}
+.vid-tab summary {
+  padding: 0.6rem 0.9rem; cursor: pointer; font-size: 0.85rem;
+  color: #3a2a1a; list-style: none; user-select: none;
+}
+.vid-tab summary::-webkit-details-marker { display: none; }
+.vid-tab summary::before {
+  content: '▶'; display: inline-block; margin-right: 0.5rem;
+  font-size: 0.7rem; transition: transform 0.2s;
+}
+.vid-tab[open] summary::before { transform: rotate(90deg); }
+.vid-tab .vid-status {
+  float: right; font-size: 0.75rem; padding: 0.15rem 0.5rem;
+  border-radius: 3px; margin-left: 0.5rem;
+}
+.vid-tab .vid-ok { background: #4ade8040; color: #2d6a4f; }
+.vid-tab .vid-err { background: #f8717140; color: #9b2c2c; }
+.vid-tab .vid-list {
+  padding: 0 0.9rem 0.7rem; margin: 0;
+  list-style: none; font-size: 0.8rem;
+}
+.vid-tab .vid-list li {
+  padding: 0.35rem 0; border-top: 1px solid #d4c8b0;
+  display: flex; justify-content: space-between; gap: 8px;
+}
+.vid-tab .vid-list .vid-date {
+  color: #a08060; white-space: nowrap; flex: none;
+}
+.vid-tab .vid-list .vid-concepts {
+  color: #a08060; white-space: nowrap; flex: none; font-size: 0.75rem;
+}
+.vid-tab .vid-none {
+  padding: 0.4rem 0.9rem 0.7rem; color: #a08060; font-size: 0.8rem;
+}
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../accounting-financial-statements.html">&larr; Accounting &amp; Financial Statements</a>
+
+<div class="concept-meta"><span>standard</span><span>Accounting &amp; Financial Statements</span><span>added 2026-09-30</span></div>
+<h4 id="available_for_sale_securities">Available-for-Sale (AFS) Securities</h4>
+
+<p><strong>Available-for-sale (AFS) securities</strong> are debt securities, such as Treasuries, agency mortgage bonds, and corporate or municipal bonds, that a bank holds without committing to keep them until maturity. Under US accounting rule <strong>ASC 320</strong>, a bank has to sort each debt security it buys into a bucket: trading, held-to-maturity, or available-for-sale. AFS is the middle-ground bucket. The bank might sell the bond if it needs cash, if rates move, or if a better opportunity comes along, but it isn't actively trading it for quick profit. The defining rule is that AFS bonds are carried on the balance sheet at <strong>fair value</strong>, meaning roughly what the bond would sell for today.</p>
+
+<p>This matters because bonds are the second-largest asset on most bank balance sheets after loans, and a bond's price moves opposite to interest rates. When rates rise, existing low-coupon bonds lose value. Which bucket the bank chose decides how much of that loss the outside world sees in the bank's books. The video's central argument is that AFS is the "honest" bucket, where losses visibly reduce equity, and that held-to-maturity is the bucket where losses go unseen. That framing is useful but needs correcting, and I'll do that below. Either way, the AFS/HTM split explains why two banks holding identical bonds can report very different equity.</p>
+
+<p>Here is the mechanism step by step. First, the bank buys a bond at cost. Every quarter it marks the bond to market. Interest income still flows through the income statement as normal, and the bond's premium or discount is amortized. The difference between fair value and the bond's amortized cost is the <strong>unrealized gain or loss</strong>. That change is not booked to net income. It goes into <strong>accumulated other comprehensive income (AOCI)</strong>, a separate line inside shareholders' equity. So a $100 million AFS portfolio that falls to $75 million shrinks the asset side by $25 million, and equity falls by the same amount through AOCI. Net income stays unchanged until the bond is actually sold.</p>
+
+<p>The video describes how the losses came about. In 2020 and 2021, banks were flooded with stimulus deposits while cash earned roughly 0%, so treasurers reached for yield and bought 10-year and 30-year Treasuries and mortgage bonds paying about 1.5% to 2.2%. Then the Fed tightened. The video cites a Fed funds target near 4%, overnight SOFR at 3.88%, and the 10-year Treasury yield near 5.27%. Duration is just math. Take a 30-year, 2% coupon bond and reprice it at a 5% yield. Its value falls to roughly 54 cents on the dollar. A 10-year bond with the same coupon and the same yield jump falls to about 75 cents. If those bonds sit in AFS, every cent of that decline flows through AOCI into equity.</p>
+
+<p>Traders and investors use AFS accounting as a diagnostic. Bank analysts often compute <strong>tangible common equity (TCE)</strong>, meaning common equity minus goodwill and intangibles, and then adjust it for unrealized losses. The AFS piece is already sitting in AOCI on the balance sheet. The HTM piece has to be dug out of the footnotes, which disclose fair value next to amortized cost. Adding both gives an "economic" TCE ratio. Investors also look at the size of the securities book relative to equity, its average duration, and the share of the portfolio in AFS. A bank whose unrealized losses equal 40% or more of its tangible equity, and which also has runaway deposit outflows, is one to study closely. This is how analysts flagged trouble at Silicon Valley Bank before it failed in March 2023.</p>
+
+<blockquote>"If they place the bond in the available for sale bucket, any decline in value shows up on their reported balance sheet under accumulated other comprehensive income. It visibly reduces tangible common equity."</blockquote>
+
+<p>Now the gotchas, because the video's version is simplified. First, HTM losses are not truly "hidden." Banks must disclose the fair value of HTM securities in their filings, and the FDIC's $325.1 billion figure (up $19 billion in one quarter, as the video notes) covers unrealized losses on both AFS and HTM securities combined. Second, HTM bonds are not carried at "100 cents on the dollar." They're carried at amortized cost, which is what the bank paid, adjusted for premium or discount, and which can be well above or below par. Third, and most important, AOCI losses don't automatically reduce regulatory capital. Most banks below roughly $700 billion in assets have opted out of counting AOCI in their regulatory capital ratios. So AFS losses reduce accounting equity and TCE but often not the ratios regulators police. The video's claim that AFS losses "visibly" hit TCE is correct for TCE. It is not correct for regulatory Tier 1.</p>
+
+<p>Also, unrealized isn't the same as realized. A loss sitting in AOCI is a paper loss. If the bond is held to maturity or rates fall, the loss shrinks and eventually reverses as the bond's price pulls back toward par. Credit losses are different. If a bond is actually likely to default, the expected credit loss is recognized through an allowance and hits earnings. Treasuries and agency mortgage bonds carry essentially no credit risk, so their losses are purely interest-rate losses. This is why accountants and regulators argue over how alarming the number is. The loss is real in the sense that the bank could not sell the bonds today for what it paid. It only becomes permanent if the bank is forced to sell before prices recover.</p>
+
+<p>That last point is where the system breaks, and it's the heart of the video's "trap" argument. If deposits flee, as depositors move cash into T-bills and money market funds paying 4% or more, a bank needs cash. Selling AFS bonds turns a paper loss into a realized one, which hits net income and equity immediately. Selling even a sliver of HTM bonds is worse, because it can "taint" the whole HTM portfolio and force reclassification of all of it into AFS at fair value. So the video's picture is broadly right: the bank ends up borrowing at 4% or more from the Federal Home Loan Banks against assets yielding 2%, squeezing its <strong>net interest margin</strong>. SVB in 2023 is the textbook case. It sold roughly $21 billion of AFS bonds at a loss of about $1.8 billion, and the run followed.</p>
+
+<p>Finally, the connections. AFS is one half of a pair with <strong>held-to-maturity (HTM)</strong>, and the choice of bucket is really a choice about which numbers show up where, not about the bond itself. Accounting chooses between AOCI and amortized cost. Regulation adds the AOCI opt-out. Economics ignores both and asks what the bond is worth. AFS also ties into <strong>duration risk</strong>, <strong>net interest margin</strong>, deposit runs, and <strong>mark-to-market</strong> discipline generally. The takeaway is that AFS gives a truer accounting view of a bank's bond losses than HTM does, but neither bucket changes the underlying economics. To judge a bank, read the footnotes, add up both buckets, and then ask whether the bank can survive without being forced to sell.</p>
+<div class="concept-side">Also called: Accumulated Other Comprehensive Income (AOCI), Unrealized Losses on Bank Investment Securities<br>Related in this category: <a href="earnings_quality.html">Earnings Quality</a>, <a href="gross_margin.html">Gross Margin</a>, <a href="free_cash_flow.html">Free Cash Flow (FCF)</a>, <a href="held_to_maturity_accounting.html">Held-to-Maturity (HTM) Securities Accounting</a>, <a href="mark_to_model_valuation.html">Mark-to-Model Valuation (Private Asset Fair Value)</a>, <a href="capital_expenditure.html">Capital Expenditure (CapEx)</a></div>
+<button class="concept-done" data-slug="available_for_sale_securities" onclick="toggleDone('available_for_sale_securities')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_available_for_sale_securities';</script>
+<script src="../../book.js"></script>
+<script src="../fg.js"></script>
+</body>
+</html>

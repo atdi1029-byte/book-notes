@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Fractional Reserve Banking - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.prog-stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(112px,1fr));
+  gap:10px; margin:1rem 0 1.5rem; }
+.prog-stat { background:#e8e0d0; border:1px solid #d4c8b0; border-radius:8px;
+  padding:0.7rem 0.9rem; }
+.prog-stat .n { display:block; font-size:1.5rem; color:#5a3e1a; line-height:1.1; }
+.prog-stat .l { display:block; font-size:0.75rem; color:#8a7a60; margin-top:0.2rem; }
+.prog-chart { position:relative; margin:0.5rem 0 0.4rem; }
+.prog-chart svg { width:100%; height:auto; display:block; overflow:visible; }
+.prog-chart .grid { stroke:#ddd3c0; stroke-width:1; }
+.prog-chart .axis { stroke:#c8bca4; stroke-width:1; }
+.prog-chart .tick { fill:#8a7a60; font-size:11px; }
+.prog-chart .ylab { fill:#8a7a60; font-size:11px; }
+.prog-chart .actual { fill:none; stroke:#9a5a22; stroke-width:2; stroke-linejoin:round; }
+.prog-chart .actual-dot { fill:#9a5a22; stroke:#f4efe8; stroke-width:2; }
+.prog-chart .model { fill:none; stroke:#0e9488; stroke-width:2; stroke-dasharray:6 4; }
+.prog-chart .ceiling { stroke:#8a7a60; stroke-width:1; stroke-dasharray:2 4; }
+.prog-chart .here { stroke:#9a5a22; stroke-width:1; stroke-dasharray:2 3; opacity:0.6; }
+.prog-chart .dlabel { font-size:11px; fill:#3a2e1e; }
+.prog-chart .bar { fill:#9a5a22; opacity:0.75; }
+.prog-chart .bar-model { fill:none; stroke:#0e9488; stroke-width:2; stroke-dasharray:6 4; }
+.prog-chart .hit { fill:transparent; cursor:crosshair; }
+.prog-tip { position:absolute; pointer-events:none; display:none;
+  background:#3a2e1e; color:#f4efe8; font-size:12px; line-height:1.4;
+  padding:6px 9px; border-radius:6px; white-space:nowrap; z-index:5; }
+.prog-legend { display:flex; gap:1.2rem; font-size:0.8rem; color:#5a3e1a;
+  margin:0 0 1.5rem; flex-wrap:wrap; }
+.prog-legend span::before { content:""; display:inline-block; width:18px; height:0;
+  border-top:2px solid; margin-right:6px; vertical-align:middle; }
+.prog-legend .lg-actual::before { border-color:#9a5a22; }
+.prog-legend .lg-model::before { border-color:#0e9488; border-top-style:dashed; }
+.prog-legend .lg-ceiling::before { border-color:#8a7a60; border-top-style:dotted; }
+.prog-eq { background:#e8e0d0; border:1px solid #d4c8b0; border-radius:8px;
+  padding:0.9rem 1.1rem; font-family:Georgia,serif; font-size:1.05rem; color:#3a2e1e;
+  margin:1rem 0; }
+.prog-eq .sub { display:block; font-size:0.85rem; color:#8a7a60; margin-top:0.4rem;
+  font-family:inherit; }
+.prog-note { font-size:0.85rem; color:#8a7a60; }
+.prog-link { font-size:0.85rem; margin:-0.8rem 0 1.2rem; }
+.prog-link a { color:#0e9488; }
+table.prog-table { font-size:0.85rem; margin:1rem 0; }
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.tier .tier-desc { color: #a08060; font-size: 0.85rem; margin: 0.4rem 0 0.8rem; }
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done,
+body.hide-done .cat-card.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+.vid-tab {
+  margin: 0 0 1.2rem; background: #e8e0d0; border: 1px solid #d4c8b0;
+  border-radius: 8px; overflow: hidden;
+}
+.vid-tab summary {
+  padding: 0.6rem 0.9rem; cursor: pointer; font-size: 0.85rem;
+  color: #3a2a1a; list-style: none; user-select: none;
+}
+.vid-tab summary::-webkit-details-marker { display: none; }
+.vid-tab summary::before {
+  content: '▶'; display: inline-block; margin-right: 0.5rem;
+  font-size: 0.7rem; transition: transform 0.2s;
+}
+.vid-tab[open] summary::before { transform: rotate(90deg); }
+.vid-tab .vid-status {
+  float: right; font-size: 0.75rem; padding: 0.15rem 0.5rem;
+  border-radius: 3px; margin-left: 0.5rem;
+}
+.vid-tab .vid-ok { background: #4ade8040; color: #2d6a4f; }
+.vid-tab .vid-err { background: #f8717140; color: #9b2c2c; }
+.vid-tab .vid-list {
+  padding: 0 0.9rem 0.7rem; margin: 0;
+  list-style: none; font-size: 0.8rem;
+}
+.vid-tab .vid-list li {
+  padding: 0.35rem 0; border-top: 1px solid #d4c8b0;
+  display: flex; justify-content: space-between; gap: 8px;
+}
+.vid-tab .vid-list .vid-date {
+  color: #a08060; white-space: nowrap; flex: none;
+}
+.vid-tab .vid-list .vid-concepts {
+  color: #a08060; white-space: nowrap; flex: none; font-size: 0.75rem;
+}
+.vid-tab .vid-none {
+  padding: 0.4rem 0.9rem 0.7rem; color: #a08060; font-size: 0.8rem;
+}
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../economics-fundamentals.html">&larr; Economics Fundamentals</a>
+
+<div class="concept-meta"><span><span class="star">&#9733;</span> must-know</span><span>Economics Fundamentals</span><span>added 2026-09-30</span></div>
+<h4 id="fractional_reserve_banking">Fractional Reserve Banking</h4>
+
+<p><strong>Fractional reserve banking</strong> is the system in which a bank keeps only a fraction of its customers' deposits available as cash or near-cash and lends out or invests the rest. When you deposit $1,000, the bank does not put ten hundred-dollar bills in a drawer with your name on it. Your deposit becomes a liability, meaning the bank owes you that money on demand. The bank then turns the cash into assets such as mortgages, business loans, credit card balances, and bonds. Those assets earn interest, and that interest pays for the bank's operations, pays depositors, and produces profit. The "fraction" is the slice kept liquid. The rest is working capital, tied up in things that cannot be turned back into cash instantly.</p>
+
+<p>This matters because it is how money gets created and how credit reaches the real economy. A bank that lends out deposits lets a family buy a house, a manufacturer finance payroll, and a shopper carry a card balance. Nearly every business transaction in the country depends on that pipeline. The same design also creates the central weakness of banking, a <strong>maturity mismatch</strong>. Deposits can be withdrawn today, while the loans and bonds backing them may take years or decades to repay. The system works as long as only a small share of depositors want their money at once. It is stable in normal times and fragile in the rare moments when confidence cracks.</p>
+
+<p>Mechanically, the process runs in steps. You deposit $100,000. The bank keeps a portion as reserves, held as vault cash or as balances at the Federal Reserve, and lends the remainder, say $90,000. The borrower spends that money, and the seller deposits it in a bank, often a different one. That second bank reserves a slice and lends out the rest. Each round creates new deposits from the previous round's lending, which is the <strong>money multiplier</strong> idea. In the United States, the Federal Reserve set the formal reserve requirement to zero percent in March 2020. Banks are now constrained mainly by capital rules, liquidity rules, and their own judgment about how much cash they need on hand.</p>
+
+<p>The video builds on this foundation. The presenter describes regional banks that must hold "fresh regulatory reserves" against every new $100,000 home loan and lack the spare capital to do it. They respond by tightening credit. Mid-tier banks, he says, have been inserting covenants into small business credit lines, cutting unused limits, and demanding 40% cash collateral. A manufacturer that loses access to a $20 million facility cuts overtime, freezes hiring, and eventually lays people off. Credit card issuers trim unused limits on prime borrowers. Whatever you think of the diagnosis, the chain of events is real banking mechanics. When a bank's balance sheet is stretched, it protects itself by lending less, and that hits borrowers first.</p>
+
+<p>Traders and investors watch fractional reserve dynamics through a handful of signals. The first is <strong>unrealized losses</strong> on bond portfolios. When interest rates rise, the value of older, lower-yielding bonds falls. Banks that hold them to maturity need not book the loss, but the loss is still there, and it erodes the cushion that protects depositors. The second is the mix of <strong>uninsured deposits</strong>, which are balances above the $250,000 FDIC limit and tend to leave first. The third is funding costs: if a bank must pay up to keep deposits or borrow from the Fed, its margins shrink. The video's stress on 10-year yields near 5.27% is this logic. Higher yields mean deeper paper losses on the bonds banks bought when rates were low.</p>
+
+<p>The video's most dramatic claim is the one that links this concept to branch behavior.</p>
+
+<blockquote>"They call it compliance. The trading desk calls it what it actually is: capital controls at the branch level to slow down the fractional reserve run on what is essentially a frozen system."</blockquote>
+
+<p>That is an interpretation, not an established fact. Delays on a $250,000 wire, with 48-hour fraud holds and a second manager's approval, are also exactly what anti-fraud and anti-money-laundering rules produce, and wire fraud against individuals and small businesses has risen sharply in recent years. Friction at the branch can signal stress, and it can also signal routine compliance. A careful investor treats it as one weak data point and looks for harder evidence. Examples are deposit outflows in call reports, emergency borrowing from the Fed's discount window, or sudden changes in a bank's funding mix.</p>
+
+<p>There are several common misconceptions. One is that fractional reserve banking is a scam or a fraud. It is a legal, regulated, and openly disclosed arrangement, and it is the reason credit is available. Another is that a bank needs to hold every dollar in cash to be safe, which would end most lending. A third is that a healthy bank must have unrealized bond losses that equal insolvency. A bank is insolvent only if its assets, valued realistically over time, cannot cover its liabilities. Paper losses matter when forced selling turns them into real ones. The video's "$325 billion" framing works because the figure is large, but the number alone says nothing about which banks are vulnerable or whether they will ever have to sell.</p>
+
+<p>What breaks the system is a <strong>bank run</strong>, where depositors, fearing losses, demand their money at the same time. Because only a fraction is liquid, even a solvent bank can fail if enough people show up at once. The bank must sell assets quickly at a discount, which creates the very losses depositors feared, and the fear feeds on itself. Silicon Valley Bank in March 2023 is the modern template. It held long-dated bonds that had lost value, and its depositors were concentrated and mostly uninsured. A sudden run drained about $42 billion in a single day, and it failed within hours. Modern runs move at the speed of phones and social media, which is why regulators now watch liquidity so closely.</p>
+
+<p>Several safeguards exist because of this fragility, and the video's three-point playbook responds to them in its own way. <strong>FDIC insurance</strong> covers $250,000 per depositor, per bank, per ownership category, which removes the incentive to run for most households. The Federal Reserve acts as a lender of last resort through the discount window. Regulators set capital and liquidity requirements. On the investor's side, the prudent steps are plain. Keep cash at any one bank within insured limits, or use a deposit network that spreads it across banks. Hold Treasury bills directly if you want no bank counterparty risk. Understand that a credit line is a promise the bank can change, not money you own. Those steps are reasonable diversification. The urgency in the video is a sales tone, not a measurement of how close any particular bank is to failing.</p>
+
+<p>Fractional reserve banking connects to most of the other ideas in this guide. <strong>Duration risk</strong> explains why rising rates hurt bank bond portfolios. <strong>Mark-to-market accounting</strong> explains why losses on paper can become real ones, because held-to-maturity securities are carried at cost until a bank is forced to sell. <strong>Counterparty risk</strong> explains why a deposit is really an unsecured loan to the bank, while a Treasury bill is a loan to the government. <strong>Liquidity</strong>, <strong>leverage</strong>, and <strong>credit tightening</strong> all sit downstream of it. To discuss it confidently, keep the core point in mind. Banks are built to be illiquid against demand, and their stability rests on confidence backed by insurance and regulation. The question to ask of any bank is how much cushion it has and how quickly its depositors could leave.</p>
+<div class="concept-side">Related in this category: <a href="vertical_integration.html">Vertical Integration</a>, <a href="shrinkflation.html">Shrinkflation</a>, <a href="budget_deficit.html">Government Budget Deficit</a>, <a href="demand_pull_inflation.html">Demand-Pull Inflation</a>, <a href="imported_inflation.html">Imported Inflation</a>, <a href="disinflation_vs_deflation.html">Disinflation vs. Deflation</a></div>
+<button class="concept-done" data-slug="fractional_reserve_banking" onclick="toggleDone('fractional_reserve_banking')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_fractional_reserve_banking';</script>
+<script src="../../book.js"></script>
+<script src="../fg.js"></script>
+</body>
+</html>

@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Bank Run - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.prog-stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(112px,1fr));
+  gap:10px; margin:1rem 0 1.5rem; }
+.prog-stat { background:#e8e0d0; border:1px solid #d4c8b0; border-radius:8px;
+  padding:0.7rem 0.9rem; }
+.prog-stat .n { display:block; font-size:1.5rem; color:#5a3e1a; line-height:1.1; }
+.prog-stat .l { display:block; font-size:0.75rem; color:#8a7a60; margin-top:0.2rem; }
+.prog-chart { position:relative; margin:0.5rem 0 0.4rem; }
+.prog-chart svg { width:100%; height:auto; display:block; overflow:visible; }
+.prog-chart .grid { stroke:#ddd3c0; stroke-width:1; }
+.prog-chart .axis { stroke:#c8bca4; stroke-width:1; }
+.prog-chart .tick { fill:#8a7a60; font-size:11px; }
+.prog-chart .ylab { fill:#8a7a60; font-size:11px; }
+.prog-chart .actual { fill:none; stroke:#9a5a22; stroke-width:2; stroke-linejoin:round; }
+.prog-chart .actual-dot { fill:#9a5a22; stroke:#f4efe8; stroke-width:2; }
+.prog-chart .model { fill:none; stroke:#0e9488; stroke-width:2; stroke-dasharray:6 4; }
+.prog-chart .ceiling { stroke:#8a7a60; stroke-width:1; stroke-dasharray:2 4; }
+.prog-chart .here { stroke:#9a5a22; stroke-width:1; stroke-dasharray:2 3; opacity:0.6; }
+.prog-chart .dlabel { font-size:11px; fill:#3a2e1e; }
+.prog-chart .bar { fill:#9a5a22; opacity:0.75; }
+.prog-chart .bar-model { fill:none; stroke:#0e9488; stroke-width:2; stroke-dasharray:6 4; }
+.prog-chart .hit { fill:transparent; cursor:crosshair; }
+.prog-tip { position:absolute; pointer-events:none; display:none;
+  background:#3a2e1e; color:#f4efe8; font-size:12px; line-height:1.4;
+  padding:6px 9px; border-radius:6px; white-space:nowrap; z-index:5; }
+.prog-legend { display:flex; gap:1.2rem; font-size:0.8rem; color:#5a3e1a;
+  margin:0 0 1.5rem; flex-wrap:wrap; }
+.prog-legend span::before { content:""; display:inline-block; width:18px; height:0;
+  border-top:2px solid; margin-right:6px; vertical-align:middle; }
+.prog-legend .lg-actual::before { border-color:#9a5a22; }
+.prog-legend .lg-model::before { border-color:#0e9488; border-top-style:dashed; }
+.prog-legend .lg-ceiling::before { border-color:#8a7a60; border-top-style:dotted; }
+.prog-eq { background:#e8e0d0; border:1px solid #d4c8b0; border-radius:8px;
+  padding:0.9rem 1.1rem; font-family:Georgia,serif; font-size:1.05rem; color:#3a2e1e;
+  margin:1rem 0; }
+.prog-eq .sub { display:block; font-size:0.85rem; color:#8a7a60; margin-top:0.4rem;
+  font-family:inherit; }
+.prog-note { font-size:0.85rem; color:#8a7a60; }
+.prog-link { font-size:0.85rem; margin:-0.8rem 0 1.2rem; }
+.prog-link a { color:#0e9488; }
+table.prog-table { font-size:0.85rem; margin:1rem 0; }
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.tier .tier-desc { color: #a08060; font-size: 0.85rem; margin: 0.4rem 0 0.8rem; }
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done,
+body.hide-done .cat-card.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+.vid-tab {
+  margin: 0 0 1.2rem; background: #e8e0d0; border: 1px solid #d4c8b0;
+  border-radius: 8px; overflow: hidden;
+}
+.vid-tab summary {
+  padding: 0.6rem 0.9rem; cursor: pointer; font-size: 0.85rem;
+  color: #3a2a1a; list-style: none; user-select: none;
+}
+.vid-tab summary::-webkit-details-marker { display: none; }
+.vid-tab summary::before {
+  content: '▶'; display: inline-block; margin-right: 0.5rem;
+  font-size: 0.7rem; transition: transform 0.2s;
+}
+.vid-tab[open] summary::before { transform: rotate(90deg); }
+.vid-tab .vid-status {
+  float: right; font-size: 0.75rem; padding: 0.15rem 0.5rem;
+  border-radius: 3px; margin-left: 0.5rem;
+}
+.vid-tab .vid-ok { background: #4ade8040; color: #2d6a4f; }
+.vid-tab .vid-err { background: #f8717140; color: #9b2c2c; }
+.vid-tab .vid-list {
+  padding: 0 0.9rem 0.7rem; margin: 0;
+  list-style: none; font-size: 0.8rem;
+}
+.vid-tab .vid-list li {
+  padding: 0.35rem 0; border-top: 1px solid #d4c8b0;
+  display: flex; justify-content: space-between; gap: 8px;
+}
+.vid-tab .vid-list .vid-date {
+  color: #a08060; white-space: nowrap; flex: none;
+}
+.vid-tab .vid-list .vid-concepts {
+  color: #a08060; white-space: nowrap; flex: none; font-size: 0.75rem;
+}
+.vid-tab .vid-none {
+  padding: 0.4rem 0.9rem 0.7rem; color: #a08060; font-size: 0.8rem;
+}
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../economic-history-financial-crises.html">&larr; Economic History &amp; Financial Crises</a>
+
+<div class="concept-meta"><span><span class="star">&#9733;</span> must-know</span><span>Economic History &amp; Financial Crises</span><span>added 2026-09-30</span></div>
+<h4 id="bank_run">Bank Run</h4>
+
+<p>A <strong>bank run</strong> happens when a large number of depositors try to withdraw their money at the same time because they fear the bank will fail. It rests on a basic fact about banking: your deposit is not sitting in a vault. Under <strong>fractional reserve banking</strong>, a bank keeps only a small slice of deposits as cash and lends or invests the rest in loans, mortgages, and bonds. That works fine while withdrawals trickle out at a steady pace. It breaks when everyone wants their money at once, because the bank cannot hand back what it has already put to work. A run is a confidence event, and it can turn a healthy bank into a failed one in days.</p>
+
+<p>Bank runs matter because banks are the plumbing of the real economy. They hold payroll accounts, fund small-business credit lines, write mortgages, and clear payments. When a bank fails, or merely fears failing, it stops lending to protect itself. That is why a run at one institution can spread. Depositors at other banks see the headlines and wonder if they are next, a process called <strong>contagion</strong>. The Great Depression, when thousands of US banks failed in the early 1930s, remains the defining example. The video's larger claim is that stress in the banking system does not have to show up as a dramatic queue outside a branch. It can show up quietly, as tighter credit for households and businesses.</p>
+
+<p>The mechanism starts with a <strong>maturity mismatch</strong>. Deposits can be pulled on demand, but the bank's assets, such as 10-year mortgages or 30-year Treasuries, are locked up for years. Suppose a bank has $100 in deposits, holds $10 in cash, and has $90 in longer-term assets. If depositors withdraw $10, the bank pays them from cash. If they demand $30, the bank must sell assets, often at a loss, to raise the $20 shortfall. Each withdrawal makes the bank weaker, which frightens more depositors, which triggers more withdrawals. The run becomes a <strong>self-fulfilling prophecy</strong>. Even a bank that was solvent on paper can be forced into insolvency because it has to sell assets at fire-sale prices.</p>
+
+<p>Deposit insurance was created to break this loop. In the US, the <strong>FDIC</strong> insures deposits up to $250,000 per depositor, per bank, per ownership category. If you know your money is protected, you have no reason to rush to the door. This is why classic retail runs are rarer today. But the protection has a gap. Corporate treasurers, businesses running payroll, and wealthy households often hold balances far above $250,000. These <strong>uninsured depositors</strong> have every reason to leave at the first sign of trouble, and they can do it with a click. In the 2023 failures, this group drove the panic. The modern run is digital and fast, not a crowd on the sidewalk.</p>
+
+<p>The video ties this to a specific weakness: unrealized bond losses. When interest rates rise, the market price of existing bonds falls. According to the FDIC's quarterly banking profile, which the video cites, unrealized losses on investment securities across US banks rose $19 billion in one quarter to <strong>$325.1 billion</strong>. Banks can park securities in a <strong>held-to-maturity (HTM)</strong> bucket and carry them at face value, even if a 30-year Treasury trades at 60 cents on the dollar. The video's core argument is that this accounting treatment hides the hole. If depositors leave and the bank must sell HTM bonds to pay them, the losses become real and the whole portfolio can be marked to market.</p>
+
+<p>The video describes a three-stage sequence. First, depositors notice they earn 0.2% to 0.4% on checking while <strong>Treasury bills</strong> and government money market funds pay over 4%, so sophisticated savers and corporate treasurers sweep cash out. Second, the bank cannot sell its HTM bonds without tainting the whole portfolio, so it borrows from the Federal Home Loan Banks or the overnight Fed funds market at 4% or more to replace the free deposits it lost. Third, with assets yielding around 2% and funding costing 4%, its <strong>net interest margin</strong> turns negative and it slowly burns through capital. In the video's words, regional banks are "underground volcanoes." This is a slow-motion run, in which deposits leak out over months rather than vanishing in a weekend.</p>
+
+<p>The 2023 failures show how this played out. <strong>Silicon Valley Bank</strong> held a huge portfolio of long-dated securities, lost value as rates rose, and had many uninsured depositors concentrated in one industry. When it sold bonds at a loss to meet withdrawals, it made the problem visible, and depositors tried to pull roughly $42 billion in a single day. Signature Bank and First Republic followed. Regulators responded with emergency backstops, including guaranteeing uninsured deposits and creating a Fed lending facility that valued bonds at par. The video argues that many banks still sit on large unrealized losses today, and that they avoid a dramatic run by choosing to shrink their loan books instead.</p>
+
+<p>The video describes this as a <strong>stealth liquidity squeeze</strong>. A bank whose capital is constrained cannot afford to make new loans, so it pulls back quietly. The video claims banks are denying home equity line applications, imposing tighter covenants and higher cash collateral on small-business credit lines, cutting unused credit card limits, and adding friction to large outgoing wires, such as 48-hour holds and extra manager approvals. The video suggests that this friction slows the outflow of deposits, effectively throttling a run. Treat the specific figures, like "60% of qualified buyers" being denied, as the presenter's assertions rather than verified data. The direction is plausible, though, since tighter credit standards are a standard response to balance-sheet stress, and Federal Reserve lending surveys track them.</p>
+
+<p>Investors watch several signals. Falling deposit totals in regional banks, rising reliance on wholesale funding, and large unrealized securities losses relative to equity all suggest stress. The share of <strong>uninsured deposits</strong> matters, as does how concentrated a bank's customers are. Sharp stock drops in a bank's shares, widening credit spreads, and heavy usage of Fed lending facilities are all warning signs. Watch <strong>tangible common equity</strong> once unrealized losses are subtracted. A bank with thin equity and heavy HTM losses is more fragile than its regulatory ratios suggest. Individuals can use the same logic to check whether their balances exceed FDIC limits and whether they should spread money across institutions.</p>
+
+<p>Some nuances deserve care. Unrealized losses are not automatically fatal. If a bank holds bonds to maturity and never has to sell, it receives full principal back, so the loss is real economically but only crystallizes if forced selling occurs. The danger is the combination of losses and a funding run. Also, the video's framing that regulators are "hiding" insolvency is a strong interpretation. HTM accounting is legal, disclosed in filings, and the FDIC reports the unrealized losses openly, which is how the $325 billion figure is known at all. Finally, $325 billion is spread across thousands of banks, and the largest share sits at big institutions, so headline totals do not tell you which banks are truly at risk.</p>
+
+<p>When a run does break a bank, the sequence is fast. Regulators close the institution, usually on a Friday, and the FDIC takes over as receiver. Insured depositors get their money, typically within a couple of business days. Uninsured depositors may take losses unless authorities declare a <strong>systemic risk exception</strong>, as they did in 2023. Assets are sold or the bank is acquired by a stronger one. The wider risk is that fear spreads to similar banks, forcing central banks to lend against collateral or guarantee deposits. Those rescues carry moral hazard, because if depositors expect a bailout, banks and customers take on more risk.</p>
+
+<p>Bank runs connect to several other concepts. <strong>Duration risk</strong> explains why rising rates cut bond values. <strong>Mark-to-market accounting</strong> versus held-to-maturity accounting determines whether losses show up on the balance sheet. The <strong>discount window</strong> and Federal Home Loan Bank advances are the lender-of-last-resort tools that banks turn to before failing. <strong>Net interest margin</strong> and <strong>tier 1 capital</strong> measure whether a bank can absorb the stress. The <strong>credit crunch</strong> is the real-economy result when many banks tighten at once. Understanding a bank run means seeing all of these together: a confidence problem that grows out of a mismatch between short-term promises and long-term assets, worsened by rates and accounting choices.</p>
+<div class="concept-side">Related in this category: <a href="bank_sector_contagion.html">Bank Sector Contagion (Investor Flight to Safety)</a>, <a href="dot_com_bubble_comparison.html">Dot-Com Bubble Comparison (1999 Analogy)</a></div>
+<button class="concept-done" data-slug="bank_run" onclick="toggleDone('bank_run')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_bank_run';</script>
+<script src="../../book.js"></script>
+<script src="../fg.js"></script>
+</body>
+</html>

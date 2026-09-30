@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Value Trap - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.prog-stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(112px,1fr));
+  gap:10px; margin:1rem 0 1.5rem; }
+.prog-stat { background:#e8e0d0; border:1px solid #d4c8b0; border-radius:8px;
+  padding:0.7rem 0.9rem; }
+.prog-stat .n { display:block; font-size:1.5rem; color:#5a3e1a; line-height:1.1; }
+.prog-stat .l { display:block; font-size:0.75rem; color:#8a7a60; margin-top:0.2rem; }
+.prog-chart { position:relative; margin:0.5rem 0 0.4rem; }
+.prog-chart svg { width:100%; height:auto; display:block; overflow:visible; }
+.prog-chart .grid { stroke:#ddd3c0; stroke-width:1; }
+.prog-chart .axis { stroke:#c8bca4; stroke-width:1; }
+.prog-chart .tick { fill:#8a7a60; font-size:11px; }
+.prog-chart .ylab { fill:#8a7a60; font-size:11px; }
+.prog-chart .actual { fill:none; stroke:#9a5a22; stroke-width:2; stroke-linejoin:round; }
+.prog-chart .actual-dot { fill:#9a5a22; stroke:#f4efe8; stroke-width:2; }
+.prog-chart .model { fill:none; stroke:#0e9488; stroke-width:2; stroke-dasharray:6 4; }
+.prog-chart .ceiling { stroke:#8a7a60; stroke-width:1; stroke-dasharray:2 4; }
+.prog-chart .here { stroke:#9a5a22; stroke-width:1; stroke-dasharray:2 3; opacity:0.6; }
+.prog-chart .dlabel { font-size:11px; fill:#3a2e1e; }
+.prog-chart .bar { fill:#9a5a22; opacity:0.75; }
+.prog-chart .bar-model { fill:none; stroke:#0e9488; stroke-width:2; stroke-dasharray:6 4; }
+.prog-chart .hit { fill:transparent; cursor:crosshair; }
+.prog-tip { position:absolute; pointer-events:none; display:none;
+  background:#3a2e1e; color:#f4efe8; font-size:12px; line-height:1.4;
+  padding:6px 9px; border-radius:6px; white-space:nowrap; z-index:5; }
+.prog-legend { display:flex; gap:1.2rem; font-size:0.8rem; color:#5a3e1a;
+  margin:0 0 1.5rem; flex-wrap:wrap; }
+.prog-legend span::before { content:""; display:inline-block; width:18px; height:0;
+  border-top:2px solid; margin-right:6px; vertical-align:middle; }
+.prog-legend .lg-actual::before { border-color:#9a5a22; }
+.prog-legend .lg-model::before { border-color:#0e9488; border-top-style:dashed; }
+.prog-legend .lg-ceiling::before { border-color:#8a7a60; border-top-style:dotted; }
+.prog-eq { background:#e8e0d0; border:1px solid #d4c8b0; border-radius:8px;
+  padding:0.9rem 1.1rem; font-family:Georgia,serif; font-size:1.05rem; color:#3a2e1e;
+  margin:1rem 0; }
+.prog-eq .sub { display:block; font-size:0.85rem; color:#8a7a60; margin-top:0.4rem;
+  font-family:inherit; }
+.prog-note { font-size:0.85rem; color:#8a7a60; }
+.prog-link { font-size:0.85rem; margin:-0.8rem 0 1.2rem; }
+.prog-link a { color:#0e9488; }
+table.prog-table { font-size:0.85rem; margin:1rem 0; }
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.tier .tier-desc { color: #a08060; font-size: 0.85rem; margin: 0.4rem 0 0.8rem; }
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done,
+body.hide-done .cat-card.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+.vid-tab {
+  margin: 0 0 1.2rem; background: #e8e0d0; border: 1px solid #d4c8b0;
+  border-radius: 8px; overflow: hidden;
+}
+.vid-tab summary {
+  padding: 0.6rem 0.9rem; cursor: pointer; font-size: 0.85rem;
+  color: #3a2a1a; list-style: none; user-select: none;
+}
+.vid-tab summary::-webkit-details-marker { display: none; }
+.vid-tab summary::before {
+  content: '▶'; display: inline-block; margin-right: 0.5rem;
+  font-size: 0.7rem; transition: transform 0.2s;
+}
+.vid-tab[open] summary::before { transform: rotate(90deg); }
+.vid-tab .vid-status {
+  float: right; font-size: 0.75rem; padding: 0.15rem 0.5rem;
+  border-radius: 3px; margin-left: 0.5rem;
+}
+.vid-tab .vid-ok { background: #4ade8040; color: #2d6a4f; }
+.vid-tab .vid-err { background: #f8717140; color: #9b2c2c; }
+.vid-tab .vid-list {
+  padding: 0 0.9rem 0.7rem; margin: 0;
+  list-style: none; font-size: 0.8rem;
+}
+.vid-tab .vid-list li {
+  padding: 0.35rem 0; border-top: 1px solid #d4c8b0;
+  display: flex; justify-content: space-between; gap: 8px;
+}
+.vid-tab .vid-list .vid-date {
+  color: #a08060; white-space: nowrap; flex: none;
+}
+.vid-tab .vid-list .vid-concepts {
+  color: #a08060; white-space: nowrap; flex: none; font-size: 0.75rem;
+}
+.vid-tab .vid-none {
+  padding: 0.4rem 0.9rem 0.7rem; color: #a08060; font-size: 0.8rem;
+}
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../value-investing-equities.html">&larr; Value Investing &amp; Equities</a>
+
+<div class="concept-meta"><span>standard</span><span>Value Investing &amp; Equities</span><span>added 2026-09-30</span></div>
+<h4 id="bank_stock_value_trap">Value Trap</h4>
+
+<p>A <strong>value trap</strong> is a stock that looks cheap but is cheap for a good reason, and stays cheap or gets cheaper. The usual signals are a low price-to-earnings ratio, a share price well below book value, or a fat dividend yield. A newcomer sees a bargain. A veteran asks why the market is offering the bargain in the first place. In a real value investment, the price is low compared with what the business is worth, and that gap closes over time. In a trap, the "worth" on paper is overstated, or the business is deteriorating so fast that the low multiple keeps shrinking along with the fundamentals. The investor is caught because the number that made it look attractive was never reliable.</p>
+
+<p>This matters because value investing is one of the most popular and respected approaches in the market, and its core signal, "cheap relative to assets or earnings," is exactly what traps imitate. Buying traps erodes capital in two ways. You lose money directly when the price falls. You also lose the opportunity cost of holding a dead position for years while healthier companies compound. Traps also draw in dividend and income investors, who often own them for the yield, only to see the dividend cut and the price drop together. The concept forces a discipline: <em>cheap is a hypothesis, not a conclusion</em>. Before you buy, you must ask what would have to be true for the stock to be worth more, and whether that is actually happening.</p>
+
+<p>Mechanically, traps form in a few ways. The first is <strong>overstated book value</strong>: the assets on the balance sheet are carried at a number higher than what they could be sold for. The second is <strong>structural decline</strong>: earnings are high now, but the industry is shrinking, so the multiple looks low against peak profits that will not come back. The third is <strong>a cost of capital problem</strong>: the company's liabilities reprice faster than its assets, squeezing profits. In every case, the "cheap" metric is measured against a stale or flattering denominator. Book value, trailing earnings, and dividend yield are all backward-looking. When conditions change, the price fixes itself downward toward the real number, and investors who bought the low multiple find it was an illusion, or that the multiple was low because the market saw the problem before they did.</p>
+
+<p>The video applies this to regional and mid-tier banks, and the setup is clear. In 2020 and 2021, banks were flooded with stimulus deposits while cash earned nothing, so treasurers reached for yield. They bought 10-year and 30-year Treasuries and residential mortgage-backed securities paying roughly 1.5% to 2.2%. Then the Fed tightened. The video cites a Fed funds target near 4%, overnight SOFR at 3.88%, and a 10-year Treasury yield around 5.27%. When market rates reach 5% and you hold a 30-year bond paying 2%, the bond's market value can fall 30% to 40%. That is duration math, not opinion. According to the FDIC quarterly banking profile the video cites, unrealized losses on bank securities rose $19 billion in one quarter to <strong>$325.1 billion</strong>.</p>
+
+<p>Here is how those losses turn a bank stock into a trap. Banks can classify securities as <strong>available for sale (AFS)</strong>, where price declines flow through accumulated other comprehensive income and reduce reported equity, or <strong>held to maturity (HTM)</strong>, where the bank attests it has the intent and ability to hold the bond to maturity and so carries it near cost. The video's "frozen ice box" analogy fits: a restaurateur pays $100,000 for premium beef, and if he sold it today he would get $20,000, but he padlocks the freezer, labels it "held to maturity," and keeps reporting $100,000 in assets. The bank looks well capitalized and trades at an apparent discount to book value. But <strong>tangible book value</strong> is overstated compared with what the balance sheet would show if the bonds were marked to market. The stock is cheap against a number that is not real.</p>
+
+<blockquote>"If you have money deposited in an institution that can't liquidate its own assets without going insolvent, well, you don't have a liquid account. You have an unsecured loan to a trapped balance sheet."</blockquote>
+
+<p>The trap deepens through the earnings side, which the video describes as a catalyst sequence starting with the <strong>deposit rate spread</strong>. A bank holding billions in assets yielding 2% cannot pay depositors 5% without losing money on every dollar. So regional banks keep paying a few tenths of a percent on checking. Sophisticated depositors and corporate treasurers notice and move cash to money market funds and Treasury bills paying far more. As deposits leave, the bank has to replace them with costlier funding, which squeezes its <strong>net interest margin</strong>. If it tries to raise cash by selling the underwater bonds, it must realize the losses and cut into capital. So the bank is stuck between two bad choices: keep the losses hidden and bleed deposits, or sell and take the hit. Neither path is kind to shareholders, even while the stock screens as cheap.</p>
+
+<p>Investors use the concept as a filter and as a rotation signal. The filter: when a bank looks cheap on price-to-book, adjust the book. Compare unrealized losses on HTM and AFS securities to tangible common equity, using the schedules in the bank's <strong>call report</strong> filed with the FDIC. If losses eat a large share of equity, the "discount" may disappear once the assets are marked honestly. Also check the share of uninsured deposits, the deposit cost trend, and the loan-to-deposit ratio. The video's recommendation is to rotate out of such holdings into <strong>cash-rich, pricing-power companies</strong>: businesses with net cash, low leverage, and the ability to raise prices without losing customers. Their earnings do not depend on funding a bond portfolio bought at the wrong time.</p>
+
+<p>There are gotchas. First, not every cheap bank is a trap. Duration losses only become real if the bank is forced to sell, and a bank with stable, cheap deposits and short-dated bonds can simply wait as those securities mature at par. Second, the trap can spring in more than one way: a bank can be fine on credit quality and still be a poor investment because its earnings are squeezed for years. That is a slow bleed, not a crash. Third, the framing in a video like this one is deliberately dramatic. Phrases such as "hidden insolvency" overstate things for most institutions. The losses are real and disclosed in filings, so the market can and does price them in. The honest question is whether the price already reflects the problem, and it may. Treat the video's argument as a thesis to test, not a fact.</p>
+
+<p>When the trap springs, it tends to be sudden. Confidence is the key variable, because a bank's ability to "hold to maturity" depends on depositors staying put. If uninsured depositors run, the bank must sell securities at a loss, the padlock comes off, and capital gets impaired at exactly the moment funding disappears. The failures of Silicon Valley Bank and others in 2023 followed this pattern. Shareholders are last in line, so equity can be wiped out even when depositors are made whole. The sell-off can also spread to healthier banks with similar balance sheets. That is why the trap is dangerous: the same low multiple that looked like a margin of safety was concealing the fragility beneath it.</p>
+
+<p>The value trap connects to several other ideas worth knowing. <strong>Duration risk</strong> and interest-rate risk explain why the bonds lost value. <strong>Mark-to-market</strong> versus <strong>historical cost accounting</strong> explains why the losses stay off the headline equity number. <strong>Margin of safety</strong> is the value investor's defense, and it only works when the underlying figures are honest. <strong>Asset-liability mismatch</strong> and <strong>bank runs</strong> describe how the problem turns into a crisis. And <strong>quality investing</strong>, favoring companies with strong cash flow, low debt, and pricing power, is the counterpart to avoiding traps. The takeaway is simple. Before buying something because it is cheap, find out what the price is measured against, and whether that measurement can be trusted.</p>
+<div class="concept-side">Related in this category: <a href="comparable_store_sales.html">Comparable Store Sales (Same-Store Sales)</a>, <a href="economic_moat.html">Economic Moat (Competitive Moat)</a>, <a href="earnings_guidance.html">Earnings Guidance (Forward Guidance — Corporate)</a>, <a href="discounted_cash_flow_valuation.html">Discounted Cash Flow (DCF) Valuation</a>, <a href="corporate_stock_buybacks.html">Corporate Stock Buybacks (Share Repurchase Programs)</a>, <a href="buyback_blackout_window.html">Buyback Blackout Window</a></div>
+<button class="concept-done" data-slug="bank_stock_value_trap" onclick="toggleDone('bank_stock_value_trap')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_bank_stock_value_trap';</script>
+<script src="../../book.js"></script>
+<script src="../fg.js"></script>
+</body>
+</html>

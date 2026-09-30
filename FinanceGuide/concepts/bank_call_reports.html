@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Bank Call Reports (FFIEC 031/041) - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.prog-stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(112px,1fr));
+  gap:10px; margin:1rem 0 1.5rem; }
+.prog-stat { background:#e8e0d0; border:1px solid #d4c8b0; border-radius:8px;
+  padding:0.7rem 0.9rem; }
+.prog-stat .n { display:block; font-size:1.5rem; color:#5a3e1a; line-height:1.1; }
+.prog-stat .l { display:block; font-size:0.75rem; color:#8a7a60; margin-top:0.2rem; }
+.prog-chart { position:relative; margin:0.5rem 0 0.4rem; }
+.prog-chart svg { width:100%; height:auto; display:block; overflow:visible; }
+.prog-chart .grid { stroke:#ddd3c0; stroke-width:1; }
+.prog-chart .axis { stroke:#c8bca4; stroke-width:1; }
+.prog-chart .tick { fill:#8a7a60; font-size:11px; }
+.prog-chart .ylab { fill:#8a7a60; font-size:11px; }
+.prog-chart .actual { fill:none; stroke:#9a5a22; stroke-width:2; stroke-linejoin:round; }
+.prog-chart .actual-dot { fill:#9a5a22; stroke:#f4efe8; stroke-width:2; }
+.prog-chart .model { fill:none; stroke:#0e9488; stroke-width:2; stroke-dasharray:6 4; }
+.prog-chart .ceiling { stroke:#8a7a60; stroke-width:1; stroke-dasharray:2 4; }
+.prog-chart .here { stroke:#9a5a22; stroke-width:1; stroke-dasharray:2 3; opacity:0.6; }
+.prog-chart .dlabel { font-size:11px; fill:#3a2e1e; }
+.prog-chart .bar { fill:#9a5a22; opacity:0.75; }
+.prog-chart .bar-model { fill:none; stroke:#0e9488; stroke-width:2; stroke-dasharray:6 4; }
+.prog-chart .hit { fill:transparent; cursor:crosshair; }
+.prog-tip { position:absolute; pointer-events:none; display:none;
+  background:#3a2e1e; color:#f4efe8; font-size:12px; line-height:1.4;
+  padding:6px 9px; border-radius:6px; white-space:nowrap; z-index:5; }
+.prog-legend { display:flex; gap:1.2rem; font-size:0.8rem; color:#5a3e1a;
+  margin:0 0 1.5rem; flex-wrap:wrap; }
+.prog-legend span::before { content:""; display:inline-block; width:18px; height:0;
+  border-top:2px solid; margin-right:6px; vertical-align:middle; }
+.prog-legend .lg-actual::before { border-color:#9a5a22; }
+.prog-legend .lg-model::before { border-color:#0e9488; border-top-style:dashed; }
+.prog-legend .lg-ceiling::before { border-color:#8a7a60; border-top-style:dotted; }
+.prog-eq { background:#e8e0d0; border:1px solid #d4c8b0; border-radius:8px;
+  padding:0.9rem 1.1rem; font-family:Georgia,serif; font-size:1.05rem; color:#3a2e1e;
+  margin:1rem 0; }
+.prog-eq .sub { display:block; font-size:0.85rem; color:#8a7a60; margin-top:0.4rem;
+  font-family:inherit; }
+.prog-note { font-size:0.85rem; color:#8a7a60; }
+.prog-link { font-size:0.85rem; margin:-0.8rem 0 1.2rem; }
+.prog-link a { color:#0e9488; }
+table.prog-table { font-size:0.85rem; margin:1rem 0; }
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.tier .tier-desc { color: #a08060; font-size: 0.85rem; margin: 0.4rem 0 0.8rem; }
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done,
+body.hide-done .cat-card.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+.vid-tab {
+  margin: 0 0 1.2rem; background: #e8e0d0; border: 1px solid #d4c8b0;
+  border-radius: 8px; overflow: hidden;
+}
+.vid-tab summary {
+  padding: 0.6rem 0.9rem; cursor: pointer; font-size: 0.85rem;
+  color: #3a2a1a; list-style: none; user-select: none;
+}
+.vid-tab summary::-webkit-details-marker { display: none; }
+.vid-tab summary::before {
+  content: '▶'; display: inline-block; margin-right: 0.5rem;
+  font-size: 0.7rem; transition: transform 0.2s;
+}
+.vid-tab[open] summary::before { transform: rotate(90deg); }
+.vid-tab .vid-status {
+  float: right; font-size: 0.75rem; padding: 0.15rem 0.5rem;
+  border-radius: 3px; margin-left: 0.5rem;
+}
+.vid-tab .vid-ok { background: #4ade8040; color: #2d6a4f; }
+.vid-tab .vid-err { background: #f8717140; color: #9b2c2c; }
+.vid-tab .vid-list {
+  padding: 0 0.9rem 0.7rem; margin: 0;
+  list-style: none; font-size: 0.8rem;
+}
+.vid-tab .vid-list li {
+  padding: 0.35rem 0; border-top: 1px solid #d4c8b0;
+  display: flex; justify-content: space-between; gap: 8px;
+}
+.vid-tab .vid-list .vid-date {
+  color: #a08060; white-space: nowrap; flex: none;
+}
+.vid-tab .vid-list .vid-concepts {
+  color: #a08060; white-space: nowrap; flex: none; font-size: 0.75rem;
+}
+.vid-tab .vid-none {
+  padding: 0.4rem 0.9rem 0.7rem; color: #a08060; font-size: 0.8rem;
+}
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../accounting-financial-statements.html">&larr; Accounting &amp; Financial Statements</a>
+
+<div class="concept-meta"><span>deep cut</span><span>Accounting &amp; Financial Statements</span><span>added 2026-09-30</span></div>
+<h4 id="bank_call_reports">Bank Call Reports (FFIEC 031/041)</h4>
+
+<p>A <strong>Call Report</strong> is the quarterly financial statement every FDIC-insured bank in the United States must file with its regulators. Officially it is the "Consolidated Reports of Condition and Income," and it comes in two main flavors: <strong>FFIEC 031</strong> for banks with foreign offices and <strong>FFIEC 041</strong> for banks that operate only domestically. FFIEC stands for the Federal Financial Institutions Examination Council, the interagency body that standardizes the form so the FDIC, the Federal Reserve, and the OCC all collect identical data. Think of it as a bank's report card, except the bank writes its own grades under penalty of law. It is far more detailed than the glossy annual report shareholders receive, and it is public, which is exactly why the video calls it "shadow data."</p>
+
+<p>It matters because the Call Report is the closest thing to an X-ray of a bank. Press releases, investor decks, and headline deposit totals are curated. The Call Report is standardized, line by line, so you can compare a $2 billion community bank in Ohio against a $200 billion regional lender on identical terms. It reveals how much of the balance sheet sits in loans versus securities, how those securities are classified, how much funding is cheap deposits versus expensive borrowing, and how much capital cushions the whole structure. When the video argues that regulators and media are painting a rosier picture than the data supports, the Call Report is where you go to check the claim yourself instead of taking anyone's word for it.</p>
+
+<p>Mechanically, the report is organized into <strong>schedules</strong>, each covering a slice of the bank. <strong>Schedule RC</strong> is the balance sheet ("Report of Condition"): assets, liabilities, and equity. <strong>Schedule RI</strong> is the income statement. <strong>Schedule RC-B</strong> is the one that matters most for the video's thesis, because it lists the securities portfolio and shows, for both <strong>held-to-maturity (HTM)</strong> and <strong>available-for-sale (AFS)</strong> holdings, the amortized cost alongside the fair value. Subtract one from the other and you get the unrealized gain or loss. Other schedules cover loan quality, past-due balances, deposits, borrowings, derivatives, and regulatory capital ratios. Banks file within about 30 days of quarter-end, and the data is published through the FFIEC's Central Data Repository and the FDIC's tools.</p>
+
+<p>Here is why the securities schedule is central to the video's argument. Under accounting standard <strong>ASC 320</strong>, a bank chooses how to classify each bond. AFS bonds are marked to market, and their losses flow through <strong>accumulated other comprehensive income (AOCI)</strong>, which reduces reported equity. HTM bonds are carried at amortized cost, meaning roughly what the bank paid, on the theory that it will hold them until maturity and collect par. The presenter's "frozen ice box" analogy captures it well: a restaurateur who paid $100,000 for premium beef labels the freezer "held to maturity" and keeps reporting $100,000 of inventory, even though selling it on the sidewalk today would fetch perhaps $20,000. The loss is real. It is just not on the main scoreboard.</p>
+
+<blockquote>"That's the direct flows sitting inside the schedule RC of the call reports filed directly with the FDIC."</blockquote>
+
+<p>Now the numbers. The video cites FDIC Quarterly Banking Profile data showing total unrealized losses on investment securities across US banks rising by $19 billion in a single quarter to <strong>$325.1 billion</strong>, driven by the 10-year Treasury yield pushing above 5.2%. The bond math is simple: a 30-year bond with a 2% coupon, when market yields move above 5%, loses roughly 30 to 40% of its value. Banks bought huge quantities of these low-coupon Treasuries and mortgage-backed securities during the low-rate years. The presenter then lays out a three-step squeeze: depositors leave for T-bills and money funds paying over 4%; the bank cannot sell HTM bonds to fund withdrawals; so it borrows at 4%-plus from the Federal Home Loan Banks or the Fed funds market, which squeezes profit and lending capacity.</p>
+
+<p>Why can't the bank just sell? Because of the <strong>tainting rule</strong>. If a bank sells more than a small, defensible amount of HTM securities before maturity, regulators and auditors can question its stated "intent and ability" to hold the rest, and the entire HTM portfolio may have to be reclassified at fair value. That would force the whole unrealized loss to be recognized at once, potentially wiping out a large slice of capital. This is exactly the dynamic that helped sink <strong>Silicon Valley Bank</strong> in March 2023: it had a large HTM book with deep unrealized losses, deposits ran, and it had to sell AFS securities and realize losses, which spooked the remaining depositors. The Call Report showed those losses in plain sight beforehand, for anyone who looked.</p>
+
+<p>Investors and traders use the Call Report in a few practical ways. First, compute <strong>unrealized losses as a percentage of equity</strong>: take the RC-B gap between fair value and amortized cost, then divide by Tier 1 capital or tangible equity. A bank whose hidden losses equal 40% of its equity is in a very different position from one at 5%. Second, check the <strong>HTM share of total securities</strong> and the loan-to-deposit ratio. Third, examine funding: rising Federal Home Loan Bank advances and brokered deposits, plus a falling share of noninterest-bearing deposits, signal a bank paying up to stay funded. Fourth, look at <strong>uninsured deposits</strong>, which are the flighty money. Analysts also track these quarter over quarter, since the trend often says more than any single snapshot.</p>
+
+<p>There are real nuances, and honest analysis needs them. Unrealized losses are not realized losses. If a bond truly is held to maturity and the issuer pays in full, the bank gets par back and the loss reverses as the bond "pulls to par." A Treasury will not default. So a big unrealized loss is a <em>liquidity and flexibility</em> problem, not automatically a solvency problem. It becomes a solvency problem only if the bank is forced to sell. Also, HTM disclosure is not really a "loophole" or a secret: the fair values are reported in the notes and the Call Report, and rules like the tainting provision exist because the accounting is a deliberate tradeoff. The video's tone is dramatic. The data is real, but the conclusion "insolvent and hidden" overstates what the schedules show for most banks.</p>
+
+<p>Another gotcha is that the aggregate hides the distribution. A $325 billion system-wide number sounds catastrophic, but the banking system holds trillions in equity and the losses are concentrated unevenly. Large banks with heavy AFS books already show losses in equity through AOCI, while a specific subset of mid-sized banks with large HTM books, thin capital, and a high share of uninsured deposits is where the real risk lives. Regulatory capital rules also matter: many banks, especially smaller ones, can opt out of including AOCI in regulatory capital, which is why reported capital ratios can look strong even when tangible equity is far thinner. Always compare regulatory capital against a "mark-to-market" version you compute yourself. And remember that Call Report data is backward-looking, reflecting the last quarter-end, so conditions can shift between filings.</p>
+
+<p>When it breaks, it breaks fast. A bank with large hidden losses, uninsured deposits, and a concentrated depositor base can go from "well capitalized" to failed in days, as SVB and Signature Bank showed in 2023, because the Call Report's slow quarterly cadence cannot capture a digital bank run. The failure sequence is predictable: deposit outflows, forced asset sales, realized losses, capital shortfall, loss of confidence, more outflows. Regulators can interrupt it with emergency lending, such as the Fed's Bank Term Funding Program in 2023, which lent against bonds at par value. That backstop is precisely why some analysts argue the problem was "solved," while the presenter argues it was merely deferred, and both can be partly true simultaneously.</p>
+
+<p>Finally, the Call Report connects to several other ideas in this guide. <strong>Duration risk</strong> explains why long, low-coupon bonds lose so much when rates rise. <strong>Mark-to-market versus amortized cost accounting</strong> explains why identical bonds can appear at different values on different balance sheets. <strong>Net interest margin</strong> compression, the gap between what a bank earns on assets and pays on funding, is the profit consequence of the whole squeeze. And <strong>deposit beta</strong> measures how quickly banks pass rate increases to savers. If you take one habit from this chapter, make it this: when someone tells you a bank is safe or doomed, pull up its Call Report, find Schedule RC-B, compute the hidden loss against equity, and decide for yourself.</p>
+<div class="concept-side">Related in this category: <a href="earnings_quality.html">Earnings Quality</a>, <a href="gross_margin.html">Gross Margin</a>, <a href="free_cash_flow.html">Free Cash Flow (FCF)</a>, <a href="held_to_maturity_accounting.html">Held-to-Maturity (HTM) Securities Accounting</a>, <a href="mark_to_model_valuation.html">Mark-to-Model Valuation (Private Asset Fair Value)</a>, <a href="capital_expenditure.html">Capital Expenditure (CapEx)</a></div>
+<button class="concept-done" data-slug="bank_call_reports" onclick="toggleDone('bank_call_reports')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_bank_call_reports';</script>
+<script src="../../book.js"></script>
+<script src="../fg.js"></script>
+</body>
+</html>
