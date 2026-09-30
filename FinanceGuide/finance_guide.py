@@ -286,6 +286,81 @@ def _needs_processing(vid_id, processed):
     return entry is None or entry.get("retry", False)
 
 
+# === Channel "done" ===
+# A channel is done when DONE_DAYS pass with no new must-know or standard
+# concept from it (deep cuts don't count).  The bot then marks it
+# "done": "<date>" in channels.json and stops checking it, so the guide is
+# finished and ready for the next channel.  To resume a channel, delete its
+# "done" key.
+DONE_DAYS = 21
+
+
+def channel_status(channel, concepts, processed):
+    """{"last_core": date|None, "days": days without a new core concept,
+    "done": bool, "done_on": date|None} for one channel."""
+    name = channel["name"]
+    last_core = None
+    for c in concepts.values():
+        if concept_flag(c) == "deep":
+            continue
+        srcs = [x for x in c.get("sources", []) if x in processed]
+        if not srcs:
+            continue
+        first = min(srcs, key=lambda x: processed[x].get("processed", ""))
+        if processed[first].get("channel") == name:
+            d = c.get("added", "")
+            if d and (last_core is None or d > last_core):
+                last_core = d
+    since = last_core or channel.get("added") or datetime.now().strftime("%Y-%m-%d")
+    days = (datetime.now() - datetime.strptime(since[:10], "%Y-%m-%d")).days
+    return {"last_core": last_core, "days": days,
+            "done": bool(channel.get("done")) or days >= DONE_DAYS,
+            "done_on": channel.get("done")}
+
+
+def mark_done_channels():
+    """Flag channels that have gone DONE_DAYS without a core concept."""
+    channels = load_json(CHANNELS_FILE)
+    if not isinstance(channels, list):
+        return
+    concepts, processed = load_json(CONCEPTS_FILE), load_json(PROCESSED_FILE)
+    changed = False
+    for ch in channels:
+        if ch.get("done"):
+            continue
+        st = channel_status(ch, concepts, processed)
+        if st["done"]:
+            ch["done"] = datetime.now().strftime("%Y-%m-%d")
+            log(f"  CHANNEL DONE: {ch['name']} — {st['days']} days with no new "
+                f"core concept. No longer checking it.")
+            changed = True
+    if changed:
+        save_json(CHANNELS_FILE, channels)
+        rebuild_html(concepts)
+        git_push()
+
+
+def _channel_status_html(concepts, processed):
+    """One line per channel for the index and progress pages."""
+    channels = load_json(CHANNELS_FILE)
+    if not isinstance(channels, list):
+        return ""
+    rows = []
+    for ch in channels:
+        st = channel_status(ch, concepts, processed)
+        name = _esc(ch["name"])
+        if ch.get("done"):
+            rows.append(f'<p class="ch-status done">&#x2713; <b>Channel done:</b> {name} '
+                        f'&middot; finished {ch["done"]} &middot; no longer checked '
+                        f'&middot; ready for the next channel</p>')
+        else:
+            last = f"last one {st['last_core']}" if st["last_core"] else "none yet"
+            rows.append(f'<p class="ch-status">{name}: <b>{st["days"]} of {DONE_DAYS} days</b> '
+                        f'without a new must-know or standard concept ({last}) '
+                        f'&middot; done at {DONE_DAYS}</p>')
+    return "".join(rows)
+
+
 def find_new_videos():
     """Check all channels.  Returns (videos_not_yet_processed, ok) where
     ok is False if any channel could not be checked.
@@ -302,6 +377,8 @@ def find_new_videos():
     new_videos = []
     ok = True
     for channel in channels:
+        if channel.get("done"):
+            continue
         log(f"  Checking: {channel['name']}")
         videos = get_channel_videos(channel["url"])
         if videos is None:
@@ -992,6 +1069,9 @@ PAGE_CSS = """
 .prog-note { font-size:0.85rem; color:#8a7a60; }
 .prog-link { font-size:0.85rem; margin:-0.8rem 0 1.2rem; }
 .prog-link a { color:#0e9488; }
+.ch-status { font-size:0.85rem; color:#5a3e1a; margin:-0.6rem 0 1.2rem; }
+.ch-status.done { color:#0e6b5f; background:#e3efe9; border:1px solid #b9d8cc;
+  border-radius:6px; padding:0.5rem 0.8rem; margin:0 0 1.2rem; }
 table.prog-table { font-size:0.85rem; margin:1rem 0; }
 .fg-bar {
   display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
@@ -1543,6 +1623,7 @@ def _progress_html(m, concepts):
 <p class="subtitle">{m['n_now']} videos &middot; {m['per_day']:.1f} videos/day
  &middot; {flags.get('star', 0)} &#9733; must-know &middot; {flags.get('plain', 0)} standard
  &middot; {flags.get('deep', 0)} deep cuts &middot; refit on every rebuild</p>
+{_channel_status_html(concepts, load_json(PROCESSED_FILE))}
 {stats}
 <h2 id="curve">Concepts found vs. videos watched</h2>
 {chart}
@@ -1653,6 +1734,7 @@ def rebuild_html(concepts):
  &middot; {videos_done} videos &middot;
  <a href="recent.html" style="color:#a08060">Added this week ({len(recent)})</a></p>
 {_progress_teaser(prog)}
+{_channel_status_html(concepts, processed)}
 {vid_tab}
 {FILTER_BAR}
 {"".join(tiers_html)}"""
@@ -1802,6 +1884,7 @@ def run_once():
     fetch, a Claude call.
     """
     log("=== Finance Guide check ===")
+    mark_done_channels()
 
     # Find new videos
     new_videos, ok = find_new_videos()
