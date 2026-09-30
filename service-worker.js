@@ -24,7 +24,7 @@
 */
 'use strict';
 
-const SW_VERSION = 2;
+const SW_VERSION = 3;
 const DB_NAME = 'book-notes-offline';
 const SCOPE = new URL('./', self.location).href;   // …/book-notes/
 const SHELF = SCOPE + 'index.html';
@@ -277,6 +277,14 @@ function extractLinks(html, baseUrl) {
     } else if (ASSET_EXT.test(path)) {
       assets.push(keyFor(abs));
     }
+  }
+  // Images named inside inline scripts, e.g. onclick="ewpLB('charts/p022_002.jpeg', …)"
+  const quoted = /["']([^"'<>\s()+{}]+\.(?:png|jpe?g|gif|webp|svg))["']/gi;
+  while ((m = quoted.exec(html))) {
+    if (/^[a-z][a-z0-9+.-]*:/i.test(m[1])) continue;
+    let abs;
+    try { abs = new URL(m[1], baseUrl).href; } catch (e) { continue; }
+    if (inScope(abs)) images.push(keyFor(abs));
   }
   return { pages, images, assets };
 }
