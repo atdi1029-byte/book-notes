@@ -288,16 +288,14 @@ def _needs_processing(vid_id, processed):
 
 # === Channel "done" ===
 # A channel is done when DONE_DAYS pass with no new must-know or standard
-# concept from it (deep cuts don't count).  The bot then marks it
-# "done": "<date>" in channels.json and stops checking it, so the guide is
-# finished and ready for the next channel.  To resume a channel, delete its
-# "done" key.
+# concept from it (deep cuts don't count).  Display only: the bot keeps
+# checking it, and a new core concept resets the count.
 DONE_DAYS = 21
 
 
 def channel_status(channel, concepts, processed):
     """{"last_core": date|None, "days": days without a new core concept,
-    "done": bool, "done_on": date|None} for one channel."""
+    "done": bool} for one channel."""
     name = channel["name"]
     last_core = None
     for c in concepts.values():
@@ -313,31 +311,7 @@ def channel_status(channel, concepts, processed):
                 last_core = d
     since = last_core or channel.get("added") or datetime.now().strftime("%Y-%m-%d")
     days = (datetime.now() - datetime.strptime(since[:10], "%Y-%m-%d")).days
-    return {"last_core": last_core, "days": days,
-            "done": bool(channel.get("done")) or days >= DONE_DAYS,
-            "done_on": channel.get("done")}
-
-
-def mark_done_channels():
-    """Flag channels that have gone DONE_DAYS without a core concept."""
-    channels = load_json(CHANNELS_FILE)
-    if not isinstance(channels, list):
-        return
-    concepts, processed = load_json(CONCEPTS_FILE), load_json(PROCESSED_FILE)
-    changed = False
-    for ch in channels:
-        if ch.get("done"):
-            continue
-        st = channel_status(ch, concepts, processed)
-        if st["done"]:
-            ch["done"] = datetime.now().strftime("%Y-%m-%d")
-            log(f"  CHANNEL DONE: {ch['name']} — {st['days']} days with no new "
-                f"core concept. No longer checking it.")
-            changed = True
-    if changed:
-        save_json(CHANNELS_FILE, channels)
-        rebuild_html(concepts)
-        git_push()
+    return {"last_core": last_core, "days": days, "done": days >= DONE_DAYS}
 
 
 def _channel_status_html(concepts, processed):
@@ -349,10 +323,11 @@ def _channel_status_html(concepts, processed):
     for ch in channels:
         st = channel_status(ch, concepts, processed)
         name = _esc(ch["name"])
-        if ch.get("done"):
+        if st["done"]:
             rows.append(f'<p class="ch-status done">&#x2713; <b>Channel done:</b> {name} '
-                        f'&middot; finished {ch["done"]} &middot; no longer checked '
-                        f'&middot; ready for the next channel</p>')
+                        f'&middot; {st["days"]} days without a new must-know or standard '
+                        f'concept (last one {st["last_core"]}) &middot; ready for the next '
+                        f'channel &middot; still checking</p>')
         else:
             last = f"last one {st['last_core']}" if st["last_core"] else "none yet"
             rows.append(f'<p class="ch-status">{name}: <b>{st["days"]} of {DONE_DAYS} days</b> '
@@ -377,8 +352,6 @@ def find_new_videos():
     new_videos = []
     ok = True
     for channel in channels:
-        if channel.get("done"):
-            continue
         log(f"  Checking: {channel['name']}")
         videos = get_channel_videos(channel["url"])
         if videos is None:
@@ -1884,7 +1857,6 @@ def run_once():
     fetch, a Claude call.
     """
     log("=== Finance Guide check ===")
-    mark_done_channels()
 
     # Find new videos
     new_videos, ok = find_new_videos()
