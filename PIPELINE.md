@@ -50,8 +50,9 @@ debate the book with someone who read all of it.
 ./bookai "/path/to/book.pdf" "Book_Folder" [start] [end] [batch] [sleep] [parallel] [--type=TYPE]
 ```
 
-- Always use bookai for PDFs (don't read a PDF by hand in batches). For EPUBs,
-  convert first: `python3 epub_convert.py`.
+- Always use bookai for PDFs (don't read a PDF by hand in batches). bookai
+  takes a PDF; `epub_convert.py` goes the other way (finished page → EPUB for
+  an e-reader).
 - Types: `analytical` (default), `narrative`, `technical`, `textbook`,
   `practical`. Omit `--type` to auto-detect. Defaults per type: technical
   10-page batches, 1 at a time; practical 10/2; textbook 12/2; others 20/3.
