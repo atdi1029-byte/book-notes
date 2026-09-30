@@ -1719,9 +1719,12 @@ def git_push():
             f'{git_cmd} add FinanceGuide/',
             shell=True, capture_output=True, timeout=30
         )
+        # "-- FinanceGuide/" commits only the guide. A bare commit also swept
+        # in anything else staged in the Books repo and published it under
+        # this message.
         subprocess.run(
             f'{git_cmd} commit -m "finance guide: auto-update '
-            f'{datetime.now().strftime("%Y-%m-%d %H:%M")}"',
+            f'{datetime.now().strftime("%Y-%m-%d %H:%M")}" -- FinanceGuide/',
             shell=True, capture_output=True, timeout=30
         )
         result = subprocess.run(
