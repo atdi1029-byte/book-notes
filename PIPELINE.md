@@ -240,7 +240,7 @@ Never `git add -A` a book folder; use finish-book.
 |---|---|---|
 | Cover in the page | skill: put it before `<h1>`; CLAUDE.md/memory: never | never |
 | Table of contents | flat vs nested by Part | flat; nested only when the book has Parts |
-| Section order | skill had no glossary; books.md had no 10 Things / Safely Skipped; template.html put Key Takeaways first | the list above |
+| Section order | skill had no glossary; books.md had no 10 Things / Safely Skipped; the old template.html (removed) put Key Takeaways first | the list above |
 | Paragraphs per chapter | 8+ vs "7-8" vs 6-8 vs 5-8 | 8+, averaging 100-120 words (80 minimum) |
 | Page length | several line targets, some "hard gates" | soft guidance; depth is checked per chapter |
 | Compaction | "HARD LIMIT: X lines" vs soft target | soft target; every MUST/SHOULD ID must survive (checked) |
