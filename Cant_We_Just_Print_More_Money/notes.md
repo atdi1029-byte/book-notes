@@ -1832,6 +1832,27 @@ and the great bra shortage of 2005.*
 
 ## Chapter 9: Why Didn't Anyone See It Coming?
 
+<!-- Recovered Sep 30 2026: the next two nuggets (pp. 195-198) were deleted
+     by the old duplicate-removal step in bookai; restored from notes.duplicates.md. -->
+
+- [MUST KNOW] **The Queen's question (Nov 2008, LSE): "Why did no one see it
+  coming?"** Specific answer: banks lent mortgages to people who could never
+  repay, and economists failed to "join up the dots" — a few unpaid loans
+  cascaded because banks were intertwined with every other sector. **Luis
+  Garicano** (The Guardian): those at every point in the lending chain were
+  "eager to continue doing the job they were paid to do." General answer:
+  crashes are chaotic, have hit in each of the last seven decades, and
+  economists have been wrong more often than right.
+
+- [MUST KNOW] **Financial crises ≠ economic crises.** 1929: Black Thursday
+  (24 Oct) fell ~10% in hours, 25% over five days → Great Depression, global
+  GDP per capita −20% in 1930-2. 1987: Black Monday (19 Oct) fell 23%, −$1
+  trillion, Variety reran "Wall Street Lays an Egg" — yet no recession (US
+  growth 4% in 1988 and 1989). Economic crisis = GDP contraction (recession if
+  6+ months); only about half of financial crises in the past 100 years caused
+  one. The chapter's question: what makes a financial shock spread to the real
+  economy?
+
 - [SHOULD KNOW] Over an 85-year life, you're likely to live through **eight
   economic crises** — double the number of times the average Briton moves house.
   No two crises are the same: fallout from 1929 ≠ 1987. Oldest recorded
