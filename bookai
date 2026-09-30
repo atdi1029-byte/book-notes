@@ -670,7 +670,7 @@ try_leaf() {
   mv "$BW/leaf.md" "$LEAF"
   echo "$S-$E:$MODEL" >> "$MODEL_LOG"
   [ "$MODEL" = haiku ] && echo "$S-$E" >> "$WORK/haiku"
-  wlog "  OK — pp. $S-$E ($MODEL, +$(wc -l < "$LEAF" | tr -d ' ') lines, $(wc -w < "$LEAF" | tr -d ' ') words, $(grep -cE '\[(MUST KNOW|SHOULD KNOW|NICE TO KNOW)\]' "$LEAF" || true) tags, \$$COST)"
+  wlog "  OK — pp. $S-$E ($MODEL, +$(wc -l < "$LEAF" | tr -d ' ') lines, $(wc -w < "$LEAF" | tr -d ' ') words, $(grep -cE '\[(MUST KNOW|SHOULD KNOW|NICE TO KNOW)\]' "$LEAF" || true) tags, ≈\$$COST plan usage)"
   rm -rf "$BW"
   return 0
 }
@@ -811,7 +811,7 @@ FAILED_RUN=$(sort -n "$WORK/failed" 2>/dev/null | tr '\n' ' ' | sed 's/ $//' || 
 echo "" | tee -a "$LOG"
 echo "========================================" | tee -a "$LOG"
 echo "DONE — $(date)" | tee -a "$LOG"
-echo "Batches merged this run: $MERGED   Cost this run: \$$COST" | tee -a "$LOG"
+echo "Batches merged this run: $MERGED   Plan usage this run: ≈\$$COST at pay-per-use prices (your Claude plan covers it)" | tee -a "$LOG"
 [ -n "$HAIKU_RUN" ] && echo "Written by haiku (flagged): $HAIKU_RUN" | tee -a "$LOG"
 [ -n "$FAILED_RUN" ] && echo "Failed ranges: $FAILED_RUN" | tee -a "$LOG"
 [ -f "$WORK/fatal" ] && echo "STOPPED EARLY: $(cat "$WORK/fatal") — re-run later to continue" | tee -a "$LOG"
@@ -978,7 +978,7 @@ echo "  Extraction: $EXTRACTION_STATUS ($MUST_COUNT MUST, $SHOULD_COUNT SHOULD, 
 [ -n "$MISSING" ] && echo "  Missing pages: $MISSING — re-run the same command to fill them" | tee -a "$LOG"
 [ -n "$ALL_HAIKU" ] && echo "  Haiku pages (check or re-run on Sonnet): $ALL_HAIKU" | tee -a "$LOG"
 echo "  Quotes:     $QUOTES_TESTED tested, $QUOTES_UNVERIFIED unverified" | tee -a "$LOG"
-echo "  Cost:       \$$COST this run, \$$TOTAL_COST total" | tee -a "$LOG"
+echo "  Plan usage: ≈\$$COST this run, ≈\$$TOTAL_COST total, at pay-per-use prices (not a charge on the subscription)" | tee -a "$LOG"
 echo "  Next (see PIPELINE.md): compaction if > 3000 lines → summary.md → index.html" | tee -a "$LOG"
 echo "        → ./check_html.py \"$FOLDER\" → ./grade_coverage.py \"$FOLDER\" → ./finish-book.sh \"$FOLDER\" --push" | tee -a "$LOG"
 echo "========================================" | tee -a "$LOG"

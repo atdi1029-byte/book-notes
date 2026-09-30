@@ -72,8 +72,10 @@ debate the book with someone who read all of it.
   finished batches. A usage/credit limit stops the run cleanly; re-run later.
 - Nothing is deleted from the notes. Pages covered twice are listed in
   `notes.duplicates-report.md`.
-- `extraction.status` is `PASSED` only when every page is in. Cost per run is
-  in the log and in `extraction.cost_usd`.
+- `extraction.status` is `PASSED` only when every page is in.
+- Everything runs on the Claude subscription: the "≈$" figures in the logs
+  (and `extraction.cost_usd`) are what the calls would cost at pay-per-use
+  prices, shown as a measure of plan usage — nothing is charged.
 
 ### 2. Compact — only when notes.md > 3000 lines
 

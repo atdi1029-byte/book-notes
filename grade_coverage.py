@@ -424,7 +424,7 @@ def main():
           + (f', {audit["ungraded"]} ungraded' if audit['ungraded'] else '')
           + f' of {len(nuggets)}  →  {"PASS" if audit["pass"] else "FAIL"}')
     print(f'  Debate-ready: {report["chapters_passed"]}/{report["chapters_tested"]} chapters  →  {"PASS" if report["pass"] else "FAIL"}')
-    print(f'  Grader cost: ${cost:.2f}')
+    print(f'  Plan usage: ≈${cost:.2f} at pay-per-use prices (your Claude plan covers it; not a charge)')
     todo = [n for n in nuggets if n['status'] != 'COVERED']
     if todo:
         print('\n  Fix these in the chapter prose, then re-run with --chapters N:')
