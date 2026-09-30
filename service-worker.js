@@ -24,7 +24,7 @@
 */
 'use strict';
 
-const SW_VERSION = 1;
+const SW_VERSION = 2;
 const DB_NAME = 'book-notes-offline';
 const SCOPE = new URL('./', self.location).href;   // …/book-notes/
 const SHELF = SCOPE + 'index.html';
@@ -290,6 +290,25 @@ async function crawl() {
   const queue = CORE.map(url => ({ key: keyFor(url), depth: url === SHELF ? 0 : MAX_DEPTH }));
   let fetched = 0, kept = 0, failed = 0, gone = 0, active = 0;
   let shelfOk = false, quotaFull = false;
+  const failures = [];             // the first few, for the status report
+
+  function fail(key, why) {
+    failed++;
+    if (failures.length < 10) failures.push(pathOf(key).slice(new URL(SCOPE).pathname.length) + ' (' + why + ')');
+  }
+
+  // One retry after a dropped connection or a busy server (5xx / 429).
+  async function download(key) {
+    for (let attempt = 0; ; attempt++) {
+      try {
+        const resp = await fetch(key, { cache: 'no-cache' });
+        if (attempt === 1 || (resp.status < 500 && resp.status !== 429)) return resp;
+      } catch (e) {
+        if (attempt === 1) throw e;
+      }
+      await new Promise(r => setTimeout(r, 1500));
+    }
+  }
 
   // Make sure `key` is saved and fresh enough. Returns the saved entry (the
   // old one if the download failed) or null.
@@ -299,15 +318,15 @@ async function crawl() {
     if (entry && !always && Date.now() - entry.saved < staleMs) { kept++; return entry; }
     if (quotaFull) return entry;
     try {
-      const resp = await fetch(key, { cache: 'no-cache' });
+      const resp = await download(key);
       if (resp.status === 404 || resp.status === 410) { gone++; return entry; }
-      if (!resp.ok) { if (!entry) failed++; return entry; }
+      if (!resp.ok) { if (!entry) fail(key, 'HTTP ' + resp.status); return entry; }
       const saved = await save(key, resp);
       fetched++;
       return saved;
     } catch (e) {
       if (e && e.name === 'QuotaExceededError') quotaFull = true;
-      if (!entry) failed++;
+      if (!entry) fail(key, (e && e.name) || 'error');
       return entry;
     }
   }
@@ -344,7 +363,7 @@ async function crawl() {
           links.pages.forEach(k => { if (!seen.has(k)) queue.push({ key: k, depth: item.depth + 1 }); });
         }
       } catch (e) {
-        failed++;
+        fail(item.key, 'unreadable');
       } finally {
         active--;
       }
@@ -376,7 +395,7 @@ async function crawl() {
     }
   }
   return { complete, fetched, kept, failed, gone, pruned, quotaFull, imagesSkipped: !wifi,
-    items: seen.size, images: imageList.length, ms: Date.now() - started };
+    items: seen.size, images: imageList.length, ms: Date.now() - started, failures };
 }
 
 async function status() {
