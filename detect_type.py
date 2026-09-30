@@ -19,6 +19,7 @@ import re
 import shutil
 import subprocess
 import sys
+import tempfile
 
 try:
     import pymupdf as fitz
@@ -73,11 +74,16 @@ def heuristic(words_pp, imgs_pp, draw_pp):
 def ask_claude(prompt, model='haiku', timeout=120):
     if not shutil.which('claude'):
         return None, 'claude CLI not found'
+    # From an empty temp folder with no tools: skips CLAUDE.md, memory and MCP.
+    work = tempfile.mkdtemp(prefix='detect-type-')
     try:
-        r = subprocess.run(['claude', '-p', prompt, '--model', model, '--max-turns', '1'],
-                           capture_output=True, text=True, timeout=timeout)
+        r = subprocess.run(['claude', '-p', prompt, '--model', model, '--max-turns', '1', '--tools', '',
+                            '--strict-mcp-config', '--no-session-persistence'],
+                           capture_output=True, text=True, timeout=timeout, cwd=work)
     except subprocess.TimeoutExpired:
         return None, 'claude timed out'
+    finally:
+        shutil.rmtree(work, ignore_errors=True)
     out = (r.stdout or '').strip().lower()
     for t in TYPES:
         if re.search(r'\b' + t + r'\b', out):

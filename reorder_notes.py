@@ -17,6 +17,8 @@ Usage:
   python3 reorder_notes.py Book_Folder/notes.md
   python3 reorder_notes.py Book_Folder/notes.md --dry-run
   python3 reorder_notes.py Book_Folder/notes.md --no-renumber
+  python3 reorder_notes.py Book_Folder/notes.md --add-ids   (give untagged-ID nuggets an ID first)
+  python3 reorder_notes.py Book_Folder/notes.md --check     (prints ok / order / dupe / noid; changes nothing)
 
 Exit codes: 0 ok, 1 error.
 """
@@ -28,6 +30,7 @@ import sys
 
 MARKER_RE = re.compile(r'^\s*<!--\s*pp?\.\s*(\d+)(?:\s*-\s*(\d+))?\s*-->\s*$')
 NUGGET_ID_RE = re.compile(r'\[N(\d+)\]')
+TAG_WITHOUT_ID_RE = re.compile(r'(\[(?:MUST KNOW|SHOULD KNOW|NICE TO KNOW)\])(?!\s*\[N\d+\])')
 
 
 def split_blocks(lines):
@@ -83,12 +86,27 @@ def main():
 
     with open(path, 'r', encoding='utf-8', errors='replace') as f:
         original = f.read()
+
+    if '--check' in flags:
+        starts = [int(m) for m in re.findall(r'<!--\s*pp?\.\s*(\d+)', original)]
+        if any(b < a for a, b in zip(starts, starts[1:])):
+            print('order')
+        elif re.search(r'\[(?:MUST KNOW|SHOULD KNOW)\](?!\s*\[N\d+\])', original):
+            print('noid')
+        else:
+            ids = NUGGET_ID_RE.findall(original)
+            print('dupe' if len(ids) != len(set(ids)) else 'ok')
+        return 0
     lines = original.splitlines(keepends=True)
 
     preamble, blocks = split_blocks(lines)
     if not blocks:
-        print('  No page markers found — nothing to reorder')
-        return 0
+        # Compacted notes often have no page markers: nothing to reorder, but
+        # IDs can still be added / renumbered.
+        if '--add-ids' not in flags:
+            print('  No page markers found — nothing to reorder')
+            return 0
+        preamble, blocks = [], [[0, 0, lines]]
 
     # Stable sort by start page, then end page
     indexed = list(enumerate(blocks))
@@ -106,15 +124,22 @@ def main():
 
     new_text = ''.join(out_lines)
 
+    added = 0
+    if '--add-ids' in flags:
+        new_text, added = TAG_WITHOUT_ID_RE.subn(r'\1[N000]', new_text)
+        do_renumber = True
     renumbered = 0
     dupes = 0
     if do_renumber:
         new_text, renumbered, dupes = renumber(new_text)
 
-    pages = sorted(set(p for _, (s, e, _) in ordered for p in range(s, e + 1)))
-    print(f'  Blocks: {len(blocks)}  (pages {pages[0]}-{pages[-1]}, '
-          f'{len(pages)} distinct)')
+    pages = sorted(set(p for _, (s, e, _) in ordered for p in range(s, e + 1) if p))
+    if pages:
+        print(f'  Blocks: {len(blocks)}  (pages {pages[0]}-{pages[-1]}, '
+              f'{len(pages)} distinct)')
     print(f'  Moved:  {moved} block(s) were out of page order')
+    if added:
+        print(f'  Added:  {added} missing nugget ID(s)')
     if do_renumber:
         print(f'  IDs:    {renumbered} nugget IDs renumbered sequentially'
               + (f' ({dupes} duplicate IDs fixed)' if dupes else ''))

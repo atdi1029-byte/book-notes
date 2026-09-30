@@ -1,8 +1,20 @@
-# Book Notes app tests
+# Book Notes tests
 
-Headless tests for the shelf (`index.html`), `book.js`, the offline service
-worker (`service-worker.js`) and the sync backend (`apps_script.gs`).
-Run them before changing any of those files.
+Two groups. Run the matching group before changing any of these files.
+
+**BookAI pipeline** (Python, no API calls, no browser):
+
+```
+/usr/bin/python3 tests/bookai_test.py    # bookai with a fake claude: resume, split → haiku, limits, lock, Ctrl-C (~1 min)
+/usr/bin/python3 tests/grader_test.py    # check_html.py, grade_coverage.py (fake grader), audit_check.py
+/usr/bin/python3 tests/finish_test.py    # finish-book.sh gates and what it commits, in a throwaway repo
+```
+
+`fake_claude.py` and `fake_grader.py` stand in for `claude -p` (via
+`BOOKAI_CLAUDE` / `GRADER_CLAUDE`); their docstrings list the switches.
+
+**App** (shelf `index.html`, `book.js`, `service-worker.js`, `apps_script.gs`),
+headless Chrome for Testing:
 
 ```
 cd tests

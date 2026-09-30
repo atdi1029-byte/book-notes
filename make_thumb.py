@@ -11,7 +11,7 @@ Usage:
   python3 make_thumb.py Book_Folder                  # cover.jpg -> thumb.jpg
   python3 make_thumb.py Book_Folder --pdf book.pdf   # also extract cover if missing
   python3 make_thumb.py Book_Folder --force          # overwrite existing thumb
-  python3 make_thumb.py --all                        # backfill every folder with cover.jpg but no thumb.jpg
+  python3 make_thumb.py --all                        # backfill every folder whose thumb.jpg is missing or older than cover.jpg
 
 Exit codes: 0 ok, 1 nothing to do / error.
 """
@@ -79,8 +79,10 @@ def process_dir(folder, pdf=None, force=False):
             print(f'  {name}: no cover.jpg (pass --pdf to extract one)')
             return False
 
-    if os.path.isfile(thumb) and not force:
-        print(f'  {name}: thumb.jpg already exists')
+    # A replaced cover (e.g. the real one instead of an ebook title page) is
+    # newer than the thumb: rebuild it, or the shelf keeps showing the old one.
+    if os.path.isfile(thumb) and not force and os.path.getmtime(thumb) >= os.path.getmtime(cover):
+        print(f'  {name}: thumb.jpg is up to date')
         return True
     if make_thumb(cover, thumb):
         kb = os.path.getsize(thumb) // 1024
@@ -110,7 +112,8 @@ def main():
                 continue
             if not os.path.isfile(os.path.join(full, 'index.html')):
                 continue
-            if os.path.isfile(os.path.join(full, 'thumb.jpg')) and not force:
+            t, c = os.path.join(full, 'thumb.jpg'), os.path.join(full, 'cover.jpg')
+            if os.path.isfile(t) and not force and (not os.path.isfile(c) or os.path.getmtime(t) >= os.path.getmtime(c)):
                 continue
             if os.path.isfile(os.path.join(full, 'cover.jpg')):
                 if process_dir(full, force=force):

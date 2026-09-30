@@ -8,9 +8,10 @@
 #   ./build.sh thumbs    [--force]        # backfill thumb.jpg for every book that has cover.jpg
 #   ./build.sh finish    "Folder" [finish-book.sh options]
 #
-# Typical flow for one book:
-#   ./build.sh process "/path/to/book.pdf" "My_Book"       # bookai: extraction + gates + audits
-#   (Claude writes summary.md, index.html, coverage_audit.json, debate_ready_report.json)
+# Typical flow for one book (full rules: PIPELINE.md):
+#   ./build.sh process "/path/to/book.pdf" "My_Book"       # bookai: extraction + gates
+#   (Claude writes summary.md and index.html; ./check_html.py My_Book --progress while writing)
+#   ./grade_coverage.py My_Book                            # independent coverage + debate grader
 #   ./build.sh finish "My_Book" --category "Investing" --tier now --push
 #
 # Examples:
@@ -31,7 +32,6 @@ scaffold() {
   # Create folder name from title (spaces → underscores, remove special chars)
   local FOLDER=$(echo "$TITLE" | sed 's/ /_/g; s/[^A-Za-z0-9_]//g')
   local DIR="$BOOKS_DIR/$FOLDER"
-  local BM_KEY=$(echo "$TITLE" | tr '[:upper:]' '[:lower:]' | sed 's/ /_/g; s/[^a-z0-9_]//g')
 
   echo "Creating book: $TITLE"
   echo "  Folder: $DIR"
@@ -47,39 +47,15 @@ scaffold() {
     echo "  No PDF provided — add cover.jpg then run: ./build.sh thumbs"
   fi
 
-  # Create summary.md from template
-  if [ ! -f "$DIR/summary.md" ]; then
-    sed "s/\[BOOK TITLE\]/$TITLE/g; s/\[AUTHOR\]/$AUTHOR/g; s/\[YEAR\]/$YEAR/g; s/\[PAGE COUNT\]/$PAGES/g" \
-      "$BOOKS_DIR/summary-template.md" > "$DIR/summary.md"
-    echo "  Created summary.md"
-  else
-    echo "  summary.md already exists — skipping"
-  fi
-
-  # Create notes.md from template
-  if [ ! -f "$DIR/notes.md" ]; then
-    sed "s/\[BOOK TITLE\]/$TITLE/g" \
-      "$BOOKS_DIR/notes-template.md" > "$DIR/notes.md"
-    echo "  Created notes.md"
-  else
-    echo "  notes.md already exists — skipping"
-  fi
-
-  # Create index.html from template
-  if [ ! -f "$DIR/index.html" ]; then
-    sed "s/BOOK_TITLE/$TITLE/g; s/BOOK_AUTHOR/$AUTHOR/g; s/BOOK_YEAR/$YEAR/g; s/BOOK_PAGES/$PAGES/g; s/BOOK_KEY/$BM_KEY/g" \
-      "$BOOKS_DIR/template.html" > "$DIR/index.html"
-    echo "  Created index.html (template — fill in content)"
-  else
-    echo "  index.html already exists — skipping"
-  fi
+  # No notes.md / summary.md / index.html from templates: bookai writes the
+  # notes, and a template index.html made the folder look finished.
 
   echo ""
-  echo "Done! Next steps:"
+  echo "Done! Next steps (PIPELINE.md):"
   echo "  1. Extract notes:  ./build.sh process \"$PDF\" \"$FOLDER\""
-  echo "  2. Fill in $DIR/summary.md and build the HTML content in $DIR/index.html"
-  echo "  3. Write coverage_audit.json and debate_ready_report.json"
-  echo "  4. Finish:         ./build.sh finish \"$FOLDER\" --category \"$CATEGORY\""
+  echo "  2. Write summary.md and index.html (check as you go: ./check_html.py \"$FOLDER\" --progress)"
+  echo "  3. Grade:          ./grade_coverage.py \"$FOLDER\""
+  echo "  4. Finish:         ./build.sh finish \"$FOLDER\" --category \"$CATEGORY\" --push"
 }
 
 add_shelf() {
