@@ -4,15 +4,46 @@ const path = require('path');
 const http = require('http');
 const puppeteer = require('puppeteer-core');
 
-const CHROME = process.env.CHROME || '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
 const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+// Tests run Chrome for Testing, never the Chrome app. macOS sends AppleScript for
+// "Google Chrome" to the newest running copy of that app, so even a headless test
+// copy takes over the outreach night run's Chrome commands (it stopped the
+// Sep 30 2026 night). Chrome for Testing is a separate app, so it can't.
+// Install once: npx @puppeteer/browsers install chrome@stable --path ~/.cache/puppeteer
+function chromeBin() {
+  let bin = process.env.CHROME || '';
+  if (!bin) {
+    const root = path.join(os.homedir(), '.cache', 'puppeteer', 'chrome');
+    const ver = d => (d.split('-')[1] || '').split('.').map(Number);
+    const newer = (a, b) => {
+      const x = ver(a), y = ver(b);
+      for (let i = 0; i < 4; i++) if ((x[i] || 0) !== (y[i] || 0)) return (y[i] || 0) - (x[i] || 0);
+      return 0;
+    };
+    const builds = fs.existsSync(root) ? fs.readdirSync(root).filter(d => d.startsWith('mac')).sort(newer) : [];
+    for (const d of builds) {
+      for (const sub of ['chrome-mac-arm64', 'chrome-mac-x64']) {
+        const p = path.join(root, d, sub, 'Google Chrome for Testing.app', 'Contents', 'MacOS', 'Google Chrome for Testing');
+        if (!bin && fs.existsSync(p)) bin = p;
+      }
+    }
+  }
+  if (!bin) {
+    throw new Error('Chrome for Testing is not installed. Run: npx @puppeteer/browsers install chrome@stable --path ~/.cache/puppeteer');
+  }
+  if (bin.includes('/Google Chrome.app/')) {
+    throw new Error(`${bin} is the Chrome app; a test copy of it takes the night run's AppleScript. Use Chrome for Testing.`);
+  }
+  return bin;
+}
 
 // Every host except localhost is unreachable, so nothing in a test can ever
 // touch the real Apps Script backend or your reading data.
 async function launch() {
   const profile = fs.mkdtempSync(path.join(os.tmpdir(), 'book-notes-test-'));
   const browser = await puppeteer.launch({
-    executablePath: CHROME,
+    executablePath: chromeBin(),
     headless: true,
     userDataDir: profile,
     args: ['--no-first-run', '--no-default-browser-check',
