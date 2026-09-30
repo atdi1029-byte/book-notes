@@ -3426,12 +3426,7 @@
 <script>
   var KEY = 'books_read';
   var filtering = true;
-  var activeBookmarks = (function() {
-    try { return JSON.parse(localStorage.getItem('books_bookmarks')) || {}; }
-    catch(e) { return {}; }
-  })(); // load from localStorage first, sync overwrites later
   var syncReady = false; // blocks pushes until initial remote fetch completes
-  // Paste your deployed Apps Script web app URL here:
   var SYNC_URL = 'https://script.google.com/macros/s/AKfycbwt438APIycBc534W6T66O3IgtxLUU9cczw-PZAN6Mc9p2xfU2ySsND_wEMJDHUvrXyUg/exec';
 
   function getRead() {
@@ -3446,12 +3441,90 @@
     var cbName = '_booksCb_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5);
     var script = document.createElement('script');
     var done = false;
-    window[cbName] = function(resp) { done = true; delete window[cbName]; script.remove(); cb(null, resp); };
+    function finish(err, resp) {
+      if (done) return;
+      done = true;
+      // Leave a no-op behind so a late response can't call an undefined global.
+      window[cbName] = function() {};
+      script.remove();
+      if (!err && resp && resp.status === 'error') err = resp.message || 'Server error';
+      cb(err, resp);
+    }
+    window[cbName] = function(resp) { finish(null, resp); };
     script.src = url + (url.includes('?') ? '&' : '?') + 'callback=' + cbName;
-    script.onerror = function() { if (!done) { delete window[cbName]; script.remove(); cb('Failed'); } };
-    setTimeout(function() { if (!done) { delete window[cbName]; script.remove(); cb('Timeout'); } }, 15000);
+    script.onerror = function() { finish('Failed'); };
+    // The Apps Script backend sometimes takes 15-35 s to answer.
+    setTimeout(function() { finish('Timeout'); }, 40000);
     document.head.appendChild(script);
   }
+
+  // ── Pending writes ──
+  // Read marks and shelf moves wait here until the server confirms them, and
+  // are re-applied on top of every pull. Without this, a mark made offline
+  // (or before the first sync finished) was undone by the server's older copy.
+  var PENDING_KEY = 'books_pending_writes';
+
+  function getPending() {
+    try { return JSON.parse(localStorage.getItem(PENDING_KEY)) || {}; } catch(e) { return {}; }
+  }
+
+  function setPending(p) {
+    localStorage.setItem(PENDING_KEY, JSON.stringify(p));
+  }
+
+  // op: { action: 'toggle_read'|'move_to_shelf'|'unmove_from_shelf', book, read?, section? }
+  function queueWrite(slot, op) {
+    var p = getPending();
+    op.ts = Date.now();
+    p[slot] = op;
+    setPending(p);
+    flushPending();
+  }
+
+  function writeUrl(op) {
+    var url = SYNC_URL + '?action=' + op.action + '&book=' + encodeURIComponent(op.book);
+    if (op.action === 'toggle_read') url += '&read=' + (op.read ? 'true' : 'false');
+    if (op.action === 'move_to_shelf') url += '&section=' + encodeURIComponent(op.section || '');
+    return url;
+  }
+
+  function flushPending() {
+    if (!syncReady) return; // the first sync flushes when it finishes
+    var p = getPending();
+    Object.keys(p).forEach(function(slot) {
+      var op = p[slot];
+      jsonpFetch(writeUrl(op), function(err) {
+        if (err) return; // stays queued; retried after the next sync
+        var cur = getPending();
+        if (cur[slot] && cur[slot].ts === op.ts) {
+          delete cur[slot];
+          setPending(cur);
+        }
+      });
+    });
+  }
+
+  function applyPendingRead(read) {
+    var p = getPending();
+    Object.keys(p).forEach(function(slot) {
+      var op = p[slot];
+      if (op.action !== 'toggle_read') return;
+      if (op.read) read[op.book] = true; else delete read[op.book];
+    });
+    return read;
+  }
+
+  function applyPendingMoves(moved) {
+    var p = getPending();
+    Object.keys(p).forEach(function(slot) {
+      var op = p[slot];
+      if (op.action === 'move_to_shelf') moved[op.book] = { ts: op.ts, section: op.section };
+      else if (op.action === 'unmove_from_shelf') delete moved[op.book];
+    });
+    return moved;
+  }
+
+  window.addEventListener('online', flushPending);
 
   function toggleRead(e, id) {
     e.preventDefault();
@@ -3461,10 +3534,7 @@
     if (nowRead) { read[id] = true; } else { delete read[id]; }
     saveRead(read);
     render();
-    // Sync individual toggle to backend (safe — never wipes other data)
-    if (syncReady && SYNC_URL && SYNC_URL !== 'YOUR_APPS_SCRIPT_URL_HERE') {
-      jsonpFetch(SYNC_URL + '?action=toggle_read&book=' + encodeURIComponent(id) + '&read=' + nowRead, function(){});
-    }
+    queueWrite('read:' + id, { action: 'toggle_read', book: id, read: nowRead });
   }
 
   function switchTab(tab) {
@@ -3524,30 +3594,25 @@
     });
   }
 
-  // Initial render from localStorage (instant)
-  render();
-
   // Sync from backend on load
   function syncFromBackend() {
-    if (!SYNC_URL || SYNC_URL === 'YOUR_APPS_SCRIPT_URL_HERE') { syncReady = true; return; }
     var got = 0;
     function checkDone() {
       got++;
       if (got >= 3) {
         syncReady = true;
         render();
+        flushPending();
       }
     }
     jsonpFetch(SYNC_URL + '?action=get_read', function(err, readData) {
       if (!err && readData && readData.status === 'ok' && readData.books_read) {
-        saveRead(readData.books_read);
+        saveRead(applyPendingRead(readData.books_read));
       }
       checkDone();
     });
     jsonpFetch(SYNC_URL + '?action=get_bookmarks', function(err, bmData) {
       if (!err && bmData && bmData.status === 'ok' && bmData.bookmarks) {
-        activeBookmarks = bmData.bookmarks;
-        localStorage.setItem('books_bookmarks', JSON.stringify(activeBookmarks));
         // Merge reading speed data from same response (avoids second request)
         if (window._RS_KEY && bmData.bookmarks[window._RS_KEY]) {
           var remote = bmData.bookmarks[window._RS_KEY];
@@ -3559,25 +3624,11 @@
           if (remote.books) {
             if (!local.books) local.books = {};
             Object.keys(remote.books).forEach(function(path) {
-              var rb = remote.books[path];
               var lb = local.books[path];
-              if (!lb) { local.books[path] = rb; changed = true; }
-              else {
-                var localTime = lb.updatedAt || lb.resetAt || 0;
-                var remoteTime = rb.updatedAt || rb.resetAt || 0;
-                if (localTime || remoteTime) {
-                  // Timestamped: newest state wins (supports resets)
-                  if (remoteTime > localTime) {
-                    rb.words = Math.max(rb.words || 0, lb.words || 0);
-                    local.books[path] = rb;
-                    changed = true;
-                  }
-                } else {
-                  // Legacy records without timestamps: highest wins
-                  if ((rb.maxScroll || 0) > (lb.maxScroll || 0)) { lb.maxScroll = rb.maxScroll; changed = true; }
-                  if ((rb.maxWordsRead || 0) > (lb.maxWordsRead || 0)) { lb.maxWordsRead = rb.maxWordsRead; changed = true; }
-                  if ((rb.words || 0) > (lb.words || 0)) { lb.words = rb.words; changed = true; }
-                }
+              var merged = mergeProgress(lb, remote.books[path]);
+              if (JSON.stringify(merged) !== JSON.stringify(lb)) {
+                local.books[path] = merged;
+                changed = true;
               }
             });
           }
@@ -3590,17 +3641,9 @@
             });
             if (local.sessions.length > 50) local.sessions = local.sessions.slice(-50);
           }
-          // Sync reader model — newest updatedAt wins (so a reset can
-          // propagate); legacy models without timestamps fall back to
-          // "more samples wins"
-          if (remote.reader) {
-            var lr = local.reader, rr = remote.reader;
-            var rt = rr.updatedAt || 0, lt = lr ? (lr.updatedAt || 0) : 0;
-            var takeRemote = !lr || ((rt || lt) ? rt > lt : (rr.samples || 0) > (lr.samples || 0));
-            if (takeRemote) {
-              local.reader = rr;
-              changed = true;
-            }
+          if (remote.reader && readerIsNewer(remote.reader, local.reader)) {
+            local.reader = remote.reader;
+            changed = true;
           }
           if (changed) {
             localStorage.setItem(window._RS_KEY, JSON.stringify(local));
@@ -3612,16 +3655,54 @@
     });
     jsonpFetch(SYNC_URL + '?action=get_moved', function(err, movedData) {
       if (!err && movedData && movedData.status === 'ok' && movedData.moved) {
-        // Merge remote into local (remote wins for conflicts)
+        // Merge remote into local (remote wins for conflicts), then re-apply
+        // moves this device hasn't got confirmed yet
         var local = getMovedToShelf();
         var remote = movedData.moved;
         for (var k in remote) { local[k] = remote[k]; }
-        localStorage.setItem(SHELF_MOVED_KEY, JSON.stringify(local));
+        localStorage.setItem(SHELF_MOVED_KEY, JSON.stringify(applyPendingMoves(local)));
         render();
       }
       checkDone();
     });
   }
+
+  // Merge two reading-progress records for the same page. Progress only moves
+  // forward, except that a reset newer than everything the other copy knows
+  // about wins outright. Keep identical to mergeProgress in book.js and
+  // mergeProgress_ in the Apps Script (tests/sync_test.js checks all three).
+  function mergeProgress(a, b) {
+    if (!a) return b;
+    if (!b) return a;
+    var aReset = a.resetAt || 0, bReset = b.resetAt || 0;
+    if (bReset > (a.updatedAt || 0) && bReset > aReset) return b;
+    if (aReset > (b.updatedAt || 0) && aReset > bReset) return a;
+    var newer = (b.updatedAt || 0) > (a.updatedAt || 0) ? b : a;
+    var out = {};
+    for (var k in newer) out[k] = newer[k];
+    out.words = Math.max(a.words || 0, b.words || 0);
+    out.maxScroll = Math.max(a.maxScroll || 0, b.maxScroll || 0);
+    if (a.maxWordsRead !== undefined || b.maxWordsRead !== undefined) {
+      out.maxWordsRead = Math.max(a.maxWordsRead || 0, b.maxWordsRead || 0);
+    }
+    var updated = Math.max(a.updatedAt || 0, b.updatedAt || 0);
+    if (updated) out.updatedAt = updated;
+    if (aReset || bReset) out.resetAt = Math.max(aReset, bReset);
+    return out;
+  }
+
+  // Reading-speed model: an out-of-range model never wins; otherwise the one
+  // built from more reading sessions wins, newest first on a tie. Keep
+  // identical to readerIsNewer in book.js and readerIsNewer_ in the Apps Script.
+  function readerIsNewer(inc, ex) {
+    function valid(r) { return !!r && r.averageWPM >= 80 && r.averageWPM <= 500; }
+    if (!valid(inc)) return false;
+    if (!valid(ex)) return true;
+    var is = inc.samples || 0, es = ex.samples || 0;
+    if (is !== es) return is > es;
+    return (inc.updatedAt || 0) > (ex.updatedAt || 0);
+  }
+
   syncFromBackend();
 
   // Re-fetch when page becomes visible (fixes Reading filter after setting bookmark in a book)
@@ -3690,10 +3771,7 @@
     moved[id] = { ts: Date.now(), section: sectionName };
     localStorage.setItem(SHELF_MOVED_KEY, JSON.stringify(moved));
     render();
-    // Sync to backend
-    if (syncReady && SYNC_URL && SYNC_URL !== 'YOUR_APPS_SCRIPT_URL_HERE') {
-      jsonpFetch(SYNC_URL + '?action=move_to_shelf&book=' + encodeURIComponent(id) + '&section=' + encodeURIComponent(sectionName), function(){});
-    }
+    queueWrite('move:' + id, { action: 'move_to_shelf', book: id, section: sectionName });
   }
 
   function unmoveFromShelf(e, id) {
@@ -3703,9 +3781,7 @@
     delete moved[id];
     localStorage.setItem(SHELF_MOVED_KEY, JSON.stringify(moved));
     render();
-    if (syncReady && SYNC_URL && SYNC_URL !== 'YOUR_APPS_SCRIPT_URL_HERE') {
-      jsonpFetch(SYNC_URL + '?action=unmove_from_shelf&book=' + encodeURIComponent(id), function(){});
-    }
+    queueWrite('move:' + id, { action: 'unmove_from_shelf', book: id });
   }
 
   function renderMovedToShelf() {
@@ -3836,9 +3912,10 @@
     } catch(e) { return; }
     if (!data || !data.books) return;
 
-    // Reset corrupted WPM (one-time fix for outlier spikes)
+    // Drop a corrupted WPM model (outlier spikes). No timestamp, so a good
+    // model from another device still wins the next sync.
     if (data.reader && (data.reader.averageWPM > 500 || data.reader.averageWPM < 80)) {
-      data.reader = { averageWPM: 225, samples: 0, updatedAt: Date.now() };
+      data.reader = { averageWPM: 225, samples: 0, updatedAt: 0 };
       localStorage.setItem(RS_KEY, JSON.stringify(data));
     }
 
@@ -3958,12 +4035,28 @@
 </script>
 
 <script>
-// Offline caching was removed (service-worker.js has been empty since July
-// 2026); unregister any worker left over from older versions of the site.
+// Offline library: service-worker.js saves every book on this device. Ping it
+// on load (and when the connection comes back) so it saves anything new, and
+// keep pinging while a long first download is still running.
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.getRegistrations().then(function(regs) {
-    regs.forEach(function(r) { r.unregister(); });
-  }).catch(function() {});
+  navigator.serviceWorker.register('service-worker.js').catch(function() {});
+  var pingOfflineLibrary = function() {
+    if (navigator.onLine === false) return;
+    navigator.serviceWorker.ready.then(function(reg) {
+      if (reg.active) reg.active.postMessage({ type: 'sync' });
+    });
+  };
+  navigator.serviceWorker.addEventListener('message', function(e) {
+    if (!e.data || e.data.type !== 'offline-status') return;
+    clearTimeout(window._offlinePing);
+    if (e.data.syncing) window._offlinePing = setTimeout(pingOfflineLibrary, 60000);
+  });
+  window.addEventListener('online', pingOfflineLibrary);
+  pingOfflineLibrary();
+  // Ask the browser not to evict the saved books when storage runs low.
+  if (navigator.storage && navigator.storage.persist) {
+    navigator.storage.persist().catch(function() {});
+  }
 }
 </script>
 

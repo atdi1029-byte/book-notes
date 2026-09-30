@@ -6,6 +6,8 @@
 
 (function() {
   var SYNC_URL = 'https://script.google.com/macros/s/AKfycbwt438APIycBc534W6T66O3IgtxLUU9cczw-PZAN6Mc9p2xfU2ySsND_wEMJDHUvrXyUg/exec';
+  // Where book.js was loaded from (the site root), for the service worker.
+  var SCRIPT_SRC = document.currentScript && document.currentScript.src;
   var bar = document.getElementById('bookmarkBar');
   var label = document.getElementById('bmLabel');
   var toast = document.getElementById('bmToast');
@@ -28,7 +30,8 @@
     window[cbName] = function(resp) { finish(null, resp); };
     script.src = url + (url.includes('?') ? '&' : '?') + 'callback=' + cbName;
     script.onerror = function() { finish('Failed'); };
-    setTimeout(function() { finish('Timeout'); }, 15000);
+    // The Apps Script backend sometimes takes 15-35 s to answer.
+    setTimeout(function() { finish('Timeout'); }, 40000);
     document.head.appendChild(script);
   }
 
@@ -83,11 +86,6 @@
     var rawTitle = el.textContent.replace('\u{1F516}','').trim();
     var d = { id: id, title: rawTitle.length > 25 ? rawTitle.slice(0, 25) + '...' : rawTitle, y: window.scrollY, ts: Date.now() };
     localStorage.setItem(BM_KEY, JSON.stringify(d));
-    // Update shared bookmark collection for library page
-    var all = {};
-    try { all = JSON.parse(localStorage.getItem('books_bookmarks')) || {}; } catch(e) {}
-    all[BM_KEY] = d;
-    localStorage.setItem('books_bookmarks', JSON.stringify(all));
     bar.style.display = 'flex';
     label.textContent = 'Resume: ' + d.title;
     showToast('Bookmark saved');
@@ -110,9 +108,9 @@
   };
 
   window.jumpToBookmark = function() {
-    var saved = localStorage.getItem(BM_KEY);
-    if (!saved) return;
-    var d = JSON.parse(saved);
+    var d;
+    try { d = JSON.parse(localStorage.getItem(BM_KEY)); } catch(e) {}
+    if (!d) return;
     var el = document.getElementById(d.id);
     if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
     else window.scrollTo({ top: d.y, behavior: 'smooth' });
@@ -120,10 +118,6 @@
 
   function forgetLocalBookmark() {
     localStorage.removeItem(BM_KEY);
-    var all = {};
-    try { all = JSON.parse(localStorage.getItem('books_bookmarks')) || {}; } catch(e) {}
-    delete all[BM_KEY];
-    localStorage.setItem('books_bookmarks', JSON.stringify(all));
     bar.style.display = 'none';
     document.querySelectorAll('.bm-btn').forEach(function(b) { b.classList.remove('active'); });
   }
@@ -254,8 +248,10 @@
           );
         }
       }
-      // Reading speed merge (shared from same response)
-      window._bmSyncJson = json;
+      // Reading progress from other devices rides on the same response.
+      // (This used to be picked up by a 2 s poll, so a slow reply — common —
+      // was never merged and older progress could overwrite newer.)
+      mergeRemoteReadingData(json);
     } else {
       if (err) console.warn('[BM SYNC] get_bookmarks FAILED:', err);
       var localRaw = localStorage.getItem(BM_KEY);
@@ -502,7 +498,31 @@
   // save (progress made on another device was lost that way).
   var speedData = loadSpeedData();
 
-  // Merge remote reading data — reuse the bookmark sync response
+  // Merge two reading-progress records for the same page. Progress only moves
+  // forward, except that a reset newer than everything the other copy knows
+  // about wins outright. Keep identical to mergeProgress in index.html and
+  // mergeProgress_ in the Apps Script (tests/sync_test.js checks all three).
+  function mergeProgress(a, b) {
+    if (!a) return b;
+    if (!b) return a;
+    var aReset = a.resetAt || 0, bReset = b.resetAt || 0;
+    if (bReset > (a.updatedAt || 0) && bReset > aReset) return b;
+    if (aReset > (b.updatedAt || 0) && aReset > bReset) return a;
+    var newer = (b.updatedAt || 0) > (a.updatedAt || 0) ? b : a;
+    var out = {};
+    for (var k in newer) out[k] = newer[k];
+    out.words = Math.max(a.words || 0, b.words || 0);
+    out.maxScroll = Math.max(a.maxScroll || 0, b.maxScroll || 0);
+    if (a.maxWordsRead !== undefined || b.maxWordsRead !== undefined) {
+      out.maxWordsRead = Math.max(a.maxWordsRead || 0, b.maxWordsRead || 0);
+    }
+    var updated = Math.max(a.updatedAt || 0, b.updatedAt || 0);
+    if (updated) out.updatedAt = updated;
+    if (aReset || bReset) out.resetAt = Math.max(aReset, bReset);
+    return out;
+  }
+
+  // Merge remote reading data — reuses the bookmark sync response
   function mergeRemoteReadingData(json) {
     if (!json || !json.bookmarks || !json.bookmarks[RS_KEY]) return;
     var remote = json.bookmarks[RS_KEY];
@@ -512,33 +532,11 @@
     if (remote.books) {
       if (!local.books) local.books = {};
       Object.keys(remote.books).forEach(function(path) {
-        var rb = remote.books[path];
         var lb = local.books[path];
-        if (!lb) {
-          local.books[path] = rb;
+        var merged = mergeProgress(lb, remote.books[path]);
+        if (JSON.stringify(merged) !== JSON.stringify(lb)) {
+          local.books[path] = merged;
           changed = true;
-        } else {
-          var localTime = lb.updatedAt || lb.resetAt || 0;
-          var remoteTime = rb.updatedAt || rb.resetAt || 0;
-          if (localTime || remoteTime) {
-            // Timestamped: newest state wins (supports resets)
-            if (remoteTime > localTime) {
-              // Preserve local word count (total words in book)
-              rb.words = Math.max(rb.words || 0, lb.words || 0);
-              local.books[path] = rb;
-              changed = true;
-            }
-          } else {
-            // Legacy records without timestamps: highest wins
-            if ((rb.maxScroll || 0) > (lb.maxScroll || 0)) {
-              lb.maxScroll = rb.maxScroll;
-              changed = true;
-            }
-            if ((rb.words || 0) > (lb.words || 0)) {
-              lb.words = rb.words;
-              changed = true;
-            }
-          }
         }
       });
     }
@@ -560,13 +558,9 @@
       }
     }
 
-    // Sync reader model — newest updatedAt wins (so a reset propagates);
-    // legacy models without timestamps fall back to "more samples wins".
-    if (remote.reader) {
-      if (readerIsNewer(remote.reader, local.reader)) {
-        local.reader = remote.reader;
-        changed = true;
-      }
+    if (remote.reader && readerIsNewer(remote.reader, local.reader)) {
+      local.reader = remote.reader;
+      changed = true;
     }
 
     if (changed) {
@@ -575,27 +569,18 @@
     }
   }
 
+  // Reading-speed model: an out-of-range model never wins; otherwise the one
+  // built from more reading sessions wins, newest first on a tie. (Newest-
+  // always-wins let a fresh device's 1-session model replace months of
+  // calibration.) Keep identical to readerIsNewer in index.html and
+  // readerIsNewer_ in the Apps Script.
   function readerIsNewer(inc, ex) {
-    if (!ex) return true;
-    var it = inc.updatedAt || 0, et = ex.updatedAt || 0;
-    if (it || et) return it > et;
-    return (inc.samples || 0) > (ex.samples || 0);
-  }
-
-  // If sync already completed, merge now; otherwise poll briefly
-  if (window._bmSyncJson) {
-    mergeRemoteReadingData(window._bmSyncJson);
-  } else {
-    var _pollCount = 0;
-    var _pollTimer = setInterval(function() {
-      _pollCount++;
-      if (window._bmSyncJson) {
-        clearInterval(_pollTimer);
-        mergeRemoteReadingData(window._bmSyncJson);
-      } else if (_pollCount > 20) {
-        clearInterval(_pollTimer); // give up after 2s
-      }
-    }, 100);
+    function valid(r) { return !!r && r.averageWPM >= 80 && r.averageWPM <= 500; }
+    if (!valid(inc)) return false;
+    if (!valid(ex)) return true;
+    var is = inc.samples || 0, es = ex.samples || 0;
+    if (is !== es) return is > es;
+    return (inc.updatedAt || 0) > (ex.updatedAt || 0);
   }
 
   (function initReadingTracker() {
@@ -832,14 +817,16 @@
     // ETA updates via the 1-second dwell ticker above
 
     // ── Reader model (Kindle-style EMA) ──
-    // updatedAt lets a reset win the merge against an older model that
-    // merely has more samples (the old rule kept resurrecting a 71 wpm outlier).
+    // A corrupted or brand-new model starts at 225 wpm with no samples and no
+    // timestamp, so it never replaces the real model from another device
+    // (it used to be stamped "now", which reset the model everywhere whenever
+    // a new device opened a book).
     if (data.reader && (data.reader.averageWPM > 500 || data.reader.averageWPM < 80)) {
-      data.reader = { averageWPM: 225, samples: 0, updatedAt: Date.now() };
+      data.reader = { averageWPM: 225, samples: 0, updatedAt: 0 };
       saveSpeedData(data);
     }
     if (!data.reader) {
-      data.reader = { averageWPM: 225, samples: 0, updatedAt: Date.now() };
+      data.reader = { averageWPM: 225, samples: 0, updatedAt: 0 };
       if (data.sessions && data.sessions.length > 0) {
         var recent = data.sessions.slice(-10);
         var tw = 0, tm = 0;
@@ -1102,43 +1089,106 @@
   // Parses the glossary section, then highlights matching terms
   // in chapter text with tap/hover tooltips showing definitions.
   (function initGlossary() {
-    var glossaryH2 = document.getElementById('glossary');
-    if (!glossaryH2) return;
+    var glossaryEl = document.getElementById('glossary');
+    if (!glossaryEl) return;
 
-    // Collect terms from glossary lists
-    var terms = [];
-    var sibling = glossaryH2.nextElementSibling;
-    while (sibling) {
-      // Stop at the next h2 (end of glossary section)
-      if (sibling.tagName === 'H2') break;
-      if (sibling.tagName === 'UL') {
-        sibling.querySelectorAll('li').forEach(function(li) {
-          var strong = li.querySelector('strong');
-          if (!strong) return;
-          var rawTerm = strong.textContent.replace(/:$/, '').trim();
-          // Get definition: everything after the strong tag
-          var def = li.textContent
-            .replace(strong.textContent, '').trim();
-          if (rawTerm && def) {
-            terms.push({ term: rawTerm, def: def });
-          }
-        });
-      }
-      // Also handle <p><strong>Term:</strong> definition</p> format
-      if (sibling.tagName === 'P') {
-        var strong = sibling.querySelector('strong');
-        if (strong) {
-          var rawTerm = strong.textContent.replace(/:$/, '').trim();
-          var def = sibling.textContent
-            .replace(strong.textContent, '').trim();
-          if (rawTerm && def) {
-            terms.push({ term: rawTerm, def: def });
-          }
-        }
-      }
-      sibling = sibling.nextElementSibling;
+    // Text of a node without the bookmark buttons that initBookmark() has
+    // already added (a 🔖 glued onto every <li><strong> term meant list-style
+    // glossaries never matched, and paragraph-style ones showed it in every
+    // definition).
+    function textOf(node) {
+      if (node.nodeType === 3) return node.textContent;
+      if (node.nodeType !== 1 || node.classList.contains('bm-btn')) return '';
+      var clone = node.cloneNode(true);
+      clone.querySelectorAll('.bm-btn').forEach(function(b) { b.remove(); });
+      return clone.textContent;
     }
 
+    var terms = [];
+    function addTerm(term, def) {
+      term = term.replace(/\s+/g, ' ').replace(/[\s:]+$/, '').trim();
+      def = def.replace(/\s+/g, ' ').replace(/^[\s:\u2013\u2014-]+/, '').trim();
+      if (term && def) terms.push({ term: term, def: def });
+    }
+
+    // One <p>/<li>/<dd> can hold several entries ("<br><strong>Put:</strong>
+    // …"). A <strong> starts a new term only at the start of the block or
+    // right after a <br>; a <strong> inside a definition is just emphasis.
+    function parseBlock(block) {
+      var term = null, def = '', atLineStart = true;
+      block.childNodes.forEach(function(n) {
+        if (n.nodeType === 1 && n.classList.contains('bm-btn')) return;
+        if (n.nodeType === 1 && n.tagName === 'BR') {
+          atLineStart = true;
+          def += ' ';
+          return;
+        }
+        if (n.nodeType === 3 && !n.textContent.trim()) { def += n.textContent; return; }
+        if (n.nodeType === 1 && n.tagName === 'STRONG' && atLineStart) {
+          if (term) addTerm(term, def);
+          term = textOf(n);
+          def = '';
+          atLineStart = false;
+          return;
+        }
+        atLineStart = false;
+        def += textOf(n);
+      });
+      if (term) addTerm(term, def);
+    }
+
+    // Elements that make up the glossary: everything after <h2 id="glossary">
+    // up to the next <h2>, or the children of a <section id="glossary">.
+    var blocks = [];
+    if (glossaryEl.tagName === 'H2') {
+      for (var s = glossaryEl.nextElementSibling; s && s.tagName !== 'H2'; s = s.nextElementSibling) {
+        blocks.push(s);
+      }
+    } else {
+      blocks = Array.prototype.slice.call(glossaryEl.children);
+    }
+
+    var glossaryParas = new Set();
+    function collect(el) {
+      var tag = el.tagName;
+      if (tag === 'P' || tag === 'LI') {
+        glossaryParas.add(el);
+        parseBlock(el);
+      } else if (tag === 'DL') {
+        var dt = null;
+        Array.prototype.forEach.call(el.children, function(c) {
+          if (c.tagName === 'DT') dt = c;
+          else if (c.tagName === 'DD' && dt) addTerm(textOf(dt), textOf(c));
+        });
+      } else if (tag === 'TABLE') {
+        el.querySelectorAll('tr').forEach(function(tr) {
+          var cells = tr.querySelectorAll('td');
+          if (cells.length < 2) return;
+          var def = '';
+          for (var i = 1; i < cells.length; i++) def += ' ' + textOf(cells[i]);
+          addTerm(textOf(cells[0]), def);
+        });
+      } else if (tag === 'UL' || tag === 'OL' || tag === 'DIV' || tag === 'SECTION') {
+        Array.prototype.forEach.call(el.children, collect);
+      }
+      if (tag !== 'P') el.querySelectorAll('p').forEach(function(p) { glossaryParas.add(p); });
+    }
+    blocks.forEach(collect);
+
+    // "Caliph (Khalifa)" should also match plain "caliph" in the chapters.
+    terms.slice().forEach(function(t) {
+      var base = t.term.replace(/\s*\([^)]*\)\s*$/, '');
+      if (base !== t.term && base.length >= 3) terms.push({ term: base, def: t.def, label: t.term });
+    });
+
+    // Build term→def lookup (lowercase keys); the first definition wins
+    var lookup = {};
+    terms = terms.filter(function(t) {
+      var k = t.term.toLowerCase();
+      if (lookup[k]) return false;
+      lookup[k] = t;
+      return true;
+    });
     if (terms.length === 0) return;
 
     // Sort by length descending so longer terms match first
@@ -1147,55 +1197,37 @@
       return b.term.length - a.term.length;
     });
 
-    // Build regex matching all terms (case-insensitive, word boundary)
+    // Build regex matching all terms (case-insensitive, whole words — also
+    // for terms that start or end with punctuation, like "401(k)")
     var escaped = terms.map(function(t) {
       return t.term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     });
-    var re = new RegExp(
-      '\\b(' + escaped.join('|') + ')\\b', 'gi'
-    );
+    var re;
+    try {
+      re = new RegExp('(?<![\\w])(' + escaped.join('|') + ')(?![\\w])', 'gi');
+    } catch (e) {
+      re = new RegExp('\\b(' + escaped.join('|') + ')\\b', 'gi');
+    }
 
-    // Build term→def lookup (lowercase keys)
-    var lookup = {};
-    terms.forEach(function(t) {
-      lookup[t.term.toLowerCase()] = t;
-    });
-
-    // Walk text nodes in chapter content (skip glossary itself,
-    // headings, blockquotes with cite, and existing glossary spans)
-    var container = document.querySelector('body');
-    var glossarySection = glossaryH2.parentElement === container
-      ? null : glossaryH2.parentElement;
+    // Walk text nodes in chapter paragraphs (skip the glossary itself,
+    // links, headings and existing glossary spans)
+    var container = document.body;
 
     function shouldSkip(node) {
       var el = node.parentElement;
       while (el && el !== container) {
-        if (el === glossaryH2) return true;
         if (el.id === 'glossary') return true;
         if (el.classList && el.classList.contains('gloss')) return true;
         if (el.tagName === 'A') return true;
         if (el.tagName === 'H1' || el.tagName === 'H2') return true;
-        // Skip inside the glossary ULs
-        if (glossarySection && el === glossarySection) return true;
         el = el.parentElement;
       }
       return false;
     }
 
     // Link every occurrence of each term, not just the first
-    var linked = null; // unused — kept for reference
-
-    // Find the end of the glossary section (next h2 after glossary)
-    var glossaryEnd = glossaryH2.nextElementSibling;
-    while (glossaryEnd && glossaryEnd.tagName !== 'H2') {
-      glossaryEnd = glossaryEnd.nextElementSibling;
-    }
-
-    // Get all paragraphs — skip those inside the glossary
-    var paras = document.querySelectorAll('p');
-    paras.forEach(function(p) {
-      // Skip if inside glossary (between glossary h2 and next h2)
-      if (shouldSkip(p)) return;
+    document.querySelectorAll('p').forEach(function(p) {
+      if (glossaryParas.has(p) || shouldSkip(p)) return;
 
       var walker = document.createTreeWalker(
         p, NodeFilter.SHOW_TEXT, null, false
@@ -1208,7 +1240,6 @@
         var text = textNode.textContent;
         re.lastIndex = 0;
         if (!re.test(text)) return;
-        re.lastIndex = 0;
 
         var frag = document.createDocumentFragment();
         var lastIdx = 0;
@@ -1216,8 +1247,7 @@
 
         re.lastIndex = 0;
         while ((match = re.exec(text)) !== null) {
-          var termKey = match[1].toLowerCase();
-          var entry = lookup[termKey];
+          var entry = lookup[match[1].toLowerCase()];
           if (!entry) continue;
 
           // Text before match
@@ -1230,7 +1260,7 @@
           // Glossary span
           var span = document.createElement('span');
           span.className = 'gloss';
-          span.setAttribute('data-term', entry.term);
+          span.setAttribute('data-term', entry.label || entry.term);
           span.setAttribute('data-def', entry.def);
           span.textContent = match[0];
           frag.appendChild(span);
@@ -1314,4 +1344,18 @@
       }
     });
   })();
+
+  // ── Offline library ──
+  // The shelf registers the service worker too; doing it here as well means
+  // a book opened directly (bookmark, home-screen shortcut) still ends up
+  // saving the whole library for offline reading.
+  if ('serviceWorker' in navigator && SCRIPT_SRC) {
+    navigator.serviceWorker.register(new URL('service-worker.js', SCRIPT_SRC).href)
+      .catch(function() {});
+    if (navigator.onLine !== false) {
+      navigator.serviceWorker.ready.then(function(reg) {
+        if (reg.active) reg.active.postMessage({ type: 'sync' });
+      });
+    }
+  }
 })();

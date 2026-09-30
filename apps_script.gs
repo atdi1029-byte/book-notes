@@ -16,6 +16,14 @@
 //   - Cleared bookmarks leave a 30-day tombstone (returned in `deleted`) so
 //     another device does not resurrect them from localStorage.
 //   - Reader model precedence: newest `updatedAt` wins (a reset can propagate).
+//
+// v3 (2026-09-30)
+//   - Reading progress merges field by field and only moves forward
+//     (mergeProgress_), unless a newer reset says otherwise. Newest-record-
+//     wins let a device that missed another device's progress overwrite it.
+//   - Reader model: the model built from more sessions wins; an out-of-range
+//     model never does. A new device's default model can no longer replace
+//     the real one.
 //   - Reading records are only kept for real book pages
 //     (<Folder>/index.html or <Folder>/plain.html).
 //
@@ -31,10 +39,12 @@
 // Scalp journal:   scalp_get / scalp_save&data= / scalp_add&data= / scalp_delete&date=   Settings!E1
 // Finance guide:   fg_get_done / fg_toggle_done&slug=&done=                              Settings!F1
 // Taper:           taper_get / taper_save&data= / taper_save_chunk&i=&cd= / taper_save_done&n=   Settings!G1 (+H col temp)
-// Zercher:         zercher_save_config / zercher_save_chunk / zercher_save_done / zercher_save_extra /
-//                  zercher_log_workout / zercher_log_run / zercher_load                   sheet "Zercher"
+// Zercher:         zercher_save_config / zercher_save_chunk&u= / zercher_save_done&u=&target= /
+//                  zercher_save_extra / zercher_log_workout / zercher_delete_log&id= /
+//                  zercher_log_run / zercher_load[&lite=1]      sheets "Zercher", "ZercherBlobs",
+//                                                               "ZercherChunks", "ZercherDeleted"
 
-var VERSION = 2;
+var VERSION = 3;
 var BM_SHEET = 'BookmarkRows';       // A=key, B=json, C=updated (ms)
 var LEGACY_BM_SHEET = 'Bookmarks';   // old single-cell store (A1)
 var RS_KEY = 'reading_speed_data';
@@ -48,7 +58,7 @@ var WRITE_ACTIONS = {
   scalp_save: 1, scalp_add: 1, scalp_delete: 1, fg_toggle_done: 1,
   taper_save: 1, taper_save_chunk: 1, taper_save_done: 1,
   zercher_save_config: 1, zercher_save_chunk: 1, zercher_save_done: 1,
-  zercher_save_extra: 1, zercher_log_workout: 1, zercher_log_run: 1
+  zercher_save_extra: 1, zercher_log_workout: 1, zercher_log_run: 1, zercher_delete_log: 1
 };
 
 function jsonpWrap_(json, callback) {
@@ -413,16 +423,10 @@ function mergeReadingData_(sh, byKey, inc) {
     delete b._lastJumpAt;
     var k = 'rs:book:' + path;
     var ex = byKey[k] ? byKey[k].data : null;
-    if (ex) {
-      var incTime = recordTime_(b), exTime = recordTime_(ex);
-      if (incTime || exTime) {
-        if (incTime <= exTime) return;             // server copy is as new or newer
-        b.words = Math.max(b.words || 0, ex.words || 0);
-      } else if ((b.maxScroll || 0) <= (ex.maxScroll || 0)) {
-        return;                                    // legacy records: highest wins
-      }
-    }
-    writeBmRow_(sh, byKey, k, b);
+    var merged = mergeProgress_(ex, b);
+    delete merged._lastJumpAt;
+    if (ex && JSON.stringify(merged) === JSON.stringify(ex)) return;   // nothing new
+    writeBmRow_(sh, byKey, k, merged);
     written++;
   });
 
@@ -450,69 +454,217 @@ function mergeReadingData_(sh, byKey, inc) {
   return written;
 }
 
-// Reader model precedence: newest updatedAt wins (so a reset propagates);
-// legacy models without timestamps fall back to "more samples wins".
+// Merge two reading-progress records for the same page. Progress only moves
+// forward, except that a reset newer than everything the other copy knows
+// about wins outright. (Newest-record-wins let a device that had missed
+// another device's progress overwrite 80% with 25%.) Keep identical to
+// mergeProgress in Books/book.js and Books/index.html.
+function mergeProgress_(a, b) {
+  if (!a) return b;
+  if (!b) return a;
+  var aReset = a.resetAt || 0, bReset = b.resetAt || 0;
+  if (bReset > (a.updatedAt || 0) && bReset > aReset) return b;
+  if (aReset > (b.updatedAt || 0) && aReset > bReset) return a;
+  var newer = (b.updatedAt || 0) > (a.updatedAt || 0) ? b : a;
+  var out = {};
+  for (var k in newer) out[k] = newer[k];
+  out.words = Math.max(a.words || 0, b.words || 0);
+  out.maxScroll = Math.max(a.maxScroll || 0, b.maxScroll || 0);
+  if (a.maxWordsRead !== undefined || b.maxWordsRead !== undefined) {
+    out.maxWordsRead = Math.max(a.maxWordsRead || 0, b.maxWordsRead || 0);
+  }
+  var updated = Math.max(a.updatedAt || 0, b.updatedAt || 0);
+  if (updated) out.updatedAt = updated;
+  if (aReset || bReset) out.resetAt = Math.max(aReset, bReset);
+  return out;
+}
+
+// Reading-speed model: an out-of-range model never wins; otherwise the one
+// built from more reading sessions wins, newest first on a tie. (Newest-
+// always-wins let a fresh device's 1-session model replace months of
+// calibration.) Keep identical to readerIsNewer in Books/book.js.
 function readerIsNewer_(inc, ex) {
-  if (!ex) return true;
-  var it = inc.updatedAt || 0, et = ex.updatedAt || 0;
-  if (it || et) return it > et;
-  return (inc.samples || 0) > (ex.samples || 0);
+  function valid(r) { return !!r && r.averageWPM >= 80 && r.averageWPM <= 500; }
+  if (!valid(inc)) return false;
+  if (!valid(ex)) return true;
+  var is = inc.samples || 0, es = ex.samples || 0;
+  if (is !== es) return is > es;
+  return (inc.updatedAt || 0) > (ex.updatedAt || 0);
 }
 
 // ── Zercher ──────────────────────────────────────────────────────────────
+// Sheet "Zercher":        A2+ = workout logs (one JSON per row, upserted by id),
+//                         C2+ = legacy run logs, A1/B1 = legacy config/extra
+//                         (read only as a fallback), D = legacy chunk rows.
+// Sheet "ZercherBlobs":   one row per blob ("config", "extra"):
+//                         A=key, B=updated ms, C=length, D=client version,
+//                         E.. = 45,000-char parts. A blob is never capped by the
+//                         50,000-character cell limit (the old A1 cell hit it and
+//                         every config write failed from ~Sep 2026).
+// Sheet "ZercherChunks":  chunked uploads, keyed by upload id (&u=) so two uploads
+//                         running at once can never mix: A=u, B=index, C=text, D=ms.
+// Sheet "ZercherDeleted": deleted workout logs are archived here, not destroyed.
+// Stored text is prefixed with "~" so Sheets never reads a slice of JSON as a
+// number, date or formula.
+
+var Z_PART = 45000;
+var Z_BLOB_COL = 5;   // first part column (E)
+
+function zNamedSheet_(ss, name, header) {
+  var sh = ss.getSheetByName(name);
+  if (!sh) {
+    sh = ss.insertSheet(name);
+    sh.getRange(1, 1, 1, header.length).setValues([header]);
+  }
+  return sh;
+}
+
+function zBlobRow_(sh, key) {
+  var last = sh.getLastRow();
+  if (last < 2) return -1;
+  var keys = sh.getRange(2, 1, last - 1, 1).getValues();
+  for (var r = 0; r < keys.length; r++) if (String(keys[r][0]) === key) return r + 2;
+  return -1;
+}
+
+function zGetBlob_(ss, zSheet, key, legacyCell) {
+  var sh = ss.getSheetByName('ZercherBlobs');
+  if (sh) {
+    var row = zBlobRow_(sh, key);
+    if (row > 0) {
+      var width = sh.getLastColumn();
+      var vals = sh.getRange(row, 1, 1, width).getValues()[0];
+      var text = '';
+      for (var c = Z_BLOB_COL - 1; c < vals.length; c++) {
+        var part = String(vals[c] || '');
+        if (part) text += part.slice(1);
+      }
+      if (text.length === Number(vals[2])) return parseJson_(text, {});
+      throw new Error('Zercher ' + key + ' blob is damaged (' + text.length + ' of ' + vals[2] + ' chars)');
+    }
+  }
+  return cellJson_(zSheet, legacyCell, {});
+}
+
+// ver = client version. Once a v2+ client has written a blob, older app copies
+// (a stale tab left open somewhere) can no longer overwrite it.
+function zPutBlob_(ss, key, text, ver) {
+  JSON.parse(text); // validate before touching the sheet
+  ver = Number(ver || 1);
+  var sh = zNamedSheet_(ss, 'ZercherBlobs', ['key', 'updated', 'length', 'version', 'data']);
+  var row = zBlobRow_(sh, key);
+  if (row > 0) {
+    var stored = Number(sh.getRange(row, 4).getValue() || 1);
+    if (ver < stored) throw new Error('This copy of Zercher is out of date. Reload the app.');
+  } else {
+    row = sh.getLastRow() + 1;
+  }
+  var parts = [];
+  for (var i = 0; i < text.length; i += Z_PART) parts.push('~' + text.substring(i, i + Z_PART));
+  if (!parts.length) parts.push('~');
+  var need = Z_BLOB_COL - 1 + parts.length;
+  if (sh.getMaxColumns() < need) sh.insertColumnsAfter(sh.getMaxColumns(), need - sh.getMaxColumns());
+  sh.getRange(row, 1, 1, sh.getMaxColumns()).clearContent();
+  sh.getRange(row, 1, 1, need).setValues([[key, Date.now(), text.length, ver].concat(parts)]);
+  return { status: 'ok', ok: true, length: text.length, ts: new Date().toISOString() };
+}
+
+function zUpsertLog_(zSheet, text) {
+  var logObj = JSON.parse(text);
+  if (!logObj || !logObj.id) throw new Error('Workout log has no id');
+  var lastRow = zSheet.getLastRow();
+  if (lastRow >= 2) {
+    var existing = zSheet.getRange(2, 1, lastRow - 1, 1).getValues();
+    for (var w = 0; w < existing.length; w++) {
+      var ex = parseJson_(existing[w][0], null);
+      if (ex && ex.id === logObj.id) {
+        zSheet.getRange(w + 2, 1).setValue(text);
+        return { status: 'ok', ok: true, updated: true };
+      }
+    }
+  }
+  zSheet.getRange(Math.max(lastRow + 1, 2), 1).setValue(text);
+  return { status: 'ok', ok: true };
+}
+
+function zStore_(ss, zSheet, target, text, ver) {
+  if (target === 'config' || target === 'extra') return zPutBlob_(ss, target, text, ver);
+  if (target === 'workout') return zUpsertLog_(zSheet, text);
+  throw new Error('Unknown save target: ' + target);
+}
 
 function zercher_(ss, action, p) {
   var zSheet = ss.getSheetByName('Zercher');
   if (!zSheet) {
     zSheet = ss.insertSheet('Zercher');
-    zSheet.getRange('A1').setValue('{}');  // config
-    zSheet.getRange('B1').setValue('{}');  // extra (holds/notes/starts)
-    // A2+ = workout logs (one JSON per row), C2+ = run logs, D = temp chunks
+    zSheet.getRange('A1').setValue('{}');  // legacy config
+    zSheet.getRange('B1').setValue('{}');  // legacy extra
   }
 
-  if (action === 'zercher_save_config') {
-    var configData = p.data || '{}';
-    JSON.parse(configData); // validate
-    zSheet.getRange('A1').setValue(configData);
-    return { status: 'ok' };
-  }
+  if (action === 'zercher_save_config') return zPutBlob_(ss, 'config', p.data || '{}', p.v);
+  if (action === 'zercher_save_extra') return zPutBlob_(ss, 'extra', p.data || '{}', p.v);
+  if (action === 'zercher_log_workout') return zUpsertLog_(zSheet, p.data || '{}');
+
   if (action === 'zercher_save_chunk') {
     var idx = parseInt(p.i || '0', 10);
-    zSheet.getRange('D' + (idx + 1)).setValue(p.cd || '');
+    if (p.u) {
+      zNamedSheet_(ss, 'ZercherChunks', ['upload', 'index', 'text', 'ms'])
+        .appendRow([String(p.u), idx, '~' + (p.cd || ''), Date.now()]);
+    } else {
+      zSheet.getRange('D' + (idx + 1)).setValue(p.cd || '');   // legacy clients
+    }
     return { status: 'ok', ok: true, chunk: idx };
   }
+
   if (action === 'zercher_save_done') {
     var target = p.target || 'config';
     var total = parseInt(p.n || '1', 10);
     var fullData = '';
-    for (var i = 0; i < total; i++) fullData += (zSheet.getRange('D' + (i + 1)).getValue() || '');
-    zSheet.getRange(target === 'extra' ? 'B1' : 'A1').setValue(fullData);
-    for (var j = 0; j < total; j++) zSheet.getRange('D' + (j + 1)).clearContent();
-    return { status: 'ok', ok: true, ts: new Date().toISOString() };
+    if (p.u) {
+      var ch = zNamedSheet_(ss, 'ZercherChunks', ['upload', 'index', 'text', 'ms']);
+      var last = ch.getLastRow();
+      var got = {}, drop = [], now = Date.now();
+      if (last >= 2) {
+        var rows = ch.getRange(2, 1, last - 1, 4).getValues();
+        for (var r = 0; r < rows.length; r++) {
+          var mine = String(rows[r][0]) === String(p.u);
+          if (mine) got[Number(rows[r][1])] = String(rows[r][2]).slice(1);
+          if (mine || now - Number(rows[r][3] || 0) > 86400000) drop.push(r + 2);
+        }
+      }
+      for (var d = drop.length - 1; d >= 0; d--) ch.deleteRow(drop[d]);
+      for (var i = 0; i < total; i++) {
+        if (!(i in got)) throw new Error('Upload incomplete: chunk ' + i + ' of ' + total + ' missing');
+        fullData += got[i];
+      }
+    } else {
+      for (var j = 0; j < total; j++) fullData += (zSheet.getRange('D' + (j + 1)).getValue() || '');
+      for (var k = 0; k < total; k++) zSheet.getRange('D' + (k + 1)).clearContent();
+    }
+    var res = zStore_(ss, zSheet, target, fullData, p.v);
+    res.ts = new Date().toISOString();
+    return res;
   }
-  if (action === 'zercher_save_extra') {
-    var extraData = p.data || '{}';
-    JSON.parse(extraData); // validate
-    zSheet.getRange('B1').setValue(extraData);
-    return { status: 'ok' };
-  }
-  if (action === 'zercher_log_workout') {
-    var logData = p.data || '{}';
-    var logObj = JSON.parse(logData);
-    var lastRow = zSheet.getLastRow();
-    if (lastRow >= 2) {
-      var existing = zSheet.getRange(2, 1, lastRow - 1, 1).getValues();
-      for (var w = 0; w < existing.length; w++) {
-        var ex = parseJson_(existing[w][0], null);
-        if (ex && ex.id === logObj.id) {
-          zSheet.getRange(w + 2, 1).setValue(logData);
-          return { status: 'ok', updated: true };
+
+  if (action === 'zercher_delete_log') {
+    var delId = String(p.id || '');
+    if (!delId) throw new Error('No log id');
+    var lr = zSheet.getLastRow();
+    if (lr >= 2) {
+      var col = zSheet.getRange(2, 1, lr - 1, 1).getValues();
+      for (var q = 0; q < col.length; q++) {
+        var lg = parseJson_(col[q][0], null);
+        if (lg && lg.id === delId) {
+          zNamedSheet_(ss, 'ZercherDeleted', ['id', 'deleted', 'json'])
+            .appendRow([delId, Date.now(), '~' + col[q][0]]);
+          zSheet.getRange(q + 2, 1).clearContent();   // clear only A: run logs share the row
+          return { status: 'ok', ok: true, deleted: true };
         }
       }
     }
-    zSheet.getRange(lastRow + 1, 1).setValue(logData);
-    return { status: 'ok' };
+    return { status: 'ok', ok: true, deleted: false };
   }
+
   if (action === 'zercher_log_run') {
     var runData = p.data || '{}';
     var runObj = JSON.parse(runData);
@@ -520,11 +672,11 @@ function zercher_(ss, action, p) {
     var lastRunRow = 1;
     if (lastRow2 >= 2) {
       var runs = zSheet.getRange(2, 3, lastRow2 - 1, 1).getValues();
-      for (var r = 0; r < runs.length; r++) {
-        if (runs[r][0]) lastRunRow = r + 2;
-        var exr = parseJson_(runs[r][0], null);
+      for (var rr = 0; rr < runs.length; rr++) {
+        if (runs[rr][0]) lastRunRow = rr + 2;
+        var exr = parseJson_(runs[rr][0], null);
         if (exr && exr.id === runObj.id) {
-          zSheet.getRange(r + 2, 3).setValue(runData);
+          zSheet.getRange(rr + 2, 3).setValue(runData);
           return { status: 'ok', updated: true };
         }
       }
@@ -532,22 +684,27 @@ function zercher_(ss, action, p) {
     zSheet.getRange(Math.max(lastRunRow + 1, 2), 3).setValue(runData);
     return { status: 'ok' };
   }
+
+  // &lite=1 skips the log bodies and returns only their ids (the 30s poll)
   if (action === 'zercher_load') {
-    var config = cellJson_(zSheet, 'A1', {});
-    var extra = cellJson_(zSheet, 'B1', {});
-    var logs = [], runLogs = [];
+    var config = zGetBlob_(ss, zSheet, 'config', 'A1');
+    var extra = zGetBlob_(ss, zSheet, 'extra', 'B1');
+    var lite = p.lite === '1';
+    var logs = [], logIds = [], runLogs = [];
     var lastRow3 = zSheet.getLastRow();
     if (lastRow3 >= 2) {
-      var rows = zSheet.getRange(2, 1, lastRow3 - 1, 3).getValues();
-      for (var q = 0; q < rows.length; q++) {
-        var lg = parseJson_(rows[q][0], null);
-        if (lg) logs.push(lg);
-        var rl = rows[q][2] ? parseJson_(rows[q][2], null) : null;
+      var all = zSheet.getRange(2, 1, lastRow3 - 1, 3).getValues();
+      for (var a = 0; a < all.length; a++) {
+        var lg2 = all[a][0] ? parseJson_(all[a][0], null) : null;
+        if (lg2) { logIds.push(lg2.id); if (!lite) logs.push(lg2); }
+        var rl = (!lite && all[a][2]) ? parseJson_(all[a][2], null) : null;
         if (rl) runLogs.push(rl);
       }
     }
-    return { status: 'ok', config: config, extra: extra, logs: logs, runLogs: runLogs,
+    var out = { status: 'ok', config: config, extra: extra, logIds: logIds,
       prs: config.prs || {}, ts: new Date().toISOString() };
+    if (!lite) { out.logs = logs; out.runLogs = runLogs; }
+    return out;
   }
   return { status: 'error', message: 'Unknown action: ' + action };
 }
