@@ -13,6 +13,7 @@
 
   function visible(flag) {
     if (filter === 'star') return flag === 'star';
+    if (filter === 'nodeep') return flag !== 'deep';
     return true;
   }
 
