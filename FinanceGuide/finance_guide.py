@@ -59,7 +59,6 @@ TRANSCRIPTS_DIR.mkdir(exist_ok=True)
 # is never modified by this bot.
 OUTLINE = [
     {"tier": 1, "name": "Tier 1 \u2014 Foundations",
-     "desc": "Build the base. Learn how money, economies, and markets actually work.",
      "cats": [
         {"slug": "personal-finance-basics", "name": "Personal Finance Basics",
          "stars": ["I Will Teach You To Be Rich — Ramit Sethi", "The Simple Path To Wealth — JL Collins", "The Total Money Makeover — Dave Ramsey", "Your Money or Your Life — Vicki Robin", "The Millionaire Next Door — Thomas Stanley", "The Millionaire Mind — Thomas Stanley"]},
@@ -71,7 +70,6 @@ OUTLINE = [
          "stars": ["Free To Choose — Milton Friedman", "Capitalism And Freedom — Milton Friedman", "The Road To Serfdom — F.A. Hayek", "Capital in the Twenty-First Century — Thomas Piketty"]},
      ]},
     {"tier": 2, "name": "Tier 2 \u2014 Core Knowledge",
-     "desc": "Understand how money is created, why markets crash, and why humans are terrible with money.",
      "cats": [
         {"slug": "monetary-policy-central-banking", "name": "Monetary Policy & Central Banking",
          "stars": ["The Price of Time: The Real Story of Interest — Edward Chancellor", "A History of Interest Rates — Sidney Homer & Richard Sylla", "The Creature From Jekyll Island — G. Edward Griffin", "When Money Dies — Adam Fergusson", "A Monetary History of the United States, 1867-1960 — Friedman & Schwartz"]},
@@ -85,7 +83,6 @@ OUTLINE = [
          "stars": ["The Interpretation of Financial Statements — Benjamin Graham", "Financial Statements: A Step-by-Step Guide — Thomas Ittelson"]},
      ]},
     {"tier": 3, "name": "Tier 3 \u2014 Asset Classes",
-     "desc": "Deep dives into each major asset class \u2014 stocks, bonds, real estate, commodities, currencies, and derivatives.",
      "cats": [
         {"slug": "value-investing-equities", "name": "Value Investing & Equities",
          "stars": ["The Intelligent Investor — Benjamin Graham", "Security Analysis — Benjamin Graham & David Dodd", "The Essays of Warren Buffett — Buffett & Cunningham", "One Up on Wall Street — Peter Lynch", "Common Stocks and Uncommon Profits — Philip Fisher", "Common Stocks as Long Term Investments — Edgar Lawrence Smith", "Margin of Safety — Seth Klarman", "Stocks For The Long Run — Jeremy Siegel", "The Dhandho Investor — Mohnish Pabrai"]},
@@ -103,7 +100,6 @@ OUTLINE = [
          "stars": []},
      ]},
     {"tier": 4, "name": "Tier 4 \u2014 Advanced Strategies",
-     "desc": "Active trading, cycles, quant methods, and global macro. For when you want to go deeper.",
      "cats": [
         {"slug": "trading-technical-analysis", "name": "Trading & Technical Analysis",
          "stars": ["Winning on Wall Street — Martin Zweig", "Market Wizards — Jack Schwager", "Hedge Fund Market Wizards — Jack Schwager", "Reminiscences of a Stock Operator — Edwin Lefevre", "Come Into My Trading Room — Alexander Elder", "Trade Your Way To Financial Freedom — Van Tharp"]},
@@ -121,7 +117,6 @@ OUTLINE = [
          "stars": ["The Trader's Guide to Key Economic Indicators — Richard Yamarone"]},
      ]},
     {"tier": 5, "name": "Tier 5 \u2014 Wisdom & Perspective",
-     "desc": "Wall Street war stories, big-picture thinking, and the mindset to keep going.",
      "cats": [
         {"slug": "wall-street-stories-biographies", "name": "Wall Street Stories & Biographies",
          "stars": ["Liar's Poker — Michael Lewis", "Barbarians at the Gate — Burrough & Helyar", "More Money Than God — Sebastian Mallaby", "The Ascent of Money — Niall Ferguson", "Lords Of Finance — Liaquat Ahamed"]},
@@ -1065,7 +1060,6 @@ table.prog-table { font-size:0.85rem; margin:1rem 0; }
   font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
   padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
 }
-.tier .tier-desc { color: #a08060; font-size: 0.85rem; margin: 0.4rem 0 0.8rem; }
 .cat-card {
   display: flex; align-items: baseline; gap: 12px;
   padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
@@ -1694,7 +1688,6 @@ def rebuild_html(concepts):
             cards.append('<p class="tier-empty">No concepts filed here yet.</p>')
         tiers_html.append(
             f'<div class="tier"><h2>{_esc(t["name"])}</h2>'
-            f'<p class="tier-desc">{_esc(t["desc"])}</p>'
             f'{"".join(cards)}</div>'
         )
 
