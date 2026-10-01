@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Enhanced Supplementary Leverage Ratio (eSLR) - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.prog-stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(112px,1fr));
+  gap:10px; margin:1rem 0 1.5rem; }
+.prog-stat { background:#e8e0d0; border:1px solid #d4c8b0; border-radius:8px;
+  padding:0.7rem 0.9rem; }
+.prog-stat .n { display:block; font-size:1.5rem; color:#5a3e1a; line-height:1.1; }
+.prog-stat .l { display:block; font-size:0.75rem; color:#8a7a60; margin-top:0.2rem; }
+.prog-chart { position:relative; margin:0.5rem 0 0.4rem; }
+.prog-chart svg { width:100%; height:auto; display:block; overflow:visible; }
+.prog-chart .grid { stroke:#ddd3c0; stroke-width:1; }
+.prog-chart .axis { stroke:#c8bca4; stroke-width:1; }
+.prog-chart .tick { fill:#8a7a60; font-size:11px; }
+.prog-chart .ylab { fill:#8a7a60; font-size:11px; }
+.prog-chart .actual { fill:none; stroke:#9a5a22; stroke-width:2; stroke-linejoin:round; }
+.prog-chart .actual-dot { fill:#9a5a22; stroke:#f4efe8; stroke-width:2; }
+.prog-chart .model { fill:none; stroke:#0e9488; stroke-width:2; stroke-dasharray:6 4; }
+.prog-chart .ceiling { stroke:#8a7a60; stroke-width:1; stroke-dasharray:2 4; }
+.prog-chart .here { stroke:#9a5a22; stroke-width:1; stroke-dasharray:2 3; opacity:0.6; }
+.prog-chart .dlabel { font-size:11px; fill:#3a2e1e; }
+.prog-chart .bar { fill:#9a5a22; opacity:0.75; }
+.prog-chart .bar.spike { fill:#6b3410; opacity:1; }
+.prog-legend .lg-spike::before { border-color:#6b3410; border-top-width:6px; }
+.prog-spikes { font-size:0.88rem; color:#5a3e1a; margin:-0.8rem 0 1.5rem; }
+.prog-chart .bar-model { fill:none; stroke:#0e9488; stroke-width:2; stroke-dasharray:6 4; }
+.prog-chart .hit { fill:transparent; cursor:crosshair; }
+.prog-tip { position:absolute; pointer-events:none; display:none;
+  background:#3a2e1e; color:#f4efe8; font-size:12px; line-height:1.4;
+  padding:6px 9px; border-radius:6px; white-space:nowrap; z-index:5; }
+.prog-legend { display:flex; gap:1.2rem; font-size:0.8rem; color:#5a3e1a;
+  margin:0 0 1.5rem; flex-wrap:wrap; }
+.prog-legend span::before { content:""; display:inline-block; width:18px; height:0;
+  border-top:2px solid; margin-right:6px; vertical-align:middle; }
+.prog-legend .lg-actual::before { border-color:#9a5a22; }
+.prog-legend .lg-model::before { border-color:#0e9488; border-top-style:dashed; }
+.prog-legend .lg-ceiling::before { border-color:#8a7a60; border-top-style:dotted; }
+.prog-eq { background:#e8e0d0; border:1px solid #d4c8b0; border-radius:8px;
+  padding:0.9rem 1.1rem; font-family:Georgia,serif; font-size:1.05rem; color:#3a2e1e;
+  margin:1rem 0; }
+.prog-eq .sub { display:block; font-size:0.85rem; color:#8a7a60; margin-top:0.4rem;
+  font-family:inherit; }
+.prog-note { font-size:0.85rem; color:#8a7a60; }
+.prog-link { font-size:0.85rem; margin:-0.8rem 0 1.2rem; }
+.prog-link a { color:#0e9488; }
+.ch-status { font-size:0.85rem; color:#5a3e1a; margin:-0.6rem 0 1.2rem; }
+.ch-status.done { color:#0e6b5f; background:#e3efe9; border:1px solid #b9d8cc;
+  border-radius:6px; padding:0.5rem 0.8rem; margin:0 0 1.2rem; }
+table.prog-table { font-size:0.85rem; margin:1rem 0; }
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.tier .tier-desc { color: #a08060; font-size: 0.85rem; margin: 0.4rem 0 0.8rem; }
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done,
+body.hide-done .cat-card.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+.vid-tab {
+  margin: 0 0 1.2rem; background: #e8e0d0; border: 1px solid #d4c8b0;
+  border-radius: 8px; overflow: hidden;
+}
+.vid-tab summary {
+  padding: 0.6rem 0.9rem; cursor: pointer; font-size: 0.85rem;
+  color: #3a2a1a; list-style: none; user-select: none;
+}
+.vid-tab summary::-webkit-details-marker { display: none; }
+.vid-tab summary::before {
+  content: '▶'; display: inline-block; margin-right: 0.5rem;
+  font-size: 0.7rem; transition: transform 0.2s;
+}
+.vid-tab[open] summary::before { transform: rotate(90deg); }
+.vid-tab .vid-status {
+  float: right; font-size: 0.75rem; padding: 0.15rem 0.5rem;
+  border-radius: 3px; margin-left: 0.5rem;
+}
+.vid-tab .vid-ok { background: #4ade8040; color: #2d6a4f; }
+.vid-tab .vid-err { background: #f8717140; color: #9b2c2c; }
+.vid-tab .vid-list {
+  padding: 0 0.9rem 0.7rem; margin: 0;
+  list-style: none; font-size: 0.8rem;
+}
+.vid-tab .vid-list li {
+  padding: 0.35rem 0; border-top: 1px solid #d4c8b0;
+  display: flex; justify-content: space-between; gap: 8px;
+}
+.vid-tab .vid-list .vid-date {
+  color: #a08060; white-space: nowrap; flex: none;
+}
+.vid-tab .vid-list .vid-concepts {
+  color: #a08060; white-space: nowrap; flex: none; font-size: 0.75rem;
+}
+.vid-tab .vid-none {
+  padding: 0.4rem 0.9rem 0.7rem; color: #a08060; font-size: 0.8rem;
+}
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../risk-management-position-sizing.html">&larr; Risk Management &amp; Position Sizing</a>
+
+<div class="concept-meta"><span>standard</span><span>Risk Management &amp; Position Sizing</span><span>added 2026-10-01</span></div>
+<h4 id="enhanced_supplementary_leverage_ratio">Enhanced Supplementary Leverage Ratio (eSLR)</h4>
+
+<p>The <strong>Enhanced Supplementary Leverage Ratio (eSLR)</strong> is a capital rule for the largest U.S. banks, the ones regulators call global systemically important banks, or <strong>GSIBs</strong>. It asks a blunt question: how much loss-absorbing capital does the bank hold compared with everything on its books, with no adjustment for how risky each asset is? The numerator is <strong>Tier 1 capital</strong>, which is mostly common equity plus a few preferred instruments. The denominator is <strong>total leverage exposure</strong>. That includes loans, securities, reserves held at the Fed, and many off-balance-sheet items. "Enhanced" means the biggest banks must clear a higher bar than the basic 3% minimum that applies to everyone else.</p>
+
+<p>The rule matters because the biggest banks are also the biggest <strong>primary dealers</strong>, the firms that stand in the middle of the Treasury market. When a pension fund sells bonds, a dealer usually buys them. When a hedge fund wants to borrow against Treasuries overnight, a dealer usually lends the cash through repo. Every one of those activities puts assets on the dealer's balance sheet. A leverage ratio ignores risk, so a ten-year Treasury costs as much capital as a risky corporate loan of the same size. When the ratio is the binding constraint, a dealer rations balance sheet, and low-margin, high-volume work such as repo and market-making gets cut first. That is why a capital rule shows up in bond-market plumbing.</p>
+
+<p>Mechanically, the eSLR works like this. Take Tier 1 capital and divide it by total leverage exposure. Compare the result with a required level. Under the old framework, a GSIB holding company needed the 3% minimum plus a fixed 2% buffer, so 5% in total. Its bank subsidiaries needed 6% to count as "well capitalized." A firm that dipped into the buffer faced automatic limits on dividends, buybacks, and discretionary bonuses. The rule that took effect in April replaced the flat 2% with a buffer of <strong>half the bank's GSIB surcharge</strong>, a number already calculated to reflect its size and interconnectedness. For most firms that produces a smaller buffer than before. The requirement now scales with each bank's footprint instead of being the same for everyone.</p>
+
+<p>Here is an illustration with round numbers. Suppose a dealer bank has $3 trillion of leverage exposure and $150 billion of Tier 1 capital. That is 5.0%, exactly at the old requirement. It could not add a dollar of balance sheet without raising more capital or shrinking something else. If the new requirement is, say, 4.0%, the bank needs only $120 billion. The $30 billion of surplus supports roughly $750 billion of extra exposure ($30 billion divided by 0.04). Those figures are hypothetical, but the arithmetic shows why the change matters for a market where, as the video notes, the Fed and BIS put the basis trade near $830 billion. Even small percentage changes release a lot of capacity.</p>
+
+<p>Traders and investors do not trade the eSLR directly. They watch what it implies for dealer balance-sheet capacity. The video's checklist is a good example: the Fed's standing repo facility took in exactly zero, SOFR fell two basis points to 3.88% and sat flat with Fed funds, and the reverse repo facility rose to $11.4 billion. Those readings say cash is plentiful and dealers are not rationing. Other signals include quarter-end spikes in repo rates, how far SOFR trades above the Fed's administered rates, thin Treasury liquidity on volatile days, and the level of swap spreads. Persistently negative swap spreads have long been read as a sign that holding Treasuries is expensive for balance-sheet-constrained intermediaries.</p>
+
+<blockquote>"Regulatory constraints are running backwards. The enhanced supplementary leverage ratio that took effect in April loosened leverage constraints on the biggest dealer banks explicitly to encourage Treasury intermediation."</blockquote>
+
+<p>Several nuances get lost in the headlines. First, a looser rule creates <em>capacity</em>, not <em>demand</em>. Banks can use the freed capital to hold more Treasuries, but they can also use it for buybacks, dividends, or other businesses, and no one forces them to intermediate more. Second, the eSLR is only one of several constraints. Risk-based capital rules, stress-test buffers, liquidity requirements, and the bank's own risk limits can bind first. For many banks the leverage ratio was never the tightest one. Third, the video's point is a fair rebuttal to the claim that regulation is squeezing dealers into shrinking, because the direction of travel is easing. But easing does not prove that balance sheet is free at every quarter-end. Foreign banks, for example, often shrink their repo books around reporting dates.</p>
+
+<p>What happens when the framework fails? The key lesson comes from March 2020. Treasury yields swung violently, dealers could not absorb the selling, and the leverage ratio was a big part of why. The Fed responded by temporarily excluding Treasuries and reserves from the denominator, from April 2020 through March 2021. That relief expired, which is part of why the topic stayed alive. There is a trade-off here. Lower requirements mean thinner cushions. If the bond market gaps, as the video's backdrop suggests with a ten-year yield at 5.26% and the MOVE index above 100, a bank that is leveraged closer to its limit has less room to absorb losses. Looser rules help in calm markets and matter most in the worst moments.</p>
+
+<p>The eSLR also shows the video's recurring theme that leverage never disappears, it only mutates. Rules that make dealer balance sheets cheaper can pull hedge-fund financing back toward regulated banks, where it is at least visible. Meanwhile, the video says the Fed's financial stability report and the BIS found that unwound basis-trade positions were largely offset by a rotation into swap spread trades, which the BIS said grew from $100 billion to $300 billion in a year, with "zero public positioning reports." A looser eSLR does not stop that migration. It changes the cost of staying inside the regulated system. Whether that migration is healthy depends on who ends up holding the risk and how much cushion they have.</p>
+
+<p>The eSLR connects to nearly everything else in the video. The <strong>basis trade</strong> depends on dealers lending against Treasuries in repo, often at zero haircut. The <strong>Standing Repo Facility</strong> and <strong>reverse repo facility</strong> show whether cash is scarce or abundant. <strong>SOFR</strong> measures what that borrowing costs. <strong>Swap spreads</strong> reflect how expensive balance sheet is for intermediaries. The <strong>MOVE index</strong> tells you how much volatility dealers are being asked to warehouse, and that spills into mortgage spreads. To discuss the eSLR with confidence, remember three points: it is a risk-blind cap on how big a bank's balance sheet can be relative to its capital. It was recently loosened to encourage Treasury intermediation. And its real test comes in a crisis, not on a quiet quarter-end.</p>
+<div class="concept-side">Related in this category: <a href="platform_obsolescence.html">Platform Obsolescence Risk</a>, <a href="redemption_gate.html">Redemption Gate</a>, <a href="hedge_basis_risk.html">Hedge Basis Risk (Correlated Hedge Failure)</a>, <a href="asset_resale_liquidity_vs_illiquid_obligation.html">Resalable Assets vs. Illiquid Long-Term Obligations</a>, <a href="margin_call.html">Margin Call / Collateral Covenant Trigger</a>, <a href="wrong_way_risk.html">Wrong-Way Risk (Collateral-Exposure Correlation)</a></div>
+<button class="concept-done" data-slug="enhanced_supplementary_leverage_ratio" onclick="toggleDone('enhanced_supplementary_leverage_ratio')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_enhanced_supplementary_leverage_ratio';</script>
+<script src="../../book.js"></script>
+<script src="../fg.js"></script>
+</body>
+</html>
