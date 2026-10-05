@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Bank for International Settlements (BIS) - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.prog-stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(112px,1fr));
+  gap:10px; margin:1rem 0 1.5rem; }
+.prog-stat { background:#e8e0d0; border:1px solid #d4c8b0; border-radius:8px;
+  padding:0.7rem 0.9rem; }
+.prog-stat .n { display:block; font-size:1.5rem; color:#5a3e1a; line-height:1.1; }
+.prog-stat .l { display:block; font-size:0.75rem; color:#8a7a60; margin-top:0.2rem; }
+.prog-chart { position:relative; margin:0.5rem 0 0.4rem; }
+.prog-chart svg { width:100%; height:auto; display:block; overflow:visible; }
+.prog-chart .grid { stroke:#ddd3c0; stroke-width:1; }
+.prog-chart .axis { stroke:#c8bca4; stroke-width:1; }
+.prog-chart .tick { fill:#8a7a60; font-size:11px; }
+.prog-chart .ylab { fill:#8a7a60; font-size:11px; }
+.prog-chart .actual { fill:none; stroke:#9a5a22; stroke-width:2; stroke-linejoin:round; }
+.prog-chart .actual-dot { fill:#9a5a22; stroke:#f4efe8; stroke-width:2; }
+.prog-chart .model { fill:none; stroke:#0e9488; stroke-width:2; stroke-dasharray:6 4; }
+.prog-chart .ceiling { stroke:#8a7a60; stroke-width:1; stroke-dasharray:2 4; }
+.prog-chart .here { stroke:#9a5a22; stroke-width:1; stroke-dasharray:2 3; opacity:0.6; }
+.prog-chart .dlabel { font-size:11px; fill:#3a2e1e; }
+.prog-chart .bar { fill:#9a5a22; opacity:0.75; }
+.prog-chart .bar.spike { fill:#6b3410; opacity:1; }
+.prog-legend .lg-spike::before { border-color:#6b3410; border-top-width:6px; }
+.prog-spikes { font-size:0.88rem; color:#5a3e1a; margin:-0.8rem 0 1.5rem; }
+.prog-chart .bar-model { fill:none; stroke:#0e9488; stroke-width:2; stroke-dasharray:6 4; }
+.prog-chart .hit { fill:transparent; cursor:crosshair; }
+.prog-tip { position:absolute; pointer-events:none; display:none;
+  background:#3a2e1e; color:#f4efe8; font-size:12px; line-height:1.4;
+  padding:6px 9px; border-radius:6px; white-space:nowrap; z-index:5; }
+.prog-legend { display:flex; gap:1.2rem; font-size:0.8rem; color:#5a3e1a;
+  margin:0 0 1.5rem; flex-wrap:wrap; }
+.prog-legend span::before { content:""; display:inline-block; width:18px; height:0;
+  border-top:2px solid; margin-right:6px; vertical-align:middle; }
+.prog-legend .lg-actual::before { border-color:#9a5a22; }
+.prog-legend .lg-model::before { border-color:#0e9488; border-top-style:dashed; }
+.prog-legend .lg-ceiling::before { border-color:#8a7a60; border-top-style:dotted; }
+.prog-eq { background:#e8e0d0; border:1px solid #d4c8b0; border-radius:8px;
+  padding:0.9rem 1.1rem; font-family:Georgia,serif; font-size:1.05rem; color:#3a2e1e;
+  margin:1rem 0; }
+.prog-eq .sub { display:block; font-size:0.85rem; color:#8a7a60; margin-top:0.4rem;
+  font-family:inherit; }
+.prog-note { font-size:0.85rem; color:#8a7a60; }
+.prog-link { font-size:0.85rem; margin:-0.8rem 0 1.2rem; }
+.prog-link a { color:#0e9488; }
+.ch-status { font-size:0.85rem; color:#5a3e1a; margin:-0.6rem 0 1.2rem; }
+.ch-status.done { color:#0e6b5f; background:#e3efe9; border:1px solid #b9d8cc;
+  border-radius:6px; padding:0.5rem 0.8rem; margin:0 0 1.2rem; }
+table.prog-table { font-size:0.85rem; margin:1rem 0; }
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done,
+body.hide-done .cat-card.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+.vid-tab {
+  margin: 0 0 1.2rem; background: #e8e0d0; border: 1px solid #d4c8b0;
+  border-radius: 8px; overflow: hidden;
+}
+.vid-tab summary {
+  padding: 0.6rem 0.9rem; cursor: pointer; font-size: 0.85rem;
+  color: #3a2a1a; list-style: none; user-select: none;
+}
+.vid-tab summary::-webkit-details-marker { display: none; }
+.vid-tab summary::before {
+  content: '▶'; display: inline-block; margin-right: 0.5rem;
+  font-size: 0.7rem; transition: transform 0.2s;
+}
+.vid-tab[open] summary::before { transform: rotate(90deg); }
+.vid-tab .vid-status {
+  float: right; font-size: 0.75rem; padding: 0.15rem 0.5rem;
+  border-radius: 3px; margin-left: 0.5rem;
+}
+.vid-tab .vid-ok { background: #4ade8040; color: #2d6a4f; }
+.vid-tab .vid-err { background: #f8717140; color: #9b2c2c; }
+.vid-tab .vid-list {
+  padding: 0 0.9rem 0.7rem; margin: 0;
+  list-style: none; font-size: 0.8rem;
+}
+.vid-tab .vid-list li {
+  padding: 0.35rem 0; border-top: 1px solid #d4c8b0;
+  display: flex; justify-content: space-between; gap: 8px;
+}
+.vid-tab .vid-list .vid-date {
+  color: #a08060; white-space: nowrap; flex: none;
+}
+.vid-tab .vid-list .vid-concepts {
+  color: #a08060; white-space: nowrap; flex: none; font-size: 0.75rem;
+}
+.vid-tab .vid-none {
+  padding: 0.4rem 0.9rem 0.7rem; color: #a08060; font-size: 0.8rem;
+}
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../monetary-policy-central-banking.html">&larr; Monetary Policy &amp; Central Banking</a>
+
+<div class="concept-meta"><span>standard</span><span>Monetary Policy &amp; Central Banking</span><span>added 2026-10-05</span></div>
+<h4 id="bank_for_international_settlements">Bank for International Settlements (BIS)</h4>
+
+<p>The <strong>Bank for International Settlements (BIS)</strong> is an international organization, owned by about 60 central banks, that works as a "bank for central banks." It was founded in 1930 and is headquartered in Basel, Switzerland. It takes no deposits from you and doesn't lend to households or companies. Its customers are central banks like the Federal Reserve, the European Central Bank, and the Bank of Japan. It does three main things. It hosts the meetings where central bankers compare notes. It publishes some of the most respected research on global finance. It houses committees, such as the Basel Committee, that write the bank-capital rules most large banks follow. For investors, it matters mainly as a source of data and warnings.</p>
+
+<p>The BIS matters because nobody else collects the full picture of cross-border money. A national regulator sees its own banks. The BIS gathers statistics from dozens of countries on international bank lending, currency trading, and derivatives, and publishes them in the <strong>BIS Quarterly Review</strong>, the Annual Economic Report, and the Triennial Central Bank Survey of foreign-exchange markets. Those numbers show where leverage is building up outside any single country's view. It sometimes called "the central bankers' central bank" for good reason: its warnings often foreshadow policy debates. It flagged rising housing and credit risks before 2008, and in recent years it has repeatedly flagged how much dollar borrowing happens through derivatives rather than ordinary loans.</p>
+
+<p>The mechanism behind the BIS's best-known warning is the <strong>FX swap</strong>. A bank in Europe or Japan needs dollars but holds euros or yen. It hands its home currency to a counterparty and receives dollars today. It simultaneously agrees to reverse the trade at a fixed exchange rate on a set future date, often within days, weeks, or months. Economically, this is a dollar loan secured by the other currency, but accounting rules book it as a derivative, so the future obligation to hand dollars back doesn't appear as debt on the balance sheet. The BIS's point is that the real leverage is therefore hidden. Because most swaps are short-term, borrowers must keep rolling them over, and each roll requires a lender willing to supply dollars again.</p>
+
+<p>The video leans on two BIS ideas: that offshore dollar debt is the "blind spot" of the global financial system, and that the off-balance-sheet total is around <strong>$65 trillion</strong>. The BIS has published estimates in this range for dollar obligations that sit in FX swaps and similar instruments, and its researchers have said these obligations are comparable in size to, or larger than, the dollar debt visible on balance sheets. Treat the exact figure as an estimate. The BIS has cited different totals in different years, and some analyses put the number higher, so "$65 trillion" is better read as "tens of trillions" than as a precise measurement. The video also says most of the contracts mature in under a year. Short maturity is what makes the system fragile: the debt must be refinanced constantly.</p>
+
+<blockquote>"The Bank for International Settlements, that's BIS, calls this the blind spot of the global financial system. They said it, not me."</blockquote>
+
+<p>Traders use BIS output in two ways. First, as a map of where stress could appear. When BIS data shows dollar borrowing outside the US growing faster than the visible, regulated pieces, analysts know to watch the plumbing. Second, as a source for market-based stress gauges. The one the video highlights is the <strong>cross-currency basis</strong>, the extra premium a foreign borrower pays to swap euros or yen into dollars, over and above the interest-rate difference. A basis near zero means dollars are easy to get. A deeply negative basis, say the three-month EUR/USD or USD/JPY swap trading well below zero, means dollars are scarce and expensive. Traders also compare it with SOFR, the US overnight rate, and watch usage of the Fed's swap lines.</p>
+
+<p>Several nuances get lost in the video's dramatic framing. First, "off-balance-sheet" does not mean "illegal," "unregulated," or "secret." The swaps are disclosed in derivatives statistics, and the BIS itself is the one counting them. The gap is in how leverage ratios and standard debt statistics treat them. Second, the $65 trillion is a gross stock of obligations, and each swap has an offsetting claim: the borrower also holds the other currency it lent out. It is not a $65 trillion hole. Third, the borrowers are not only commercial banks but also insurers, pension funds, asset managers, and corporations, and the BIS does not say they will all be forced sellers. A large number is a risk indicator, not a prediction of collapse.</p>
+
+<p>The failure scenario is a dollar funding squeeze, and history shows it is real. In 2008, foreign banks that had borrowed dollars short-term to fund long-term US assets lost access to dollars, and the Fed opened swap lines to the ECB, the Bank of Japan, and others to keep them afloat. It happened again in March 2020, when the basis blew out as investors worldwide scrambled for dollars and the Fed expanded the lines. In a squeeze, borrowers may sell liquid dollar assets such as Treasuries, a pattern seen in March 2020 when even Treasuries sold off. One correction to the video: swap lines are collateralized currency exchanges, not a bailout, and the foreign central bank takes the credit risk, not the Fed.</p>
+
+<p>The video's toll-booth story captures the logic well. Dollars are the toll, borrowers need them to keep moving, and if the exchange booth closes, they sell cargo at a discount. The cargo here is liquid assets: Treasuries, large-cap US stocks, and foreign reserves. The video also claims that this pressure explains unexplained opening-bell air pockets in US stocks. That is a hypothesis, not proof. Many things move markets at the open, and funding stress is hard to isolate from them. The video also cites 10-year Treasury yields around 5.34% and 30-year yields near 5.60% as a driver of dollar demand. Verify current levels yourself before relying on them. The mechanism is plausible, but the video presents the timing with more certainty than the data supports.</p>
+
+<p>For a personal investor, the practical response is modest rather than apocalyptic. Watch the cross-currency basis and the BIS's quarterly commentary as background signals, not trading triggers. Check whether your international funds are currency-hedged, since a surging dollar cuts the dollar value of unhedged foreign holdings. Keep an emergency reserve in short Treasury bills or a Treasury-only money market fund, as the video recommends, because that paper stays liquid when other markets seize. It also helps to remember that the same system has a backstop. The Fed's standing swap lines exist precisely to stop a funding squeeze from becoming a crisis, which is why such episodes have so far been sharp but short.</p>
+
+<p>The BIS connects to several other concepts in this guide. <strong>Eurodollars</strong> (dollars held outside the US banking system) are the raw material of the offshore market. <strong>Central bank swap lines</strong> are the safety valve the BIS community built after 2008. <strong>SOFR and repo markets</strong> set the price of dollar funding at home, and when they tighten, the squeeze spreads abroad. <strong>Reserve currency status</strong> explains why so much trade and debt is denominated in dollars in the first place. Once you see these links, a story about "global banks dumping US stocks" becomes testable: check the basis, the swap-line usage, and the BIS data, and decide for yourself whether the stress is real or merely loud.</p>
+<div class="concept-side">Related in this category: <a href="pce_inflation_basket.html">PCE Inflation Basket</a>, <a href="jackson_hole_symposium.html">Jackson Hole Symposium</a>, <a href="hawkish_dovish_fed_signaling.html">Hawkish vs. Dovish Fed Signaling</a>, <a href="inflation_breadth.html">Inflation Breadth</a>, <a href="central_bank_credibility.html">Central Bank Credibility</a>, <a href="forward_guidance.html">Forward Guidance</a></div>
+<button class="concept-done" data-slug="bank_for_international_settlements" onclick="toggleDone('bank_for_international_settlements')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_bank_for_international_settlements';</script>
+<script src="../../book.js"></script>
+<script src="../fg.js"></script>
+</body>
+</html>
