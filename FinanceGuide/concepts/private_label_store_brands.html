@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Private Label (Store Brand) Products - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.prog-stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(112px,1fr));
+  gap:10px; margin:1rem 0 1.5rem; }
+.prog-stat { background:#e8e0d0; border:1px solid #d4c8b0; border-radius:8px;
+  padding:0.7rem 0.9rem; }
+.prog-stat .n { display:block; font-size:1.5rem; color:#5a3e1a; line-height:1.1; }
+.prog-stat .l { display:block; font-size:0.75rem; color:#8a7a60; margin-top:0.2rem; }
+.prog-chart { position:relative; margin:0.5rem 0 0.4rem; }
+.prog-chart svg { width:100%; height:auto; display:block; overflow:visible; }
+.prog-chart .grid { stroke:#ddd3c0; stroke-width:1; }
+.prog-chart .axis { stroke:#c8bca4; stroke-width:1; }
+.prog-chart .tick { fill:#8a7a60; font-size:11px; }
+.prog-chart .ylab { fill:#8a7a60; font-size:11px; }
+.prog-chart .actual { fill:none; stroke:#9a5a22; stroke-width:2; stroke-linejoin:round; }
+.prog-chart .actual-dot { fill:#9a5a22; stroke:#f4efe8; stroke-width:2; }
+.prog-chart .model { fill:none; stroke:#0e9488; stroke-width:2; stroke-dasharray:6 4; }
+.prog-chart .ceiling { stroke:#8a7a60; stroke-width:1; stroke-dasharray:2 4; }
+.prog-chart .here { stroke:#9a5a22; stroke-width:1; stroke-dasharray:2 3; opacity:0.6; }
+.prog-chart .dlabel { font-size:11px; fill:#3a2e1e; }
+.prog-chart .bar { fill:#9a5a22; opacity:0.75; }
+.prog-chart .bar.spike { fill:#6b3410; opacity:1; }
+.prog-legend .lg-spike::before { border-color:#6b3410; border-top-width:6px; }
+.prog-spikes { font-size:0.88rem; color:#5a3e1a; margin:-0.8rem 0 1.5rem; }
+.prog-chart .bar-model { fill:none; stroke:#0e9488; stroke-width:2; stroke-dasharray:6 4; }
+.prog-chart .hit { fill:transparent; cursor:crosshair; }
+.prog-tip { position:absolute; pointer-events:none; display:none;
+  background:#3a2e1e; color:#f4efe8; font-size:12px; line-height:1.4;
+  padding:6px 9px; border-radius:6px; white-space:nowrap; z-index:5; }
+.prog-legend { display:flex; gap:1.2rem; font-size:0.8rem; color:#5a3e1a;
+  margin:0 0 1.5rem; flex-wrap:wrap; }
+.prog-legend span::before { content:""; display:inline-block; width:18px; height:0;
+  border-top:2px solid; margin-right:6px; vertical-align:middle; }
+.prog-legend .lg-actual::before { border-color:#9a5a22; }
+.prog-legend .lg-model::before { border-color:#0e9488; border-top-style:dashed; }
+.prog-legend .lg-ceiling::before { border-color:#8a7a60; border-top-style:dotted; }
+.prog-eq { background:#e8e0d0; border:1px solid #d4c8b0; border-radius:8px;
+  padding:0.9rem 1.1rem; font-family:Georgia,serif; font-size:1.05rem; color:#3a2e1e;
+  margin:1rem 0; }
+.prog-eq .sub { display:block; font-size:0.85rem; color:#8a7a60; margin-top:0.4rem;
+  font-family:inherit; }
+.prog-note { font-size:0.85rem; color:#8a7a60; }
+.prog-link { font-size:0.85rem; margin:-0.8rem 0 1.2rem; }
+.prog-link a { color:#0e9488; }
+.ch-status { font-size:0.85rem; color:#5a3e1a; margin:-0.6rem 0 1.2rem; }
+.ch-status.done { color:#0e6b5f; background:#e3efe9; border:1px solid #b9d8cc;
+  border-radius:6px; padding:0.5rem 0.8rem; margin:0 0 1.2rem; }
+table.prog-table { font-size:0.85rem; margin:1rem 0; }
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done,
+body.hide-done .cat-card.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+.vid-tab {
+  margin: 0 0 1.2rem; background: #e8e0d0; border: 1px solid #d4c8b0;
+  border-radius: 8px; overflow: hidden;
+}
+.vid-tab summary {
+  padding: 0.6rem 0.9rem; cursor: pointer; font-size: 0.85rem;
+  color: #3a2a1a; list-style: none; user-select: none;
+}
+.vid-tab summary::-webkit-details-marker { display: none; }
+.vid-tab summary::before {
+  content: '▶'; display: inline-block; margin-right: 0.5rem;
+  font-size: 0.7rem; transition: transform 0.2s;
+}
+.vid-tab[open] summary::before { transform: rotate(90deg); }
+.vid-tab .vid-status {
+  float: right; font-size: 0.75rem; padding: 0.15rem 0.5rem;
+  border-radius: 3px; margin-left: 0.5rem;
+}
+.vid-tab .vid-ok { background: #4ade8040; color: #2d6a4f; }
+.vid-tab .vid-err { background: #f8717140; color: #9b2c2c; }
+.vid-tab .vid-list {
+  padding: 0 0.9rem 0.7rem; margin: 0;
+  list-style: none; font-size: 0.8rem;
+}
+.vid-tab .vid-list li {
+  padding: 0.35rem 0; border-top: 1px solid #d4c8b0;
+  display: flex; justify-content: space-between; gap: 8px;
+}
+.vid-tab .vid-list .vid-date {
+  color: #a08060; white-space: nowrap; flex: none;
+}
+.vid-tab .vid-list .vid-concepts {
+  color: #a08060; white-space: nowrap; flex: none; font-size: 0.75rem;
+}
+.vid-tab .vid-none {
+  padding: 0.4rem 0.9rem 0.7rem; color: #a08060; font-size: 0.8rem;
+}
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../personal-finance-basics.html">&larr; Personal Finance Basics</a>
+
+<div class="concept-meta"><span>standard</span><span>Personal Finance Basics</span><span>added 2026-10-11</span></div>
+<h4 id="private_label_store_brands">Private Label (Store Brand) Products</h4>
+
+<p>A <strong>private label</strong> product, usually called a <strong>store brand</strong>, is an item sold under a retailer's own name or a name the retailer controls, instead of under a national manufacturer's name. Kroger's Simple Truth, Costco's Kirkland Signature, Walmart's Great Value, Target's Good &amp; Gather, and Aldi's many in-house labels are all examples. The retailer owns the brand and decides the price, the packaging, and the shelf position. Someone else usually makes the product. For a household, the idea is simple: you buy something close to a name-brand item, but you don't pay for the brand name. That makes it one of the easiest levers in a food budget.</p>
+
+<p>It matters because groceries are a large, steady, non-negotiable expense, so a small percentage change adds up over years. It also matters for markets. The video argues that a few big food companies hold <strong>pricing power</strong>, which means they can raise prices, and keep them high, without losing many customers. Private label is the main thing that limits that power. If a branded cereal rises too far above the store version, shoppers trade down, and the brand loses volume. That is why food executives talk so much about "price gaps" on earnings calls. It also affects retailers, whose own brands usually earn them higher profit margins than the national brands they sit next to.</p>
+
+<p>Mechanically, the savings come from what a branded price pays for. A national brand's shelf price covers more than ingredients and manufacturing. It also covers advertising, coupons, promotions, <strong>slotting fees</strong> (payments manufacturers make to get shelf space), and the profit margin of a company that has built a recognizable name. A store brand skips most of that. The retailer buys from a contract manufacturer, often one that also makes branded goods, puts its own label on the package, and spends little on marketing because the shelf placement does the selling. The retailer then prices the item below the national brand and still earns a healthy margin. The shopper gets a lower price, and the retailer gets more profit per unit.</p>
+
+<p>Here is how the video uses the idea. In its first tactic, the host tells viewers to audit their last five grocery receipts, find center-aisle processed and packaged items, and swap them for store brands. The claim is that store-brand oatmeal, frozen vegetables, and dry spices come from the same kinds of plants as the name brands and skip the roughly 20% advertising premium. The host says this "compresses your running register line by an immediate 18%." The video sets this up with its corn flakes example: a $4 box holds only about eight cents of actual corn, and most of the price is packaging, freight, shelf fees, and corporate margin. Private label goes after that non-grain part of the price.</p>
+
+<blockquote>"Private label and storeowned commodities are produced in the exact same bottling and packing conduits as the promoted corporate brands."</blockquote>
+
+<p>You can check the video's 18% figure with simple arithmetic, and the result is useful. If a national brand costs 20% more than the store version, then switching saves 1 minus 1/1.2, which is about 16.7% on that item. If instead the store brand is 20% cheaper than the national brand, you save 20%. Real-world gaps often fall in the 20% to 30% range, so the video's number is plausible for the items you switch. But 18% applies only to the products you actually switch. Fresh produce, meat, dairy, and anything you already buy as store brand stay the same. If center-aisle packaged goods are, say, 40% of your cart and you switch most of them, your total bill drops by something more like 5% to 8%. That is still real money, but it is not 18% of the whole receipt.</p>
+
+<p>Investors read private label as a signal about consumer stress. When household budgets tighten, store-brand share tends to rise. Industry trackers usually put private label at roughly a fifth of US grocery dollar sales and a larger share of units, and that share climbs in squeezed periods. The video points to the same behavior when it says packaged-food unit volumes have fallen for four straight quarters as families "downgrade basket sizes." An investor watches several things. Is store-brand share still growing after prices stop rising? Are branded companies increasing promotions or cutting prices to win shoppers back? Are retailers such as Costco and Walmart reporting strong sales of their own labels? Together these show whether the branded makers' pricing power is weakening.</p>
+
+<p>There are real gotchas. First, "the exact same plant" is sometimes true and often not. Some store-brand items are made by the same company that makes the national brand, but many use a different recipe, cheaper ingredients, or a different supplier. Quality varies by category. Staples like flour, sugar, canned beans, frozen vegetables, and basic spices are close to interchangeable. Items where the brand is the product, like a specific sauce or snack, may taste different. Second, the store brand is not automatically the cheapest option. A branded item on sale with a coupon can beat the store version, so compare price per ounce, not sticker price. Third, store brands are not immune to <strong>shrinkflation</strong>, and sizes change too, which again makes unit price the number to watch.</p>
+
+<p>The strategy can also fail, or stop working as well. If everyone trades down, retailers see that they can raise their own-brand prices, and the gap with national brands narrows. Retailers also use private label to protect their own margins, so a "cheaper" store brand can still carry a generous markup. If a retailer's supplier fails or a recall hits a contract plant, the store brand can disappear from shelves or become a safety issue, and unlike a national manufacturer, the retailer has fewer ways to absorb that. Finally, saving 15% to 20% on an item is not a win if you stop buying it because you dislike it. The savings only count if you actually eat the product.</p>
+
+<p>Private label connects to the rest of the video's argument. The video describes a one-way <strong>price ratchet</strong>: prices go up quickly when costs rise and stay put when commodity costs fall. Grain was only about eight cents of a $4 box of cereal, so the price of the commodity matters little to what you pay. The consumer's real power lies in the rest of the price, the brand, marketing, and margin. Private label attacks that layer. It sits alongside tactic two, buying beef directly from a producer to bypass the meatpacking bottleneck. Both tactics work by cutting out an expensive middle step. On the investing side, it ties to the third tactic: if shoppers keep trading down, margins at branded food companies can come under pressure.</p>
+
+<p>Used well, private label is a practical, low-effort way to cut spending without cutting what you eat. Start with the categories where store brands are most likely to match the branded product: oatmeal, rice, pasta, canned tomatoes, frozen vegetables, baking staples, spices, and cleaning supplies. Compare the unit price (price per ounce) on the shelf tag. Try the store version once, and keep buying it if you can't tell the difference. Then go back to your receipts and see what the switch actually saved. It will probably be less than the video's 18% of the whole bill, but across a year of groceries it still adds up to a meaningful amount. At the macro level, it is also one way consumers push back against pricing power.</p>
+<div class="concept-side">Related in this category: <a href="credit_score.html">Credit Score (FICO / VantageScore)</a>, <a href="used_vehicle_resale_value.html">Used Vehicle Resale Value (Residual Value)</a>, <a href="erisa_fiduciary_safe_harbor.html">ERISA Fiduciary Safe Harbor</a>, <a href="loan_amortization.html">Loan Amortization</a>, <a href="home_equity_line_of_credit.html">Home Equity Line of Credit (HELOC)</a>, <a href="margin_loan.html">Margin Loan</a></div>
+<button class="concept-done" data-slug="private_label_store_brands" onclick="toggleDone('private_label_store_brands')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_private_label_store_brands';</script>
+<script src="../../book.js"></script>
+<script src="../fg.js"></script>
+</body>
+</html>

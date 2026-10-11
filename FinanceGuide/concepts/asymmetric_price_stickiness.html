@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Asymmetric Price Stickiness (Rockets and Feathers) - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.prog-stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(112px,1fr));
+  gap:10px; margin:1rem 0 1.5rem; }
+.prog-stat { background:#e8e0d0; border:1px solid #d4c8b0; border-radius:8px;
+  padding:0.7rem 0.9rem; }
+.prog-stat .n { display:block; font-size:1.5rem; color:#5a3e1a; line-height:1.1; }
+.prog-stat .l { display:block; font-size:0.75rem; color:#8a7a60; margin-top:0.2rem; }
+.prog-chart { position:relative; margin:0.5rem 0 0.4rem; }
+.prog-chart svg { width:100%; height:auto; display:block; overflow:visible; }
+.prog-chart .grid { stroke:#ddd3c0; stroke-width:1; }
+.prog-chart .axis { stroke:#c8bca4; stroke-width:1; }
+.prog-chart .tick { fill:#8a7a60; font-size:11px; }
+.prog-chart .ylab { fill:#8a7a60; font-size:11px; }
+.prog-chart .actual { fill:none; stroke:#9a5a22; stroke-width:2; stroke-linejoin:round; }
+.prog-chart .actual-dot { fill:#9a5a22; stroke:#f4efe8; stroke-width:2; }
+.prog-chart .model { fill:none; stroke:#0e9488; stroke-width:2; stroke-dasharray:6 4; }
+.prog-chart .ceiling { stroke:#8a7a60; stroke-width:1; stroke-dasharray:2 4; }
+.prog-chart .here { stroke:#9a5a22; stroke-width:1; stroke-dasharray:2 3; opacity:0.6; }
+.prog-chart .dlabel { font-size:11px; fill:#3a2e1e; }
+.prog-chart .bar { fill:#9a5a22; opacity:0.75; }
+.prog-chart .bar.spike { fill:#6b3410; opacity:1; }
+.prog-legend .lg-spike::before { border-color:#6b3410; border-top-width:6px; }
+.prog-spikes { font-size:0.88rem; color:#5a3e1a; margin:-0.8rem 0 1.5rem; }
+.prog-chart .bar-model { fill:none; stroke:#0e9488; stroke-width:2; stroke-dasharray:6 4; }
+.prog-chart .hit { fill:transparent; cursor:crosshair; }
+.prog-tip { position:absolute; pointer-events:none; display:none;
+  background:#3a2e1e; color:#f4efe8; font-size:12px; line-height:1.4;
+  padding:6px 9px; border-radius:6px; white-space:nowrap; z-index:5; }
+.prog-legend { display:flex; gap:1.2rem; font-size:0.8rem; color:#5a3e1a;
+  margin:0 0 1.5rem; flex-wrap:wrap; }
+.prog-legend span::before { content:""; display:inline-block; width:18px; height:0;
+  border-top:2px solid; margin-right:6px; vertical-align:middle; }
+.prog-legend .lg-actual::before { border-color:#9a5a22; }
+.prog-legend .lg-model::before { border-color:#0e9488; border-top-style:dashed; }
+.prog-legend .lg-ceiling::before { border-color:#8a7a60; border-top-style:dotted; }
+.prog-eq { background:#e8e0d0; border:1px solid #d4c8b0; border-radius:8px;
+  padding:0.9rem 1.1rem; font-family:Georgia,serif; font-size:1.05rem; color:#3a2e1e;
+  margin:1rem 0; }
+.prog-eq .sub { display:block; font-size:0.85rem; color:#8a7a60; margin-top:0.4rem;
+  font-family:inherit; }
+.prog-note { font-size:0.85rem; color:#8a7a60; }
+.prog-link { font-size:0.85rem; margin:-0.8rem 0 1.2rem; }
+.prog-link a { color:#0e9488; }
+.ch-status { font-size:0.85rem; color:#5a3e1a; margin:-0.6rem 0 1.2rem; }
+.ch-status.done { color:#0e6b5f; background:#e3efe9; border:1px solid #b9d8cc;
+  border-radius:6px; padding:0.5rem 0.8rem; margin:0 0 1.2rem; }
+table.prog-table { font-size:0.85rem; margin:1rem 0; }
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done,
+body.hide-done .cat-card.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+.vid-tab {
+  margin: 0 0 1.2rem; background: #e8e0d0; border: 1px solid #d4c8b0;
+  border-radius: 8px; overflow: hidden;
+}
+.vid-tab summary {
+  padding: 0.6rem 0.9rem; cursor: pointer; font-size: 0.85rem;
+  color: #3a2a1a; list-style: none; user-select: none;
+}
+.vid-tab summary::-webkit-details-marker { display: none; }
+.vid-tab summary::before {
+  content: '▶'; display: inline-block; margin-right: 0.5rem;
+  font-size: 0.7rem; transition: transform 0.2s;
+}
+.vid-tab[open] summary::before { transform: rotate(90deg); }
+.vid-tab .vid-status {
+  float: right; font-size: 0.75rem; padding: 0.15rem 0.5rem;
+  border-radius: 3px; margin-left: 0.5rem;
+}
+.vid-tab .vid-ok { background: #4ade8040; color: #2d6a4f; }
+.vid-tab .vid-err { background: #f8717140; color: #9b2c2c; }
+.vid-tab .vid-list {
+  padding: 0 0.9rem 0.7rem; margin: 0;
+  list-style: none; font-size: 0.8rem;
+}
+.vid-tab .vid-list li {
+  padding: 0.35rem 0; border-top: 1px solid #d4c8b0;
+  display: flex; justify-content: space-between; gap: 8px;
+}
+.vid-tab .vid-list .vid-date {
+  color: #a08060; white-space: nowrap; flex: none;
+}
+.vid-tab .vid-list .vid-concepts {
+  color: #a08060; white-space: nowrap; flex: none; font-size: 0.75rem;
+}
+.vid-tab .vid-none {
+  padding: 0.4rem 0.9rem 0.7rem; color: #a08060; font-size: 0.8rem;
+}
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../economics-fundamentals.html">&larr; Economics Fundamentals</a>
+
+<div class="concept-meta"><span>standard</span><span>Economics Fundamentals</span><span>added 2026-10-11</span></div>
+<h4 id="asymmetric_price_stickiness">Asymmetric Price Stickiness (Rockets and Feathers)</h4>
+
+<p><strong>Asymmetric price stickiness</strong> describes a pattern in which prices climb quickly when costs rise but fall slowly, partially, or not at all when costs fall. Economists call it <strong>"rockets and feathers"</strong>: prices shoot up like rockets and drift down like feathers. The video calls it the <strong>"one-way price ratchet"</strong>, since a ratchet turns freely in one direction and locks in the other. A symmetric market would behave like a see-saw: a 10% rise in input costs would lift prices by some amount, and a 10% drop would take them back. In an asymmetric market, the rise sticks. The pattern was documented in gasoline markets in the early 1990s and has since been found in groceries, banking, and many other industries.</p>
+
+<p>It matters because it quietly moves money from households to producers, and it does so in a way that is hard to see. Every cost shock, whether wheat, diesel, fertilizer, or shipping, gets passed through to shoppers on the way up. If the relief doesn't pass through on the way down, each boom-and-bust cycle leaves prices at a higher level than where they started. Over several cycles, that is a large transfer of wealth. It also helps explain why people feel poorer even when headline inflation "cools." The cooling means prices are rising more slowly, and it says nothing about prices falling. This one idea connects commodity charts, corporate profit margins, and your grocery receipt.</p>
+
+<p>The mechanism works in steps. First, a input cost jumps, and the whole industry sees it at once, so every firm has the same excuse to raise prices together. Second, firms raise shelf prices, and customers have little choice because everyone else did the same. Third, the input cost falls later. Now a firm that cuts prices first gives away margin, while one that waits keeps it. Fourth, nothing forces the cut. Consumers can't easily check what the underlying ingredient costs, and rivals who also keep prices high make holding the line safe. Fifth, the old price becomes the new normal. The gap between the new, lower cost and the unchanged price lands in <strong>gross margin</strong>, which is revenue minus the direct cost of producing the product.</p>
+
+<p>The video gives a concrete illustration. A $4 box of corn flakes contains about 8 cents of actual corn. When corn rises 50%, the manufacturer's real cost rises by roughly 4 cents. The company, citing headline supply-chain turmoil, raises the shelf price by 50 cents. That is about 12 times the actual cost increase, which the narrator frames as a 1,200% markup on the cost shock. Two years later, corn falls 25%, which on a 12-cent corn cost is worth about 3 cents. A symmetric market would roll back some or all of the 50-cent hike. Instead, the $4 price stays. The difference between the 50 cents collected and the few pennies of real cost movement is pure margin expansion.</p>
+
+<blockquote>"Prices are elastic on the way up. Of course, they're entirely rigid, unfortunately, on the way down."</blockquote>
+
+<p>Investors read this pattern in a few ways. When a commodity falls sharply while shelf prices hold, the company's margin should widen, so the investor looks at gross margin trends in earnings reports and for management talking about "pricing power." The risk is that margin gains from stickiness are not permanent, so the investor also watches <strong>unit volumes</strong>, the number of boxes actually sold. If revenue is flat only because of price while volumes shrink for several quarters, the ratchet is being tested. The video also notes that shoppers are "downgrading basket sizes." Rising private-label share, discount-store traffic, and promotional intensity are the early signals that customers have hit their limit and that margins may compress.</p>
+
+<p>There are several gotchas. First, not every sticky price is a conspiracy. Raw ingredients are often a small share of the shelf price, as with the 8 cents of corn in the box, so a commodity drop really cannot cut the price much. Labor, packaging, freight, rent, and marketing are costs too, and they may still be rising. Second, firms hold inventory bought at old prices, so cost declines reach the income statement months late. Third, "menu costs" and the hassle of repricing make small cuts unattractive. Fourth, the video's claim that four packers control the bottleneck is a market-concentration argument, which is a real concern, but researchers debate how much concentration, as opposed to ordinary frictions, explains the gap. The honest conclusion is that the ratchet is real and its causes are mixed.</p>
+
+<p>The ratchet can break. Consumers are the main force that breaks it. When household budgets are stretched, shoppers switch to store brands, buy fewer snacks, and shop at discounters. The video points out that packaged food volumes have fallen for four straight quarters. Once volume loss outweighs the price gain, a company must either discount or accept lower revenue. Competition is a second force: a new entrant, a store-brand push, or a retailer with bargaining power can force cuts. Policy is a third: antitrust action, or changes to the rules on who can slaughter and sell meat, can reduce bottlenecks. Companies also use <strong>shrinkflation</strong>, shrinking the package instead of raising the price, as a quieter way to keep the ratchet turning when the shelf tag can't rise any further.</p>
+
+<p>This concept connects to several others in the video. <strong>Disinflation</strong> versus deflation is the clearest: when the government says food inflation is down to 3%, prices are still rising, just more slowly, so the level stays ratcheted up from the 40% cumulative increase since 2020. It also links to <strong>pricing power</strong>, the ability to raise prices without losing customers, which is exactly what makes sticky prices profitable. It connects to <strong>market concentration</strong> and the spread between farm-gate prices (what the rancher gets) and retail prices (what you pay). Finally, it ties to <strong>consumer staples investing</strong>, where "safe dividends" may depend on margins that only exist while the ratchet holds.</p>
+
+<p>For your own money, the practical lesson is to stop expecting commodity headlines to show up at the register. A fall in wheat, corn, or diesel is a necessary condition for lower prices, not a sufficient one. You can fight back on the parts you control. Compare unit prices, not shelf tags, so shrinkflation shows up. Move center-aisle items to private label, which the video claims can cut that part of the bill by about 18%, a figure worth checking against your own receipts. Consider buying protein directly from local producers, which skips part of the retail spread. As an investor, remember the other side of the trade: the same stickiness that fattens a food company's margin today is the thing most likely to disappear when stretched shoppers finally push back.</p>
+<div class="concept-side">Related in this category: <a href="vertical_integration.html">Vertical Integration</a>, <a href="shrinkflation.html">Shrinkflation</a>, <a href="budget_deficit.html">Government Budget Deficit</a>, <a href="demand_pull_inflation.html">Demand-Pull Inflation</a>, <a href="imported_inflation.html">Imported Inflation</a>, <a href="disinflation_vs_deflation.html">Disinflation vs. Deflation</a></div>
+<button class="concept-done" data-slug="asymmetric_price_stickiness" onclick="toggleDone('asymmetric_price_stickiness')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_asymmetric_price_stickiness';</script>
+<script src="../../book.js"></script>
+<script src="../fg.js"></script>
+</body>
+</html>
