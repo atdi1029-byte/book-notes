@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Credit Line Reduction (Balance Chasing) - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.prog-stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(112px,1fr));
+  gap:10px; margin:1rem 0 1.5rem; }
+.prog-stat { background:#e8e0d0; border:1px solid #d4c8b0; border-radius:8px;
+  padding:0.7rem 0.9rem; }
+.prog-stat .n { display:block; font-size:1.5rem; color:#5a3e1a; line-height:1.1; }
+.prog-stat .l { display:block; font-size:0.75rem; color:#8a7a60; margin-top:0.2rem; }
+.prog-chart { position:relative; margin:0.5rem 0 0.4rem; }
+.prog-chart svg { width:100%; height:auto; display:block; overflow:visible; }
+.prog-chart .grid { stroke:#ddd3c0; stroke-width:1; }
+.prog-chart .axis { stroke:#c8bca4; stroke-width:1; }
+.prog-chart .tick { fill:#8a7a60; font-size:11px; }
+.prog-chart .ylab { fill:#8a7a60; font-size:11px; }
+.prog-chart .actual { fill:none; stroke:#9a5a22; stroke-width:2; stroke-linejoin:round; }
+.prog-chart .actual-dot { fill:#9a5a22; stroke:#f4efe8; stroke-width:2; }
+.prog-chart .model { fill:none; stroke:#0e9488; stroke-width:2; stroke-dasharray:6 4; }
+.prog-chart .ceiling { stroke:#8a7a60; stroke-width:1; stroke-dasharray:2 4; }
+.prog-chart .here { stroke:#9a5a22; stroke-width:1; stroke-dasharray:2 3; opacity:0.6; }
+.prog-chart .dlabel { font-size:11px; fill:#3a2e1e; }
+.prog-chart .bar { fill:#9a5a22; opacity:0.75; }
+.prog-chart .bar.spike { fill:#6b3410; opacity:1; }
+.prog-legend .lg-spike::before { border-color:#6b3410; border-top-width:6px; }
+.prog-spikes { font-size:0.88rem; color:#5a3e1a; margin:-0.8rem 0 1.5rem; }
+.prog-chart .bar-model { fill:none; stroke:#0e9488; stroke-width:2; stroke-dasharray:6 4; }
+.prog-chart .hit { fill:transparent; cursor:crosshair; }
+.prog-tip { position:absolute; pointer-events:none; display:none;
+  background:#3a2e1e; color:#f4efe8; font-size:12px; line-height:1.4;
+  padding:6px 9px; border-radius:6px; white-space:nowrap; z-index:5; }
+.prog-legend { display:flex; gap:1.2rem; font-size:0.8rem; color:#5a3e1a;
+  margin:0 0 1.5rem; flex-wrap:wrap; }
+.prog-legend span::before { content:""; display:inline-block; width:18px; height:0;
+  border-top:2px solid; margin-right:6px; vertical-align:middle; }
+.prog-legend .lg-actual::before { border-color:#9a5a22; }
+.prog-legend .lg-model::before { border-color:#0e9488; border-top-style:dashed; }
+.prog-legend .lg-ceiling::before { border-color:#8a7a60; border-top-style:dotted; }
+.prog-eq { background:#e8e0d0; border:1px solid #d4c8b0; border-radius:8px;
+  padding:0.9rem 1.1rem; font-family:Georgia,serif; font-size:1.05rem; color:#3a2e1e;
+  margin:1rem 0; }
+.prog-eq .sub { display:block; font-size:0.85rem; color:#8a7a60; margin-top:0.4rem;
+  font-family:inherit; }
+.prog-note { font-size:0.85rem; color:#8a7a60; }
+.prog-link { font-size:0.85rem; margin:-0.8rem 0 1.2rem; }
+.prog-link a { color:#0e9488; }
+.ch-status { font-size:0.85rem; color:#5a3e1a; margin:-0.6rem 0 1.2rem; }
+.ch-status.done { color:#0e6b5f; background:#e3efe9; border:1px solid #b9d8cc;
+  border-radius:6px; padding:0.5rem 0.8rem; margin:0 0 1.2rem; }
+table.prog-table { font-size:0.85rem; margin:1rem 0; }
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done,
+body.hide-done .cat-card.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+.vid-tab {
+  margin: 0 0 1.2rem; background: #e8e0d0; border: 1px solid #d4c8b0;
+  border-radius: 8px; overflow: hidden;
+}
+.vid-tab summary {
+  padding: 0.6rem 0.9rem; cursor: pointer; font-size: 0.85rem;
+  color: #3a2a1a; list-style: none; user-select: none;
+}
+.vid-tab summary::-webkit-details-marker { display: none; }
+.vid-tab summary::before {
+  content: '▶'; display: inline-block; margin-right: 0.5rem;
+  font-size: 0.7rem; transition: transform 0.2s;
+}
+.vid-tab[open] summary::before { transform: rotate(90deg); }
+.vid-tab .vid-status {
+  float: right; font-size: 0.75rem; padding: 0.15rem 0.5rem;
+  border-radius: 3px; margin-left: 0.5rem;
+}
+.vid-tab .vid-ok { background: #4ade8040; color: #2d6a4f; }
+.vid-tab .vid-err { background: #f8717140; color: #9b2c2c; }
+.vid-tab .vid-list {
+  padding: 0 0.9rem 0.7rem; margin: 0;
+  list-style: none; font-size: 0.8rem;
+}
+.vid-tab .vid-list li {
+  padding: 0.35rem 0; border-top: 1px solid #d4c8b0;
+  display: flex; justify-content: space-between; gap: 8px;
+}
+.vid-tab .vid-list .vid-date {
+  color: #a08060; white-space: nowrap; flex: none;
+}
+.vid-tab .vid-list .vid-concepts {
+  color: #a08060; white-space: nowrap; flex: none; font-size: 0.75rem;
+}
+.vid-tab .vid-none {
+  padding: 0.4rem 0.9rem 0.7rem; color: #a08060; font-size: 0.8rem;
+}
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../personal-finance-basics.html">&larr; Personal Finance Basics</a>
+
+<div class="concept-meta"><span>standard</span><span>Personal Finance Basics</span><span>added 2026-10-15</span></div>
+<h4 id="balance_chasing_credit_line_reduction">Credit Line Reduction (Balance Chasing)</h4>
+
+<p>A <strong>credit line reduction</strong> is a lender's decision to lower the maximum amount you can borrow on a revolving account, usually a credit card. The <strong>credit limit</strong> is a ceiling, not a loan. You owe only what you have spent, and the gap between the balance and the limit is your <strong>available credit</strong>. <strong>Balance chasing</strong> is a specific, aggressive version of the cut. As you pay the balance down, the bank pulls the limit down with it so the cushion never grows back. The video's example is a $25,000 line cut to $10,500 right after the borrower pays from $15,000 to $10,000. The bank has taken back nearly all the room you just freed.</p>
+
+<p>This matters because a credit line works like an emergency fund for many households. The water heater fails, the car needs a transmission, or a paycheck arrives late, and the card absorbs the shock. If lenders shrink those lines across millions of accounts, the cushion shrinks too, and households have less room to borrow and are more likely to cut spending. Consumer spending is roughly two-thirds of U.S. GDP, so shifts in household liquidity can move the broader economy. It matters to the borrower directly as well. A smaller limit raises your <strong>credit utilization</strong>, the share of your limit you are using, and that can lower your credit score right when you are trying to improve your finances.</p>
+
+<p>Mechanically, the process is mostly automated. A bank's risk engine rescores every account regularly, using the borrower's payment history, credit bureau data, income signals, and the bank's own loss forecasts. If the model decides the account is riskier than the open line justifies, it lowers the limit, often overnight and with little warning. In a true balance-chasing rule, the trigger is a payment: the system sees the balance drop and resets the ceiling to a fixed margin above the new balance. Lenders must send an adverse action notice explaining the change, but they usually do not need your consent. The new limit applies to your next purchase.</p>
+
+<p>The video's numbers show the effect. A borrower with a 720 score and a decade-old $25,000 line carries $15,000, pays $5,000, and owes $10,000. Before the payment, available credit was $10,000. After a normal payoff it would be $15,000. Instead the limit falls to $10,500, leaving only $500 of room. Note that the video says the borrower loses $4,500 of credit, but the real figure is $14,500, the full drop from $25,000 to $10,500. Utilization also jumps from 40% ($10,000 of $25,000) to about 95% ($10,000 of $10,500), a level that scoring models penalize heavily. The $10,000 balance still costs about $2,150 a year at 21.5% APR, roughly $179 a month.</p>
+
+<blockquote>"The moment your $5,000 cash clearing wire registered, the bank automatically lowers your credit ceiling to $10,500. They chase your principal down."</blockquote>
+
+<p>Investors treat line reductions as one clue to how a bank sees the credit cycle. The practical signals are in quarterly earnings and regulatory filings. Watch the <strong>provision for credit losses</strong>, the money a bank sets aside today for expected future defaults under the CECL accounting rule. Watch card <strong>net charge-off rates</strong>, which are the share of balances written off as uncollectible after recoveries. The video treats a charge-off rate above about 4.5% as stress, though the exact threshold is its own judgment. Also compare total unused commitments with card balances. If banks are growing provisions while shrinking undrawn lines, they are defending themselves ahead of expected losses. A trader should read this as a lender-side warning, not a certain forecast.</p>
+
+<p>There are several gotchas. First, the video's capital argument is only partly right. Banks do hold capital against unused commitments, but the treatment of lines that can be cancelled at any time is lighter than the video implies, and line cuts are driven at least as much by loss models as by capital rules. Second, nothing in the transcript proves that cuts are happening at systemic scale. The video offers no data on how many lines were cut. Third, line reductions are normal. Banks cut dormant accounts, accounts with falling credit scores, and accounts where the borrower is maxed out. Cutting a limit that is far above need is routine risk management and not necessarily a recession signal.</p>
+
+<p>Be careful with the video's other statistics as well. The 11.1% figure refers to the rate at which card balances move into serious delinquency, which means 90 or more days past due. It is an annualized flow rate, not the share of all card debt currently in trouble. So "more than one in ten dollars" overstates what it measures. The claim that it exceeds the 2008 peak is also contestable, since card delinquency flows during and after the financial crisis ran higher than that by most Federal Reserve measures. Treat the video's framing as a worst-case reading, and check the original Federal Reserve Bank of New York household debt report before repeating a number.</p>
+
+<p>A line cut can backfire on both sides. For borrowers, the score hit from higher utilization can raise the cost of other credit, such as auto loans, and can trigger further cuts from other issuers who see the lower score. A borrower with no savings who loses a line may turn to costlier substitutes like payday loans or buy-now-pay-later plans. For banks, cutting too broadly can push borrowers into default, because a customer who could have borrowed their way through a rough month now cannot. It also costs the bank future interest income from healthy customers. If cuts are heavy and a recession deepens, lenders may lose both the profits from good accounts and their protection from bad ones.</p>
+
+<p>Several other concepts connect to this one. <strong>Utilization</strong> ties directly to credit scoring, and <strong>APR</strong> explains why carrying balances is so costly. CECL and loan-loss provisions explain why banks reserve money in advance, and net charge-offs show whether those reserves were justified. At the macro level, line reductions link to consumer spending, liquidity, and the credit cycle, where tightening credit slows demand and raises defaults. For a household, the lesson is practical. Keep an emergency fund in cash so you do not depend on a credit line that the bank can shrink at any time. Pay balances down without assuming your available credit will return.</p>
+<div class="concept-side">Related in this category: <a href="credit_score.html">Credit Score (FICO / VantageScore)</a>, <a href="used_vehicle_resale_value.html">Used Vehicle Resale Value (Residual Value)</a>, <a href="erisa_fiduciary_safe_harbor.html">ERISA Fiduciary Safe Harbor</a>, <a href="loan_amortization.html">Loan Amortization</a>, <a href="home_equity_line_of_credit.html">Home Equity Line of Credit (HELOC)</a>, <a href="margin_loan.html">Margin Loan</a></div>
+<button class="concept-done" data-slug="balance_chasing_credit_line_reduction" onclick="toggleDone('balance_chasing_credit_line_reduction')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_balance_chasing_credit_line_reduction';</script>
+<script src="../../book.js"></script>
+<script src="../fg.js"></script>
+</body>
+</html>
