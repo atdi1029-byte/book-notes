@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>American Depositary Receipt (ADR) - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.prog-stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(112px,1fr));
+  gap:10px; margin:1rem 0 1.5rem; }
+.prog-stat { background:#e8e0d0; border:1px solid #d4c8b0; border-radius:8px;
+  padding:0.7rem 0.9rem; }
+.prog-stat .n { display:block; font-size:1.5rem; color:#5a3e1a; line-height:1.1; }
+.prog-stat .l { display:block; font-size:0.75rem; color:#8a7a60; margin-top:0.2rem; }
+.prog-chart { position:relative; margin:0.5rem 0 0.4rem; }
+.prog-chart svg { width:100%; height:auto; display:block; overflow:visible; }
+.prog-chart .grid { stroke:#ddd3c0; stroke-width:1; }
+.prog-chart .axis { stroke:#c8bca4; stroke-width:1; }
+.prog-chart .tick { fill:#8a7a60; font-size:11px; }
+.prog-chart .ylab { fill:#8a7a60; font-size:11px; }
+.prog-chart .actual { fill:none; stroke:#9a5a22; stroke-width:2; stroke-linejoin:round; }
+.prog-chart .actual-dot { fill:#9a5a22; stroke:#f4efe8; stroke-width:2; }
+.prog-chart .model { fill:none; stroke:#0e9488; stroke-width:2; stroke-dasharray:6 4; }
+.prog-chart .ceiling { stroke:#8a7a60; stroke-width:1; stroke-dasharray:2 4; }
+.prog-chart .here { stroke:#9a5a22; stroke-width:1; stroke-dasharray:2 3; opacity:0.6; }
+.prog-chart .dlabel { font-size:11px; fill:#3a2e1e; }
+.prog-chart .bar { fill:#9a5a22; opacity:0.75; }
+.prog-chart .bar.spike { fill:#6b3410; opacity:1; }
+.prog-legend .lg-spike::before { border-color:#6b3410; border-top-width:6px; }
+.prog-spikes { font-size:0.88rem; color:#5a3e1a; margin:-0.8rem 0 1.5rem; }
+.prog-chart .bar-model { fill:none; stroke:#0e9488; stroke-width:2; stroke-dasharray:6 4; }
+.prog-chart .hit { fill:transparent; cursor:crosshair; }
+.prog-tip { position:absolute; pointer-events:none; display:none;
+  background:#3a2e1e; color:#f4efe8; font-size:12px; line-height:1.4;
+  padding:6px 9px; border-radius:6px; white-space:nowrap; z-index:5; }
+.prog-legend { display:flex; gap:1.2rem; font-size:0.8rem; color:#5a3e1a;
+  margin:0 0 1.5rem; flex-wrap:wrap; }
+.prog-legend span::before { content:""; display:inline-block; width:18px; height:0;
+  border-top:2px solid; margin-right:6px; vertical-align:middle; }
+.prog-legend .lg-actual::before { border-color:#9a5a22; }
+.prog-legend .lg-model::before { border-color:#0e9488; border-top-style:dashed; }
+.prog-legend .lg-ceiling::before { border-color:#8a7a60; border-top-style:dotted; }
+.prog-eq { background:#e8e0d0; border:1px solid #d4c8b0; border-radius:8px;
+  padding:0.9rem 1.1rem; font-family:Georgia,serif; font-size:1.05rem; color:#3a2e1e;
+  margin:1rem 0; }
+.prog-eq .sub { display:block; font-size:0.85rem; color:#8a7a60; margin-top:0.4rem;
+  font-family:inherit; }
+.prog-note { font-size:0.85rem; color:#8a7a60; }
+.prog-link { font-size:0.85rem; margin:-0.8rem 0 1.2rem; }
+.prog-link a { color:#0e9488; }
+.ch-status { font-size:0.85rem; color:#5a3e1a; margin:-0.6rem 0 1.2rem; }
+.ch-status.done { color:#0e6b5f; background:#e3efe9; border:1px solid #b9d8cc;
+  border-radius:6px; padding:0.5rem 0.8rem; margin:0 0 1.2rem; }
+table.prog-table { font-size:0.85rem; margin:1rem 0; }
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done,
+body.hide-done .cat-card.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+.vid-tab {
+  margin: 0 0 1.2rem; background: #e8e0d0; border: 1px solid #d4c8b0;
+  border-radius: 8px; overflow: hidden;
+}
+.vid-tab summary {
+  padding: 0.6rem 0.9rem; cursor: pointer; font-size: 0.85rem;
+  color: #3a2a1a; list-style: none; user-select: none;
+}
+.vid-tab summary::-webkit-details-marker { display: none; }
+.vid-tab summary::before {
+  content: '▶'; display: inline-block; margin-right: 0.5rem;
+  font-size: 0.7rem; transition: transform 0.2s;
+}
+.vid-tab[open] summary::before { transform: rotate(90deg); }
+.vid-tab .vid-status {
+  float: right; font-size: 0.75rem; padding: 0.15rem 0.5rem;
+  border-radius: 3px; margin-left: 0.5rem;
+}
+.vid-tab .vid-ok { background: #4ade8040; color: #2d6a4f; }
+.vid-tab .vid-err { background: #f8717140; color: #9b2c2c; }
+.vid-tab .vid-list {
+  padding: 0 0.9rem 0.7rem; margin: 0;
+  list-style: none; font-size: 0.8rem;
+}
+.vid-tab .vid-list li {
+  padding: 0.35rem 0; border-top: 1px solid #d4c8b0;
+  display: flex; justify-content: space-between; gap: 8px;
+}
+.vid-tab .vid-list .vid-date {
+  color: #a08060; white-space: nowrap; flex: none;
+}
+.vid-tab .vid-list .vid-concepts {
+  color: #a08060; white-space: nowrap; flex: none; font-size: 0.75rem;
+}
+.vid-tab .vid-none {
+  padding: 0.4rem 0.9rem 0.7rem; color: #a08060; font-size: 0.8rem;
+}
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../investing-fundamentals.html">&larr; Investing Fundamentals</a>
+
+<div class="concept-meta"><span>standard</span><span>Investing Fundamentals</span><span>added 2026-10-22</span></div>
+<h4 id="american_depositary_receipt">American Depositary Receipt (ADR)</h4>
+
+<p>An <strong>American Depositary Receipt (ADR)</strong> is a certificate issued by a US bank that represents shares of a foreign company, letting you buy and sell that company on a US exchange, in US dollars, through an ordinary brokerage account. The foreign company's real shares sit in a vault, so to speak, at a custodian bank in its home country. The ADR is the claim ticket on those shares, and it trades like any US stock: it has a ticker, a dollar price, and settles through the US system. Taiwan Semiconductor Manufacturing Company is the example in the video. Its actual shares are listed in Taipei and priced in Taiwan dollars. The "TSM" you buy at your US broker is the ADR.</p>
+
+<p>Why does this matter? Foreign markets are hard for ordinary investors to reach. Buying shares directly in Taipei, Tokyo, or London means opening an account with a broker that has access to those exchanges, trading during their hours, paying in foreign currency, and dealing with foreign settlement rules and tax paperwork. ADRs remove most of that friction. They are a big reason a US investor can own the world's most important chipmaker with the same few clicks used to buy Apple. For the companies, an ADR gives access to the deepest pool of investment capital on earth. For the broader market, ADRs are part of how global business, like the AI chip supply chain, ends up inside American retirement accounts and index funds.</p>
+
+<p>Here is the mechanism, step by step. A US investor wants exposure to a foreign company. A broker buys the underlying shares on the home exchange and delivers them to a custodian bank there. A US <strong>depositary bank</strong> (such as Bank of New York Mellon or Citibank) then issues ADRs against those shares and they begin trading in the US. Each ADR represents a fixed <strong>ADR ratio</strong>: it might equal one ordinary share, a fraction of one, or several. TSM's ADR represents five of TSMC's Taiwan-listed ordinary shares. The process also runs in reverse. An investor can hand ADRs back, the depositary bank cancels them, and the underlying shares are released. That two-way door is what keeps the ADR price tied to the home-market price.</p>
+
+<p>Now the video's example. Mark Malkiel covered TSMC's third-quarter 2026 report and said earnings came in at <strong>$4.60 per ADR</strong>, beating estimates of about $4.45 per ADR. He then paused to make a point:</p>
+
+<blockquote>"Notice how I said ADR, right? That's a depositary receipt. That is not a stock that exists here in America, but we trade the ADRs on the American Exchange."</blockquote>
+
+<p>That phrasing matters. TSMC reports in Taiwan dollars, and its earnings per ordinary share are a much smaller number. US analysts convert the figure to a per-ADR basis so it lines up with the price you actually see on screen. The same report showed revenue of $46.72 billion, up 50.9% from a year earlier and above the $45.62 billion consensus. Even so, TSM fell 1.8% on the day to $422.25, dragged down by a chip-sector sell-off. The number you quote and the price you pay both refer to the ADR, not the Taiwan share.</p>
+
+<p>How do investors use ADRs in practice? Mostly as the easy on-ramp to foreign companies: TSMC, ASML, Toyota, Novo Nordisk, Alibaba, and many more are held by US investors this way. Traders also use the ADR's price as a signal. Because the ADR trades while Asia and Europe are closed, its moves can hint at where the home-market stock may open the next day. Professionals watch the gap between the ADR price and the home-market price, adjusted for the ratio and the exchange rate, looking for temporary mispricings. When reading earnings, the practical habit is to check which unit a number refers to: per ordinary share, per ADR, or in local currency. The video's "per ADR" wording is exactly that kind of care.</p>
+
+<p>There are several gotchas. First, an ADR is <strong>not a stock that was created in America</strong>, and buying it does not make you a direct shareholder of the foreign company. Your rights flow through the depositary bank, which affects voting, corporate actions, and communications. Second, the price carries currency risk: the ADR moves with the home share price <em>and</em> the exchange rate. If the Taiwan dollar weakens against the US dollar, your ADR can fall even when the company's shares are flat at home. Third, depositary banks typically charge small annual fees, often deducted from dividends. Fourth, foreign countries may withhold tax on dividends before they reach you, and the ADR ratio means you cannot compare an ADR price to the home share price without converting.</p>
+
+<p>Not all ADRs are equal. <strong>Sponsored</strong> ADRs are set up with the foreign company's cooperation, and the best of them list on major exchanges like the NYSE or Nasdaq, with proper reporting. <strong>Unsponsored</strong> ADRs are created by a bank without the company's involvement and usually trade over the counter, with thinner liquidity and less information. Even for top-tier names, the structure can break down at the edges. A government might restrict foreign ownership or capital flows, a depositary agreement might be terminated, or a company might be delisted from US exchanges. Geopolitics is a real risk here: TSMC's operations sit in Taiwan, and a home-market trading halt or a political shock would hit the ADR at once. Arbitrage usually keeps ADR and home prices aligned, but when the home market is closed or capital moves are restricted, that link can stretch badly.</p>
+
+<p>ADRs connect to many other ideas in this guide. They are a form of <strong>equity exposure to foreign markets</strong>, so currency movements and international risk sit on top of ordinary stock risk. Earnings-per-share comparisons depend on the unit, which ties directly to how <strong>consensus estimates</strong> and "beats" are measured. The video's wider theme also applies: TSM sold off on a record quarter because the market was worried about whether AI buyers could keep <em>financing</em> their chip purchases, a story about interest rates and the cost of capital, not about the ADR structure itself. The structure is plumbing. It does not change the fundamentals, but knowing how it works lets you read the quotes correctly and avoid confusing a receipt with the underlying share.</p>
+
+<p>To sum up, an ADR is a convenient wrapper: a dollar-denominated, US-listed receipt for foreign shares, with a fixed ratio, a depositary bank in the middle, and a conversion path back to the original shares. It gives you real economic exposure to a company like TSMC without a foreign brokerage account. It also adds layers you should understand: currency risk, fees, withholding taxes, indirect shareholder rights, and the possibility of distortions in a crisis. If you can explain what the ratio is, why "per ADR" earnings differ from per-share earnings, and why the ADR price tracks both the home stock and the currency, you can discuss foreign-stock investing in the US market with confidence.</p>
+<div class="concept-side">Related in this category: <a href="sp_500_index.html">S&amp;P 500 Index</a>, <a href="dow_jones_industrial_average.html">Dow Jones Industrial Average (DJIA)</a>, <a href="pick_and_shovel_investing.html">Pick-and-Shovel Investment Strategy</a>, <a href="initial_public_offering.html">Initial Public Offering (IPO)</a>, <a href="prime_brokerage.html">Prime Brokerage</a>, <a href="rotation_to_cash_generative_value.html">Beta (High-Beta Stocks)</a></div>
+<button class="concept-done" data-slug="american_depositary_receipt" onclick="toggleDone('american_depositary_receipt')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_american_depositary_receipt';</script>
+<script src="../../book.js"></script>
+<script src="../fg.js"></script>
+</body>
+</html>

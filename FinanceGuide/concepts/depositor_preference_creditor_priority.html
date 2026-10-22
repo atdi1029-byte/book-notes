@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Depositor Preference and Creditor Priority in Bank Failure - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.prog-stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(112px,1fr));
+  gap:10px; margin:1rem 0 1.5rem; }
+.prog-stat { background:#e8e0d0; border:1px solid #d4c8b0; border-radius:8px;
+  padding:0.7rem 0.9rem; }
+.prog-stat .n { display:block; font-size:1.5rem; color:#5a3e1a; line-height:1.1; }
+.prog-stat .l { display:block; font-size:0.75rem; color:#8a7a60; margin-top:0.2rem; }
+.prog-chart { position:relative; margin:0.5rem 0 0.4rem; }
+.prog-chart svg { width:100%; height:auto; display:block; overflow:visible; }
+.prog-chart .grid { stroke:#ddd3c0; stroke-width:1; }
+.prog-chart .axis { stroke:#c8bca4; stroke-width:1; }
+.prog-chart .tick { fill:#8a7a60; font-size:11px; }
+.prog-chart .ylab { fill:#8a7a60; font-size:11px; }
+.prog-chart .actual { fill:none; stroke:#9a5a22; stroke-width:2; stroke-linejoin:round; }
+.prog-chart .actual-dot { fill:#9a5a22; stroke:#f4efe8; stroke-width:2; }
+.prog-chart .model { fill:none; stroke:#0e9488; stroke-width:2; stroke-dasharray:6 4; }
+.prog-chart .ceiling { stroke:#8a7a60; stroke-width:1; stroke-dasharray:2 4; }
+.prog-chart .here { stroke:#9a5a22; stroke-width:1; stroke-dasharray:2 3; opacity:0.6; }
+.prog-chart .dlabel { font-size:11px; fill:#3a2e1e; }
+.prog-chart .bar { fill:#9a5a22; opacity:0.75; }
+.prog-chart .bar.spike { fill:#6b3410; opacity:1; }
+.prog-legend .lg-spike::before { border-color:#6b3410; border-top-width:6px; }
+.prog-spikes { font-size:0.88rem; color:#5a3e1a; margin:-0.8rem 0 1.5rem; }
+.prog-chart .bar-model { fill:none; stroke:#0e9488; stroke-width:2; stroke-dasharray:6 4; }
+.prog-chart .hit { fill:transparent; cursor:crosshair; }
+.prog-tip { position:absolute; pointer-events:none; display:none;
+  background:#3a2e1e; color:#f4efe8; font-size:12px; line-height:1.4;
+  padding:6px 9px; border-radius:6px; white-space:nowrap; z-index:5; }
+.prog-legend { display:flex; gap:1.2rem; font-size:0.8rem; color:#5a3e1a;
+  margin:0 0 1.5rem; flex-wrap:wrap; }
+.prog-legend span::before { content:""; display:inline-block; width:18px; height:0;
+  border-top:2px solid; margin-right:6px; vertical-align:middle; }
+.prog-legend .lg-actual::before { border-color:#9a5a22; }
+.prog-legend .lg-model::before { border-color:#0e9488; border-top-style:dashed; }
+.prog-legend .lg-ceiling::before { border-color:#8a7a60; border-top-style:dotted; }
+.prog-eq { background:#e8e0d0; border:1px solid #d4c8b0; border-radius:8px;
+  padding:0.9rem 1.1rem; font-family:Georgia,serif; font-size:1.05rem; color:#3a2e1e;
+  margin:1rem 0; }
+.prog-eq .sub { display:block; font-size:0.85rem; color:#8a7a60; margin-top:0.4rem;
+  font-family:inherit; }
+.prog-note { font-size:0.85rem; color:#8a7a60; }
+.prog-link { font-size:0.85rem; margin:-0.8rem 0 1.2rem; }
+.prog-link a { color:#0e9488; }
+.ch-status { font-size:0.85rem; color:#5a3e1a; margin:-0.6rem 0 1.2rem; }
+.ch-status.done { color:#0e6b5f; background:#e3efe9; border:1px solid #b9d8cc;
+  border-radius:6px; padding:0.5rem 0.8rem; margin:0 0 1.2rem; }
+table.prog-table { font-size:0.85rem; margin:1rem 0; }
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done,
+body.hide-done .cat-card.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+.vid-tab {
+  margin: 0 0 1.2rem; background: #e8e0d0; border: 1px solid #d4c8b0;
+  border-radius: 8px; overflow: hidden;
+}
+.vid-tab summary {
+  padding: 0.6rem 0.9rem; cursor: pointer; font-size: 0.85rem;
+  color: #3a2a1a; list-style: none; user-select: none;
+}
+.vid-tab summary::-webkit-details-marker { display: none; }
+.vid-tab summary::before {
+  content: '▶'; display: inline-block; margin-right: 0.5rem;
+  font-size: 0.7rem; transition: transform 0.2s;
+}
+.vid-tab[open] summary::before { transform: rotate(90deg); }
+.vid-tab .vid-status {
+  float: right; font-size: 0.75rem; padding: 0.15rem 0.5rem;
+  border-radius: 3px; margin-left: 0.5rem;
+}
+.vid-tab .vid-ok { background: #4ade8040; color: #2d6a4f; }
+.vid-tab .vid-err { background: #f8717140; color: #9b2c2c; }
+.vid-tab .vid-list {
+  padding: 0 0.9rem 0.7rem; margin: 0;
+  list-style: none; font-size: 0.8rem;
+}
+.vid-tab .vid-list li {
+  padding: 0.35rem 0; border-top: 1px solid #d4c8b0;
+  display: flex; justify-content: space-between; gap: 8px;
+}
+.vid-tab .vid-list .vid-date {
+  color: #a08060; white-space: nowrap; flex: none;
+}
+.vid-tab .vid-list .vid-concepts {
+  color: #a08060; white-space: nowrap; flex: none; font-size: 0.75rem;
+}
+.vid-tab .vid-none {
+  padding: 0.4rem 0.9rem 0.7rem; color: #a08060; font-size: 0.8rem;
+}
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../economic-history-financial-crises.html">&larr; Economic History &amp; Financial Crises</a>
+
+<div class="concept-meta"><span>standard</span><span>Economic History &amp; Financial Crises</span><span>added 2026-10-22</span></div>
+<h4 id="depositor_preference_creditor_priority">Depositor Preference and Creditor Priority in Bank Failure</h4>
+
+<p><strong>Creditor priority</strong> is the rulebook that decides who gets paid, and in what order, when a company runs out of money. Every dollar a bank owes is a claim against the same shrinking pile of assets, and the claims are not equal. <strong>Depositor preference</strong> is the part of that rulebook that moves depositors ahead of ordinary creditors such as bondholders, vendors and trade partners. Lawyers call the ordering a <strong>waterfall</strong>. Money fills the top bucket first, and only what overflows reaches the next one down. The video adds a layer that most people never hear about: a secured lender sits above this whole waterfall, because it collects from its collateral before the waterfall even starts.</p>
+
+<p>This matters because a bank is built differently from a normal company. It runs on borrowed money: deposits, bonds and loans from other institutions. Its equity cushion is thin, often under a tenth of its assets. When a bank fails, the shortfall is therefore rarely small. The priority rules decide who absorbs it. They affect how much interest a bank must pay to attract funding, whether large depositors run at the first sign of trouble, and how much the <strong>Deposit Insurance Fund</strong> (the FDIC's pool of premiums paid by banks) has to cover. Ultimately the ordering shapes how fragile the whole banking system is, and it is the reason a single borrowing statistic can be a warning about your own money.</p>
+
+<p>Here is the mechanism step by step. A bank is declared insolvent, and the FDIC is appointed <strong>receiver</strong>, meaning it steps in to take over the bank's assets and liabilities and wind them down. First, anyone holding a valid <strong>secured claim</strong>, a loan backed by specific pledged collateral, is paid from that collateral. Next, under US law, administrative expenses of the receivership are paid. Then depositors are paid, with the FDIC standing in for insured depositors up to $250,000 per depositor, per bank, per ownership category. Uninsured depositors come next in line. General creditors follow, then subordinated debt, and shareholders collect last, usually nothing. The FDIC is also paid as the subrogated claimant for the insured deposits it covered, which is how it recovers its outlay.</p>
+
+<p>The video's focus is the secured lender at the top: the Federal Home Loan Bank system. An <strong>advance</strong> is simply a loan from a Home Loan Bank to a member bank, backed by pledged collateral such as mortgages, Treasuries and mortgage bonds. Under Title 12, Section 1430(e) of the US Code, a Home Loan Bank's security interest takes priority over the claims of any other party, and the statute names a receiver specifically. There are narrow exceptions, mainly other lenders who already hold a perfected claim on the same collateral. Because every advance must be fully collateralized, the Home Loan Banks have never taken a loss on an advance in over nine decades. The video puts it this way:</p>
+
+<blockquote>"They're not smarter than everybody else. They are senior to everybody else."</blockquote>
+
+<p>The Silicon Valley Bank failure in March 2023 shows the waterfall in action. According to the Government Accountability Office, SVB's Home Loan Bank advances rose from $20 billion on March 1 to $30 billion on March 10, the day it failed. Signature Bank went from $8.2 billion to $11.2 billion, and First Republic from $19.4 billion to $28.1 billion. When the FDIC's bridge bank took over SVB, it repaid the full $30 billion to the Home Loan Bank of San Francisco. It also paid $266.5 million in prepayment fees and another $18.8 million in waiver fees. The lender walked away whole, with a bonus for being repaid early. Nobody at the Home Loan Bank lost a cent, and the cost of that clean outcome landed on whoever was left.</p>
+
+<p>That is the central idea: losses do not vanish, they move. When a failed bank's best assets are carved out to repay a secured lender, the remaining assets have to cover everyone else, and they are worse on average than the original pool. The Deposit Insurance Fund pays off insured depositors and then recovers less from the leftover assets. Uninsured depositors, those holding balances above $250,000, share in what remains. The video cites a 2005 Richmond Fed working paper finding that heavier use of Home Loan Bank advances raises expected losses to the FDIC's insurance fund, with increases it described as non-trivial. The mechanism is intuitive: the more a bank has pledged, the less unencumbered collateral stands behind depositors.</p>
+
+<p>For investors and savvy savers, the idea becomes a set of practical signals. The first is the $250,000 line. Any individual or business holding more than that at one bank is holding money that stands behind a secured lender's claim on the best collateral. The video's fixes are an insured deposit sweep network, which splits cash across several banks each under the limit, or Treasury bills held in a brokerage account, which are direct obligations of the US government with no bank balance sheet in between. The second signal is public: Schedule RC-M, item 5.a of a bank's quarterly call report shows its Home Loan Bank advances. Compare that figure to total deposits. Advances climbing quarter after quarter while deposits shrink suggests a bank is renting its funding.</p>
+
+<p>There are several gotchas. First, a high advance balance is not automatically a red flag. The system's total hit $810.7 billion at the end of June, up from $676.7 billion at year-end, but it was still well below the March 2023 record of $1.04 trillion, and the banking industry earned $90.1 billion that quarter. The video is explicit that the headline number alone is no crisis; the real question is which banks borrowed and what they had left afterward. Second, depositor preference does not mean depositors are safe. It ranks them above general creditors, but below secured lenders. Third, "insured" and "uninsured" are not equally exposed, because insured depositors are paid by the FDIC quickly, while uninsured ones wait for recoveries and often take losses.</p>
+
+<p>Things go wrong when the priority system meets a fast-moving crisis. The video points out that a bank with underwater bonds cannot sell them without booking a loss, but it can pledge them. FDIC data showed $326.7 billion in unrealized losses on bank securities at the end of June. Pledging those bonds to the Home Loan Bank keeps the lights on, and that works until the day it doesn't. Meanwhile, the more collateral is locked away, the less is left for everyone else, so sophisticated depositors have a reason to run earlier, which can speed up the very failure they fear. Regulators are aware of it. In November 2023 the Federal Housing Finance Agency's review of the system said troubled banks should use the Fed's discount window, not lean on the Home Loan Banks as a crisis lender. In September 2024 it told the Home Loan Banks to coordinate with a member's primary regulator before lending to a troubled institution.</p>
+
+<p>This concept connects to several others. The <strong>discount window</strong>, the Fed's own lending desk, is the stigmatized alternative: the Fed publishes weekly balance data and releases borrower names with a two-year lag, so banks avoid it, while Home Loan Bank borrowing looks routine. It also ties to <strong>deposit insurance</strong> and the $250,000 limit, to <strong>unrealized losses on securities</strong>, which create the need for pledgeable collateral, and to <strong>net interest margin</strong> and deposit competition, which push banks toward wholesale funding. Once you hold the idea that a bank's liabilities line up in a queue, you can read any bank's funding mix as a statement about where you would stand in that queue. The video's closing line captures it:</p>
+
+<blockquote>"The home loan banks never lost a dollar because they always get paid first. So when a borrowing bank fails, the loss doesn't vanish. It lands on the insurance fund and the uninsured depositors standing behind them in line."</blockquote>
+<div class="concept-side">Related in this category: <a href="bank_sector_contagion.html">Bank Sector Contagion (Investor Flight to Safety)</a>, <a href="dot_com_bubble_comparison.html">Dot-Com Bubble Comparison (1999 Analogy)</a>, <a href="bank_run.html">Bank Run</a>, <a href="telecom_bubble_bust.html">Telecom Bubble and Bust (2000–2002)</a>, <a href="fdic_receivership_bridge_bank.html">FDIC Receivership and Bridge Bank Resolution</a></div>
+<button class="concept-done" data-slug="depositor_preference_creditor_priority" onclick="toggleDone('depositor_preference_creditor_priority')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_depositor_preference_creditor_priority';</script>
+<script src="../../book.js"></script>
+<script src="../fg.js"></script>
+</body>
+</html>
