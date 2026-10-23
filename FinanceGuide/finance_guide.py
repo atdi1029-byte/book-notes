@@ -47,6 +47,8 @@ RETRY_INTERVAL = 10 * 60   # after a check that failed (network, yt-dlp, claude)
 NETWORK_WAIT = 3 * 60      # after login/wake, wait up to this long for Wi-Fi before checking
 CAPTION_RETRY = 60 * 60    # a new video is up but has no captions yet: check again this soon
 MAX_VIDEOS_PER_RUN = 0     # 0 = no limit, process all new videos
+BACKFILL_PER_RUN = 20      # channels with "backfill": true in channels.json also
+                           # work through their older uploads, this many per check
 BOOKS_DIR = BASE_DIR.parent
 
 TRANSCRIPTS_DIR.mkdir(exist_ok=True)
@@ -236,10 +238,11 @@ def get_channel_videos(channel_url, limit=30):
     missing, crashed, or the network was down).  None must never be
     treated as "the channel has no new videos"."""
     try:
+        # limit=0 pulls the whole upload list (for backfill)
         result = subprocess.run(
-            ["yt-dlp", "--flat-playlist", "--print", "id", "--print", "title",
-             "--playlist-end", str(limit), channel_url],
-            capture_output=True, text=True, timeout=120
+            ["yt-dlp", "--flat-playlist", "--print", "id", "--print", "title"]
+            + (["--playlist-end", str(limit)] if limit else []) + [channel_url],
+            capture_output=True, text=True, timeout=120 if limit else 600
         )
     except FileNotFoundError:
         log("  ERROR yt-dlp not found on PATH — install it or fix the PATH "
@@ -348,7 +351,8 @@ def find_new_videos():
     ok = True
     for channel in channels:
         log(f"  Checking: {channel['name']}")
-        videos = get_channel_videos(channel["url"])
+        backfill = channel.get("backfill", False)
+        videos = get_channel_videos(channel["url"], limit=0 if backfill else 30)
         if videos is None:
             # Skip, don't guess.  In particular a NEW channel must not get
             # an empty backlog recorded, or its whole history floods in on
@@ -375,12 +379,21 @@ def find_new_videos():
             continue
 
         picked = []
-        for v in videos:
+        for v in videos[:30]:
             if _needs_processing(v["id"], processed):
                 v["channel"] = channel["name"]
                 picked.append(v)
         new_videos.extend(picked)
-        log(f"  Found {len(videos)} total, {len(picked)} new/retry")
+        log(f"  Found {min(len(videos), 30)} total, {len(picked)} new/retry")
+
+        # Older uploads, newest first, a few per check
+        if backfill:
+            older = [v for v in videos[30:] if _needs_processing(v["id"], processed)]
+            for v in older[:BACKFILL_PER_RUN]:
+                v["channel"] = channel["name"]
+                new_videos.append(v)
+            log(f"  Backfill: {len(older)} older videos left, "
+                f"{min(len(older), BACKFILL_PER_RUN)} this check")
 
     if MAX_VIDEOS_PER_RUN:
         new_videos = new_videos[:MAX_VIDEOS_PER_RUN]
