@@ -107,11 +107,19 @@
     if (activeBtn) activeBtn.classList.add('active');
   };
 
+  // A bookmark saved inside a plain-English box: open the box first, or
+  // the paragraph has no position to scroll to.
+  function openHelpAround(el) {
+    var box = el && el.closest('details.plain-help');
+    if (box) box.open = true;
+  }
+
   window.jumpToBookmark = function() {
     var d;
     try { d = JSON.parse(localStorage.getItem(BM_KEY)); } catch(e) {}
     if (!d) return;
     var el = document.getElementById(d.id);
+    openHelpAround(el);
     if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
     else window.scrollTo({ top: d.y, behavior: 'smooth' });
   };
@@ -185,6 +193,7 @@
     if (window.__skipBookmarkScroll ||
         document.querySelectorAll('.new-badge').length > 0) return;
     var target = document.getElementById(d.id);
+    openHelpAround(target);
     if (target) {
       var rect = target.getBoundingClientRect();
       window.scrollTo(0, window.scrollY + rect.top);
@@ -271,6 +280,8 @@
     var best = null;
     var bestDist = Infinity;
     for (var i = 0; i < candidates.length; i++) {
+      // Paragraphs inside a closed plain-English box aren't laid out
+      if (candidates[i].closest('details:not([open])')) continue;
       var rect = candidates[i].getBoundingClientRect();
       // Pick the element whose top is closest to viewport top
       var dist = Math.abs(rect.top);
@@ -327,7 +338,7 @@
       if (el) el.remove();
     });
     clone.querySelectorAll(
-      'script, style, nav, .bm-btn, footer, .toc'
+      'script, style, nav, .bm-btn, footer, .toc, .plain-help, .primer'
     ).forEach(function(el) { el.remove(); });
     var text = clone.textContent || '';
     return text.split(/\s+/).filter(function(w) {
@@ -354,6 +365,9 @@
       var el = els[i];
       // Skip UI chrome
       if (el.closest('nav, .toc, .bookmark-bar, #bookmarkBar, #bmToast, .bm-toast')) continue;
+      // Plain-English help and primers are extra, not the book: progress
+      // and time-left count the book's own words only.
+      if (el.closest('.plain-help, .primer')) continue;
       if (el.classList.contains('bm-btn')) continue;
       // Don't double-count nested elements (li inside td, etc.): an ancestor
       // already in the map always precedes its descendants in document

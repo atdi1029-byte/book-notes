@@ -23,6 +23,7 @@ npx @puppeteer/browsers install chrome@stable --path ~/.cache/puppeteer   # once
 node sync_test.js      # merge rules, backend, shelf/book sync, glossary (~1 min)
 node offline_test.js   # save the library, then read it with no connection (~30 s)
 node pages_test.js     # every shelf page loads without a JavaScript error (~2 min)
+node help_test.js      # plain-English boxes/primers: closed by default, bookmarks reopen them, progress skips them (~15 s)
 ```
 
 - `server.js` serves this folder on localhost with `SYNC_URL` pointed at a local

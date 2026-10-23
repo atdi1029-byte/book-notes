@@ -9,6 +9,10 @@ check_html.py — check a book page against the layout rules (book_rules.json).
   ./check_html.py Book_Folder --json       machine-readable result
   ./check_html.py Book_Folder --page plain.html
 
+Plain-English help boxes (<details class="plain-help">) and primers
+(<aside class="primer">) are extra help, not the book: they are left out of
+every count (paragraphs, words, <strong>, blockquotes) and checked on their own.
+
 Errors are PIPELINE.md "must" rules (section order, 8+ paragraphs per chapter,
 no cover image, bookmarks, table formats, ...); warnings are "should" rules.
 Exit: 0 no errors, 1 errors, 2 usage/file problem.
@@ -42,6 +46,25 @@ def paragraphs(fragment):
         if words(body) == 0:
             continue
         out.append(body)
+    return out
+
+
+HELP_RE = re.compile(
+    r'<(details|aside)\b([^>]*\bclass=["\'][^"\']*(?<![\w-])(?:plain-help|primer)(?![\w-])[^"\']*["\'][^>]*)>(.*?)</\1>',
+    re.S | re.I)
+
+
+def strip_help(doc):
+    """The page without its plain-English boxes and primers (the book alone)."""
+    return HELP_RE.sub('', doc)
+
+
+def help_boxes(fragment):
+    """[(kind, inner_html)] for each plain-English box / primer in fragment."""
+    out = []
+    for m in HELP_RE.finditer(fragment):
+        kind = 'plain' if re.search(r'(?<![\w-])plain-help(?![\w-])', m.group(2)) else 'primer'
+        out.append((kind, m.group(1).lower(), m.group(3)))
     return out
 
 
@@ -95,7 +118,8 @@ def check(folder, page='index.html', progress=False):
     path = os.path.join(BOOKS_DIR, folder, page)
     if not os.path.isfile(path):
         return None
-    doc = open(path, encoding='utf-8', errors='replace').read()
+    full = open(path, encoding='utf-8', errors='replace').read()
+    doc = strip_help(full)
     book_type = ''
     try:
         book_type = json.load(open(os.path.join(BOOKS_DIR, folder, '.run_state.json'))).get('type', '')
@@ -106,12 +130,15 @@ def check(folder, page='index.html', progress=False):
     B, C = RULES['book'], RULES['chapter']
 
     sections = [s for s in split_sections(doc) if not s['toc']]
+    full_sections = [s for s in split_sections(full) if not s['toc']]
     order_keys = [s['key'] for s in RULES['section_order']]
     rank = {k: i for i, k in enumerate(order_keys)}
 
     # Every <h2> is either a named section or a chapter.
-    for s in sections:
+    same = len(full_sections) == len(sections)   # False only when a box holds an <h2> (an error below)
+    for i, s in enumerate(sections):
         s['key'] = classify(s['title'], s['id']) or 'chapters'
+        s['help'] = len(help_boxes(full_sections[i]['html'])) if same else 0
     chapters = [s for s in sections if s['key'] == 'chapters']
     present = {}
     for s in sections:
@@ -168,6 +195,26 @@ def check(folder, page='index.html', progress=False):
     if no_cite:
         W(f'{no_cite} <blockquote>(s) without a <cite>')
 
+    # ── plain-English boxes and primers (extra help, not the book) ──
+    boxes = help_boxes(full)
+    if len(re.findall(r'\bclass=["\'][^"\']*(?<![\w-])(?:plain-help|primer)(?![\w-])', full)) != len(boxes):
+        E('a plain-help/primer class on the wrong tag (plain English is <details class="plain-help">, '
+          'primers are <aside class="primer">) or a box inside a box')
+    for kind, tag, inner in boxes:
+        where = text_of(inner)[:50]
+        if kind == 'plain' and tag != 'details':
+            E(f'plain-English box is not a <details> (it must start closed): "{where}"')
+        if kind == 'primer' and tag != 'aside':
+            E(f'primer is not an <aside class="primer">: "{where}"')
+        if re.search(r'<h2\b', inner, re.I):
+            E(f'<h2> inside a plain-English box or primer: "{where}"')
+        if kind == 'plain' and not re.match(r'\s*<summary\b[^>]*>\s*Plain English\s*</summary>', inner, re.I):
+            E(f'plain-English box must open with <summary>Plain English</summary>: "{where}"')
+        if kind == 'primer' and 'primer-label' not in inner:
+            W(f'primer without a <div class="primer-label">: "{where}"')
+        if not paragraphs(inner):
+            E(f'empty plain-English box or primer: "{where}"')
+
     # ── chapters ──
     rows = []
     for s in chapters:
@@ -177,7 +224,8 @@ def check(folder, page='index.html', progress=False):
         avg = round(sum(words(p) for p in ps) / n) if n else 0
         bq = len(re.findall(r'<blockquote\b', s['html'], re.I))
         part = bool(re.search(C['part_header_match'], title, re.I)) and n < C['min_paragraphs']
-        rows.append({'title': title, 'paragraphs': n, 'avg_words': avg, 'blockquotes': bq, 'part_header': part})
+        rows.append({'title': title, 'paragraphs': n, 'avg_words': avg, 'blockquotes': bq, 'help': s['help'],
+                     'part_header': part})
         if re.search(C['combined_heading_match'], title, re.I):
             E(f'combined chapters in one heading: "{title[:60]}" (every chapter gets its own <h2>)')
         if part:
@@ -258,12 +306,14 @@ def check(folder, page='index.html', progress=False):
         W('no footer (author, year, pages, summary blurb)')
 
     # ── length and wrapping (soft) ──
-    lines = doc.split('\n')
+    lines = full.split('\n')
     long_share = sum(1 for l in lines if len(l) > B['long_line_chars']) / max(1, len(lines))
     if long_share > B['long_line_share_warn']:
         W(f'{long_share:.0%} of lines are over {B["long_line_chars"]} characters (wrap prose at ~70)')
 
     return {'folder': folder, 'page': page, 'type': book_type, 'lines': len(lines), 'strong': strongs,
+            'plain_help': sum(1 for b in boxes if b[0] == 'plain'),
+            'primers': sum(1 for b in boxes if b[0] == 'primer'),
             'blockquotes': len(quotes), 'chapters': rows, 'sections': [s['key'] for s in sections],
             'errors': errors, 'warnings': warnings}
 
@@ -290,14 +340,16 @@ def main():
         return 1 if res['errors'] else 0
 
     print(f'═══ check_html: {folder}/{page} ({res["lines"]} lines, {res["strong"]} <strong>, {res["blockquotes"]} blockquotes) ═══')
-    print(f'{"#":>3}  {"paras":>5}  {"avg w":>5}  {"quotes":>6}  chapter')
+    if res['plain_help'] or res['primers']:
+        print(f'(plain-English boxes: {res["plain_help"]}, primers: {res["primers"]} — not counted below)')
+    print(f'{"#":>3}  {"paras":>5}  {"avg w":>5}  {"quotes":>6}  {"help":>4}  chapter')
     for i, r in enumerate(res['chapters'], 1):
         flag = ''
         if r['part_header']:
             flag = '  (part header)'
         elif r['paragraphs'] < RULES['chapter']['min_paragraphs'] or r['avg_words'] < RULES['chapter']['min_avg_words']:
             flag = '  ✗'
-        print(f'{i:>3}  {r["paragraphs"]:>5}  {r["avg_words"]:>5}  {r["blockquotes"]:>6}  {r["title"][:60]}{flag}')
+        print(f'{i:>3}  {r["paragraphs"]:>5}  {r["avg_words"]:>5}  {r["blockquotes"]:>6}  {r["help"] or "":>4}  {r["title"][:60]}{flag}')
     if res['errors']:
         print(f'\nERRORS ({len(res["errors"])}):')
         for e in res['errors']:

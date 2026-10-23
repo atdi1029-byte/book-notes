@@ -98,6 +98,31 @@ def main():
         r = run(root, 'check_html.py', 'Test_Book', '--progress')
         check('--progress still flags the thin chapter', r.returncode == 1)
 
+        print('plain-English boxes and primers')
+        box = '<details class="plain-help"><summary>Plain English</summary>\n' + para('help', 3) + '\n</details>'
+        primer = '<aside class="primer"><div class="primer-label">Primer</div>' + para('basics', 1) + '</aside>'
+        open(os.path.join(book, 'index.html'), 'w').write(book_html(ch1_extra=primer + box))
+        r = run(root, 'check_html.py', 'Test_Book')
+        check('a page with a box and a primer passes', r.returncode == 0, r.stdout[-600:])
+        check('the boxes are reported, not counted', 'plain-English boxes: 1, primers: 1' in r.stdout
+              and '\n  1      8' in r.stdout, r.stdout[:500])
+        open(os.path.join(book, 'index.html'), 'w').write(
+            book_html(ch2_extra=box).replace(para('banks'), para('banks', 5)))
+        r = run(root, 'check_html.py', 'Test_Book')
+        check("help paragraphs don't fill a thin chapter", r.returncode == 1 and '5 paragraphs' in r.stdout, r.stdout[-400:])
+        open(os.path.join(book, 'index.html'), 'w').write(
+            book_html(ch1_extra=box.replace('<details', '<div').replace('</details>', '</div>')))
+        r = run(root, 'check_html.py', 'Test_Book')
+        check('a box that is not a <details> is an error', r.returncode == 1 and 'wrong tag' in r.stdout, r.stdout[-400:])
+        open(os.path.join(book, 'index.html'), 'w').write(
+            book_html(ch1_extra=box.replace('<summary>Plain English</summary>', '')))
+        r = run(root, 'check_html.py', 'Test_Book')
+        check('a box without its summary is an error', r.returncode == 1 and '<summary>Plain English' in r.stdout, r.stdout[-400:])
+        open(os.path.join(book, 'index.html'), 'w').write(
+            book_html(ch1_extra=box.replace('</summary>', '</summary>' + box)))
+        r = run(root, 'check_html.py', 'Test_Book')
+        check('a box inside a box is an error', r.returncode == 1 and 'box inside a box' in r.stdout, r.stdout[-400:])
+
         print('grade_coverage + audit_check')
         env = {'GRADER_CLAUDE': os.path.join(HERE, 'fake_grader.py')}
         open(os.path.join(book, 'notes.md'), 'w').write(NOTES)
@@ -111,6 +136,13 @@ def main():
         check('grader exits 1 when something is missing', r.returncode == 1, r.stdout[-300:])
         r = run(root, 'audit_check.py', 'Test_Book')
         check('audit_check fails on the missing nugget', r.returncode == 1 and 'N005' in r.stdout, r.stdout)
+
+        hidden = ('<details class="plain-help"><summary>Plain English</summary><p>The book explains that '
+                  'reserves are not lent out to customers.</p></details>')
+        open(os.path.join(book, 'index.html'), 'w').write(book_html(ch2_extra=hidden))
+        run(root, 'grade_coverage.py', 'Test_Book', env=env)
+        st = {n['id']: n['status'] for n in json.load(open(os.path.join(book, 'coverage_audit.json')))['nuggets']}
+        check('a nugget only in a plain-English box is still MISSING', st.get('N005') == 'MISSING', st)
 
         extra = '<p>The book explains that reserves are not lent out to customers, contrary to the textbook story told for decades.</p>'
         open(os.path.join(book, 'index.html'), 'w').write(book_html(ch2_extra=extra))

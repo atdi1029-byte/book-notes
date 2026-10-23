@@ -36,7 +36,7 @@ from datetime import datetime, timezone
 
 BOOKS_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, BOOKS_DIR)
-from check_html import split_sections, classify, text_of  # noqa: E402
+from check_html import split_sections, classify, text_of, strip_help  # noqa: E402
 from verify_quotes import normalize  # noqa: E402
 
 CLAUDE = os.environ.get('GRADER_CLAUDE', 'claude')
@@ -297,7 +297,9 @@ def main():
     if not all_nugs:
         print('notes.md has no [MUST KNOW]/[SHOULD KNOW] nuggets with IDs — nothing to grade')
         return 2
-    doc = open(html_p, encoding='utf-8', errors='replace').read()
+    # Plain-English boxes and primers are extra help: a nugget only counts
+    # as covered when the book's own text covers it.
+    doc = strip_help(open(html_p, encoding='utf-8', errors='replace').read())
     secs = page_sections(doc)
     chapters = [s for s in secs if s['key'] == 'chapters']
     page_text = '\n\n'.join(f"## {s['title']}\n{s['text']}" for s in secs)

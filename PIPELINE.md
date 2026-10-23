@@ -30,7 +30,8 @@ debate the book with someone who read all of it.
   stories, build the arguments as flowing prose. The good books (Big Debt Crises,
   How an Economy Grows, Talking to My Daughter) were written this way.
 - Each book folder holds `notes.md`, `summary.md`, `index.html`, `cover.jpg`
-  (+ `thumb.jpg`, and `plain.html` when asked for).
+  (+ `thumb.jpg`). Plain-English help lives inside `index.html` (step 4b); the
+  12 older books with a separate `plain.html` keep it.
 
 ## The flow
 
@@ -40,6 +41,7 @@ debate the book with someone who read all of it.
 | 2. Compact (if notes > 3000 lines) | Claude + 2 agents | `notes.md.raw` kept; `notes.md` compacted |
 | 3. Summary | Claude | `summary.md` |
 | 4. Write the page | Claude, main session | `index.html`, checked with `./check_html.py Book_Folder --progress` after each chapter |
+| 4b. Plain-English pass | Claude, main session | primers + closed "Plain English" boxes inside `index.html`, only where an idea needs it |
 | 5. Grade | script (fresh Claude calls) | `./grade_coverage.py Book_Folder` → `coverage_audit.json`, `debate_ready_report.json` |
 | 6. Publish | script | `./finish-book.sh Book_Folder --category "…" --push` |
 | 7. Remember | Claude | add the book to `books.md` and its type guide in memory |
@@ -117,15 +119,52 @@ Key takeaways and thematic breakdown, written after the notes are final.
   count and average words and fails when later chapters get thinner than the
   first ones. Fix a thin chapter right away; don't rewrite what is already good.
 - Wrap prose at ~70 characters, one sentence per line.
-- Plain-English companion `plain.html`: only when Alex asks for it (dense or
-  technical books: bonds, options, macro finance, quantitative) — don't suggest
-  or assume it. Same chapter structure, title + "(Plain English)", its own
-  `BM_KEY`, its own card on the shelf. No length limit (a math/quant book may
-  need 1,500-2,500+ lines): 8+ paragraphs per chapter with everyday worked
-  examples and real explanations of the math (not just "there's a formula").
-  Inline SVG diagrams wherever they help (flow charts, timelines, feedback
-  loops, comparisons) in `.diagram` divs with optional `.diagram-caption`,
-  light strokes that work on dark backgrounds. No synthesis sections.
+- No separate `plain.html` any more (Oct 23 2026): plain-English help goes
+  inside the page, step 4b.
+
+### 4b. Plain-English pass (inside `index.html`)
+
+Alex, Oct 23 2026: with a separate plain-English page, Alex read it first
+and then had no interest in the main one, because it was the same book twice. Now
+there is one page, and help appears only where an idea needs it.
+
+- **Every book gets the pass**, after the whole page is written and before
+  grading (grading hashes the page). Most help lands in dense books (Mises,
+  economics, bonds, macro, quant); a light book may end with none. Zero boxes
+  is a fine result. Don't add help for its own sake.
+- **Help with the overall idea, never the same thing twice.** A box doesn't
+  re-say the paragraph above it in simpler words. It explains the idea behind
+  the passage another way: an everyday worked example, the math walked
+  through with real numbers, what it means in practice, why it matters, a
+  small SVG diagram (`.diagram`). If the box would read like the paragraph
+  again, cut it.
+- **Plain-English box**: after the passage it helps with (one paragraph or a
+  run of them), closed until tapped:
+  ```html
+  <details class="plain-help">
+  <summary>Plain English</summary>
+  <p>…</p>
+  </details>
+  ```
+  Usually 1-3 paragraphs. No `<h2>`, no new book content, no quotes from the
+  book.
+- **Primer**: open, before a chapter or section that leans on background the
+  book assumes (what a yield is, what marginal utility means, how a central
+  bank balance sheet works). Background only, never a preview of the chapter:
+  ```html
+  <aside class="primer">
+  <div class="primer-label">Primer</div>
+  <p>…</p>
+  </aside>
+  ```
+- **Not part of the book:** `check_html.py` leaves boxes and primers out of
+  every count (paragraphs, words, `<strong>`, blockquotes) and lists how many
+  each chapter has in its `help` column; `grade_coverage.py` grades the book's
+  own text only (a nugget covered only in a box is still MISSING); reading
+  progress and time left count the book's words only. The page must pass on
+  its own.
+- Same writer as the page (main session, never an agent). Prose wraps at ~70
+  characters like the rest.
 
 ### 5. Grade — `grade_coverage.py`
 
@@ -211,7 +250,7 @@ Everywhere:
 - **Table of contents:** `<nav class="toc"><h2>Contents</h2><ol>…</ol></nav>`.
   Flat list; when the book is divided into Parts, nest each Part's chapters in
   an `<ol>` inside the Part's `<li>` (Economics 101 style).
-- **No cover image inside the page** (`index.html` or `plain.html`); the cover
+- **No cover image inside the page** (`index.html` or an older `plain.html`); the cover
   is on the shelf card only.
 - Every `<h2>` has an `id`. Sub-items use `<h3>` so each gets a bookmark
   (book.js adds bookmark buttons to headings and every `<p>`).
@@ -227,7 +266,7 @@ Everywhere:
 
 ## Files: what's published and what stays on this Mac
 
-The repo is the public site. Committed per book: `index.html`, `plain.html`,
+The repo is the public site. Committed per book: `index.html` (older books: `plain.html`),
 `summary.md`, `notes.md`, `cover.jpg`, `thumb.jpg`, and the images the pages
 actually use. Pipeline files stay local (`.gitignore`): `charts/` renders
 (referenced images are force-added by finish-book), `notes.md.raw` and other
