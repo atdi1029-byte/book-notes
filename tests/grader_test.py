@@ -99,13 +99,22 @@ def main():
         check('--progress still flags the thin chapter', r.returncode == 1)
 
         print('plain-English boxes and primers')
-        box = '<details class="plain-help"><summary>Plain English</summary>\n' + para('help', 3) + '\n</details>'
+        box = '<details class="plain-help"><summary>Plain English</summary>\n' + para('help', 1) + '\n</details>'
+        small = '<details class="plain-help"><summary>Plain English</summary><p>A short worked example.</p></details>'
         primer = '<aside class="primer"><div class="primer-label">Primer</div>' + para('basics', 1) + '</aside>'
         open(os.path.join(book, 'index.html'), 'w').write(book_html(ch1_extra=primer + box))
         r = run(root, 'check_html.py', 'Test_Book')
         check('a page with a box and a primer passes', r.returncode == 0, r.stdout[-600:])
         check('the boxes are reported, not counted', 'plain-English boxes: 1, primers: 1' in r.stdout
               and '\n  1      8' in r.stdout, r.stdout[:500])
+        open(os.path.join(book, 'index.html'), 'w').write(book_html(ch2_extra=small * 5))
+        r = run(root, 'check_html.py', 'Test_Book')
+        check('more than 4 boxes in a chapter is a warning', r.returncode == 0 and '5 plain-English boxes' in r.stdout,
+              r.stdout[-400:])
+        open(os.path.join(book, 'index.html'), 'w').write(book_html(ch1_extra=box * 3, ch2_extra=box * 3))
+        r = run(root, 'check_html.py', 'Test_Book')
+        check("help over 20% of the book's words is an error", r.returncode == 1 and 'max 20%' in r.stdout,
+              r.stdout[-400:])
         open(os.path.join(book, 'index.html'), 'w').write(
             book_html(ch2_extra=box).replace(para('banks'), para('banks', 5)))
         r = run(root, 'check_html.py', 'Test_Book')
