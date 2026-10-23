@@ -132,12 +132,13 @@ there is one page, and help appears only where an idea needs it.
   grading (grading hashes the page). Most help lands in dense books (Mises,
   economics, bonds, macro, quant); a light book may end with none. Zero boxes
   is a fine result. Don't add help for its own sake.
-- **Don't overdo it (Alex).** The default is no box. Add one only where a
-  smart reader without the background would get stuck on the idea, not
-  where a paragraph is merely long or has a hard word (the glossary handles
-  words). Most chapters get 0-2. Limits in `check_html.py`: help over 20% of
-  the book's own words is an error; more than 4 boxes/primers in one chapter
-  is a warning, so ask whether each one earns its place.
+- **As much as it takes, where it's needed (Alex, Oct 23 2026: "add as
+  much as you want in order to get the point across").** No limit on boxes
+  per chapter or per book. What decides it is need, not a count: add a box
+  wherever a smart reader without the background would get stuck on the
+  idea, and none where a paragraph is merely long or has a hard word (the
+  glossary handles words). Overdoing it means boxes that repeat the text or
+  explain what was already clear, not a high count.
 - **Help with the overall idea, never the same thing twice.** A box doesn't
   re-say the paragraph above it in simpler words. It explains the idea behind
   the passage another way: an everyday worked example, the math walked
@@ -171,7 +172,7 @@ there is one page, and help appears only where an idea needs it.
   its own.
 - **Reference:** `The_Theory_Of_Money_And_Credit/plain-help-demo.html`
   (Mises ch. 8, primer + 4 boxes). Alex, Oct 23 2026: "i think this is
-  perfect". That is the most a chapter should get; match its tone and size.
+  perfect". Match its tone; a harder chapter can get more.
 - Same writer as the page (main session, never an agent). Prose wraps at ~70
   characters like the rest.
 

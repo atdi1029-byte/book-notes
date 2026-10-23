@@ -215,13 +215,6 @@ def check(folder, page='index.html', progress=False):
         if not paragraphs(inner):
             E(f'empty plain-English box or primer: "{where}"')
 
-    # Don't overdo it (Alex, Oct 23 2026): help stays a small share of the page.
-    help_words = sum(words(inner) for _, _, inner in boxes)
-    book_words = sum(words(p) for s in chapters for p in paragraphs(s['html']))
-    if book_words and help_words / book_words > B['plain_help_max_share']:
-        E(f'plain-English help is {help_words / book_words:.0%} of the book\'s words '
-          f'(max {B["plain_help_max_share"]:.0%}) — keep only the boxes where an idea truly needs it')
-
     # ── chapters ──
     rows = []
     for s in chapters:
@@ -235,9 +228,6 @@ def check(folder, page='index.html', progress=False):
                      'part_header': part})
         if re.search(C['combined_heading_match'], title, re.I):
             E(f'combined chapters in one heading: "{title[:60]}" (every chapter gets its own <h2>)')
-        if s['help'] > B['plain_help_warn_per_chapter']:
-            W(f'"{title[:60]}": {s["help"]} plain-English boxes/primers (more than {B["plain_help_warn_per_chapter"]} — '
-              'is each one needed?)')
         if part:
             continue
         if n < C['min_paragraphs']:
