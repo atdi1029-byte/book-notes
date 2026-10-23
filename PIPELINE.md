@@ -169,6 +169,9 @@ there is one page, and help appears only where an idea needs it.
   own text only (a nugget covered only in a box is still MISSING); reading
   progress and time left count the book's words only. The page must pass on
   its own.
+- **Reference:** `The_Theory_Of_Money_And_Credit/plain-help-demo.html`
+  (Mises ch. 8, primer + 4 boxes). Alex, Oct 23 2026: "i think this is
+  perfect". That is the most a chapter should get; match its tone and size.
 - Same writer as the page (main session, never an agent). Prose wraps at ~70
   characters like the rest.
 
