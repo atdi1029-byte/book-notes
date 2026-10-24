@@ -154,8 +154,9 @@ there is one page, and help appears only where an idea needs it.
   <p>…</p>
   </details>
   ```
-  Usually 1-3 paragraphs. No `<h2>`, no new book content, no quotes from the
-  book.
+  As long as the idea needs, with no cap on length, boxes per chapter or
+  boxes per book (Alex, Oct 24 2026: "definitely don't put limits on plain
+  English stuff"). No `<h2>`, no new book content, no quotes from the book.
 - **Primer**: open, before a chapter or section that leans on background the
   book assumes (what a yield is, what marginal utility means, how a central
   bank balance sheet works). Background only, never a preview of the chapter:
