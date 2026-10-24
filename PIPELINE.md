@@ -31,7 +31,8 @@ debate the book with someone who read all of it.
   How an Economy Grows, Talking to My Daughter) were written this way.
 - Each book folder holds `notes.md`, `summary.md`, `index.html`, `cover.jpg`
   (+ `thumb.jpg`). Plain-English help lives inside `index.html` (step 4b); the
-  12 older books with a separate `plain.html` keep it.
+  11 older books with a separate `plain.html` keep it (Position Sizing was
+  converted Oct 24 2026).
 
 ## The flow
 
@@ -164,6 +165,25 @@ there is one page, and help appears only where an idea needs it.
   <p>…</p>
   </aside>
   ```
+- **Primer or box? (Position Sizing, Oct 24 2026)** Ask why the reader is
+  stuck. The author *skipped* something he assumes you know → primer, before
+  the chapter. The author *explained* it but it's hard → box, after the
+  passage. One word that a definition fixes → glossary. Put a primer before
+  the chapter where the background is **first used**, not where the book
+  first names it (stops were used all through ch. 1 but the primer was
+  placed before ch. 2), and add those terms to the glossary too.
+- **Where boxes are most needed:** every formula the page states, every
+  table of results (why the numbers come out that way), and every
+  counterintuitive claim the page asserts without showing it ("adding big
+  winners lowers SQN" needed a worked example).
+- **Check every number in a box with a quick calculation** before writing
+  it (`python3 -c …`). Compounding, averages and made-up examples are easy
+  to get wrong by feel: 60R at 1% risk is a ~45% loss, not 60%.
+- **Self-check before grading:** go chapter by chapter and ask where a smart
+  reader without the background would still get stuck. Position Sizing
+  needed a second pass (7 more boxes) because the first pass covered the
+  math but skipped the asserted claims and the "how do I actually use this
+  table" steps.
 - **Not part of the book:** `check_html.py` leaves boxes and primers out of
   every count (paragraphs, words, `<strong>`, blockquotes) and lists how many
   each chapter has in its `help` column; `grade_coverage.py` grades the book's
