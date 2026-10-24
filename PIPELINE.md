@@ -31,7 +31,7 @@ debate the book with someone who read all of it.
   How an Economy Grows, Talking to My Daughter) were written this way.
 - Each book folder holds `notes.md`, `summary.md`, `index.html`, `cover.jpg`
   (+ `thumb.jpg`). Plain-English help lives inside `index.html` (step 4b); the
-  11 older books with a separate `plain.html` keep it (Position Sizing was
+  10 older books with a separate `plain.html` keep it (Position Sizing and Bond Markets were
   converted Oct 24 2026).
 
 ## The flow
