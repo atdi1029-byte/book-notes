@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Debt Service Coverage Ratio (DSCR) - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.prog-stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(112px,1fr));
+  gap:10px; margin:1rem 0 1.5rem; }
+.prog-stat { background:#e8e0d0; border:1px solid #d4c8b0; border-radius:8px;
+  padding:0.7rem 0.9rem; }
+.prog-stat .n { display:block; font-size:1.5rem; color:#5a3e1a; line-height:1.1; }
+.prog-stat .l { display:block; font-size:0.75rem; color:#8a7a60; margin-top:0.2rem; }
+.prog-chart { position:relative; margin:0.5rem 0 0.4rem; }
+.prog-chart svg { width:100%; height:auto; display:block; overflow:visible; }
+.prog-chart .grid { stroke:#ddd3c0; stroke-width:1; }
+.prog-chart .axis { stroke:#c8bca4; stroke-width:1; }
+.prog-chart .tick { fill:#8a7a60; font-size:11px; }
+.prog-chart .ylab { fill:#8a7a60; font-size:11px; }
+.prog-chart .actual { fill:none; stroke:#9a5a22; stroke-width:2; stroke-linejoin:round; }
+.prog-chart .actual-dot { fill:#9a5a22; stroke:#f4efe8; stroke-width:2; }
+.prog-chart .model { fill:none; stroke:#0e9488; stroke-width:2; stroke-dasharray:6 4; }
+.prog-chart .ceiling { stroke:#8a7a60; stroke-width:1; stroke-dasharray:2 4; }
+.prog-chart .here { stroke:#9a5a22; stroke-width:1; stroke-dasharray:2 3; opacity:0.6; }
+.prog-chart .dlabel { font-size:11px; fill:#3a2e1e; }
+.prog-chart .bar { fill:#9a5a22; opacity:0.75; }
+.prog-chart .bar.spike { fill:#6b3410; opacity:1; }
+.prog-legend .lg-spike::before { border-color:#6b3410; border-top-width:6px; }
+.prog-spikes { font-size:0.88rem; color:#5a3e1a; margin:-0.8rem 0 1.5rem; }
+.prog-chart .bar-model { fill:none; stroke:#0e9488; stroke-width:2; stroke-dasharray:6 4; }
+.prog-chart .hit { fill:transparent; cursor:crosshair; }
+.prog-tip { position:absolute; pointer-events:none; display:none;
+  background:#3a2e1e; color:#f4efe8; font-size:12px; line-height:1.4;
+  padding:6px 9px; border-radius:6px; white-space:nowrap; z-index:5; }
+.prog-legend { display:flex; gap:1.2rem; font-size:0.8rem; color:#5a3e1a;
+  margin:0 0 1.5rem; flex-wrap:wrap; }
+.prog-legend span::before { content:""; display:inline-block; width:18px; height:0;
+  border-top:2px solid; margin-right:6px; vertical-align:middle; }
+.prog-legend .lg-actual::before { border-color:#9a5a22; }
+.prog-legend .lg-model::before { border-color:#0e9488; border-top-style:dashed; }
+.prog-legend .lg-ceiling::before { border-color:#8a7a60; border-top-style:dotted; }
+.prog-eq { background:#e8e0d0; border:1px solid #d4c8b0; border-radius:8px;
+  padding:0.9rem 1.1rem; font-family:Georgia,serif; font-size:1.05rem; color:#3a2e1e;
+  margin:1rem 0; }
+.prog-eq .sub { display:block; font-size:0.85rem; color:#8a7a60; margin-top:0.4rem;
+  font-family:inherit; }
+.prog-note { font-size:0.85rem; color:#8a7a60; }
+.prog-link { font-size:0.85rem; margin:-0.8rem 0 1.2rem; }
+.prog-link a { color:#0e9488; }
+.ch-status { font-size:0.85rem; color:#5a3e1a; margin:-0.6rem 0 1.2rem; }
+.ch-status.done { color:#0e6b5f; background:#e3efe9; border:1px solid #b9d8cc;
+  border-radius:6px; padding:0.5rem 0.8rem; margin:0 0 1.2rem; }
+table.prog-table { font-size:0.85rem; margin:1rem 0; }
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done,
+body.hide-done .cat-card.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+.vid-tab {
+  margin: 0 0 1.2rem; background: #e8e0d0; border: 1px solid #d4c8b0;
+  border-radius: 8px; overflow: hidden;
+}
+.vid-tab summary {
+  padding: 0.6rem 0.9rem; cursor: pointer; font-size: 0.85rem;
+  color: #3a2a1a; list-style: none; user-select: none;
+}
+.vid-tab summary::-webkit-details-marker { display: none; }
+.vid-tab summary::before {
+  content: '▶'; display: inline-block; margin-right: 0.5rem;
+  font-size: 0.7rem; transition: transform 0.2s;
+}
+.vid-tab[open] summary::before { transform: rotate(90deg); }
+.vid-tab .vid-status {
+  float: right; font-size: 0.75rem; padding: 0.15rem 0.5rem;
+  border-radius: 3px; margin-left: 0.5rem;
+}
+.vid-tab .vid-ok { background: #4ade8040; color: #2d6a4f; }
+.vid-tab .vid-err { background: #f8717140; color: #9b2c2c; }
+.vid-tab .vid-list {
+  padding: 0 0.9rem 0.7rem; margin: 0;
+  list-style: none; font-size: 0.8rem;
+}
+.vid-tab .vid-list li {
+  padding: 0.35rem 0; border-top: 1px solid #d4c8b0;
+  display: flex; justify-content: space-between; gap: 8px;
+}
+.vid-tab .vid-list .vid-date {
+  color: #a08060; white-space: nowrap; flex: none;
+}
+.vid-tab .vid-list .vid-concepts {
+  color: #a08060; white-space: nowrap; flex: none; font-size: 0.75rem;
+}
+.vid-tab .vid-none {
+  padding: 0.4rem 0.9rem 0.7rem; color: #a08060; font-size: 0.8rem;
+}
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../corporate-finance-investment-banking.html">&larr; Corporate Finance &amp; Investment Banking</a>
+
+<div class="concept-meta"><span>standard</span><span>Corporate Finance &amp; Investment Banking</span><span>added 2026-10-25</span></div>
+<h4 id="debt_service_coverage_ratio">Debt Service Coverage Ratio (DSCR)</h4>
+
+<p>The <strong>Debt Service Coverage Ratio (DSCR)</strong> asks one plain question: does the money coming in cover the money owed on the debt? You calculate it by dividing the cash a business generates from operations by its <strong>debt service</strong>, which is the total of principal and interest due in a given period. A DSCR of 1.0 means income exactly covers the payments, with nothing left over. A DSCR of 1.5 means the borrower earns $1.50 for every $1.00 owed. Below 1.0, the borrower can't make its payments from operations and has to find cash somewhere else. Lenders treat it as the basic health check on any loan, because a borrower can look wealthy on paper and still miss a payment.</p>
+
+<p>DSCR matters because it works as an early-warning system, and lenders write it into contracts. A lender can't watch a borrower's day-to-day decisions, so it sets a numerical tripwire. As long as the ratio stays above the line, the borrower runs its own business. Once the ratio falls below the line, the lender gets rights it didn't have before. That makes DSCR a hinge between a healthy loan and a troubled one. It affects who can borrow, how much they can borrow, and what interest rate they pay. It also shapes what happens to investors who sit upstream, such as private credit funds, business development companies, and the retirement accounts and wealth-management clients behind them.</p>
+
+<p>Mechanically, the calculation has two halves. The top half is <strong>net operating income</strong>, or cash flow available for debt service, which is revenue minus operating costs such as power, staff, and maintenance, before any loan payments. The bottom half is debt service: scheduled interest plus scheduled principal repayment. Say a business earns $60 million of operating cash flow in a year and owes $40 million in interest and principal. Its DSCR is 60 divided by 40, or 1.5. The credit agreement might require a minimum of 1.25. If revenue falls and cash flow drops to $48 million, the ratio hits 1.2, and the borrower has broken the promise even though it has paid every bill on time.</p>
+
+<p>That last point is what separates a <strong>maintenance covenant</strong> from an ordinary loan term. An <em>incurrence</em> covenant is only tested when the borrower does something, like issuing new debt. A maintenance covenant is tested on a schedule, usually every quarter, whatever the borrower is doing. The borrower submits financials, the lender runs the formula, and the ratio has to pass every time. A breach is called an <strong>event of default</strong>, or at least a "trigger event," even though no payment has been missed. This is a big difference from a bond, where trouble is usually declared only after a coupon goes unpaid. In a covenant-heavy private loan, the lender can step in while there is still some value left to protect.</p>
+
+<p>The video applies this to GPU-backed debt. In 2023, Blackstone and other lenders put together a $2.3 billion private credit facility for the cloud operator CoreWeave, secured by racks of graphics chips instead of buildings or long-term contracts. The borrower's income is what it earns by renting out that computing power, charged per GPU-hour. The video describes operators charging $3 to $4 per GPU-hour when hardware was scarce, and those fat margins paid the debt down ahead of schedule. Then comes the crack: if more capacity floods the market and corporate buyers pull back, the rental price can slide from $4 toward $2.50. The numerator of the DSCR shrinks, while the loan payments in the denominator stay exactly the same.</p>
+
+<blockquote>"As soon as that rental price ticks down from $4 to $2.50, well, the entire debt service formula literally blows apart."</blockquote>
+
+<p>Run the numbers to see how fast it happens. A rental price falling from $4.00 to $2.50 is a 37.5% revenue cut, and if power and staff costs are fixed, almost all of that cut falls straight through to operating cash flow. Suppose the operator had a comfortable DSCR of 1.6 against a covenant of 1.25. A 37.5% drop in revenue could reduce cash flow by far more than the 22% cushion, which pushes the ratio below 1.0. Operating leverage makes this worse: the costs of running a data center don't fall when prices do, so profit falls much faster than revenue. A modest-looking price decline can turn into a covenant breach within a single quarter.</p>
+
+<p>When the covenant trips, the video says, the lender can issue a <strong>capital call</strong>, which means a demand for fresh equity cash or additional unencumbered collateral. The usual remedies are called a cure. The borrower can inject cash, pledge more assets, pay down part of the loan, or negotiate a waiver, which typically costs a fee and a higher interest rate. If the borrower can't do any of those, the lender can accelerate the loan, which means demanding the whole balance now, and then enforce on the collateral. This ties the DSCR to the loan-to-value problem the video stresses: chips lose value fast, so the collateral cushion shrinks at the same time as the income cushion. Two covenants can be breached together, and both demands arrive in the same quarter.</p>
+
+<p>Investors and analysts use DSCR in practice as a stress-testing tool. Instead of asking whether the ratio is fine today, they ask how far revenue can fall before it hits the covenant, which is the headroom. Headroom of 40% is comfortable, while 10% means a single soft quarter can cause a breach. For an investor in a private credit fund or BDC, the practical step is to read the portfolio schedule and ask what the borrowers' coverage looks like, how much of the income is PIK (payment-in-kind, meaning interest paid by adding to the loan balance instead of in cash), and what the borrowers' customers are paying. Rising PIK income is often a sign borrowers are avoiding cash defaults. On the public side, falling rental indexes and widening credit spreads are signals that coverage ratios are weakening.</p>
+
+<p>There are several gotchas. First, DSCR is only as honest as its inputs, and definitions vary by contract. One agreement may use EBITDA, another may use cash flow after taxes and maintenance spending, and "adjusted" numbers can add back items that flatter the result. The video itself warns against relying on headline EBITDA, because EBITDA ignores the heavy replacement spending that chip-based businesses need. Second, a ratio above 1.0 doesn't mean a loan is safe: if the chips will be worthless before the loan ends, a borrower can pay on time for three years and still leave the lender with an under-collateralized balance. Third, contracted revenue helps only while the customers stay solvent and the contracts can't be renegotiated. And last, a breach doesn't automatically mean failure, since many borrowers cure or negotiate waivers.</p>
+
+<p>When DSCR fails, the damage spreads outward in steps. A cash-strapped operator facing a capital call has few good options, because equity markets and venture funds are already full of illiquid AI paper. It may sell chips at a discount, which pushes down the market value of everyone else's identical collateral and triggers further covenant tests at other borrowers. That feedback loop is how a single breach turns into a wave of margin calls. The lenders, in turn, are private credit funds with quarterly redemption caps of about 5%, so their own investors may find the exit gated. In extreme cases, the equipment is written down to pennies on the dollar, as happened with telecom equipment after 2000 and 2001, when vendor financing collapsed alongside the revenue it had been funding.</p>
+
+<p>DSCR connects to a whole family of ideas in the video. It is the income-side partner of the <strong>loan-to-value (LTV)</strong> ratio, which measures the collateral side, and lenders usually monitor both. It sits inside the structure of a <strong>senior secured term loan</strong>, which gets repaid first and is backed by specific assets. It links to <strong>depreciation</strong> and obsolescence, because shorter asset lives require faster principal repayment, which raises debt service and lowers DSCR. It relates to <strong>PIK interest</strong> and private credit redemption gates as the stress signals further up the chain. And it echoes <strong>vendor financing</strong> and the circular capital loop, where the lender's money funds the chip purchases that generate the revenue everyone is counting on. If you remember one thing, make it this: DSCR measures whether a borrower can pay its debts from what it earns, and a covenant turns that measurement into a trigger that gives lenders power before any payment is missed.</p>
+<div class="concept-side">Related in this category: <a href="hyperscaler.html">Hyperscaler (Cloud Infrastructure Giant)</a>, <a href="corporate_restructuring.html">Corporate Restructuring</a>, <a href="cross_subsidization.html">Cross-Subsidization Between Business Divisions</a>, <a href="cash_cow.html">Cash Cow Business Unit</a>, <a href="oem_tier_supplier_hierarchy.html">OEM Tiered Supply Chain Hierarchy (Tier 1 / Tier 2 Suppliers)</a>, <a href="business_development_company_bdc.html">Business Development Company (BDC)</a></div>
+<button class="concept-done" data-slug="debt_service_coverage_ratio" onclick="toggleDone('debt_service_coverage_ratio')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_debt_service_coverage_ratio';</script>
+<script src="../../book.js"></script>
+<script src="../fg.js"></script>
+</body>
+</html>
