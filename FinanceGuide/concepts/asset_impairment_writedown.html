@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Asset Impairment / Write-Down - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.prog-stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(112px,1fr));
+  gap:10px; margin:1rem 0 1.5rem; }
+.prog-stat { background:#e8e0d0; border:1px solid #d4c8b0; border-radius:8px;
+  padding:0.7rem 0.9rem; }
+.prog-stat .n { display:block; font-size:1.5rem; color:#5a3e1a; line-height:1.1; }
+.prog-stat .l { display:block; font-size:0.75rem; color:#8a7a60; margin-top:0.2rem; }
+.prog-chart { position:relative; margin:0.5rem 0 0.4rem; }
+.prog-chart svg { width:100%; height:auto; display:block; overflow:visible; }
+.prog-chart .grid { stroke:#ddd3c0; stroke-width:1; }
+.prog-chart .axis { stroke:#c8bca4; stroke-width:1; }
+.prog-chart .tick { fill:#8a7a60; font-size:11px; }
+.prog-chart .ylab { fill:#8a7a60; font-size:11px; }
+.prog-chart .actual { fill:none; stroke:#9a5a22; stroke-width:2; stroke-linejoin:round; }
+.prog-chart .actual-dot { fill:#9a5a22; stroke:#f4efe8; stroke-width:2; }
+.prog-chart .model { fill:none; stroke:#0e9488; stroke-width:2; stroke-dasharray:6 4; }
+.prog-chart .ceiling { stroke:#8a7a60; stroke-width:1; stroke-dasharray:2 4; }
+.prog-chart .here { stroke:#9a5a22; stroke-width:1; stroke-dasharray:2 3; opacity:0.6; }
+.prog-chart .dlabel { font-size:11px; fill:#3a2e1e; }
+.prog-chart .bar { fill:#9a5a22; opacity:0.75; }
+.prog-chart .bar.spike { fill:#6b3410; opacity:1; }
+.prog-legend .lg-spike::before { border-color:#6b3410; border-top-width:6px; }
+.prog-spikes { font-size:0.88rem; color:#5a3e1a; margin:-0.8rem 0 1.5rem; }
+.prog-chart .bar-model { fill:none; stroke:#0e9488; stroke-width:2; stroke-dasharray:6 4; }
+.prog-chart .hit { fill:transparent; cursor:crosshair; }
+.prog-tip { position:absolute; pointer-events:none; display:none;
+  background:#3a2e1e; color:#f4efe8; font-size:12px; line-height:1.4;
+  padding:6px 9px; border-radius:6px; white-space:nowrap; z-index:5; }
+.prog-legend { display:flex; gap:1.2rem; font-size:0.8rem; color:#5a3e1a;
+  margin:0 0 1.5rem; flex-wrap:wrap; }
+.prog-legend span::before { content:""; display:inline-block; width:18px; height:0;
+  border-top:2px solid; margin-right:6px; vertical-align:middle; }
+.prog-legend .lg-actual::before { border-color:#9a5a22; }
+.prog-legend .lg-model::before { border-color:#0e9488; border-top-style:dashed; }
+.prog-legend .lg-ceiling::before { border-color:#8a7a60; border-top-style:dotted; }
+.prog-eq { background:#e8e0d0; border:1px solid #d4c8b0; border-radius:8px;
+  padding:0.9rem 1.1rem; font-family:Georgia,serif; font-size:1.05rem; color:#3a2e1e;
+  margin:1rem 0; }
+.prog-eq .sub { display:block; font-size:0.85rem; color:#8a7a60; margin-top:0.4rem;
+  font-family:inherit; }
+.prog-note { font-size:0.85rem; color:#8a7a60; }
+.prog-link { font-size:0.85rem; margin:-0.8rem 0 1.2rem; }
+.prog-link a { color:#0e9488; }
+.ch-status { font-size:0.85rem; color:#5a3e1a; margin:-0.6rem 0 1.2rem; }
+.ch-status.done { color:#0e6b5f; background:#e3efe9; border:1px solid #b9d8cc;
+  border-radius:6px; padding:0.5rem 0.8rem; margin:0 0 1.2rem; }
+table.prog-table { font-size:0.85rem; margin:1rem 0; }
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done,
+body.hide-done .cat-card.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+.vid-tab {
+  margin: 0 0 1.2rem; background: #e8e0d0; border: 1px solid #d4c8b0;
+  border-radius: 8px; overflow: hidden;
+}
+.vid-tab summary {
+  padding: 0.6rem 0.9rem; cursor: pointer; font-size: 0.85rem;
+  color: #3a2a1a; list-style: none; user-select: none;
+}
+.vid-tab summary::-webkit-details-marker { display: none; }
+.vid-tab summary::before {
+  content: '▶'; display: inline-block; margin-right: 0.5rem;
+  font-size: 0.7rem; transition: transform 0.2s;
+}
+.vid-tab[open] summary::before { transform: rotate(90deg); }
+.vid-tab .vid-status {
+  float: right; font-size: 0.75rem; padding: 0.15rem 0.5rem;
+  border-radius: 3px; margin-left: 0.5rem;
+}
+.vid-tab .vid-ok { background: #4ade8040; color: #2d6a4f; }
+.vid-tab .vid-err { background: #f8717140; color: #9b2c2c; }
+.vid-tab .vid-list {
+  padding: 0 0.9rem 0.7rem; margin: 0;
+  list-style: none; font-size: 0.8rem;
+}
+.vid-tab .vid-list li {
+  padding: 0.35rem 0; border-top: 1px solid #d4c8b0;
+  display: flex; justify-content: space-between; gap: 8px;
+}
+.vid-tab .vid-list .vid-date {
+  color: #a08060; white-space: nowrap; flex: none;
+}
+.vid-tab .vid-list .vid-concepts {
+  color: #a08060; white-space: nowrap; flex: none; font-size: 0.75rem;
+}
+.vid-tab .vid-none {
+  padding: 0.4rem 0.9rem 0.7rem; color: #a08060; font-size: 0.8rem;
+}
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../accounting-financial-statements.html">&larr; Accounting &amp; Financial Statements</a>
+
+<div class="concept-meta"><span>standard</span><span>Accounting &amp; Financial Statements</span><span>added 2026-10-25</span></div>
+<h4 id="asset_impairment_writedown">Asset Impairment / Write-Down</h4>
+
+<p>An <strong>asset impairment</strong> is an accounting admission that something a company owns is worth less than the value written on its books. A <strong>write-down</strong> is the action of recording that admission: the company lowers the asset's carrying value and books the difference as a loss. The asset can be physical, like a factory, a fleet of trucks, or a network of cell towers. It can also be intangible, like a brand, a license, a customer list, or <strong>goodwill</strong>, the premium paid when one company buys another for more than the fair value of its identifiable parts. The key idea is that the books are catching up to reality. Nothing is sold and no check is written. The company simply says, "We thought this was worth X. It's really worth less."</p>
+
+<p>This matters because assets sit on the balance sheet at a number, and that number feeds nearly every measure investors use: book value, return on assets, debt ratios, and earnings. When a company overpays for an acquisition or builds something that never earns what was promised, the shortfall has to show up somewhere. A write-down is where it lands. It also tells you something about management's judgment, because every impairment is a confession that an earlier decision, usually a big capital allocation bet, didn't work. Lenders watch for it too. Many loan agreements include covenants tied to equity or net worth, so a large write-down can tighten a company's borrowing options even though no cash left the building.</p>
+
+<p>Mechanically, the process runs in steps. Each reporting period, a company checks for warning signs: falling demand, a regulatory change, a currency collapse, a market that disappointed, or a share price far below book value. If it finds triggers, it runs a test. Under U.S. GAAP for long-lived assets, it first compares the asset's carrying value to the total undiscounted cash it expects the asset to generate. If carrying value is higher, the asset fails, and the company writes it down to fair value. Goodwill is tested at least once a year. The accounting entry is simple: debit an impairment expense on the income statement, credit the asset (or a contra-asset account) on the balance sheet. Assets fall, earnings fall, and cash stays put.</p>
+
+<p>The video gives a clean, current example. AT&T reported third-quarter 2026 adjusted EPS of 65 cents against a 60 cent estimate, and revenue of $32.32 billion against $31.65 billion expected. It also raised its full-year earnings outlook. Yet the stock fell 6.1% that day, partly on a <strong>$2.6 billion write-down tied to its Mexico business</strong>. That charge says AT&T's Mexican operations are worth materially less than the figure on its balance sheet. Notice what the number is not: it isn't a quarter of cash disappearing. It's the recognition that capital invested years ago in that market will probably never earn the return management once assumed. The beat and the raise showed the core business is healthy. The write-down showed one expensive piece wasn't.</p>
+
+<p>Investors use impairments in several practical ways. First, they separate the one-time charge from the ongoing business. Notice that the AT&T headline used <em>adjusted</em> EPS, which strips out items like impairments, while GAAP EPS includes them. Analysts often look at both. Second, they treat a write-down as a clue about where the company went wrong: which acquisition, which region, which product. Third, they look at the pattern. A single charge in a weak market can be forgivable. Repeated charges in the same segment suggest a serial overpayer. Fourth, value investors sometimes hunt for companies after a big write-down, since the bad news is now acknowledged and the stock may already have priced it in.</p>
+
+<p>The first common misconception is that a write-down is a cash loss. It is not. The cash was spent when the asset was bought or built, which could be years earlier. The write-down just recognizes that the spending won't pay back as hoped. The second misconception is that it's meaningless because it's "non-cash." That's too dismissive. The charge reveals that real cash was likely wasted, it reduces equity, and it can change what the company does next: exit a market, sell the unit, cut investment. The third nuance is that management has discretion. Fair value estimates depend on forecasts and discount rates, so companies can delay a write-down or take a big one all at once, often in a bad quarter when the market is already unhappy, a tactic known as taking a "kitchen sink" charge.</p>
+
+<p>Write-downs also get lost in the noise of how markets react. In the video, AT&T fell 6.1% on a day it beat estimates and raised guidance. The host put it this way:</p>
+
+<blockquote>"It raised and still got crushed because the market doesn't pay you for what you earned last quarter, it prices who's coming for your customers next."</blockquote>
+
+<p>That's a useful reminder that the impairment was only one ingredient. A write-down arrives bundled with other information: competition, spending plans, guidance. Two days later, AT&T dropped another 7.96% to $20.93 on a Bloomberg report that SpaceX was in talks to access at least 80,000 U.S. cell sites to build a fourth national wireless network. Crown Castle, the tower owner, jumped 9.06%. The lesson is that you can't read a stock move as a verdict on one line item. Investors weigh the write-down together with whatever tells them about the future earning power of the whole business.</p>
+
+<p>Things go wrong in a few ways. A company can impair too late: assets stay overstated on the balance sheet for years, then a huge charge lands all at once and shocks investors who trusted the reported book value. A company can also impair too aggressively, creating a cushion of lower asset values so that future earnings look better, since lower carrying values mean lower depreciation later. Under U.S. GAAP, a write-down of an asset held for use generally cannot be reversed if conditions improve, while IFRS allows reversals for most assets other than goodwill. In extreme cases, impairments are an early warning of deeper trouble, like the collapse of a business model, and they often precede restructuring, dividend cuts, or bankruptcy.</p>
+
+<p>Impairments connect to several other ideas in the guide. They sit at the junction of <strong>GAAP vs. adjusted earnings</strong>, since the charge is the classic item companies exclude from adjusted EPS. They tie to <strong>capital expenditure</strong>, because every dollar spent on capex becomes an asset that may someday be tested, which makes the video's $145 billion AI spending theme relevant: today's enormous buildouts are tomorrow's potential write-down candidates if returns disappoint. Meta's $9.89 billion settlement charge in the same video shows a related but distinct item, a legal charge rather than an impairment. And the link to <strong>free cash flow</strong> is a useful contrast: impairments hit earnings without touching cash, while capex hits cash first and shows up in earnings only through depreciation or, if things go badly, a write-down.</p>
+<div class="concept-side">Related in this category: <a href="earnings_quality.html">Earnings Quality</a>, <a href="gross_margin.html">Gross Margin</a>, <a href="free_cash_flow.html">Free Cash Flow (FCF)</a>, <a href="held_to_maturity_accounting.html">Held-to-Maturity (HTM) Securities Accounting</a>, <a href="mark_to_model_valuation.html">Mark-to-Model Valuation (Private Asset Fair Value)</a>, <a href="capital_expenditure.html">Capital Expenditure (CapEx)</a></div>
+<button class="concept-done" data-slug="asset_impairment_writedown" onclick="toggleDone('asset_impairment_writedown')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_asset_impairment_writedown';</script>
+<script src="../../book.js"></script>
+<script src="../fg.js"></script>
+</body>
+</html>
