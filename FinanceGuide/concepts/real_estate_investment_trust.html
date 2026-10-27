@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Real Estate Investment Trust (REIT) - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.prog-stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(112px,1fr));
+  gap:10px; margin:1rem 0 1.5rem; }
+.prog-stat { background:#e8e0d0; border:1px solid #d4c8b0; border-radius:8px;
+  padding:0.7rem 0.9rem; }
+.prog-stat .n { display:block; font-size:1.5rem; color:#5a3e1a; line-height:1.1; }
+.prog-stat .l { display:block; font-size:0.75rem; color:#8a7a60; margin-top:0.2rem; }
+.prog-chart { position:relative; margin:0.5rem 0 0.4rem; }
+.prog-chart svg { width:100%; height:auto; display:block; overflow:visible; }
+.prog-chart .grid { stroke:#ddd3c0; stroke-width:1; }
+.prog-chart .axis { stroke:#c8bca4; stroke-width:1; }
+.prog-chart .tick { fill:#8a7a60; font-size:11px; }
+.prog-chart .ylab { fill:#8a7a60; font-size:11px; }
+.prog-chart .actual { fill:none; stroke:#9a5a22; stroke-width:2; stroke-linejoin:round; }
+.prog-chart .actual-dot { fill:#9a5a22; stroke:#f4efe8; stroke-width:2; }
+.prog-chart .model { fill:none; stroke:#0e9488; stroke-width:2; stroke-dasharray:6 4; }
+.prog-chart .ceiling { stroke:#8a7a60; stroke-width:1; stroke-dasharray:2 4; }
+.prog-chart .here { stroke:#9a5a22; stroke-width:1; stroke-dasharray:2 3; opacity:0.6; }
+.prog-chart .dlabel { font-size:11px; fill:#3a2e1e; }
+.prog-chart .bar { fill:#9a5a22; opacity:0.75; }
+.prog-chart .bar.spike { fill:#6b3410; opacity:1; }
+.prog-legend .lg-spike::before { border-color:#6b3410; border-top-width:6px; }
+.prog-spikes { font-size:0.88rem; color:#5a3e1a; margin:-0.8rem 0 1.5rem; }
+.prog-chart .bar-model { fill:none; stroke:#0e9488; stroke-width:2; stroke-dasharray:6 4; }
+.prog-chart .hit { fill:transparent; cursor:crosshair; }
+.prog-tip { position:absolute; pointer-events:none; display:none;
+  background:#3a2e1e; color:#f4efe8; font-size:12px; line-height:1.4;
+  padding:6px 9px; border-radius:6px; white-space:nowrap; z-index:5; }
+.prog-legend { display:flex; gap:1.2rem; font-size:0.8rem; color:#5a3e1a;
+  margin:0 0 1.5rem; flex-wrap:wrap; }
+.prog-legend span::before { content:""; display:inline-block; width:18px; height:0;
+  border-top:2px solid; margin-right:6px; vertical-align:middle; }
+.prog-legend .lg-actual::before { border-color:#9a5a22; }
+.prog-legend .lg-model::before { border-color:#0e9488; border-top-style:dashed; }
+.prog-legend .lg-ceiling::before { border-color:#8a7a60; border-top-style:dotted; }
+.prog-eq { background:#e8e0d0; border:1px solid #d4c8b0; border-radius:8px;
+  padding:0.9rem 1.1rem; font-family:Georgia,serif; font-size:1.05rem; color:#3a2e1e;
+  margin:1rem 0; }
+.prog-eq .sub { display:block; font-size:0.85rem; color:#8a7a60; margin-top:0.4rem;
+  font-family:inherit; }
+.prog-note { font-size:0.85rem; color:#8a7a60; }
+.prog-link { font-size:0.85rem; margin:-0.8rem 0 1.2rem; }
+.prog-link a { color:#0e9488; }
+.ch-status { font-size:0.85rem; color:#5a3e1a; margin:-0.6rem 0 1.2rem; }
+.ch-status.done { color:#0e6b5f; background:#e3efe9; border:1px solid #b9d8cc;
+  border-radius:6px; padding:0.5rem 0.8rem; margin:0 0 1.2rem; }
+table.prog-table { font-size:0.85rem; margin:1rem 0; }
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done,
+body.hide-done .cat-card.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+.vid-tab {
+  margin: 0 0 1.2rem; background: #e8e0d0; border: 1px solid #d4c8b0;
+  border-radius: 8px; overflow: hidden;
+}
+.vid-tab summary {
+  padding: 0.6rem 0.9rem; cursor: pointer; font-size: 0.85rem;
+  color: #3a2a1a; list-style: none; user-select: none;
+}
+.vid-tab summary::-webkit-details-marker { display: none; }
+.vid-tab summary::before {
+  content: '▶'; display: inline-block; margin-right: 0.5rem;
+  font-size: 0.7rem; transition: transform 0.2s;
+}
+.vid-tab[open] summary::before { transform: rotate(90deg); }
+.vid-tab .vid-status {
+  float: right; font-size: 0.75rem; padding: 0.15rem 0.5rem;
+  border-radius: 3px; margin-left: 0.5rem;
+}
+.vid-tab .vid-ok { background: #4ade8040; color: #2d6a4f; }
+.vid-tab .vid-err { background: #f8717140; color: #9b2c2c; }
+.vid-tab .vid-list {
+  padding: 0 0.9rem 0.7rem; margin: 0;
+  list-style: none; font-size: 0.8rem;
+}
+.vid-tab .vid-list li {
+  padding: 0.35rem 0; border-top: 1px solid #d4c8b0;
+  display: flex; justify-content: space-between; gap: 8px;
+}
+.vid-tab .vid-list .vid-date {
+  color: #a08060; white-space: nowrap; flex: none;
+}
+.vid-tab .vid-list .vid-concepts {
+  color: #a08060; white-space: nowrap; flex: none; font-size: 0.75rem;
+}
+.vid-tab .vid-none {
+  padding: 0.4rem 0.9rem 0.7rem; color: #a08060; font-size: 0.8rem;
+}
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../real-estate.html">&larr; Real Estate</a>
+
+<div class="concept-meta"><span>standard</span><span>Real Estate</span><span>added 2026-10-27</span></div>
+<h4 id="real_estate_investment_trust">Real Estate Investment Trust (REIT)</h4>
+
+<p>A <strong>Real Estate Investment Trust (REIT)</strong> is a company that owns, operates, or finances income-producing real estate and passes most of its profit to shareholders. In the United States, a company that meets the tax rules, chiefly paying out at least 90 percent of its taxable income as dividends, pays little or no corporate income tax. In effect, a REIT is a mutual fund for buildings. You buy a share on an exchange for a few hundred dollars, and you own a slice of apartment towers, warehouses, cell towers, hospitals, or data centers. You don't need a down payment, a mortgage, or a plumber. The trade-off is that you give up control: management decides what to buy, what to sell, and how much debt to use.</p>
+
+<p>REITs matter because they turned real estate, historically a lumpy, illiquid, local business, into something that trades like a stock. Real estate is one of the largest asset classes in the world, and REITs are how pension funds, retirees, and index funds get exposure to it without owning property directly. They also sit at a key junction in the credit system. A REIT borrows against stable, long-lived buildings at relatively cheap rates, then rents those buildings to tenants whose own finances may be far shakier. That makes the REIT a middleman that converts tenant risk into a steady stream of rent, and when tenants stumble, the middleman feels it.</p>
+
+<p>Mechanically, the cycle runs in a few steps. First, the REIT raises money by selling shares and bonds and by taking bank loans. Second, it buys or builds property, such as a data center shell, which is the building, the power hookups, and the cooling infrastructure but not the computers inside. Third, it signs a lease with a tenant. Fourth, the tenant's rent pays the REIT's interest, operating costs, and dividends. Because the REIT must distribute roughly 90 percent of taxable income, it keeps little cash and has to go back to the capital markets to fund growth. Investors judge it by <strong>funds from operations (FFO)</strong>, which adds depreciation back to earnings, since buildings often hold value even as the accounting says they wear out.</p>
+
+<p>The video puts this machinery at the center of the AI hardware squeeze. Neoclouds, the specialized companies renting out GPUs, don't own their buildings. The presenter says they signed <em>"15-year power purchase agreements and take-or-pay data center shell leases with infrastructure real estate trust REITs."</em> A <strong>take-or-pay</strong> clause means the tenant owes the rent whether or not it uses the space. Compare that with the neocloud's customers, who signed capacity leases of only 12 to 36 months. The result is a mismatch: 15-year obligations on one side, two-year revenue on the other, with a roughly $10 billion hardware loan at SOFR plus 600 basis points, near 10 percent, sitting underneath. The REIT is the counterparty to that fixed obligation.</p>
+
+<blockquote>"Their power obligations, they don't disappear. They're contractually locked into paying millions of dollars a month for gigawatt capacity power reservations regardless of whether GPU in the rack is drawing a single volt of current."</blockquote>
+
+<p>Investors use REITs in a few ways. Income investors buy them for dividend yield, often well above the broader stock market's. Others use them as an inflation hedge, since many leases include annual rent escalators. Analysts read a REIT's filings for three signals. One is <strong>tenant concentration</strong>, meaning how much rent comes from one or two customers. Another is <strong>weighted average lease term</strong>, which shows how long the income is locked in. The third is the credit quality of the tenants. A data center REIT leasing to Microsoft or Amazon looks very different from one leasing to a venture-funded startup, even if the contract text is identical. Traders also watch REIT share prices against Treasury yields, because REITs behave like long-duration bonds and fall when rates rise.</p>
+
+<p>There are several nuances that trip people up. First, the dividend yield is not a guarantee. It's a payout of whatever cash flow exists, and it can be cut. Second, a long lease is only as strong as the tenant behind it. A 15-year contract with a company that can't pay is a claim in a bankruptcy line, not a wall of cash. Third, REIT earnings aren't comparable to normal earnings per share, which is why FFO exists. Fourth, REIT dividends are usually taxed as ordinary income rather than at the lower qualified-dividend rate, though a deduction for pass-through income often softens this. And fifth, not all real estate is alike. The video's contrast is pointed: a New Jersey warehouse can stand for 30 years, while GPUs become "electric room heaters" in three. A shell is durable, but whether it stays rentable depends on power and demand.</p>
+
+<p>Now consider what happens when it breaks. Suppose a neocloud's GPU rental rate decays from $4 or $5 an hour toward $2 or $1.50, and its customers demand a 45 percent cut at renewal. The neocloud's lender still wants full principal and about 10 percent interest, and the REIT still wants full rent. Something has to give. The neocloud may default on the lease, and the REIT then faces a bankruptcy court, a vacant specialized building, and possibly a long, costly search for a replacement tenant. Specialized buildings are harder to re-let than generic ones. The REIT's rent is secured by a real building, which gives it a stronger position than the GPU lenders, but recovery still takes time, and meanwhile the REIT's own debt payments and dividend are under pressure.</p>
+
+<p>The failure can spread. REITs are financed by bonds, bank loans, and shareholders who expect a stable dividend. If several tenants default, the REIT's FFO falls, its credit rating may slip, and its borrowing costs rise, which makes it harder to build the next data center. Its share price drops, which makes raising equity more expensive. That can slow construction of new capacity and hit the utilities, contractors, and equipment makers that depend on it. This is the same chain the video describes elsewhere: when the borrowers run short of borrowed money, the companies further up the chain face a "liquidity reversal." The REIT is a link in that chain, protected by hard assets but not immune.</p>
+
+<p>Several other concepts connect to this one. <strong>Counterparty risk</strong> is the danger that the other side of a contract can't pay, and it's the core exposure of a REIT whose tenants are thinly capitalized. <strong>Duration and interest rates</strong> explain why REIT prices swing with Treasury yields. <strong>Collateral and depreciation</strong> show why lenders on GPUs and lenders on buildings end up in such different positions: one holds an asset that loses value fast, the other holds an asset that mostly keeps it. <strong>Leverage</strong>, in the form of SOFR-plus-600 loans, is what makes the squeeze dangerous. To discuss this confidently, remember the key idea: a REIT is a steady, rent-collecting landlord, and its safety depends mostly on who is paying the rent and how long that tenant can keep paying.</p>
+<div class="concept-side">Related in this category: <a href="fixed_rate_mortgage_insulation.html">Fixed-Rate Mortgage Insulation</a>, <a href="30_year_fixed_mortgage_rate.html">30-Year Fixed Mortgage Rate</a>, <a href="mortgage_spread.html">Mortgage Spread (Treasury-to-Mortgage Rate)</a>, <a href="extend_and_pretend.html">Extend and Pretend (Loan Maturity Extension Strategy)</a>, <a href="loan_to_value_ratio.html">Loan-to-Value (LTV) Ratio</a>, <a href="cash_in_refinance.html">Cash-In Refinance (Equity Recapture Requirement)</a></div>
+<button class="concept-done" data-slug="real_estate_investment_trust" onclick="toggleDone('real_estate_investment_trust')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_real_estate_investment_trust';</script>
+<script src="../../book.js"></script>
+<script src="../fg.js"></script>
+</body>
+</html>

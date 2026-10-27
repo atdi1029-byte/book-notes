@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Market Correction - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.prog-stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(112px,1fr));
+  gap:10px; margin:1rem 0 1.5rem; }
+.prog-stat { background:#e8e0d0; border:1px solid #d4c8b0; border-radius:8px;
+  padding:0.7rem 0.9rem; }
+.prog-stat .n { display:block; font-size:1.5rem; color:#5a3e1a; line-height:1.1; }
+.prog-stat .l { display:block; font-size:0.75rem; color:#8a7a60; margin-top:0.2rem; }
+.prog-chart { position:relative; margin:0.5rem 0 0.4rem; }
+.prog-chart svg { width:100%; height:auto; display:block; overflow:visible; }
+.prog-chart .grid { stroke:#ddd3c0; stroke-width:1; }
+.prog-chart .axis { stroke:#c8bca4; stroke-width:1; }
+.prog-chart .tick { fill:#8a7a60; font-size:11px; }
+.prog-chart .ylab { fill:#8a7a60; font-size:11px; }
+.prog-chart .actual { fill:none; stroke:#9a5a22; stroke-width:2; stroke-linejoin:round; }
+.prog-chart .actual-dot { fill:#9a5a22; stroke:#f4efe8; stroke-width:2; }
+.prog-chart .model { fill:none; stroke:#0e9488; stroke-width:2; stroke-dasharray:6 4; }
+.prog-chart .ceiling { stroke:#8a7a60; stroke-width:1; stroke-dasharray:2 4; }
+.prog-chart .here { stroke:#9a5a22; stroke-width:1; stroke-dasharray:2 3; opacity:0.6; }
+.prog-chart .dlabel { font-size:11px; fill:#3a2e1e; }
+.prog-chart .bar { fill:#9a5a22; opacity:0.75; }
+.prog-chart .bar.spike { fill:#6b3410; opacity:1; }
+.prog-legend .lg-spike::before { border-color:#6b3410; border-top-width:6px; }
+.prog-spikes { font-size:0.88rem; color:#5a3e1a; margin:-0.8rem 0 1.5rem; }
+.prog-chart .bar-model { fill:none; stroke:#0e9488; stroke-width:2; stroke-dasharray:6 4; }
+.prog-chart .hit { fill:transparent; cursor:crosshair; }
+.prog-tip { position:absolute; pointer-events:none; display:none;
+  background:#3a2e1e; color:#f4efe8; font-size:12px; line-height:1.4;
+  padding:6px 9px; border-radius:6px; white-space:nowrap; z-index:5; }
+.prog-legend { display:flex; gap:1.2rem; font-size:0.8rem; color:#5a3e1a;
+  margin:0 0 1.5rem; flex-wrap:wrap; }
+.prog-legend span::before { content:""; display:inline-block; width:18px; height:0;
+  border-top:2px solid; margin-right:6px; vertical-align:middle; }
+.prog-legend .lg-actual::before { border-color:#9a5a22; }
+.prog-legend .lg-model::before { border-color:#0e9488; border-top-style:dashed; }
+.prog-legend .lg-ceiling::before { border-color:#8a7a60; border-top-style:dotted; }
+.prog-eq { background:#e8e0d0; border:1px solid #d4c8b0; border-radius:8px;
+  padding:0.9rem 1.1rem; font-family:Georgia,serif; font-size:1.05rem; color:#3a2e1e;
+  margin:1rem 0; }
+.prog-eq .sub { display:block; font-size:0.85rem; color:#8a7a60; margin-top:0.4rem;
+  font-family:inherit; }
+.prog-note { font-size:0.85rem; color:#8a7a60; }
+.prog-link { font-size:0.85rem; margin:-0.8rem 0 1.2rem; }
+.prog-link a { color:#0e9488; }
+.ch-status { font-size:0.85rem; color:#5a3e1a; margin:-0.6rem 0 1.2rem; }
+.ch-status.done { color:#0e6b5f; background:#e3efe9; border:1px solid #b9d8cc;
+  border-radius:6px; padding:0.5rem 0.8rem; margin:0 0 1.2rem; }
+table.prog-table { font-size:0.85rem; margin:1rem 0; }
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done,
+body.hide-done .cat-card.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+.vid-tab {
+  margin: 0 0 1.2rem; background: #e8e0d0; border: 1px solid #d4c8b0;
+  border-radius: 8px; overflow: hidden;
+}
+.vid-tab summary {
+  padding: 0.6rem 0.9rem; cursor: pointer; font-size: 0.85rem;
+  color: #3a2a1a; list-style: none; user-select: none;
+}
+.vid-tab summary::-webkit-details-marker { display: none; }
+.vid-tab summary::before {
+  content: '▶'; display: inline-block; margin-right: 0.5rem;
+  font-size: 0.7rem; transition: transform 0.2s;
+}
+.vid-tab[open] summary::before { transform: rotate(90deg); }
+.vid-tab .vid-status {
+  float: right; font-size: 0.75rem; padding: 0.15rem 0.5rem;
+  border-radius: 3px; margin-left: 0.5rem;
+}
+.vid-tab .vid-ok { background: #4ade8040; color: #2d6a4f; }
+.vid-tab .vid-err { background: #f8717140; color: #9b2c2c; }
+.vid-tab .vid-list {
+  padding: 0 0.9rem 0.7rem; margin: 0;
+  list-style: none; font-size: 0.8rem;
+}
+.vid-tab .vid-list li {
+  padding: 0.35rem 0; border-top: 1px solid #d4c8b0;
+  display: flex; justify-content: space-between; gap: 8px;
+}
+.vid-tab .vid-list .vid-date {
+  color: #a08060; white-space: nowrap; flex: none;
+}
+.vid-tab .vid-list .vid-concepts {
+  color: #a08060; white-space: nowrap; flex: none; font-size: 0.75rem;
+}
+.vid-tab .vid-none {
+  padding: 0.4rem 0.9rem 0.7rem; color: #a08060; font-size: 0.8rem;
+}
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../trading-technical-analysis.html">&larr; Trading &amp; Technical Analysis</a>
+
+<div class="concept-meta"><span><span class="star">&#9733;</span> must-know</span><span>Trading &amp; Technical Analysis</span><span>added 2026-10-27</span></div>
+<h4 id="stock_market_correction">Market Correction</h4>
+
+<p>A <strong>market correction</strong> is a decline of 10% or more from a recent peak in a stock, an index, or a sector, short of the 20% drop that conventionally defines a bear market. The usual yardstick is the drop from the highest close, measured to the lowest close so far. Corrections are a normal part of how markets work. They happen on average about once every year or two for broad indexes like the S&P 500, and more often for volatile sectors. The word "correction" implies prices ran ahead of reality and are being pulled back toward it, which is a judgment, not a fact. Sometimes the drop is a healthy reset, and sometimes it is the first leg of something worse.</p>
+
+<p>Corrections matter because they are where markets reprice risk, and they often show up in one area before they spread. The thresholds also form a ladder: a <strong>pullback</strong> is roughly 5% to 10%, a correction is 10% to 20%, and a <strong>bear market</strong> is 20% or more. Each rung changes behavior. At 10%, financial media start covering it, margin lenders get nervous, and portfolio managers check their risk limits. For ordinary investors, 401(k)s, index funds, and target-date funds all hold the affected stocks, so a sector correction can reach savings accounts that never bought the sector on purpose. Corrections also change the cost and availability of capital, which is how a drop in prices turns into real-world consequences for companies that need to raise money.</p>
+
+<p>Mechanically, a correction starts when sellers outnumber buyers at the current price, so the price must fall until buyers step in. Triggers vary: disappointing earnings, rising interest rates, a shock in credit markets, or simply a crowded trade where everyone wants out at once. Once prices fall, several things amplify the move. Stop-loss orders trigger more selling. Leveraged investors face <strong>margin calls</strong> and must sell positions to meet them. Trend-following and volatility-targeting funds cut exposure automatically as volatility rises. Each wave of selling pushes prices lower, which triggers the next wave. The decline usually ends when valuations look cheap enough that long-term buyers return, or when the underlying worry fades. The correction is measured from peak to trough, and the trough is only known afterward.</p>
+
+<p>The video gives a precise example. The presenter says the Philadelphia Semiconductor Index, ticker <strong>SOX</strong>, "has quietly accumulated a 10% correction beneath the surface of these record equity benchmarks." That is the situation in a sentence: the headline indexes sit at all-time highs, yet the chip sector, which supplied much of the market's leadership, is already down 10% from its own peak. The video links this to the financing chain behind AI hardware. Neoclouds borrowed about $10 billion at roughly SOFR plus 600 basis points, near 10% interest, to buy chips. If lenders stop funding them, orders dry up, and the video points to chip inventories on secondary exchanges "starting to reremisprice lower."</p>
+
+<blockquote>"The Philadelphia Semiconductor Index... has quietly accumulated a 10% correction beneath the surface of these record equity benchmarks."</blockquote>
+
+<p>Why can a sector correct while the index sets records? Because major indexes like the S&P 500 and Nasdaq-100 are <strong>market-cap weighted</strong>, so a handful of giant companies dominate them, and other parts can fall without moving the total. Strength in a few mega-caps can mask weakness elsewhere. This is called <strong>narrow breadth</strong> or a divergence. Investors watch it through sector indexes, the number of stocks above their 200-day moving average, and the ratio of advancing to declining issues. A semiconductor drop of 10% is a meaningful warning because chip makers sit at the start of the AI supply chain: if their order books weaken, the effect travels down to every company that depends on that spending. The sector often acts as the early signal for the wider theme.</p>
+
+<p>Traders and investors use corrections in practical ways. Some treat them as buying opportunities, scaling in at 10%, 15%, and 20% declines with cash they set aside in advance, a practice often called "buying the dip." Others use a correction as a signal to reduce risk, because they see the cause as structural. The difference comes down to why prices fell. A decline caused by sentiment or a temporary shock tends to recover. A decline caused by broken financing or collapsing earnings may not. This is why the presenter looks past the equity price to the <strong>secondary bond market</strong>, where lenders reprice risk first. If credit spreads widen while stocks fall, the correction is more likely to be real. If spreads stay tight, it is more likely to be noise.</p>
+
+<p>There are common misconceptions. The first is that a correction means a crash is coming. Most corrections end without becoming bear markets, and historically many recover within a few months. The second is that you can time the bottom. Prices often fall further after the 10% mark, and the exact low is only visible in hindsight. A third is that a correction in one sector is irrelevant if the index is at records. The video argues the opposite: records can hide damage underneath. A fourth is that cheap after a drop means safe. A stock down 10% can be down 40% later if the business is deteriorating. The percentage drop tells you the price moved, not whether the price is now fair.</p>
+
+<p>Corrections break down when they stop being a repricing and become a <strong>credit event</strong>. This is the scenario the video describes. Highly leveraged companies cannot simply wait out a price decline, because their debt requires cash payments regardless of what the stock does. A neocloud with a 10% coupon and shrinking rental rates, locked into long power and lease obligations, cannot survive a long drought. Defaults then hit the lenders, including bond funds and private credit vehicles that retail investors hold, so losses spread beyond the original sector. A fund that bought "asset-backed" debt secured by GPUs worth far less than expected must write the value down. At that point a 10% sector correction is not the story, and the real damage is in balance sheets.</p>
+
+<p>Corrections connect to many other ideas in this guide. <strong>Market breadth</strong> and divergence tell you how widespread a decline is. <strong>Volatility</strong> and the VIX measure the fear that accompanies it. <strong>Credit spreads</strong> and <strong>leverage</strong> determine whether a drop stays contained or spreads. <strong>Technical analysis</strong> tools like moving averages and support levels give traders reference points for where selling may pause. And the video's balance-sheet filters, such as favoring companies with large cash reserves and avoiding operators with more than 3x net debt to EBITDA, are the practical response to a correction whose cause is financial. Understanding corrections means asking two questions each time: how far did prices fall, and what, exactly, forced them down?</p>
+<div class="concept-side">Related in this category: <a href="stop_loss_cascade.html">Stop-Loss Cascade (Stop-Loss Ladder)</a>, <a href="market_breadth.html">Market Breadth (Narrow vs. Broad Moves)</a>, <a href="market_liquidity_bid_ask_slippage.html">Market Liquidity and Slippage</a>, <a href="trend_following_short_covering.html">Short Covering</a></div>
+<button class="concept-done" data-slug="stock_market_correction" onclick="toggleDone('stock_market_correction')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_stock_market_correction';</script>
+<script src="../../book.js"></script>
+<script src="../fg.js"></script>
+</body>
+</html>

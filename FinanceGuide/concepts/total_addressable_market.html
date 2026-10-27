@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Total Addressable Market (TAM) - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.prog-stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(112px,1fr));
+  gap:10px; margin:1rem 0 1.5rem; }
+.prog-stat { background:#e8e0d0; border:1px solid #d4c8b0; border-radius:8px;
+  padding:0.7rem 0.9rem; }
+.prog-stat .n { display:block; font-size:1.5rem; color:#5a3e1a; line-height:1.1; }
+.prog-stat .l { display:block; font-size:0.75rem; color:#8a7a60; margin-top:0.2rem; }
+.prog-chart { position:relative; margin:0.5rem 0 0.4rem; }
+.prog-chart svg { width:100%; height:auto; display:block; overflow:visible; }
+.prog-chart .grid { stroke:#ddd3c0; stroke-width:1; }
+.prog-chart .axis { stroke:#c8bca4; stroke-width:1; }
+.prog-chart .tick { fill:#8a7a60; font-size:11px; }
+.prog-chart .ylab { fill:#8a7a60; font-size:11px; }
+.prog-chart .actual { fill:none; stroke:#9a5a22; stroke-width:2; stroke-linejoin:round; }
+.prog-chart .actual-dot { fill:#9a5a22; stroke:#f4efe8; stroke-width:2; }
+.prog-chart .model { fill:none; stroke:#0e9488; stroke-width:2; stroke-dasharray:6 4; }
+.prog-chart .ceiling { stroke:#8a7a60; stroke-width:1; stroke-dasharray:2 4; }
+.prog-chart .here { stroke:#9a5a22; stroke-width:1; stroke-dasharray:2 3; opacity:0.6; }
+.prog-chart .dlabel { font-size:11px; fill:#3a2e1e; }
+.prog-chart .bar { fill:#9a5a22; opacity:0.75; }
+.prog-chart .bar.spike { fill:#6b3410; opacity:1; }
+.prog-legend .lg-spike::before { border-color:#6b3410; border-top-width:6px; }
+.prog-spikes { font-size:0.88rem; color:#5a3e1a; margin:-0.8rem 0 1.5rem; }
+.prog-chart .bar-model { fill:none; stroke:#0e9488; stroke-width:2; stroke-dasharray:6 4; }
+.prog-chart .hit { fill:transparent; cursor:crosshair; }
+.prog-tip { position:absolute; pointer-events:none; display:none;
+  background:#3a2e1e; color:#f4efe8; font-size:12px; line-height:1.4;
+  padding:6px 9px; border-radius:6px; white-space:nowrap; z-index:5; }
+.prog-legend { display:flex; gap:1.2rem; font-size:0.8rem; color:#5a3e1a;
+  margin:0 0 1.5rem; flex-wrap:wrap; }
+.prog-legend span::before { content:""; display:inline-block; width:18px; height:0;
+  border-top:2px solid; margin-right:6px; vertical-align:middle; }
+.prog-legend .lg-actual::before { border-color:#9a5a22; }
+.prog-legend .lg-model::before { border-color:#0e9488; border-top-style:dashed; }
+.prog-legend .lg-ceiling::before { border-color:#8a7a60; border-top-style:dotted; }
+.prog-eq { background:#e8e0d0; border:1px solid #d4c8b0; border-radius:8px;
+  padding:0.9rem 1.1rem; font-family:Georgia,serif; font-size:1.05rem; color:#3a2e1e;
+  margin:1rem 0; }
+.prog-eq .sub { display:block; font-size:0.85rem; color:#8a7a60; margin-top:0.4rem;
+  font-family:inherit; }
+.prog-note { font-size:0.85rem; color:#8a7a60; }
+.prog-link { font-size:0.85rem; margin:-0.8rem 0 1.2rem; }
+.prog-link a { color:#0e9488; }
+.ch-status { font-size:0.85rem; color:#5a3e1a; margin:-0.6rem 0 1.2rem; }
+.ch-status.done { color:#0e6b5f; background:#e3efe9; border:1px solid #b9d8cc;
+  border-radius:6px; padding:0.5rem 0.8rem; margin:0 0 1.2rem; }
+table.prog-table { font-size:0.85rem; margin:1rem 0; }
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done,
+body.hide-done .cat-card.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+.vid-tab {
+  margin: 0 0 1.2rem; background: #e8e0d0; border: 1px solid #d4c8b0;
+  border-radius: 8px; overflow: hidden;
+}
+.vid-tab summary {
+  padding: 0.6rem 0.9rem; cursor: pointer; font-size: 0.85rem;
+  color: #3a2a1a; list-style: none; user-select: none;
+}
+.vid-tab summary::-webkit-details-marker { display: none; }
+.vid-tab summary::before {
+  content: '▶'; display: inline-block; margin-right: 0.5rem;
+  font-size: 0.7rem; transition: transform 0.2s;
+}
+.vid-tab[open] summary::before { transform: rotate(90deg); }
+.vid-tab .vid-status {
+  float: right; font-size: 0.75rem; padding: 0.15rem 0.5rem;
+  border-radius: 3px; margin-left: 0.5rem;
+}
+.vid-tab .vid-ok { background: #4ade8040; color: #2d6a4f; }
+.vid-tab .vid-err { background: #f8717140; color: #9b2c2c; }
+.vid-tab .vid-list {
+  padding: 0 0.9rem 0.7rem; margin: 0;
+  list-style: none; font-size: 0.8rem;
+}
+.vid-tab .vid-list li {
+  padding: 0.35rem 0; border-top: 1px solid #d4c8b0;
+  display: flex; justify-content: space-between; gap: 8px;
+}
+.vid-tab .vid-list .vid-date {
+  color: #a08060; white-space: nowrap; flex: none;
+}
+.vid-tab .vid-list .vid-concepts {
+  color: #a08060; white-space: nowrap; flex: none; font-size: 0.75rem;
+}
+.vid-tab .vid-none {
+  padding: 0.4rem 0.9rem 0.7rem; color: #a08060; font-size: 0.8rem;
+}
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../value-investing-equities.html">&larr; Value Investing &amp; Equities</a>
+
+<div class="concept-meta"><span>standard</span><span>Value Investing &amp; Equities</span><span>added 2026-10-27</span></div>
+<h4 id="total_addressable_market">Total Addressable Market (TAM)</h4>
+
+<p><strong>Total Addressable Market (TAM)</strong> is an estimate of the total yearly revenue a company could earn if it captured every customer who could plausibly buy its product. Say a company sells software that helps dentists schedule patients. If the United States has 200,000 dental practices and each could pay $5,000 a year, the TAM is $1 billion. It is a ceiling, not a forecast. Nobody expects to win every customer, and TAM says nothing about whether the company will make money. It answers one narrow question: how big is the prize if everything goes right? Investors use that number to judge whether a business has room to grow, or whether it will run out of customers early.</p>
+
+<p>TAM matters because it is the foundation of most growth-stock valuations. A stock's price is a bet on future earnings, and future earnings need future revenue. A company with $200 million in sales and a $500 billion TAM can plausibly grow for decades, so investors will pay a very high multiple of today's sales. A company in a $2 billion market cannot. When a TAM story is believed, it pulls money into a whole sector: venture funding, IPOs, debt issuance, and in the video's case, billions of dollars spent on chips and data centers. When the story weakens, that money leaves just as fast, and the effects reach well beyond the one company.</p>
+
+<p>Mechanically, analysts build TAM in two ways. The <em>top-down</em> method starts with a huge industry figure, such as "global cloud spending will reach $1 trillion," and then applies percentages. The <em>bottom-up</em> method counts units: number of potential customers times average revenue per customer. Analysts then narrow the figure in steps. TAM is the whole theoretical market. The <strong>Serviceable Addressable Market (SAM)</strong> is the slice the company's product and geography can reach. The <strong>Serviceable Obtainable Market (SOM)</strong> is the share it can realistically win against competitors. Next comes the <strong>adoption curve</strong>, which models how quickly customers switch, usually slowly at first, then fast, then flattening. Multiply those pieces together and you get a revenue projection, which feeds a valuation model.</p>
+
+<p>The video offers a clear example in AI "neo clouds," the young companies that rent out GPU computing power by the hour. Their pitch rests on a giant TAM: every business on earth will need AI compute, so demand looks nearly unlimited. On that story, equity investors supported chip sales that "set new records" every quarter for roughly 18 months. The presenter's point is that this TAM said nothing about the neo clouds' obligations. They carry senior debt with a roughly 10% coupon paid in cash every 90 days, plus 15-year power agreements and take-or-pay data center leases. Whether the market is $1 trillion or $10 trillion, those payments are due on schedule.</p>
+
+<blockquote>"Equity traders will be the last to know. Unfortunately, they look at revenue growth and TAM projections, which are really important. I look at those also, but... the canary in this coal mine is and always has been the secondary bond market."</blockquote>
+
+<p>That quote shows the split in how people read the same company. An equity trader asks, "How big can this get?" and values the stock on upside, with the answer stretching far into the future. A bond trader asks, "Will I get my principal and interest back, and what is recovered if not?" and values the debt on the downside, with the answer measured in the next few quarters. A bondholder gains nothing extra if the TAM turns out to be enormous, because the most a bond pays is its coupon and its face value. That asymmetry makes lenders more skeptical, and it is why the video treats the bond market, where yields on weaker borrowers were pushed out to 15%, as an early warning that equity analysts miss.</p>
+
+<p>Practical use starts with treating TAM as a starting point and testing it from several angles. Check how the TAM was built, since bottom-up numbers built from real customer counts and real prices are more credible than top-down figures like "1% of a trillion-dollar market." Compare the market's size to the company's actual revenue, margins, and cash flow. Then look at the balance sheet: debt maturities, interest costs, and fixed commitments such as leases. The video also suggests watching credit signals, including bond yields, loan terms, and lenders demanding more equity. When credit tightens for a sector while its stock still rises, the two markets disagree, and the bond market has the better record on distress.</p>
+
+<p>The gotchas are many. First, <strong>a big TAM does not mean a good business</strong>. Airlines serve a huge market and have destroyed far more capital than they have created. Second, TAM is often inflated by counting every possible customer, including ones who will never buy or who have cheaper alternatives. Third, a growing market attracts competitors, so prices fall and the share of profit available to any one firm shrinks. Fourth, TAM ignores timing: a market that is huge in 2035 does not pay the lender due in 2027. Fifth, a TAM that depends on a product people rent by the hour can disappear if hardware gets cheaper or a large customer builds its own. The video highlights that the survivors, such as Microsoft, Alphabet, and Amazon, have other cash engines, while a pure-play neo cloud has only its rental income.</p>
+
+<p>When the TAM story breaks, the damage runs through the financial structure. If demand for rentals falls short or prices drop, a neo cloud still owes interest, still owes lease and power payments regardless of whether any GPU is running, and may see its collateral lose value. Lenders recalculate loan-to-value ratios, demand more equity, and stop lending, which is what the video describes. Then the chain reaction begins. Neo clouds stop ordering hardware, so chip makers face an "air pocket" in orders, and the video notes the Philadelphia Semiconductor Index (SOX) had already corrected about 10%. Bankrupt operators also leave their customers without cheap rented compute, pushing that debt onto stronger companies' own balance sheets. The failure of a large-TAM story is therefore rarely contained to one stock.</p>
+
+<p>TAM connects to several other ideas worth knowing. It feeds <strong>valuation multiples</strong>, since a larger TAM justifies paying more per dollar of sales. It contrasts with <strong>cash flow and debt service coverage</strong>, which ask whether current income can cover obligations. It connects to <strong>credit spreads and secondary bond yields</strong>, the prices lenders put on risk, and to <strong>loan-to-value ratios</strong>, which show how much collateral protects a loan. It also relates to the <strong>circular financing loop</strong> the presenter describes, where chip sales to debt-funded customers inflate the very revenue growth equity investors cite. If you remember one thing, make it this: TAM measures how much could be earned, while credit analysis measures whether the company survives long enough to earn it. A confident investor needs to ask both questions.</p>
+<div class="concept-side">Related in this category: <a href="comparable_store_sales.html">Comparable Store Sales (Same-Store Sales)</a>, <a href="economic_moat.html">Economic Moat (Competitive Moat)</a>, <a href="earnings_guidance.html">Earnings Guidance (Forward Guidance — Corporate)</a>, <a href="discounted_cash_flow_valuation.html">Discounted Cash Flow (DCF) Valuation</a>, <a href="corporate_stock_buybacks.html">Corporate Stock Buybacks (Share Repurchase Programs)</a>, <a href="buyback_blackout_window.html">Buyback Blackout Window</a></div>
+<button class="concept-done" data-slug="total_addressable_market" onclick="toggleDone('total_addressable_market')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_total_addressable_market';</script>
+<script src="../../book.js"></script>
+<script src="../fg.js"></script>
+</body>
+</html>
