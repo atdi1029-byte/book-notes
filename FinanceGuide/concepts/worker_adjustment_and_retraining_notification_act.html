@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>WARN Act (Mass Layoff Notice Law) - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.prog-stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(112px,1fr));
+  gap:10px; margin:1rem 0 1.5rem; }
+.prog-stat { background:#e8e0d0; border:1px solid #d4c8b0; border-radius:8px;
+  padding:0.7rem 0.9rem; }
+.prog-stat .n { display:block; font-size:1.5rem; color:#5a3e1a; line-height:1.1; }
+.prog-stat .l { display:block; font-size:0.75rem; color:#8a7a60; margin-top:0.2rem; }
+.prog-chart { position:relative; margin:0.5rem 0 0.4rem; }
+.prog-chart svg { width:100%; height:auto; display:block; overflow:visible; }
+.prog-chart .grid { stroke:#ddd3c0; stroke-width:1; }
+.prog-chart .axis { stroke:#c8bca4; stroke-width:1; }
+.prog-chart .tick { fill:#8a7a60; font-size:11px; }
+.prog-chart .ylab { fill:#8a7a60; font-size:11px; }
+.prog-chart .actual { fill:none; stroke:#9a5a22; stroke-width:2; stroke-linejoin:round; }
+.prog-chart .actual-dot { fill:#9a5a22; stroke:#f4efe8; stroke-width:2; }
+.prog-chart .model { fill:none; stroke:#0e9488; stroke-width:2; stroke-dasharray:6 4; }
+.prog-chart .ceiling { stroke:#8a7a60; stroke-width:1; stroke-dasharray:2 4; }
+.prog-chart .here { stroke:#9a5a22; stroke-width:1; stroke-dasharray:2 3; opacity:0.6; }
+.prog-chart .dlabel { font-size:11px; fill:#3a2e1e; }
+.prog-chart .bar { fill:#9a5a22; opacity:0.75; }
+.prog-chart .bar.spike { fill:#6b3410; opacity:1; }
+.prog-legend .lg-spike::before { border-color:#6b3410; border-top-width:6px; }
+.prog-spikes { font-size:0.88rem; color:#5a3e1a; margin:-0.8rem 0 1.5rem; }
+.prog-chart .bar-model { fill:none; stroke:#0e9488; stroke-width:2; stroke-dasharray:6 4; }
+.prog-chart .hit { fill:transparent; cursor:crosshair; }
+.prog-tip { position:absolute; pointer-events:none; display:none;
+  background:#3a2e1e; color:#f4efe8; font-size:12px; line-height:1.4;
+  padding:6px 9px; border-radius:6px; white-space:nowrap; z-index:5; }
+.prog-legend { display:flex; gap:1.2rem; font-size:0.8rem; color:#5a3e1a;
+  margin:0 0 1.5rem; flex-wrap:wrap; }
+.prog-legend span::before { content:""; display:inline-block; width:18px; height:0;
+  border-top:2px solid; margin-right:6px; vertical-align:middle; }
+.prog-legend .lg-actual::before { border-color:#9a5a22; }
+.prog-legend .lg-model::before { border-color:#0e9488; border-top-style:dashed; }
+.prog-legend .lg-ceiling::before { border-color:#8a7a60; border-top-style:dotted; }
+.prog-eq { background:#e8e0d0; border:1px solid #d4c8b0; border-radius:8px;
+  padding:0.9rem 1.1rem; font-family:Georgia,serif; font-size:1.05rem; color:#3a2e1e;
+  margin:1rem 0; }
+.prog-eq .sub { display:block; font-size:0.85rem; color:#8a7a60; margin-top:0.4rem;
+  font-family:inherit; }
+.prog-note { font-size:0.85rem; color:#8a7a60; }
+.prog-link { font-size:0.85rem; margin:-0.8rem 0 1.2rem; }
+.prog-link a { color:#0e9488; }
+.ch-status { font-size:0.85rem; color:#5a3e1a; margin:-0.6rem 0 1.2rem; }
+.ch-status.done { color:#0e6b5f; background:#e3efe9; border:1px solid #b9d8cc;
+  border-radius:6px; padding:0.5rem 0.8rem; margin:0 0 1.2rem; }
+table.prog-table { font-size:0.85rem; margin:1rem 0; }
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done,
+body.hide-done .cat-card.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+.vid-tab {
+  margin: 0 0 1.2rem; background: #e8e0d0; border: 1px solid #d4c8b0;
+  border-radius: 8px; overflow: hidden;
+}
+.vid-tab summary {
+  padding: 0.6rem 0.9rem; cursor: pointer; font-size: 0.85rem;
+  color: #3a2a1a; list-style: none; user-select: none;
+}
+.vid-tab summary::-webkit-details-marker { display: none; }
+.vid-tab summary::before {
+  content: '▶'; display: inline-block; margin-right: 0.5rem;
+  font-size: 0.7rem; transition: transform 0.2s;
+}
+.vid-tab[open] summary::before { transform: rotate(90deg); }
+.vid-tab .vid-status {
+  float: right; font-size: 0.75rem; padding: 0.15rem 0.5rem;
+  border-radius: 3px; margin-left: 0.5rem;
+}
+.vid-tab .vid-ok { background: #4ade8040; color: #2d6a4f; }
+.vid-tab .vid-err { background: #f8717140; color: #9b2c2c; }
+.vid-tab .vid-list {
+  padding: 0 0.9rem 0.7rem; margin: 0;
+  list-style: none; font-size: 0.8rem;
+}
+.vid-tab .vid-list li {
+  padding: 0.35rem 0; border-top: 1px solid #d4c8b0;
+  display: flex; justify-content: space-between; gap: 8px;
+}
+.vid-tab .vid-list .vid-date {
+  color: #a08060; white-space: nowrap; flex: none;
+}
+.vid-tab .vid-list .vid-concepts {
+  color: #a08060; white-space: nowrap; flex: none; font-size: 0.75rem;
+}
+.vid-tab .vid-none {
+  padding: 0.4rem 0.9rem 0.7rem; color: #a08060; font-size: 0.8rem;
+}
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../economics-fundamentals.html">&larr; Economics Fundamentals</a>
+
+<div class="concept-meta"><span>standard</span><span>Economics Fundamentals</span><span>added 2026-10-30</span></div>
+<h4 id="worker_adjustment_and_retraining_notification_act">WARN Act (Mass Layoff Notice Law)</h4>
+
+<p>The <strong>Worker Adjustment and Retraining Notification Act</strong>, almost always called the <strong>WARN Act</strong>, is a federal law passed in 1988. It requires certain large employers to give workers 60 days of advance written notice before a plant closing or a mass layoff. The idea is simple and humane: if a company is about to eliminate a lot of jobs at once, the people affected, and the local government, deserve time to look for new work, retrain, or line up help instead of learning on a Friday afternoon that Monday is their last day. The notice goes to the affected employees (or their union), the state's dislocated-worker unit, and the local government. For a new investor, the key point is that WARN is a <em>notification</em> law, not a law that stops layoffs. It does not prevent a company from cutting jobs. It only dictates how much warning the company must give when it does.</p>
+
+<p>Why does a notice law matter to markets and the economy? Because WARN filings are one of the few public, legally mandated, early signals that a company is shrinking. Local reporters, state labor departments, and data firms scan these filings every day, and a big notice can become a headline within hours. Economists treat clusters of notices as a leading indicator, since they arrive weeks before the people actually lose their paychecks and before those people show up in jobless claims. A rising count in one industry, say tech or insurance, hints that earnings pressure is spreading there. That is why the WARN Act became the first of four "filters" in the video's argument: if the signal is built to catch only certain kinds of job loss, then anything outside its definitions stays invisible, no matter how large it is.</p>
+
+<p>Mechanically, WARN works through definitions and thresholds, and the details matter. It covers employers with 100 or more employees (not counting part-time workers). A <strong>plant closing</strong> is a shutdown of a single site, or of one operating unit within it, that causes 50 or more employees to suffer an employment loss during a 30-day period. A <strong>mass layoff</strong> is a reduction that is not a closing but that causes an employment loss at one site for at least 50 employees <em>and</em> at least one-third of the workforce at that site, or for 500 or more employees regardless of share. If a company crosses those lines, it must send written notice at least 60 days ahead. Each condition has to be met for the law to apply, and the counting is done site by site, not company-wide.</p>
+
+<p>The phrase <strong>employment loss</strong> is where the law gets narrow. Under the regulation, an employment loss means being fired or laid off, or having your hours cut by more than half for six months, with important exclusions. A <strong>voluntary departure</strong>, a retirement, and a firing for cause do not count. Notice what that does. If a company wants 1,000 people gone and tells them "fire you" it must warn the public. If it instead offers a package and 1,000 people choose to leave, nobody was laid off in the legal sense. The worker made a choice, so there is no employment loss to count. The presenter in the video leans on this exact gap: a company can shrink dramatically without ever tripping the wire.</p>
+
+<p>The video makes this concrete with Microsoft. The company offered buyouts to roughly 60,000 people, about one in four of its employees, with decisions due in early December and departures on December 31st. Because accepting a buyout is a voluntary departure, none of those exits would generate a WARN notice, no matter how many people say yes. Compare that with the other side of the picture. Through September, Challenger, Gray &amp; Christmas counted 573,000 announced job cuts, down 39% from a year earlier, while the same tracker logged only 11,919 voluntary severance and buyout cuts for the whole year. One large buyout could rival that whole line. Meanwhile weekly claims came in at just 194,000. As the host put it:</p>
+
+<blockquote>"Read the regulation. An employment loss under WARN specifically excludes a voluntary departure, a retirement, or a firing for cause. So when somebody takes a buyout, that is voluntary. No employment loss, no notice, no headline."</blockquote>
+
+<p>How do traders and investors actually use WARN data? Mostly as a ground-level check on the narrative. Corporate announcements are often vague ("streamlining," "efficiency initiatives"), but a WARN filing names a specific site, a date, and a headcount, which makes it hard to spin. Investors scan filings for patterns: several filings from one company across different states can confirm a restructuring that earnings calls only hinted at; a burst in one sector can support a thesis about weakening demand or AI-driven cost cutting. Macro watchers compare notice counts with Challenger's announced cuts and with initial jobless claims to see whether they tell the same story. The most valuable use is the disagreement: if WARN and claims look calm while the long-term unemployed share rises, that gap is the thing to investigate.</p>
+
+<p>There are several gotchas. First, a quiet WARN count does not mean a healthy job market, only that few <em>qualifying</em> events happened. Second, the thresholds are site-based, so a company can cut 40 people at each of twenty offices and never file a single notice, even though 800 jobs vanished. Third, many people assume WARN guarantees severance or protects them from being laid off; it does neither. It guarantees notice (or pay in lieu of notice, in the form of back pay and benefits for up to 60 days if the employer fails to comply). Fourth, the law has exceptions, such as unforeseeable business circumstances, faltering companies seeking capital, and natural disasters, that allow shorter notice. Finally, some states, like New York and California, have stricter "mini-WARN" laws with lower thresholds, so the federal picture is not the whole picture.</p>
+
+<p>What happens when the system fails or gets bypassed? The most obvious failure is the one the video describes: shrinkage through attrition, hiring freezes, buyouts, and early retirement never enters the data. Employers can also stagger layoffs in batches smaller than 50 or spread across more than 30 days to dodge the trigger, although the law has aggregation rules over a 90-day window that try to catch this. When a company ignores the law entirely, the remedy is a lawsuit by workers, not a government shutdown of the layoff, and small or collapsing firms often cannot pay. The result is that WARN is a reasonably reliable alarm for old-fashioned, large, involuntary cuts, and a poor one for the modern, quieter ways companies reduce headcount.</p>
+
+<p>WARN connects directly to the other "filters" in the video, and the four together explain what the host calls the <strong>ghost recession</strong>. Filter two is layoff trackers like Challenger, which have a small buyout category. Filter three is the unemployment office: weekly claims count only people who file, and workers who left voluntarily may be disqualified or may never apply. Filter four is the clock, since most states pay benefits for at most 26 weeks, after which people stop appearing in continuing claims. Put them together and you get the paradox in the data: about 1.7 million people collecting benefits versus about 1.94 million unemployed for 27 weeks or longer, with the long-term share rising from 23.6% to 27.1%. A reader who understands WARN's definitions can see why one signal says "nobody's getting fired" while another says "nobody's getting hired." Watching the hires rate in JOLTS, the long-term unemployed share, and the Fed's reading of these numbers fills in what the notice law cannot see.</p>
+<div class="concept-side">Related in this category: <a href="vertical_integration.html">Vertical Integration</a>, <a href="shrinkflation.html">Shrinkflation</a>, <a href="budget_deficit.html">Government Budget Deficit</a>, <a href="demand_pull_inflation.html">Demand-Pull Inflation</a>, <a href="imported_inflation.html">Imported Inflation</a>, <a href="disinflation_vs_deflation.html">Disinflation vs. Deflation</a></div>
+<button class="concept-done" data-slug="worker_adjustment_and_retraining_notification_act" onclick="toggleDone('worker_adjustment_and_retraining_notification_act')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_worker_adjustment_and_retraining_notification_act';</script>
+<script src="../../book.js"></script>
+<script src="../fg.js"></script>
+</body>
+</html>
