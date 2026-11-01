@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Crypto Theft Laundering and On-Chain Tracing - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.prog-stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(112px,1fr));
+  gap:10px; margin:1rem 0 1.5rem; }
+.prog-stat { background:#e8e0d0; border:1px solid #d4c8b0; border-radius:8px;
+  padding:0.7rem 0.9rem; }
+.prog-stat .n { display:block; font-size:1.5rem; color:#5a3e1a; line-height:1.1; }
+.prog-stat .l { display:block; font-size:0.75rem; color:#8a7a60; margin-top:0.2rem; }
+.prog-chart { position:relative; margin:0.5rem 0 0.4rem; }
+.prog-chart svg { width:100%; height:auto; display:block; overflow:visible; }
+.prog-chart .grid { stroke:#ddd3c0; stroke-width:1; }
+.prog-chart .axis { stroke:#c8bca4; stroke-width:1; }
+.prog-chart .tick { fill:#8a7a60; font-size:11px; }
+.prog-chart .ylab { fill:#8a7a60; font-size:11px; }
+.prog-chart .actual { fill:none; stroke:#9a5a22; stroke-width:2; stroke-linejoin:round; }
+.prog-chart .actual-dot { fill:#9a5a22; stroke:#f4efe8; stroke-width:2; }
+.prog-chart .model { fill:none; stroke:#0e9488; stroke-width:2; stroke-dasharray:6 4; }
+.prog-chart .ceiling { stroke:#8a7a60; stroke-width:1; stroke-dasharray:2 4; }
+.prog-chart .here { stroke:#9a5a22; stroke-width:1; stroke-dasharray:2 3; opacity:0.6; }
+.prog-chart .dlabel { font-size:11px; fill:#3a2e1e; }
+.prog-chart .bar { fill:#9a5a22; opacity:0.75; }
+.prog-chart .bar.spike { fill:#6b3410; opacity:1; }
+.prog-legend .lg-spike::before { border-color:#6b3410; border-top-width:6px; }
+.prog-spikes { font-size:0.88rem; color:#5a3e1a; margin:-0.8rem 0 1.5rem; }
+.prog-chart .bar-model { fill:none; stroke:#0e9488; stroke-width:2; stroke-dasharray:6 4; }
+.prog-chart .hit { fill:transparent; cursor:crosshair; }
+.prog-tip { position:absolute; pointer-events:none; display:none;
+  background:#3a2e1e; color:#f4efe8; font-size:12px; line-height:1.4;
+  padding:6px 9px; border-radius:6px; white-space:nowrap; z-index:5; }
+.prog-legend { display:flex; gap:1.2rem; font-size:0.8rem; color:#5a3e1a;
+  margin:0 0 1.5rem; flex-wrap:wrap; }
+.prog-legend span::before { content:""; display:inline-block; width:18px; height:0;
+  border-top:2px solid; margin-right:6px; vertical-align:middle; }
+.prog-legend .lg-actual::before { border-color:#9a5a22; }
+.prog-legend .lg-model::before { border-color:#0e9488; border-top-style:dashed; }
+.prog-legend .lg-ceiling::before { border-color:#8a7a60; border-top-style:dotted; }
+.prog-eq { background:#e8e0d0; border:1px solid #d4c8b0; border-radius:8px;
+  padding:0.9rem 1.1rem; font-family:Georgia,serif; font-size:1.05rem; color:#3a2e1e;
+  margin:1rem 0; }
+.prog-eq .sub { display:block; font-size:0.85rem; color:#8a7a60; margin-top:0.4rem;
+  font-family:inherit; }
+.prog-note { font-size:0.85rem; color:#8a7a60; }
+.prog-link { font-size:0.85rem; margin:-0.8rem 0 1.2rem; }
+.prog-link a { color:#0e9488; }
+.ch-status { font-size:0.85rem; color:#5a3e1a; margin:-0.6rem 0 1.2rem; }
+.ch-status.done { color:#0e6b5f; background:#e3efe9; border:1px solid #b9d8cc;
+  border-radius:6px; padding:0.5rem 0.8rem; margin:0 0 1.2rem; }
+table.prog-table { font-size:0.85rem; margin:1rem 0; }
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done,
+body.hide-done .cat-card.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+.vid-tab {
+  margin: 0 0 1.2rem; background: #e8e0d0; border: 1px solid #d4c8b0;
+  border-radius: 8px; overflow: hidden;
+}
+.vid-tab summary {
+  padding: 0.6rem 0.9rem; cursor: pointer; font-size: 0.85rem;
+  color: #3a2a1a; list-style: none; user-select: none;
+}
+.vid-tab summary::-webkit-details-marker { display: none; }
+.vid-tab summary::before {
+  content: '▶'; display: inline-block; margin-right: 0.5rem;
+  font-size: 0.7rem; transition: transform 0.2s;
+}
+.vid-tab[open] summary::before { transform: rotate(90deg); }
+.vid-tab .vid-status {
+  float: right; font-size: 0.75rem; padding: 0.15rem 0.5rem;
+  border-radius: 3px; margin-left: 0.5rem;
+}
+.vid-tab .vid-ok { background: #4ade8040; color: #2d6a4f; }
+.vid-tab .vid-err { background: #f8717140; color: #9b2c2c; }
+.vid-tab .vid-list {
+  padding: 0 0.9rem 0.7rem; margin: 0;
+  list-style: none; font-size: 0.8rem;
+}
+.vid-tab .vid-list li {
+  padding: 0.35rem 0; border-top: 1px solid #d4c8b0;
+  display: flex; justify-content: space-between; gap: 8px;
+}
+.vid-tab .vid-list .vid-date {
+  color: #a08060; white-space: nowrap; flex: none;
+}
+.vid-tab .vid-list .vid-concepts {
+  color: #a08060; white-space: nowrap; flex: none; font-size: 0.75rem;
+}
+.vid-tab .vid-none {
+  padding: 0.4rem 0.9rem 0.7rem; color: #a08060; font-size: 0.8rem;
+}
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../crypto-digital-money.html">&larr; Crypto &amp; Digital Money</a>
+
+<div class="concept-meta"><span>deep cut</span><span>Crypto &amp; Digital Money</span><span>added 2026-11-01</span></div>
+<h4 id="crypto_exchange_hack_laundering">Crypto Theft Laundering and On-Chain Tracing</h4>
+
+<p><strong>Crypto theft laundering</strong> is the process a thief uses to turn stolen digital assets into money that can be spent without being traced or seized. <strong>On-chain tracing</strong> is the opposite discipline: following those assets from wallet to wallet on a public ledger. Every transfer on a blockchain is recorded permanently, and anyone can read it. What the ledger does not show is who owns a wallet. Names are replaced by long strings of characters called <strong>addresses</strong>. So the contest is simple. The thief tries to break the link between the stolen coins and the point of theft. The investigator tries to keep that link intact long enough to freeze the money or identify who is moving it.</p>
+
+<p>This matters because crypto theft is now a large-scale financial crime, and the outcome of each case sets expectations for everyone who holds digital assets. In the Binance heist described in the video, roughly $6.36 billion left exchange wallets in about 20 minutes. That is more than four times the Bybit theft of $1.5 billion in February 2025, the previous record. Thefts on this scale move markets: Bitcoin dropped to a six-week low near $76,000, Coinbase stock fell 4.8% even though it was untouched, and Binance's own token lost 8%. They also decide whether ordinary users get repaid, which depends on how fast stolen funds can be located and stopped.</p>
+
+<p>Mechanically, the theft comes first. The video says Binance's <strong>hot wallets</strong> were compromised. A hot wallet is the exchange's "cash drawer," funds kept online so customers can withdraw quickly. Once an attacker controls the signing ability for those wallets, they can send funds anywhere. Attackers rarely hold the loot where it landed. They split it across many new addresses, swap one asset for another, and hop between networks. This is called <strong>layering</strong>. Each step aims to add distance and noise between the stolen funds and the original theft, so that a simple "follow the money" search returns hundreds of branches instead of one clear path.</p>
+
+<p>Tracing works because every hop leaves a permanent record. Analytics firms such as TRM Labs, Chainalysis and Elliptic run software that clusters addresses likely controlled by the same entity. They look at shared signing behavior, timing, and funding patterns. They then label clusters as exchanges, mixers, bridges, or known criminal groups. When stolen coins arrive in a cluster tagged as a centralized exchange, investigators can alert that exchange to freeze them. Attribution works in a similar way: the firms compare technical fingerprints, such as tooling, laundering routes and wallet reuse, against earlier cases. In the video, TRM and Chainalysis said with high confidence that the attacker was a North Korean unit called TraderTraitor, while Binance itself had not named anyone.</p>
+
+<p>The video's numbers show the whole cycle. TRM traced about $6.36 billion across 10 different blockchains, a deliberate tactic because each chain has its own tools, and moving across them takes extra effort to follow. Within hours, around $3 billion was frozen. Tether froze more than $1.567 billion of USDT, and Circle froze more than $800 million of USDC in coordination with law enforcement. Elliptic reported that the hackers still controlled over $3 billion in assets that issuers could not freeze. Chainalysis then saw "thousands of automated transactions in a short window," a laundering pattern it said it had never seen before. That pattern is itself a signal: software-driven fragmentation at that volume is built to overwhelm human analysts.</p>
+
+<blockquote>"Chain analysis says it is seeing laundering patterns it has never seen before. Thousands of automated transactions in a short window."</blockquote>
+
+<p>Investors and market participants use this information in practical ways. Exchanges and compliance teams subscribe to tracing tools so they can screen incoming deposits against "tainted" address lists and block suspect funds before they are cashed out. Law enforcement uses the same maps to build seizure requests. Traders watch the movement of the unfrozen funds as a market signal. The video points out that where the remaining $3 billion goes next shows how much of the heist was really stopped, and large sales of stolen assets can add selling pressure to prices. Ordinary holders can read the same signs: how fast an exchange admits a breach, whether it can name a repayment plan, and whether it publishes proof of reserves.</p>
+
+<p>There are several common misconceptions. First, "traceable" does not mean "recoverable." Seeing where money went is not the same as getting it back. The video stresses that freezing is not owning: returning frozen funds may require proving who owns them, and perhaps court orders in more than one country. Issuers can burn frozen tokens and reissue new ones, but that takes time. Second, the tracing firms deal in probabilities. Attribution is stated as "high confidence," not proof in court. Third, freezes depend on the asset type. Stablecoins like USDT and USDC have a built-in issuer control. Bitcoin has no company behind it, so it stops only if it reaches an exchange that chooses to block it.</p>
+
+<p>Tracing breaks down in several ways. Thieves can route funds through mixers, privacy coins, or cross-chain bridges, and can use over-the-counter brokers in jurisdictions that ignore freeze requests. Speed matters most: once funds are converted to non-freezable assets and cashed out, the trail ends at a real-world payout that the ledger cannot see. Freezing also carries its own risk, which the video highlights. The same switch that stops a thief "can be used on any wallet," and issuers face liability if they freeze the wrong money. A trading-firm founder quoted in the video called this one a "business decision" because of its size, and that raises the issue of consistency. In April, Circle took criticism for not freezing stolen USDC in the roughly $290 million Drift hack, then moved within hours here.</p>
+
+<p>This concept connects to several others in the guide. <strong>Custody risk</strong> is the starting point: if you hold crypto on an exchange, you are a customer of the company, not your own bank, and its security and balance sheet decide your outcome. Binance covered the loss with more than $6.34 billion of its own money, because its roughly $1 billion SAFU emergency fund covered only about one-sixth of the hole. That links to <strong>proof of reserves</strong> and to the lack of any deposit insurance for crypto. <strong>Stablecoin issuer controls</strong> explain why the freezes were possible. And <strong>sanctions and AML compliance</strong> explain why attribution to a state-backed group matters: it turns a theft into a national-security case, which is why law enforcement joined the response.</p>
+
+<p>To discuss this confidently, hold on to four points. A blockchain is a public ledger, so theft leaves a permanent trail, but the trail shows addresses, not identities. Tracing firms turn that trail into actionable intelligence by clustering wallets, labeling them, and alerting exchanges and issuers. The decisive factor is speed and asset type: funds in stablecoins can be frozen within hours, while funds already converted to non-freezable assets may be gone. Last, a freeze is not a refund. It shows that crypto has an off switch held by companies, and the open questions the video leaves you with are who decides when to use it and who is left out when they do.</p>
+<div class="concept-side">Related in this category: <a href="spot_bitcoin_etf.html">Spot Bitcoin ETF</a>, <a href="stablecoin_issuer_freeze_control.html">Issuer Freeze and Blacklist Control</a>, <a href="hot_wallet_vs_cold_wallet.html">Hot Wallet vs. Cold Wallet</a>, <a href="proof_of_reserves.html">Proof of Reserves</a>, <a href="exchange_insurance_fund.html">Exchange Emergency Insurance Fund (SAFU)</a></div>
+<button class="concept-done" data-slug="crypto_exchange_hack_laundering" onclick="toggleDone('crypto_exchange_hack_laundering')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_crypto_exchange_hack_laundering';</script>
+<script src="../../book.js"></script>
+<script src="../fg.js"></script>
+</body>
+</html>
