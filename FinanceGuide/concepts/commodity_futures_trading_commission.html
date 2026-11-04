@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Commodity Futures Trading Commission (CFTC) - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.prog-stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(112px,1fr));
+  gap:10px; margin:1rem 0 1.5rem; }
+.prog-stat { background:#e8e0d0; border:1px solid #d4c8b0; border-radius:8px;
+  padding:0.7rem 0.9rem; }
+.prog-stat .n { display:block; font-size:1.5rem; color:#5a3e1a; line-height:1.1; }
+.prog-stat .l { display:block; font-size:0.75rem; color:#8a7a60; margin-top:0.2rem; }
+.prog-chart { position:relative; margin:0.5rem 0 0.4rem; }
+.prog-chart svg { width:100%; height:auto; display:block; overflow:visible; }
+.prog-chart .grid { stroke:#ddd3c0; stroke-width:1; }
+.prog-chart .axis { stroke:#c8bca4; stroke-width:1; }
+.prog-chart .tick { fill:#8a7a60; font-size:11px; }
+.prog-chart .ylab { fill:#8a7a60; font-size:11px; }
+.prog-chart .actual { fill:none; stroke:#9a5a22; stroke-width:2; stroke-linejoin:round; }
+.prog-chart .actual-dot { fill:#9a5a22; stroke:#f4efe8; stroke-width:2; }
+.prog-chart .model { fill:none; stroke:#0e9488; stroke-width:2; stroke-dasharray:6 4; }
+.prog-chart .ceiling { stroke:#8a7a60; stroke-width:1; stroke-dasharray:2 4; }
+.prog-chart .here { stroke:#9a5a22; stroke-width:1; stroke-dasharray:2 3; opacity:0.6; }
+.prog-chart .dlabel { font-size:11px; fill:#3a2e1e; }
+.prog-chart .bar { fill:#9a5a22; opacity:0.75; }
+.prog-chart .bar.spike { fill:#6b3410; opacity:1; }
+.prog-legend .lg-spike::before { border-color:#6b3410; border-top-width:6px; }
+.prog-spikes { font-size:0.88rem; color:#5a3e1a; margin:-0.8rem 0 1.5rem; }
+.prog-chart .bar-model { fill:none; stroke:#0e9488; stroke-width:2; stroke-dasharray:6 4; }
+.prog-chart .hit { fill:transparent; cursor:crosshair; }
+.prog-tip { position:absolute; pointer-events:none; display:none;
+  background:#3a2e1e; color:#f4efe8; font-size:12px; line-height:1.4;
+  padding:6px 9px; border-radius:6px; white-space:nowrap; z-index:5; }
+.prog-legend { display:flex; gap:1.2rem; font-size:0.8rem; color:#5a3e1a;
+  margin:0 0 1.5rem; flex-wrap:wrap; }
+.prog-legend span::before { content:""; display:inline-block; width:18px; height:0;
+  border-top:2px solid; margin-right:6px; vertical-align:middle; }
+.prog-legend .lg-actual::before { border-color:#9a5a22; }
+.prog-legend .lg-model::before { border-color:#0e9488; border-top-style:dashed; }
+.prog-legend .lg-ceiling::before { border-color:#8a7a60; border-top-style:dotted; }
+.prog-eq { background:#e8e0d0; border:1px solid #d4c8b0; border-radius:8px;
+  padding:0.9rem 1.1rem; font-family:Georgia,serif; font-size:1.05rem; color:#3a2e1e;
+  margin:1rem 0; }
+.prog-eq .sub { display:block; font-size:0.85rem; color:#8a7a60; margin-top:0.4rem;
+  font-family:inherit; }
+.prog-note { font-size:0.85rem; color:#8a7a60; }
+.prog-link { font-size:0.85rem; margin:-0.8rem 0 1.2rem; }
+.prog-link a { color:#0e9488; }
+.ch-status { font-size:0.85rem; color:#5a3e1a; margin:-0.6rem 0 1.2rem; }
+.ch-status.done { color:#0e6b5f; background:#e3efe9; border:1px solid #b9d8cc;
+  border-radius:6px; padding:0.5rem 0.8rem; margin:0 0 1.2rem; }
+table.prog-table { font-size:0.85rem; margin:1rem 0; }
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done,
+body.hide-done .cat-card.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+.vid-tab {
+  margin: 0 0 1.2rem; background: #e8e0d0; border: 1px solid #d4c8b0;
+  border-radius: 8px; overflow: hidden;
+}
+.vid-tab summary {
+  padding: 0.6rem 0.9rem; cursor: pointer; font-size: 0.85rem;
+  color: #3a2a1a; list-style: none; user-select: none;
+}
+.vid-tab summary::-webkit-details-marker { display: none; }
+.vid-tab summary::before {
+  content: '▶'; display: inline-block; margin-right: 0.5rem;
+  font-size: 0.7rem; transition: transform 0.2s;
+}
+.vid-tab[open] summary::before { transform: rotate(90deg); }
+.vid-tab .vid-status {
+  float: right; font-size: 0.75rem; padding: 0.15rem 0.5rem;
+  border-radius: 3px; margin-left: 0.5rem;
+}
+.vid-tab .vid-ok { background: #4ade8040; color: #2d6a4f; }
+.vid-tab .vid-err { background: #f8717140; color: #9b2c2c; }
+.vid-tab .vid-list {
+  padding: 0 0.9rem 0.7rem; margin: 0;
+  list-style: none; font-size: 0.8rem;
+}
+.vid-tab .vid-list li {
+  padding: 0.35rem 0; border-top: 1px solid #d4c8b0;
+  display: flex; justify-content: space-between; gap: 8px;
+}
+.vid-tab .vid-list .vid-date {
+  color: #a08060; white-space: nowrap; flex: none;
+}
+.vid-tab .vid-list .vid-concepts {
+  color: #a08060; white-space: nowrap; flex: none; font-size: 0.75rem;
+}
+.vid-tab .vid-none {
+  padding: 0.4rem 0.9rem 0.7rem; color: #a08060; font-size: 0.8rem;
+}
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../free-markets-political-economy.html">&larr; Free Markets &amp; Political Economy</a>
+
+<div class="concept-meta"><span>standard</span><span>Free Markets &amp; Political Economy</span><span>added 2026-11-04</span></div>
+<h4 id="commodity_futures_trading_commission">Commodity Futures Trading Commission (CFTC)</h4>
+
+<p>The <strong>Commodity Futures Trading Commission</strong>, or <strong>CFTC</strong>, is the U.S. federal agency that regulates the derivatives markets: futures, options on futures, and swaps. Congress created it in 1974 to oversee trading in contracts whose value comes from something else, such as wheat, crude oil, interest rates, stock indexes, or currencies. A <strong>derivative</strong> is a contract that pays out based on a future outcome instead of a thing you own outright. The CFTC is a different agency from the SEC. The SEC polices stocks and bonds, which represent ownership or debt in a company. The CFTC polices contracts about the future. That split matters in the video, because a bet on who controls the House is a contract about the future, and it sits in the CFTC's territory.</p>
+
+<p>The CFTC matters because derivatives markets are enormous, and they touch ordinary life even if you never trade them. Farmers lock in a crop price months before harvest. Airlines hedge fuel. Banks hedge interest rates. Pension funds hedge currency risk. When those markets work, risk moves from people who can't afford it to people who are paid to carry it. When they are rigged or collapse, the damage spreads: price manipulation, fraud, and failed clearinghouses can freeze credit and raise what you pay at the pump or the grocery store. The CFTC is the referee that tries to keep those prices honest, so that a futures price means what it appears to mean.</p>
+
+<p>Mechanically, the CFTC works through a layered system. Trading happens on licensed venues called <strong>designated contract markets</strong>, such as the CME Group exchanges. Those venues must register with the CFTC, follow its core principles, and monitor their own members. Trades are guaranteed by <strong>clearinghouses</strong>, which stand between buyer and seller so one side's default doesn't ruin the other. The CFTC writes rules, reviews or allows new contract types, collects data on who holds large positions, and brings enforcement cases for fraud, manipulation, and insider abuse. A new contract generally must be self-certified by the exchange or approved by the agency. The agency can step in, as it did against Kalshi, if it decides a contract violates the law or the public interest.</p>
+
+<p>That brings us to the video's example. Kalshi is a CFTC-regulated exchange that lists event contracts: yes/no questions that pay $1 if the event happens and nothing if it doesn't. A 94% price on Democratic control of the House means a contract costing about 94 cents. Kalshi wanted to list election contracts, and the CFTC had fought it in court, arguing that betting on elections wasn't something it should allow. In May 2025 the agency <strong>moved to drop that court fight</strong>. Kalshi's response was that election markets are here to stay. By late October, CNN counted more than $1.4 billion traded on markets tied to the midterms, and the House-control market alone held more than $237 million.</p>
+
+<blockquote>"The door opened in Washington as well. In May of 2025, the federal regulator, the CFTC, moved to drop its court fight to stop Kalshi from listing election contracts."</blockquote>
+
+<p>The decision changed the product's status. Before, election betting in the U.S. was a niche activity on small, tightly capped platforms like PredictIt, or on offshore sites. Once the agency stopped resisting, a regulated exchange with licensed clearing, identity checks, and a billboard in New York City could sell the same contracts. That is the shift from fringe to mainstream the video describes. It is also why money followed. The video notes that Intercontinental Exchange, which owns the New York Stock Exchange, invested $1.6 billion in Polymarket, and that Kalshi raised $1 billion at a $22 billion valuation. Investors don't build businesses on markets that regulators might shut down next quarter. Regulatory clarity is the foundation under that capital.</p>
+
+<p>Traders and investors read the CFTC in a few practical ways. First, its stance on a product tells you how durable the product is. A contract the agency tolerates can attract institutions; one it fights may vanish. Second, the CFTC publishes the weekly <strong>Commitments of Traders</strong> report, showing how commercial hedgers, big speculators, and small traders are positioned in futures. Many investors use it as a sentiment gauge. Third, its enforcement actions signal where the rules are tightest. If you trade event contracts, a CFTC-regulated venue offers recourse and rules against manipulation that an offshore site may not. Even the video's host, who builds a boom-versus-doom index from these prices, weights them by money in the market, a rule borrowed from conventional market practice.</p>
+
+<p>There are several gotchas. First, regulation is not endorsement. When the CFTC drops a court fight, that doesn't mean it vouches for the prices or says the odds are accurate. It means the contracts may be listed. Second, the agency polices fraud and manipulation but cannot make a thin market deep. The video's data shows that on Polymarket's international site the top 1% of wallets placed about 68 to 70% of the trading, and 80% of the markets had fewer than 100 wallets. Polymarket's international site is also not the same as a U.S.-regulated exchange, so the CFTC's reach differs. Third, "the regulator allowed it" is a legal fact, not a statistical one. A 94% price is still a probability, not a promise.</p>
+
+<p>What happens when the system fails? Regulators have limited staff, and the CFTC is a small agency relative to the markets it watches. Manipulation is hard to prove, especially in thin markets where one confident trader can be most of the volume. The video is careful here: nobody has shown that any 2026 midterm market was manipulated, and the source of the wallet data is an advocacy group critical of these markets. But the risks are visible. Kalshi suspended a handful of candidates for betting on their own races, and NPR reported campaign staffers betting on races they worked on. That is insider trading in a new costume. Rules written for oil and corn have to stretch to cover candidates and staffers, and enforcement can lag behind the product.</p>
+
+<p>The CFTC also connects to several other ideas in the video. <strong>Calibration</strong> is the test of whether markets priced at 80% really win about 80% of the time, and it requires hundreds of outcomes, not one election night. <strong>Liquidity</strong> and concentration explain why a price in a $237 million market deserves more trust than one in a market with fewer than 100 wallets. <strong>Market structure</strong> shows up in the slicing of one question into many margin bets, which makes thinner markets. And the investment from ICE and Morgan Stanley shows how regulatory permission becomes a business. The takeaway: the CFTC decides whether the game may be played in the open. It doesn't decide whether the odds on the board are any good. That job still belongs to you.</p>
+<div class="concept-side">Related in this category: <a href="industrial_policy.html">Industrial Policy</a>, <a href="rate_base_cost_of_service_regulation.html">Cost-of-Service Rate-Base Regulation</a>, <a href="market_concentration_oligopoly.html">Market Concentration and Oligopoly</a>, <a href="market_manipulation_insider_trading.html">Market Manipulation and Insider Trading</a></div>
+<button class="concept-done" data-slug="commodity_futures_trading_commission" onclick="toggleDone('commodity_futures_trading_commission')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_commodity_futures_trading_commission';</script>
+<script src="../../book.js"></script>
+<script src="../fg.js"></script>
+</body>
+</html>

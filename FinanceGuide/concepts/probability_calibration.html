@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Probability Calibration - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.prog-stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(112px,1fr));
+  gap:10px; margin:1rem 0 1.5rem; }
+.prog-stat { background:#e8e0d0; border:1px solid #d4c8b0; border-radius:8px;
+  padding:0.7rem 0.9rem; }
+.prog-stat .n { display:block; font-size:1.5rem; color:#5a3e1a; line-height:1.1; }
+.prog-stat .l { display:block; font-size:0.75rem; color:#8a7a60; margin-top:0.2rem; }
+.prog-chart { position:relative; margin:0.5rem 0 0.4rem; }
+.prog-chart svg { width:100%; height:auto; display:block; overflow:visible; }
+.prog-chart .grid { stroke:#ddd3c0; stroke-width:1; }
+.prog-chart .axis { stroke:#c8bca4; stroke-width:1; }
+.prog-chart .tick { fill:#8a7a60; font-size:11px; }
+.prog-chart .ylab { fill:#8a7a60; font-size:11px; }
+.prog-chart .actual { fill:none; stroke:#9a5a22; stroke-width:2; stroke-linejoin:round; }
+.prog-chart .actual-dot { fill:#9a5a22; stroke:#f4efe8; stroke-width:2; }
+.prog-chart .model { fill:none; stroke:#0e9488; stroke-width:2; stroke-dasharray:6 4; }
+.prog-chart .ceiling { stroke:#8a7a60; stroke-width:1; stroke-dasharray:2 4; }
+.prog-chart .here { stroke:#9a5a22; stroke-width:1; stroke-dasharray:2 3; opacity:0.6; }
+.prog-chart .dlabel { font-size:11px; fill:#3a2e1e; }
+.prog-chart .bar { fill:#9a5a22; opacity:0.75; }
+.prog-chart .bar.spike { fill:#6b3410; opacity:1; }
+.prog-legend .lg-spike::before { border-color:#6b3410; border-top-width:6px; }
+.prog-spikes { font-size:0.88rem; color:#5a3e1a; margin:-0.8rem 0 1.5rem; }
+.prog-chart .bar-model { fill:none; stroke:#0e9488; stroke-width:2; stroke-dasharray:6 4; }
+.prog-chart .hit { fill:transparent; cursor:crosshair; }
+.prog-tip { position:absolute; pointer-events:none; display:none;
+  background:#3a2e1e; color:#f4efe8; font-size:12px; line-height:1.4;
+  padding:6px 9px; border-radius:6px; white-space:nowrap; z-index:5; }
+.prog-legend { display:flex; gap:1.2rem; font-size:0.8rem; color:#5a3e1a;
+  margin:0 0 1.5rem; flex-wrap:wrap; }
+.prog-legend span::before { content:""; display:inline-block; width:18px; height:0;
+  border-top:2px solid; margin-right:6px; vertical-align:middle; }
+.prog-legend .lg-actual::before { border-color:#9a5a22; }
+.prog-legend .lg-model::before { border-color:#0e9488; border-top-style:dashed; }
+.prog-legend .lg-ceiling::before { border-color:#8a7a60; border-top-style:dotted; }
+.prog-eq { background:#e8e0d0; border:1px solid #d4c8b0; border-radius:8px;
+  padding:0.9rem 1.1rem; font-family:Georgia,serif; font-size:1.05rem; color:#3a2e1e;
+  margin:1rem 0; }
+.prog-eq .sub { display:block; font-size:0.85rem; color:#8a7a60; margin-top:0.4rem;
+  font-family:inherit; }
+.prog-note { font-size:0.85rem; color:#8a7a60; }
+.prog-link { font-size:0.85rem; margin:-0.8rem 0 1.2rem; }
+.prog-link a { color:#0e9488; }
+.ch-status { font-size:0.85rem; color:#5a3e1a; margin:-0.6rem 0 1.2rem; }
+.ch-status.done { color:#0e6b5f; background:#e3efe9; border:1px solid #b9d8cc;
+  border-radius:6px; padding:0.5rem 0.8rem; margin:0 0 1.2rem; }
+table.prog-table { font-size:0.85rem; margin:1rem 0; }
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done,
+body.hide-done .cat-card.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+.vid-tab {
+  margin: 0 0 1.2rem; background: #e8e0d0; border: 1px solid #d4c8b0;
+  border-radius: 8px; overflow: hidden;
+}
+.vid-tab summary {
+  padding: 0.6rem 0.9rem; cursor: pointer; font-size: 0.85rem;
+  color: #3a2a1a; list-style: none; user-select: none;
+}
+.vid-tab summary::-webkit-details-marker { display: none; }
+.vid-tab summary::before {
+  content: '▶'; display: inline-block; margin-right: 0.5rem;
+  font-size: 0.7rem; transition: transform 0.2s;
+}
+.vid-tab[open] summary::before { transform: rotate(90deg); }
+.vid-tab .vid-status {
+  float: right; font-size: 0.75rem; padding: 0.15rem 0.5rem;
+  border-radius: 3px; margin-left: 0.5rem;
+}
+.vid-tab .vid-ok { background: #4ade8040; color: #2d6a4f; }
+.vid-tab .vid-err { background: #f8717140; color: #9b2c2c; }
+.vid-tab .vid-list {
+  padding: 0 0.9rem 0.7rem; margin: 0;
+  list-style: none; font-size: 0.8rem;
+}
+.vid-tab .vid-list li {
+  padding: 0.35rem 0; border-top: 1px solid #d4c8b0;
+  display: flex; justify-content: space-between; gap: 8px;
+}
+.vid-tab .vid-list .vid-date {
+  color: #a08060; white-space: nowrap; flex: none;
+}
+.vid-tab .vid-list .vid-concepts {
+  color: #a08060; white-space: nowrap; flex: none; font-size: 0.75rem;
+}
+.vid-tab .vid-none {
+  padding: 0.4rem 0.9rem 0.7rem; color: #a08060; font-size: 0.8rem;
+}
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../quantitative-algorithmic-trading.html">&larr; Quantitative &amp; Algorithmic Trading</a>
+
+<div class="concept-meta"><span>standard</span><span>Quantitative &amp; Algorithmic Trading</span><span>added 2026-11-04</span></div>
+<h4 id="probability_calibration">Probability Calibration</h4>
+
+<p><strong>Probability calibration</strong> is the question of whether the probabilities a forecaster states match how often those events actually happen. A forecaster is well calibrated when the things they call 80% likely occur about 80% of the time, the 90% calls occur about 90% of the time, and so on. Notice what this does not require. It does not require the forecaster to be right on any single call. A 94% price is a probability, not a prediction that something will happen. In the video's words, it says that in 100 elections that look like this one, the underdog wins about 6 of them, roughly one time in 17. Calibration is the test that tells you whether numbers like that deserve your trust.</p>
+
+<p>It matters because prediction markets such as Kalshi and Polymarket now put prices on elections, inflation prints and Fed decisions, and those prices travel. They show up in headlines, on a Kalshi billboard in New York City, and in the feeds of people who then make money decisions. The video's warning is that the brain hears "94%" and translates it to "certain." If you size a bet, hedge a portfolio or change a plan around a number you misread, calibration is what protects you. A market that says 90% but delivers 70% is quietly overcharging you for certainty. A market that says 90% and delivers 90% is giving you honest information.</p>
+
+<p>Mechanically, the test works by <strong>bucketing</strong>. First, collect a large set of forecasts the market made, ideally hundreds or thousands. Second, sort them into groups by stated probability: everything priced near 70%, everything near 80%, everything near 90%. Third, wait until every outcome is resolved. Fourth, count what share of each bucket happened. If the 80% bucket contains 100 races and 79 of them came in, the market is calibrated there. If only 60 came in, it was overconfident. If 95 came in, it was underconfident. Plotting stated probability on one axis and actual frequency on the other gives a <strong>calibration curve</strong>. A perfectly calibrated forecaster sits on the diagonal line.</p>
+
+<p>The video's central point is that a single event cannot grade a probability. Think of a weather app that says 94% chance of sun. If it rains, the app was not necessarily wrong, because rain was always going to arrive about one day in seventeen. If it is sunny, the app was not necessarily right either, since a bad forecaster who says 94% for everything will also be right on most sunny days. One outcome is compatible with both a good forecast and a bad one. That is why the presenter says that whatever the results said the morning after, they could not tell you whether 94% was the right price. He puts the real standard plainly:</p>
+
+<blockquote>"You can't grade a probability with one outcome. Not a win, not a loss. You grade it with hundreds."</blockquote>
+
+<p>The video gives two contrasting examples. In 2024, polling averages showed a roughly even presidential race while prediction markets favored Donald Trump for weeks, and the markets were right. Polymarket called that proof of the wisdom of the markets over the polls. But in 2022, PredictIt had Republicans as high as 82% to win the Senate on election day. Democrats kept the chamber. The 82% price fell to 39% as early results came in that night, and the final answer arrived only when Nevada was called the following Saturday. Which year is the real record? The honest answer is neither one alone. The 2024 hit and the 2022 miss are two data points, and a trophy cherry-picked from one is no more informative than a failure cherry-picked from the other. Only the full set of 70%, 80% and 90% calls can say how reliable the market is.</p>
+
+<p>Traders and informed readers use calibration in several practical ways. First, they discount headline numbers by asking how much money and how many independent participants stand behind a price. The presenter weights every price in his Boom versus Doom index by the money sitting in the market, trusting a deep price more than a thin one. Second, they look at track records by bucket, not by anecdote, before trusting a source's confidence. Third, they hunt for miscalibration they can trade. A well-known pattern in forecasting is the favorite-longshot bias, where very likely outcomes are slightly underpriced and unlikely ones overpriced. Finally, they watch the post-election scorecard: once every race is called, check how many of the 70%, 80% and 90% races came in, and treat that as the verdict.</p>
+
+<p>There are several gotchas. The first is that being calibrated is not the same as being useful. A forecaster who says "60%" about every event that happens 60% of the time is perfectly calibrated and tells you nothing you could not get from the base rate. Useful forecasts are also <strong>sharp</strong>, meaning they separate likely from unlikely events, and the two properties are measured together by tools like the Brier score. The second gotcha is sample size: ten races in a bucket cannot confirm anything, because luck can easily produce 6 of 10 for an honest 80% call. The third is that races are not independent. If the national mood shifts, many 90% races can fall together, so a bad night in a correlated set is less surprising than the arithmetic suggests, and the bucket needs to be judged across many cycles, not one.</p>
+
+<p>Calibration can fail for structural reasons, and the video points at them. A price is only as good as the money willing to trade at it. The Anti-Corruption Data Collective found that the top 1% of wallets on Polymarket's international site accounted for about 68% of trading, that Reuters put the share near 70%, that 80% of the markets it examined had fewer than 100 wallets, and that just 10 wallets were behind 17% of volume and had bet in 426 of 470 seats. In a market that thin, a price may be one confident trader's opinion rather than a crowd consensus. The video adds a caution: the group is an advocacy critic, and nobody has shown any 2026 midterm market was manipulated. But thin markets are a sound reason for suspecting overconfidence.</p>
+
+<p>A second failure mode is the feedback loop. When a thin market's price is quoted on television, the quote can attract new money, and the new money can make the price look even more convincing, with no new information behind it. The product mix makes this worse. Reuters found that 71% of 2024 election markets simply asked who would win a race, against only 16% this cycle, with 58% now asking about winning margin. Slicing one question into a dozen produces thinner markets with less money behind each price, and that makes each one harder to calibrate and easier for a single large wallet to move. Even the 94% on the roughly $237 million House control market is an opinion about probability, not the voice of the country.</p>
+
+<p>Calibration connects to several other ideas worth knowing. It is the cousin of <strong>liquidity</strong> and market depth, because deep markets tend to aggregate more independent information and resist a single trader's influence. It connects to <strong>base rates</strong> and the favorite-longshot bias, which tell you where to expect systematic error. It links to <strong>scoring rules</strong> such as the Brier score, which turn calibration and sharpness into a single number. And it ties into <strong>market structure and incentives</strong>: with ICE committing $1.6 billion to Polymarket and Kalshi raising money at a $22 billion valuation, odds have become a product that needs volume. The presenter's closing line captures the discipline:</p>
+
+<blockquote>"A 94% price is not the voice of the country, it is the opinion of whoever wrote the biggest checks. And no single election night can tell you whether those checks were smart or just really, really loud."</blockquote>
+
+<p>To discuss this confidently in a conversation about markets, hold on to four ideas. A probability is a statement about many repetitions, not a promise about one. A single result, whether the 2024 hit or the 2022 miss, cannot validate or refute it. Trust is earned through bucket-by-bucket track records across many events, so ask "of all the races priced near 80%, how many came in?" And the quality of a price depends on who and how much money stands behind it. If you carry those habits, a headline reading 94% becomes information to weigh instead of a verdict to obey.</p>
+<div class="concept-side">Related in this category: <a href="volatility_control_fund.html">Volatility Control Fund</a>, <a href="cta_trend_following.html">CTAs / Trend-Following Funds</a>, <a href="spurious_correlation_normalization.html">Spurious Correlation and Normalizing a Statistic</a></div>
+<button class="concept-done" data-slug="probability_calibration" onclick="toggleDone('probability_calibration')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_probability_calibration';</script>
+<script src="../../book.js"></script>
+<script src="../fg.js"></script>
+</body>
+</html>
