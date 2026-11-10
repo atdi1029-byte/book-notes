@@ -24,7 +24,13 @@ node sync_test.js      # merge rules, backend, shelf/book sync, glossary (~1 min
 node offline_test.js   # save the library, then read it with no connection (~30 s)
 node pages_test.js     # every shelf page loads without a JavaScript error (~2 min)
 node help_test.js      # plain-English boxes/primers: closed by default, bookmarks reopen them, progress skips them (~15 s)
+node progress_test.js  # "% read" counts what was read: jumps, flicking and peeks add next to nothing; old progress is kept (~45 s)
 ```
+
+- `progress_test.js` runs the reader's one-second clock 20× faster (the page's
+  `setInterval(…, 1000)` fires every 50 ms), so a minute of reading takes 3 s.
+  Page positions can differ by a word or two between runs, so it compares them
+  with a small tolerance.
 
 - `server.js` serves this folder on localhost with `SYNC_URL` pointed at a local
   copy of the real `apps_script.gs` (run by `gas_harness.js`). Switches:

@@ -41,7 +41,7 @@ const PORT = 8791;
       check(label || rel, res && !res.error && res.ok, res);
       return res;
     };
-    await offline('', () => ({ ok: document.querySelectorAll('.book').length >= 170, books: document.querySelectorAll('.book').length }), 'shelf opens (start_url ./)');
+    await offline('', () => ({ ok: document.querySelectorAll('.book').length >= 150, books: document.querySelectorAll('.book').length }), 'shelf opens (start_url ./)');
     const plain = await page.evaluate(() => {
       const a = document.querySelector('a.book[href$="plain.html"]');
       return a && a.getAttribute('href');

@@ -319,8 +319,9 @@
   setTimeout(updateProgress, 100);
 
   // ── Reading Speed Tracker ──
-  // Content-based word tracking: counts words per DOM element,
-  // determines words read from viewport position (not scroll %).
+  // Content-based word tracking: counts words per DOM element, and counts
+  // them as read while they are on screen, at reading speed (see
+  // countReading). Not scroll %, and not the furthest point reached.
   // Blends session speed (40%) with lifetime average (60%) for ETA.
 
   var RS_KEY = 'reading_speed_data';
@@ -393,27 +394,35 @@
     return cumulative;
   }
 
-  // ── Location-based reading progress ──
-  // Progress = furthest word position the viewport has reached.
-  // Uses a "reading line" ~65% down the viewport to determine
-  // which word the reader is currently on. Independent of WPM
-  // or dwell time — purely positional.
+  // ── Where the screen is, in words ──
 
-  var READING_LINE = 0.65; // 65% down the viewport
+  // Top edge of word-map element i, in px from the top of the viewport. An
+  // element that isn't laid out (inside a closed <details>, hidden) has no
+  // position of its own, so it takes the bottom of the last laid-out element
+  // before it: tops then never go backwards down the map, which the search
+  // below relies on. (Its own rect is all zeros, which used to read as "at
+  // the top of the screen" wherever it sat in the book.)
+  function topOfMapped(i) {
+    var el = _wordMap[i].el;
+    if (el.getClientRects().length) return el.getBoundingClientRect().top;
+    for (var j = i - 1; j >= 0 && j > i - 80; j--) {
+      var prev = _wordMap[j].el;
+      if (prev.getClientRects().length) return prev.getBoundingClientRect().bottom;
+    }
+    return -1e9;
+  }
 
-  function getCurrentWordPosition() {
+  // How many of the book's words lie above the line `y` px from the top of
+  // the viewport.
+  function wordAtY(y) {
     if (!_wordMap || _wordMap.length === 0) return 0;
-    var vpH = window.innerHeight;
-    var readingY = vpH * READING_LINE; // px from top of viewport
-
     // Elements are in document order, so their tops are monotonic: binary-
-    // search for the last one above the reading line instead of measuring
-    // every element on every scroll event (thousands of layout reads per
-    // second near the top of a long book).
+    // search for the last one above the line instead of measuring every
+    // element.
     var lo = 0, hi = _wordMap.length - 1, found = -1;
     while (lo <= hi) {
       var mid = (lo + hi) >> 1;
-      if (_wordMap[mid].el.getBoundingClientRect().top <= readingY) {
+      if (topOfMapped(mid) <= y) {
         found = mid;
         lo = mid + 1;
       } else {
@@ -425,13 +434,15 @@
     // step forward a little while the next element is also above the line.
     var guard = 0;
     while (guard++ < 8 && found + 1 < _wordMap.length &&
-           _wordMap[found + 1].el.getBoundingClientRect().top <= readingY) {
+           topOfMapped(found + 1) <= y) {
       found++;
     }
-    var rect = _wordMap[found].el.getBoundingClientRect();
-    // Estimate word position within this element
-    var elH = Math.max(1, rect.height);
-    var fraction = Math.min(1, Math.max(0, (readingY - rect.top) / elH));
+    var el = _wordMap[found].el;
+    var fraction = 1; // not laid out: all of it counts as above the line
+    if (el.getClientRects().length) {
+      var rect = el.getBoundingClientRect();
+      fraction = Math.min(1, Math.max(0, (y - rect.top) / Math.max(1, rect.height)));
+    }
     var wordsIntoEl = Math.round(_wordMap[found].words * fraction);
     var prevCum = found > 0 ? _wordMap[found - 1].cumWords : 0;
     return Math.min(_totalMappedWords, prevCum + wordsIntoEl);
@@ -446,9 +457,102 @@
     return (scrollTop + vpH) >= (docH - 50);
   }
 
-  function getWordsRead() {
-    // Returns the current live word position (not persisted max)
-    return getCurrentWordPosition();
+  // ── What has actually been read ──
+  // A record's `ranges` lists the stretches of the book that were read, as
+  // word offsets: [start, end, start, end, …], end not included, in order and
+  // never touching. `maxWordsRead` is their total length (the name is from
+  // when it meant "furthest point the screen reached"; the shelf, the backend
+  // and the merge rules all still read it, as the number of words read).
+
+  // A tidy copy: whole numbers, in order, overlapping or touching stretches
+  // joined, nothing past `total` (when given).
+  function rangesClean(r, total) {
+    var pairs = [];
+    if (Array.isArray(r)) {
+      for (var i = 0; i + 1 < r.length; i += 2) {
+        var s = Math.round(Number(r[i])), e = Math.round(Number(r[i + 1]));
+        if (!isFinite(s) || !isFinite(e)) continue;
+        if (s < 0) s = 0;
+        if (total > 0 && e > total) e = total;
+        if (e > s) pairs.push([s, e]);
+      }
+    }
+    pairs.sort(function(a, b) { return a[0] - b[0]; });
+    var out = [];
+    for (var k = 0; k < pairs.length; k++) {
+      var n = out.length;
+      if (n && pairs[k][0] <= out[n - 1]) {
+        if (pairs[k][1] > out[n - 1]) out[n - 1] = pairs[k][1];
+      } else {
+        out.push(pairs[k][0], pairs[k][1]);
+      }
+    }
+    return out;
+  }
+
+  function rangesTotal(r) {
+    var t = 0;
+    for (var i = 0; i + 1 < r.length; i += 2) t += r[i + 1] - r[i];
+    return t;
+  }
+
+  // The first word at or after `w` that has not been read.
+  function rangesNextUnread(r, w) {
+    for (var i = 0; i + 1 < r.length; i += 2) {
+      if (w < r[i]) break;
+      if (w < r[i + 1]) return r[i + 1];
+    }
+    return w;
+  }
+
+  // Count the first `n` unread words as read, from the start of the book.
+  function rangesFill(r, n, total) {
+    var out = r.slice(), at = 0;
+    for (var i = 0; n > 0 && i <= r.length; i += 2) {
+      var gapEnd = i < r.length ? r[i] : (total > 0 ? total : at + n);
+      var take = Math.min(n, gapEnd - at);
+      if (take > 0) { out.push(at, at + take); n -= take; }
+      if (i < r.length) at = r[i + 1];
+    }
+    return rangesClean(out, total);
+  }
+
+  // At most `max` stretches: the shortest ones go first, except the one being
+  // read right now (the one that holds or ends at word `keep`).
+  function rangesTrim(r, max, keep) {
+    r = r.slice();
+    while (r.length / 2 > max) {
+      var drop = -1, len = Infinity;
+      for (var i = 0; i + 1 < r.length; i += 2) {
+        if (keep >= r[i] && keep <= r[i + 1]) continue;
+        if (r[i + 1] - r[i] < len) { len = r[i + 1] - r[i]; drop = i; }
+      }
+      if (drop < 0) break;
+      r.splice(drop, 2);
+    }
+    return r;
+  }
+
+  // The stretches a record stands for. A record from before `ranges` existed
+  // only says how many words: those were read from the start. The same goes
+  // for words a record counts beyond its ranges (the merge rules keep the
+  // highest count but only the newer copy's ranges).
+  function readRanges(rec, total) {
+    if (!rec) return [];
+    var r = rangesClean(rec.ranges, total);
+    var want = rec.maxWordsRead || 0;
+    if (total > 0 && want > total) want = total;
+    var have = rangesTotal(r);
+    return have < want ? rangesFill(r, want - have, total) : r;
+  }
+
+  // Make a record's ranges and its count agree; returns the count.
+  function settleRead(rec, total) {
+    var r = readRanges(rec, total);
+    var have = rangesTotal(r);
+    rec.ranges = r;
+    if (have > (rec.maxWordsRead || 0)) rec.maxWordsRead = have;
+    return have;
   }
 
   function getBookPath() {
@@ -547,7 +651,17 @@
       if (!local.books) local.books = {};
       Object.keys(remote.books).forEach(function(path) {
         var lb = local.books[path];
-        var merged = mergeProgress(lb, remote.books[path]);
+        var rb = remote.books[path];
+        var merged = mergeProgress(lb, rb);
+        // What this device read and what the other one read add up.
+        // mergeProgress alone keeps the higher count but only the newer
+        // copy's ranges. (When it hands back one side untouched, that side
+        // is all there is: the other is missing, or was reset.)
+        if (lb && rb && merged !== lb && merged !== rb) {
+          var total = merged.words || 0;
+          merged.ranges = rangesClean(readRanges(lb, total).concat(readRanges(rb, total)), total);
+          merged.maxWordsRead = Math.max(merged.maxWordsRead || 0, rangesTotal(merged.ranges));
+        }
         if (JSON.stringify(merged) !== JSON.stringify(lb)) {
           local.books[path] = merged;
           changed = true;
@@ -621,6 +735,10 @@
     }
     data.books[bookPath].words = totalWords;
     data.books[bookPath].title = document.title;
+    delete data.books[bookPath]._lastJumpAt; // from the old position tracking
+    // Words of this page counted as read. Progress saved before `ranges`
+    // existed is kept as it was: read from the start, up to that count.
+    var readWords = settleRead(data.books[bookPath], totalWords);
     saveSpeedData(data);
 
     if (totalWords < 200) return;
@@ -631,7 +749,7 @@
     var IDLE_THRESHOLD = 30000;
 
     // Session-level speed tracking (for blended ETA)
-    var sessionWordsStart = data.books[bookPath].maxWordsRead || 0;
+    var sessionWordsStart = readWords;
     var sessionWpm = 0;
 
     // Rolling window: track recent reading snapshots (words + time)
@@ -641,21 +759,8 @@
     var SNAPSHOT_INTERVAL = 50; // only snapshot every 50 words read
     var ROLLING_WORDS = Math.min(1000, Math.round(totalWords * 0.1));
 
-    // Jump detection: track last known position to filter out
-    // TOC clicks, bookmark jumps, and page restore from WPM calc
-    var _lastWordPos = sessionWordsStart;
-    var JUMP_THRESHOLD = 2000; // words — larger = navigation jump
-
     function markActivity() {
       lastActivity = Date.now();
-    }
-
-    // ── Scroll-based progress (for progress bar only) ──
-    function getScrollProgress() {
-      var docH = document.documentElement.scrollHeight
-        - window.innerHeight;
-      if (docH <= 0) return 0;
-      return Math.min(1, window.scrollY / docH);
     }
 
     // ── ETA display element ──
@@ -681,18 +786,14 @@
     }
 
     function updateEta() {
-      // Use persisted high-water mark for progress
-      var currentWords = data.books[bookPath].maxWordsRead || 0;
-      // Also check live position (might be ahead of saved)
-      var livePos = getCurrentWordPosition();
-      if (isAtDocumentEnd()) livePos = totalWords;
-      livePos = Math.max(0, Math.min(totalWords, livePos));
-      if (livePos > currentWords) currentWords = livePos;
+      // Words read (see countReading below), not where the screen is: being
+      // at the end of the page is not the same as having read the book.
+      var currentWords = Math.min(totalWords, readWords);
 
       var wordsRemaining = Math.max(0, totalWords - currentWords);
       var percent = Math.round(currentWords / totalWords * 100);
 
-      // Finished: >= 95% or at document end
+      // Finished: 95% of the words read
       if (currentWords >= totalWords * 0.95 || wordsRemaining < 30) {
         etaEl.textContent = '\u2714 Reading complete';
         return;
@@ -707,13 +808,9 @@
         return;
       }
 
-      // Record snapshot for WPM calculation.
-      // Skip if this looks like a navigation jump (not organic reading).
-      var jumpedRecently = data.books[bookPath]._lastJumpAt &&
-        (Date.now() - data.books[bookPath]._lastJumpAt) < 3000;
-
-      if (!jumpedRecently &&
-          currentWords - _lastSnapshotWords >= SNAPSHOT_INTERVAL) {
+      // Record snapshot for WPM calculation. (Jumps no longer need filtering
+      // out: they add no words.)
+      if (currentWords - _lastSnapshotWords >= SNAPSHOT_INTERVAL) {
         _snapshots.push({ words: currentWords, time: activeTime });
         _lastSnapshotWords = currentWords;
       }
@@ -751,61 +848,19 @@
       etaEl.textContent = percent + '% read \u2022 ' + formatEta(minutesLeft);
     }
 
-    // ── Single scroll listener for everything (one layout read per frame) ──
-    var _scrollSaveTimer = null;
+    // ── Scrolling ──
+    // Scrolling moves the thin bar at the top and shows somebody is there.
+    // It does not count as reading: that is decided once a second, below.
     var _scrollPending = false;
     window.addEventListener('scroll', function() {
       markActivity();
       if (_scrollPending) return;
       _scrollPending = true;
-      requestAnimationFrame(onScrollFrame);
+      requestAnimationFrame(function() {
+        _scrollPending = false;
+        updateProgress();
+      });
     }, { passive: true });
-
-    function onScrollFrame() {
-      _scrollPending = false;
-      // Progress bar (still scroll-based — that's fine for the bar)
-      updateProgress();
-
-      // Update maxWordsRead from location-based position
-      var wordPos = getCurrentWordPosition();
-
-      // If at document end, set to totalWords explicitly
-      if (isAtDocumentEnd()) {
-        wordPos = totalWords;
-      }
-
-      // Clamp to [0, totalWords]
-      wordPos = Math.max(0, Math.min(totalWords, wordPos));
-
-      // Jump detection: if position moved forward by more than
-      // JUMP_THRESHOLD, treat as navigation (TOC, bookmark, etc.)
-      // — update position but don't create a speed sample
-      var delta = wordPos - _lastWordPos;
-      if (delta > JUMP_THRESHOLD) {
-        data.books[bookPath]._lastJumpAt = Date.now();
-      }
-      _lastWordPos = wordPos;
-
-      var maxWords = data.books[bookPath].maxWordsRead || 0;
-      if (wordPos > maxWords) {
-        data.books[bookPath].maxWordsRead = wordPos;
-        data.books[bookPath].updatedAt = Date.now();
-      }
-
-      // Also update legacy maxScroll for backward compat
-      var scrollPct = getScrollProgress();
-      if (scrollPct > (data.books[bookPath].maxScroll || 0)) {
-        data.books[bookPath].maxScroll = scrollPct;
-        data.books[bookPath].updatedAt = Date.now();
-      }
-      // Debounced save (data persistence only)
-      if (!_scrollSaveTimer) {
-        _scrollSaveTimer = setTimeout(function() {
-          _scrollSaveTimer = null;
-          saveSpeedData(data);
-        }, 2000);
-      }
-    }
 
     // Non-scroll activity signals
     window.addEventListener('keydown', markActivity);
@@ -813,11 +868,96 @@
     window.addEventListener('click', markActivity);
     window.addEventListener('wheel', markActivity);
 
-    // No dwell restore needed — progress is from maxWordsRead directly
+    // ── Counting what is read ──
+    // Words count as read only while they are on the screen, and no faster
+    // than READ_WPM words a minute (the fastest the speed model accepts as
+    // real reading). So a jump (the contents list, a bookmark, the end of
+    // the page) or flicking through pages adds next to nothing, and sitting
+    // on a page and reading it adds what is there. Until Nov 2026 progress
+    // was the furthest point the screen had ever reached: one jump to the
+    // end showed "Reading complete".
+    //
+    // `run` is the stretch being read now: it began at word run.a, and run.f
+    // is how far the reader can have got. Each second run.f moves down the
+    // text on screen by up to READ_WPM / 60 words, passing over text already
+    // counted, and never beyond the bottom of the screen. When the screen
+    // has left it more than READ_SLACK words behind (a skip ahead) or has
+    // gone back above it, the stretch ends and a new one starts at the top
+    // of the screen; the words in between stay unread.
+    //
+    // The words of a stretch are added to the count when they leave the top
+    // of the screen, when the stretch ends, and when the page is put away:
+    // not while they are still on screen. Counting them the moment run.f
+    // passed them put the count a screen ahead of the reader, at 500 words a
+    // minute, and the time-left estimate (which is worked out from the
+    // count) dropped by a quarter in the first seconds of every session.
+    var READ_WPM = 500;
+    var READ_SLACK = 120;    // words that may leave the top of the screen before run.f reaches them
+    var READ_MIN = 20;       // a stop that adds fewer new words than this is a glance: not counted
+    var READ_IDLE = 120000;  // no scroll, touch or key for this long: nobody is reading
+    var MAX_RANGES = 24;     // keeps the record small enough to sync in a URL
+    var run = null;          // { a, f, gain: new words run.f has passed }
+    var _readDirty = false;
+    var _lastReadSave = 0;
 
-    // Tick every 1 second — two clocks:
+    // Count the current stretch as read, as far as word `upTo` (all of it
+    // when not given).
+    function commitRun(upTo) {
+      if (!run || run.gain < READ_MIN) return; // nothing, or only a glance so far
+      var rec = data.books[bookPath];
+      var start = Math.round(run.a);
+      var end = Math.round(upTo === undefined ? run.f : Math.min(run.f, upTo));
+      if (end <= start) return;
+      // Everything from run.a to run.f was either counted before or passed
+      // by run.f at reading speed, so the whole span can be added.
+      var r = rangesClean((rec.ranges || []).concat([start, end]), totalWords);
+      // One stretch fewer than the limit: settleRead may add one back for
+      // the words a dropped stretch stood for (the count never goes down).
+      rec.ranges = rangesTrim(r, MAX_RANGES - 1, end);
+      var now = settleRead(rec, totalWords);
+      if (now !== readWords) {
+        readWords = now;
+        rec.updatedAt = Date.now();
+        // Old field, still merged everywhere; keep it from saying more than was read.
+        rec.maxScroll = Math.max(rec.maxScroll || 0, readWords / totalWords);
+        _readDirty = true;
+      }
+    }
+
+    function countReading() {
+      if (Date.now() - lastActivity > READ_IDLE) return;
+      var rec = data.books[bookPath];
+      var top = wordAtY(0);
+      var atEnd = isAtDocumentEnd();
+      var bot = atEnd ? totalWords : wordAtY(window.innerHeight);
+      if (bot <= top) return; // no book text on screen
+      if (!run || run.f < top - READ_SLACK || run.f > bot) {
+        commitRun(); // what was read before the screen moved away still counts
+        run = { a: top, f: top, gain: 0 };
+      }
+      var from = rangesNextUnread(rec.ranges || [], run.f);
+      if (from >= bot) {
+        run.f = bot; // everything on screen is already counted
+      } else {
+        var to = Math.min(bot, from + READ_WPM / 60);
+        run.gain += to - from;
+        run.f = to;
+      }
+      // At the end of the page nothing scrolls off any more: count as read.
+      commitRun(atEnd ? undefined : top);
+    }
+
+    // The page is being put away (closed, another app, screen off): the
+    // screen that was being read counts as far as the reader can have got.
+    function endRun() {
+      commitRun();
+      run = null;
+    }
+
+    // Tick every 1 second — three things:
     // 1. Active time (30s idle gate) — drives WPM/speed model
-    // 2. ETA display — always updates when tab visible
+    // 2. What has been read
+    // 3. ETA display — always updates when tab visible
     setInterval(function() {
       if (document.hidden) return;
       var sinceActivity = Date.now() - lastActivity;
@@ -825,10 +965,14 @@
       if (sinceActivity < IDLE_THRESHOLD) {
         activeTime += 1000;
       }
+      countReading();
       updateEta();
+      if (_readDirty && Date.now() - _lastReadSave >= 3000) {
+        _readDirty = false;
+        _lastReadSave = Date.now();
+        saveSpeedData(data);
+      }
     }, 1000);
-
-    // ETA updates via the 1-second dwell ticker above
 
     // ── Reader model (Kindle-style EMA) ──
     // A corrupted or brand-new model starts at 225 wpm with no samples and no
@@ -887,7 +1031,7 @@
       var timeDelta = activeTime - lastSavedTime;
       if (timeDelta < 60000) { saveSpeedData(data); return; }
 
-      var currentMaxWords = data.books[bookPath].maxWordsRead || 0;
+      var currentMaxWords = readWords;
       var wordsDelta = Math.max(0, currentMaxWords - lastSavedWords);
 
       // Lower threshold near end of book: if <500 words remain,
@@ -930,32 +1074,59 @@
       saveSpeedData(data);
     }
 
-    window.addEventListener('beforeunload', saveSession);
+    function leaving() {
+      endRun();
+      saveSession();
+    }
+    window.addEventListener('beforeunload', leaving);
     document.addEventListener('visibilitychange', function() {
-      if (document.hidden) saveSession();
+      if (document.hidden) leaving();
     });
-    window.addEventListener('pagehide', saveSession);
+    window.addEventListener('pagehide', leaving);
     setInterval(function() {
-      var currentMaxWords = data.books[bookPath].maxWordsRead || 0;
-      if (currentMaxWords > lastSavedWords || activeTime - lastSavedTime > 60000) {
+      if (readWords > lastSavedWords || activeTime - lastSavedTime > 60000) {
         saveSession();
       }
     }, 15000);
 
-    // Remote progress arrived after we started (another device read further):
-    // adopt it without counting it as words read in this session.
+    // Remote progress arrived after we started (another device read more, or
+    // reset the book): adopt it without counting it as words read in this
+    // session.
     window._rsOnRemoteMerge = function() {
       var rec = data.books[bookPath];
       if (!rec) return;
-      var mw = rec.maxWordsRead || 0;
-      if (mw > lastSavedWords) {
-        lastSavedWords = mw;
-        sessionWordsStart = mw;
-        _lastSnapshotWords = mw;
-        _lastWordPos = Math.max(_lastWordPos, mw);
-        _snapshots = [{ words: mw, time: activeTime }];
+      var now = settleRead(rec, totalWords);
+      var gained = now - readWords;
+      readWords = now;
+      if (gained > 0) {
+        // Move every baseline up by what the other device added.
+        lastSavedWords += gained;
+        sessionWordsStart += gained;
+        _lastSnapshotWords += gained;
+        _snapshots.forEach(function(s) { s.words += gained; });
+      } else if (gained < 0) {
+        // Reset on another device: start again from what is left.
+        lastSavedWords = sessionWordsStart = _lastSnapshotWords = now;
+        _snapshots = [{ words: now, time: activeTime }];
+        run = null;
       }
       updateEta();
+    };
+
+    // For the tests (tests/progress_test.js): what is counted as read, which
+    // words are on screen, and how far down them the reader can have got.
+    window._rsState = function() {
+      var rec = data.books[bookPath] || {};
+      var top = wordAtY(0);
+      return {
+        total: totalWords,
+        read: readWords,
+        ranges: (rec.ranges || []).slice(),
+        top: top,
+        bottom: isAtDocumentEnd() ? totalWords : wordAtY(window.innerHeight),
+        front: run ? run.f : top,
+        label: etaEl.textContent
+      };
     };
 
     // ── Reset reading progress button ──
@@ -971,9 +1142,11 @@
       var book = data.books[bookPath];
       book.maxWordsRead = 0;
       book.maxScroll = 0;
+      book.ranges = [];
       book.updatedAt = Date.now();
       book.resetAt = book.updatedAt;
-      delete book._lastJumpAt;
+      readWords = 0;
+      run = null;
       // Clear sessions for this book
       data.sessions = (data.sessions || []).filter(function(s) {
         return s.book !== bookPath;
@@ -984,7 +1157,6 @@
       activeTime = 0;
       _snapshots = [{ words: 0, time: 0 }];
       _lastSnapshotWords = 0;
-      _lastWordPos = 0;
       sessionWpm = 0;
       saveSpeedData(data, true);
       // Also clear the bookmark so resume bar doesn't restore
