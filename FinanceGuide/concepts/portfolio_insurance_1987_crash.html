@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Portfolio Insurance and the 1987 Crash - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.prog-stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(112px,1fr));
+  gap:10px; margin:1rem 0 1.5rem; }
+.prog-stat { background:#e8e0d0; border:1px solid #d4c8b0; border-radius:8px;
+  padding:0.7rem 0.9rem; }
+.prog-stat .n { display:block; font-size:1.5rem; color:#5a3e1a; line-height:1.1; }
+.prog-stat .l { display:block; font-size:0.75rem; color:#8a7a60; margin-top:0.2rem; }
+.prog-chart { position:relative; margin:0.5rem 0 0.4rem; }
+.prog-chart svg { width:100%; height:auto; display:block; overflow:visible; }
+.prog-chart .grid { stroke:#ddd3c0; stroke-width:1; }
+.prog-chart .axis { stroke:#c8bca4; stroke-width:1; }
+.prog-chart .tick { fill:#8a7a60; font-size:11px; }
+.prog-chart .ylab { fill:#8a7a60; font-size:11px; }
+.prog-chart .actual { fill:none; stroke:#9a5a22; stroke-width:2; stroke-linejoin:round; }
+.prog-chart .actual-dot { fill:#9a5a22; stroke:#f4efe8; stroke-width:2; }
+.prog-chart .model { fill:none; stroke:#0e9488; stroke-width:2; stroke-dasharray:6 4; }
+.prog-chart .ceiling { stroke:#8a7a60; stroke-width:1; stroke-dasharray:2 4; }
+.prog-chart .here { stroke:#9a5a22; stroke-width:1; stroke-dasharray:2 3; opacity:0.6; }
+.prog-chart .dlabel { font-size:11px; fill:#3a2e1e; }
+.prog-chart .bar { fill:#9a5a22; opacity:0.75; }
+.prog-chart .bar.spike { fill:#6b3410; opacity:1; }
+.prog-legend .lg-spike::before { border-color:#6b3410; border-top-width:6px; }
+.prog-spikes { font-size:0.88rem; color:#5a3e1a; margin:-0.8rem 0 1.5rem; }
+.prog-chart .bar-model { fill:none; stroke:#0e9488; stroke-width:2; stroke-dasharray:6 4; }
+.prog-chart .hit { fill:transparent; cursor:crosshair; }
+.prog-tip { position:absolute; pointer-events:none; display:none;
+  background:#3a2e1e; color:#f4efe8; font-size:12px; line-height:1.4;
+  padding:6px 9px; border-radius:6px; white-space:nowrap; z-index:5; }
+.prog-legend { display:flex; gap:1.2rem; font-size:0.8rem; color:#5a3e1a;
+  margin:0 0 1.5rem; flex-wrap:wrap; }
+.prog-legend span::before { content:""; display:inline-block; width:18px; height:0;
+  border-top:2px solid; margin-right:6px; vertical-align:middle; }
+.prog-legend .lg-actual::before { border-color:#9a5a22; }
+.prog-legend .lg-model::before { border-color:#0e9488; border-top-style:dashed; }
+.prog-legend .lg-ceiling::before { border-color:#8a7a60; border-top-style:dotted; }
+.prog-eq { background:#e8e0d0; border:1px solid #d4c8b0; border-radius:8px;
+  padding:0.9rem 1.1rem; font-family:Georgia,serif; font-size:1.05rem; color:#3a2e1e;
+  margin:1rem 0; }
+.prog-eq .sub { display:block; font-size:0.85rem; color:#8a7a60; margin-top:0.4rem;
+  font-family:inherit; }
+.prog-note { font-size:0.85rem; color:#8a7a60; }
+.prog-link { font-size:0.85rem; margin:-0.8rem 0 1.2rem; }
+.prog-link a { color:#0e9488; }
+.ch-status { font-size:0.85rem; color:#5a3e1a; margin:-0.6rem 0 1.2rem; }
+.ch-status.done { color:#0e6b5f; background:#e3efe9; border:1px solid #b9d8cc;
+  border-radius:6px; padding:0.5rem 0.8rem; margin:0 0 1.2rem; }
+table.prog-table { font-size:0.85rem; margin:1rem 0; }
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done,
+body.hide-done .cat-card.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+.vid-tab {
+  margin: 0 0 1.2rem; background: #e8e0d0; border: 1px solid #d4c8b0;
+  border-radius: 8px; overflow: hidden;
+}
+.vid-tab summary {
+  padding: 0.6rem 0.9rem; cursor: pointer; font-size: 0.85rem;
+  color: #3a2a1a; list-style: none; user-select: none;
+}
+.vid-tab summary::-webkit-details-marker { display: none; }
+.vid-tab summary::before {
+  content: '▶'; display: inline-block; margin-right: 0.5rem;
+  font-size: 0.7rem; transition: transform 0.2s;
+}
+.vid-tab[open] summary::before { transform: rotate(90deg); }
+.vid-tab .vid-status {
+  float: right; font-size: 0.75rem; padding: 0.15rem 0.5rem;
+  border-radius: 3px; margin-left: 0.5rem;
+}
+.vid-tab .vid-ok { background: #4ade8040; color: #2d6a4f; }
+.vid-tab .vid-err { background: #f8717140; color: #9b2c2c; }
+.vid-tab .vid-list {
+  padding: 0 0.9rem 0.7rem; margin: 0;
+  list-style: none; font-size: 0.8rem;
+}
+.vid-tab .vid-list li {
+  padding: 0.35rem 0; border-top: 1px solid #d4c8b0;
+  display: flex; justify-content: space-between; gap: 8px;
+}
+.vid-tab .vid-list .vid-date {
+  color: #a08060; white-space: nowrap; flex: none;
+}
+.vid-tab .vid-list .vid-concepts {
+  color: #a08060; white-space: nowrap; flex: none; font-size: 0.75rem;
+}
+.vid-tab .vid-none {
+  padding: 0.4rem 0.9rem 0.7rem; color: #a08060; font-size: 0.8rem;
+}
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../economic-history-financial-crises.html">&larr; Economic History &amp; Financial Crises</a>
+
+<div class="concept-meta"><span>standard</span><span>Economic History &amp; Financial Crises</span><span>added 2026-11-11</span></div>
+<h4 id="portfolio_insurance_1987_crash">Portfolio Insurance and the 1987 Crash</h4>
+
+<p><strong>Portfolio insurance</strong> was an investment strategy popular in the mid-1980s that promised to cap an investor's losses while keeping most of the upside. It did not work by buying a policy from an insurance company. It worked by trading. A computer-guided rule told the manager how much stock to hold at any moment, and that amount shrank as prices fell. If the market dropped, the program sold stock or sold <strong>stock index futures</strong>, which are contracts that track an index such as the S&P 500. If the market rose, it bought back in. The goal was to build, out of trades, a "floor" under the portfolio, similar to owning a protective put option.</p>
+
+<p>The reason this matters today is that 1987 is the standard example of what happens when many large investors follow the same rules at the same moment. On Monday, October 19, 1987, the S&P 500 fell about 20% in a single session, and the Dow dropped roughly 22%. It remains the worst one-day percentage decline in US stock market history. The <strong>Brady Commission</strong>, the presidential task force appointed to investigate, concluded that portfolio insurance did not create the underlying nervousness, but it helped turn a sharp decline into a rout. The lessons shaped today's market structure, including the <strong>circuit breakers</strong> that pause trading when prices fall too fast.</p>
+
+<p>Here is the mechanism, step by step. A pension fund holds $100 million of stock and wants to protect against a loss of more than about 5%. Instead of paying for options, the fund hires an insurer whose model computes a "delta," the share of the portfolio that should be in stocks given the current price, the floor, and the time left. Say the model starts at 80% stocks. The market falls. The model now says 70%. The insurer sells $10 million of stock exposure, usually in futures because they are cheap and fast. The market falls further, the model says 60%, and another sale follows. Selling is triggered by price, not by opinion about value.</p>
+
+<p>Now add the feedback loop, which is the heart of the story. Each insurer's sale pushes prices down a little. Lower prices push every insurer's model to sell more. The video describes the result in one line:</p>
+
+<blockquote>"The rules were all written in advance and they just all fired at once."</blockquote>
+
+<p>The numbers from that Monday show how it played out. According to the video, three portfolio insurers sold just under $2 billion of stock plus futures that day, worth about $2.8 billion of stock exposure, and SEC staff later estimated that at least $55 billion of stock was covered by portfolio insurance. Those sales were a modest share of total volume. But the unsold remainder was the real problem: other traders knew that a huge pool of insurance-driven selling still hung over the market, so they stepped back, and buyers vanished.</p>
+
+<p>Investors and analysts use the lesson as a signal-reading tool rather than a trading system. The question to ask on any violent day is whether the move is a verdict on the economy or on positioning. When selling comes from rule-based models, you can often spot it: the drop arrives without news, the futures market leads the stock market down, and prices fall in steps that look like waves. Many professionals watch estimates of systematic positioning, the way the video discusses Goldman Sachs's modeled flows for trend-following funds, to gauge how much mechanical selling or buying could be waiting in the wings.</p>
+
+<p>The biggest nuance is that today's <strong>CTAs</strong> (commodity trading advisors, the trend-following funds in the video) are not 1987 portfolio insurance. Portfolio insurance sold in order to guarantee a floor for one client's portfolio, and it was concentrated in a market far smaller than today's. Trend followers sell because price direction and volatility readings tell them to cut risk, and they hold many markets at once, so some of them are buying while others sell. The video makes the point explicitly: nobody is forecasting a repeat. The narrower lesson is that when a lot of money uses similar rules, it tends to lean the same way at the same time.</p>
+
+<p>A second nuance is the word "forced." Portfolio insurers in 1987 were bound by contracts promising a floor, so their selling really was close to mandatory. Today's trend followers are not under any such contract. Goldman's numbers are an estimate of what the funds' own rules would probably do, and the video compares them to a weather forecast, not a court order. Firms use different lookback windows and volatility settings, and they change them. Also, scale matters. The video notes that $31 billion is about 1.2% of a week's roughly $2.5 trillion of E-mini futures volume. That is a headwind, not a tidal wave.</p>
+
+<p>What happens when the system fails? In 1987 it failed in a way that exposed its central flaw: the insurance assumed you could always sell at or near the last price. When everyone sells at once, there is no one to take the other side, so prices gap down past the level the model expected, and the floor does not hold. Futures traded at a steep discount to the stocks underneath them, which confused the arbitrageurs who normally link the two markets, and some of the stock exchange's systems were overwhelmed by volume. The protection worked for the first sellers and failed for the later ones, which is exactly when it was needed.</p>
+
+<p>Several other ideas connect to this one. <strong>Volatility targeting</strong> is the modern cousin: the video explains that when the market gets twice as bumpy, a trend follower's position is cut roughly in half, which can mean selling into a bounce. <strong>Negative gamma</strong> in the options market, where dealers hedge by selling as prices fall and buying as prices rise, can make a move bigger, as the video notes about the zone from about 7,000 to 7,550 on the S&P. Finally, <strong>liquidity</strong>, the ability to trade without moving the price, ties it together. For your own portfolio, the practical takeaway is to ask why a fall is happening before reacting, since a mechanical move is not always a message about the economy.</p>
+<div class="concept-side">Related in this category: <a href="bank_sector_contagion.html">Bank Sector Contagion (Investor Flight to Safety)</a>, <a href="dot_com_bubble_comparison.html">Dot-Com Bubble Comparison (1999 Analogy)</a>, <a href="bank_run.html">Bank Run</a>, <a href="telecom_bubble_bust.html">Telecom Bubble and Bust (2000–2002)</a>, <a href="fdic_receivership_bridge_bank.html">FDIC Receivership and Bridge Bank Resolution</a>, <a href="depositor_preference_creditor_priority.html">Depositor Preference and Creditor Priority in Bank Failure</a></div>
+<button class="concept-done" data-slug="portfolio_insurance_1987_crash" onclick="toggleDone('portfolio_insurance_1987_crash')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_portfolio_insurance_1987_crash';</script>
+<script src="../../book.js"></script>
+<script src="../fg.js"></script>
+</body>
+</html>

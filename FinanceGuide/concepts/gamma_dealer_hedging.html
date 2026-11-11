@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Dealer Gamma Positioning (Short/Negative Gamma) - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.prog-stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(112px,1fr));
+  gap:10px; margin:1rem 0 1.5rem; }
+.prog-stat { background:#e8e0d0; border:1px solid #d4c8b0; border-radius:8px;
+  padding:0.7rem 0.9rem; }
+.prog-stat .n { display:block; font-size:1.5rem; color:#5a3e1a; line-height:1.1; }
+.prog-stat .l { display:block; font-size:0.75rem; color:#8a7a60; margin-top:0.2rem; }
+.prog-chart { position:relative; margin:0.5rem 0 0.4rem; }
+.prog-chart svg { width:100%; height:auto; display:block; overflow:visible; }
+.prog-chart .grid { stroke:#ddd3c0; stroke-width:1; }
+.prog-chart .axis { stroke:#c8bca4; stroke-width:1; }
+.prog-chart .tick { fill:#8a7a60; font-size:11px; }
+.prog-chart .ylab { fill:#8a7a60; font-size:11px; }
+.prog-chart .actual { fill:none; stroke:#9a5a22; stroke-width:2; stroke-linejoin:round; }
+.prog-chart .actual-dot { fill:#9a5a22; stroke:#f4efe8; stroke-width:2; }
+.prog-chart .model { fill:none; stroke:#0e9488; stroke-width:2; stroke-dasharray:6 4; }
+.prog-chart .ceiling { stroke:#8a7a60; stroke-width:1; stroke-dasharray:2 4; }
+.prog-chart .here { stroke:#9a5a22; stroke-width:1; stroke-dasharray:2 3; opacity:0.6; }
+.prog-chart .dlabel { font-size:11px; fill:#3a2e1e; }
+.prog-chart .bar { fill:#9a5a22; opacity:0.75; }
+.prog-chart .bar.spike { fill:#6b3410; opacity:1; }
+.prog-legend .lg-spike::before { border-color:#6b3410; border-top-width:6px; }
+.prog-spikes { font-size:0.88rem; color:#5a3e1a; margin:-0.8rem 0 1.5rem; }
+.prog-chart .bar-model { fill:none; stroke:#0e9488; stroke-width:2; stroke-dasharray:6 4; }
+.prog-chart .hit { fill:transparent; cursor:crosshair; }
+.prog-tip { position:absolute; pointer-events:none; display:none;
+  background:#3a2e1e; color:#f4efe8; font-size:12px; line-height:1.4;
+  padding:6px 9px; border-radius:6px; white-space:nowrap; z-index:5; }
+.prog-legend { display:flex; gap:1.2rem; font-size:0.8rem; color:#5a3e1a;
+  margin:0 0 1.5rem; flex-wrap:wrap; }
+.prog-legend span::before { content:""; display:inline-block; width:18px; height:0;
+  border-top:2px solid; margin-right:6px; vertical-align:middle; }
+.prog-legend .lg-actual::before { border-color:#9a5a22; }
+.prog-legend .lg-model::before { border-color:#0e9488; border-top-style:dashed; }
+.prog-legend .lg-ceiling::before { border-color:#8a7a60; border-top-style:dotted; }
+.prog-eq { background:#e8e0d0; border:1px solid #d4c8b0; border-radius:8px;
+  padding:0.9rem 1.1rem; font-family:Georgia,serif; font-size:1.05rem; color:#3a2e1e;
+  margin:1rem 0; }
+.prog-eq .sub { display:block; font-size:0.85rem; color:#8a7a60; margin-top:0.4rem;
+  font-family:inherit; }
+.prog-note { font-size:0.85rem; color:#8a7a60; }
+.prog-link { font-size:0.85rem; margin:-0.8rem 0 1.2rem; }
+.prog-link a { color:#0e9488; }
+.ch-status { font-size:0.85rem; color:#5a3e1a; margin:-0.6rem 0 1.2rem; }
+.ch-status.done { color:#0e6b5f; background:#e3efe9; border:1px solid #b9d8cc;
+  border-radius:6px; padding:0.5rem 0.8rem; margin:0 0 1.2rem; }
+table.prog-table { font-size:0.85rem; margin:1rem 0; }
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done,
+body.hide-done .cat-card.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+.vid-tab {
+  margin: 0 0 1.2rem; background: #e8e0d0; border: 1px solid #d4c8b0;
+  border-radius: 8px; overflow: hidden;
+}
+.vid-tab summary {
+  padding: 0.6rem 0.9rem; cursor: pointer; font-size: 0.85rem;
+  color: #3a2a1a; list-style: none; user-select: none;
+}
+.vid-tab summary::-webkit-details-marker { display: none; }
+.vid-tab summary::before {
+  content: '▶'; display: inline-block; margin-right: 0.5rem;
+  font-size: 0.7rem; transition: transform 0.2s;
+}
+.vid-tab[open] summary::before { transform: rotate(90deg); }
+.vid-tab .vid-status {
+  float: right; font-size: 0.75rem; padding: 0.15rem 0.5rem;
+  border-radius: 3px; margin-left: 0.5rem;
+}
+.vid-tab .vid-ok { background: #4ade8040; color: #2d6a4f; }
+.vid-tab .vid-err { background: #f8717140; color: #9b2c2c; }
+.vid-tab .vid-list {
+  padding: 0 0.9rem 0.7rem; margin: 0;
+  list-style: none; font-size: 0.8rem;
+}
+.vid-tab .vid-list li {
+  padding: 0.35rem 0; border-top: 1px solid #d4c8b0;
+  display: flex; justify-content: space-between; gap: 8px;
+}
+.vid-tab .vid-list .vid-date {
+  color: #a08060; white-space: nowrap; flex: none;
+}
+.vid-tab .vid-list .vid-concepts {
+  color: #a08060; white-space: nowrap; flex: none; font-size: 0.75rem;
+}
+.vid-tab .vid-none {
+  padding: 0.4rem 0.9rem 0.7rem; color: #a08060; font-size: 0.8rem;
+}
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../options-derivatives.html">&larr; Options &amp; Derivatives</a>
+
+<div class="concept-meta"><span>standard</span><span>Options &amp; Derivatives</span><span>added 2026-11-11</span></div>
+<h4 id="gamma_dealer_hedging">Dealer Gamma Positioning (Short/Negative Gamma)</h4>
+
+<p>Start with the vocabulary. An <strong>option</strong> is a contract giving the right, but not the obligation, to buy or sell something at a set price before a set date. Options are priced and traded by <strong>dealers</strong>, usually the options desks of big banks and market makers, who take the other side of what customers want. <strong>Delta</strong> measures how much an option's value changes when the underlying index moves by one point. <strong>Gamma</strong> measures how fast delta itself changes as the price moves. <strong>Dealer gamma positioning</strong> is the net gamma a dealer community holds across all its options books. When that total is negative, dealers are <strong>short gamma</strong>, and their hedging tends to amplify market moves instead of calming them.</p>
+
+<p>This matters because dealers hold enormous options positions, and they do not want to bet on market direction. They hedge by trading stock or futures, and those hedge trades are real orders that hit the market. Whether the hedging is stabilizing or destabilizing depends on the sign of their gamma. In a long-gamma regime, dealer hedging pushes against the market: they sell rallies and buy dips, which dampens volatility. In a short-gamma regime, they do the opposite. They sell into falling prices and buy into rising ones, which can turn an ordinary move into a violent one. It is one of the least visible forces behind why some days feel calm and others feel disorderly with no obvious news.</p>
+
+<p>Here is the mechanism, step by step. Say a dealer sells a customer a call option. The dealer now loses money if the market rises, so they buy some futures to offset it, just enough to be neutral. That amount is the option's delta. Now the market rises. The call is more likely to finish in the money, so its delta increases, and the dealer is suddenly under-hedged. To stay neutral, they must buy more. If they sold the option, they are short gamma: each rise forces more buying, and each fall forces more selling. The reverse holds for a dealer who owns options. They are long gamma, and they sell as prices rise and buy as prices fall, which leans against the move.</p>
+
+<p>The video gives a concrete case. On November 5, the options analytics firm SpotGamma estimated that dealers sat in negative gamma from roughly 7,000 to 7,550 on the S&P 500, with much of that exposure tied to the November 20 expiration. The Monday close was right around 7,550, the top edge of that zone. The S&P had fallen 4.4% to 7,353 on the previous Thursday, its worst day since April 2025, and that put the index squarely inside the negative-gamma band. Inside that band, any large move in either direction can be magnified by dealer hedging, whether it is a rebound or another leg down.</p>
+
+<blockquote>"Dealers hedge their own options books. When they are what traders call short gamma, hedging means selling as prices fall and buying as prices rise. That can make any move bigger."</blockquote>
+
+<p>Traders use gamma positioning as a map of where the market's shock absorbers are strong and where they are missing. Services such as SpotGamma estimate dealer exposure strike by strike and publish levels: a zone of positive gamma where moves tend to get dampened and prices pin, a "gamma flip" level where the sign changes, and a zone of negative gamma where ranges widen. A trader might tighten stops, cut position size, or avoid fading moves when the index trades inside negative gamma. Someone selling options may demand a higher price for the extra risk. Longer-term investors use it more modestly, as context for why a day's move looks outsized relative to the news.</p>
+
+<p>The video's most important correction concerns causality. A viral version of the story says that selling by CTAs, the trend-following funds, forces options dealers to short stock. The video called that backwards. Dealers do not hedge CTA futures trades. They hedge their own options books, and their hedging depends on gamma and on where the index is relative to its strikes. What gamma does is act as an amplifier: if CTAs sell and push the index down into a negative-gamma zone, dealer hedging can add to the selling. The two forces are separate and can reinforce each other, but one does not mechanically create the other.</p>
+
+<p>There are several other gotchas. Dealer gamma is an <em>estimate</em>, not a reported fact. Nobody publishes dealer books, so firms infer positions from open interest and assumptions about who is long and who is short, and different vendors can disagree, even on the sign. Gamma also changes constantly: as time passes, as prices move, and especially as options expire. That is why the video flags the November 20 expiration as a key date, since a large share of the positioning rolls off then and the map can change overnight. Finally, negative gamma is a tendency, not a guarantee. It makes big moves more likely and larger, but it says nothing about which direction they will go.</p>
+
+<p>When the framework fails, it usually fails in one of three ways. The estimate can simply be wrong, because customers' trades were misclassified or large positions were hedged elsewhere. Positioning can shift intraday as new options trade, so a map drawn in the morning is stale by the afternoon. And in extreme stress, hedging liquidity can vanish, so dealers cannot trade at sensible prices and moves overshoot any model. The worst case is a feedback loop: falling prices force selling, which pushes prices lower, which forces more selling. Circuit breakers and a far larger market make a repeat of 1987 less likely, but the loop itself is the risk.</p>
+
+<p>Gamma connects to the video's other themes. CTA trend followers and dealers are different actors with different rules. CTAs size positions by trend and volatility, while dealers hedge option exposure by price level. But both lean in the same direction in a selloff: the CTAs shrink because volatility is high, and short-gamma dealers sell into the decline. That is the "lean the same way at the same time" lesson, and it also echoes the 1987 portfolio insurance story, in which rule-based selling fed on itself. It also links to volatility: rising volatility raises CTA selling and often accompanies negative gamma. The practical takeaway is to ask whether a sharp move reflects the economy or just mechanics before reacting to it.</p>
+<div class="concept-side">Also called: Options Expiration (OpEx)<br>Related in this category: <a href="interest_rate_cap.html">Interest Rate Cap (Floating-Rate Debt Hedge)</a>, <a href="vix_implied_volatility.html">VIX / Implied Volatility</a>, <a href="stock_warrants.html">Stock Warrants</a>, <a href="treasury_futures.html">Treasury Futures</a>, <a href="credit_default_swap.html">Credit Default Swap (CDS)</a>, <a href="e_mini_sp500_futures.html">E-mini S&amp;P 500 Futures</a></div>
+<button class="concept-done" data-slug="gamma_dealer_hedging" onclick="toggleDone('gamma_dealer_hedging')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_gamma_dealer_hedging';</script>
+<script src="../../book.js"></script>
+<script src="../fg.js"></script>
+</body>
+</html>
