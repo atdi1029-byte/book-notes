@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>New York Fed Household Debt and Credit Report - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.prog-stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(112px,1fr));
+  gap:10px; margin:1rem 0 1.5rem; }
+.prog-stat { background:#e8e0d0; border:1px solid #d4c8b0; border-radius:8px;
+  padding:0.7rem 0.9rem; }
+.prog-stat .n { display:block; font-size:1.5rem; color:#5a3e1a; line-height:1.1; }
+.prog-stat .l { display:block; font-size:0.75rem; color:#8a7a60; margin-top:0.2rem; }
+.prog-chart { position:relative; margin:0.5rem 0 0.4rem; }
+.prog-chart svg { width:100%; height:auto; display:block; overflow:visible; }
+.prog-chart .grid { stroke:#ddd3c0; stroke-width:1; }
+.prog-chart .axis { stroke:#c8bca4; stroke-width:1; }
+.prog-chart .tick { fill:#8a7a60; font-size:11px; }
+.prog-chart .ylab { fill:#8a7a60; font-size:11px; }
+.prog-chart .actual { fill:none; stroke:#9a5a22; stroke-width:2; stroke-linejoin:round; }
+.prog-chart .actual-dot { fill:#9a5a22; stroke:#f4efe8; stroke-width:2; }
+.prog-chart .model { fill:none; stroke:#0e9488; stroke-width:2; stroke-dasharray:6 4; }
+.prog-chart .ceiling { stroke:#8a7a60; stroke-width:1; stroke-dasharray:2 4; }
+.prog-chart .here { stroke:#9a5a22; stroke-width:1; stroke-dasharray:2 3; opacity:0.6; }
+.prog-chart .dlabel { font-size:11px; fill:#3a2e1e; }
+.prog-chart .bar { fill:#9a5a22; opacity:0.75; }
+.prog-chart .bar.spike { fill:#6b3410; opacity:1; }
+.prog-legend .lg-spike::before { border-color:#6b3410; border-top-width:6px; }
+.prog-spikes { font-size:0.88rem; color:#5a3e1a; margin:-0.8rem 0 1.5rem; }
+.prog-chart .bar-model { fill:none; stroke:#0e9488; stroke-width:2; stroke-dasharray:6 4; }
+.prog-chart .hit { fill:transparent; cursor:crosshair; }
+.prog-tip { position:absolute; pointer-events:none; display:none;
+  background:#3a2e1e; color:#f4efe8; font-size:12px; line-height:1.4;
+  padding:6px 9px; border-radius:6px; white-space:nowrap; z-index:5; }
+.prog-legend { display:flex; gap:1.2rem; font-size:0.8rem; color:#5a3e1a;
+  margin:0 0 1.5rem; flex-wrap:wrap; }
+.prog-legend span::before { content:""; display:inline-block; width:18px; height:0;
+  border-top:2px solid; margin-right:6px; vertical-align:middle; }
+.prog-legend .lg-actual::before { border-color:#9a5a22; }
+.prog-legend .lg-model::before { border-color:#0e9488; border-top-style:dashed; }
+.prog-legend .lg-ceiling::before { border-color:#8a7a60; border-top-style:dotted; }
+.prog-eq { background:#e8e0d0; border:1px solid #d4c8b0; border-radius:8px;
+  padding:0.9rem 1.1rem; font-family:Georgia,serif; font-size:1.05rem; color:#3a2e1e;
+  margin:1rem 0; }
+.prog-eq .sub { display:block; font-size:0.85rem; color:#8a7a60; margin-top:0.4rem;
+  font-family:inherit; }
+.prog-note { font-size:0.85rem; color:#8a7a60; }
+.prog-link { font-size:0.85rem; margin:-0.8rem 0 1.2rem; }
+.prog-link a { color:#0e9488; }
+.ch-status { font-size:0.85rem; color:#5a3e1a; margin:-0.6rem 0 1.2rem; }
+.ch-status.done { color:#0e6b5f; background:#e3efe9; border:1px solid #b9d8cc;
+  border-radius:6px; padding:0.5rem 0.8rem; margin:0 0 1.2rem; }
+table.prog-table { font-size:0.85rem; margin:1rem 0; }
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done,
+body.hide-done .cat-card.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+.vid-tab {
+  margin: 0 0 1.2rem; background: #e8e0d0; border: 1px solid #d4c8b0;
+  border-radius: 8px; overflow: hidden;
+}
+.vid-tab summary {
+  padding: 0.6rem 0.9rem; cursor: pointer; font-size: 0.85rem;
+  color: #3a2a1a; list-style: none; user-select: none;
+}
+.vid-tab summary::-webkit-details-marker { display: none; }
+.vid-tab summary::before {
+  content: '▶'; display: inline-block; margin-right: 0.5rem;
+  font-size: 0.7rem; transition: transform 0.2s;
+}
+.vid-tab[open] summary::before { transform: rotate(90deg); }
+.vid-tab .vid-status {
+  float: right; font-size: 0.75rem; padding: 0.15rem 0.5rem;
+  border-radius: 3px; margin-left: 0.5rem;
+}
+.vid-tab .vid-ok { background: #4ade8040; color: #2d6a4f; }
+.vid-tab .vid-err { background: #f8717140; color: #9b2c2c; }
+.vid-tab .vid-list {
+  padding: 0 0.9rem 0.7rem; margin: 0;
+  list-style: none; font-size: 0.8rem;
+}
+.vid-tab .vid-list li {
+  padding: 0.35rem 0; border-top: 1px solid #d4c8b0;
+  display: flex; justify-content: space-between; gap: 8px;
+}
+.vid-tab .vid-list .vid-date {
+  color: #a08060; white-space: nowrap; flex: none;
+}
+.vid-tab .vid-list .vid-concepts {
+  color: #a08060; white-space: nowrap; flex: none; font-size: 0.75rem;
+}
+.vid-tab .vid-none {
+  padding: 0.4rem 0.9rem 0.7rem; color: #a08060; font-size: 0.8rem;
+}
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../economic-indicators.html">&larr; Economic Indicators</a>
+
+<div class="concept-meta"><span>standard</span><span>Economic Indicators</span><span>added 2026-11-12</span></div>
+<h4 id="new_york_fed_household_debt_report">New York Fed Household Debt and Credit Report</h4>
+
+<p>The <strong>New York Fed Household Debt and Credit Report</strong> is a quarterly snapshot of how much American households owe, to whom, and how well they are paying it back. The Federal Reserve Bank of New York builds it from the Consumer Credit Panel, an anonymized sample of credit files drawn from Equifax. Instead of surveying people about their debts, it counts the loans that actually appear on credit reports. It breaks the total into mortgages, home equity lines of credit, auto loans, credit cards, student loans, and other debt. Alongside balances it reports delinquency, meaning how many borrowers fall behind, plus foreclosures and bankruptcies. Think of it as a quarterly physical exam for the household sector.</p>
+
+<p>It matters because households are the engine of the U.S. economy. Consumer spending is roughly two-thirds of GDP, and whether people can keep spending depends on how heavy their debts are and whether they can service them. Rising balances with steady repayment suggest confidence and healthy credit access. Rising balances with rising delinquency suggest strain. Because the report is built from credit files, it catches stress early, often before it shows up in retail sales or unemployment. Banks use it to judge loan losses, the Fed uses it to see how its rate decisions are landing, and investors use it to gauge how much more borrowing the consumer can absorb.</p>
+
+<p>Mechanically, the New York Fed takes a representative sample of credit records and tracks each person's accounts over time. It adds up the balances in each category to get the headline totals. It also measures <strong>transition rates</strong>, which are flows between states. For example, it asks what share of a given kind of debt moved from current into 90-plus days late in this quarter. This "flow into serious delinquency" figure is more useful than the stock of bad debt, because it shows new trouble as it appears. The report also tracks new foreclosure notations, bankruptcy notations, and credit inquiries, which measure appetite for new loans. Everything is published with a lag, shortly after each quarter closes, and the numbers are not seasonally adjusted for every series.</p>
+
+<p>The video builds its story on the third-quarter report. Total household debt reached <strong>$19.1 trillion</strong>, up $334 billion, with mortgages making up $13.4 trillion of that. The New York Fed's economist called the increase moderate and said housing credit quality remained strong. The detail that mattered was further down. Home equity line of credit balances rose $23 billion to $481 billion, the largest increase since 2005 and the 18th straight quarterly rise. Credit card balances rose $22 billion to $1.29 trillion. Over the year, HELOCs added $59 billion and cards added $52 billion. A smaller market was adding more dollars than the one everyone watches as the consumer stress gauge.</p>
+
+<blockquote>"The house out borrowed the credit card."</blockquote>
+
+<p>Investors read the report in a few ways. First, they compare balance growth to delinquency flows. In the video, HELOC serious delinquency was 1.17%, down from 1.27% a year earlier, while cards ran 6.87% and mortgage flow into serious delinquency rose to 1.6% from 1.28%. That tells you the HELOC surge is not yet a credit problem, and the mortgage drift is a small step in the wrong direction. Second, they look at where borrowing is moving. A shift from unsecured cards to home-secured lines can be read as lenders and borrowers using the house as a cushion. Third, bank analysts watch limits too. HELOC credit limits grew $31 billion in the quarter, which shows lenders are leaning in. Traders then pair all this with rate expectations.</p>
+
+<p>There are real gotchas. Balances are not the same as stress. Debt rising in dollars is normal in a growing, inflating economy, so context such as income growth and delinquency matters more than the raw total. The big numbers also hide composition: $481 billion in HELOCs is only about 2.5% of household debt, and it is owed by people who by definition have equity. Another misconception is that comparisons to 2005 mean a replay of 2008. The video is explicit that lending standards today are not the no-questions-asked kind of that era. Finally, the report is backward-looking. It shows July through September, and the interest-rate effects of the Fed's September hike would only show up in later statements.</p>
+
+<p>The deeper point of the video is about rate structure. Roughly 49.1% of outstanding mortgages carry a rate below 4%, while new 30-year fixed loans sit near 7.18% to 7.3%. Nobody swaps a 3% mortgage for a 7% one to redo a kitchen, so they borrow through a HELOC instead. That preserves the cheap first mortgage, but a HELOC usually floats. Its rate is typically <strong>prime plus a margin</strong>. Prime was 7%, three points above the top of the Fed's 3.75% to 4% target range, and the average HELOC rate was 7.49% in early November. So the "shield" of a low fixed mortgage has a gap: any Fed hike lifts prime and, with it, the payment on that line.</p>
+
+<p>The video's arithmetic shows the exposure. Each quarter point adds about $250 a year in interest per $100,000 drawn. A half point adds $500. If all $481 billion floated, a quarter point would cost households roughly $1.2 billion a year, and a half point twice that. That is a ceiling rather than a forecast, since some lines let borrowers lock a fixed portion. Governor Waller had said he would support a quarter-point hike in December and would consider a half point if core inflation reached about 3%, and the data landed there. The December 9th meeting is the next test. Markets treated a quarter-point hike as nearly certain and a half point as a 10 to 15% long shot.</p>
+
+<p>When this indicator signals trouble, it shows up in a recognizable order. Credit cards crack first, because they are unsecured and carry the highest rates. Auto loans and then HELOCs follow, and mortgages usually go last because people protect their homes above all other debts. A HELOC sits behind the first mortgage, so in a foreclosure the lender holding it is paid second, and borrowers who owe on both face two payments on the same house and the same paycheck. If home prices fall, the equity cushion shrinks and lenders can freeze or cut lines, removing a source of cash just when households need it. The video stresses this is not 2008, but the watch item is what happens when the benchmark moves two or three more times.</p>
+
+<p>The report connects to several other concepts. The Fed's rate decisions flow directly into prime and into HELOC costs, so it links to the <strong>federal funds rate</strong> and FOMC policy. Inflation data, such as the October CPI showing core prices up 0.3% for a third straight month, shapes how aggressive the Fed becomes. The "lock-in effect" of sub-4% mortgages ties it to housing market liquidity, since owners stay put rather than sell. Fed funds futures show what traders expect next. To follow the story, watch four things: the next report's HELOC delinquency flow, whether card and mortgage delinquencies keep rising, the December Fed decision, and the gap between old mortgage rates and new ones.</p>
+<div class="concept-side">Related in this category: <a href="non_farm_payroll_report.html">Non-Farm Payroll (NFP) Report</a>, <a href="u6_unemployment_rate.html">U6 Unemployment Rate (Broad Labor Underutilization)</a>, <a href="adp_employment_report.html">ADP National Employment Report</a>, <a href="payroll_data_revision.html">Payroll Data Revision (BLS Benchmark Revision)</a>, <a href="challenger_gray_christmas_layoff_report.html">Challenger, Gray &amp; Christmas Job Cut Report</a>, <a href="average_hourly_earnings.html">Average Hourly Earnings (Wage Growth)</a></div>
+<button class="concept-done" data-slug="new_york_fed_household_debt_report" onclick="toggleDone('new_york_fed_household_debt_report')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_new_york_fed_household_debt_report';</script>
+<script src="../../book.js"></script>
+<script src="../fg.js"></script>
+</body>
+</html>

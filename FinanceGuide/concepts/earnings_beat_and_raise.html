@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Beat and Raise - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.prog-stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(112px,1fr));
+  gap:10px; margin:1rem 0 1.5rem; }
+.prog-stat { background:#e8e0d0; border:1px solid #d4c8b0; border-radius:8px;
+  padding:0.7rem 0.9rem; }
+.prog-stat .n { display:block; font-size:1.5rem; color:#5a3e1a; line-height:1.1; }
+.prog-stat .l { display:block; font-size:0.75rem; color:#8a7a60; margin-top:0.2rem; }
+.prog-chart { position:relative; margin:0.5rem 0 0.4rem; }
+.prog-chart svg { width:100%; height:auto; display:block; overflow:visible; }
+.prog-chart .grid { stroke:#ddd3c0; stroke-width:1; }
+.prog-chart .axis { stroke:#c8bca4; stroke-width:1; }
+.prog-chart .tick { fill:#8a7a60; font-size:11px; }
+.prog-chart .ylab { fill:#8a7a60; font-size:11px; }
+.prog-chart .actual { fill:none; stroke:#9a5a22; stroke-width:2; stroke-linejoin:round; }
+.prog-chart .actual-dot { fill:#9a5a22; stroke:#f4efe8; stroke-width:2; }
+.prog-chart .model { fill:none; stroke:#0e9488; stroke-width:2; stroke-dasharray:6 4; }
+.prog-chart .ceiling { stroke:#8a7a60; stroke-width:1; stroke-dasharray:2 4; }
+.prog-chart .here { stroke:#9a5a22; stroke-width:1; stroke-dasharray:2 3; opacity:0.6; }
+.prog-chart .dlabel { font-size:11px; fill:#3a2e1e; }
+.prog-chart .bar { fill:#9a5a22; opacity:0.75; }
+.prog-chart .bar.spike { fill:#6b3410; opacity:1; }
+.prog-legend .lg-spike::before { border-color:#6b3410; border-top-width:6px; }
+.prog-spikes { font-size:0.88rem; color:#5a3e1a; margin:-0.8rem 0 1.5rem; }
+.prog-chart .bar-model { fill:none; stroke:#0e9488; stroke-width:2; stroke-dasharray:6 4; }
+.prog-chart .hit { fill:transparent; cursor:crosshair; }
+.prog-tip { position:absolute; pointer-events:none; display:none;
+  background:#3a2e1e; color:#f4efe8; font-size:12px; line-height:1.4;
+  padding:6px 9px; border-radius:6px; white-space:nowrap; z-index:5; }
+.prog-legend { display:flex; gap:1.2rem; font-size:0.8rem; color:#5a3e1a;
+  margin:0 0 1.5rem; flex-wrap:wrap; }
+.prog-legend span::before { content:""; display:inline-block; width:18px; height:0;
+  border-top:2px solid; margin-right:6px; vertical-align:middle; }
+.prog-legend .lg-actual::before { border-color:#9a5a22; }
+.prog-legend .lg-model::before { border-color:#0e9488; border-top-style:dashed; }
+.prog-legend .lg-ceiling::before { border-color:#8a7a60; border-top-style:dotted; }
+.prog-eq { background:#e8e0d0; border:1px solid #d4c8b0; border-radius:8px;
+  padding:0.9rem 1.1rem; font-family:Georgia,serif; font-size:1.05rem; color:#3a2e1e;
+  margin:1rem 0; }
+.prog-eq .sub { display:block; font-size:0.85rem; color:#8a7a60; margin-top:0.4rem;
+  font-family:inherit; }
+.prog-note { font-size:0.85rem; color:#8a7a60; }
+.prog-link { font-size:0.85rem; margin:-0.8rem 0 1.2rem; }
+.prog-link a { color:#0e9488; }
+.ch-status { font-size:0.85rem; color:#5a3e1a; margin:-0.6rem 0 1.2rem; }
+.ch-status.done { color:#0e6b5f; background:#e3efe9; border:1px solid #b9d8cc;
+  border-radius:6px; padding:0.5rem 0.8rem; margin:0 0 1.2rem; }
+table.prog-table { font-size:0.85rem; margin:1rem 0; }
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done,
+body.hide-done .cat-card.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+.vid-tab {
+  margin: 0 0 1.2rem; background: #e8e0d0; border: 1px solid #d4c8b0;
+  border-radius: 8px; overflow: hidden;
+}
+.vid-tab summary {
+  padding: 0.6rem 0.9rem; cursor: pointer; font-size: 0.85rem;
+  color: #3a2a1a; list-style: none; user-select: none;
+}
+.vid-tab summary::-webkit-details-marker { display: none; }
+.vid-tab summary::before {
+  content: '▶'; display: inline-block; margin-right: 0.5rem;
+  font-size: 0.7rem; transition: transform 0.2s;
+}
+.vid-tab[open] summary::before { transform: rotate(90deg); }
+.vid-tab .vid-status {
+  float: right; font-size: 0.75rem; padding: 0.15rem 0.5rem;
+  border-radius: 3px; margin-left: 0.5rem;
+}
+.vid-tab .vid-ok { background: #4ade8040; color: #2d6a4f; }
+.vid-tab .vid-err { background: #f8717140; color: #9b2c2c; }
+.vid-tab .vid-list {
+  padding: 0 0.9rem 0.7rem; margin: 0;
+  list-style: none; font-size: 0.8rem;
+}
+.vid-tab .vid-list li {
+  padding: 0.35rem 0; border-top: 1px solid #d4c8b0;
+  display: flex; justify-content: space-between; gap: 8px;
+}
+.vid-tab .vid-list .vid-date {
+  color: #a08060; white-space: nowrap; flex: none;
+}
+.vid-tab .vid-list .vid-concepts {
+  color: #a08060; white-space: nowrap; flex: none; font-size: 0.75rem;
+}
+.vid-tab .vid-none {
+  padding: 0.4rem 0.9rem 0.7rem; color: #a08060; font-size: 0.8rem;
+}
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../value-investing-equities.html">&larr; Value Investing &amp; Equities</a>
+
+<div class="concept-meta"><span>standard</span><span>Value Investing &amp; Equities</span><span>added 2026-11-12</span></div>
+<h4 id="earnings_beat_and_raise">Beat and Raise</h4>
+
+<p>A <strong>beat and raise</strong> is what happens when a public company reports quarterly results that come in above what Wall Street analysts expected, and then also lifts its forecast for the coming quarter or year. Two separate things are happening. The "beat" is backward-looking: revenue, earnings per share, or both exceeded the consensus estimate, which is the average of the analysts who follow the stock. The "raise" is forward-looking: management increases its <strong>guidance</strong>, the official outlook it gives investors for future results. Of the two, the raise usually matters more. The beat tells you the past quarter was good. The raise tells you management expects the future to be better than everyone assumed.</p>
+
+<p>It matters because stock prices are built on expectations about future cash flows, not on what already happened. A company can earn a record profit and still see its stock fall if investors hoped for more. A beat and raise is the cleanest signal that expectations were too low and have to be revised upward. When that happens at a large, widely owned company, the effect spreads. Analysts change their models, fund managers change their positions, and index-level moves follow. In the video, a beat and raise from CoreWeave, which the host pronounces "Cororee," helped lift the S&P 500 by 1.31% to 7619 and the Nasdaq by 1.6%. One company's report can move an entire theme.</p>
+
+<p>The mechanism runs in steps. First, before earnings, analysts publish estimates and the market settles on a consensus. Second, the company reports, usually after the close, and everyone compares the actual numbers with that consensus. Third, management holds a conference call and updates guidance. Fourth, analysts rewrite their forecasts within hours, and those new numbers become the new baseline. Fifth, the stock reprices, often immediately in after-hours trading. Because the stock already reflected the old consensus, any move comes from the <em>surprise</em>, the gap between reality and expectation. The size of the beat matters, but so does how much the raise exceeds what the market had quietly hoped for, often called the "whisper number."</p>
+
+<p>The video gives a clean example. The host opens with the line:</p>
+
+<blockquote>"Yesterday, the AI trade came back from the dead, and this morning, it's back on the table. A beat and a raise from Cororee lifted the S&P 500 1.31% to 7619."</blockquote>
+
+<p>Look at what moved. The Nasdaq gained 1.6%, the Dow added a smaller amount, and the small-cap Russell 2000 rose less than the large-cap indexes. The equal-weight S&P lagged with a smaller gain than the regular S&P. The host explains why: "That makes sense given who drove the trade yesterday." The beat and raise lifted AI infrastructure names, which are heavily weighted in cap-weighted indexes, so the headline index outran the average stock. Advancers beat decliners 1.48 to 1 on the NYSE, which is positive breadth but not a broad celebration.</p>
+
+<p>Traders and investors use beat and raise as a signal in several ways. Short-term traders look at the after-hours reaction and the first thirty minutes of the next session to judge whether the news is being bought or sold. Longer-term investors watch for a pattern: companies that string together several beat-and-raise quarters often see a steady rise in estimates, and stocks tend to follow estimates upward. Others read through to peers. When a company in a supply chain raises its outlook, its customers and suppliers get a bump too. The host does this on air, noting that the "read through is pretty simple. When one company carries the theme, one headline reprices the theme." AMD and Broadcom rose pre-market even as Nvidia slid.</p>
+
+<p>There are nuances that trip people up. The first is that "beat" is relative to a bar that analysts and management help set. Companies often guide conservatively so they can beat easily, which is why most companies beat estimates in a typical quarter. A beat alone is therefore weak evidence. The second is that the raise has to be judged against expectations, not against the old guidance. If management raises its outlook by 3% and the market expected 8%, the stock can fall. The third is quality: a beat driven by one-time gains, cost cutting, buybacks that shrink the share count, or pulled-forward demand is worth less than one driven by organic revenue growth. Read the details, not just the headline.</p>
+
+<p>The video also shows how fragile the effect can be. A day after CoreWeave's surge, the host reports that CoreWeave was "down about 7% pre-market... giving back a chunk of its surge from yesterday." The cause was not the earnings. It was a report that Nvidia's board was weighing a leadership change, and Nvidia fell about 7% as well. This is the first failure mode: good company news gets overwhelmed by a bigger theme-level shock. The host puts it this way: "all roads lead to Nvidia." A beat and raise lifts a stock on the day, but it does not protect it from what happens to its biggest partner, customer, or supplier.</p>
+
+<p>Other failure modes are worth knowing. Companies that beat and raise can still be sold if the stock had already run up and the good news was "priced in." Guidance can also be raised and then missed later, which usually punishes the stock more severely, because trust is gone. And the macro backdrop can swamp everything. The host stresses that the 10-year Treasury yield sits around 5%, that futures treat a December Fed rate hike as nearly certain, and that "much of the AI buildout runs on borrowed money." When financing costs rise, even a raised forecast can lose value, because the same future profits are discounted at a higher rate and capital-hungry businesses have to pay more to grow.</p>
+
+<p>Beat and raise connects to several other ideas. It is a form of <strong>earnings surprise</strong>, and it feeds <strong>post-earnings announcement drift</strong>, the tendency of stocks to keep moving in the direction of the surprise for days or weeks. It ties to valuation: a higher earnings forecast lowers the price-to-earnings multiple on forward numbers, which can make a stock look cheaper even after it jumps. It also connects to <strong>market breadth</strong> and <strong>cap-weighting</strong>, as the equal-weight lag shows, and to <strong>interest rates and discount rates</strong>, as the Treasury auction discussion shows. Someone who understands all of this can look at a headline like "beat and raise lifts the S&P" and ask the right questions: how big was the surprise, who else benefits, and what could overpower it?</p>
+<div class="concept-side">Related in this category: <a href="comparable_store_sales.html">Comparable Store Sales (Same-Store Sales)</a>, <a href="economic_moat.html">Economic Moat (Competitive Moat)</a>, <a href="earnings_guidance.html">Earnings Guidance (Forward Guidance — Corporate)</a>, <a href="discounted_cash_flow_valuation.html">Discounted Cash Flow (DCF) Valuation</a>, <a href="corporate_stock_buybacks.html">Corporate Stock Buybacks (Share Repurchase Programs)</a>, <a href="buyback_blackout_window.html">Buyback Blackout Window</a></div>
+<button class="concept-done" data-slug="earnings_beat_and_raise" onclick="toggleDone('earnings_beat_and_raise')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_earnings_beat_and_raise';</script>
+<script src="../../book.js"></script>
+<script src="../fg.js"></script>
+</body>
+</html>

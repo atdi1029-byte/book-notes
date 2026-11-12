@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Hedge Fund Year-End Positioning - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.prog-stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(112px,1fr));
+  gap:10px; margin:1rem 0 1.5rem; }
+.prog-stat { background:#e8e0d0; border:1px solid #d4c8b0; border-radius:8px;
+  padding:0.7rem 0.9rem; }
+.prog-stat .n { display:block; font-size:1.5rem; color:#5a3e1a; line-height:1.1; }
+.prog-stat .l { display:block; font-size:0.75rem; color:#8a7a60; margin-top:0.2rem; }
+.prog-chart { position:relative; margin:0.5rem 0 0.4rem; }
+.prog-chart svg { width:100%; height:auto; display:block; overflow:visible; }
+.prog-chart .grid { stroke:#ddd3c0; stroke-width:1; }
+.prog-chart .axis { stroke:#c8bca4; stroke-width:1; }
+.prog-chart .tick { fill:#8a7a60; font-size:11px; }
+.prog-chart .ylab { fill:#8a7a60; font-size:11px; }
+.prog-chart .actual { fill:none; stroke:#9a5a22; stroke-width:2; stroke-linejoin:round; }
+.prog-chart .actual-dot { fill:#9a5a22; stroke:#f4efe8; stroke-width:2; }
+.prog-chart .model { fill:none; stroke:#0e9488; stroke-width:2; stroke-dasharray:6 4; }
+.prog-chart .ceiling { stroke:#8a7a60; stroke-width:1; stroke-dasharray:2 4; }
+.prog-chart .here { stroke:#9a5a22; stroke-width:1; stroke-dasharray:2 3; opacity:0.6; }
+.prog-chart .dlabel { font-size:11px; fill:#3a2e1e; }
+.prog-chart .bar { fill:#9a5a22; opacity:0.75; }
+.prog-chart .bar.spike { fill:#6b3410; opacity:1; }
+.prog-legend .lg-spike::before { border-color:#6b3410; border-top-width:6px; }
+.prog-spikes { font-size:0.88rem; color:#5a3e1a; margin:-0.8rem 0 1.5rem; }
+.prog-chart .bar-model { fill:none; stroke:#0e9488; stroke-width:2; stroke-dasharray:6 4; }
+.prog-chart .hit { fill:transparent; cursor:crosshair; }
+.prog-tip { position:absolute; pointer-events:none; display:none;
+  background:#3a2e1e; color:#f4efe8; font-size:12px; line-height:1.4;
+  padding:6px 9px; border-radius:6px; white-space:nowrap; z-index:5; }
+.prog-legend { display:flex; gap:1.2rem; font-size:0.8rem; color:#5a3e1a;
+  margin:0 0 1.5rem; flex-wrap:wrap; }
+.prog-legend span::before { content:""; display:inline-block; width:18px; height:0;
+  border-top:2px solid; margin-right:6px; vertical-align:middle; }
+.prog-legend .lg-actual::before { border-color:#9a5a22; }
+.prog-legend .lg-model::before { border-color:#0e9488; border-top-style:dashed; }
+.prog-legend .lg-ceiling::before { border-color:#8a7a60; border-top-style:dotted; }
+.prog-eq { background:#e8e0d0; border:1px solid #d4c8b0; border-radius:8px;
+  padding:0.9rem 1.1rem; font-family:Georgia,serif; font-size:1.05rem; color:#3a2e1e;
+  margin:1rem 0; }
+.prog-eq .sub { display:block; font-size:0.85rem; color:#8a7a60; margin-top:0.4rem;
+  font-family:inherit; }
+.prog-note { font-size:0.85rem; color:#8a7a60; }
+.prog-link { font-size:0.85rem; margin:-0.8rem 0 1.2rem; }
+.prog-link a { color:#0e9488; }
+.ch-status { font-size:0.85rem; color:#5a3e1a; margin:-0.6rem 0 1.2rem; }
+.ch-status.done { color:#0e6b5f; background:#e3efe9; border:1px solid #b9d8cc;
+  border-radius:6px; padding:0.5rem 0.8rem; margin:0 0 1.2rem; }
+table.prog-table { font-size:0.85rem; margin:1rem 0; }
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done,
+body.hide-done .cat-card.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+.vid-tab {
+  margin: 0 0 1.2rem; background: #e8e0d0; border: 1px solid #d4c8b0;
+  border-radius: 8px; overflow: hidden;
+}
+.vid-tab summary {
+  padding: 0.6rem 0.9rem; cursor: pointer; font-size: 0.85rem;
+  color: #3a2a1a; list-style: none; user-select: none;
+}
+.vid-tab summary::-webkit-details-marker { display: none; }
+.vid-tab summary::before {
+  content: '▶'; display: inline-block; margin-right: 0.5rem;
+  font-size: 0.7rem; transition: transform 0.2s;
+}
+.vid-tab[open] summary::before { transform: rotate(90deg); }
+.vid-tab .vid-status {
+  float: right; font-size: 0.75rem; padding: 0.15rem 0.5rem;
+  border-radius: 3px; margin-left: 0.5rem;
+}
+.vid-tab .vid-ok { background: #4ade8040; color: #2d6a4f; }
+.vid-tab .vid-err { background: #f8717140; color: #9b2c2c; }
+.vid-tab .vid-list {
+  padding: 0 0.9rem 0.7rem; margin: 0;
+  list-style: none; font-size: 0.8rem;
+}
+.vid-tab .vid-list li {
+  padding: 0.35rem 0; border-top: 1px solid #d4c8b0;
+  display: flex; justify-content: space-between; gap: 8px;
+}
+.vid-tab .vid-list .vid-date {
+  color: #a08060; white-space: nowrap; flex: none;
+}
+.vid-tab .vid-list .vid-concepts {
+  color: #a08060; white-space: nowrap; flex: none; font-size: 0.75rem;
+}
+.vid-tab .vid-none {
+  padding: 0.4rem 0.9rem 0.7rem; color: #a08060; font-size: 0.8rem;
+}
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../portfolio-management-asset-allocation.html">&larr; Portfolio Management &amp; Asset Allocation</a>
+
+<div class="concept-meta"><span>deep cut</span><span>Portfolio Management &amp; Asset Allocation</span><span>added 2026-11-12</span></div>
+<h4 id="hedge_fund_year_end_positioning">Hedge Fund Year-End Positioning</h4>
+
+<p><strong>Hedge fund year-end positioning</strong> is the way professional money managers change their portfolios as the calendar year closes. A <strong>hedge fund</strong> is a privately run investment pool for wealthy individuals and institutions. It can use leverage, short selling, and derivatives, and it charges fees tied to performance, typically around 20% of profits above some hurdle. Because those fees and the fund's reputation are measured on a calendar-year scorecard, December 31 works like a deadline. In the second half of November, managers start deciding whether to protect what they've earned, cut what has hurt them, or take more risk to catch up. That mix of incentives produces the behavior traders call "year-end positioning."</p>
+
+<p>It matters because hedge funds are a small share of total market assets but a large share of daily trading. Many of them trade fast, trade big, and borrow to do it. When a lot of them move in the same direction at once, prices can jump or drop by more than the news would justify. That affects the stocks and sectors you own through index funds and retirement accounts, even though you never see the trades. It also explains days when the market falls with no obvious headline, or a stock rallies for no clear reason. Sometimes the cause is plumbing: managers adjusting books before a deadline, not a change in the economy.</p>
+
+<p>The mechanics start with the fee structure. Most hedge funds are paid on <strong>performance fees</strong>, and many have a <strong>high-water mark</strong>, meaning they only earn fees on gains above the fund's previous peak. A manager who is up 18% by November has a lot to lose if the market turns, because a bad December can shrink the bonus pool and the fund's track record. So the manager takes risk off, selling winners and trimming <strong>gross exposure</strong> (total longs plus shorts). A manager who is down has the opposite pressure: nothing to protect, and a possible incentive to swing harder. Investors can also request <strong>redemptions</strong> (withdrawals) at year-end, which can force selling to raise cash.</p>
+
+<p>Leverage makes all this sharper. A fund running 4x gross leverage, meaning $4 of positions for every $1 of capital, sees a 1% move in its holdings become a 4% move in its own results. Lenders, called prime brokers, set <strong>margin</strong> requirements, and if losses eat the cushion, the fund gets a margin call and must sell, whatever its view. Risk managers also set drawdown limits, such as "cut exposure by half if we lose 5% in a month." Those rules are mechanical. They are why a fund can dump positions it still likes, and why funds' selling tends to arrive in clusters rather than one at a time.</p>
+
+<p>The November 12, 2026 session shows the pattern. The S&P 500 had jumped 1.31% to 7619 the day before on a strong report from CoreWeave, which revived the AI trade. Overnight, reports that Nvidia's board was weighing a leadership change pushed Nvidia down about 7% pre-market, and Nasdaq 100 futures fell roughly 0.7%. The presenter noted evidence that hedge funds had been "jumping all over the place," and added:</p>
+
+<blockquote>"They're highly leveraged, so that sort of makes sense in a volatile market when it goes against them. And also they're a bit twitchy this time of year running into the end of the year. Afraid that they won't be able to lock in some of their gains if they even have them."</blockquote>
+
+<p>The backdrop made that twitchiness reasonable. The 10-year Treasury yield sat just above 5%, a hot CPI report on Tuesday had pushed the 2-year up 17 basis points in one session, and futures treated a December rate hike as nearly certain. Crowded AI positions were also exposed to a single headline about Nvidia, the anchor of the whole theme. A fund holding big AI winners, financed with borrowed money, faced rising financing costs and a concentrated risk with seven weeks left in the year. Taking some profit before December would be a rational move for many of them, and it also explains the sharp same-day reversals.</p>
+
+<p>Traders watch for year-end positioning in a few ways. One is price action that looks out of proportion to the news: a stock that drops 7% on a report and then keeps sliding as the day goes on can suggest forced or deadline-driven selling. Another is rotation. The presenter's checkpoint was whether the equal-weight S&P stays green while the Nasdaq bleeds, which would signal "a rotation, not a liquidation." If money moves from crowded winners into laggards, that looks like rebalancing. If everything falls together, that looks like leverage being unwound. Traders also track prime broker reports on hedge fund exposure, crowded-trade lists, and volume in the final weeks of December, when thin liquidity amplifies every order.</p>
+
+<p>There are several gotchas. First, "year-end positioning" is a tendency, not a law. Funds differ widely in their fiscal years, strategies, and incentives, and any single day's move can have a cause that has nothing to do with the calendar. Second, commentators often use it as a catch-all explanation after the fact, and it is hard to prove. Third, the direction is not fixed. Some funds de-risk early to lock in gains, which can lead to a quiet or choppy December, while underperformers may chase returns, helping the so-called <strong>Santa Claus rally</strong> or a late-year squeeze in heavily shorted names. Fourth, the presenter's wording matters: "if they even have them." Not every fund has gains to protect, and a fund that is behind behaves very differently.</p>
+
+<p>When it goes wrong, it goes wrong through crowding and leverage together. If many funds hold the same winners, such as AI infrastructure names, and all try to sell at once, there are few buyers, and prices gap down. Falling prices trigger margin calls and risk-limit cuts, which cause more selling, a loop known as a <strong>deleveraging spiral</strong>. The best-known examples are the quant fund losses of August 2007 and the Archegos collapse in 2021, where borrowed, concentrated positions had to be dumped quickly. Thin year-end liquidity makes it worse. The risk for ordinary investors is not that hedge funds fail, but that forced selling pulls down good assets for reasons unrelated to their value, and you shouldn't read those drops as news about the underlying companies.</p>
+
+<p>Year-end positioning connects to several other ideas covered in this guide. It is a cousin of <strong>rebalancing</strong> and <strong>tax-loss harvesting</strong>, other calendar-driven behaviors that bunch trades near December. It links to <strong>market breadth</strong> and sector rotation, the tools the presenter used to separate rotation from liquidation. It ties to <strong>crowded trades</strong> and concentration risk, which is why a single Nvidia headline can move the whole AI complex. And it connects to interest rates: with the 10-year near 5% and a 30-year Treasury auction at 1:00 p.m., higher borrowing costs raise the price of leverage itself, which is what makes a leveraged fund twitchier. A good rule for conversation is to treat positioning as context for how a move happens, not as a forecast of where prices end up.</p>
+<div class="concept-side">Related in this category: <a href="etf_fund_flows.html">ETF Fund Flows</a>, <a href="valuation_multiples_rate_sensitivity.html">Valuation Multiples and Rate Sensitivity</a>, <a href="money_market_funds.html">Money Market Funds</a>, <a href="russell_2000_small_cap_index.html">Russell 2000 Small Cap Index</a>, <a href="algorithmic_trading_repricing.html">Algorithmic Trading and Instant Repricing</a>, <a href="leverage_amplification.html">Leverage Amplification in Trading</a></div>
+<button class="concept-done" data-slug="hedge_fund_year_end_positioning" onclick="toggleDone('hedge_fund_year_end_positioning')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_hedge_fund_year_end_positioning';</script>
+<script src="../../book.js"></script>
+<script src="../fg.js"></script>
+</body>
+</html>
