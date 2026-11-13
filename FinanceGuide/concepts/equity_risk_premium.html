@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Equity Risk Premium - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.prog-stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(112px,1fr));
+  gap:10px; margin:1rem 0 1.5rem; }
+.prog-stat { background:#e8e0d0; border:1px solid #d4c8b0; border-radius:8px;
+  padding:0.7rem 0.9rem; }
+.prog-stat .n { display:block; font-size:1.5rem; color:#5a3e1a; line-height:1.1; }
+.prog-stat .l { display:block; font-size:0.75rem; color:#8a7a60; margin-top:0.2rem; }
+.prog-chart { position:relative; margin:0.5rem 0 0.4rem; }
+.prog-chart svg { width:100%; height:auto; display:block; overflow:visible; }
+.prog-chart .grid { stroke:#ddd3c0; stroke-width:1; }
+.prog-chart .axis { stroke:#c8bca4; stroke-width:1; }
+.prog-chart .tick { fill:#8a7a60; font-size:11px; }
+.prog-chart .ylab { fill:#8a7a60; font-size:11px; }
+.prog-chart .actual { fill:none; stroke:#9a5a22; stroke-width:2; stroke-linejoin:round; }
+.prog-chart .actual-dot { fill:#9a5a22; stroke:#f4efe8; stroke-width:2; }
+.prog-chart .model { fill:none; stroke:#0e9488; stroke-width:2; stroke-dasharray:6 4; }
+.prog-chart .ceiling { stroke:#8a7a60; stroke-width:1; stroke-dasharray:2 4; }
+.prog-chart .here { stroke:#9a5a22; stroke-width:1; stroke-dasharray:2 3; opacity:0.6; }
+.prog-chart .dlabel { font-size:11px; fill:#3a2e1e; }
+.prog-chart .bar { fill:#9a5a22; opacity:0.75; }
+.prog-chart .bar.spike { fill:#6b3410; opacity:1; }
+.prog-legend .lg-spike::before { border-color:#6b3410; border-top-width:6px; }
+.prog-spikes { font-size:0.88rem; color:#5a3e1a; margin:-0.8rem 0 1.5rem; }
+.prog-chart .bar-model { fill:none; stroke:#0e9488; stroke-width:2; stroke-dasharray:6 4; }
+.prog-chart .hit { fill:transparent; cursor:crosshair; }
+.prog-tip { position:absolute; pointer-events:none; display:none;
+  background:#3a2e1e; color:#f4efe8; font-size:12px; line-height:1.4;
+  padding:6px 9px; border-radius:6px; white-space:nowrap; z-index:5; }
+.prog-legend { display:flex; gap:1.2rem; font-size:0.8rem; color:#5a3e1a;
+  margin:0 0 1.5rem; flex-wrap:wrap; }
+.prog-legend span::before { content:""; display:inline-block; width:18px; height:0;
+  border-top:2px solid; margin-right:6px; vertical-align:middle; }
+.prog-legend .lg-actual::before { border-color:#9a5a22; }
+.prog-legend .lg-model::before { border-color:#0e9488; border-top-style:dashed; }
+.prog-legend .lg-ceiling::before { border-color:#8a7a60; border-top-style:dotted; }
+.prog-eq { background:#e8e0d0; border:1px solid #d4c8b0; border-radius:8px;
+  padding:0.9rem 1.1rem; font-family:Georgia,serif; font-size:1.05rem; color:#3a2e1e;
+  margin:1rem 0; }
+.prog-eq .sub { display:block; font-size:0.85rem; color:#8a7a60; margin-top:0.4rem;
+  font-family:inherit; }
+.prog-note { font-size:0.85rem; color:#8a7a60; }
+.prog-link { font-size:0.85rem; margin:-0.8rem 0 1.2rem; }
+.prog-link a { color:#0e9488; }
+.ch-status { font-size:0.85rem; color:#5a3e1a; margin:-0.6rem 0 1.2rem; }
+.ch-status.done { color:#0e6b5f; background:#e3efe9; border:1px solid #b9d8cc;
+  border-radius:6px; padding:0.5rem 0.8rem; margin:0 0 1.2rem; }
+table.prog-table { font-size:0.85rem; margin:1rem 0; }
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done,
+body.hide-done .cat-card.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+.vid-tab {
+  margin: 0 0 1.2rem; background: #e8e0d0; border: 1px solid #d4c8b0;
+  border-radius: 8px; overflow: hidden;
+}
+.vid-tab summary {
+  padding: 0.6rem 0.9rem; cursor: pointer; font-size: 0.85rem;
+  color: #3a2a1a; list-style: none; user-select: none;
+}
+.vid-tab summary::-webkit-details-marker { display: none; }
+.vid-tab summary::before {
+  content: '▶'; display: inline-block; margin-right: 0.5rem;
+  font-size: 0.7rem; transition: transform 0.2s;
+}
+.vid-tab[open] summary::before { transform: rotate(90deg); }
+.vid-tab .vid-status {
+  float: right; font-size: 0.75rem; padding: 0.15rem 0.5rem;
+  border-radius: 3px; margin-left: 0.5rem;
+}
+.vid-tab .vid-ok { background: #4ade8040; color: #2d6a4f; }
+.vid-tab .vid-err { background: #f8717140; color: #9b2c2c; }
+.vid-tab .vid-list {
+  padding: 0 0.9rem 0.7rem; margin: 0;
+  list-style: none; font-size: 0.8rem;
+}
+.vid-tab .vid-list li {
+  padding: 0.35rem 0; border-top: 1px solid #d4c8b0;
+  display: flex; justify-content: space-between; gap: 8px;
+}
+.vid-tab .vid-list .vid-date {
+  color: #a08060; white-space: nowrap; flex: none;
+}
+.vid-tab .vid-list .vid-concepts {
+  color: #a08060; white-space: nowrap; flex: none; font-size: 0.75rem;
+}
+.vid-tab .vid-none {
+  padding: 0.4rem 0.9rem 0.7rem; color: #a08060; font-size: 0.8rem;
+}
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../investing-fundamentals.html">&larr; Investing Fundamentals</a>
+
+<div class="concept-meta"><span><span class="star">&#9733;</span> must-know</span><span>Investing Fundamentals</span><span>added 2026-11-13</span></div>
+<h4 id="equity_risk_premium">Equity Risk Premium</h4>
+
+<p>The <strong>equity risk premium</strong> (ERP) is the extra return investors demand for owning stocks instead of a risk-free asset, usually a government bond. Stocks can fall 30% or 50% in a bad year. A Treasury held to maturity pays a known amount. Nobody would take the stock-market ride for the same expected payoff as the safe one, so stocks have to promise more. That "more" is the premium. If a 10-year Treasury pays 5% and you expect stocks to return 9% a year over the long run, the premium is 4 percentage points. It is the market's price for bearing uncertainty, and it is never observed directly. You can only estimate it.</p>
+
+<p>It matters because the premium links two enormous markets. The bond market sets the baseline, the return you can get for sure. The stock market sets what you get for taking risk on top of that. When the premium is wide, stocks are attractive relative to bonds, and money tends to flow toward equities. When it is thin, the cushion that compensates you for volatility shrinks. This affects 401(k) allocations, target-date funds, pension assumptions, corporate borrowing decisions, and how much a company's future profits are worth today. Almost every valuation model contains a discount rate built from the risk-free rate plus a premium, so a small change in the premium moves the fair value of every stock.</p>
+
+<p>Mechanically, you can build the premium in two ways. The <strong>historical</strong> method looks backward: take the average stock return over a long period, say 8 to 10% a year, subtract the average Treasury return, and call the gap the premium. The <strong>implied</strong> method looks forward. It asks what return the market is pricing in today. A common shortcut is the <strong>earnings yield</strong>, which is earnings divided by price, or the forward P/E turned upside down. Subtract the 10-year Treasury yield from that earnings yield, and you have a quick, rough premium. A high number means you are well paid for risk. A low or negative number means you are not.</p>
+
+<p>The video gives a clean worked example. On November 5th, FactSet had the S&P 500 at 17.7 times expected earnings. Flip that over: 1 divided by 17.7 is about 5.6%. That is what $1 of expected profit yields on the price you pay. On the same day the Treasury sold 10-year notes at a yield of 5.02%. The gap is roughly 0.6 percentage points. The host's verdict was blunt:</p>
+
+<blockquote>"The gap between a forecast and a government guarantee is a little more than a half a point. That's not much pay for the risk, don't you think?"</blockquote>
+
+<p>Compare that with the start of the year. At 22 times earnings, the earnings yield was only about 4.5%. If Treasury yields were anywhere near 5%, the shortcut premium was then negative: stocks yielded less than the government guarantee. The premium widened to about 0.6 points because earnings forecasts jumped about 33.6% while the index rose only 7.4%. So the market became cheaper by the metric, and the premium improved. It improved from "nothing" to "barely something." The video's point is that even after the improvement, the cushion is thin.</p>
+
+<p>Investors use the premium as a relative-value signal, not a timing tool. When the gap is wide, as it was in the early 1980s or after the 2008 crash, stocks are paying generously compared with bonds, and long-term buyers have historically done well. When the gap is near zero, as in this example, the argument for stocks has to rest on growth: earnings must keep rising to make up for the thin starting yield. Asset allocators watch it to decide how much to hold in equities versus bonds. Traders watch the Treasury yield against the earnings yield daily. In the video's list of things to watch, the 10-year yield sitting at 5.03% was one of four numbers, because every tick up makes the forecast look worse next to a guarantee.</p>
+
+<p>There are several gotchas. First, the earnings yield shortcut is not the true premium. The real premium is expected return minus the risk-free rate, and expected return includes growth in earnings, not just today's yield. A stock bought at a 5.6% earnings yield can return far more than 5.6% if profits grow 10% a year. Second, the "E" in the forward P/E is a forecast. The video stresses that analysts are often wrong at the worst moments, and they have an optimism bias. Third, a thin premium does not predict a crash next month. It says the compensation is low, not that the loss is imminent. Stocks can stay richly priced for years.</p>
+
+<p>Third, the denominator matters. Because the premium is a difference, it can shrink from either side. Bond yields rising makes it smaller even if stocks do not move. Earnings estimates falling makes it smaller even if bond yields stay put. The video shows the second case: if the $415.82 estimate proved 10% too high, the ratio would jump from about 18.3 to over 20, and the earnings yield would drop to roughly 5%, which is about where the Treasury sits. The premium would be close to zero, and not one stock would need to move. That is why the premium is an estimate with moving parts, not a fixed fact.</p>
+
+<p>When the premium breaks down, you can see it in two ways. One is that it goes negative: stocks yield less than a risk-free bond, as in much of 2000 and again in parts of the 2020s. A negative premium means you are betting entirely on growth, with no cushion. If growth disappoints, losses can be severe, because the price had assumed perfection. The other is that the premium is wide for a reason. In November 2008 the forward P/E hit 8.6, which looked like an enormous premium, but earnings were collapsing and fear was real. A fat premium can be a trap if the earnings behind it turn out to be fiction. Cheap can always get cheaper.</p>
+
+<p>The equity risk premium connects to several other ideas in this guide. It is the other half of the <strong>forward P/E ratio</strong>, since the earnings yield is just the P/E flipped. It ties to <strong>interest rates and Fed policy</strong>, because the risk-free rate is the baseline everything is measured against; with the market expecting a December hike in the video, the baseline was rising. It links to <strong>discount rates and valuation</strong>, where the premium is added to the risk-free rate to value future cash flows. And it relates to the video's central theme, that risk moves rather than disappears. A thin premium means the whole bet rests on the forecast being right, which is why the host closed by saying your 401(k) is "a bet that the forecast is right."</p>
+<div class="concept-side">Related in this category: <a href="sp_500_index.html">S&amp;P 500 Index</a>, <a href="dow_jones_industrial_average.html">Dow Jones Industrial Average (DJIA)</a>, <a href="pick_and_shovel_investing.html">Pick-and-Shovel Investment Strategy</a>, <a href="initial_public_offering.html">Initial Public Offering (IPO)</a>, <a href="prime_brokerage.html">Prime Brokerage</a>, <a href="rotation_to_cash_generative_value.html">Beta (High-Beta Stocks)</a></div>
+<button class="concept-done" data-slug="equity_risk_premium" onclick="toggleDone('equity_risk_premium')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_equity_risk_premium';</script>
+<script src="../../book.js"></script>
+<script src="../fg.js"></script>
+</body>
+</html>

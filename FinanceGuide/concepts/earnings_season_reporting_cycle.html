@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Earnings Season - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.prog-stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(112px,1fr));
+  gap:10px; margin:1rem 0 1.5rem; }
+.prog-stat { background:#e8e0d0; border:1px solid #d4c8b0; border-radius:8px;
+  padding:0.7rem 0.9rem; }
+.prog-stat .n { display:block; font-size:1.5rem; color:#5a3e1a; line-height:1.1; }
+.prog-stat .l { display:block; font-size:0.75rem; color:#8a7a60; margin-top:0.2rem; }
+.prog-chart { position:relative; margin:0.5rem 0 0.4rem; }
+.prog-chart svg { width:100%; height:auto; display:block; overflow:visible; }
+.prog-chart .grid { stroke:#ddd3c0; stroke-width:1; }
+.prog-chart .axis { stroke:#c8bca4; stroke-width:1; }
+.prog-chart .tick { fill:#8a7a60; font-size:11px; }
+.prog-chart .ylab { fill:#8a7a60; font-size:11px; }
+.prog-chart .actual { fill:none; stroke:#9a5a22; stroke-width:2; stroke-linejoin:round; }
+.prog-chart .actual-dot { fill:#9a5a22; stroke:#f4efe8; stroke-width:2; }
+.prog-chart .model { fill:none; stroke:#0e9488; stroke-width:2; stroke-dasharray:6 4; }
+.prog-chart .ceiling { stroke:#8a7a60; stroke-width:1; stroke-dasharray:2 4; }
+.prog-chart .here { stroke:#9a5a22; stroke-width:1; stroke-dasharray:2 3; opacity:0.6; }
+.prog-chart .dlabel { font-size:11px; fill:#3a2e1e; }
+.prog-chart .bar { fill:#9a5a22; opacity:0.75; }
+.prog-chart .bar.spike { fill:#6b3410; opacity:1; }
+.prog-legend .lg-spike::before { border-color:#6b3410; border-top-width:6px; }
+.prog-spikes { font-size:0.88rem; color:#5a3e1a; margin:-0.8rem 0 1.5rem; }
+.prog-chart .bar-model { fill:none; stroke:#0e9488; stroke-width:2; stroke-dasharray:6 4; }
+.prog-chart .hit { fill:transparent; cursor:crosshair; }
+.prog-tip { position:absolute; pointer-events:none; display:none;
+  background:#3a2e1e; color:#f4efe8; font-size:12px; line-height:1.4;
+  padding:6px 9px; border-radius:6px; white-space:nowrap; z-index:5; }
+.prog-legend { display:flex; gap:1.2rem; font-size:0.8rem; color:#5a3e1a;
+  margin:0 0 1.5rem; flex-wrap:wrap; }
+.prog-legend span::before { content:""; display:inline-block; width:18px; height:0;
+  border-top:2px solid; margin-right:6px; vertical-align:middle; }
+.prog-legend .lg-actual::before { border-color:#9a5a22; }
+.prog-legend .lg-model::before { border-color:#0e9488; border-top-style:dashed; }
+.prog-legend .lg-ceiling::before { border-color:#8a7a60; border-top-style:dotted; }
+.prog-eq { background:#e8e0d0; border:1px solid #d4c8b0; border-radius:8px;
+  padding:0.9rem 1.1rem; font-family:Georgia,serif; font-size:1.05rem; color:#3a2e1e;
+  margin:1rem 0; }
+.prog-eq .sub { display:block; font-size:0.85rem; color:#8a7a60; margin-top:0.4rem;
+  font-family:inherit; }
+.prog-note { font-size:0.85rem; color:#8a7a60; }
+.prog-link { font-size:0.85rem; margin:-0.8rem 0 1.2rem; }
+.prog-link a { color:#0e9488; }
+.ch-status { font-size:0.85rem; color:#5a3e1a; margin:-0.6rem 0 1.2rem; }
+.ch-status.done { color:#0e6b5f; background:#e3efe9; border:1px solid #b9d8cc;
+  border-radius:6px; padding:0.5rem 0.8rem; margin:0 0 1.2rem; }
+table.prog-table { font-size:0.85rem; margin:1rem 0; }
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done,
+body.hide-done .cat-card.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+.vid-tab {
+  margin: 0 0 1.2rem; background: #e8e0d0; border: 1px solid #d4c8b0;
+  border-radius: 8px; overflow: hidden;
+}
+.vid-tab summary {
+  padding: 0.6rem 0.9rem; cursor: pointer; font-size: 0.85rem;
+  color: #3a2a1a; list-style: none; user-select: none;
+}
+.vid-tab summary::-webkit-details-marker { display: none; }
+.vid-tab summary::before {
+  content: '▶'; display: inline-block; margin-right: 0.5rem;
+  font-size: 0.7rem; transition: transform 0.2s;
+}
+.vid-tab[open] summary::before { transform: rotate(90deg); }
+.vid-tab .vid-status {
+  float: right; font-size: 0.75rem; padding: 0.15rem 0.5rem;
+  border-radius: 3px; margin-left: 0.5rem;
+}
+.vid-tab .vid-ok { background: #4ade8040; color: #2d6a4f; }
+.vid-tab .vid-err { background: #f8717140; color: #9b2c2c; }
+.vid-tab .vid-list {
+  padding: 0 0.9rem 0.7rem; margin: 0;
+  list-style: none; font-size: 0.8rem;
+}
+.vid-tab .vid-list li {
+  padding: 0.35rem 0; border-top: 1px solid #d4c8b0;
+  display: flex; justify-content: space-between; gap: 8px;
+}
+.vid-tab .vid-list .vid-date {
+  color: #a08060; white-space: nowrap; flex: none;
+}
+.vid-tab .vid-list .vid-concepts {
+  color: #a08060; white-space: nowrap; flex: none; font-size: 0.75rem;
+}
+.vid-tab .vid-none {
+  padding: 0.4rem 0.9rem 0.7rem; color: #a08060; font-size: 0.8rem;
+}
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../value-investing-equities.html">&larr; Value Investing &amp; Equities</a>
+
+<div class="concept-meta"><span>standard</span><span>Value Investing &amp; Equities</span><span>added 2026-11-13</span></div>
+<h4 id="earnings_season_reporting_cycle">Earnings Season</h4>
+
+<p><strong>Earnings season</strong> is the stretch of about six weeks, four times a year, when most publicly traded companies report how much money they made in the quarter that just ended. For the U.S. calendar, reports for January through March arrive in April and May. Reports for April through June arrive in July and August. July through September reports arrive in October and November, and the fourth quarter comes in January and February. A company's <strong>earnings report</strong> contains revenue (what it sold), net income, and <strong>earnings per share (EPS)</strong>, which is profit divided by shares outstanding. It usually comes with a conference call where executives take analysts' questions. This is the one time each quarter when a company's story gets tested against its actual accounting.</p>
+
+<p>Earnings season matters because stock prices are, in the long run, claims on profits. For months the market runs on opinions, headlines, interest-rate guesses and mood. Then every three months the companies publish real numbers, and the opinions have to match them. The results affect more than individual share prices. They set the profit estimate that goes into the whole market's valuation. They shape corporate decisions on hiring, spending and buybacks. They also drive what happens to the retirement accounts of anyone holding an index fund. In the video's words, delivery problems "show up on a schedule," every three months, in black and white. Earnings season is that schedule.</p>
+
+<p>Mechanically, the cycle runs in steps. First, analysts at banks and research firms publish <strong>consensus estimates</strong>, the average forecast for each company's EPS and revenue. Second, the company closes its books and reports, typically before the market opens or just after it closes. Third, the result is compared with the estimate. A company that exceeds the estimate has delivered a <strong>beat</strong>, and one that falls short has delivered a <strong>miss</strong>. Fourth, the company gives <strong>guidance</strong>, its own forecast for the next quarter or year. Fifth, analysts revise their numbers and the stock reprices, often within seconds. The calls and revisions can move the price more than the quarter itself, because markets pay for the future, not the past.</p>
+
+<p>The video offers a clear picture of what this looks like in practice. By November 5th, <strong>88% of S&amp;P 500 companies</strong> had reported third-quarter results. Earnings were growing 31.4% from a year earlier, which would make it the third straight quarter above 25%. Revenue grew 14.3%, so companies were actually selling more and not only cutting costs. Some 84% of companies topped their profit estimates. Yet in total they beat by only 2.7%, against a five-year average of 7.5%, and if that holds it would be the smallest beat since the end of 2022. Strong growth, thinning surprises: the numbers carry both messages at once.</p>
+
+<blockquote>"When the price tag comes down because profits went up, the danger is the profits themselves. The whole case now rests on one number being right. That's a delivery problem, and delivery problems show up on a schedule."</blockquote>
+
+<p>Earnings season also explains the paradox in the video's title. The S&amp;P 500 was up 7.4% for the year through November 5th, yet its <strong>forward P/E ratio</strong> (price divided by expected earnings over the next 12 months) fell from about 22 to 17.7. The reason is that the "E" kept rising. The expected 12-month profit climbed about 33.6%, from roughly $311 a share to $415.82. Those increases come from the reporting cycle itself: strong results and upbeat guidance lead analysts to raise their estimates, and the data firm FactSet updates its aggregate estimate weekly. When profits grow faster than prices, a rising market can get cheaper.</p>
+
+<p>Investors and traders use earnings season in practical ways. Long-term investors watch the aggregate numbers: the growth rate, the share of companies beating, the size of the beats, and profit margins. In the video, margins of about 14.9% this quarter were down from a record 17% the quarter before. They also watch the <strong>guidance scorecard</strong>. At that point 32 S&amp;P companies had guided next-quarter profits below expectations and 43 above, and the useful question is which side of that count grows. Traders look at single names, particularly bellwethers. Nvidia was due to report on November 17th, and because it is one of the biggest index members, its outlook feeds directly into the index's forward estimate. The video's advice is to watch what it says about next quarter, not whether it beats.</p>
+
+<p>There are several gotchas. The first is that a beat does not mean the stock goes up. Prices already contain expectations, so a company can beat and still fall if its guidance disappoints, or if investors were hoping for more. The second is that estimates are managed: companies often guide analysts low so they can beat, which is part of why 84% beating looks less impressive than it sounds. The third is that "cheap" depends on the yardstick. A P/E of 17.7 is under the five-year average of 19.8 and the ten-year average of 19.1, but above the 25-year average of 16.4. It was 8.6 in November 2008. The fourth is that a forward P/E is a snapshot. It moved to about 18.3 once the index bounced to 7,619.</p>
+
+<p>Earnings season can also expose a market resting on shaky numbers. Take the video's hypothetical: if the $415.82 estimate proves 10% too high, it drops to about $374, and the ratio rises from roughly 18.3 to over 20 without a single stock moving. The market becomes more expensive purely through arithmetic. Analysts already expect the pace to slow, with 2026 profit growth around 33% and 2027 around 16.1%. Price targets summing to 9,306 on the S&amp;P 500, 26.6% above the November 5th close, come from the same forecasters, who rarely lose clients by being optimistic in a bull market. If the numbers fall short, anyone holding an index fund through a 401(k) or target-date fund bears the loss.</p>
+
+<p>Earnings season connects to several other ideas. The <strong>forward P/E ratio</strong> is the headline valuation measure, and earnings season is what updates its denominator. <strong>Earnings yield</strong>, the inverse of P/E, lets you compare stocks with bonds. At 17.7, stocks offered about a 5.6% yield against a 5.02% Treasury, a gap of barely half a point for taking equity risk. <strong>Interest rates</strong> matter because the Fed and the 10-year yield set the bar stocks must clear. <strong>Sentiment versus fundamentals</strong> ties it together. A high price tag risks a change in mood, while a low one built on rising forecasts risks the forecasts failing. Earnings season is the quarterly audit of which kind of risk you are carrying.</p>
+<div class="concept-side">Related in this category: <a href="comparable_store_sales.html">Comparable Store Sales (Same-Store Sales)</a>, <a href="economic_moat.html">Economic Moat (Competitive Moat)</a>, <a href="earnings_guidance.html">Earnings Guidance (Forward Guidance — Corporate)</a>, <a href="discounted_cash_flow_valuation.html">Discounted Cash Flow (DCF) Valuation</a>, <a href="corporate_stock_buybacks.html">Corporate Stock Buybacks (Share Repurchase Programs)</a>, <a href="buyback_blackout_window.html">Buyback Blackout Window</a></div>
+<button class="concept-done" data-slug="earnings_season_reporting_cycle" onclick="toggleDone('earnings_season_reporting_cycle')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_earnings_season_reporting_cycle';</script>
+<script src="../../book.js"></script>
+<script src="../fg.js"></script>
+</body>
+</html>
