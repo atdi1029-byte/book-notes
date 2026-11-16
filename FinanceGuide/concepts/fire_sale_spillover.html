@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Fire Sale Spillover - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.prog-stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(112px,1fr));
+  gap:10px; margin:1rem 0 1.5rem; }
+.prog-stat { background:#e8e0d0; border:1px solid #d4c8b0; border-radius:8px;
+  padding:0.7rem 0.9rem; }
+.prog-stat .n { display:block; font-size:1.5rem; color:#5a3e1a; line-height:1.1; }
+.prog-stat .l { display:block; font-size:0.75rem; color:#8a7a60; margin-top:0.2rem; }
+.prog-chart { position:relative; margin:0.5rem 0 0.4rem; }
+.prog-chart svg { width:100%; height:auto; display:block; overflow:visible; }
+.prog-chart .grid { stroke:#ddd3c0; stroke-width:1; }
+.prog-chart .axis { stroke:#c8bca4; stroke-width:1; }
+.prog-chart .tick { fill:#8a7a60; font-size:11px; }
+.prog-chart .ylab { fill:#8a7a60; font-size:11px; }
+.prog-chart .actual { fill:none; stroke:#9a5a22; stroke-width:2; stroke-linejoin:round; }
+.prog-chart .actual-dot { fill:#9a5a22; stroke:#f4efe8; stroke-width:2; }
+.prog-chart .model { fill:none; stroke:#0e9488; stroke-width:2; stroke-dasharray:6 4; }
+.prog-chart .ceiling { stroke:#8a7a60; stroke-width:1; stroke-dasharray:2 4; }
+.prog-chart .here { stroke:#9a5a22; stroke-width:1; stroke-dasharray:2 3; opacity:0.6; }
+.prog-chart .dlabel { font-size:11px; fill:#3a2e1e; }
+.prog-chart .bar { fill:#9a5a22; opacity:0.75; }
+.prog-chart .bar.spike { fill:#6b3410; opacity:1; }
+.prog-legend .lg-spike::before { border-color:#6b3410; border-top-width:6px; }
+.prog-spikes { font-size:0.88rem; color:#5a3e1a; margin:-0.8rem 0 1.5rem; }
+.prog-chart .bar-model { fill:none; stroke:#0e9488; stroke-width:2; stroke-dasharray:6 4; }
+.prog-chart .hit { fill:transparent; cursor:crosshair; }
+.prog-tip { position:absolute; pointer-events:none; display:none;
+  background:#3a2e1e; color:#f4efe8; font-size:12px; line-height:1.4;
+  padding:6px 9px; border-radius:6px; white-space:nowrap; z-index:5; }
+.prog-legend { display:flex; gap:1.2rem; font-size:0.8rem; color:#5a3e1a;
+  margin:0 0 1.5rem; flex-wrap:wrap; }
+.prog-legend span::before { content:""; display:inline-block; width:18px; height:0;
+  border-top:2px solid; margin-right:6px; vertical-align:middle; }
+.prog-legend .lg-actual::before { border-color:#9a5a22; }
+.prog-legend .lg-model::before { border-color:#0e9488; border-top-style:dashed; }
+.prog-legend .lg-ceiling::before { border-color:#8a7a60; border-top-style:dotted; }
+.prog-eq { background:#e8e0d0; border:1px solid #d4c8b0; border-radius:8px;
+  padding:0.9rem 1.1rem; font-family:Georgia,serif; font-size:1.05rem; color:#3a2e1e;
+  margin:1rem 0; }
+.prog-eq .sub { display:block; font-size:0.85rem; color:#8a7a60; margin-top:0.4rem;
+  font-family:inherit; }
+.prog-note { font-size:0.85rem; color:#8a7a60; }
+.prog-link { font-size:0.85rem; margin:-0.8rem 0 1.2rem; }
+.prog-link a { color:#0e9488; }
+.ch-status { font-size:0.85rem; color:#5a3e1a; margin:-0.6rem 0 1.2rem; }
+.ch-status.done { color:#0e6b5f; background:#e3efe9; border:1px solid #b9d8cc;
+  border-radius:6px; padding:0.5rem 0.8rem; margin:0 0 1.2rem; }
+table.prog-table { font-size:0.85rem; margin:1rem 0; }
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done,
+body.hide-done .cat-card.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+.vid-tab {
+  margin: 0 0 1.2rem; background: #e8e0d0; border: 1px solid #d4c8b0;
+  border-radius: 8px; overflow: hidden;
+}
+.vid-tab summary {
+  padding: 0.6rem 0.9rem; cursor: pointer; font-size: 0.85rem;
+  color: #3a2a1a; list-style: none; user-select: none;
+}
+.vid-tab summary::-webkit-details-marker { display: none; }
+.vid-tab summary::before {
+  content: '▶'; display: inline-block; margin-right: 0.5rem;
+  font-size: 0.7rem; transition: transform 0.2s;
+}
+.vid-tab[open] summary::before { transform: rotate(90deg); }
+.vid-tab .vid-status {
+  float: right; font-size: 0.75rem; padding: 0.15rem 0.5rem;
+  border-radius: 3px; margin-left: 0.5rem;
+}
+.vid-tab .vid-ok { background: #4ade8040; color: #2d6a4f; }
+.vid-tab .vid-err { background: #f8717140; color: #9b2c2c; }
+.vid-tab .vid-list {
+  padding: 0 0.9rem 0.7rem; margin: 0;
+  list-style: none; font-size: 0.8rem;
+}
+.vid-tab .vid-list li {
+  padding: 0.35rem 0; border-top: 1px solid #d4c8b0;
+  display: flex; justify-content: space-between; gap: 8px;
+}
+.vid-tab .vid-list .vid-date {
+  color: #a08060; white-space: nowrap; flex: none;
+}
+.vid-tab .vid-list .vid-concepts {
+  color: #a08060; white-space: nowrap; flex: none; font-size: 0.75rem;
+}
+.vid-tab .vid-none {
+  padding: 0.4rem 0.9rem 0.7rem; color: #a08060; font-size: 0.8rem;
+}
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../economic-history-financial-crises.html">&larr; Economic History &amp; Financial Crises</a>
+
+<div class="concept-meta"><span>standard</span><span>Economic History &amp; Financial Crises</span><span>added 2026-11-16</span></div>
+<h4 id="fire_sale_spillover">Fire Sale Spillover</h4>
+
+<p>A <strong>fire sale</strong> is a forced sale of assets at prices below what they would fetch in an orderly market, because the seller needs cash now and cannot wait for a better buyer. <strong>Fire sale spillover</strong> is what happens next: the discounted sale drags down the market price of the same asset, and every other holder of that asset takes a loss, even holders who never wanted to sell. Picture a neighborhood where one owner must dump a house at a steep discount to meet a deadline. The next appraisal for every similar house on the street drops, and so does the value of the collateral behind those owners' mortgages. In banking, the "houses" are Treasuries, agency mortgage-backed securities and other bonds, and the "appraisal" is the market price used to mark them.</p>
+
+<p>This matters because it turns one institution's problem into a systemic one. Banks tend to hold similar assets: Treasuries, agency MBS, and highly rated securities that regulators treat as safe. When portfolios overlap that much, the banks are tied together by what they own, even if they never lend to each other directly. The New York Fed's 2026 vulnerability update puts a number on this: an estimated <strong>15.7% of bank capital</strong> is at risk from fire sale spillovers. That is a measure of contagion through prices. It is not a prediction that one bank fails. It affects depositors, who see confidence erode, shareholders, who see capital shrink, and borrowers, who see credit tighten as banks protect themselves.</p>
+
+<p>Mechanically, the chain runs in steps. First, a bank faces a liquidity need: deposits leave, a funding line is not renewed, or borrowers draw on credit lines. Second, it sells its most liquid assets, usually Treasuries or agency MBS, because those are the easiest to sell. Third, if the sale is big enough, buyers demand a discount to absorb it, so the price falls. Fourth, other banks holding the same securities see their holdings marked down. Fifth, those markdowns shrink their capital ratios and lower the value of collateral they have pledged. Sixth, counterparties demand more collateral, which forces more selling. Each round feeds the next. Economists call it a feedback loop, and it is what separates a fire sale from an ordinary sale.</p>
+
+<p>The video gives a concrete case. Suppose a mid-sized bank faces a deposit outflow and has to sell <strong>$10 billion</strong> of Treasuries or agency MBS. Because rates have risen since March 2026, those bonds sit at unrealized losses. Selling turns the paper loss into a real one that is booked against capital. The sale also pushes prices lower for everyone holding the same bonds. As the host put it, even if "bank B has zero deposit outflows, its bond portfolio just dropped in value on paper." Its adjusted capital ratio shrinks, and counterparties "see the drop and demand more collateral on repo lines." Bank B did nothing wrong and still ends up in trouble.</p>
+
+<blockquote>"Banks do not die because they run out of capital on paper. They die because they run out of cash on a Tuesday afternoon."</blockquote>
+
+<p>The trigger for all this is the <strong>run vulnerability index</strong>, which the video covers right beside the fire sale index. The NY Fed calculates a critical fraction of unstable funding, meaning the share of flighty liabilities that would have to leave before a bank's liquid buffer is exhausted and it has to sell assets into the market. Across the aggregate banking system that figure is <strong>31%</strong>. Unstable funding includes uninsured deposits, brokered deposits and wholesale borrowing. The two indexes work as a pair. The run index asks how much has to leave before banks must start selling. The fire sale index asks how much damage that selling does to everyone else. A low threshold means selling starts sooner, and a high spillover number means the selling does more damage.</p>
+
+<p>Investors can use these ideas as a watchlist. The video suggests tracking weekly Fed H.8 data and Federal Home Loan Bank advances: when regional banks quietly borrow billions from the FHLB system, core deposits may be leaving. Watch the 10-year Treasury yield, because each 25 basis point rise in long-term rates widens the unrealized loss hole in bank bond portfolios. Separate money center banks from regional banks in your holdings, since flight to quality usually helps the giants and squeezes the regionals. For cash, check FDIC limits: <strong>$250,000</strong> per depositor, per insured bank, per ownership category. Cash above that at one regional bank is uninsured credit exposure, and Treasury bills in your own name are one alternative.</p>
+
+<p>There are several nuances and misconceptions. First, 15.7% is an estimate from a model with assumptions about how much banks sell and how much prices move. It is not a forecast. Second, the aggregate hides the tail: the system average includes fortress balance sheets like JPMorgan alongside regional lenders with heavy commercial real estate exposure and many uninsured deposits, and the weakest banks have a much lower threshold. Third, unrealized losses are not real losses until the bond is sold. A bank that can hold to maturity never has to realize them, and that is exactly why forced selling is the danger. Fourth, a fire sale is a liquidity event even when the bank is solvent on paper. Solvent banks can still be forced sellers.</p>
+
+<p>Several things can stop the spiral. The video notes that the Fed's discount window and standing repo facility are open, so a bank with pre-positioned collateral can borrow against its bonds rather than sell them into a falling market. Large banks also face liquidity coverage ratios that force them to hold big buffers of high-quality liquid assets. This is not March 2023 again, the host argues. But these defenses have weak points. Collateral that was never pre-positioned cannot be used quickly. Borrowing from the Fed can signal weakness and invite the very run it is meant to prevent. And if many banks need help at once, or if rates keep rising and losses deepen, the backstop is tested at the worst moment.</p>
+
+<p>Fire sale spillover connects to most of the video's other ideas. It follows from the <strong>liquidity stress ratio</strong> (0.484, the highest since early 2022), which shows how little cash cushion banks have against flighty funding. It is amplified by <strong>off-balance-sheet credit lines</strong>: when corporations and private credit funds draw their revolvers all at once, banks need cash exactly when deposits are leaving, which pushes them toward selling. It ties to <strong>interest rate risk</strong>, since higher yields create the unrealized losses that make selling painful, and to <strong>repo markets</strong>, where falling collateral values trigger margin calls. It also echoes Silicon Valley Bank in March 2023, where a bond portfolio sold at a loss helped set off the run. The takeaway: a bank's safety depends partly on its own balance sheet and partly on what every other bank holds and how fast they might all try to sell.</p>
+<div class="concept-side">Related in this category: <a href="bank_sector_contagion.html">Bank Sector Contagion (Investor Flight to Safety)</a>, <a href="dot_com_bubble_comparison.html">Dot-Com Bubble Comparison (1999 Analogy)</a>, <a href="bank_run.html">Bank Run</a>, <a href="telecom_bubble_bust.html">Telecom Bubble and Bust (2000–2002)</a>, <a href="fdic_receivership_bridge_bank.html">FDIC Receivership and Bridge Bank Resolution</a>, <a href="depositor_preference_creditor_priority.html">Depositor Preference and Creditor Priority in Bank Failure</a></div>
+<button class="concept-done" data-slug="fire_sale_spillover" onclick="toggleDone('fire_sale_spillover')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_fire_sale_spillover';</script>
+<script src="../../book.js"></script>
+<script src="../fg.js"></script>
+</body>
+</html>

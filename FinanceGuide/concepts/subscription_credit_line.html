@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Subscription Credit Line (Capital Call Facility) - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.prog-stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(112px,1fr));
+  gap:10px; margin:1rem 0 1.5rem; }
+.prog-stat { background:#e8e0d0; border:1px solid #d4c8b0; border-radius:8px;
+  padding:0.7rem 0.9rem; }
+.prog-stat .n { display:block; font-size:1.5rem; color:#5a3e1a; line-height:1.1; }
+.prog-stat .l { display:block; font-size:0.75rem; color:#8a7a60; margin-top:0.2rem; }
+.prog-chart { position:relative; margin:0.5rem 0 0.4rem; }
+.prog-chart svg { width:100%; height:auto; display:block; overflow:visible; }
+.prog-chart .grid { stroke:#ddd3c0; stroke-width:1; }
+.prog-chart .axis { stroke:#c8bca4; stroke-width:1; }
+.prog-chart .tick { fill:#8a7a60; font-size:11px; }
+.prog-chart .ylab { fill:#8a7a60; font-size:11px; }
+.prog-chart .actual { fill:none; stroke:#9a5a22; stroke-width:2; stroke-linejoin:round; }
+.prog-chart .actual-dot { fill:#9a5a22; stroke:#f4efe8; stroke-width:2; }
+.prog-chart .model { fill:none; stroke:#0e9488; stroke-width:2; stroke-dasharray:6 4; }
+.prog-chart .ceiling { stroke:#8a7a60; stroke-width:1; stroke-dasharray:2 4; }
+.prog-chart .here { stroke:#9a5a22; stroke-width:1; stroke-dasharray:2 3; opacity:0.6; }
+.prog-chart .dlabel { font-size:11px; fill:#3a2e1e; }
+.prog-chart .bar { fill:#9a5a22; opacity:0.75; }
+.prog-chart .bar.spike { fill:#6b3410; opacity:1; }
+.prog-legend .lg-spike::before { border-color:#6b3410; border-top-width:6px; }
+.prog-spikes { font-size:0.88rem; color:#5a3e1a; margin:-0.8rem 0 1.5rem; }
+.prog-chart .bar-model { fill:none; stroke:#0e9488; stroke-width:2; stroke-dasharray:6 4; }
+.prog-chart .hit { fill:transparent; cursor:crosshair; }
+.prog-tip { position:absolute; pointer-events:none; display:none;
+  background:#3a2e1e; color:#f4efe8; font-size:12px; line-height:1.4;
+  padding:6px 9px; border-radius:6px; white-space:nowrap; z-index:5; }
+.prog-legend { display:flex; gap:1.2rem; font-size:0.8rem; color:#5a3e1a;
+  margin:0 0 1.5rem; flex-wrap:wrap; }
+.prog-legend span::before { content:""; display:inline-block; width:18px; height:0;
+  border-top:2px solid; margin-right:6px; vertical-align:middle; }
+.prog-legend .lg-actual::before { border-color:#9a5a22; }
+.prog-legend .lg-model::before { border-color:#0e9488; border-top-style:dashed; }
+.prog-legend .lg-ceiling::before { border-color:#8a7a60; border-top-style:dotted; }
+.prog-eq { background:#e8e0d0; border:1px solid #d4c8b0; border-radius:8px;
+  padding:0.9rem 1.1rem; font-family:Georgia,serif; font-size:1.05rem; color:#3a2e1e;
+  margin:1rem 0; }
+.prog-eq .sub { display:block; font-size:0.85rem; color:#8a7a60; margin-top:0.4rem;
+  font-family:inherit; }
+.prog-note { font-size:0.85rem; color:#8a7a60; }
+.prog-link { font-size:0.85rem; margin:-0.8rem 0 1.2rem; }
+.prog-link a { color:#0e9488; }
+.ch-status { font-size:0.85rem; color:#5a3e1a; margin:-0.6rem 0 1.2rem; }
+.ch-status.done { color:#0e6b5f; background:#e3efe9; border:1px solid #b9d8cc;
+  border-radius:6px; padding:0.5rem 0.8rem; margin:0 0 1.2rem; }
+table.prog-table { font-size:0.85rem; margin:1rem 0; }
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done,
+body.hide-done .cat-card.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+.vid-tab {
+  margin: 0 0 1.2rem; background: #e8e0d0; border: 1px solid #d4c8b0;
+  border-radius: 8px; overflow: hidden;
+}
+.vid-tab summary {
+  padding: 0.6rem 0.9rem; cursor: pointer; font-size: 0.85rem;
+  color: #3a2a1a; list-style: none; user-select: none;
+}
+.vid-tab summary::-webkit-details-marker { display: none; }
+.vid-tab summary::before {
+  content: '▶'; display: inline-block; margin-right: 0.5rem;
+  font-size: 0.7rem; transition: transform 0.2s;
+}
+.vid-tab[open] summary::before { transform: rotate(90deg); }
+.vid-tab .vid-status {
+  float: right; font-size: 0.75rem; padding: 0.15rem 0.5rem;
+  border-radius: 3px; margin-left: 0.5rem;
+}
+.vid-tab .vid-ok { background: #4ade8040; color: #2d6a4f; }
+.vid-tab .vid-err { background: #f8717140; color: #9b2c2c; }
+.vid-tab .vid-list {
+  padding: 0 0.9rem 0.7rem; margin: 0;
+  list-style: none; font-size: 0.8rem;
+}
+.vid-tab .vid-list li {
+  padding: 0.35rem 0; border-top: 1px solid #d4c8b0;
+  display: flex; justify-content: space-between; gap: 8px;
+}
+.vid-tab .vid-list .vid-date {
+  color: #a08060; white-space: nowrap; flex: none;
+}
+.vid-tab .vid-list .vid-concepts {
+  color: #a08060; white-space: nowrap; flex: none; font-size: 0.75rem;
+}
+.vid-tab .vid-none {
+  padding: 0.4rem 0.9rem 0.7rem; color: #a08060; font-size: 0.8rem;
+}
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../corporate-finance-investment-banking.html">&larr; Corporate Finance &amp; Investment Banking</a>
+
+<div class="concept-meta"><span>deep cut</span><span>Corporate Finance &amp; Investment Banking</span><span>added 2026-11-16</span></div>
+<h4 id="subscription_credit_line">Subscription Credit Line (Capital Call Facility)</h4>
+
+<p>A <strong>subscription credit line</strong>, also called a <strong>capital call facility</strong>, is a revolving loan that a bank makes to a private fund, such as a private credit fund, private equity fund or real estate fund. The fund's investors, called <strong>limited partners</strong> (LPs), promise to hand over a set amount of money later, whenever the fund asks for it. That promise is called an <strong>uncalled capital commitment</strong>. The bank lends against it. The loan isn't secured by the fund's investments. It's secured by the right to demand cash from the LPs. The fund can borrow today, then repay the bank when it collects the investors' money. Think of it as a bridge loan between "we found a deal" and "our investors have wired the cash."</p>
+
+<p>It matters because private credit has grown into a very large part of the financial system, and these lines are one of the main channels by which traditional banks fund it. A bank that avoids making a risky loan directly can still earn a fee and interest by lending to the fund that makes it. That connects regulated, deposit-funded banks to the shadow banking sector, which the video sizes at roughly $1.7 trillion. The links show up in bank filings as undrawn commitments and loans to non-depository financial institutions. When stress hits private credit, it doesn't stay there. It travels through these lines into the banks' own liquidity.</p>
+
+<p>Mechanically, the process runs in a few steps. First, investors sign a partnership agreement committing, say, $500 million over several years. Second, the fund signs a revolving facility with a bank, perhaps $100 million, with the LP commitments pledged as collateral. Third, when the fund finds a deal, it draws on the line and closes the purchase within days, with no need to wait for investors to wire cash. Fourth, the fund later issues a <strong>capital call</strong> to its LPs, who typically have about ten business days to pay, and uses that cash to repay the bank. The bank checks the quality of the LPs, not the quality of the investments, when it sets the borrowing base.</p>
+
+<p>Funds like these lines because they're quick and cheap. Calling capital for every deal means constant paperwork for investors and delays for sellers. A line lets the fund batch its capital calls into fewer, larger ones. It also has a side effect that critics point out: borrowing early and calling investor money late makes the fund's reported return, its <strong>IRR</strong>, look higher, because investors' cash is outstanding for a shorter period. Banks like the lines because defaults have historically been extremely rare. The collateral is a pool of pension funds, endowments and insurers with deep pockets, and the bank can legally force them to fund the loan.</p>
+
+<p>The video puts these lines in a larger story about off-balance-sheet exposure. The New York Fed's 2026 vulnerability update shows the liquidity stress ratio at 0.484, the highest since early 2022. One of the three gears behind that number is that undrawn commitments to corporations and non-bank lenders have ballooned. A commitment that has not been drawn doesn't sit in the loan column. It sits in the footnotes of the FR Y-9C filing, where it earns fee income. The video's warning is that those footnotes are promises to deliver cash on demand, and the bank must keep a buffer of liquid assets to honor them.</p>
+
+<blockquote>"They look safe because they're backed by diversified loan pools until interest rates stay at 5%, borrowers start paying interest in paper IOUs instead of cash. And those private credit funds draw down their bank credit lines all at once."</blockquote>
+
+<p>Here is how that failure would play out with numbers from the video. Suppose a regional bank has $5 billion of undrawn subscription and warehouse lines to private credit funds. With the 10-year Treasury near 5% and corporate bond yields at 8.65%, some borrowers inside those funds begin paying their interest in kind, with <strong>PIK</strong> notes instead of cash. The funds receive less cash than they expected, so they draw on the bank lines to cover their own obligations. Meanwhile, uninsured depositors are leaving. The New York Fed's critical fraction is 31%: if just that share of unstable funding walks out, the bank's liquidity buffer is gone. The credit-line draws pull cash out through the back door at the same moment depositors pull it out through the front.</p>
+
+<p>For investors and traders, the practical use is as an early signal. Regulatory filings show unused commitments and loans to non-depository financial institutions, so you can compare them with a bank's liquid assets and its share of uninsured and wholesale funding. The video suggests watching the weekly Fed H.8 release and Federal Home Loan Bank advances. If regional banks quietly start borrowing billions from the FHLB, that is the smoke alarm. Analysts also separate money-center banks, which hold large liquid buffers under the liquidity coverage ratio, from regional banks of $50 to $250 billion in assets. Those regionals are the ones with heavy commercial real estate concentrations, high uninsured deposits and large exposure to fund lending.</p>
+
+<p>There are real nuances and common misconceptions. First, a subscription line really is lower-risk than most fund loans, and historical losses have been tiny. The danger the video describes is not that the bank loses money. It is a liquidity problem, not a credit problem: the bank can be fully repaid in the end and still run short of cash on the day many borrowers draw at once. Second, a capital commitment from an LP is only as good as that LP. If some LPs are stressed or default, the other investors may be asked to cover the gap, and the bank's protection is thinner than it looks. Third, "undrawn" does not mean "harmless." An undrawn line is a legally binding promise, so the bank must plan as if it could be drawn.</p>
+
+<p>When it breaks, the failure mode looks like the stories of Silicon Valley Bank and First Republic. A bank with shrinking liquid assets and unstable funding has to raise cash fast. If it sells Treasuries or agency mortgage bonds that now carry unrealized losses, it books real losses against capital. The sale also pushes prices lower for every other bank holding the same bonds, which is the <strong>fire sale</strong> spillover the New York Fed estimates puts 15.7% of bank capital at risk. Counterparties then demand more collateral on repo lines. The Fed's discount window and standing repo facility are open, but only to banks that have pre-positioned collateral and tested the process. The video's point is that a bank can look healthy on its capital report and still fail on a Tuesday afternoon for lack of cash.</p>
+
+<p>The concept connects to several others in this guide. It is a cousin of the warehouse facility, the revolving credit line used by non-bank lenders. It ties to <strong>PIK loans</strong>, which are the trigger the video names. It links to the liquidity stress ratio and the run vulnerability index, which measure how much cash a bank can find if commitments are drawn and deposits leave together. And it connects to shadow banking, since these lines are how regulated banks supply leverage to unregulated lenders. Hold on to one idea: a bank's capital tells you whether it can absorb losses, but its liquidity tells you whether it can keep its promises on the day everyone asks at once.</p>
+<div class="concept-side">Related in this category: <a href="hyperscaler.html">Hyperscaler (Cloud Infrastructure Giant)</a>, <a href="corporate_restructuring.html">Corporate Restructuring</a>, <a href="cross_subsidization.html">Cross-Subsidization Between Business Divisions</a>, <a href="cash_cow.html">Cash Cow Business Unit</a>, <a href="oem_tier_supplier_hierarchy.html">OEM Tiered Supply Chain Hierarchy (Tier 1 / Tier 2 Suppliers)</a>, <a href="business_development_company_bdc.html">Business Development Company (BDC)</a></div>
+<button class="concept-done" data-slug="subscription_credit_line" onclick="toggleDone('subscription_credit_line')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_subscription_credit_line';</script>
+<script src="../../book.js"></script>
+<script src="../fg.js"></script>
+</body>
+</html>
