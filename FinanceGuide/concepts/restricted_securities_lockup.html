@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Restricted Securities and Underwriter Lockup Agreements - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.prog-stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(112px,1fr));
+  gap:10px; margin:1rem 0 1.5rem; }
+.prog-stat { background:#e8e0d0; border:1px solid #d4c8b0; border-radius:8px;
+  padding:0.7rem 0.9rem; }
+.prog-stat .n { display:block; font-size:1.5rem; color:#5a3e1a; line-height:1.1; }
+.prog-stat .l { display:block; font-size:0.75rem; color:#8a7a60; margin-top:0.2rem; }
+.prog-chart { position:relative; margin:0.5rem 0 0.4rem; }
+.prog-chart svg { width:100%; height:auto; display:block; overflow:visible; }
+.prog-chart .grid { stroke:#ddd3c0; stroke-width:1; }
+.prog-chart .axis { stroke:#c8bca4; stroke-width:1; }
+.prog-chart .tick { fill:#8a7a60; font-size:11px; }
+.prog-chart .ylab { fill:#8a7a60; font-size:11px; }
+.prog-chart .actual { fill:none; stroke:#9a5a22; stroke-width:2; stroke-linejoin:round; }
+.prog-chart .actual-dot { fill:#9a5a22; stroke:#f4efe8; stroke-width:2; }
+.prog-chart .model { fill:none; stroke:#0e9488; stroke-width:2; stroke-dasharray:6 4; }
+.prog-chart .ceiling { stroke:#8a7a60; stroke-width:1; stroke-dasharray:2 4; }
+.prog-chart .here { stroke:#9a5a22; stroke-width:1; stroke-dasharray:2 3; opacity:0.6; }
+.prog-chart .dlabel { font-size:11px; fill:#3a2e1e; }
+.prog-chart .bar { fill:#9a5a22; opacity:0.75; }
+.prog-chart .bar.spike { fill:#6b3410; opacity:1; }
+.prog-legend .lg-spike::before { border-color:#6b3410; border-top-width:6px; }
+.prog-spikes { font-size:0.88rem; color:#5a3e1a; margin:-0.8rem 0 1.5rem; }
+.prog-chart .bar-model { fill:none; stroke:#0e9488; stroke-width:2; stroke-dasharray:6 4; }
+.prog-chart .hit { fill:transparent; cursor:crosshair; }
+.prog-tip { position:absolute; pointer-events:none; display:none;
+  background:#3a2e1e; color:#f4efe8; font-size:12px; line-height:1.4;
+  padding:6px 9px; border-radius:6px; white-space:nowrap; z-index:5; }
+.prog-legend { display:flex; gap:1.2rem; font-size:0.8rem; color:#5a3e1a;
+  margin:0 0 1.5rem; flex-wrap:wrap; }
+.prog-legend span::before { content:""; display:inline-block; width:18px; height:0;
+  border-top:2px solid; margin-right:6px; vertical-align:middle; }
+.prog-legend .lg-actual::before { border-color:#9a5a22; }
+.prog-legend .lg-model::before { border-color:#0e9488; border-top-style:dashed; }
+.prog-legend .lg-ceiling::before { border-color:#8a7a60; border-top-style:dotted; }
+.prog-eq { background:#e8e0d0; border:1px solid #d4c8b0; border-radius:8px;
+  padding:0.9rem 1.1rem; font-family:Georgia,serif; font-size:1.05rem; color:#3a2e1e;
+  margin:1rem 0; }
+.prog-eq .sub { display:block; font-size:0.85rem; color:#8a7a60; margin-top:0.4rem;
+  font-family:inherit; }
+.prog-note { font-size:0.85rem; color:#8a7a60; }
+.prog-link { font-size:0.85rem; margin:-0.8rem 0 1.2rem; }
+.prog-link a { color:#0e9488; }
+.ch-status { font-size:0.85rem; color:#5a3e1a; margin:-0.6rem 0 1.2rem; }
+.ch-status.done { color:#0e6b5f; background:#e3efe9; border:1px solid #b9d8cc;
+  border-radius:6px; padding:0.5rem 0.8rem; margin:0 0 1.2rem; }
+table.prog-table { font-size:0.85rem; margin:1rem 0; }
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done,
+body.hide-done .cat-card.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+.vid-tab {
+  margin: 0 0 1.2rem; background: #e8e0d0; border: 1px solid #d4c8b0;
+  border-radius: 8px; overflow: hidden;
+}
+.vid-tab summary {
+  padding: 0.6rem 0.9rem; cursor: pointer; font-size: 0.85rem;
+  color: #3a2a1a; list-style: none; user-select: none;
+}
+.vid-tab summary::-webkit-details-marker { display: none; }
+.vid-tab summary::before {
+  content: '▶'; display: inline-block; margin-right: 0.5rem;
+  font-size: 0.7rem; transition: transform 0.2s;
+}
+.vid-tab[open] summary::before { transform: rotate(90deg); }
+.vid-tab .vid-status {
+  float: right; font-size: 0.75rem; padding: 0.15rem 0.5rem;
+  border-radius: 3px; margin-left: 0.5rem;
+}
+.vid-tab .vid-ok { background: #4ade8040; color: #2d6a4f; }
+.vid-tab .vid-err { background: #f8717140; color: #9b2c2c; }
+.vid-tab .vid-list {
+  padding: 0 0.9rem 0.7rem; margin: 0;
+  list-style: none; font-size: 0.8rem;
+}
+.vid-tab .vid-list li {
+  padding: 0.35rem 0; border-top: 1px solid #d4c8b0;
+  display: flex; justify-content: space-between; gap: 8px;
+}
+.vid-tab .vid-list .vid-date {
+  color: #a08060; white-space: nowrap; flex: none;
+}
+.vid-tab .vid-list .vid-concepts {
+  color: #a08060; white-space: nowrap; flex: none; font-size: 0.75rem;
+}
+.vid-tab .vid-none {
+  padding: 0.4rem 0.9rem 0.7rem; color: #a08060; font-size: 0.8rem;
+}
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../investing-fundamentals.html">&larr; Investing Fundamentals</a>
+
+<div class="concept-meta"><span>standard</span><span>Investing Fundamentals</span><span>added 2026-11-18</span></div>
+<h4 id="restricted_securities_lockup">Restricted Securities and Underwriter Lockup Agreements</h4>
+
+<p>A <strong>restricted security</strong> is stock that was acquired in a way that did not go through a registered public offering, so the owner cannot freely resell it on the open market. In the United States, shares bought in a private placement, issued to founders or employees, or received in a merger with a private company usually carry this label. Before they can be sold, the owner must satisfy a rule, most commonly a holding period under SEC Rule 144, or the company must register the shares for resale. The shares are real and the owner has real economic rights. What the owner lacks is the ability to sell them to anyone at any time. Think of it as ownership with a leash on liquidity.</p>
+
+<p>A <strong>lockup agreement</strong> is something different, and mixing the two up is the most common mistake. It is a contract, usually signed by company insiders and the investment banks (the <strong>underwriters</strong>) running an IPO. In it, the insiders promise not to sell their shares for a set period after the offering, typically 90 to 180 days. Restricted status comes from securities law and how the shares were acquired. A lockup comes from a private promise made to the banks. A share can be restricted and locked up, restricted but not locked up, or locked up without being restricted. The video flagged the second case, and that is where the interesting detail sits.</p>
+
+<p>Why does this matter to the broader market? Because the number of shares that can trade is just as important as the price. A newly public company usually has a small <strong>float</strong>, meaning the shares actually available to buy and sell, while insiders and early investors hold a much larger block that cannot yet be sold. Price is set by supply and demand, and a hidden supply of future sellers hangs over the stock. When a lockup ends, that supply can arrive all at once. Studies of IPOs have repeatedly found that stocks tend to drift lower around expiration dates. This is why professionals track the calendar of who can sell and when as carefully as they track earnings.</p>
+
+<p>Here is the mechanism step by step. Before the IPO, the company and its underwriters negotiate the deal. As a condition of the banks agreeing to sell the stock to the public, major holders such as founders, executives, venture investors and sometimes employees sign lockups. The prospectus discloses the length and the exceptions. After the IPO prices and trading begins, those holders are barred from selling, lending against, or hedging their shares for the lockup period. Banks can sometimes release holders early, and many lockups now include early-release triggers tied to the stock price or an earnings report. When the clock runs out, the shares become sellable, subject to any Rule 144 limits that still apply.</p>
+
+<p>Now the video's example. Anthropic's IPO included a <strong>concurrent private placement</strong> of about $26 billion, sold at the same price as the public deal to seven strategic partners: Nvidia (about $10 billion), Google (about $10 billion), AMD (about $2.5 billion), Broadcom, Micron and Microsoft (about $1 billion each), and TSMC (about $500 million). They receive non-voting Class N stock. The filing says these shares are restricted securities, because they were never registered for public sale, but they are <em>not</em> covered by the underwriters' lockup agreements. The presenter called that an important detail, and it is.</p>
+
+<blockquote>"The filing also says that those shares are not covered by the underwriters lockup agreements. That's an important one. Although they're restricted securities, which limits how they can be sold."</blockquote>
+
+<p>Why would that matter? Normally the lockup is the protective wall that keeps insiders from dumping on new public buyers. The partners' shares are held back by a different wall, the securities-law restrictions. Under Rule 144, holders of restricted shares in a company that reports to the SEC generally must wait six months before reselling, and affiliates face extra limits on volume and manner of sale. So the partners are not free to sell the day after the IPO. But their constraint is the legal default rather than a contract negotiated with the banks. That means it cannot be waived by the underwriters, it does not come with the bank-controlled early-release terms, and it can be changed by other agreements the partners signed, such as registration rights that let them force the company to register their shares for resale. The filing's wording tells you to go read those separate documents.</p>
+
+<p>How do investors use this? They treat the lockup and restriction calendar as a map of future supply. Practical steps include reading the "Shares Eligible for Future Sale" section of the prospectus, listing every holder group and when each can sell, and marking dates when large blocks unlock. Traders often watch for weakness in the weeks before expiration, since some holders hedge or sell early in anticipation. Longer-term investors ask a different question: who the sellers might be and how motivated they are. Venture funds that need to return cash to their own investors tend to sell. Strategic partners with supply contracts tied to the stock tend to hold, because selling could signal a loss of confidence in a customer they depend on.</p>
+
+<p>There are several gotchas. First, "not locked up" does not mean "free to sell." Restricted status still blocks resale until a holding period passes or registration occurs. Second, "locked up" does not mean "can never sell": lockups end, and the banks may release shares early. Third, lockup agreements often have carve-outs for gifts, transfers to family trusts, and certain hedging, so the true float can change quietly. Fourth, one holder's lockup does not bind another. The Anthropic partners sit outside the bank contract, so a reader who assumes one wall protects everyone will misread the supply picture. Finally, a market signal can be loud even when no one actually sells. The mere unlock date can move the price.</p>
+
+<p>What goes wrong? The classic failure is a <strong>lockup cliff</strong>: a huge block of insider shares unlocks on one day, the float multiplies, and the price drops as sellers rush to exit before others do. The dot-com era showed this clearly, and the video's Divine Interventures example is a reminder of how that period ended. Divine sold concurrent private placements to Microsoft, Compaq, Hewlett-Packard and Level 3 in 2000, and the stock fell from $9 at IPO to about $1.56 by year-end. Part of Level 3's payment was a services credit, not cash. In the Anthropic case, the risk is not an obvious cliff but a slower one: partners hold shares whose value depends on a customer whose bills are due whether or not markets cooperate, and their selling restrictions are governed by rules the banks do not control.</p>
+
+<p>This concept connects to several others in the video. A concurrent private placement is the vehicle that creates restricted shares in the first place. <strong>Circular financing</strong> explains why the buyers are suppliers whose investment can return as revenue. Non-voting share classes, like Class N, show how partners get the economics without control. Float, dilution and index inclusion all depend on how many shares can actually trade. And because six of the seven buyers sit in the S&P 500, index fund holders carry indirect exposure to the deal. The lesson that carries to every IPO: when you evaluate a new listing, do not stop at the price and the valuation. Ask who holds shares, which wall holds them back, and when it comes down.</p>
+<div class="concept-side">Related in this category: <a href="sp_500_index.html">S&amp;P 500 Index</a>, <a href="dow_jones_industrial_average.html">Dow Jones Industrial Average (DJIA)</a>, <a href="pick_and_shovel_investing.html">Pick-and-Shovel Investment Strategy</a>, <a href="initial_public_offering.html">Initial Public Offering (IPO)</a>, <a href="prime_brokerage.html">Prime Brokerage</a>, <a href="rotation_to_cash_generative_value.html">Beta (High-Beta Stocks)</a></div>
+<button class="concept-done" data-slug="restricted_securities_lockup" onclick="toggleDone('restricted_securities_lockup')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_restricted_securities_lockup';</script>
+<script src="../../book.js"></script>
+<script src="../fg.js"></script>
+</body>
+</html>

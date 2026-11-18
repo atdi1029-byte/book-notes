@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Fully Diluted vs. Outstanding-Share Valuation - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.prog-stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(112px,1fr));
+  gap:10px; margin:1rem 0 1.5rem; }
+.prog-stat { background:#e8e0d0; border:1px solid #d4c8b0; border-radius:8px;
+  padding:0.7rem 0.9rem; }
+.prog-stat .n { display:block; font-size:1.5rem; color:#5a3e1a; line-height:1.1; }
+.prog-stat .l { display:block; font-size:0.75rem; color:#8a7a60; margin-top:0.2rem; }
+.prog-chart { position:relative; margin:0.5rem 0 0.4rem; }
+.prog-chart svg { width:100%; height:auto; display:block; overflow:visible; }
+.prog-chart .grid { stroke:#ddd3c0; stroke-width:1; }
+.prog-chart .axis { stroke:#c8bca4; stroke-width:1; }
+.prog-chart .tick { fill:#8a7a60; font-size:11px; }
+.prog-chart .ylab { fill:#8a7a60; font-size:11px; }
+.prog-chart .actual { fill:none; stroke:#9a5a22; stroke-width:2; stroke-linejoin:round; }
+.prog-chart .actual-dot { fill:#9a5a22; stroke:#f4efe8; stroke-width:2; }
+.prog-chart .model { fill:none; stroke:#0e9488; stroke-width:2; stroke-dasharray:6 4; }
+.prog-chart .ceiling { stroke:#8a7a60; stroke-width:1; stroke-dasharray:2 4; }
+.prog-chart .here { stroke:#9a5a22; stroke-width:1; stroke-dasharray:2 3; opacity:0.6; }
+.prog-chart .dlabel { font-size:11px; fill:#3a2e1e; }
+.prog-chart .bar { fill:#9a5a22; opacity:0.75; }
+.prog-chart .bar.spike { fill:#6b3410; opacity:1; }
+.prog-legend .lg-spike::before { border-color:#6b3410; border-top-width:6px; }
+.prog-spikes { font-size:0.88rem; color:#5a3e1a; margin:-0.8rem 0 1.5rem; }
+.prog-chart .bar-model { fill:none; stroke:#0e9488; stroke-width:2; stroke-dasharray:6 4; }
+.prog-chart .hit { fill:transparent; cursor:crosshair; }
+.prog-tip { position:absolute; pointer-events:none; display:none;
+  background:#3a2e1e; color:#f4efe8; font-size:12px; line-height:1.4;
+  padding:6px 9px; border-radius:6px; white-space:nowrap; z-index:5; }
+.prog-legend { display:flex; gap:1.2rem; font-size:0.8rem; color:#5a3e1a;
+  margin:0 0 1.5rem; flex-wrap:wrap; }
+.prog-legend span::before { content:""; display:inline-block; width:18px; height:0;
+  border-top:2px solid; margin-right:6px; vertical-align:middle; }
+.prog-legend .lg-actual::before { border-color:#9a5a22; }
+.prog-legend .lg-model::before { border-color:#0e9488; border-top-style:dashed; }
+.prog-legend .lg-ceiling::before { border-color:#8a7a60; border-top-style:dotted; }
+.prog-eq { background:#e8e0d0; border:1px solid #d4c8b0; border-radius:8px;
+  padding:0.9rem 1.1rem; font-family:Georgia,serif; font-size:1.05rem; color:#3a2e1e;
+  margin:1rem 0; }
+.prog-eq .sub { display:block; font-size:0.85rem; color:#8a7a60; margin-top:0.4rem;
+  font-family:inherit; }
+.prog-note { font-size:0.85rem; color:#8a7a60; }
+.prog-link { font-size:0.85rem; margin:-0.8rem 0 1.2rem; }
+.prog-link a { color:#0e9488; }
+.ch-status { font-size:0.85rem; color:#5a3e1a; margin:-0.6rem 0 1.2rem; }
+.ch-status.done { color:#0e6b5f; background:#e3efe9; border:1px solid #b9d8cc;
+  border-radius:6px; padding:0.5rem 0.8rem; margin:0 0 1.2rem; }
+table.prog-table { font-size:0.85rem; margin:1rem 0; }
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done,
+body.hide-done .cat-card.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+.vid-tab {
+  margin: 0 0 1.2rem; background: #e8e0d0; border: 1px solid #d4c8b0;
+  border-radius: 8px; overflow: hidden;
+}
+.vid-tab summary {
+  padding: 0.6rem 0.9rem; cursor: pointer; font-size: 0.85rem;
+  color: #3a2a1a; list-style: none; user-select: none;
+}
+.vid-tab summary::-webkit-details-marker { display: none; }
+.vid-tab summary::before {
+  content: '▶'; display: inline-block; margin-right: 0.5rem;
+  font-size: 0.7rem; transition: transform 0.2s;
+}
+.vid-tab[open] summary::before { transform: rotate(90deg); }
+.vid-tab .vid-status {
+  float: right; font-size: 0.75rem; padding: 0.15rem 0.5rem;
+  border-radius: 3px; margin-left: 0.5rem;
+}
+.vid-tab .vid-ok { background: #4ade8040; color: #2d6a4f; }
+.vid-tab .vid-err { background: #f8717140; color: #9b2c2c; }
+.vid-tab .vid-list {
+  padding: 0 0.9rem 0.7rem; margin: 0;
+  list-style: none; font-size: 0.8rem;
+}
+.vid-tab .vid-list li {
+  padding: 0.35rem 0; border-top: 1px solid #d4c8b0;
+  display: flex; justify-content: space-between; gap: 8px;
+}
+.vid-tab .vid-list .vid-date {
+  color: #a08060; white-space: nowrap; flex: none;
+}
+.vid-tab .vid-list .vid-concepts {
+  color: #a08060; white-space: nowrap; flex: none; font-size: 0.75rem;
+}
+.vid-tab .vid-none {
+  padding: 0.4rem 0.9rem 0.7rem; color: #a08060; font-size: 0.8rem;
+}
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../value-investing-equities.html">&larr; Value Investing &amp; Equities</a>
+
+<div class="concept-meta"><span>standard</span><span>Value Investing &amp; Equities</span><span>added 2026-11-18</span></div>
+<h4 id="fully_diluted_valuation">Fully Diluted vs. Outstanding-Share Valuation</h4>
+
+<p>A company's <strong>valuation</strong> is simply a price tag on the whole business, and for a public company it comes from one multiplication: share price times number of shares. The tricky part is that "number of shares" has more than one honest answer. <strong>Shares outstanding</strong> are the shares that actually exist and are held by investors and insiders today. <strong>Fully diluted shares</strong> add everything that could become shares: stock options, restricted stock units, warrants, convertible notes, and shares set aside for future employee grants. Multiply the same price by each count and you get two different valuations, <strong>market capitalization</strong> on the outstanding count and <strong>fully diluted valuation</strong> on the larger one. Neither is a lie, but they answer different questions.</p>
+
+<p>This matters because the valuation number is the headline, and headlines set expectations, comparisons, and sometimes real decisions. If a company is "worth $1.4 trillion" in one article and "$916 billion" in another, a reader can't tell whether the company is bigger than Meta or smaller than a rival, or whether an IPO is priced richly or fairly. Index funds, which weight holdings by market cap, only count shares that exist and trade. Bankers pitching a deal, founders bragging about a round, and journalists hunting a big number often prefer the larger figure. Knowing which count sits underneath a valuation is the first question to ask of any large number, because the gap can be tens of percent.</p>
+
+<p>Mechanically, you start with the basic count from the cover of the prospectus or the latest quarterly filing. Then you add the "dilutive" securities. Options and warrants are added using a method that nets out their exercise price: if an option lets you buy at $10 and the stock is $70, you effectively gain 6/7 of a share. Convertible notes are added at the number of shares they would convert into. Unvested RSUs and the unallocated employee-option pool are often added in full. The total is the fully diluted share count. Multiply by the offering price and you have the fully diluted valuation. Subtract nothing, and note the shares don't exist yet, so no cash has come in for them.</p>
+
+<p>The Anthropic IPO shows the gap clearly. The company offered 825 million shares at $70 to $78. On the shares that would be outstanding after the deal, that range valued it at roughly $916 billion to $1.02 trillion. Yet the headline floating around was $1.4 trillion. The video explained why: that bigger number <strong>counts stock options and other shares that haven't even been issued yet</strong>. Do the rough arithmetic. At the top of the range, $1.02 trillion at $78 implies about 13 billion shares outstanding. A $1.4 trillion figure at the same price implies about 18 billion, so roughly 5 billion shares, or over a third more, are potential rather than actual.</p>
+
+<blockquote>"Same story with the $1.4 trillion valuation that you're going to see on some headline. The number counts stock options and other shares that haven't even been issued yet."</blockquote>
+
+<p>Investors use the distinction in layers. For the question "what is the market paying for the company today?", market cap on outstanding shares is the cleaner measure, and it is what index providers and most screens use. For the question "what will my slice be worth once everyone with a claim exercises it?", fully diluted is the more honest measure, because options and converts eventually turn into real shares and shrink each existing holder's percentage. Analysts often compute per-share metrics, such as earnings per share, on both bases and watch the gap. A wide gap between basic and diluted EPS signals that many claims sit behind the current owners. Traders also read the gap as a measure of future selling pressure when insiders exercise and sell.</p>
+
+<p>The gotchas start with the fact that "fully diluted" has no single legal definition, so two sources can use it differently. One may include every option ever granted, vested or not, in the money or underwater. Another may include the whole unissued pool reserved for hiring years from now. A third may use the treasury stock method. That is why the video's $1.4 trillion should be treated as a ceiling, not a price. A second misconception is that the larger number is "more correct" because it is more conservative about ownership. It is conservative for your percentage, but it overstates what the market currently values, since the market is not yet pricing those shares as outstanding.</p>
+
+<p>A third nuance: the share class matters. In this deal, the seven partners bought <strong>Class N stock, which carries no vote except where the law requires one</strong>, and those shares sit outside the underwriters' lockup. They are real shares and are in the count, but they pay for economics without control. Meanwhile, a fixed $26 billion placement means a higher final price gives partners fewer shares for the same money, as the video noted. So the share count itself moves with the price. A valuation quoted before pricing is therefore a moving target, and you should recompute it once the final price and the final count are published.</p>
+
+<p>The approach breaks in a few ways. Dilution can come back to bite when a stock falls: underwater options get ignored in the calculation, but if a convertible note converts at a fixed price, a falling stock means <em>more</em> shares are issued, not fewer, hurting existing holders further. If a company issues a flood of new shares for acquisitions or pay, a basic market cap that looked modest can balloon. The reverse risk is a headline that uses the fully diluted figure to make a company look larger than it is, which can mislead anyone comparing it with peers measured on outstanding shares. Mixing the two bases in the same comparison, say Anthropic fully diluted against Nvidia outstanding, is how people end up drawing false conclusions about relative size.</p>
+
+<p>This concept links to several others. It connects to <strong>float</strong>, the portion of outstanding shares actually free to trade, which is smaller still after lockups. It ties to <strong>enterprise value</strong>, which adjusts market cap for cash and debt, and Anthropic held about $95.6 billion in cash and $36.3 billion in short-term investments before the IPO. It echoes the video's point about the $104 billion net loss, most of it an accounting charge on convertible notes, which is a reminder that these securities leave footprints in both the share count and the income statement. And it connects to index investing: since index funds weight by market cap on outstanding shares, the figure that matters to your 401(k) is the smaller, firmer one. When you read any big valuation, ask which share count was used, and you'll be ahead of most of the conversation.</p>
+<div class="concept-side">Related in this category: <a href="comparable_store_sales.html">Comparable Store Sales (Same-Store Sales)</a>, <a href="economic_moat.html">Economic Moat (Competitive Moat)</a>, <a href="earnings_guidance.html">Earnings Guidance (Forward Guidance — Corporate)</a>, <a href="discounted_cash_flow_valuation.html">Discounted Cash Flow (DCF) Valuation</a>, <a href="corporate_stock_buybacks.html">Corporate Stock Buybacks (Share Repurchase Programs)</a>, <a href="buyback_blackout_window.html">Buyback Blackout Window</a></div>
+<button class="concept-done" data-slug="fully_diluted_valuation" onclick="toggleDone('fully_diluted_valuation')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_fully_diluted_valuation';</script>
+<script src="../../book.js"></script>
+<script src="../fg.js"></script>
+</body>
+</html>
