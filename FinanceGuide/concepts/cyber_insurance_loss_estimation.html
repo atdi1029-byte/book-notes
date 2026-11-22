@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Cyber and Outage Insurance Loss Estimation - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.prog-stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(112px,1fr));
+  gap:10px; margin:1rem 0 1.5rem; }
+.prog-stat { background:#e8e0d0; border:1px solid #d4c8b0; border-radius:8px;
+  padding:0.7rem 0.9rem; }
+.prog-stat .n { display:block; font-size:1.5rem; color:#5a3e1a; line-height:1.1; }
+.prog-stat .l { display:block; font-size:0.75rem; color:#8a7a60; margin-top:0.2rem; }
+.prog-chart { position:relative; margin:0.5rem 0 0.4rem; }
+.prog-chart svg { width:100%; height:auto; display:block; overflow:visible; }
+.prog-chart .grid { stroke:#ddd3c0; stroke-width:1; }
+.prog-chart .axis { stroke:#c8bca4; stroke-width:1; }
+.prog-chart .tick { fill:#8a7a60; font-size:11px; }
+.prog-chart .ylab { fill:#8a7a60; font-size:11px; }
+.prog-chart .actual { fill:none; stroke:#9a5a22; stroke-width:2; stroke-linejoin:round; }
+.prog-chart .actual-dot { fill:#9a5a22; stroke:#f4efe8; stroke-width:2; }
+.prog-chart .model { fill:none; stroke:#0e9488; stroke-width:2; stroke-dasharray:6 4; }
+.prog-chart .ceiling { stroke:#8a7a60; stroke-width:1; stroke-dasharray:2 4; }
+.prog-chart .here { stroke:#9a5a22; stroke-width:1; stroke-dasharray:2 3; opacity:0.6; }
+.prog-chart .dlabel { font-size:11px; fill:#3a2e1e; }
+.prog-chart .bar { fill:#9a5a22; opacity:0.75; }
+.prog-chart .bar.spike { fill:#6b3410; opacity:1; }
+.prog-legend .lg-spike::before { border-color:#6b3410; border-top-width:6px; }
+.prog-spikes { font-size:0.88rem; color:#5a3e1a; margin:-0.8rem 0 1.5rem; }
+.prog-chart .bar-model { fill:none; stroke:#0e9488; stroke-width:2; stroke-dasharray:6 4; }
+.prog-chart .hit { fill:transparent; cursor:crosshair; }
+.prog-tip { position:absolute; pointer-events:none; display:none;
+  background:#3a2e1e; color:#f4efe8; font-size:12px; line-height:1.4;
+  padding:6px 9px; border-radius:6px; white-space:nowrap; z-index:5; }
+.prog-legend { display:flex; gap:1.2rem; font-size:0.8rem; color:#5a3e1a;
+  margin:0 0 1.5rem; flex-wrap:wrap; }
+.prog-legend span::before { content:""; display:inline-block; width:18px; height:0;
+  border-top:2px solid; margin-right:6px; vertical-align:middle; }
+.prog-legend .lg-actual::before { border-color:#9a5a22; }
+.prog-legend .lg-model::before { border-color:#0e9488; border-top-style:dashed; }
+.prog-legend .lg-ceiling::before { border-color:#8a7a60; border-top-style:dotted; }
+.prog-eq { background:#e8e0d0; border:1px solid #d4c8b0; border-radius:8px;
+  padding:0.9rem 1.1rem; font-family:Georgia,serif; font-size:1.05rem; color:#3a2e1e;
+  margin:1rem 0; }
+.prog-eq .sub { display:block; font-size:0.85rem; color:#8a7a60; margin-top:0.4rem;
+  font-family:inherit; }
+.prog-note { font-size:0.85rem; color:#8a7a60; }
+.prog-link { font-size:0.85rem; margin:-0.8rem 0 1.2rem; }
+.prog-link a { color:#0e9488; }
+.ch-status { font-size:0.85rem; color:#5a3e1a; margin:-0.6rem 0 1.2rem; }
+.ch-status.done { color:#0e6b5f; background:#e3efe9; border:1px solid #b9d8cc;
+  border-radius:6px; padding:0.5rem 0.8rem; margin:0 0 1.2rem; }
+table.prog-table { font-size:0.85rem; margin:1rem 0; }
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done,
+body.hide-done .cat-card.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+.vid-tab {
+  margin: 0 0 1.2rem; background: #e8e0d0; border: 1px solid #d4c8b0;
+  border-radius: 8px; overflow: hidden;
+}
+.vid-tab summary {
+  padding: 0.6rem 0.9rem; cursor: pointer; font-size: 0.85rem;
+  color: #3a2a1a; list-style: none; user-select: none;
+}
+.vid-tab summary::-webkit-details-marker { display: none; }
+.vid-tab summary::before {
+  content: '▶'; display: inline-block; margin-right: 0.5rem;
+  font-size: 0.7rem; transition: transform 0.2s;
+}
+.vid-tab[open] summary::before { transform: rotate(90deg); }
+.vid-tab .vid-status {
+  float: right; font-size: 0.75rem; padding: 0.15rem 0.5rem;
+  border-radius: 3px; margin-left: 0.5rem;
+}
+.vid-tab .vid-ok { background: #4ade8040; color: #2d6a4f; }
+.vid-tab .vid-err { background: #f8717140; color: #9b2c2c; }
+.vid-tab .vid-list {
+  padding: 0 0.9rem 0.7rem; margin: 0;
+  list-style: none; font-size: 0.8rem;
+}
+.vid-tab .vid-list li {
+  padding: 0.35rem 0; border-top: 1px solid #d4c8b0;
+  display: flex; justify-content: space-between; gap: 8px;
+}
+.vid-tab .vid-list .vid-date {
+  color: #a08060; white-space: nowrap; flex: none;
+}
+.vid-tab .vid-list .vid-concepts {
+  color: #a08060; white-space: nowrap; flex: none; font-size: 0.75rem;
+}
+.vid-tab .vid-none {
+  padding: 0.4rem 0.9rem 0.7rem; color: #a08060; font-size: 0.8rem;
+}
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../risk-management-position-sizing.html">&larr; Risk Management &amp; Position Sizing</a>
+
+<div class="concept-meta"><span>deep cut</span><span>Risk Management &amp; Position Sizing</span><span>added 2026-11-22</span></div>
+<h4 id="cyber_insurance_loss_estimation">Cyber and Outage Insurance Loss Estimation</h4>
+
+<p><strong>Cyber and outage insurance loss estimation</strong> is the work of putting a dollar figure on what a technology failure costs. The failure might be a hack, a software bug, a bad update, or a cloud provider going dark. Insurers, reinsurers, and risk-modeling firms publish these estimates in the days after a big event. Each figure answers the same question: how much of this will insurance companies end up paying? It helps to separate two numbers. The first is the <strong>economic loss</strong>, which is everything the world lost: wasted hours, missed sales, delayed payments. The second is the <strong>insured loss</strong>, the smaller slice that falls on an insurance policy. When you see a headline estimate for an outage, it is almost always the insured piece, and it comes from a model, not a bill.</p>
+
+<p>This matters because insurance is how modern economies spread risk, and spreading risk only works if someone can price it. A fire insurer has more than a century of claims data. It knows roughly how many buildings burn each year and what the average fire costs. With that data it can set premiums, hold the right reserves, and stay solvent. If a risk can't be priced, insurers respond in one of three ways. They charge too much, they exclude the risk from policies, or they underprice it and get hurt later. For companies, that means coverage gaps. For investors, it means surprise losses at insurers and reinsurers. And for the economy, it means a large category of risk that nobody is really holding. In practice the company suffering the outage is holding it.</p>
+
+<p>Mechanically, a loss estimate is built in layers. The modeler starts with <strong>event definition</strong>: what failed, for how long, and which customers were affected. Next comes <strong>exposure mapping</strong>, which asks how many of those customers hold cyber or business-interruption policies and what limits those policies carry. Then come the policy terms. Many policies include a <strong>waiting period</strong>, often 8 to 12 hours, before an outage counts as a covered loss, plus a <strong>deductible</strong> and a <strong>sublimit</strong> that caps what the policy pays. The modeler also has to decide whether the outage was <strong>dependent business interruption</strong>, meaning a vendor failed rather than the company's own systems, because many policies cover that only partially. Multiply the pieces together and you get a number. Every layer rests on an assumption.</p>
+
+<p>Now look at the video's example. After the November 12th Microsoft email failure, which lasted almost 24 hours, one firm said the insured loss was most likely under $100 million. Another said it could reach $700 million. That is a gap of roughly seven times, and the two firms were looking at the same event. The presenter called it a shrug, not a forecast:</p>
+
+<blockquote>"When the experts are seven times apart, well, my friends, that's not exactly a forecast. That is kind of like a shrug."</blockquote>
+
+<p>The gap is not mysterious once you know the layers. One firm can assume a short outage that mostly stayed under policy waiting periods. The other can assume a wider customer base with more claims clearing the threshold. A small change in each input compounds, and the output swings widely. Each estimate can be careful and honest and still land far from the other.</p>
+
+<p>Why is this so hard when other insurance lines are easy? The first reason is thin history. Property insurers have decades of claims on every kind of building. Cyber insurance is young, and the technology changes faster than the data accumulates. Last year's outage was caused by a different kind of failure than this year's. The second reason is <strong>correlation</strong>. Fires in different buildings are independent, so risk pools well. A single bug in software used by millions of companies hits all of them at once. This is why one defect can create thousands of claims in a day, and why the video's cluster of November events, from Microsoft to the FAA to Chase to Apple, matters. The third reason is definitional. Is a failed vendor update an accident, an attack, or a systems failure? The answer decides which policy responds.</p>
+
+<p>How do investors and traders use these estimates? They don't treat them as truth. They treat them as ranges and read the width of the range as information. A narrow range of estimates signals a risk the market understands. A wide one, like $100 million to $700 million, signals that insurers themselves are uncertain, and that uncertainty has consequences. Investors watch cyber premium rates at the large insurers and reinsurers, and they watch whether companies are tightening exclusions. They listen to earnings calls for how much cyber exposure is in the book. For banks and corporations, they watch technology and resilience spending, because a company that can't insure the risk fully has to fund it with its own spending, which hits expenses. The presenter pointed to that exact line item at JP Morgan, which plans $19.8 billion in technology spending this year.</p>
+
+<p>There are several gotchas. First, the loss number is not a measure of how bad the outage felt. The Chase problem on November 16th drew roughly 90,000 reports on Down Detector, about 165 times normal, but a day of slowed payments that was fixed by evening may generate very few insured claims, because it falls under waiting periods and deductibles. Second, the biggest figures tend to get the most coverage, yet they are often the upper end of a scenario range, not the central case. Third, an outage and a hack are different insurance events. The video's tally showed zero of the outages blamed on attackers, so it is a systems-failure question, and some policies cover only attacks. Fourth, estimates move. Early numbers are made with incomplete information about duration and customers, and they are usually revised once claims actually arrive, which can take months.</p>
+
+<p>What happens when this system fails? The worst case is a <strong>systemic event</strong>, where one failure triggers claims across so many policyholders that insurers can't pay comfortably. Insurers manage this in several ways. They buy reinsurance, which is insurance for insurers. They cap their exposure with aggregate limits. They write war and infrastructure exclusions, which carve out the very large events. The danger is a gap between what customers think they bought and what the policy pays. If a company believes it is covered for a vendor outage and discovers a sublimit of a few million dollars, the loss lands on its income statement. When that happens at many companies at once, it appears as an earnings surprise in the sector, and because banks sit in the middle of so many transactions, it can show up in bank stocks too.</p>
+
+<p>This concept connects to several others in the video. The central theme is that the risk comes from <strong>change</strong>, not attack. When every patch is a possible failure, and the number of patches is growing, outages become more frequent and harder to model, which is the very condition under which loss estimation gets worse. It ties to <strong>concentration risk</strong>, the dependence of the whole system on a few vendors, which is why a vendor breach or a vendor bug spreads so widely. It links to <strong>operating expenses</strong>, since reliability is a budget line that gets squeezed and then paid for later. And it links to position sizing: if a sector faces a loss it can't price, a sensible investor holds that exposure with smaller size and wider margins for error. One caution is important. The video said a bad week is not a trend, and Down Detector's own data show outages falling since about 2022. The honest takeaway is not that disaster is coming. It is that the cost of the next big failure is unknowable in advance, and the spread between estimates tells you exactly how unknowable.</p>
+<div class="concept-side">Related in this category: <a href="platform_obsolescence.html">Platform Obsolescence Risk</a>, <a href="redemption_gate.html">Redemption Gate</a>, <a href="hedge_basis_risk.html">Hedge Basis Risk (Correlated Hedge Failure)</a>, <a href="asset_resale_liquidity_vs_illiquid_obligation.html">Resalable Assets vs. Illiquid Long-Term Obligations</a>, <a href="margin_call.html">Margin Call / Collateral Covenant Trigger</a>, <a href="wrong_way_risk.html">Wrong-Way Risk (Collateral-Exposure Correlation)</a></div>
+<button class="concept-done" data-slug="cyber_insurance_loss_estimation" onclick="toggleDone('cyber_insurance_loss_estimation')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_cyber_insurance_loss_estimation';</script>
+<script src="../../book.js"></script>
+<script src="../fg.js"></script>
+</body>
+</html>

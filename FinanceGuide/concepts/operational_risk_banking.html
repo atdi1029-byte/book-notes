@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f4efe8">
+<title>Operational and Technology Risk in Banking - Finance Guide</title>
+<link rel="stylesheet" href="../../book.css">
+<style>
+.prog-stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(112px,1fr));
+  gap:10px; margin:1rem 0 1.5rem; }
+.prog-stat { background:#e8e0d0; border:1px solid #d4c8b0; border-radius:8px;
+  padding:0.7rem 0.9rem; }
+.prog-stat .n { display:block; font-size:1.5rem; color:#5a3e1a; line-height:1.1; }
+.prog-stat .l { display:block; font-size:0.75rem; color:#8a7a60; margin-top:0.2rem; }
+.prog-chart { position:relative; margin:0.5rem 0 0.4rem; }
+.prog-chart svg { width:100%; height:auto; display:block; overflow:visible; }
+.prog-chart .grid { stroke:#ddd3c0; stroke-width:1; }
+.prog-chart .axis { stroke:#c8bca4; stroke-width:1; }
+.prog-chart .tick { fill:#8a7a60; font-size:11px; }
+.prog-chart .ylab { fill:#8a7a60; font-size:11px; }
+.prog-chart .actual { fill:none; stroke:#9a5a22; stroke-width:2; stroke-linejoin:round; }
+.prog-chart .actual-dot { fill:#9a5a22; stroke:#f4efe8; stroke-width:2; }
+.prog-chart .model { fill:none; stroke:#0e9488; stroke-width:2; stroke-dasharray:6 4; }
+.prog-chart .ceiling { stroke:#8a7a60; stroke-width:1; stroke-dasharray:2 4; }
+.prog-chart .here { stroke:#9a5a22; stroke-width:1; stroke-dasharray:2 3; opacity:0.6; }
+.prog-chart .dlabel { font-size:11px; fill:#3a2e1e; }
+.prog-chart .bar { fill:#9a5a22; opacity:0.75; }
+.prog-chart .bar.spike { fill:#6b3410; opacity:1; }
+.prog-legend .lg-spike::before { border-color:#6b3410; border-top-width:6px; }
+.prog-spikes { font-size:0.88rem; color:#5a3e1a; margin:-0.8rem 0 1.5rem; }
+.prog-chart .bar-model { fill:none; stroke:#0e9488; stroke-width:2; stroke-dasharray:6 4; }
+.prog-chart .hit { fill:transparent; cursor:crosshair; }
+.prog-tip { position:absolute; pointer-events:none; display:none;
+  background:#3a2e1e; color:#f4efe8; font-size:12px; line-height:1.4;
+  padding:6px 9px; border-radius:6px; white-space:nowrap; z-index:5; }
+.prog-legend { display:flex; gap:1.2rem; font-size:0.8rem; color:#5a3e1a;
+  margin:0 0 1.5rem; flex-wrap:wrap; }
+.prog-legend span::before { content:""; display:inline-block; width:18px; height:0;
+  border-top:2px solid; margin-right:6px; vertical-align:middle; }
+.prog-legend .lg-actual::before { border-color:#9a5a22; }
+.prog-legend .lg-model::before { border-color:#0e9488; border-top-style:dashed; }
+.prog-legend .lg-ceiling::before { border-color:#8a7a60; border-top-style:dotted; }
+.prog-eq { background:#e8e0d0; border:1px solid #d4c8b0; border-radius:8px;
+  padding:0.9rem 1.1rem; font-family:Georgia,serif; font-size:1.05rem; color:#3a2e1e;
+  margin:1rem 0; }
+.prog-eq .sub { display:block; font-size:0.85rem; color:#8a7a60; margin-top:0.4rem;
+  font-family:inherit; }
+.prog-note { font-size:0.85rem; color:#8a7a60; }
+.prog-link { font-size:0.85rem; margin:-0.8rem 0 1.2rem; }
+.prog-link a { color:#0e9488; }
+.ch-status { font-size:0.85rem; color:#5a3e1a; margin:-0.6rem 0 1.2rem; }
+.ch-status.done { color:#0e6b5f; background:#e3efe9; border:1px solid #b9d8cc;
+  border-radius:6px; padding:0.5rem 0.8rem; margin:0 0 1.2rem; }
+table.prog-table { font-size:0.85rem; margin:1rem 0; }
+.fg-bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin: 0 0 1.5rem; padding: 0.6rem 0.9rem;
+  background: #e8e0d0; border-radius: 8px;
+  border: 1px solid #d4c8b0; font-size: 0.85rem;
+}
+.fg-btn {
+  background: none; border: 1px solid #d4c8b0; color: #3a2a1a;
+  padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer;
+  font-size: 0.8rem; transition: all 0.2s;
+}
+.fg-btn:hover { border-color: #a08060; }
+.fg-btn.active { background: #a08060; color: #f4efe8; border-color: #a08060; }
+.fg-count { color: #a08060; margin-left: auto; }
+.tier { margin: 0 0 2rem; }
+.tier h2 {
+  font-weight: 400; font-size: 1.3rem; margin: 0 0 0.1rem;
+  padding-bottom: 0.35rem; border-bottom: 2px solid #d4c8b0;
+}
+.cat-card {
+  display: flex; align-items: baseline; gap: 12px;
+  padding: 0.7rem 0.9rem; margin: 0 0 0.5rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+  text-decoration: none; color: #3a2a1a; transition: all 0.2s;
+}
+.cat-card:hover { border-color: #a08060; background: #ded4c0; }
+.cat-card .cat-name { font-size: 1.05rem; }
+.cat-card .cat-count { margin-left: auto; color: #a08060; font-size: 0.8rem; white-space: nowrap; }
+.cat-card.done { opacity: 0.3; }
+.cat-card.fg-empty { display: none; }
+.tier-empty { color: #a08060; font-size: 0.8rem; margin: 0.4rem 0 0; }
+.concept-row {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0.6rem 0.4rem; border-bottom: 1px solid #d4c8b0;
+  text-decoration: none; color: #3a2a1a;
+}
+.concept-row:hover { background: #ede5d6; }
+.concept-row .mark { width: 22px; text-align: center; color: #b8863b; flex: none; }
+.concept-row .mark.deep { color: #a08060; font-size: 0.7rem; }
+.concept-row.done .ctitle { opacity: 0.35; text-decoration: line-through; }
+.concept-row.fg-hidden, body.hide-done .concept-row.done,
+body.hide-done .cat-card.done { display: none; }
+.fg-hidden-note { color: #a08060; font-size: 0.8rem; margin: 0.6rem 0 0; }
+.books {
+  margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+  background: #e8e0d0; border: 1px solid #d4c8b0; border-radius: 8px;
+}
+.books h3 { font-weight: 400; font-size: 1rem; margin: 0 0 0.4rem; }
+.books ul { margin: 0; padding-left: 1.2rem; }
+.books li { font-size: 0.85rem; margin: 0.15rem 0; }
+.concept-meta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  color: #a08060; font-size: 0.8rem; margin: 0 0 1.2rem;
+}
+.concept-meta .star { color: #b8863b; }
+.concept-side {
+  margin: 2rem 0 0; padding-top: 1rem; border-top: 1px solid #d4c8b0;
+  color: #a08060; font-size: 0.85rem; line-height: 1.7;
+}
+.concept-side a { color: #3a2a1a; border-bottom: 1px dotted #a08060; text-decoration: none; }
+.concept-done {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: 1px solid #d4c8b0; border-radius: 4px;
+  padding: 0.3rem 0.8rem; cursor: pointer; font-size: 0.8rem;
+  color: #a08060; transition: all 0.2s; margin-top: 1.2rem;
+}
+.concept-done:hover { border-color: #4ade80; color: #4ade80; }
+.concept-done.on { border-color: #4ade80; background: #4ade80; color: #1a1008; }
+.back-link {
+  display: inline-block; margin-bottom: 1rem;
+  color: #a08060; text-decoration: none; font-size: 0.9rem;
+}
+.back-link:hover { color: #d4a574; }
+.vid-tab {
+  margin: 0 0 1.2rem; background: #e8e0d0; border: 1px solid #d4c8b0;
+  border-radius: 8px; overflow: hidden;
+}
+.vid-tab summary {
+  padding: 0.6rem 0.9rem; cursor: pointer; font-size: 0.85rem;
+  color: #3a2a1a; list-style: none; user-select: none;
+}
+.vid-tab summary::-webkit-details-marker { display: none; }
+.vid-tab summary::before {
+  content: '▶'; display: inline-block; margin-right: 0.5rem;
+  font-size: 0.7rem; transition: transform 0.2s;
+}
+.vid-tab[open] summary::before { transform: rotate(90deg); }
+.vid-tab .vid-status {
+  float: right; font-size: 0.75rem; padding: 0.15rem 0.5rem;
+  border-radius: 3px; margin-left: 0.5rem;
+}
+.vid-tab .vid-ok { background: #4ade8040; color: #2d6a4f; }
+.vid-tab .vid-err { background: #f8717140; color: #9b2c2c; }
+.vid-tab .vid-list {
+  padding: 0 0.9rem 0.7rem; margin: 0;
+  list-style: none; font-size: 0.8rem;
+}
+.vid-tab .vid-list li {
+  padding: 0.35rem 0; border-top: 1px solid #d4c8b0;
+  display: flex; justify-content: space-between; gap: 8px;
+}
+.vid-tab .vid-list .vid-date {
+  color: #a08060; white-space: nowrap; flex: none;
+}
+.vid-tab .vid-list .vid-concepts {
+  color: #a08060; white-space: nowrap; flex: none; font-size: 0.75rem;
+}
+.vid-tab .vid-none {
+  padding: 0.4rem 0.9rem 0.7rem; color: #a08060; font-size: 0.8rem;
+}
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="bookmark-bar" id="bookmarkBar" style="display:none"
+ onclick="jumpToBookmark()">
+  <span class="bm-label" id="bmLabel"></span>
+  <button class="bm-clear"
+   onclick="event.stopPropagation();clearBookmark()">Clear</button>
+</div>
+<div class="bm-toast" id="bmToast"></div>
+<a class="back-link" href="../risk-management-position-sizing.html">&larr; Risk Management &amp; Position Sizing</a>
+
+<div class="concept-meta"><span>standard</span><span>Risk Management &amp; Position Sizing</span><span>added 2026-11-22</span></div>
+<h4 id="operational_risk_banking">Operational and Technology Risk in Banking</h4>
+
+<p><strong>Operational risk</strong> is the chance that a bank loses money, customers, or trust because something inside its own machinery fails: a process, a person, a system, or an outside vendor. <strong>Technology risk</strong> is the subset that lives in software, servers, networks, and the code connecting them. Credit risk asks whether borrowers will repay, and market risk asks whether prices will move against the bank. Operational risk asks a plainer question: can the bank do what it says it does today? Can it post your paycheck, clear a card swipe, send a Zelle payment? A bank can have pristine loans and a fortress balance sheet and still fail its customers for a day because one piece of software misbehaved.</p>
+
+<p>This matters because banks are the plumbing of the economy. Nearly every wage, rent payment, grocery purchase, and business invoice passes through a handful of institutions running enormous, interlinked systems. When that plumbing slows, the damage is spread thin across millions of people: a rent payment stuck in limbo, a card that hesitates at the register, a payroll that lands late. The video's example of JPMorgan Chase on November 16th shows the scale. A bank with roughly $4.4 trillion in assets, with its own transactions on one side of a huge share of US payments, moved in slow motion for most of a business day. Within minutes, according to Reuters, the Treasury and banking regulators were calling banks to confirm the problem was contained. That is how seriously Washington treats one slow day at one bank.</p>
+
+<p>Mechanically, most big outages follow a recognizable sequence, and the surprising part is how rarely it begins with an attacker. A bank or its vendor decides to change something: install a security patch, upgrade aging equipment, push a new feature, migrate a database. The change is tested, but the test environment is never a perfect copy of the live one, with its odd data, legacy connections, and peak-hour load. The change goes live. A hidden defect interacts with something nobody anticipated. A fault in one component spreads along the dependencies, because systems call other systems that call other systems. Transactions queue, time out, or fail. Then comes the slow part: engineers must find the cause, roll back the change or patch the patch, and clear the backlog, which can take hours even after the root problem is fixed.</p>
+
+<p>Here is what the video documented in just six days in November. On November 12th, Microsoft's email system failed for almost 24 hours, which the company traced to a hidden software defect on the servers connecting users to email. On the 13th, the FAA stopped every US departure for more than four hours; the transportation secretary said a contractor was upgrading old telecom equipment. On the 16th, Chase had a software bug in hardware sitting on its own premises. On the 17th, Apple Pay and iCloud went down after what Apple called a faulty internal update. Down Detector counted 6.4 million problem reports in the US in seven days, about four times a normal week, and the Chase outage alone drew roughly 90,000 reports, about 165 times normal. The scorecard: outages blamed by the companies on hackers, zero. Common thread: change.</p>
+
+<blockquote>"That's the real threat, not attack, change."</blockquote>
+
+<p>The central trade-off is <strong>patch velocity versus stability</strong>. A <strong>patch</strong> is a software fix for a known flaw, and every patch is itself a change that can break something. The careful approach is to bundle fixes, test them thoroughly, and install them when traffic is quiet. But when flaws are discovered faster, that schedule stretches, and leaving a known hole open raises the risk of a breach. Rush the fix and you risk an outage; wait and you risk an intrusion. The pressure is real: publicly reported software flaws, each catalogued with an identifier, hit a record of about 48,000 last year, and an industry forecaster raised its 2026 estimate to about 66,000, citing AI-assisted discovery. Microsoft's CEO said the company pushed at least three critical patches on a single day this month. The video's highway analogy fits: fix one pothole a month and traffic barely notices; fix ten a week on a road still carrying cars and eventually you close a lane at rush hour.</p>
+
+<p>Money does not erase the problem, and that is one of the most useful lessons here. JPMorgan planned to spend $19.8 billion on technology this year, and its own strategy paper had warned of a "tsunami" of patches from AI models able to find flaws at scale. It still had a bug slow payments nationwide. The FAA case shows the other side: replacing old equipment was the right call, and the upgrade itself caused the grounding. Software has no free lunch: you can have it fast, you can have it thoroughly tested, but getting both costs a fortune. Systems that can never be turned off, such as payment networks, air traffic control, and core banking, must be repaired while running, like swapping an engine mid-flight. That is why the video says to watch how the FAA restarts its paused router work.</p>
+
+<p>For investors, operational risk shows up in a few places. The first is the expense line. JPMorgan's finance chief said this year that technology remains a major driver of expense growth, and a Down Detector analyst described a cycle he sees every three to four years: banks pour money into new products, reliability spending slips, outages rise, then money returns and outages fade. Reliability is a budget line, and budget lines get squeezed. Second is the headline reaction: the KBW index of 24 large US banks fell 6.6% in four days ending November 19th, its worst four-day stretch since April 2025, and flashed a <strong>death cross</strong> (the 50-day average price falling below the 200-day average). Third are the signals the video said to watch: whether cards and payment apps run clean over Black Friday on November 27th, whether companies delay updates during the holiday rush and leave known holes open longer, what regulators ask of banks next, and what banks say about technology spending at the next earnings.</p>
+
+<p>There are plenty of gotchas. The first is attribution: the popular story, "we're under attack," and its successor, "AI found the holes and the rush to fix them broke everything," both sounded plausible, and neither had a confession behind it. Microsoft said its outage was a technical issue, not a cyber attack and not AI agents; Fortune reported that neither Microsoft nor JPMorgan connected their problems to AI-driven patching. Second, a real hack did arrive on November 19th, but it was a different thing: JPMorgan, Visa, and Mastercard said outside vendors had been breached, exposing marketing data such as names and email addresses. Visa said no card numbers were involved, Mastercard said no impact on the payment network, and JPMorgan said it was unconnected to the earlier outage. Third, the stock slide was not caused by the outages. Goldman Sachs and Morgan Stanley were each down roughly 20% from August highs and JPMorgan close to 10%, on worries about interest rates and AI disruption; the outages landed on a slide already underway. And a death cross looks backward: it describes what already happened, and the video notes this index has produced nine of them in ten years.</p>
+
+<p>Data nuance matters too. Down Detector's own parent called the timing something of a coincidence and said outages have actually been falling since about 2022, with October quiet. Report counts can overstate things, since when a payment to a Chase customer fails, people blame and report their own bank. Citigroup, whose CEO Jane Fraser said software fixes are moving through the world's technology at 5 to 10 times anything seen before and warned of more downtime, reported no outages itself. One bad week is not a trend. The honest conclusion is that the risk is real and rising in structure while the evidence of a lasting jump in frequency is still thin, so a careful investor holds both ideas at once.</p>
+
+<p>When the system breaks, costs arrive in layers. The immediate layer is customers: late wages, failed payments, and lost sales at the register, right as 126 million Americans were planning Black Friday shopping. The second is contagion through <strong>concentration</strong>: Chase said other banks were slowed only when they sat on the other side of a Chase transaction, which sounds reassuring until you count how many transactions have the largest US bank on one side. The third is third-party risk, because the one real breach in this story came through vendors. A group claiming credit has been tied to roughly 200 incidents since September, so banks must now patch faster, break less, and police every outside company touching their data, all at once. The last layer is uncertainty about cost: insurers put the Microsoft outage at under $100 million at one firm and as much as $700 million at another, a sevenfold gap that the video likened to a shrug.</p>
+
+<p>Operational risk connects to many other ideas in this guide. It is a form of <strong>concentration and systemic risk</strong>: when a few institutions and vendors carry most of the flow, a local fault becomes a national one, which is why regulators phone within minutes. It feeds <strong>expense ratios and bank earnings</strong>, since technology spending is a cost that investors track and that management can cut when times are good. It is related to <strong>cyber risk</strong> but distinct: cyber risk comes from adversaries, while operational risk comes from your own changes and complexity. For position sizing, the lesson is that a stock can drop for reasons unrelated to credit quality, so one bank should not carry a portfolio. For personal finance, it argues for resilience: keep a second payment method, some cash on hand, a buffer so a delayed deposit does not cause an overdraft, and a second bank account at a different institution. As the video put it, the outages come from a system that has to change faster than it can be tested, and the bill lands on banks and on you.</p>
+
+<blockquote>"They are what happens when the financial system has to change faster than it can be tested."</blockquote>
+<div class="concept-side">Related in this category: <a href="platform_obsolescence.html">Platform Obsolescence Risk</a>, <a href="redemption_gate.html">Redemption Gate</a>, <a href="hedge_basis_risk.html">Hedge Basis Risk (Correlated Hedge Failure)</a>, <a href="asset_resale_liquidity_vs_illiquid_obligation.html">Resalable Assets vs. Illiquid Long-Term Obligations</a>, <a href="margin_call.html">Margin Call / Collateral Covenant Trigger</a>, <a href="wrong_way_risk.html">Wrong-Way Risk (Collateral-Exposure Correlation)</a></div>
+<button class="concept-done" data-slug="operational_risk_banking" onclick="toggleDone('operational_risk_banking')">&#x2713; Mark complete</button>
+<script>var BM_KEY = 'fg_c_operational_risk_banking';</script>
+<script src="../../book.js"></script>
+<script src="../fg.js"></script>
+</body>
+</html>
